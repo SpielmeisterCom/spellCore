@@ -1,7 +1,6 @@
 define(
 	"spell/shared/util/InputManager",
 	[
-		"funkysnakes/shared/config/constants",
 		"spell/shared/util/input/keyCodes",
 		"spell/shared/util/math",
 		"spell/shared/util/platform/PlatformKit",
@@ -9,7 +8,6 @@ define(
 		"underscore"
 	],
 	function(
-		constants,
 		keyCodes,
 		math,
 		PlatformKit,
@@ -18,6 +16,11 @@ define(
 	) {
 		"use strict"
 
+		//TODO: get constants from a global configuration
+		var constants = {
+			"xSize" : 1024,
+			"ySize" : 768
+		}
 
 		/**
 		 * private
