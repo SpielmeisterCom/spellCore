@@ -1,13 +1,13 @@
 define(
-	'spell/client/main',
+	"spell/client/main",
 	[
-		'spell/shared/util/ConfigurationManager',
-		'spell/shared/util/EventManager',
-		'spell/shared/util/InputManager',
-		'spell/shared/util/ResourceLoader',
-		'spell/shared/util/StatisticsManager',
-		'spell/shared/util/Events',
-		'spell/shared/util/platform/PlatformKit'
+		"spell/shared/util/ConfigurationManager",
+		"spell/shared/util/EventManager",
+		"spell/shared/util/InputManager",
+		"spell/shared/util/ResourceLoader",
+		"spell/shared/util/StatisticsManager",
+		"spell/shared/util/Events",
+		"spell/shared/util/platform/PlatformKit"
 	],
 	function(
 		ConfigurationManager,
@@ -18,11 +18,11 @@ define(
 		Events,
 		PlatformKit
 	) {
-		'use strict'
+		"use strict"
 
 
 		// return spell entry point
-		return function( gameModule, clientMain ) {
+		return function( clientMain ) {
 			var eventManager         = new EventManager()
 			var configurationManager = new ConfigurationManager( eventManager )
 
