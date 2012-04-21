@@ -1,13 +1,9 @@
 define(
 	"spell/shared/util/platform/private/graphics/Viewporter",
     [
-		"funkysnakes/shared/config/constants",
-
 		"spell/shared/util/math"
     ],
 	function (
-		constants,
-
 		math
 	) {
         "use strict"
