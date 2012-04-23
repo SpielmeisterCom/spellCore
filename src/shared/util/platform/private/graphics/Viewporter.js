@@ -1,11 +1,6 @@
 define(
 	"spell/shared/util/platform/private/graphics/Viewporter",
-    [
-		"spell/shared/util/math"
-    ],
-	function (
-		math
-	) {
+	function () {
         "use strict"
 
 		var viewporter   = {}
