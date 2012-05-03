@@ -1,0 +1,8 @@
+#!/bin/bash
+
+TOOL_PATH=`readlink -f $0`
+SPELL_PATH=`dirname $TOOL_PATH`
+
+cd $SPELL_PATH
+
+./node_modules/.bin/r.js src/spell/cli/developmentTool.js $@

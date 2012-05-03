@@ -3,7 +3,7 @@ var need = {
 }
 
 
-var resolveDependencies = function( moduleName ) {
+var resolveDependencies = function( moduleName, config ) {
 	if( moduleName === undefined ||
 		moduleName === "" ) {
 
@@ -41,6 +41,9 @@ var resolveDependencies = function( moduleName ) {
 		)
 	}
 
+	if( config ) {
+		args.push( config )
+	}
 
 	return callback.apply( null, args )
 }
@@ -90,9 +93,9 @@ var require = function( dependencies, callback ) {
 }
 
 
-var enterMain = function( mainModuleName ) {
+var enterMain = function( mainModuleName, config ) {
 	var wrapper = function() {
-		resolveDependencies( mainModuleName )
+		resolveDependencies( mainModuleName, config )
 	}
 
 	// the web client must wait until the dom construction is finished

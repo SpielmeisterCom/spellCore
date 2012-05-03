@@ -1,9 +1,13 @@
 define(
 	'spell/shared/util/BlueprintManager',
 	[
+		'spell/shared/util/deepClone',
+
 		'underscore'
 	],
 	function(
+		deepClone,
+
 		_
 	) {
 		'use strict'
@@ -20,24 +24,157 @@ define(
 		}
 
 
-		var blueprints = {}
+		var blueprints = {},
+			entityTemplates = {}
 
-		var isValidDefinition = function( blueprintType ) {
-			return _.include( blueprintTypes, blueprintType )
+		var isValidComponentBlueprint = function( blueprint ) {
+			// check for ambiguous attribute names
+			var attributeNameCounts = _.reduce(
+				blueprint.attributes,
+				function( memo, attributeConfig ) {
+					var attributeName = attributeConfig.name
+
+					memo[ attributeName ] = ( _.has( memo, attributeName ) ?
+						memo[ attributeName ] += 1 :
+						1
+					)
+
+					return memo
+				},
+				{}
+			)
+
+			return !_.any(
+				attributeNameCounts,
+				function( iter ) { return iter > 1 }
+			)
 		}
 
-		var hasBlueprintDefinition = function( blueprintId ) {
-			return _.has( blueprints, blueprintId )
+		var isValidEntityBlueprint = function( blueprint ) {
+			// check for ambiguous local component names
+			var componentNameCounts = _.reduce(
+				blueprint.components,
+				function( memo, componentConfig ) {
+					var localComponentName = createLocalComponentName( componentConfig.id, componentConfig.importName )
+
+					memo[ localComponentName ] = ( _.has( memo, localComponentName ) ?
+						memo[ localComponentName ] += 1 :
+						1
+					)
+
+					return memo
+				},
+				{}
+			)
+
+			return !_.any(
+				componentNameCounts,
+				function( iter ) { return iter > 1 }
+			)
+		}
+
+		var isValidDefinition = function( blueprint ) {
+			var bluePrintType = blueprint.type
+
+			if( !_.include( blueprintTypes, bluePrintType ) ) return false
+
+
+			if( bluePrintType === blueprintTypes.BLUEPRINT_TYPE_COMPONENT ) {
+				return isValidComponentBlueprint( blueprint )
+			}
+
+			if( bluePrintType === blueprintTypes.BLUEPRINT_TYPE_ENTITY ) {
+				return isValidEntityBlueprint( blueprint )
+			}
+
+			return true
 		}
 
 		var throwCouldNotFindBlueprint = function( blueprintId, blueprintType ) {
-			throw 'Could not find a blueprint with id ' + blueprintId + ( blueprintType ? ' of type ' + blueprintType : '' ) + '.'
+			throw 'Could not find a blueprint with id "' + blueprintId + ( blueprintType ? '" of type ' + blueprintType : '' ) + '.'
+		}
+
+		var isSingleAttributeComponent = function( attributes ) {
+			return _.size( attributes ) === 1
+		}
+
+		var createComponentTemplate = function( componentBlueprint ) {
+			if( _.size( componentBlueprint.attributes ) === 1 ) {
+				return _.clone( componentBlueprint.attributes[ 0 ][ 'default' ] )
+			}
+
+			return _.reduce(
+				componentBlueprint.attributes,
+				function( memo, attributeConfig ) {
+					memo[ attributeConfig.name ] = _.clone( attributeConfig[ 'default' ] )
+
+					return memo
+				},
+				{}
+			)
+		}
+
+		var updateComponent = function( component, attributeConfig, isSingleAttributeComponent ) {
+			if( isSingleAttributeComponent ) {
+				for( var property in attributeConfig ) {
+					return _.clone( attributeConfig[ property ] )
+				}
+			}
+
+			return _.extend( component, attributeConfig )
+		}
+
+		var createEntityTemplate = function( entityBlueprint ) {
+			return _.reduce(
+				entityBlueprint.components,
+				function( memo, componentConfig ) {
+					var componentBlueprintId = componentConfig.id,
+						componentBlueprint = getBlueprint( blueprintTypes.BLUEPRINT_TYPE_COMPONENT, componentBlueprintId )
+
+					if( !componentBlueprint ) throwCouldNotFindBlueprint( componentBlueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
+
+
+					var localComponentName = createLocalComponentName( componentBlueprintId, componentConfig.importName )
+
+					memo[ localComponentName ] = updateComponent(
+						createComponentTemplate( componentBlueprint ),
+						componentConfig.config,
+						isSingleAttributeComponent( componentBlueprint.attributes )
+					)
+
+					return memo
+				},
+				{}
+			)
+		}
+
+		var updateEntity = function( entity, entityConfig ) {
+			return _.reduce(
+				entityConfig,
+				function( memo, componentConfig, componentName ) {
+					updateComponent(
+						memo[ componentName ],
+						componentConfig,
+						isSingleAttributeComponent( memo[ componentName ] )
+					)
+
+					return memo
+				},
+				entity
+			)
 		}
 
 		var addBlueprint = function( definition ) {
-			if( _.has( blueprints, definition.type ) ) throw 'Blueprint definition ' + definition.type + ' already exists.'
+			var blueprintId = definition.namespace + '/' + definition.name
 
-			blueprints[ definition.namespace + '/' + definition.name ] = definition
+			if( _.has( blueprints, blueprintId ) ) throw 'Blueprint definition "' + blueprintId + '" already exists.'
+
+
+			blueprints[ blueprintId ] = definition
+
+			if( definition.type === blueprintTypes.BLUEPRINT_TYPE_ENTITY ) {
+				entityTemplates[ blueprintId ] = createEntityTemplate( definition )
+			}
 		}
 
 		var getBlueprint = function( blueprintType, blueprintId ) {
@@ -52,6 +189,12 @@ define(
 			return blueprint
 		}
 
+		var createLocalComponentName = function( componentBlueprintId, importName ) {
+			if( importName ) return importName
+
+			return _.last( componentBlueprintId.split( '/' ) )
+		}
+
 
 		/**
 		 * public
@@ -62,8 +205,8 @@ define(
 
 		BlueprintManager.prototype = {
 			add : function( definition ) {
-				if( !definition.type &&
-					!isValidDefinition( definition.type ) ) {
+				if( !definition.type ||
+					!isValidDefinition( definition ) ) {
 
 					throw 'The format of the supplied blueprint definition is invalid.'
 				}
@@ -71,22 +214,13 @@ define(
 				addBlueprint( definition )
 			},
 			createEntity : function( blueprintId, entityConfig ) {
-				var blueprint = getBlueprint( blueprintTypes.BLUEPRINT_TYPE_ENTITY, blueprintId )
-
-				if( !blueprint ) throwCouldNotFindBlueprint( blueprintId )
-
-				return _.reduce(
-					blueprint.components,
-					function( memo, componentConfig ) {
-						var componentId = componentConfig.id
-						memo[ componentId ] = componentConfig
-
-						return memo
-					},
-					{}
+				return updateEntity(
+					deepClone( entityTemplates[ blueprintId ] ),
+					entityConfig
 				)
 			},
-			createComponent : function( blueprintId, config ) {
+			hasBlueprint : function( blueprintId ) {
+				return _.has( blueprints, blueprintId )
 			}
 		}
 

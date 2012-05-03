@@ -59,7 +59,8 @@ define(
 			"code/modernizr.js",
 			"code/jsonh.js",
             "code/jquery.js",
-			"swfobject.js"
+			"swfobject.js",
+			"public"
 		]
 
 
@@ -72,7 +73,7 @@ define(
 
 
 		function onRequest( request, response ) {
-			var filePath = createFilePath( request.url )
+			var filePath = 'public/' + createFilePath( request.url )
 
 
 			if( !path.existsSync( filePath ) ) {

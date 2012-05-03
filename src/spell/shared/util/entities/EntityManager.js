@@ -8,10 +8,15 @@ define(
 	) {
 		"use strict"
 
+		var nextEntityId = 0
 
-		var EntityManager = function( entityConstructors, componentConstructors ) {
-			this.entityConstructors    = entityConstructors
-			this.componentConstructors = componentConstructors
+		var getNextEntityId = function() {
+			return nextEntityId++
+		}
+
+
+		var EntityManager = function( blueprintManager ) {
+			this.blueprintManager = blueprintManager
 
 			this.nextId = 0
 		}
@@ -22,53 +27,35 @@ define(
 
 
 		EntityManager.prototype = {
-			createEntity: function( entityType, args ) {
-				var constructor = this.entityConstructors[ entityType ]
+			createEntity: function( blueprintId, entityConfig ) {
+				if( !this.blueprintManager.hasBlueprint( blueprintId ) ) throw 'Error: Unknown blueprint \'' + blueprintId + '\'. Could not create entity.'
 
-				if ( constructor === undefined ) {
-					throw EntityManager.ENTITY_TYPE_NOT_KNOWN + entityType
-				}
-
-				var entityId = getNextId( this )
-				var entity   = create( constructor, args )
-				entity.id    = entityId
-
-				// WORKAROUND: until the state synchronization gets refactored entity type and creation arguments must be saved
-				entity.type  = entityType
-				entity.args  = args
+				var entity = this.blueprintManager.createEntity( blueprintId, entityConfig )
+				entity.id = getNextEntityId()
 
 				return entity
-			},
+			}//,
 
-			addComponent: function( entity, componentType, args ) {
-				var constructor = this.componentConstructors[ componentType ]
-
-				if ( constructor === undefined ) {
-					throw EntityManager.COMPONENT_TYPE_NOT_KNOWN + componentType
-				}
-
-				var component = create( constructor, args )
-				entity[ componentType ] = component
-
-				return component
-			},
-
-			removeComponent: function( entity, componentType ) {
-				var component = entity[ componentType ]
-
-				delete entity[ componentType ]
-
-				return component
-			}
-		}
-
-
-		function getNextId( self ) {
-			var id = self.nextId
-
-			self.nextId += 1
-
-			return id
+//			addComponent: function( entity, componentType, args ) {
+//				var constructor = this.componentConstructors[ componentType ]
+//
+//				if ( constructor === undefined ) {
+//					throw EntityManager.COMPONENT_TYPE_NOT_KNOWN + componentType
+//				}
+//
+//				var component = create( constructor, args )
+//				entity[ componentType ] = component
+//
+//				return component
+//			},
+//
+//			removeComponent: function( entity, componentType ) {
+//				var component = entity[ componentType ]
+//
+//				delete entity[ componentType ]
+//
+//				return component
+//			}
 		}
 
 

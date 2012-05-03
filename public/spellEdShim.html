@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>test1</title>
+		<script type="text/javascript" src="output/spell.js"></script>
+	</head>
+
+	<body>
+		<div id="spell"></div>
+
+		<script type="text/javascript">
+			var spaceshipEntityBlueprint = {
+				"type" : "entityBlueprint",
+				"namespace" : "projectName/entities",
+				"name" : "spacecraft",
+				"components" : [
+					{
+						"id" : "spell/core/position",
+						"config" : {
+							"value" : [ 1, 2, 3 ]
+						}
+					},
+//					{
+//						"id" : "myProject/position",
+//						"importName" : "otherPosition",
+//						"config" : {
+//							"value" : [ 10, 10, 10 ]
+//						}
+//					},
+					{
+						"id" : "spell/collision/axisAlignedBoundingBox",
+						"config" : {
+							"width" : 5.0,
+							"height" : 12.5
+						}
+					},
+					{
+						"id" : "spell/core/graphics/appearance",
+						"config" : {
+							"textureId" : "output/assets/textures/4.2.04_256.png"
+						}
+					},
+					{
+						"id" : "spell/core/graphics/renderData"
+					}
+				]
+			}
+
+			var positionComponentBlueprint = {
+				"type" : "componentBlueprint",
+				"namespace" : "spell/core",
+				"name" : "position",
+				"attributes" : [
+					{
+						"name" : "value",
+						"type" : "vec3",
+						"default" : [ 0, 0, 0 ]
+					}
+				]
+			}
+
+			var otherPositionComponentBlueprint = {
+				"type" : "componentBlueprint",
+				"namespace" : "myProject",
+				"name" : "position",
+				"attributes" : [
+					{
+						"name" : "value",
+						"type" : "vec3",
+						"default" : [ 0, 0, 0 ]
+					}
+				]
+			}
+
+			var axisAlignedBoundingBoxComponentBlueprint = {
+				"type" : "componentBlueprint",
+				"namespace" : "spell/collision",
+				"name" : "axisAlignedBoundingBox",
+				"attributes" : [
+					{
+						"name" : "width",
+						"type" : "Number",
+						"default" : 1.0
+					},
+					{
+						"name" : "height",
+						"type" : "Number",
+						"default" : 1.0
+					}
+				],
+				"scriptId" : "interpolate/axisAlignedBoundingBox"
+			}
+
+			var appearanceComponentBlueprint = {
+				"type" : "componentBlueprint",
+				"namespace" : "spell/core/graphics",
+				"name" : "appearance",
+				"attributes" : [
+					{
+						"name" : "textureId",
+						"type" : "AssetTextureId",
+						"default" : "spell/textures/not_defined"
+					},
+					{
+						"name" : "rotation",
+						"type" : "Number",
+						"default" : 0
+					},
+					{
+						"name" : "scale",
+						"type" : "vec2",
+						"default" : [ 1, 1 ]
+					},
+					{
+						"name" : "translation",
+						"type" : "vec3",
+						"default" : [ 0, 0, 0 ]
+					}
+				]
+			}
+
+			var renderDataComponentBlueprint = {
+				"type" : "componentBlueprint",
+				"namespace" : "spell/core/graphics",
+				"name" : "renderData",
+				"attributes" : [
+					{
+						"name" : "position",
+						"type" : "vec3",
+						"default" : [ 0, 0, 0 ]
+					},
+					{
+						"name" : "orientation",
+						"type" : "Number",
+						"default" : 0
+					},
+					{
+						"name" : "scale",
+						"type" : "vec2",
+						"default" : [ 0, 0 ]
+					},
+					{
+						"name" : "pass",
+						"type" : "Integer",
+						"default" : 1
+					},
+					{
+						"name" : "opacity",
+						"type" : "Number",
+						"default" : 1.0
+					}
+				]
+			}
+
+			var applicationModule = {
+				zoneConfig: {
+					entities: [
+						{
+							"name" : "spacecraft1",
+							"blueprintId": "projectName/entities/spacecraft",
+							"config": {
+								axisAlignedBoundingBox : {
+									width : 1
+								},
+								position : [ 10, 0, 0 ]
+							}
+						},
+						{
+							"name" : "spacecraft2",
+							"blueprintId": "projectName/entities/spacecraft",
+							"config": {
+								axisAlignedBoundingBox : {
+									width : 1
+								},
+								position : [ 400, 100, 0 ]
+							}
+						}
+					]
+				},
+				componentBlueprints: [
+					positionComponentBlueprint,
+					otherPositionComponentBlueprint,
+					axisAlignedBoundingBoxComponentBlueprint,
+					appearanceComponentBlueprint,
+					renderDataComponentBlueprint
+				],
+				entityBlueprints: [
+					spaceshipEntityBlueprint
+				]
+			}
+
+			enterMain( 'spell/client/main', applicationModule )
+		</script>
+	</body>
+</html>

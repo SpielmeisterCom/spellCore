@@ -375,7 +375,7 @@ define(
 			var initial = iterator ? _.map(array, iterator) : array;
 			var result = [];
 			_.reduce(initial, function(memo, el, i) {
-				if (0 == i || (isSorted === true ? _.last(memo) != el : !_._include(memo, el))) {
+				if (0 == i || (isSorted === true ? _.last(memo) != el : !_.include(memo, el))) {
 					memo[memo.length] = el;
 					result[result.length] = array[i];
 				}
@@ -405,7 +405,7 @@ define(
 		// Only the elements present in just the first array will remain.
 		_.difference = function(array) {
 			var rest = _.flatten(slice.call(arguments, 1));
-			return _.filter(array, function(value){ return !_._include(rest, value); });
+			return _.filter(array, function(value){ return !_.include(rest, value); });
 		};
 
 		// Zip together multiple lists into a single array -- elements that share

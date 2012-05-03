@@ -1,0 +1,19 @@
+#!/bin/bash
+
+trap "exit 255" SIGINT SIGTERM EXIT
+
+USERNAME=$(id -un)
+
+if [ -z $1 ] ; then
+	PORT=8080
+fi
+
+TOOL_PATH=`readlink -f $0`
+SPELL_PATH=`dirname $TOOL_PATH`
+
+cd $SPELL_PATH
+
+while [ 1 = 1 ]
+do
+	sudo ./node_modules/.bin/r.js src/funkysnakes/server/main.js $USERNAME $PORT $@
+done
