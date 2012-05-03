@@ -20,20 +20,6 @@
 							"value" : [ 1, 2, 3 ]
 						}
 					},
-//					{
-//						"id" : "myProject/position",
-//						"importName" : "otherPosition",
-//						"config" : {
-//							"value" : [ 10, 10, 10 ]
-//						}
-//					},
-					{
-						"id" : "spell/collision/axisAlignedBoundingBox",
-						"config" : {
-							"width" : 5.0,
-							"height" : 12.5
-						}
-					},
 					{
 						"id" : "spell/core/graphics/appearance",
 						"config" : {
@@ -57,38 +43,6 @@
 						"default" : [ 0, 0, 0 ]
 					}
 				]
-			}
-
-			var otherPositionComponentBlueprint = {
-				"type" : "componentBlueprint",
-				"namespace" : "myProject",
-				"name" : "position",
-				"attributes" : [
-					{
-						"name" : "value",
-						"type" : "vec3",
-						"default" : [ 0, 0, 0 ]
-					}
-				]
-			}
-
-			var axisAlignedBoundingBoxComponentBlueprint = {
-				"type" : "componentBlueprint",
-				"namespace" : "spell/collision",
-				"name" : "axisAlignedBoundingBox",
-				"attributes" : [
-					{
-						"name" : "width",
-						"type" : "Number",
-						"default" : 1.0
-					},
-					{
-						"name" : "height",
-						"type" : "Number",
-						"default" : 1.0
-					}
-				],
-				"scriptId" : "interpolate/axisAlignedBoundingBox"
 			}
 
 			var appearanceComponentBlueprint = {
@@ -159,9 +113,6 @@
 							"name" : "spacecraft1",
 							"blueprintId": "projectName/entities/spacecraft",
 							"config": {
-								axisAlignedBoundingBox : {
-									width : 1
-								},
 								position : [ 10, 0, 0 ]
 							}
 						},
@@ -169,9 +120,6 @@
 							"name" : "spacecraft2",
 							"blueprintId": "projectName/entities/spacecraft",
 							"config": {
-								axisAlignedBoundingBox : {
-									width : 1
-								},
 								position : [ 400, 100, 0 ]
 							}
 						}
@@ -179,8 +127,6 @@
 				},
 				componentBlueprints: [
 					positionComponentBlueprint,
-					otherPositionComponentBlueprint,
-					axisAlignedBoundingBoxComponentBlueprint,
 					appearanceComponentBlueprint,
 					renderDataComponentBlueprint
 				],
