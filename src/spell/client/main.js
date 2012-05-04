@@ -1,9 +1,10 @@
 define(
 	'spell/client/main',
 	[
+		'spell/shared/build/compileEntities',
 		'spell/shared/util/entities/EntityManager',
 		'spell/shared/util/zones/ZoneManager',
-		'spell/shared/util/BlueprintManager',
+		'spell/shared/util/blueprints/BlueprintManager',
 		'spell/shared/util/ConfigurationManager',
 		'spell/shared/util/EventManager',
 		'spell/shared/util/InputManager',
@@ -19,6 +20,7 @@ define(
 		'underscore'
 	],
 	function(
+		compileEntities,
 		EntityManager,
 		ZoneManager,
 		BlueprintManager,
@@ -155,7 +157,8 @@ define(
 			}
 		)
 
-		zoneManager.createZone( 'base', applicationModule.zoneConfig.entities )
+		var compiledEntites = compileEntities( blueprintManager, applicationModule.zone.entities )
+		zoneManager.createZone( 'base', compiledEntites )
 
 
 		var mainLoop = createMainLoop( eventManager, statisticsManager )

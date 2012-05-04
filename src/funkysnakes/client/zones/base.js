@@ -123,7 +123,8 @@ define(
 				)
 
 				var zoneResources = [
-					'output/assets/textures/4.2.04_256.png'
+					'output/assets/textures/4.2.04_256.png',
+					'output/assets/textures/ship_player4.png'
 				]
 
 				// trigger loading of zone resources

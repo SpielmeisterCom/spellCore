@@ -147,17 +147,19 @@ define(
 					var range =  (_.has( request.headers, "range" )) ? range : false
 
 					var ending = parseInt(stat.size) - 1
+					var editorOrigin = 'http://localhost:3000'
 
 					var headers = {
-						"Accept-Ranges"   : "bytes",
-						"Connection"      : "close",
-						"Content-Length"  : stat.size,
-						'Content-Range'   : "bytes 0-"+ending+"/"+stat.size,
-						"Content-Type"    : contentTypes[ fileExtension ],
-						"Date"            : new Date().toGMTString(),
-						"ETag"            : etag,
-						"Last-Modified"   : new Date(stat.mtime).toGMTString(),
-						"Server"          : "Node"
+						"Accept-Ranges"               : "bytes",
+						"Connection"                  : "close",
+						"Content-Length"              : stat.size,
+						'Content-Range'               : "bytes 0-"+ending+"/"+stat.size,
+						"Content-Type"                : contentTypes[ fileExtension ],
+						"Date"                        : new Date().toGMTString(),
+						"ETag"                        : etag,
+						"Last-Modified"               : new Date(stat.mtime).toGMTString(),
+						"Server"                      : "Node",
+						"Access-Control-Allow-Origin" : editorOrigin
 					}
 
 					if( request.headers['if-none-match'] == etag ) {

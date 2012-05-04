@@ -1,7 +1,7 @@
 define(
 	'funkysnakes/client/mainBlueprintTest',
 	[
-		'spell/shared/util/BlueprintManager'
+		'spell/shared/util/blueprints/BlueprintManager'
 	],
 	function(
 		BlueprintManager

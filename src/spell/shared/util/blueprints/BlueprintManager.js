@@ -1,12 +1,14 @@
 define(
-	'spell/shared/util/BlueprintManager',
+	'spell/shared/util/blueprints/BlueprintManager',
 	[
 		'spell/shared/util/deepClone',
+		'spell/shared/util/blueprints/createLocalComponentName',
 
 		'underscore'
 	],
 	function(
 		deepClone,
+		createLocalComponentName,
 
 		_
 	) {
@@ -22,7 +24,6 @@ define(
 			BLUEPRINT_TYPE_COMPONENT : 'componentBlueprint',
 			BLUEPRINT_TYPE_SYSTEM    : 'systemBlueprint'
 		}
-
 
 		var blueprints = {},
 			entityTemplates = {}
@@ -92,10 +93,6 @@ define(
 
 		var throwCouldNotFindBlueprint = function( blueprintId, blueprintType ) {
 			throw 'Could not find a blueprint with id "' + blueprintId + ( blueprintType ? '" of type ' + blueprintType : '' ) + '.'
-		}
-
-		var isSingleAttributeComponent = function( attributes ) {
-			return _.size( attributes ) === 1
 		}
 
 		var createComponentTemplate = function( componentBlueprint ) {
@@ -189,10 +186,10 @@ define(
 			return blueprint
 		}
 
-		var createLocalComponentName = function( componentBlueprintId, importName ) {
-			if( importName ) return importName
+		var isSingleAttributeComponent = function( attributes ) {
+			if( !attributes ) throw 'Error: \'attributes\' is of type falsy.'
 
-			return _.last( componentBlueprintId.split( '/' ) )
+			return _.size( attributes ) === 1
 		}
 
 
@@ -221,6 +218,9 @@ define(
 			},
 			hasBlueprint : function( blueprintId ) {
 				return _.has( blueprints, blueprintId )
+			},
+			isSingleAttributeComponent : function( blueprintId ) {
+				return isSingleAttributeComponent( getBlueprint( blueprintTypes.BLUEPRINT_TYPE_COMPONENT, blueprintId).attributes )
 			}
 		}
 

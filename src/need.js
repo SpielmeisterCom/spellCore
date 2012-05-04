@@ -93,31 +93,33 @@ var require = function( dependencies, callback ) {
 }
 
 
-var enterMain = function( mainModuleName, config ) {
-	var wrapper = function() {
-		resolveDependencies( mainModuleName, config )
-	}
+var enterMain = function( mainModuleName, args ) {
+	resolveDependencies( mainModuleName, args )
 
-	// the web client must wait until the dom construction is finished
-	var isBrowser = !!( typeof window !== "undefined" && navigator && document )
-
-	if( !isBrowser ) {
-		wrapper()
-		return
-	}
-
-	if( document.addEventListener ) {
-		document.addEventListener(
-			"DOMContentLoaded",
-			wrapper,
-			false
-		)
-
-	} else if( document.attachEvent ) {
-		// this is for IE
-		document.attachEvent(
-			"onreadystatechange",
-			wrapper
-		)
-	}
+//	var wrapper = function() {
+//		resolveDependencies( mainModuleName, args )
+//	}
+//
+//	// the web client must wait until the dom construction is finished
+//	var isBrowser = !!( typeof window !== "undefined" && navigator && document )
+//
+//	if( !isBrowser ) {
+//		wrapper()
+//		return
+//	}
+//
+//	if( document.addEventListener ) {
+//		document.addEventListener(
+//			"DOMContentLoaded",
+//			wrapper,
+//			false
+//		)
+//
+//	} else if( document.attachEvent ) {
+//		// this is for IE
+//		document.attachEvent(
+//			"onreadystatechange",
+//			wrapper
+//		)
+//	}
 }

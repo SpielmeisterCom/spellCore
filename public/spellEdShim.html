@@ -9,133 +9,205 @@
 		<div id="spell"></div>
 
 		<script type="text/javascript">
-			var spaceshipEntityBlueprint = {
-				"type" : "entityBlueprint",
-				"namespace" : "projectName/entities",
-				"name" : "spacecraft",
-				"components" : [
-					{
-						"id" : "spell/core/position",
-						"config" : {
-							"value" : [ 1, 2, 3 ]
-						}
-					},
-					{
-						"id" : "spell/core/graphics/appearance",
-						"config" : {
-							"textureId" : "output/assets/textures/4.2.04_256.png"
-						}
-					},
-					{
-						"id" : "spell/core/graphics/renderData"
-					}
-				]
+//			var spaceshipEntityBlueprint = {
+//				"type" : "entityBlueprint",
+//				"namespace" : "projectName/entities",
+//				"name" : "spacecraft",
+//				"components" : [
+//					{
+//						"id" : "spell/core/position",
+//						"config" : {
+//							"value" : [ 1, 2, 3 ]
+//						}
+//					},
+//					{
+//						"id" : "spell/core/graphics/appearance",
+//						"config" : {
+//							"textureId" : "output/assets/textures/4.2.04_256.png"
+//						}
+//					},
+//					{
+//						"id" : "spell/core/graphics/renderData"
+//					}
+//				]
+//			}
+//
+//			var positionComponentBlueprint = {
+//				"type" : "componentBlueprint",
+//				"namespace" : "spell/core",
+//				"name" : "position",
+//				"attributes" : [
+//					{
+//						"name" : "value",
+//						"type" : "vec3",
+//						"default" : [ 0, 0, 0 ]
+//					}
+//				]
+//			}
+//
+//			var appearanceComponentBlueprint = {
+//				"type" : "componentBlueprint",
+//				"namespace" : "spell/core/graphics",
+//				"name" : "appearance",
+//				"attributes" : [
+//					{
+//						"name" : "textureId",
+//						"type" : "assetTextureId",
+//						"default" : "spell/textures/not_defined"
+//					},
+//					{
+//						"name" : "rotation",
+//						"type" : "number",
+//						"default" : 0
+//					},
+//					{
+//						"name" : "scale",
+//						"type" : "vec2",
+//						"default" : [ 1, 1 ]
+//					},
+//					{
+//						"name" : "translation",
+//						"type" : "vec3",
+//						"default" : [ 0, 0, 0 ]
+//					}
+//				]
+//			}
+//
+//			var renderDataComponentBlueprint = {
+//				"type" : "componentBlueprint",
+//				"namespace" : "spell/core/graphics",
+//				"name" : "renderData",
+//				"attributes" : [
+//					{
+//						"name" : "position",
+//						"type" : "vec3",
+//						"default" : [ 0, 0, 0 ]
+//					},
+//					{
+//						"name" : "orientation",
+//						"type" : "number",
+//						"default" : 0
+//					},
+//					{
+//						"name" : "scale",
+//						"type" : "vec2",
+//						"default" : [ 0, 0 ]
+//					},
+//					{
+//						"name" : "pass",
+//						"type" : "integer",
+//						"default" : 1
+//					},
+//					{
+//						"name" : "opacity",
+//						"type" : "number",
+//						"default" : 1.0
+//					}
+//				]
+//			}
+//
+////			var applicationModule = {
+////				zoneConfig: {
+////					entities: [
+////						{
+////							"name" : "spacecraft1",
+////							"blueprintId": "projectName/entities/spacecraft",
+////							"config": {
+////								position : [ 10, 0, 0 ]
+////							}
+////						},
+////						{
+////							"name" : "spacecraft2",
+////							"blueprintId": "projectName/entities/spacecraft",
+////							"config": {
+////								position : [ 400, 100, 0 ]
+////							}
+////						}
+////					]
+////				},
+////				componentBlueprints: [
+////					positionComponentBlueprint,
+////					appearanceComponentBlueprint,
+////					renderDataComponentBlueprint
+////				],
+////				entityBlueprints: [
+////					spaceshipEntityBlueprint
+////				]
+////			}
+//
+//			var applicationModule = {
+//				"id": "Zone1",
+//				"spelled.model.project_id": 1,
+//				"entities": [
+//					{
+//						"id": "54e3f6ef-5529-493a-a7fe-31b12561b452",
+//						"blueprintId": "projectName/entities/spacecraft",
+//						"name": "spacecraft1",
+//						"spelled.model.config.zone_id": "Zone1",
+//						"components": [
+//							{
+//								"id": "fde4a7df-40f4-4033-bcbe-d670b260efcc",
+//								"blueprintId": "spell/core/position",
+//								"config": {
+//									"value": [
+//										10,
+//										0,
+//										0
+//									]
+//								},
+//								"spelled.model.config.entity_id": "54e3f6ef-5529-493a-a7fe-31b12561b452"
+//							}
+//						]
+//					}
+//				],
+//				componentBlueprints: [
+//					positionComponentBlueprint,
+//					appearanceComponentBlueprint,
+//					renderDataComponentBlueprint
+//				],
+//				entityBlueprints: [
+//					spaceshipEntityBlueprint
+//				]
+//			}
+//
+//			enterMain( 'spell/client/main', applicationModule )
+
+		var editorOrigin = 'http://localhost:3000'
+
+		function getParam( name ) {
+			name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+			var regexS = '[\\?&]'+name+'=([^&#]*)';
+			var regex = new RegExp( regexS );
+			var results = regex.exec( window.location.href );
+			if( results == null )
+				return '';
+			else
+				return results[1];
+		}
+
+		function receiveMessage( event ) {
+			if( event.origin !== editorOrigin ) {
+				console.log( 'event.origin: ' + event.origin )
+				console.log( 'Error: origin does not match.' )
+
+				return
 			}
 
-			var positionComponentBlueprint = {
-				"type" : "componentBlueprint",
-				"namespace" : "spell/core",
-				"name" : "position",
-				"attributes" : [
-					{
-						"name" : "value",
-						"type" : "vec3",
-						"default" : [ 0, 0, 0 ]
-					}
-				]
+			if( event.data.type === 'setConfiguration' ) {
+				var applicationModule = event.data.data
+				enterMain( 'spell/client/main', applicationModule )
 			}
+		}
 
-			var appearanceComponentBlueprint = {
-				"type" : "componentBlueprint",
-				"namespace" : "spell/core/graphics",
-				"name" : "appearance",
-				"attributes" : [
-					{
-						"name" : "textureId",
-						"type" : "assetTextureId",
-						"default" : "spell/textures/not_defined"
-					},
-					{
-						"name" : "rotation",
-						"type" : "number",
-						"default" : 0
-					},
-					{
-						"name" : "scale",
-						"type" : "vec2",
-						"default" : [ 1, 1 ]
-					},
-					{
-						"name" : "translation",
-						"type" : "vec3",
-						"default" : [ 0, 0, 0 ]
-					}
-				]
-			}
+		window.addEventListener( 'message', receiveMessage, false )
 
-			var renderDataComponentBlueprint = {
-				"type" : "componentBlueprint",
-				"namespace" : "spell/core/graphics",
-				"name" : "renderData",
-				"attributes" : [
-					{
-						"name" : "position",
-						"type" : "vec3",
-						"default" : [ 0, 0, 0 ]
-					},
-					{
-						"name" : "orientation",
-						"type" : "number",
-						"default" : 0
-					},
-					{
-						"name" : "scale",
-						"type" : "vec2",
-						"default" : [ 0, 0 ]
-					},
-					{
-						"name" : "pass",
-						"type" : "integer",
-						"default" : 1
-					},
-					{
-						"name" : "opacity",
-						"type" : "number",
-						"default" : 1.0
-					}
-				]
-			}
-
-			var applicationModule = {
-				zoneConfig: {
-					entities: [
-						{
-							"name" : "spacecraft1",
-							"blueprintId": "projectName/entities/spacecraft",
-							"config": {
-								position : [ 10, 0, 0 ]
-							}
-						},
-						{
-							"name" : "spacecraft2",
-							"blueprintId": "projectName/entities/spacecraft",
-							"config": {
-								position : [ 400, 100, 0 ]
-							}
-						}
-					]
-				},
-				componentBlueprints: [
-					positionComponentBlueprint,
-					appearanceComponentBlueprint,
-					renderDataComponentBlueprint
-				],
-				entityBlueprints: [
-					spaceshipEntityBlueprint
-				]
-			}
-
-			enterMain( 'spell/client/main', applicationModule )
+		parent.window.postMessage(
+			{
+				action: 'getConfiguration',
+				extId: getParam( 'id' )
+			},
+			editorOrigin
+		)
 		</script>
 	</body>
 </html>
