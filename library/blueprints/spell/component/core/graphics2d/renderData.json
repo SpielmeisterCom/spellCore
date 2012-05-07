@@ -1,0 +1,32 @@
+{
+	"type" : "componentBlueprint",
+	"namespace" : "spell/component/core/graphics2d",
+	"name" : "renderData",
+	"attributes" : [
+		{
+			"name" : "position",
+			"type" : "vec3",
+			"default" : [ 0, 0, 0 ]
+		},
+		{
+			"name" : "orientation",
+			"type" : "number",
+			"default" : 0
+		},
+		{
+			"name" : "scale",
+			"type" : "vec2",
+			"default" : [ 0, 0 ]
+		},
+		{
+			"name" : "pass",
+			"type" : "integer",
+			"default" : 1
+		},
+		{
+			"name" : "opacity",
+			"type" : "number",
+			"default" : 1.0
+		}
+	]
+}

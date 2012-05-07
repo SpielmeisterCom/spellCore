@@ -40,6 +40,10 @@ require(
 //		var executeBuildDeployment = function( projectFilePath ) {
 //		}
 
+		var printErrors = function( errors ) {
+			console.log( errors.join( '\n' ) )
+		}
+
 		var processBuild = function( projectFilePath, target ) {
 			var errors = []
 
@@ -47,13 +51,13 @@ require(
 
 			if( target === buildTargets.DEVELOPMENT ) {
 				if( isFile( projectFilePath ) ) {
-					errors = executeBuildDevelopment( projectPath + '/library/blueprints', projectFilePath )
+					errors = executeBuildDevelopment( spellPath, projectPath, projectFilePath )
 
 				} else {
 					errors.push( 'Error: Missing project file \'' + projectFilePath + '\'.' )
 				}
 
-				if( _.size( errors ) > 0 ) errors.unshift( 'Error: Parsing \'' + projectFilename + '\' failed.' )
+				if( _.size( errors ) > 0 ) errors.push( 'Error: Parsing \'' + projectFilename + '\' failed.' )
 
 			} else if( target === buildTargets.DEPLOYMENT ) {
 
@@ -64,14 +68,8 @@ require(
 				console.log( 'Error: \'' + target + '\' is not a valid build target. See \'' + executableName + ' --help\'.' )
 			}
 
-			if(_.size( errors ) > 0 ) {
-				_.each(
-					errors,
-					function( error ) {
-						console.log( error )
-					}
-				)
-			}
+
+			if(_.size( errors ) > 0 ) printErrors( errors )
 		}
 
 

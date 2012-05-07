@@ -157,8 +157,8 @@ define(
 			}
 		)
 
-		var compiledEntites = compileEntities( blueprintManager, applicationModule.zone.entities )
-		zoneManager.createZone( 'base', compiledEntites )
+		var compiledEntities = compileEntities( blueprintManager, applicationModule.zone.entities )
+		zoneManager.createZone( 'base', compiledEntities )
 
 
 		var mainLoop = createMainLoop( eventManager, statisticsManager )

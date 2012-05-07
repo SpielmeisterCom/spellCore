@@ -1,0 +1,27 @@
+{
+	"type" : "componentBlueprint",
+	"namespace" : "spell/component/core/graphics2d",
+	"name" : "appearance",
+	"attributes" : [
+		{
+			"name" : "textureId",
+			"type" : "assetTextureId",
+			"default" : "spell/textures/not_defined"
+		},
+		{
+			"name" : "rotation",
+			"type" : "number",
+			"default" : 0
+		},
+		{
+			"name" : "scale",
+			"type" : "vec2",
+			"default" : [ 1, 1 ]
+		},
+		{
+			"name" : "translation",
+			"type" : "vec3",
+			"default" : [ 0, 0, 0 ]
+		}
+	]
+}

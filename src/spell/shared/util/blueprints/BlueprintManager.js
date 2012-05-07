@@ -4,12 +4,14 @@ define(
 		'spell/shared/util/deepClone',
 		'spell/shared/util/blueprints/createLocalComponentName',
 
+		'jsonPath',
 		'underscore'
 	],
 	function(
 		deepClone,
 		createLocalComponentName,
 
+		jsonPath,
 		_
 	) {
 		'use strict'
@@ -92,7 +94,7 @@ define(
 		}
 
 		var throwCouldNotFindBlueprint = function( blueprintId, blueprintType ) {
-			throw 'Could not find a blueprint with id "' + blueprintId + ( blueprintType ? '" of type ' + blueprintType : '' ) + '.'
+			throw 'Error: Could not find a blueprint with id \'' + blueprintId + ( blueprintType ? '\' of type ' + blueprintType : '' ) + '.'
 		}
 
 		var createComponentTemplate = function( componentBlueprint ) {
@@ -126,7 +128,7 @@ define(
 				entityBlueprint.components,
 				function( memo, componentConfig ) {
 					var componentBlueprintId = componentConfig.id,
-						componentBlueprint = getBlueprint( blueprintTypes.BLUEPRINT_TYPE_COMPONENT, componentBlueprintId )
+						componentBlueprint = getBlueprint( componentBlueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
 
 					if( !componentBlueprint ) throwCouldNotFindBlueprint( componentBlueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
 
@@ -164,7 +166,7 @@ define(
 		var addBlueprint = function( definition ) {
 			var blueprintId = definition.namespace + '/' + definition.name
 
-			if( _.has( blueprints, blueprintId ) ) throw 'Blueprint definition "' + blueprintId + '" already exists.'
+			if( _.has( blueprints, blueprintId ) ) throw 'Error: Blueprint definition \'' + blueprintId + '\' already exists.'
 
 
 			blueprints[ blueprintId ] = definition
@@ -174,16 +176,19 @@ define(
 			}
 		}
 
-		var getBlueprint = function( blueprintType, blueprintId ) {
+		var getBlueprint = function( blueprintId, blueprintType ) {
 			var blueprint = blueprints[ blueprintId ]
 
-			if( !blueprint ||
-				blueprint.type !== blueprintType ) {
-
-				throw throwCouldNotFindBlueprint( blueprintId, blueprintType )
-			}
-
-			return blueprint
+			return ( !blueprint ?
+				false :
+				( !blueprintType ?
+					blueprint :
+					( blueprint.type !== blueprintType ?
+						false :
+						blueprint
+					)
+				)
+			)
 		}
 
 		var isSingleAttributeComponent = function( attributes ) {
@@ -205,7 +210,7 @@ define(
 				if( !definition.type ||
 					!isValidDefinition( definition ) ) {
 
-					throw 'The format of the supplied blueprint definition is invalid.'
+					throw 'Error: The format of the supplied blueprint definition is invalid.'
 				}
 
 				addBlueprint( definition )
@@ -217,10 +222,29 @@ define(
 				)
 			},
 			hasBlueprint : function( blueprintId ) {
-				return _.has( blueprints, blueprintId )
+				return !!getBlueprint( blueprintId )
 			},
+			getBlueprint : function( blueprintId ) {
+				return getBlueprint( blueprintId )
+			},
+
+			/**
+			 * Returns all dependent component blueprint ids
+			 *
+			 * @param blueprintId - entity blueprint id
+			 */
+			getDependencyComponentBlueprintIds : function( blueprintId ) {
+				return jsonPath( getBlueprint( blueprintId ), '$.components[*].id' )
+			},
+
+			/**
+			 * Returns true if the component is a single attribute component, false otherwise.
+			 *
+			 * @param blueprintId - component blueprint id
+			 * @return {*}
+			 */
 			isSingleAttributeComponent : function( blueprintId ) {
-				return isSingleAttributeComponent( getBlueprint( blueprintTypes.BLUEPRINT_TYPE_COMPONENT, blueprintId).attributes )
+				return isSingleAttributeComponent( getBlueprint( blueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT ).attributes )
 			}
 		}
 
