@@ -74,7 +74,7 @@ define(
 		}
 
 		return {
-			onCreate: function( globals, entitiesFromZoneConfig ) {
+			onCreate: function( globals, zoneConfig ) {
 				var eventManager         = globals.eventManager,
 					configurationManager = globals.configurationManager,
 					statisticsManager    = globals.statisticsManager,
@@ -114,7 +114,7 @@ define(
 
 						// create default entities from zone config
 						_.each(
-							entitiesFromZoneConfig,
+							zoneConfig.entities,
 							function( entityConfig ) {
 								entityManager.createEntity( entityConfig.blueprintId, entityConfig.config )
 							}

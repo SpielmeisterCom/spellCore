@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/executeBuildDevelopment',
 	[
+		'spell/shared/build/createReducedEntityConfig',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
 		'spell/shared/util/blueprints/BlueprintManager',
@@ -13,6 +14,7 @@ define(
 		'underscore'
 	],
 	function(
+		createReducedEntityConfig,
 		isDirectory,
 		isFile,
 		BlueprintManager,
@@ -42,7 +44,7 @@ define(
 			)
 		}
 
-		var loadBlueprintsFromPaths = function( pathPatterns, blueprintManager ) {
+		var loadBlueprintsFromPaths = function( blueprintManager, pathPatterns ) {
 			var errors = []
 
 			var filePaths = glob.sync( '{' + pathPatterns.join( ',' ) + '}', {} )
@@ -70,21 +72,21 @@ define(
 			return errors
 		}
 
-		var loadBlueprintsFromLibrary = function( libraryPaths, blueprintManager ) {
+		var loadBlueprintsFromLibrary = function( blueprintManager, libraryPaths ) {
 			var errors = []
 
 			errors = errors.concat(
 				loadBlueprintsFromPaths(
-					createBlueprintLibraryPathPatterns( libraryPaths, 'component' ),
-					blueprintManager
+					blueprintManager,
+					createBlueprintLibraryPathPatterns( libraryPaths, 'component' )
 				)
 			)
 
 			try {
 				errors = errors.concat(
 					loadBlueprintsFromPaths(
-						createBlueprintLibraryPathPatterns( libraryPaths, 'entity' ),
-						blueprintManager
+						blueprintManager,
+						createBlueprintLibraryPathPatterns( libraryPaths, 'entity' )
 					)
 				)
 
@@ -95,7 +97,7 @@ define(
 			return errors
 		}
 
-		var hasAllBlueprints = function( blueprintIds, blueprintManager ) {
+		var hasAllBlueprints = function( blueprintManager, blueprintIds ) {
 			var errors = []
 
 			_.each(
@@ -110,7 +112,14 @@ define(
 			return errors
 		}
 
-		var createDependencyComponentBlueprintIds = function( entityBlueprintIds, blueprintManager ) {
+		/**
+		 * Create a list of unique component blueprint ids that are referenced by the provided entity blueprint.
+		 *
+		 * @param entityBlueprintIds
+		 * @param blueprintManager
+		 * @return {*}
+		 */
+		var createDependencyComponentBlueprintIds = function( blueprintManager, entityBlueprintIds ) {
 			return _.unique(
 				_.flatten(
 					_.map(
@@ -123,7 +132,7 @@ define(
 			)
 		}
 
-		var createBlueprintList = function( blueprintIds, blueprintManager ) {
+		var createBlueprintList = function( blueprintManager, blueprintIds ) {
 			return _.map(
 				blueprintIds,
 				function( blueprintId ) {
@@ -132,38 +141,83 @@ define(
 			)
 		}
 
-		var createRuntimeModule = function( entities, componentBlueprints, entityBlueprints ) {
+		/**
+		 * Creates a list of resources that are referenced by the provided entity config list
+		 *
+		 * @param blueprintManager
+		 * @param entities
+		 * @return {*}
+		 */
+		var createReferencedResources = function( blueprintManager, entities ) {
+			return _.reduce(
+				entities,
+				function( memo, entityConfig ) {
+					// WORKAROUND: a specialized solution; until requirements are more clear this has to do
+					var entity = blueprintManager.createEntity( entityConfig.blueprintId, entityConfig.config )
+
+					if( _.has( entity, 'appearance' ) &&
+						_.has( entity.appearance, 'textureId' ) ) {
+
+						var textureId = entity.appearance.textureId
+
+						if( !_.include( memo, textureId ) ) {
+							memo.push( textureId )
+						}
+					}
+
+					return memo
+				},
+				[]
+			)
+		}
+
+		var createZoneList = function( blueprintManager, zones ) {
+			return _.map(
+				zones,
+				function( zone ) {
+					var reducedEntityConfig = _.map(
+						zone.entities,
+						function( entityConfig ) {
+							return createReducedEntityConfig( blueprintManager, entityConfig )
+						}
+					)
+
+					return {
+						name : zone.name,
+						entities : reducedEntityConfig,
+						resources : createReferencedResources( blueprintManager, reducedEntityConfig )
+					}
+				}
+			)
+		}
+
+		var createRuntimeModule = function( startZoneId, zones, componentBlueprints, entityBlueprints ) {
 			return {
-				entities : entities,
+				startZone : startZoneId,
+				zones : zones,
 				componentBlueprints : componentBlueprints,
 				entityBlueprints : entityBlueprints
 			}
 		}
 
-		var writeRuntimeModule = function( outputPath, outputFileName, runtimeModule ) {
-			var errors = [],
-				outputFilePath = outputPath + '/' + outputFileName
+		var writeRuntimeModule = function( outputFilePath, runtimeModule ) {
+			var errors = []
+
+			var data = _s.sprintf(
+				'spell.setRuntimeModule( %1$s )',
+				JSON.stringify(
+					runtimeModule,
+					null,
+					'\t'
+				)
+			)
 
 			// delete file if it already exists
 			if( isFile( outputFilePath ) ) {
 				fs.unlinkSync( outputFilePath )
 			}
 
-			// create parent directory if necessary
-			if( !isDirectory( outputPath ) ) {
-				var mode = '755'
-				fs.mkdirSync( outputPath, mode )
-			}
-
-			fs.writeFileSync(
-				outputFilePath,
-				JSON.stringify(
-					runtimeModule,
-					null,
-					'\t'
-				),
-				'utf-8'
-			)
+			fs.writeFileSync( outputFilePath, data, 'utf-8' )
 
 			return errors
 		}
@@ -196,38 +250,33 @@ define(
 
 			// read all blueprint files from blueprint library
 			var blueprintManager = new BlueprintManager()
-			errors = loadBlueprintsFromLibrary( [ spellBlueprintPath, projectBlueprintPath ], blueprintManager )
+			errors = loadBlueprintsFromLibrary( blueprintManager, [ spellBlueprintPath, projectBlueprintPath ] )
 
 			if( _.size( errors ) > 0 ) return errors
 
 
 			// determine all blueprints that are referenced in the project
 			var entityBlueprintIds    = _.unique( jsonPath( projectConfig, '$.zones[*].entities[*].blueprintId' ) ),
-				componentBlueprintIds = createDependencyComponentBlueprintIds( entityBlueprintIds, blueprintManager )
-
-			console.log( entityBlueprintIds )
-			console.log( componentBlueprintIds )
+				componentBlueprintIds = createDependencyComponentBlueprintIds( blueprintManager, entityBlueprintIds )
 
 
 			// check if the required blueprints are available
-			errors = hasAllBlueprints( entityBlueprintIds, blueprintManager )
-			errors = errors.concat( hasAllBlueprints( componentBlueprintIds, blueprintManager ) )
+			errors = hasAllBlueprints( blueprintManager, entityBlueprintIds )
+			errors = errors.concat( hasAllBlueprints( blueprintManager, componentBlueprintIds ) )
 
 			if( _.size( errors ) > 0 ) return errors
 
 
 			// write generated runtime module to disk
-			var projectName = projectConfig.name,
-				outputPath = projectPath + '/public/output/' + projectName,
-				outputFileName = 'data.json'
+			var outputFilePath = projectPath + '/public/output/data.js'
 
 			errors = writeRuntimeModule(
-				outputPath,
-				outputFileName,
+				outputFilePath,
 				createRuntimeModule(
-					{},
-					createBlueprintList( entityBlueprintIds, blueprintManager ),
-					createBlueprintList( componentBlueprintIds, blueprintManager )
+					projectConfig.startZone,
+					createZoneList( blueprintManager, projectConfig.zones ),
+					createBlueprintList( blueprintManager, componentBlueprintIds ),
+					createBlueprintList( blueprintManager, entityBlueprintIds )
 				)
 			)
 

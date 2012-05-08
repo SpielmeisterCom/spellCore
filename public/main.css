@@ -1,0 +1,40 @@
+body {
+	text-align:center;
+	margin: 0px;
+	padding: 0px;
+}
+
+#version {
+	position:absolute;
+	top:10px;
+	right:10px;
+}
+
+#spell-canvas {
+	text-align:center;
+	overflow:hidden;
+	-moz-transform: translate3d(0, 0, 0);
+	-webkit-transform: translate3d(0, 0, 0);
+	-o-transform: translate3d(0, 0, 0);
+	-ms-transform: translate3d(0, 0, 0);
+	transform: translate3d(0, 0, 0);
+}
+
+.logo {
+    margin-right: 10px;
+}
+
+#logotext {
+    font-size: 16pt;
+}
+
+#logos {
+    color: #FFF;
+    background-color: #27213A;
+    padding: 10px;
+}
+
+img {
+    vertical-align: middle;
+	border:0px;
+}

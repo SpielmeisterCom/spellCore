@@ -1,7 +1,6 @@
 define(
 	'spell/client/main',
 	[
-		'spell/shared/build/compileEntities',
 		'spell/shared/util/entities/EntityManager',
 		'spell/shared/util/zones/ZoneManager',
 		'spell/shared/util/blueprints/BlueprintManager',
@@ -20,7 +19,6 @@ define(
 		'underscore'
 	],
 	function(
-		compileEntities,
 		EntityManager,
 		ZoneManager,
 		BlueprintManager,
@@ -38,7 +36,7 @@ define(
 
 		_,
 
-		applicationModule
+		runtimeModule
 	) {
 		'use strict'
 
@@ -130,14 +128,14 @@ define(
 		var blueprintManager = new BlueprintManager()
 
 		_.each(
-			applicationModule.componentBlueprints,
+			runtimeModule.componentBlueprints,
 			function( componentBlueprint ) {
 				blueprintManager.add( componentBlueprint )
 			}
 		)
 
 		_.each(
-			applicationModule.entityBlueprints,
+			runtimeModule.entityBlueprints,
 			function( entityBlueprint ) {
 				blueprintManager.add( entityBlueprint )
 			}
@@ -157,8 +155,16 @@ define(
 			}
 		)
 
-		var compiledEntities = compileEntities( blueprintManager, applicationModule.zone.entities )
-		zoneManager.createZone( 'base', compiledEntities )
+
+		zoneManager.createZone(
+			'base',
+			_.find(
+				runtimeModule.zones,
+				function( iter ) {
+					return iter.name === runtimeModule.startZone
+				}
+			)
+		)
 
 
 		var mainLoop = createMainLoop( eventManager, statisticsManager )

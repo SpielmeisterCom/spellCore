@@ -1,5 +1,5 @@
 define(
-	'spell/shared/build/compileEntities',
+	'spell/shared/build/createReducedEntityConfig',
 	[
 		'spell/shared/util/blueprints/createLocalComponentName',
 
@@ -40,26 +40,14 @@ define(
 		}
 
 		/**
-		 * Creates entity configs in the spell packaging format.
+		 * Creates reduced entity config (the spell runtime module format).
 		 */
-		return function( blueprintManager, entitiesInSpellEdFormat ) {
-			var entitiesSpellFormat = _.reduce(
-				entitiesInSpellEdFormat,
-				function( memo, iter ) {
-					memo.push(
-						{
-							blueprintId : iter.blueprintId,
-							name : iter.name,
-							config : compileComponents( blueprintManager, iter.components )
-						}
-					)
-
-					return memo
-				},
-				[]
-			)
-
-			return entitiesSpellFormat
+		return function( blueprintManager, entityInSpellEdFormat ) {
+			return {
+				name        : entityInSpellEdFormat.name,
+				blueprintId : entityInSpellEdFormat.blueprintId,
+				config      : compileComponents( blueprintManager, entityInSpellEdFormat.components )
+			}
 		}
 	}
 )
