@@ -3,6 +3,8 @@ require( { baseUrl: "src" } )
 require(
 	[
 		'spell/shared/build/executeBuildDevelopment',
+		'spell/shared/build/initializeProjectDirectory',
+		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
 
 		'commander',
@@ -12,6 +14,8 @@ require(
 	],
 	function(
 		executeBuildDevelopment,
+		initializeProjectDirectory,
+		isDirectory,
 		isFile,
 
 		commander,
@@ -19,15 +23,10 @@ require(
 		path,
 		_
 	) {
-		var createProjectPath = function( spellPath ) {
-			var parts = spellPath.split( '/' )
-
-			return parts.slice( 0, parts.length - 2 ).join( '/' )
-		}
-
 		var executableName  = 'sappre',
+			argv            = process.argv.slice( 2, process.argv.length + 1),
 			spellPath       = process.cwd(),
-			projectPath     = createProjectPath( spellPath ),
+			projectPath     = argv[ 1 ],
 			projectFilename = 'project.json',
 			projectFilePath = projectPath + '/' + projectFilename
 
@@ -44,7 +43,7 @@ require(
 			console.log( errors.join( '\n' ) )
 		}
 
-		var processBuild = function( projectFilePath, target ) {
+		var buildCommand = function( projectFilePath, target ) {
 			var errors = []
 
 			if( !target ) target = buildTargets.DEVELOPMENT
@@ -57,8 +56,6 @@ require(
 					errors.push( 'Error: Missing project file \'' + projectFilePath + '\'.' )
 				}
 
-				if( _.size( errors ) > 0 ) errors.push( 'Error: Parsing \'' + projectFilename + '\' failed.' )
-
 			} else if( target === buildTargets.DEPLOYMENT ) {
 
 
@@ -69,19 +66,51 @@ require(
 			}
 
 
-			if(_.size( errors ) > 0 ) printErrors( errors )
+			if( _.size( errors ) > 0 ) {
+				errors.push( 'Error: Build failed.' )
+				printErrors( errors )
+
+			} else {
+				console.log( 'Completed build successfully' )
+			}
+		}
+
+		var initCommand = function( spellPath, projectPath, projectFilePath ) {
+			var errors = initializeProjectDirectory( spellPath, projectPath, projectFilePath )
+
+			if( _.size( errors ) > 0 ) {
+				printErrors( errors )
+
+			} else {
+				console.log( 'Initialized spell project in \'' + projectPath + '\'' )
+			}
+		}
+
+		var infoCommand = function( spellPath, projectPath, projectFilePath ) {
+			console.log( 'spell sdk path:\t\t' + spellPath )
+			console.log( 'project path:\t\t' + projectPath )
+			console.log( 'project file path:\t' + projectFilePath )
 		}
 
 
 		commander
 			.version( '0.0.1' )
-//			.option( '-C, --chdir <path>', 'change the working directory' )
 
 		commander
 			.command( 'build [target]' )
 			.description( 'build a version for a target [all, deploy, dev (default)]' )
-			.action( _.bind( processBuild, this, projectFilePath ) )
+			.action( _.bind( buildCommand, this, projectFilePath ) )
 
-		commander.parse( _.rest( process.argv ) )
+		commander
+			.command( 'init' )
+			.description( 'initialize the current working directory with spell project scaffolding' )
+			.action( _.bind( initCommand, this, spellPath, projectPath, projectFilePath ) )
+
+		commander
+			.command( 'info' )
+			.description( 'print information about current environment' )
+			.action( _.bind( infoCommand, this, spellPath, projectPath, projectFilePath ) )
+
+		commander.parse( argv )
 	}
 )

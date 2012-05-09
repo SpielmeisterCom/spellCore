@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/executeBuildDevelopment',
 	[
+		'spell/shared/build/copyFile',
 		'spell/shared/build/createReducedEntityConfig',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
@@ -8,12 +9,14 @@ define(
 
 		'fs',
 		'glob',
+		'util',
 
 		'jsonPath',
 		'underscore.string',
 		'underscore'
 	],
 	function(
+		copyFile,
 		createReducedEntityConfig,
 		isDirectory,
 		isFile,
@@ -21,6 +24,7 @@ define(
 
 		fs,
 		glob,
+		util,
 
 		jsonPath,
 		_s,
@@ -191,6 +195,10 @@ define(
 			)
 		}
 
+		var compressResourceId = function( resourceId ) {
+			return resourceId.replace( /\//g, '_' )
+		}
+
 		var createRuntimeModule = function( startZoneId, zones, componentBlueprints, entityBlueprints ) {
 			return {
 				startZone : startZoneId,
@@ -267,18 +275,84 @@ define(
 			if( _.size( errors ) > 0 ) return errors
 
 
-			// write generated runtime module to disk
-			var outputFilePath = projectPath + '/public/output/data.js'
-
-			errors = writeRuntimeModule(
-				outputFilePath,
-				createRuntimeModule(
-					projectConfig.startZone,
-					createZoneList( blueprintManager, projectConfig.zones ),
-					createBlueprintList( blueprintManager, componentBlueprintIds ),
-					createBlueprintList( blueprintManager, entityBlueprintIds )
+			// copy referenced resources to output path
+			var zoneList = createZoneList( blueprintManager, projectConfig.zones )
+			var resourceIds = _.unique(
+				_.reduce(
+					zoneList,
+					function( memo, zone ) {
+						return memo.concat( zone.resources )
+					},
+					[]
 				)
 			)
+
+			var relativeTexturesPath = '/library/assets/textures',
+				spellTexturesPath    = spellPath + relativeTexturesPath,
+				projectTexturesPath  = projectPath + relativeTexturesPath,
+				outputTexturesPath   = projectPath + '/public/output/resources/textures'
+
+			_.each(
+				resourceIds,
+				function( resourceId ) {
+					var inputFilePath  = spellTexturesPath + '/' + resourceId,
+						outputFilePath = outputTexturesPath + '/' + resourceId.replace( /\//g, '_' )
+
+					if( isFile( inputFilePath ) ) {
+						copyFile( inputFilePath, outputFilePath )
+
+						return
+					}
+
+					inputFilePath = projectTexturesPath + '/' + resourceId
+
+					if( isFile( inputFilePath ) ) {
+						copyFile( inputFilePath, outputFilePath )
+
+						return
+					}
+
+					errors.push( 'Error: Could not locate resource \'' + resourceId + '\'.' )
+				}
+			)
+
+			if( _.size( errors ) > 0 ) return errors
+
+
+
+			// write generated runtime module to output path
+			var outputPath = projectPath + '/public/output',
+				outputFilePath = outputPath + '/data.js'
+
+			var runtimeModule = createRuntimeModule(
+				projectConfig.startZone,
+				_.map(
+					zoneList,
+					function( zone ) {
+						zone.resources = _.map(
+							zone.resources,
+							function( resourceId ) {
+								return compressResourceId( resourceId )
+							}
+						)
+
+						return zone
+					}
+				),
+				createBlueprintList( blueprintManager, componentBlueprintIds ),
+				createBlueprintList( blueprintManager, entityBlueprintIds )
+			)
+
+			errors = writeRuntimeModule( outputFilePath, runtimeModule )
+
+			if( _.size( errors ) > 0 ) return errors
+
+
+			// copy engine include to output path
+			var inputFilePath = spellPath + '/build/spell.js'
+			outputFilePath = outputPath + '/spell.js'
+
+			copyFile( inputFilePath, outputFilePath )
 
 
 			return errors
