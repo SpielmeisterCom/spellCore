@@ -80,7 +80,8 @@ require(
 		}
 
 		var startServerCommand = function( command ) {
-			serverMain( projectPath + '/public', command.user, command.port )
+			var userId = command.user || process.getuid()
+			serverMain( projectPath + '/public', userId, command.port )
 		}
 
 		var initCommand = function( spellPath, projectPath, projectFilePath ) {

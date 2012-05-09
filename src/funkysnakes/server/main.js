@@ -41,7 +41,7 @@ define(
 		"use strict"
 
 
-		return function( rootPath, unprivilegedUser, port ) {
+		return function( rootPath, unprivilegedUserId, port ) {
 			port = port || 8080
 
 
@@ -60,7 +60,7 @@ define(
 
 
 			if( port < 1024 ) {
-				if( unprivilegedUser === undefined ) {
+				if( unprivilegedUserId === undefined ) {
 					Logger.error( 'Please supply the username of the user that the server is going to run as.' )
 					process.exit()
 				}
@@ -72,7 +72,7 @@ define(
 			}
 
 
-			console.log( 'The server is going to run as user "' + unprivilegedUser + '" on port ' + port + '.' )
+			console.log( 'The server is going to run as user "' + unprivilegedUserId + '" on port ' + port + '.' )
 
 			var flashPolicyFile, httpServer, connection
 
@@ -91,7 +91,7 @@ define(
 			executeLogged(
 				'dropping privileges',
 				function() {
-					process.setuid( unprivilegedUser )
+					process.setuid( unprivilegedUserId )
 				}
 			)
 

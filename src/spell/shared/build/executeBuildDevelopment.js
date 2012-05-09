@@ -10,6 +10,7 @@ define(
 		'fs',
 		'glob',
 		'util',
+		'mkdirp',
 
 		'jsonPath',
 		'underscore.string',
@@ -25,6 +26,7 @@ define(
 		fs,
 		glob,
 		util,
+		mkdirp,
 
 		jsonPath,
 		_s,
@@ -195,10 +197,6 @@ define(
 			)
 		}
 
-		var compressResourceId = function( resourceId ) {
-			return resourceId.replace( /\//g, '_' )
-		}
-
 		var createRuntimeModule = function( startZoneId, zones, componentBlueprints, entityBlueprints ) {
 			return {
 				startZone : startZoneId,
@@ -287,16 +285,21 @@ define(
 				)
 			)
 
-			var relativeTexturesPath = '/library/assets/textures',
-				spellTexturesPath    = spellPath + relativeTexturesPath,
-				projectTexturesPath  = projectPath + relativeTexturesPath,
-				outputTexturesPath   = projectPath + '/public/output/resources/textures'
+			var relativeAssetsPath = '/library/assets',
+				spellTexturesPath    = spellPath + relativeAssetsPath,
+				projectTexturesPath  = projectPath + relativeAssetsPath,
+				outputResourcesPath   = projectPath + '/public/output/resources'
 
 			_.each(
 				resourceIds,
 				function( resourceId ) {
-					var inputFilePath  = spellTexturesPath + '/' + resourceId,
-						outputFilePath = outputTexturesPath + '/' + resourceId.replace( /\//g, '_' )
+					var inputFilePath = spellTexturesPath + '/' + resourceId,
+						outputFilePath = outputResourcesPath + '/' + resourceId,
+						outputFilePathNamespaced = _.initial( outputFilePath.split( '/' ) ).join( '/' )
+
+					if( !isDirectory( outputFilePathNamespaced ) ) {
+						mkdirp.sync( outputFilePathNamespaced )
+					}
 
 					if( isFile( inputFilePath ) ) {
 						copyFile( inputFilePath, outputFilePath )
@@ -326,19 +329,7 @@ define(
 
 			var runtimeModule = createRuntimeModule(
 				projectConfig.startZone,
-				_.map(
-					zoneList,
-					function( zone ) {
-						zone.resources = _.map(
-							zone.resources,
-							function( resourceId ) {
-								return compressResourceId( resourceId )
-							}
-						)
-
-						return zone
-					}
-				),
+				zoneList,
 				createBlueprintList( blueprintManager, componentBlueprintIds ),
 				createBlueprintList( blueprintManager, entityBlueprintIds )
 			)

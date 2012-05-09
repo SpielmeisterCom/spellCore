@@ -156,15 +156,14 @@ define(
 		)
 
 
-		zoneManager.createZone(
-			'base',
-			_.find(
-				runtimeModule.zones,
-				function( iter ) {
-					return iter.name === runtimeModule.startZone
-				}
-			)
+		var startZone = _.find(
+			runtimeModule.zones,
+			function( iter ) {
+				return iter.name === runtimeModule.startZone
+			}
 		)
+
+		zoneManager.createZone( 'base', startZone )
 
 
 		var mainLoop = createMainLoop( eventManager, statisticsManager )

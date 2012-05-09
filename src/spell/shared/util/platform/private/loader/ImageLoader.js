@@ -23,7 +23,7 @@ define(
 			this.loaded = true
 
 			var resources = {}
-			resources[ this.resourceUri ] = image
+			resources[ this.resourceName ] = image
 
 			this.onCompleteCallback( resources )
 		}
@@ -46,24 +46,22 @@ define(
 		 * public
 		 */
 
-		var ImageLoader = function( eventManager, host, resourceBundleName, resourceUri, loadingCompletedCallback, timedOutCallback ) {
+		var ImageLoader = function( eventManager, resourcePath, resourceBundleName, resourceName, loadingCompletedCallback, timedOutCallback ) {
 			this.eventManager       = eventManager
-			this.host               = host
 			this.resourceBundleName = resourceBundleName
-			this.resourceUri        = resourceUri
+			this.resourcePath       = resourcePath
+			this.resourceName       = resourceName
 			this.onCompleteCallback = loadingCompletedCallback
 			this.loaded             = false
 		}
 
 		ImageLoader.prototype = {
 			start: function() {
-				var url = this.host + "/" + this.resourceUri
-
 				var image = new Image()
 				image.onload             = _.bind( onLoad, this, image )
 				image.onreadystatechange = _.bind( onReadyStateChange, this, image )
 				image.onerror            = _.bind( onError, this )
-				image.src                = url
+				image.src                = this.resourcePath + '/' + this.resourceName
 			}
 		}
 

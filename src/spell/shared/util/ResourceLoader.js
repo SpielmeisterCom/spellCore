@@ -25,6 +25,8 @@ define(
 		var STATE_PROCESSING = 1
 		var STATE_COMPLETED = 2
 
+		var RESOURCE_PATH = 'output/resources'
+
 		var extensionToLoaderFactory = {
 			'png'  : PlatformKit.createImageLoader,
 			'jpg'  : PlatformKit.createImageLoader,
@@ -124,9 +126,11 @@ define(
 				throw 'Could not create loader factory for resource "' + resourceName + '".'
 			}
 
+			var resourcePath = host + '/' + RESOURCE_PATH
+
 			var loader = loaderFactory(
 				eventManager,
-				host,
+				resourcePath,
 				resourceBundleName,
 				resourceName,
 				loadingCompletedCallback,
