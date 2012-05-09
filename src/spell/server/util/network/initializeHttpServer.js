@@ -34,46 +34,17 @@ define(
 			"wav"  : "audio/wav"
 		}
 
-		/**
-		 * Includes prefixes for all resource paths the client is allowed to request.
-		 */
-		var publicResources = [
-			"loader.html",
-			"html5.html",
-			"flash.html",
-			"payload.swf",
-			"fontTest.html",
-			"renderingTest.html",
-			"renderingCoordinateTest.html",
-			"run-specs.html",
-			"main.css",
-			"images",
-			"sounds",
-			"code/funkysnakes/client",
-			"code/funkysnakes/shared",
-			"code/spell/client",
-			"code/spell/shared",
-			"code/glmatrix",
-			"code/needjs",
-			"code/underscore.js",
-			"code/modernizr.js",
-			"code/jsonh.js",
-            "code/jquery.js",
-			"swfobject.js",
-			"public"
-		]
 
-
-		function initializeHttpServer( port ) {
-			var httpServer = http.createServer( onRequest )
+		function initializeHttpServer( rootPath, port ) {
+			var httpServer = http.createServer(_.bind( onRequest, null, rootPath ) )
 			httpServer.listen( port )
 
 			return httpServer
 		}
 
 
-		function onRequest( request, response ) {
-			var filePath = 'public/' + createFilePath( request.url )
+		function onRequest( rootPath, request, response ) {
+			var filePath = rootPath + '/' + createFilePath( request.url )
 
 
 			if( !path.existsSync( filePath ) ) {
@@ -81,12 +52,6 @@ define(
 
 				response.writeHead( 404, { "Content-Type": "text/plain" } )
 				response.end( "Not Found" )
-
-			} else if( !isAccessible( filePath ) ) {
-				Logger.warn( 'Requested file "' + filePath + '" is not accessible.' )
-
-				response.writeHead( 403, { "Content-Type": "text/plain" } )
-				response.end( "Forbidden" )
 
 			} else {
 				respondWithFile( filePath, response, request )
@@ -111,16 +76,6 @@ define(
 
 		function beginsWith( string, prefix ) {
 			return string.indexOf( prefix ) === 0
-		}
-
-
-		function isAccessible( path ) {
-			return _.find(
-				publicResources,
-				function( iter ) {
-					return beginsWith( path, iter )
-				}
-			)
 		}
 
 

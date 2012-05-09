@@ -2,6 +2,8 @@ require( { baseUrl: "src" } )
 
 require(
 	[
+		'funkysnakes/server/main',
+
 		'spell/shared/build/executeBuildDevelopment',
 		'spell/shared/build/initializeProjectDirectory',
 		'spell/shared/build/isDirectory',
@@ -13,6 +15,8 @@ require(
 		'underscore'
 	],
 	function(
+		serverMain,
+
 		executeBuildDevelopment,
 		initializeProjectDirectory,
 		isDirectory,
@@ -75,6 +79,10 @@ require(
 			}
 		}
 
+		var startServerCommand = function( command ) {
+			serverMain( projectPath + '/public', command.user, command.port )
+		}
+
 		var initCommand = function( spellPath, projectPath, projectFilePath ) {
 			var errors = initializeProjectDirectory( spellPath, projectPath, projectFilePath )
 
@@ -100,6 +108,13 @@ require(
 			.command( 'build [target]' )
 			.description( 'build a version for a target [all, deploy, dev (default)]' )
 			.action( _.bind( buildCommand, this, projectFilePath ) )
+
+		commander
+			.command( 'start-server' )
+			.option( '-u, --user [username]', 'the user the server drops it\'s privileges to' )
+			.option( '-p, --port [port number]', 'the port the server runs on' )
+			.description( 'start the dev server - run with superuser privileges to enable flash target support' )
+			.action( startServerCommand )
 
 		commander
 			.command( 'init' )

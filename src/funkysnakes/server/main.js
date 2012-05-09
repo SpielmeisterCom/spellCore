@@ -1,7 +1,5 @@
-// We need to set the base url for RequireJS, otherwise it won't be able to find modules.
-require( { baseUrl: "src" } )
-
-require(
+define(
+	'funkysnakes/server/main',
 	[
 		"funkysnakes/server/components",
 		"funkysnakes/server/entities",
@@ -43,155 +41,149 @@ require(
 		"use strict"
 
 
-		var createProjectPath = function( spellPath ) {
-			var parts = spellPath.split( '/' )
-
-			return parts.slice( 0, parts.length - 2 ).join( '/' )
-		}
-
-		var executableName  = 'sappre',
-			spellPath       = process.cwd(),
-			projectPath     = createProjectPath( spellPath )
+		return function( rootPath, unprivilegedUser, port ) {
+			port = port || 8080
 
 
-		var isRoot = function() {
-			return process.getuid() === 0
-		}
-
-		var executeLogged = function( message, func ) {
-			process.stdout.write( ' -> ' + message + '... ' )
-			func.call()
-			process.stdout.write( 'done\n' )
-		}
-
-		var unprivilegedUser = process.argv[ 3 ],
-			port             = parseInt( process.argv[ 4 ] )
+			console.log( process.cwd() )
 
 
-		if( port < 1024 ) {
-			if( unprivilegedUser === undefined ) {
-				Logger.error( 'Please supply the username of the user that the server is going to run as.' )
-				process.exit()
+			var isRoot = function() {
+				return process.getuid() === 0
 			}
 
-			if( !isRoot() ) {
-				Logger.error( 'Binding to ports less than 1024 requires root privileges. The script must be started with root privileges.' )
-				process.exit()
+			var executeLogged = function( message, func ) {
+				process.stdout.write( ' -> ' + message + '... ' )
+				func.call()
+				process.stdout.write( 'done\n' )
 			}
-		}
 
 
-		console.log( 'The server is going to run as user "' + unprivilegedUser + '" on port ' + port + '.' )
+			if( port < 1024 ) {
+				if( unprivilegedUser === undefined ) {
+					Logger.error( 'Please supply the username of the user that the server is going to run as.' )
+					process.exit()
+				}
 
-		var flashPolicyFile, httpServer, connection
-
-		executeLogged(
-			'binding to ports',
-			function() {
-				flashPolicyFile = network.initializeFlashPolicyFileServer( 843 )
-				httpServer      = network.initializeHttpServer( port )
-				connection      = network.initializeClientHandling( httpServer, networkProtocol )
-
-				network.initializePathService( connection )
-				network.initializeClockSyncService( connection )
+				if( !isRoot() ) {
+					Logger.error( 'Binding to ports less than 1024 requires root privileges. The script must be started with root privileges.' )
+					process.exit()
+				}
 			}
-		)
-
-		executeLogged(
-			'dropping privileges',
-			function() {
-				process.setuid( unprivilegedUser )
-			}
-		)
 
 
-		var eventManager = new EventManager()
-		var entityManager = new EntityManager( entities, components )
+			console.log( 'The server is going to run as user "' + unprivilegedUser + '" on port ' + port + '.' )
 
-		var globals = {}
+			var flashPolicyFile, httpServer, connection
 
-		var zones = {
-			game : gameZone
-		}
+			executeLogged(
+				'binding to ports',
+				function() {
+					flashPolicyFile = network.initializeFlashPolicyFileServer( 843 )
+					httpServer      = network.initializeHttpServer( rootPath, port )
+					connection      = network.initializeClientHandling( httpServer, networkProtocol )
 
-		var zoneManager = new ZoneManager( eventManager, zones, globals )
-
-		var clients = connection.clients
-
-		globals.clients       = clients
-		globals.entityManager = entityManager
-		globals.eventManager  = eventManager
-		globals.zoneManager   = zoneManager
-
-
-
-		var gameZones = {}
-
-		var findGameZoneWithOpenPlayerSlot = function( zones ) {
-			return _.find(
-				zones,
-				function( zone ) {
-					return zone.hasOpenPlayerSlot()
+					network.initializePathService( connection )
+					network.initializeClockSyncService( connection )
 				}
 			)
-		}
 
-		var findGameZoneWithClient = function( zones, clientId ) {
-			return _.find(
-				zones,
-				function( zone ) {
-					return zone.clients[ clientId ] !== undefined
+			executeLogged(
+				'dropping privileges',
+				function() {
+					process.setuid( unprivilegedUser )
 				}
 			)
-		}
 
-		var onZoneTransition = function( zone, nextZone ) {
-			delete gameZones[ zone.id ]
 
-			if( nextZone ) {
-				gameZones[ nextZone.id ] = nextZone
+			var eventManager = new EventManager()
+			var entityManager = new EntityManager( entities, components )
+
+			var globals = {}
+
+			var zones = {
+				game : gameZone
 			}
-		}
 
-		connection.listeners.push( {
-			onConnect: function( client ) {
-			},
+			var zoneManager = new ZoneManager( eventManager, zones, globals )
 
-			onDisconnect: function( client ) {
-				Logger.info( 'client ' + client.id + ' disconnected' )
-				var zone = findGameZoneWithClient( gameZones, client.id )
+			var clients = connection.clients
 
-				if( zone ) {
-					zone.removeClient( client )
-
-				} else {
-					Logger.error( 'Could not find a zone with client ' + client.id + '.' )
-				}
-			},
-
-			onMessage: function( client, message ) {
-				if( message.type !== Messages.JOIN_ANY_GAME ) return
+			globals.clients       = clients
+			globals.entityManager = entityManager
+			globals.eventManager  = eventManager
+			globals.zoneManager   = zoneManager
 
 
-				var zone = findGameZoneWithOpenPlayerSlot( gameZones )
 
-				if( !zone ) {
-					zone = zoneManager.createZone(
-						'game',
-						{
-							onZoneTransition : onZoneTransition
-						}
-					)
-				}
+			var gameZones = {}
 
-				zone.addClient( client )
-				client.zone = zone
-				gameZones[ zone.id ] = zone
+			var findGameZoneWithOpenPlayerSlot = function( zones ) {
+				return _.find(
+					zones,
+					function( zone ) {
+						return zone.hasOpenPlayerSlot()
+					}
+				)
 			}
-		} )
 
-		console.log( ' -> listening for incoming connections...\n' )
+			var findGameZoneWithClient = function( zones, clientId ) {
+				return _.find(
+					zones,
+					function( zone ) {
+						return zone.clients[ clientId ] !== undefined
+					}
+				)
+			}
 
-		PlatformKit.callNextFrame( createMainLoop( eventManager, Types.Time.getCurrentInMs() ) )
+			var onZoneTransition = function( zone, nextZone ) {
+				delete gameZones[ zone.id ]
+
+				if( nextZone ) {
+					gameZones[ nextZone.id ] = nextZone
+				}
+			}
+
+			connection.listeners.push( {
+				onConnect: function( client ) {
+				},
+
+				onDisconnect: function( client ) {
+					Logger.info( 'client ' + client.id + ' disconnected' )
+					var zone = findGameZoneWithClient( gameZones, client.id )
+
+					if( zone ) {
+						zone.removeClient( client )
+
+					} else {
+						Logger.error( 'Could not find a zone with client ' + client.id + '.' )
+					}
+				},
+
+				onMessage: function( client, message ) {
+					if( message.type !== Messages.JOIN_ANY_GAME ) return
+
+
+					var zone = findGameZoneWithOpenPlayerSlot( gameZones )
+
+					if( !zone ) {
+						zone = zoneManager.createZone(
+							'game',
+							{
+								onZoneTransition : onZoneTransition
+							}
+						)
+					}
+
+					zone.addClient( client )
+					client.zone = zone
+					gameZones[ zone.id ] = zone
+				}
+			} )
+
+			console.log( ' -> listening for incoming connections...\n' )
+
+			PlatformKit.callNextFrame( createMainLoop( eventManager, Types.Time.getCurrentInMs() ) )
+		}
 	}
 )
