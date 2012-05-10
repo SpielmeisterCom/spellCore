@@ -4,14 +4,12 @@ define(
 		"./initializeClientHandling",
 		"./initializeClockSyncService",
 		"./initializeFlashPolicyFileServer",
-		"./initializeHttpServer",
 		"./initializePathService"
 	],
 	function(
 		initializeClientHandling,
 		initializeClockSyncService,
 		initializeFlashPolicyFileServer,
-		initializeHttpServer,
 		initializePathService
 	) {
 		"use strict"
@@ -21,7 +19,6 @@ define(
 			initializeClientHandling        : initializeClientHandling,
 			initializeClockSyncService      : initializeClockSyncService,
 			initializeFlashPolicyFileServer : initializeFlashPolicyFileServer,
-			initializeHttpServer            : initializeHttpServer,
 			initializePathService           : initializePathService
 		}
 	}
