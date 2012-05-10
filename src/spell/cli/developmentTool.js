@@ -81,7 +81,7 @@ require(
 
 		var startServerCommand = function( command ) {
 			var userId = command.user || process.getuid()
-			serverMain( projectPath + '/public', userId, command.port )
+			serverMain( spellPath, projectPath + '/public', userId, command.port )
 		}
 
 		var initCommand = function( spellPath, projectPath, projectFilePath ) {

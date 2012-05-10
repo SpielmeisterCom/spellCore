@@ -7,7 +7,7 @@ define(
 		"funkysnakes/server/util/createMainLoop",
 		"funkysnakes/shared/util/networkProtocol",
 
-		'spell/server/build/server',
+		'spell/server/build/createServer',
 		'spell/server/util/connect/extDirect',
 		"spell/server/util/network/network",
 		"spell/shared/util/network/Messages",
@@ -31,7 +31,7 @@ define(
 		createMainLoop,
 		networkProtocol,
 
-		buildServer,
+		createBuildServer,
 		extDirect,
 		network,
 		Messages,
@@ -65,7 +65,7 @@ define(
 			process.stdout.write( 'done\n' )
 		}
 
-		var createHttpServer = function( rootPath, port ) {
+		var createHttpServer = function( spellPath, rootPath, port ) {
 			return connect()
 				.use( connect.favicon() )
 				.use( connect.logger( 'dev' ) )
@@ -74,7 +74,13 @@ define(
 						origins: [ 'http://localhost:3000', 'http://localhost:8080' ]
 					} )
 				)
-				.use( extDirect( '/router/', 'SpellBuild', buildServer ) )
+				.use(
+					extDirect(
+						'/router/',
+						'SpellBuild',
+						createBuildServer( spellPath )
+					)
+				)
 				.use( connect.static( rootPath ) )
 				.listen( port )
 		}
@@ -84,7 +90,7 @@ define(
 		 * public
 		 */
 
-		return function( rootPath, unprivilegedUserId, port ) {
+		return function( spellPath, rootPath, unprivilegedUserId, port ) {
 			port = port || 8080
 
 
@@ -109,7 +115,7 @@ define(
 				'binding to ports',
 				function() {
 					flashPolicyFile = network.initializeFlashPolicyFileServer( 843 )
-					httpServer      = createHttpServer( rootPath, port )
+					httpServer      = createHttpServer( spellPath, rootPath, port )
 					connection      = network.initializeClientHandling( httpServer, networkProtocol )
 
 					network.initializePathService( connection )
