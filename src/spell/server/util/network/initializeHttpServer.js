@@ -36,7 +36,7 @@ define(
 
 
 		function initializeHttpServer( rootPath, port ) {
-			var httpServer = http.createServer(_.bind( onRequest, null, rootPath ) )
+			var httpServer = http.createServer( _.bind( onRequest, null, rootPath ) )
 			httpServer.listen( port )
 
 			return httpServer

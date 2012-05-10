@@ -7,6 +7,8 @@ define(
 		"funkysnakes/server/util/createMainLoop",
 		"funkysnakes/shared/util/networkProtocol",
 
+		'spell/server/build/server',
+		'spell/server/util/connect/extDirect',
 		"spell/server/util/network/network",
 		"spell/shared/util/network/Messages",
 		"spell/shared/util/EventManager",
@@ -17,6 +19,8 @@ define(
 		"spell/shared/util/platform/PlatformKit",
 		"spell/shared/util/platform/Types",
 
+		"connect",
+
 		"underscore"
 	],
 	function(
@@ -26,6 +30,8 @@ define(
 		createMainLoop,
 		networkProtocol,
 
+		buildServer,
+		extDirect,
 		network,
 		Messages,
 		EventManager,
@@ -36,27 +42,43 @@ define(
 		PlatformKit,
 		Types,
 
+		connect,
+
 		_
 	) {
 		"use strict"
 
 
+		/**
+		 * private
+		 */
+
+		var isRoot = function() {
+			return process.getuid() === 0
+		}
+
+		var executeLogged = function( message, func ) {
+			process.stdout.write( ' -> ' + message + '... ' )
+			func.call()
+			process.stdout.write( 'done\n' )
+		}
+
+		var createHttpServer = function( rootPath, port ) {
+			return connect()
+				.use( connect.favicon() )
+				.use( connect.logger( 'dev' ) )
+				.use( extDirect( '/router/', 'SpellBuild', buildServer ) )
+				.use( connect.static( rootPath ) )
+				.listen( port )
+		}
+
+
+		/**
+		 * public
+		 */
+
 		return function( rootPath, unprivilegedUserId, port ) {
 			port = port || 8080
-
-
-			console.log( process.cwd() )
-
-
-			var isRoot = function() {
-				return process.getuid() === 0
-			}
-
-			var executeLogged = function( message, func ) {
-				process.stdout.write( ' -> ' + message + '... ' )
-				func.call()
-				process.stdout.write( 'done\n' )
-			}
 
 
 			if( port < 1024 ) {
@@ -80,7 +102,7 @@ define(
 				'binding to ports',
 				function() {
 					flashPolicyFile = network.initializeFlashPolicyFileServer( 843 )
-					httpServer      = network.initializeHttpServer( rootPath, port )
+					httpServer      = createHttpServer( rootPath, port )
 					connection      = network.initializeClientHandling( httpServer, networkProtocol )
 
 					network.initializePathService( connection )
