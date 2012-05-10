@@ -20,6 +20,7 @@ define(
 		"spell/shared/util/platform/Types",
 
 		"connect",
+		"connect-cors",
 
 		"underscore"
 	],
@@ -43,6 +44,7 @@ define(
 		Types,
 
 		connect,
+		cors,
 
 		_
 	) {
@@ -67,6 +69,11 @@ define(
 			return connect()
 				.use( connect.favicon() )
 				.use( connect.logger( 'dev' ) )
+				.use(
+					cors( {
+						origins: [ 'http://localhost:3000', 'http://localhost:8080' ]
+					} )
+				)
 				.use( extDirect( '/router/', 'SpellBuild', buildServer ) )
 				.use( connect.static( rootPath ) )
 				.listen( port )
