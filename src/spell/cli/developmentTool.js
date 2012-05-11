@@ -85,7 +85,10 @@ require(
 				userId = command.user || process.getuid(),
 				projectsPath = path.resolve( cwdPath + ( command.projectsRoot ? '/' + command.projectsRoot : '' ) )
 
-			if( !projectsPath ) errors.push( 'Error: No projects directory supplied. Unable to start build server.' )
+			if( !path.existsSync( projectsPath ) ) {
+				errors.push( 'Error: No valid projects directory supplied. Unable to start build server. ' +
+					'See \'' + executableName + ' start-server --help\'.' )
+			}
 
 			if( _.size( errors ) > 0 ) {
 				printErrors( errors )
