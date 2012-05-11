@@ -21,6 +21,7 @@ define(
 
 		"connect",
 		"connect-cors",
+		"path",
 
 		"underscore"
 	],
@@ -45,6 +46,7 @@ define(
 
 		connect,
 		cors,
+		path,
 
 		_
 	) {
@@ -65,7 +67,29 @@ define(
 			process.stdout.write( 'done\n' )
 		}
 
-		var createHttpServer = function( spellPath, rootPath, port ) {
+		var isValidProjectPath = function( projectsPath, projectPathToCheck ) {
+			return path.existsSync( projectsPath + projectPathToCheck )
+		}
+
+		var rewriteUrlToRealProjectPath = function( projectsPath ) {
+			return function ( req, res, next ) {
+				var match = req.url.match( /(\/[^\/.]*)(.*)/ )
+
+				if( !match ) next()
+
+				var potentialProjectPath = match[ 1 ],
+					rest = match[ 2 ]
+
+				if( isValidProjectPath( projectsPath, potentialProjectPath ) ) {
+					var rewrittenUrl = potentialProjectPath + '/public' + rest
+					req.url = rewrittenUrl
+				}
+
+				next()
+			}
+		}
+
+		var createHttpServer = function( spellPath, projectsPath, port ) {
 			return connect()
 				.use( connect.favicon() )
 				.use( connect.logger( 'dev' ) )
@@ -81,7 +105,8 @@ define(
 						createBuildServer( spellPath )
 					)
 				)
-				.use( connect.static( rootPath ) )
+				.use( rewriteUrlToRealProjectPath( projectsPath ) )
+				.use( connect.static( projectsPath ) )
 				.listen( port )
 		}
 
@@ -90,7 +115,7 @@ define(
 		 * public
 		 */
 
-		return function( spellPath, rootPath, unprivilegedUserId, port ) {
+		return function( spellPath, projectsPath, unprivilegedUserId, port ) {
 			port = port || 8080
 
 
@@ -107,7 +132,7 @@ define(
 			}
 
 
-			console.log( 'The server is going to run as user "' + unprivilegedUserId + '" on port ' + port + '.' )
+			console.log( 'The server is going to run as user \'' + unprivilegedUserId + '\' on port ' + port + ' with path \'' + projectsPath + '\' as root.' )
 
 			var flashPolicyFile, httpServer, connection
 
@@ -115,7 +140,7 @@ define(
 				'binding to ports',
 				function() {
 					flashPolicyFile = network.initializeFlashPolicyFileServer( 843 )
-					httpServer      = createHttpServer( spellPath, rootPath, port )
+					httpServer      = createHttpServer( spellPath, projectsPath, port )
 					connection      = network.initializeClientHandling( httpServer, networkProtocol )
 
 					network.initializePathService( connection )

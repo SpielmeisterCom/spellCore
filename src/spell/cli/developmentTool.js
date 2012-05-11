@@ -80,8 +80,19 @@ require(
 		}
 
 		var startServerCommand = function( command ) {
-			var userId = command.user || process.getuid()
-			serverMain( spellPath, projectPath + '/public', userId, command.port )
+			var errors = [],
+				cwdPath = argv[ 1 ],
+				userId = command.user || process.getuid(),
+				projectsPath = path.resolve( cwdPath + ( command.projectsRoot ? '/' + command.projectsRoot : '' ) )
+
+			if( !projectsPath ) errors.push( 'Error: No projects directory supplied. Unable to start build server.' )
+
+			if( _.size( errors ) > 0 ) {
+				printErrors( errors )
+
+			} else {
+				serverMain( spellPath, projectsPath, userId, command.port )
+			}
 		}
 
 		var initCommand = function( spellPath, projectPath, projectFilePath ) {
@@ -114,6 +125,7 @@ require(
 			.command( 'start-server' )
 			.option( '-u, --user [username]', 'the user the server drops it\'s privileges to' )
 			.option( '-p, --port [port number]', 'the port the server runs on' )
+			.option( '-r, --projects-root [directory]', 'the path to the projects directory, that contains the project directories' )
 			.description( 'start the dev server - run with superuser privileges to enable flash target support' )
 			.action( startServerCommand )
 
