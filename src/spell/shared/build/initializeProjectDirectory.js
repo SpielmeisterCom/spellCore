@@ -23,7 +23,7 @@ define(
 
 		return function( spellPath, projectPath, projectFilePath ) {
 			var errors = []
-console.log( arguments )
+
 			// create directory structure
 			var paths = [
 				'public',
@@ -34,7 +34,6 @@ console.log( arguments )
 				'library/blueprints'
 			]
 
-            try {
 			_.each(
 				paths,
 				function( path ) {
@@ -84,9 +83,6 @@ console.log( arguments )
 				}
 			)
 
-            } catch( e ) {
-                console.log( e )
-            }
 			return errors
 		}
 	}
