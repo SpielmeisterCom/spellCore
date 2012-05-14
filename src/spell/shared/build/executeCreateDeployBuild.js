@@ -1,5 +1,5 @@
 define(
-	'spell/shared/build/executeBuildDeployment',
+	'spell/shared/build/executeCreateDeployBuild',
 	function() {
 		'use strict'
 

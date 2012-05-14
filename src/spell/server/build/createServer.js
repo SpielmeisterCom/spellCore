@@ -1,13 +1,13 @@
 define(
 	'spell/server/build/createServer',
 	[
-		'spell/shared/build/executeBuildDevelopment',
+		'spell/shared/build/executeCreateDebugBuild',
 		'spell/shared/build/initializeProjectDirectory',
 
 		'underscore'
 	],
 	function(
-		executeBuildDevelopment,
+		executeCreateDebugBuild,
 		initializeProjectDirectory,
 
 		_
@@ -23,7 +23,7 @@ define(
 			var projectPath = payload[ 0 ],
 				projectFilePath = payload[ 1 ]
 
-			return executeBuildDevelopment( spellPath, projectPath, projectFilePath )
+			return executeCreateDebugBuild( spellPath, projectPath, projectFilePath )
 		}
 
 		var initDirectory = function( spellPath, req, res, payload, next  ) {

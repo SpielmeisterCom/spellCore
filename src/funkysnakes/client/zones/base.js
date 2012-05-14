@@ -107,6 +107,9 @@ define(
 				eventManager.subscribe( [ Events.LOGIC_UPDATE, '20' ], this.updateCallback )
 
 
+				if( _.size( zoneConfig.resources ) === 0 ) return
+
+
 				eventManager.subscribe(
 					[ Events.RESOURCE_LOADING_COMPLETED, 'zoneResources' ],
 					function() {

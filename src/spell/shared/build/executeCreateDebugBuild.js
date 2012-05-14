@@ -1,5 +1,5 @@
 define(
-	'spell/shared/build/executeBuildDevelopment',
+	'spell/shared/build/executeCreateDebugBuild',
 	[
 		'spell/shared/build/copyFile',
 		'spell/shared/build/createReducedEntityConfig',

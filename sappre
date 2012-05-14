@@ -1,9 +1,28 @@
-#!/bin/bash
+#!/usr/bin/env node
 
-CURRENT_WORKING_DIRECTORY=`pwd`
-TOOL_PATH=`readlink -f $0`
-SPELL_PATH=`dirname $TOOL_PATH`
+var createSpellPath = function( toolPath ) {
+	var parts = toolPath.split( '/' )
+	return parts.slice( 0, parts.length - 1 ).join( '/' )
+}
 
-cd $SPELL_PATH
+requirejs = require( 'requirejs' )
 
-./node_modules/.bin/r.js src/spell/cli/developmentTool.js $CURRENT_WORKING_DIRECTORY $@
+requirejs.config( {
+	baseUrl: '/home/martin/workspace/spell/spelljs/src',
+	nodeRequire: require
+} )
+
+requirejs(
+	[
+		'spell/cli/developmentTool'
+	],
+	function(
+		developmentTool
+	) {
+		developmentTool(
+			process.argv,
+			process.cwd(),
+			createSpellPath( process.mainModule.filename )
+		)
+	}
+)

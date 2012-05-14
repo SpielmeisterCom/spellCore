@@ -47,7 +47,17 @@ define(
 
 			// create project.json
 			if( !isFile( projectFilePath ) ) {
-				var data = {"id":1,"name":"","startZone":"","zones":[]}
+				var data = {
+					"id": 1,
+					"name": "",
+					"startZone": "Zone1",
+					"zones": [
+						{
+							"name": "Zone1",
+							"entities": []
+						}
+					]
+				}
 
 				fs.writeFileSync(
 					projectFilePath,
