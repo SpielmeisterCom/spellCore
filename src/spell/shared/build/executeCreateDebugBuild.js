@@ -197,8 +197,9 @@ define(
 			)
 		}
 
-		var createRuntimeModule = function( startZoneId, zones, componentBlueprints, entityBlueprints ) {
+		var createRuntimeModule = function( projectName, startZoneId, zones, componentBlueprints, entityBlueprints ) {
 			return {
+				name: projectName,
 				startZone : startZoneId,
 				zones : zones,
 				componentBlueprints : componentBlueprints,
@@ -328,6 +329,7 @@ define(
 				outputFilePath = outputPath + '/data.js'
 
 			var runtimeModule = createRuntimeModule(
+				projectConfig.name,
 				projectConfig.startZone,
 				zoneList,
 				createBlueprintList( blueprintManager, componentBlueprintIds ),

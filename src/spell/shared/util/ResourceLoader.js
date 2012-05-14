@@ -118,7 +118,7 @@ define(
 			updateProgress.call( this, this.resourceBundles[ resourceBundleName ] )
 		}
 
-		var createLoader = function( eventManager, host, resourceBundleName, resourceName, loadingCompletedCallback, loadingTimedOutCallback, soundManager ) {
+		var createLoader = function( applicationId, eventManager, host, resourceBundleName, resourceName, loadingCompletedCallback, loadingTimedOutCallback, soundManager ) {
 			var extension = _.last( resourceName.split( '.' ) )
 			var loaderFactory = extensionToLoaderFactory[ extension ]
 
@@ -126,7 +126,7 @@ define(
 				throw 'Could not create loader factory for resource "' + resourceName + '".'
 			}
 
-			var resourcePath = host + '/' + RESOURCE_PATH
+			var resourcePath = host + '/' + applicationId + '/' + RESOURCE_PATH
 
 			var loader = loaderFactory(
 				eventManager,
@@ -153,6 +153,7 @@ define(
 						}
 
 						var loader = createLoader(
+							this.applicationId,
 							this.eventManager,
 							this.host,
 							resourceBundle.name,
@@ -179,7 +180,7 @@ define(
 		 * public
 		 */
 
-		var ResourceLoader = function( soundManager, eventManager, hostConfig ) {
+		var ResourceLoader = function( applicationId, soundManager, eventManager, hostConfig ) {
 			if( eventManager === undefined ) throw 'Argument "eventManager" is undefined.'
             if( soundManager === undefined ) throw 'Argument "soundManager" is undefined.'
 
@@ -188,6 +189,7 @@ define(
 			this.resourceBundles = {}
 			this.resources = {}
 			this.host = ( hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host )
+			this.applicationId = applicationId
 		}
 
 		ResourceLoader.prototype = {

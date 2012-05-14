@@ -54,7 +54,7 @@ define(
 
 		var soundManager         = PlatformKit.createSoundManager()
 		var inputManager         = new InputManager( configurationManager )
-		var resourceLoader       = new ResourceLoader( soundManager, eventManager, configurationManager.resourceServer )
+		var resourceLoader       = new ResourceLoader( runtimeModule.name, soundManager, eventManager, configurationManager.resourceServer )
 		var statisticsManager    = new StatisticsManager()
 
 		statisticsManager.init()
