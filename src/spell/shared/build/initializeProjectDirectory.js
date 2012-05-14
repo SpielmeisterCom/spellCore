@@ -48,8 +48,7 @@ define(
 			// create project.json
 			if( !isFile( projectFilePath ) ) {
 				var data = {
-					"id": 1,
-					"name": "",
+					"name": projectPath, // projectPath equals to the project name
 					"startZone": "Zone1",
 					"zones": [
 						{
