@@ -19,16 +19,16 @@ define(
 		 * private
 		 */
 
-		var createDevelopmentBuild = function( spellPath, req, res, payload, next ) {
+		var createDevelopmentBuild = function( spellPath, projectsPath, req, res, payload, next ) {
 			var projectPath = payload[ 0 ],
 				projectFilePath = payload[ 1 ]
 
 			return executeCreateDebugBuild( spellPath, projectPath, projectFilePath )
 		}
 
-		var initDirectory = function( spellPath, req, res, payload, next  ) {
-			var projectPath = payload[ 0 ],
-				projectFilePath = payload[ 1 ]
+		var initDirectory = function( spellPath, projectsPath, req, res, payload, next  ) {
+			var projectPath = projectsPath + "/" + payload[ 0 ],
+				projectFilePath = projectsPath + "/" + payload[ 1 ]
 
 			return initializeProjectDirectory( spellPath, projectPath, projectFilePath )
 		}
@@ -38,18 +38,18 @@ define(
 		 * public
 		 */
 
-		return function( spellPath ) {
+		return function( spellPath, projectsPath ) {
 			return {
 				ProjectActions: [
 					{
 						name: "createDevelopmentBuild",
 						len: 2,
-						func: _.bind( createDevelopmentBuild, null, spellPath )
+						func: _.bind( createDevelopmentBuild, null, spellPath, projectsPath )
 					},
 					{
 						name: "initDirectory",
 						len: 2,
-						func: _.bind( initDirectory, null, spellPath )
+						func: _.bind( initDirectory, null, spellPath, projectsPath )
 					}
 				]
 			}

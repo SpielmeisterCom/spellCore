@@ -102,7 +102,7 @@ define(
 					extDirect(
 						'http://localhost:8080/router/',
 						'SpellBuild',
-						createBuildServer( spellPath )
+						createBuildServer( spellPath, projectsPath )
 					)
 				)
 				.use( rewriteUrlToRealProjectPath( projectsPath ) )
