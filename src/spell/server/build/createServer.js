@@ -27,10 +27,11 @@ define(
 		}
 
 		var initDirectory = function( spellPath, projectsPath, req, res, payload, next  ) {
-			var projectPath     = projectsPath + '/' + payload[ 0 ],
+			var projectName     = payload[ 0 ],
+				projectPath     = projectsPath + '/' + projectName,
 				projectFilePath = projectsPath + '/' + payload[ 1 ]
 
-			return initializeProjectDirectory( spellPath, projectPath, projectFilePath )
+			return initializeProjectDirectory( spellPath, projectName, projectPath, projectFilePath )
 		}
 
 

@@ -21,7 +21,7 @@ define(
 		'use strict'
 
 
-		return function( spellPath, projectPath, projectFilePath ) {
+		return function( spellPath, projectName, projectPath, projectFilePath ) {
 			var errors = []
 
 			// create directory structure
@@ -48,7 +48,7 @@ define(
 			// create project.json
 			if( !isFile( projectFilePath ) ) {
 				var data = {
-					"name": projectPath, // projectPath equals to the project name
+					"name": projectName,
 					"startZone": "Zone1",
 					"zones": [
 						{
