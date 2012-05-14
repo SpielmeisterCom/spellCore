@@ -5,10 +5,12 @@ var createSpellPath = function( toolPath ) {
 	return parts.slice( 0, parts.length - 1 ).join( '/' )
 }
 
+var spellPath = createSpellPath( process.mainModule.filename )
+
 requirejs = require( 'requirejs' )
 
 requirejs.config( {
-	baseUrl: '/home/martin/workspace/spell/spelljs/src',
+	baseUrl: spellPath + '/src',
 	nodeRequire: require
 } )
 
@@ -19,10 +21,6 @@ requirejs(
 	function(
 		developmentTool
 	) {
-		developmentTool(
-			process.argv,
-			process.cwd(),
-			createSpellPath( process.mainModule.filename )
-		)
+		developmentTool( process.argv, process.cwd(), spellPath )
 	}
 )
