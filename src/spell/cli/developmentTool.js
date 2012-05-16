@@ -1,4 +1,5 @@
 define(
+	'spell/cli/developmentTool',
 	[
 		'funkysnakes/server/main',
 
@@ -53,7 +54,6 @@ define(
 			var buildCommand = function( projectFilePath, target, version ) {
 				var errors = []
 
-
 				if( !version ) version = buildVersions.DEBUG
 				if( !target ) target = buildTargets.HTML5
 
@@ -64,7 +64,7 @@ define(
 					errors.push( 'Error: \'' + version + '\' is not a valid version. See \'' + executableName + ' --help\'.' )
 				}
 
-				if( _.size( errors ) > 0 ) {
+				if( errors.length > 0 ) {
 					printErrors( errors )
 
 					return
@@ -75,7 +75,7 @@ define(
 					console.log( 'creating debug build...' )
 
 					if( isFile( projectFilePath ) ) {
-						errors = executeCreateDebugBuild( spellPath, projectPath, projectFilePath )
+						errors = executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath )
 
 					} else {
 						errors.push( 'Error: Missing project file \'' + projectFilePath + '\'.' )
@@ -89,7 +89,7 @@ define(
 				}
 
 
-				if( _.size( errors ) > 0 ) {
+				if( errors.length > 0 ) {
 					errors.push( 'Error: Build failed.' )
 					printErrors( errors )
 
@@ -108,7 +108,7 @@ define(
 						'See \'' + executableName + ' start-server --help\'.' )
 				}
 
-				if( _.size( errors ) > 0 ) {
+				if( errors.length > 0 ) {
 					printErrors( errors )
 
 				} else {
@@ -117,9 +117,9 @@ define(
 			}
 
 			var initCommand = function( spellPath, projectPath, projectFilePath ) {
-				var errors = initializeProjectDirectory( spellPath, projectPath, projectFilePath )
+				var errors = initializeProjectDirectory( spellPath, path.basename( projectPath ), projectPath, projectFilePath )
 
-				if( _.size( errors ) > 0 ) {
+				if( errors.length > 0 ) {
 					printErrors( errors )
 
 				} else {
@@ -139,7 +139,7 @@ define(
 
 			commander
 				.command( 'build [version] [target]' )
-				.description( 'build a specific version [deploy, debug (default)] for a specific target [flash, html5 (default)]' )
+				.description( 'build a specific version [deploy, debug (default)] for a specific target [all, flash, html5 (default)]' )
 				.action( _.bind( buildCommand, this, projectFilePath ) )
 
 			commander
