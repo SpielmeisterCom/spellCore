@@ -1,6 +1,10 @@
 define(
 	'spell/client/main',
 	[
+		'funkysnakes/client/zones/base',
+		'funkysnakes/shared/util/createMainLoop',
+
+		'spell/client/runtimeModule',
 		'spell/shared/util/entities/EntityManager',
 		'spell/shared/util/zones/ZoneManager',
 		'spell/shared/util/blueprints/BlueprintManager',
@@ -13,12 +17,13 @@ define(
 		'spell/shared/util/Logger',
 		'spell/shared/util/platform/PlatformKit',
 
-		'funkysnakes/client/zones/base',
-		'funkysnakes/shared/util/createMainLoop',
-
 		'underscore'
 	],
 	function(
+		baseZone,
+		createMainLoop,
+
+		runtimeModule,
 		EntityManager,
 		ZoneManager,
 		BlueprintManager,
@@ -31,12 +36,7 @@ define(
 		Logger,
 		PlatformKit,
 
-		baseZone,
-		createMainLoop,
-
-		_,
-
-		runtimeModule
+		_
 	) {
 		'use strict'
 

@@ -79,7 +79,7 @@ define(
 		var isValidDefinition = function( blueprint ) {
 			var bluePrintType = blueprint.type
 
-			if( !_.include( blueprintTypes, bluePrintType ) ) return false
+			if( !_.contains( blueprintTypes, bluePrintType ) ) return false
 
 
 			if( bluePrintType === blueprintTypes.BLUEPRINT_TYPE_COMPONENT ) {

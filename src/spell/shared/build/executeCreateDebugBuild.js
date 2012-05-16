@@ -3,6 +3,9 @@ define(
 	[
 		'spell/shared/build/copyFile',
 		'spell/shared/build/createReducedEntityConfig',
+		'spell/shared/build/executable/Director',
+		'spell/shared/build/executable/FlashExecutableBuilder',
+		'spell/shared/build/executable/Html5ExecutableBuilder',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
 		'spell/shared/util/blueprints/BlueprintManager',
@@ -11,6 +14,7 @@ define(
 		'glob',
 		'util',
 		'mkdirp',
+		'path',
 
 		'jsonPath',
 		'underscore.string',
@@ -19,6 +23,9 @@ define(
 	function(
 		copyFile,
 		createReducedEntityConfig,
+		Director,
+		FlashExecutableBuilder,
+		Html5ExecutableBuilder,
 		isDirectory,
 		isFile,
 		BlueprintManager,
@@ -27,6 +34,7 @@ define(
 		glob,
 		util,
 		mkdirp,
+		path,
 
 		jsonPath,
 		_s,
@@ -40,6 +48,15 @@ define(
 		 */
 
 		var RELATIVE_BLUEPRINT_LIBRARY_PATH = '/library/blueprints'
+
+		var runtimeModuleRequirejsTemplate = [
+			'define(',
+			'	\'spell/client/runtimeModule\',',
+			'	function() {',
+			'		return %1$s',
+			'	}',
+			')'
+		].join( '\n' )
 
 		var createBlueprintLibraryPathPatterns = function( libraryPaths, subDirectoryName ) {
 			return _.map(
@@ -198,35 +215,18 @@ define(
 		}
 
 		var createRuntimeModule = function( projectName, startZoneId, zones, componentBlueprints, entityBlueprints ) {
-			return {
+			var runtimeModule = {
 				name: projectName,
 				startZone : startZoneId,
 				zones : zones,
 				componentBlueprints : componentBlueprints,
 				entityBlueprints : entityBlueprints
 			}
-		}
 
-		var writeRuntimeModule = function( outputFilePath, runtimeModule ) {
-			var errors = []
-
-			var data = _s.sprintf(
-				'spell.setRuntimeModule( %1$s )',
-				JSON.stringify(
-					runtimeModule,
-					null,
-					'\t'
-				)
+			return _s.sprintf(
+				runtimeModuleRequirejsTemplate,
+				JSON.stringify( runtimeModule )
 			)
-
-			// delete file if it already exists
-			if( isFile( outputFilePath ) ) {
-				fs.unlinkSync( outputFilePath )
-			}
-
-			fs.writeFileSync( outputFilePath, data, 'utf-8' )
-
-			return errors
 		}
 
 
@@ -234,7 +234,7 @@ define(
 		 * public
 		 */
 
-		return function( spellPath, projectPath, projectFilePath ) {
+		return function( target, spellPath, projectPath, projectFilePath ) {
 			var errors = [],
 				spellBlueprintPath = spellPath + RELATIVE_BLUEPRINT_LIBRARY_PATH,
 				projectBlueprintPath = projectPath + RELATIVE_BLUEPRINT_LIBRARY_PATH
@@ -323,12 +323,16 @@ define(
 			if( _.size( errors ) > 0 ) return errors
 
 
+			// generating executables
+			var tempPath = projectPath + '/build', // directory for build related temporary files
+				executablesOutputPath = projectPath + '/public/output',
+				engineSource = fs.readFileSync( spellPath + '/build/spell.js' ).toString( 'utf-8' )
 
-			// write generated runtime module to output path
-			var outputPath = projectPath + '/public/output',
-				outputFilePath = outputPath + '/data.js'
+			if( !path.existsSync( tempPath) ) {
+				fs.mkdirSync( tempPath )
+			}
 
-			var runtimeModule = createRuntimeModule(
+			var runtimeModuleSource = createRuntimeModule(
 				projectConfig.name,
 				projectConfig.startZone,
 				zoneList,
@@ -336,16 +340,23 @@ define(
 				createBlueprintList( blueprintManager, entityBlueprintIds )
 			)
 
-			errors = writeRuntimeModule( outputFilePath, runtimeModule )
+			// TODO: nur die builder erzeugen die angefordert wurden
+			var buildExecutableDirector = new Director(
+				[
+					new FlashExecutableBuilder(),
+					new Html5ExecutableBuilder(
+						fs.readFileSync( spellPath + '/build/spell.html5.js' ).toString( 'utf-8' )
+					)
+				]
+			)
 
-			if( _.size( errors ) > 0 ) return errors
+			buildExecutableDirector.setSpellPath( spellPath )
+			buildExecutableDirector.setOutputPath( executablesOutputPath )
+			buildExecutableDirector.setTempPath( tempPath )
+			buildExecutableDirector.setEngineSource( engineSource )
+			buildExecutableDirector.setRuntimeModule( runtimeModuleSource )
 
-
-			// copy engine include to output path
-			var inputFilePath = spellPath + '/build/spell.js'
-			outputFilePath = outputPath + '/spell.js'
-
-			copyFile( inputFilePath, outputFilePath )
+			errors = buildExecutableDirector.build()
 
 
 			return errors
