@@ -1,0 +1,3 @@
+[submodule "vendor/spellas"]
+	path = vendor/spellas
+	url = git@git.spielmeister.com:/spellas.git
