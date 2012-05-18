@@ -1,7 +1,7 @@
 define(
 	"spell/shared/util/platform/private/createLoader",
 	[
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_

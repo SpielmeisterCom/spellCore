@@ -23,7 +23,7 @@ define(
 		"connect-cors",
 		"path",
 
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		components,

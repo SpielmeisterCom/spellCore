@@ -1,14 +1,14 @@
 define(
 	"spell/shared/util/entities/datastructures/entityMap",
 	[
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_
 	) {
 		"use strict"
-		
-		
+
+
 		/**
 		 * A map that uses an arbitrary property of an entity as its key.
 		 * This data structure should be used, if you need to efficiently access entities based on a specific property.
@@ -27,7 +27,7 @@ define(
 		 * Attention: Changing the property afterwards is not supported and will lead to unexpected results! A
 		 * workaround for this is to remove the component from the entity and re-add it with the changed property.
 		 */
-			
+
 		return function( keyAccessor ) {
 			return {
 				onCreate: function( map ) {
@@ -51,7 +51,7 @@ define(
 							}
 						} )
 					}
-					
+
 					delete map.entityMap[ key ]
 				}
 			}

@@ -18,7 +18,7 @@ define(
 
 		'jsonPath',
 		'underscore.string',
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		copyFile,

@@ -4,7 +4,7 @@ define(
 		"spell/shared/util/platform/private/sound/createSound",
 		"spell/shared/components/sound/soundEmitter",
 
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function (
 		createSound,

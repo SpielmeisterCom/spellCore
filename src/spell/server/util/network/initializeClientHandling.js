@@ -4,7 +4,7 @@ define(
 		'spell/shared/util/Logger',
 
 		'websocket',
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		Logger,

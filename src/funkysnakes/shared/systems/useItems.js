@@ -5,7 +5,7 @@ define(
 
 		"spell/server/util/network/nextNetworkId",
 
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		constants,

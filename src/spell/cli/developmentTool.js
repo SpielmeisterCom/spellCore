@@ -11,7 +11,7 @@ define(
 		'commander',
 		'fs',
 		'path',
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		serverMain,

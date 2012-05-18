@@ -1,7 +1,7 @@
 define(
 	"spell/client/systems/sound/processSound",
 	[
-		"underscore",
+		'spell/shared/util/platform/underscore',
         "spell/shared/components/sound/soundEmitter"
 	],
 	function(

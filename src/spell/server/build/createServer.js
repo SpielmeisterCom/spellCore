@@ -4,7 +4,7 @@ define(
 		'spell/shared/build/executeCreateDebugBuild',
 		'spell/shared/build/initializeProjectDirectory',
 
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		executeCreateDebugBuild,

@@ -4,7 +4,7 @@ define(
 		'spell/shared/util/platform/private/createNativeFloatArray',
 
 		'glmatrix/mat4',
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		createNativeFloatArray,

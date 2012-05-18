@@ -1,7 +1,7 @@
 define(
 	"spell/shared/util/StatisticsManager",
 	[
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_

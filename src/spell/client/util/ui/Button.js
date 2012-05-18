@@ -1,7 +1,7 @@
 define(
 	"spell/client/util/ui/Button",
     [
-        "underscore"
+        'spell/shared/util/platform/underscore'
     ],
 	function(
 

@@ -6,7 +6,7 @@ define(
 		'spell/shared/util/random/XorShift32',
 
 		'glmatrix/vec3',
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		Events,

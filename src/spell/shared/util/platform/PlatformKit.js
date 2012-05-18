@@ -16,7 +16,7 @@ define(
 		'spell/shared/util/platform/private/sound/SoundManager',
 		'spell/shared/util/math',
 
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		callNextFrame,

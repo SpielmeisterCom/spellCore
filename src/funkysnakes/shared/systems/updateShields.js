@@ -1,7 +1,7 @@
 define(
 	"funkysnakes/shared/systems/updateShields",
 	[
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_

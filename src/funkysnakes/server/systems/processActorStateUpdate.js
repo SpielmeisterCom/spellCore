@@ -1,7 +1,7 @@
 define(
 	'funkysnakes/server/systems/processActorStateUpdate',
 	[
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_

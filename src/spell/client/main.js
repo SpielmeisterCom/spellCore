@@ -17,7 +17,7 @@ define(
 		'spell/shared/util/Logger',
 		'spell/shared/util/platform/PlatformKit',
 
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		baseZone,

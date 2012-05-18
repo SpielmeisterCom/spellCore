@@ -1,7 +1,7 @@
 define(
 	'spell/shared/build/executable/Director',
 	[
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_

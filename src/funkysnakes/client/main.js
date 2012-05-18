@@ -27,7 +27,7 @@ define(
 		"spell/shared/util/platform/Types",
 		'spell/client/main',
 
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		entities,

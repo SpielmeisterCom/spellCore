@@ -5,7 +5,7 @@ define(
 
 		"glmatrix/vec3",
 		"glmatrix/mat4",
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		constants,

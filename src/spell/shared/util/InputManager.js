@@ -5,7 +5,7 @@ define(
 		"spell/shared/util/math",
 		"spell/shared/util/platform/PlatformKit",
 
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		keyCodes,

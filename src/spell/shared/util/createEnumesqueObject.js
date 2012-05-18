@@ -1,7 +1,7 @@
 define(
 	'spell/shared/util/createEnumesqueObject',
 	[
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_

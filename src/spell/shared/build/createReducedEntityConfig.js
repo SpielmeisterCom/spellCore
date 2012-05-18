@@ -3,7 +3,7 @@ define(
 	[
 		'spell/shared/util/blueprints/createLocalComponentName',
 
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		createLocalComponentName,

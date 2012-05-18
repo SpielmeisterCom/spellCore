@@ -1,7 +1,7 @@
 define(
 	'spell/shared/util/deepClone',
 	[
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_
@@ -10,25 +10,21 @@ define(
 
 
 		return function deepClone( o ) {
-			if (
-				_.isBoolean( o )   ||
-				_.isFunction( o )  ||
-				_.isNaN( o )       ||
-				_.isNull( o )      ||
-				_.isNumber( o )    ||
-				_.isString( o )    ||
-				_.isUndefined( o )
-			) {
-				return o
+			var isArray = _.isArray( o )
 
-			} else {
-				var clone = _.isArray( o ) ? [] : {}
+			if( isArray ||
+				_.isObject( o ) ) {
+
+				var clone = isArray ? [] : {}
 
 				_.each( o, function( value, key ) {
 					clone[ key ] = deepClone( value )
 				} )
 
 				return clone
+
+			} else {
+				return o
 			}
 		}
 	}

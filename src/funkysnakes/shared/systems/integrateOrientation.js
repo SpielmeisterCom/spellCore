@@ -1,14 +1,14 @@
 define(
 	"funkysnakes/shared/systems/integrateOrientation",
 	[
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_
 	) {
 		"use strict"
-		
-		
+
+
 		return function(
 			deltaTimeInS,
 			entities

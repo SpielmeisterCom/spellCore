@@ -2,7 +2,7 @@ define(
 	"funkysnakes/client/systems/fade",
 	[
 		"glmatrix/vec3",
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		vec3,

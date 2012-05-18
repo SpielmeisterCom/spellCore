@@ -7,7 +7,7 @@ define(
 		"spell/shared/util/map",
 
 		"glmatrix/vec3",
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		collisionBetween,

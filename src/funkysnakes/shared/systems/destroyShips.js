@@ -3,7 +3,7 @@ define(
 	[
 		"spell/server/util/network/nextNetworkId",
 
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		nextNetworkId,
@@ -27,7 +27,7 @@ define(
 				entityManager.destroyEntity( element )
 			} )
 		}
-		
+
 		return function(
 			heads,
 			tailElementsByHeadId,
@@ -36,7 +36,7 @@ define(
 			_.each( heads, function( head ) {
 				if( head.hasOwnProperty( "active" ) ) return
 
-				
+
 				destroyShip(
 					head,
 					tailElementsByHeadId[ head.body.id ],

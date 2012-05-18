@@ -4,7 +4,7 @@ define(
 		"spell/shared/util/Events",
 		"spell/shared/util/platform/Types",
 
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		Events,

@@ -1,14 +1,14 @@
 define(
 	"spell/shared/util/entities/datastructures/multiMap",
 	[
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_
 	) {
 		"use strict"
-		
-		
+
+
 		/**
 		 * A multimap that uses an arbitrary property of an entity as its key.
 		 * This data structure should be used, if you need to efficiently access groups of entities based on a specific
@@ -26,28 +26,28 @@ define(
 		 * Attention: Changing the key property afterwards is not supported and will lead to unexpected results! A
 		 * workaround for this is to remove the component from the entity and re-add it with the changed key property.
 		 */
-		
+
 		return function( keyAccessor ) {
 			return {
 				onCreate: function( map ) {
 					map.multiMap = {}
 				},
-				
+
 				onAdd: function( map, key, entity ) {
 					var entityKey = keyAccessor( entity )
-					
+
 					if ( !map.multiMap.hasOwnProperty( entityKey ) ) {
 						map.multiMap[ entityKey ] = []
 					}
-					
+
 					map.multiMap[ entityKey ].push( entity )
 				},
-				
+
 				onUpdate: function( map, key, originalEntity, updatedEntity ) {
 					this.onRemove( map, key, originalEntity )
 					this.onAdd( map, key, updatedEntity )
 				},
-				
+
 				onRemove: function( map, key, entityToRemove ) {
 					var entityKey = keyAccessor( entityToRemove )
 
@@ -60,11 +60,11 @@ define(
 							} )
 						} )
 					}
-					
+
 					map.multiMap[ entityKey ] = map.multiMap[ entityKey ].filter( function( entityInMap ) {
 						return entityInMap !== entityToRemove
 					} )
-					
+
 					if ( map.multiMap[ entityKey ].length === 0 ) {
 						delete map.multiMap[ entityKey ]
 					}

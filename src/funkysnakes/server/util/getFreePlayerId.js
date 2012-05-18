@@ -1,7 +1,7 @@
 define(
 	'funkysnakes/server/util/getFreePlayerId',
 	[
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_

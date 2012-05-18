@@ -1,7 +1,7 @@
 define(
 	"funkysnakes/shared/systems/updateSpaceshipOrientation",
 	[
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_

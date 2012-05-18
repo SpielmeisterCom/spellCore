@@ -9,7 +9,7 @@ define(
 		'spell/shared/util/zones/ZoneEntityManager',
 		'spell/shared/util/Events',
 
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		updateRenderData,

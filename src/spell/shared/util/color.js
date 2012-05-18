@@ -4,7 +4,7 @@ define(
 		"spell/shared/util/math",
 
 		"glmatrix/vec3",
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		MathHelper,

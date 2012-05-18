@@ -7,7 +7,7 @@ define(
 
 		'fs',
 		'util',
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		copyFile,

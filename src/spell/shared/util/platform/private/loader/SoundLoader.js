@@ -6,7 +6,7 @@ define(
 		"spell/shared/util/platform/private/sound/loadSounds",
 		"spell/shared/util/platform/private/registerTimer",
 
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		TextLoader,

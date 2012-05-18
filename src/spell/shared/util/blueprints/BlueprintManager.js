@@ -3,15 +3,11 @@ define(
 	[
 		'spell/shared/util/deepClone',
 		'spell/shared/util/blueprints/createLocalComponentName',
-
-		'jsonPath',
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		deepClone,
 		createLocalComponentName,
-
-		jsonPath,
 		_
 	) {
 		'use strict'
@@ -226,15 +222,6 @@ define(
 			},
 			getBlueprint : function( blueprintId ) {
 				return getBlueprint( blueprintId )
-			},
-
-			/**
-			 * Returns all dependent component blueprint ids
-			 *
-			 * @param blueprintId - entity blueprint id
-			 */
-			getDependencyComponentBlueprintIds : function( blueprintId ) {
-				return jsonPath( getBlueprint( blueprintId ), '$.components[*].id' )
 			},
 
 			/**

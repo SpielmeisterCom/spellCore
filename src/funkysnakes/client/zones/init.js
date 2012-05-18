@@ -15,7 +15,7 @@ define(
 		'spell/shared/util/Events',
 		'spell/shared/util/Logger',
 
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		networkProtocol,

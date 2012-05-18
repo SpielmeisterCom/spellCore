@@ -1,7 +1,7 @@
 define(
 	"funkysnakes/shared/systems/applyInputActions",
 	[
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		_

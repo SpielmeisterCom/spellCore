@@ -1,5 +1,5 @@
 define(
-	"underscore",
+	'spell/shared/util/platform/underscore',
 	function() {
 		//     Underscore.js 1.3.1
 		//     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.

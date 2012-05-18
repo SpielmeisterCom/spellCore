@@ -4,7 +4,7 @@ define(
 		"spell/shared/util/network/Messages",
 		"spell/shared/util/platform/PlatformKit",
 
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		Messages,

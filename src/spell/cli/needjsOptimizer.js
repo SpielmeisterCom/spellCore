@@ -6,7 +6,7 @@ define(
 		'path',
 
 		'underscore.string',
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		commander,

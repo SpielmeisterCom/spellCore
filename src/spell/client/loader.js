@@ -3,7 +3,7 @@ define(
 	[
 		'modernizr',
 
-		'underscore'
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		modernizr,

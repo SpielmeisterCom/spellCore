@@ -4,7 +4,7 @@ define(
 		"funkysnakes/shared/config/constants",
 		"spell/shared/util/math",
 
-		"underscore"
+		'spell/shared/util/platform/underscore'
 	],
 	function(
 		constants,
