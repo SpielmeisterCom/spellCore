@@ -71,7 +71,7 @@ define(
 				ProjectActions: [
 					{
 						name: 'executeCreateDebugBuild',
-						len: 2,
+						len: 3,
 						func: _.bind( executeCreateDebugBuildWrapper, null, spellPath, projectsPath )
 					},
 					{
