@@ -139,7 +139,7 @@ define(
 		 * @param blueprintId - entity blueprint id
 		 */
 		var getDependencyComponentBlueprintIds = function( blueprintManager, blueprintId ) {
-			return jsonPath( blueprintManager.getBlueprint( blueprintId ), '$.components[*].id' )
+			return jsonPath( blueprintManager.getBlueprint( blueprintId ), '$.components[*].blueprintId' )
 		}
 
 		/**
@@ -257,7 +257,7 @@ define(
 				if( _s.startsWith( e, 'SyntaxError' ) ) {
 					errors.push( e.toString() )
 
-					return errors
+					callback( errors )
 				}
 			}
 
@@ -266,7 +266,7 @@ define(
 			var blueprintManager = new BlueprintManager()
 			errors = loadBlueprintsFromLibrary( blueprintManager, [ spellBlueprintPath, projectBlueprintPath ] )
 
-			if( _.size( errors ) > 0 ) return errors
+			if( _.size( errors ) > 0 ) callback( errors )
 
 
 			// determine all blueprints that are referenced in the project
@@ -278,7 +278,7 @@ define(
 			errors = hasAllBlueprints( blueprintManager, entityBlueprintIds )
 			errors = errors.concat( hasAllBlueprints( blueprintManager, componentBlueprintIds ) )
 
-			if( _.size( errors ) > 0 ) return errors
+			if( _.size( errors ) > 0 ) callback( errors )
 
 
 			// copy referenced resources to output path
@@ -327,7 +327,7 @@ define(
 				}
 			)
 
-			if( _.size( errors ) > 0 ) return errors
+			if( _.size( errors ) > 0 ) callback( errors )
 
 
 			// generating executables

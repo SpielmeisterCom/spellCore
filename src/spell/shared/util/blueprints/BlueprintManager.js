@@ -54,7 +54,7 @@ define(
 			var componentNameCounts = _.reduce(
 				blueprint.components,
 				function( memo, componentConfig ) {
-					var localComponentName = createLocalComponentName( componentConfig.id, componentConfig.importName )
+					var localComponentName = createLocalComponentName( componentConfig.blueprintId, componentConfig.importName )
 
 					memo[ localComponentName ] = ( _.has( memo, localComponentName ) ?
 						memo[ localComponentName ] += 1 :
@@ -123,7 +123,7 @@ define(
 			return _.reduce(
 				entityBlueprint.components,
 				function( memo, componentConfig ) {
-					var componentBlueprintId = componentConfig.id,
+					var componentBlueprintId = componentConfig.blueprintId,
 						componentBlueprint = getBlueprint( componentBlueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
 
 					if( !componentBlueprint ) throwCouldNotFindBlueprint( componentBlueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
@@ -212,6 +212,10 @@ define(
 				addBlueprint( definition )
 			},
 			createEntity : function( blueprintId, entityConfig ) {
+				var entityTemplate = entityTemplates[ blueprintId ]
+
+				if( !entityTemplate ) throw 'Error: Could not find entity template for blueprint id \'' + blueprintId + '\'.'
+
 				return updateEntity(
 					deepClone( entityTemplates[ blueprintId ] ),
 					entityConfig

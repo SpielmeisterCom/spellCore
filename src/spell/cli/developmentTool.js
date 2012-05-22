@@ -32,7 +32,7 @@ define(
 
 		var printErrors = function( errors ) {
 			var tmp = []
-			tmp.concat( errors )
+			tmp = tmp.concat( errors )
 
 			console.log( tmp.join( '\n' ) )
 		}
@@ -42,6 +42,7 @@ define(
 				errors.length > 0 ) {
 
 				printErrors( errors )
+				process.exit()
 
 			} else {
 				console.log( 'completed' )
