@@ -157,7 +157,7 @@ define(
 				.command( 'start-server' )
 				.option( '-u, --user [username]', 'the user the server drops it\'s privileges to' )
 				.option( '-p, --port [port number]', 'the port the server runs on' )
-				.option( '-r, --projects-root [directory]', 'the path to the projects directory, that contains the project directories' )
+				.option( '-r, --projects-root [directory]', 'The path to the projects directory that contains the project directories. The default is the current working directory.' )
 				.description( 'start the dev server - run with superuser privileges to enable flash target support' )
 				.action( startServerCommand )
 
