@@ -333,7 +333,14 @@ define(
 			// generating executables
 			var tempPath = projectPath + '/build', // directory for build related temporary files
 				executablesOutputPath = projectPath + '/public/output',
-				engineSource = fs.readFileSync( spellPath + '/build/spell.js' ).toString( 'utf-8' )
+				spellEngineSource = spellPath + '/build/spell.js'
+
+			if( !path.existsSync( spellEngineSource ) ) {
+				errors.push( 'Error: Could not locate engine include file \'' + spellEngineSource + '\'.' )
+				callback( errors )
+			}
+
+			var engineSource = fs.readFileSync( spellEngineSource ).toString( 'utf-8' )
 
 			if( !path.existsSync( tempPath) ) {
 				fs.mkdirSync( tempPath )
