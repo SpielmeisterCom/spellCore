@@ -3,9 +3,8 @@ define(
 	[
 		'spell/shared/build/copyFile',
 		'spell/shared/build/createReducedEntityConfig',
-		'spell/shared/build/executable/Director',
-		'spell/shared/build/executable/FlashExecutableBuilder',
-		'spell/shared/build/executable/Html5ExecutableBuilder',
+		'spell/shared/build/executable/buildFlashExecutable',
+		'spell/shared/build/executable/buildHtml5Executable',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
 		'spell/shared/util/blueprints/BlueprintManager',
@@ -23,9 +22,8 @@ define(
 	function(
 		copyFile,
 		createReducedEntityConfig,
-		Director,
-		FlashExecutableBuilder,
-		Html5ExecutableBuilder,
+		buildFlashExecutable,
+		buildHtml5Executable,
 		isDirectory,
 		isFile,
 		BlueprintManager,
@@ -136,6 +134,15 @@ define(
 		}
 
 		/**
+		 * Returns all dependent component blueprint ids
+		 *
+		 * @param blueprintId - entity blueprint id
+		 */
+		var getDependencyComponentBlueprintIds = function( blueprintManager, blueprintId ) {
+			return jsonPath( blueprintManager.getBlueprint( blueprintId ), '$.components[*].id' )
+		}
+
+		/**
 		 * Create a list of unique component blueprint ids that are referenced by the provided entity blueprint.
 		 *
 		 * @param entityBlueprintIds
@@ -148,7 +155,7 @@ define(
 					_.map(
 						entityBlueprintIds,
 						function( entityBlueprintId ) {
-							return blueprintManager.getDependencyComponentBlueprintIds( entityBlueprintId )
+							return getDependencyComponentBlueprintIds( blueprintManager, entityBlueprintId )
 						}
 					)
 				)
@@ -234,9 +241,9 @@ define(
 		 * public
 		 */
 
-		return function( target, spellPath, projectPath, projectFilePath ) {
-			var errors = [],
-				spellBlueprintPath = spellPath + RELATIVE_BLUEPRINT_LIBRARY_PATH,
+		return function( target, spellPath, projectPath, projectFilePath, callback ) {
+			var errors               = [],
+				spellBlueprintPath   = spellPath + RELATIVE_BLUEPRINT_LIBRARY_PATH,
 				projectBlueprintPath = projectPath + RELATIVE_BLUEPRINT_LIBRARY_PATH
 
 			// parsing project config file
@@ -340,26 +347,35 @@ define(
 				createBlueprintList( blueprintManager, entityBlueprintIds )
 			)
 
-			// TODO: nur die builder erzeugen die angefordert wurden
-			var buildExecutableDirector = new Director(
-				[
-					new FlashExecutableBuilder(),
-					new Html5ExecutableBuilder(
-						fs.readFileSync( spellPath + '/build/spell.html5.js' ).toString( 'utf-8' )
-					)
-				]
-			)
 
-			buildExecutableDirector.setSpellPath( spellPath )
-			buildExecutableDirector.setOutputPath( executablesOutputPath )
-			buildExecutableDirector.setTempPath( tempPath )
-			buildExecutableDirector.setEngineSource( engineSource )
-			buildExecutableDirector.setRuntimeModule( runtimeModuleSource )
+			if( target === 'html5' ) {
+				var platformAdapterSource = fs.readFileSync( spellPath + '/build/spell.html5.js' ).toString( 'utf-8')
 
-			errors = buildExecutableDirector.build()
+				buildHtml5Executable(
+					spellPath,
+					executablesOutputPath,
+					platformAdapterSource,
+					engineSource,
+					runtimeModuleSource,
+					callback
+				)
 
+			} else if( target === 'flash' ) {
+				var spellAsPath = spellPath + '/vendor/spellas'
 
-			return errors
+				buildFlashExecutable(
+					tempPath,
+					executablesOutputPath,
+					spellAsPath,
+					projectPath,
+					runtimeModuleSource,
+					engineSource,
+					callback
+				)
+
+			} else {
+				console.error( 'Error: Target type \'' + target + '\' is not supported.' )
+			}
 		}
 	}
 )

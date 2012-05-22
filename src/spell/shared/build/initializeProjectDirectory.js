@@ -68,9 +68,12 @@ define(
 
 			// populate public directory
 			var fileNames = [
-				'development.html',
+				'debug.html',
+				'debugFlash.html',
 				'main.css',
-				'spellEdShim.html'
+				'playerProductInstall.swf',
+				'spellEdShim.html',
+				'swfobject.js'
 			]
 
 			_.each(

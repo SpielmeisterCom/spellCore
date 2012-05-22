@@ -3,6 +3,7 @@ define(
 	[
 		'commander',
 		'fs',
+		'glob',
 		'path',
 
 		'underscore.string',
@@ -11,6 +12,7 @@ define(
 	function(
 		commander,
 		fs,
+		glob,
 		path,
 
 		_s,
@@ -31,14 +33,14 @@ define(
 			var regex  = /.*define\((\s\[.*\]|[^\[,]*)\s*,\s*(\[.*?\])?.*\).*/,
 				match  = moduleSource.match( regex )
 
-			if( !match ) throw 'Error: Parsing error.'
+			if( !match ) return false
 
 
 			var match1 = match[ 1 ].replace( /["'\s]/g, '' ),
 				match2 = match[ 2 ] ? match[ 2 ].replace( /["'\s]/g, '' ) : ''
 
 			return {
-				moduleName   : ( _s.contains( match1, '[' ) ? '' : match1 ),
+				name : ( _s.contains( match1, '[' ) ? '' : match1 ),
 				dependencies : ( _s.contains( match1, '[' ) ?
 					match1.replace( /[\[\]]/g, '' ).split( ',' ) :
 					( _s.contains( match2, '[' ) ?
@@ -49,79 +51,32 @@ define(
 			}
 		}
 
-		var isModuleIncluded = function( blackListModules, whiteListModules, moduleName ) {
-			var blackListed = _.any(
-				blackListModules,
-				function( blackListedModuleName ) {
-					return _s.startsWith( moduleName, blackListedModuleName )
-				}
-			)
-
-			if( blackListed ) return false
-
-			if( whiteListModules.length > 0 ) {
-				return _.any(
-					whiteListModules,
-					function( whiteListedModuleName ) {
-						return _s.startsWith( moduleName, whiteListedModuleName )
-					}
-				)
-			}
-
-			return true
-		}
-
-		/**
-		 * Removes modules from the dependency list according to black and white list.
-		 *
-		 * @param blackListModules
-		 * @param whiteListModules
-		 * @param dependencies
-		 * @return {*}
-		 */
-		var removeCertainModules = function( blackListModules, whiteListModules, dependencies ) {
-			if( blackListModules.length === 0 &&
-				whiteListModules.length === 0 ) {
-
-				return dependencies
-			}
-
-			return _.filter(
-				dependencies,
-				function( dependencyModuleName ) {
-					return isModuleIncluded( blackListModules, whiteListModules, dependencyModuleName )
+		var isModuleIncluded = function( ListedModules, moduleName ) {
+			return _.any(
+				ListedModules,
+				function( listedModuleName ) {
+					return _s.startsWith( moduleName, listedModuleName )
 				}
 			)
 		}
 
-		var traceDependencies = function( sourcePath, blackListModules, whiteListModules, moduleName ) {
-			var result = []
-
-			if( isModuleIncluded( blackListModules, whiteListModules, moduleName ) ) {
-				result = [ moduleName ]
+		var traceDependencies = function( modules, blackListModules, moduleName ) {
+			if( isModuleIncluded( blackListModules, moduleName ) ) {
+				return []
 			}
 
-			// read file
-			var moduleFilePath = path.join( sourcePath, moduleName ) + '.js'
+			var result = [ moduleName ],
+				module = modules[ moduleName ]
 
-			if( !path.existsSync( moduleFilePath ) ) {
-				console.error( 'Error: Could not read module \'' + moduleFilePath + '\'.' )
-				process.exit()
-			}
-
-			var fileContent = fs.readFileSync( moduleFilePath ).toString( 'utf-8' )
-
-			// extract module dependencies which are not excluded
-			var moduleHeader = extractModuleHeader( fileContent ),
-				dependencies = removeCertainModules( blackListModules, whiteListModules, moduleHeader.dependencies )
+			if( !module ) throw 'Error: Could not find module \'' + moduleName + '\'.'
 
 			// iterate
 			return _.reduce(
-				dependencies,
+				module.dependencies,
 				function( memo, dependencyModuleName ) {
 					memo = _.union(
 						memo,
-						traceDependencies( sourcePath, blackListModules, whiteListModules, dependencyModuleName )
+						traceDependencies( modules, blackListModules, dependencyModuleName )
 					)
 
 					return memo
@@ -141,6 +96,59 @@ define(
 			)
 		}
 
+		var createModuleList = function( sourcePath ) {
+			var filePattern = sourcePath + '/**/*.js',
+				filePaths = glob.sync( filePattern, {} )
+
+			return _.reduce(
+				filePaths,
+				function( memo, filePath ) {
+					var fileContent = fs.readFileSync( filePath ).toString( 'utf-8'),
+						moduleHeader = extractModuleHeader( fileContent )
+
+					if( !moduleHeader ) return memo
+
+					if( !moduleHeader.name ) {
+						console.error( 'Error: Anonymous module in file \'' + filePath + '\' is not supported.' )
+						return memo
+					}
+
+					memo[ moduleHeader.name ] = {
+						dependencies : moduleHeader.dependencies,
+						source : fileContent
+					}
+
+					return memo
+				},
+				{}
+			)
+		}
+
+		var traceExtractNamespaceDependencies = function( modules, extractNamespace ) {
+			var modulesInNamespace = _.reduce(
+				modules,
+				function( memo, value, key ) {
+					if( _s.startsWith( key, extractNamespace ) ) {
+						memo.push( key )
+					}
+
+					return memo
+				},
+				[]
+			)
+
+			return _.reduce(
+				modulesInNamespace,
+				function( memo, moduleName ) {
+					return _.union(
+						memo,
+						traceDependencies( modules, [], moduleName )
+					)
+				},
+				[]
+			)
+		}
+
 
 		/**
 		 * public
@@ -153,40 +161,46 @@ define(
 				.version( '0.0.1' )
 
 			commander
-				.option( '-b, --base <path>', 'the path to the source directory' )
+				.option( '-s, --source-base <path>', 'the path to the source directory' )
 				.option( '-m, --module <name>', 'the name of the entry module of the application' )
-				.option( '-e, --exclude <items>', 'the name(s) of the module(s) or namespaces that should be excluded (mutual exclusive with option -i)', list )
-				.option( '-i, --include <items>', 'the name(s) of the module(s) or namespaces that should be included (mutual exclusive with option -e)', list )
+				.option( '-i, --ignore <items>', 'the name(s) of the module(s) or namespaces that should be ignored', list )
+				.option( '-e, --extract <name>', 'the namespace whose dependencies should be extracted' )
 				.option( '-l, --list', 'prints the names of the traced modules to stdout instead of a concatenation of the modules contents' )
 				.parse( argv )
 
-			var sourcePath       = ( commander.base ? path.normalize( commander.base ) : cwd ),
+			var sourcePath       = ( commander.sourceBase ? path.normalize( commander.sourceBase ) : cwd ),
 				entryModuleName  = commander.module,
-				blackListModules = commander.exclude || [],
-				whiteListModules = commander.include || []
+				blackListModules = commander.ignore || [],
+				extractNamespace = commander.extract || []
 
 			if( !entryModuleName ) {
 				console.log( 'No entry module was supplied. See \'' + executableName + ' --help\'.' )
 				return
 			}
 
-			// check sourcePath
 			if( !path.existsSync( sourcePath ) ) {
 				console.error( 'Error: Could not read base directory \'' + sourcePath + '\'.' )
 			}
 
-			var moduleNames = traceDependencies(
-				sourcePath,
-				blackListModules,
-				whiteListModules,
-				entryModuleName
-			)
+			var modules                 = createModuleList( sourcePath ),
+				entryModuleDependencies = traceDependencies( modules, blackListModules, entryModuleName ),
+				resultModules           = null
 
-			if( commander.list ) {
-				console.log( moduleNames.join( '\n' ) )
+			if( !commander.extract ) {
+				resultModules = entryModuleDependencies
 
 			} else {
-				printModuleContents( sourcePath, moduleNames )
+				resultModules = _.without(
+					traceExtractNamespaceDependencies( modules, extractNamespace ),
+					entryModuleDependencies
+				)
+			}
+
+			if( commander.list ) {
+				console.log( resultModules.join( '\n' ) )
+
+			} else {
+				printModuleContents( sourcePath, resultModules )
 			}
 		}
 	}

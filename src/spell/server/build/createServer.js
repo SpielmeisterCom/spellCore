@@ -19,13 +19,40 @@ define(
 		 * private
 		 */
 
-		var createDevelopmentBuild = function( spellPath, projectsPath, req, res, payload, next ) {
-			var projectPath     = projectsPath + '/' + payload[ 0 ],
-				projectFilePath = projectsPath + '/' + payload[ 1 ]
+		/**
+		 * RPC call handler
+		 *
+		 * @param spellPath
+		 * @param projectsPath
+		 * @param req
+		 * @param res
+		 * @param payload
+		 * 	payload[ 0 ] : target ( html5, flash )
+		 * 	payload[ 1 ] : relative project path in projects directory
+		 * 	payload[ 2 ] : relative project file path inside project directory
+		 *
+		 * @param next
+		 * @return {*}
+		 */
+		var executeCreateDebugBuildWrapper = function( spellPath, projectsPath, req, res, payload, next ) {
+			var target          = payload[ 0 ],
+				projectPath     = projectsPath + '/' + payload[ 1 ],
+				projectFilePath = projectsPath + '/' + payload[ 2 ]
 
-			return executeCreateDebugBuild( spellPath, projectPath, projectFilePath )
+			return executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath )
 		}
 
+		/**
+		 * RPC call handler
+		 *
+		 * @param spellPath
+		 * @param projectsPath
+		 * @param req
+		 * @param res
+		 * @param payload
+		 * @param next
+		 * @return {*}
+		 */
 		var initDirectory = function( spellPath, projectsPath, req, res, payload, next  ) {
 			var projectName     = payload[ 0 ],
 				projectPath     = projectsPath + '/' + projectName,
@@ -43,9 +70,9 @@ define(
 			return {
 				ProjectActions: [
 					{
-						name: 'createDevelopmentBuild',
+						name: 'executeCreateDebugBuild',
 						len: 2,
-						func: _.bind( createDevelopmentBuild, null, spellPath, projectsPath )
+						func: _.bind( executeCreateDebugBuildWrapper, null, spellPath, projectsPath )
 					},
 					{
 						name: 'initDirectory',

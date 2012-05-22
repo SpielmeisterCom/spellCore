@@ -1,24 +1,18 @@
 define(
-	'spell/shared/build/executable/Html5ExecutableBuilder',
+	'spell/shared/build/executable/buildHtml5Executable',
 	[
 		'spell/shared/build/copyFile',
-		'spell/shared/build/executable/AbstractExecutableBuilder',
 		'spell/shared/build/isFile',
 
 		'fs',
-		'path',
-
-		'underscore.string'
+		'path'
 	],
 	function(
 		copyFile,
-		AbstractExecutableBuilder,
 		isFile,
 
 		fs,
-		path,
-
-		_s
+		path
 	) {
 		'use strict'
 
@@ -68,34 +62,28 @@ define(
 		 * public
 		 */
 
-		var Html5ExecutableBuilder = function( platformAdapterSource ) {
-			this.platformAdapterSource = platformAdapterSource
-		}
+		return function( spellPath, outputPath, platformAdapterSource, engineSource, runtimeModule, next ) {
+			var errors = [],
+				html5OutputPath = outputPath + '/html5'
 
-		Html5ExecutableBuilder.prototype = new AbstractExecutableBuilder()
-
-		Html5ExecutableBuilder.prototype.build = function() {
-			var errors = []
+			if( !path.existsSync( html5OutputPath ) ) {
+				fs.mkdirSync( html5OutputPath )
+			}
 
 			// writing runtime module
-			var outputFilePath = this.outputPath + '/html5/data.js'
-			errors = writeRuntimeModule( outputFilePath, this.runtimeModule )
+			var outputFilePath = html5OutputPath + '/data.js'
+			errors = writeRuntimeModule( outputFilePath, runtimeModule )
 
 			if( errors.length > 0 ) return errors
 
 
 			// writing engine include
-			outputFilePath = this.outputPath + '/html5/spell.js'
+			outputFilePath = html5OutputPath + '/spell.js'
 
-			if( !isFile( outputFilePath ) ) {
-				return errors.concat( 'Error: Could not read file \'' + outputFilePath + '\'.' )
-			}
+			errors = writeEngineInclude( spellPath, outputFilePath, platformAdapterSource, engineSource )
 
-			errors = writeEngineInclude( this.spellPath, outputFilePath, this.platformAdapterSource, this.engineSource )
 
-			return errors
+			next( errors )
 		}
-
-		return Html5ExecutableBuilder
 	}
 )

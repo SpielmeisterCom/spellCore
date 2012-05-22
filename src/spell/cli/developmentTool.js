@@ -26,6 +26,33 @@ define(
 		path,
 		_
 	) {
+		/**
+		 * private
+		 */
+
+		var printErrors = function( errors ) {
+			var tmp = []
+			tmp.concat( errors )
+
+			console.log( tmp.join( '\n' ) )
+		}
+
+		var onBuildComplete = function( errors ) {
+			if( errors &&
+				errors.length > 0 ) {
+
+				printErrors( errors )
+
+			} else {
+				console.log( 'completed' )
+			}
+		}
+
+
+		/**
+		 * public
+		 */
+
 		return function( argv, cwd, spellPath ) {
 			var executableName  = 'sappre',
 				projectPath     = cwd,
@@ -46,10 +73,6 @@ define(
 
 	//		var executeCreateDeployBuild = function( projectFilePath ) {
 	//		}
-
-			var printErrors = function( errors ) {
-				console.log( errors.join( '\n' ) )
-			}
 
 			var buildCommand = function( projectFilePath, target, version ) {
 				var errors = []
@@ -72,29 +95,17 @@ define(
 
 
 				if( version === buildVersions.DEBUG ) {
-					console.log( 'creating debug build...' )
+					console.log( 'creating debug build for target \'' + target + '\'...' )
 
 					if( isFile( projectFilePath ) ) {
-						errors = executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath )
+						executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, onBuildComplete )
 
 					} else {
-						errors.push( 'Error: Missing project file \'' + projectFilePath + '\'.' )
+						printErrors( 'Error: Missing project file \'' + projectFilePath + '\'.' )
 					}
 
 				} else if( version === buildVersions.DEPLOYMENT ) {
 					console.log( 'creating deployment build...' )
-
-				} else if( version === buildVersions.ALL ) {
-
-				}
-
-
-				if( errors.length > 0 ) {
-					errors.push( 'Error: Build failed.' )
-					printErrors( errors )
-
-				} else {
-					console.log( 'completed successfully' )
 				}
 			}
 
@@ -139,7 +150,7 @@ define(
 
 			commander
 				.command( 'build [version] [target]' )
-				.description( 'build a specific version [deploy, debug (default)] for a specific target [all, flash, html5 (default)]' )
+				.description( 'build a specific version [deploy, debug (default)] for a specific target [flash, html5 (default)]' )
 				.action( _.bind( buildCommand, this, projectFilePath ) )
 
 			commander
