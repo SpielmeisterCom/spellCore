@@ -86,7 +86,17 @@ define(
 						}
 					}
 
-					blueprintManager.add( blueprint )
+					try {
+						blueprintManager.add( blueprint )
+
+					} catch( e ) {
+						var regex = /Error: Blueprint definition '(.*)' already exists./,
+							match = e.match( regex )
+
+						if( match ) {
+							errors.push( 'Error: Overwriting of blueprint \'' + match[ 1 ] + '\' by blueprint definition in file \'' + filePath + '\' was prevented.' )
+						}
+					}
 				}
 			)
 
