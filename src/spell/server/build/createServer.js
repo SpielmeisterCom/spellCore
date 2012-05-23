@@ -14,6 +14,22 @@ define(
 	) {
 		'use strict'
 
+        var printErrors = function( errors ) {
+            var tmp = []
+            tmp = tmp.concat( errors )
+
+            console.error( tmp.join( '\n' ) )
+        }
+
+        var onBuildComplete = function( errors ) {
+            if( errors &&
+                errors.length > 0 ) {
+
+                printErrors( errors )
+
+            }
+        }
+
 
 		/**
 		 * private
@@ -37,9 +53,9 @@ define(
 		var executeCreateDebugBuildWrapper = function( spellPath, projectsPath, req, res, payload, next ) {
 			var target          = payload[ 0 ],
 				projectPath     = projectsPath + '/' + payload[ 1 ],
-				projectFilePath = projectsPath + '/' + payload[ 2 ]
+				projectFilePath = projectPath + '/' + payload[ 2 ]
 
-			return executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath )
+			return executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, onBuildComplete )
 		}
 
 		/**
