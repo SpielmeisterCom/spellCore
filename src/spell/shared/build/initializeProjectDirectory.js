@@ -6,6 +6,9 @@ define(
 		'spell/shared/build/isFile',
 
 		'fs',
+		'glob',
+		'mkdirp',
+		'path',
 		'util',
 		'spell/shared/util/platform/underscore'
 	],
@@ -15,11 +18,24 @@ define(
 		isFile,
 
 		fs,
+		glob,
+		mkdirp,
+		path,
 		util,
 		_
 	) {
 		'use strict'
 
+		/**
+		 * private
+		 */
+
+		var LIBRARY_BLUEPRINTS_PATH = '/library/blueprints'
+
+
+		/**
+		 * public
+		 */
 
 		return function( spellPath, projectName, projectPath, projectFilePath ) {
 			var errors = []
@@ -65,6 +81,33 @@ define(
 					'utf-8'
 				)
 			}
+
+			// copy spell sdk blueprints
+			var relativeFilePaths = glob.sync(
+				'/**/*.json',
+				{
+					root : spellPath + LIBRARY_BLUEPRINTS_PATH,
+					nomount : true
+				}
+			)
+
+			_.each(
+				relativeFilePaths,
+				function( relativeFilePath ) {
+					var sourceFilePath = path.join( spellPath, LIBRARY_BLUEPRINTS_PATH, relativeFilePath),
+						targetFilePath = path.join( projectPath, LIBRARY_BLUEPRINTS_PATH, relativeFilePath),
+						targetDirectoryPath = path.dirname( targetFilePath )
+
+					if( path.existsSync( targetFilePath ) ) return
+
+					if( !path.existsSync( targetDirectoryPath ) ) {
+						mkdirp.sync( targetDirectoryPath )
+					}
+
+					copyFile( sourceFilePath, targetFilePath )
+				}
+			)
+
 
 			// populate public directory
 			var fileNames = [
