@@ -34,7 +34,7 @@ define(
 			var tmp = []
 			tmp = tmp.concat( errors )
 
-			console.log( tmp.join( '\n' ) )
+			console.error( tmp.join( '\n' ) )
 		}
 
 		var onBuildComplete = function( errors ) {
@@ -42,10 +42,11 @@ define(
 				errors.length > 0 ) {
 
 				printErrors( errors )
+				console.log( 'build failed' )
 				process.exit()
 
 			} else {
-				console.log( 'completed' )
+				console.log( 'build completed' )
 			}
 		}
 

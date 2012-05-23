@@ -56,23 +56,51 @@ define(
 			')'
 		].join( '\n' )
 
-		var createBlueprintLibraryPathPatterns = function( libraryPaths, subDirectoryName ) {
-			return _.map(
+		var createBlueprintFilePaths = function( libraryPaths ) {
+			var filePathPatterns = _.map(
 				libraryPaths,
-				function( path ) {
-					return path + '/*/' + subDirectoryName + '/**/*.json'
+				function( libraryPath ) {
+					return libraryPath + '/**/*.json'
 				}
 			)
+
+			var filePathPattern = ( filePathPatterns.length > 1 ?
+				'{' + filePathPatterns.join( ',' ) + '}' :
+				filePathPatterns[ 0 ]
+			)
+
+			return glob.sync( filePathPattern, {} )
 		}
 
-		var loadBlueprintsFromPaths = function( blueprintManager, pathPatterns ) {
+		var loadBlueprints = function( blueprintManager, blueprints, type ) {
 			var errors = []
 
-			var filePaths = glob.sync( '{' + pathPatterns.join( ',' ) + '}', {} )
-
 			_.each(
+				_.filter( blueprints, function( blueprint ) { return blueprint.blueprint.type === type } ),
+				function( blueprint ) {
+					try {
+						blueprintManager.add( blueprint.blueprint )
+
+					} catch( e ) {
+						var regex = /Error: Blueprint definition '(.*)' already exists./,
+							match = e.match( regex )
+
+						if( match ) {
+							errors.push( 'Error: Overwriting of blueprint \'' + match[ 1 ] + '\' by blueprint definition in file \'' + blueprint.filePath + '\' was prevented.' )
+						}
+					}
+				}
+			)
+
+			return errors
+		}
+
+		var loadBlueprintsFromPaths = function( blueprintManager, filePaths ) {
+			var errors = []
+
+			var blueprints = _.reduce(
 				filePaths,
-				function( filePath ) {
+				function( memo, filePath ) {
 					var data = fs.readFileSync( filePath, 'utf-8')
 
 					try {
@@ -86,44 +114,35 @@ define(
 						}
 					}
 
-					try {
-						blueprintManager.add( blueprint )
+					return memo.concat( {
+						blueprint : blueprint,
+						filePath : filePath
+					} )
+				},
+				[]
+			)
 
-					} catch( e ) {
-						var regex = /Error: Blueprint definition '(.*)' already exists./,
-							match = e.match( regex )
+			errors = errors.concat(
+				loadBlueprints( blueprintManager, blueprints, 'componentBlueprint' )
+			)
 
-						if( match ) {
-							errors.push( 'Error: Overwriting of blueprint \'' + match[ 1 ] + '\' by blueprint definition in file \'' + filePath + '\' was prevented.' )
-						}
-					}
-				}
+			if( errors.length > 0 ) return errors
+
+
+			errors = errors.concat(
+				loadBlueprints( blueprintManager, blueprints, 'entityBlueprint' )
 			)
 
 			return errors
 		}
 
 		var loadBlueprintsFromLibrary = function( blueprintManager, libraryPaths ) {
-			var errors = []
+			var errors = [],
+				filePaths = createBlueprintFilePaths( libraryPaths )
 
 			errors = errors.concat(
-				loadBlueprintsFromPaths(
-					blueprintManager,
-					createBlueprintLibraryPathPatterns( libraryPaths, 'component' )
-				)
+				loadBlueprintsFromPaths( blueprintManager, filePaths )
 			)
-
-			try {
-				errors = errors.concat(
-					loadBlueprintsFromPaths(
-						blueprintManager,
-						createBlueprintLibraryPathPatterns( libraryPaths, 'entity' )
-					)
-				)
-
-			} catch( e ) {
-				errors.push( e.toString() )
-			}
 
 			return errors
 		}
@@ -253,7 +272,6 @@ define(
 
 		return function( target, spellPath, projectPath, projectFilePath, callback ) {
 			var errors               = [],
-				spellBlueprintPath   = spellPath + RELATIVE_BLUEPRINT_LIBRARY_PATH,
 				projectBlueprintPath = projectPath + RELATIVE_BLUEPRINT_LIBRARY_PATH
 
 			// parsing project config file
@@ -274,7 +292,7 @@ define(
 
 			// read all blueprint files from blueprint library
 			var blueprintManager = new BlueprintManager()
-			errors = loadBlueprintsFromLibrary( blueprintManager, [ spellBlueprintPath, projectBlueprintPath ] )
+			errors = loadBlueprintsFromLibrary( blueprintManager, [ projectBlueprintPath ] )
 
 			if( _.size( errors ) > 0 ) callback( errors )
 
