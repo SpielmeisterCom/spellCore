@@ -23,9 +23,6 @@ define(
 			BLUEPRINT_TYPE_SYSTEM    : 'systemBlueprint'
 		}
 
-		var blueprints = {},
-			entityTemplates = {}
-
 		var isValidComponentBlueprint = function( blueprint ) {
 			// check for ambiguous attribute names
 			var attributeNameCounts = _.reduce(
@@ -119,12 +116,12 @@ define(
 			return _.extend( component, attributeConfig )
 		}
 
-		var createEntityTemplate = function( entityBlueprint ) {
+		var createEntityTemplate = function( blueprints, entityBlueprint ) {
 			return _.reduce(
 				entityBlueprint.components,
 				function( memo, componentConfig ) {
 					var componentBlueprintId = componentConfig.blueprintId,
-						componentBlueprint = getBlueprint( componentBlueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
+						componentBlueprint = getBlueprint( blueprints, componentBlueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
 
 					if( !componentBlueprint ) throwCouldNotFindBlueprint( componentBlueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
 
@@ -159,7 +156,7 @@ define(
 			)
 		}
 
-		var addBlueprint = function( definition ) {
+		var addBlueprint = function( blueprints, entityTemplates, definition ) {
 			var blueprintId = definition.namespace + '/' + definition.name
 
 			if( _.has( blueprints, blueprintId ) ) throw 'Error: Blueprint definition \'' + blueprintId + '\' already exists.'
@@ -168,11 +165,11 @@ define(
 			blueprints[ blueprintId ] = definition
 
 			if( definition.type === blueprintTypes.BLUEPRINT_TYPE_ENTITY ) {
-				entityTemplates[ blueprintId ] = createEntityTemplate( definition )
+				entityTemplates[ blueprintId ] = createEntityTemplate( blueprints, definition )
 			}
 		}
 
-		var getBlueprint = function( blueprintId, blueprintType ) {
+		var getBlueprint = function( blueprints, blueprintId, blueprintType ) {
 			var blueprint = blueprints[ blueprintId ]
 
 			return ( !blueprint ?
@@ -199,6 +196,8 @@ define(
 		 */
 
 		function BlueprintManager() {
+			this.blueprints = {}
+			this.entityTemplates = {}
 		}
 
 		BlueprintManager.prototype = {
@@ -209,23 +208,23 @@ define(
 					throw 'Error: The format of the supplied blueprint definition is invalid.'
 				}
 
-				addBlueprint( definition )
+				addBlueprint( this.blueprints, this.entityTemplates, definition )
 			},
 			createEntity : function( blueprintId, entityConfig ) {
-				var entityTemplate = entityTemplates[ blueprintId ]
+				var entityTemplate = this.entityTemplates[ blueprintId ]
 
 				if( !entityTemplate ) throw 'Error: Could not find entity template for blueprint id \'' + blueprintId + '\'.'
 
 				return updateEntity(
-					deepClone( entityTemplates[ blueprintId ] ),
+					deepClone( this.entityTemplates[ blueprintId ] ),
 					entityConfig
 				)
 			},
 			hasBlueprint : function( blueprintId ) {
-				return !!getBlueprint( blueprintId )
+				return !!getBlueprint( this.blueprints, blueprintId )
 			},
 			getBlueprint : function( blueprintId ) {
-				return getBlueprint( blueprintId )
+				return getBlueprint( this.blueprints, blueprintId )
 			},
 
 			/**
@@ -235,7 +234,7 @@ define(
 			 * @return {*}
 			 */
 			isSingleAttributeComponent : function( blueprintId ) {
-				return isSingleAttributeComponent( getBlueprint( blueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT ).attributes )
+				return isSingleAttributeComponent( getBlueprint( this.blueprints, blueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT ).attributes )
 			}
 		}
 
