@@ -43,9 +43,8 @@ define(
 		var writeEngineInclude = function( spellPath, outputFilePath, platformAdapterSource, engineSource ) {
 			var errors = []
 
-			var needjs         = fs.readFileSync( spellPath + '/src/need.js' ),
-				deploymentGlue = fs.readFileSync( spellPath + '/src/spell/shared/build/deploymentGlue.js' ),
-				data           = needjs + '\n' + engineSource + '\n' + platformAdapterSource + '\n' + deploymentGlue
+			var needjs = fs.readFileSync( spellPath + '/src/need.js' ),
+				data   = needjs + '\n' + engineSource + '\n' + platformAdapterSource
 
 			// delete file if it already exists
 			if( isFile( outputFilePath ) ) {

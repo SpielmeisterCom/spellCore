@@ -60,7 +60,7 @@ define(
 		 *
 		 * gameserver/resourceServer - "internal" means "same as the server that the client was delivered from"; "*" matches any valid host/port combination, i.e. "acme.org:8080"
 		 *
-		 * The property "configurable" controls if the option can be overwriten by the environment configuration set up by the stage-0-loader.
+		 * The property "configurable" controls if the option can be overridden by the environment configuration set up by the stage-0-loader.
 		 */
 		var validOptions = {
 			screenSize : {
@@ -77,6 +77,9 @@ define(
 				validValues  : [ 'internal', '*' ],
 				configurable : true,
 				extractor    : extractServer
+			},
+			id : {
+				configurable : true
 			}
 		}
 
@@ -86,10 +89,11 @@ define(
 		var defaultOptions = {
 			screenSize     : '1024x768',
 			gameServer     : 'internal',
-			resourceServer : 'internal'
+			resourceServer : 'internal',
+			id             : 'spell' // dom node id
 		}
 
-		var createConfiguration = function( defaultOptions, validOptions ) {
+		var createConfiguration = function( parameters, defaultOptions, validOptions ) {
 			if( !defaultOptions ) defaultOptions = {}
 			if( !validOptions ) validOptions = {}
 
@@ -98,7 +102,7 @@ define(
 			_.defaults( validOptions, PlatformKit.configurationOptions.validOptions )
 
 
-			var suppliedParameters = PlatformKit.getUrlParameters()
+			var suppliedParameters = parameters
 
 			// filter out parameters that are not configurable
 			suppliedParameters = _.reduce(
@@ -122,22 +126,23 @@ define(
 			var config = _.reduce(
 				suppliedParameters,
 				function( memo, optionValue, optionName ) {
-					var option = validOptions[ optionName ]
+					var option = validOptions[ optionName ],
+						configValue = false
 
-					var configValue = option.extractor(
-						option.validValues,
-						optionValue
-					)
+					if( option.extractor ) {
+						configValue = option.extractor( option.validValues, optionValue )
+
+					} else {
+						configValue = optionValue
+					}
+
 
 					if( configValue !== false ) {
 						memo[ optionName ] = configValue
 
 					} else {
 						// use the default value
-						memo[ optionName ] = option.extractor(
-							option.validValues,
-							defaultOptions[ optionName ]
-						)
+						memo[ optionName ] = option.extractor( option.validValues, defaultOptions[ optionName ] )
 					}
 
 					return memo
@@ -155,8 +160,8 @@ define(
 		 * public
 		 */
 
-		var ConfigurationManager = function( eventManager ) {
-			_.extend( this, createConfiguration( defaultOptions, validOptions ) )
+		var ConfigurationManager = function( eventManager, parameters ) {
+			_.extend( this, createConfiguration( parameters, defaultOptions, validOptions ) )
 
 			eventManager.subscribe(
 				[ Events.SCREEN_RESIZED ],

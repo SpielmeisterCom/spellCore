@@ -22,12 +22,13 @@ define(
 		 * Creates a rendering context
 		 *
          * @param eventManager - Eventmanager
+		 * @param id - the id of the dom node the engine instance is placed in
 		 * @param width - width in pixels
 		 * @param height - height in pixels
 		 * @param requestedBackEnd - when supplied, overrides the automagic rendering back-end detection
 		 */
-		var createContext2d = function( eventManager, width, height, requestedBackEnd ) {
-			var canvas = createCanvasNode( width, height )
+		var createContext2d = function( eventManager, id, width, height, requestedBackEnd ) {
+			var canvas = createCanvasNode( id, width, height )
 
 			if( canvas === null || canvas === undefined ) throw "Could not create canvas node."
 

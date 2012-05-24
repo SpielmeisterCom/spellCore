@@ -92,34 +92,6 @@ var require = function( dependencies, callback ) {
 	callback.apply( null, args )
 }
 
-
-var enterMain = function( mainModuleName, args ) {
+enterMain = function( mainModuleName, args ) {
 	resolveDependencies( mainModuleName, args )
-
-//	var wrapper = function() {
-//		resolveDependencies( mainModuleName, args )
-//	}
-//
-//	// the web client must wait until the dom construction is finished
-//	var isBrowser = !!( typeof window !== "undefined" && navigator && document )
-//
-//	if( !isBrowser ) {
-//		wrapper()
-//		return
-//	}
-//
-//	if( document.addEventListener ) {
-//		document.addEventListener(
-//			"DOMContentLoaded",
-//			wrapper,
-//			false
-//		)
-//
-//	} else if( document.attachEvent ) {
-//		// this is for IE
-//		document.attachEvent(
-//			"onreadystatechange",
-//			wrapper
-//		)
-//	}
 }

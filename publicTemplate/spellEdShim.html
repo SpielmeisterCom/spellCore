@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Spell Development Build</title>
-		<script type="text/javascript" src="output/html5/spell.js"></script>
-		<script type="text/javascript" src="output/html5/data.js"></script>
+		<title>SpellEd</title>
+		<link rel="stylesheet" href="main.css" type="text/css" />
+		<script type="text/javascript" src="spell.js"></script>
 	</head>
 
 	<body>
@@ -31,7 +31,11 @@
 				}
 
 				if( event.data.type === 'run' ) {
-					spell.start()
+					var config = {
+						platform : 'html5'
+					}
+
+					spell.start( config )
 				}
 			}
 

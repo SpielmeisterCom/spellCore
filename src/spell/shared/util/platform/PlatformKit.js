@@ -43,20 +43,6 @@ define(
 			return document.location.host
 		}
 
-		var getUrlParameters = function() {
-			var url = window.location.href
-			var map = {}
-
-			url.replace(
-				/[?&]+([^=&]+)=([^&]*)/gi,
-				function( match, key, value ) {
-					map[ key ] = value
-				}
-			)
-
-			return map
-		}
-
 		var getPlatformInfo = function() {
 			return 'html5'
 		}
@@ -87,7 +73,6 @@ define(
 			createSoundManager     : createSoundManager,
 			RenderingFactory       : RenderingFactory,
 			getHost                : getHost,
-			getUrlParameters       : getUrlParameters,
 			configurationOptions   : configurationOptions,
 			getPlatformInfo        : getPlatformInfo,
 			getJsonCoder           : getJson,

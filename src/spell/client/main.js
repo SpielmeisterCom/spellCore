@@ -36,17 +36,20 @@ define(
 		Logger,
 		PlatformKit,
 
-		_
+		_,
+
+		// configuration parameters passed in from stage zero loader
+		parameters
 	) {
 		'use strict'
 
 
-		// return spell entry point
 		var eventManager         = new EventManager()
-		var configurationManager = new ConfigurationManager( eventManager )
+		var configurationManager = new ConfigurationManager( eventManager, parameters )
 
 		var renderingContext = PlatformKit.RenderingFactory.createContext2d(
 			eventManager,
+			configurationManager.id,
 			1024,
 			768,
 			configurationManager.renderingBackEnd

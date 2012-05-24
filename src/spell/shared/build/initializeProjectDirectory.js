@@ -112,11 +112,10 @@ define(
 			// populate public directory
 			var fileNames = [
 				'debug.html',
-				'debugFlash.html',
+				'index.html',
 				'main.css',
 				'playerProductInstall.swf',
-				'spellEdShim.html',
-				'swfobject.js'
+				'spellEdShim.html'
 			]
 
 			_.each(
@@ -128,6 +127,12 @@ define(
 					)
 				}
 			)
+
+			copyFile(
+				spellPath + '/src/spell/client/stageZeroLoader.js',
+				projectPath + '/public/spell.js'
+			)
+
 
 			return errors
 		}
