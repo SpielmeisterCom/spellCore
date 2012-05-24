@@ -127,7 +127,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 		if( config.verbose ) console.log( 'stage-zero-loader: chose ' + config.platform + ' platform' )
 
 		var parameters = {
-			id : config.id
+			id : config.id,
+			verbose : config.verbose
 		}
 
 		if( config.platform === 'html5' ) {

@@ -44,6 +44,10 @@ define(
 		'use strict'
 
 
+		if( parameters.verbose ) {
+			Logger.setLogLevel( Logger.LOG_LEVEL_DEBUG )
+		}
+
 		var eventManager         = new EventManager()
 		var configurationManager = new ConfigurationManager( eventManager, parameters )
 
