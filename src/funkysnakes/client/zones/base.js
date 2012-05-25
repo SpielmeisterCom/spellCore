@@ -29,23 +29,6 @@ define(
 		 * private
 		 */
 
-		function updateTextures( renderingContext, resources, textures ) {
-			// TODO: the resource loader should create spell texture object instances instead of raw html images
-
-			// HACK: creating textures out of images
-			_.each(
-				resources,
-				function( resource, resourceId ) {
-					var extension =  _.last( resourceId.split( '.' ) )
-					if( extension === 'png' || extension === 'jpg' ) {
-						textures[ resourceId.replace(/images\//g, '') ] = renderingContext.createTexture( resource )
-					}
-				}
-			)
-
-			return textures
-		}
-
 		function update(
 			globals,
 			timeInMs,
@@ -87,7 +70,7 @@ define(
 				var entityManager  = new ZoneEntityManager( globals.entityManager, this.entities )
 				this.entityManager = entityManager
 
-				this.renderer = new Renderer( eventManager, globals.textures, globals.renderingContext )
+				this.renderer = new Renderer( eventManager, globals.resources, globals.renderingContext )
 
 
 				this.queryIds = {
@@ -113,8 +96,6 @@ define(
 				eventManager.subscribe(
 					[ Events.RESOURCE_LOADING_COMPLETED, 'zoneResources' ],
 					function() {
-						updateTextures( globals.renderingContext, resourceLoader.getResources(), globals.textures )
-
 						// create default entities from zone config
 						_.each(
 							zoneConfig.entities,

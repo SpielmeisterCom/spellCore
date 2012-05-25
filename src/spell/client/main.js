@@ -2,9 +2,9 @@ define(
 	'spell/client/main',
 	[
 		'funkysnakes/client/zones/base',
-		'funkysnakes/shared/util/createMainLoop',
 
 		'spell/client/runtimeModule',
+		'spell/shared/util/createMainLoop',
 		'spell/shared/util/entities/EntityManager',
 		'spell/shared/util/zones/ZoneManager',
 		'spell/shared/util/blueprints/BlueprintManager',
@@ -21,9 +21,9 @@ define(
 	],
 	function(
 		baseZone,
-		createMainLoop,
 
 		runtimeModule,
+		createMainLoop,
 		EntityManager,
 		ZoneManager,
 		BlueprintManager,
@@ -61,7 +61,7 @@ define(
 
 		var soundManager         = PlatformKit.createSoundManager()
 		var inputManager         = new InputManager( configurationManager )
-		var resourceLoader       = new ResourceLoader( runtimeModule.name, soundManager, eventManager, configurationManager.resourceServer )
+		var resourceLoader       = new ResourceLoader( runtimeModule.name, soundManager, renderingContext, eventManager, configurationManager.resourceServer )
 		var statisticsManager    = new StatisticsManager()
 
 		statisticsManager.init()
@@ -73,6 +73,7 @@ define(
 			inputEvents          : inputManager.getInputEvents(),
 			renderingContext     : renderingContext,
 			resourceLoader       : resourceLoader,
+			resources            : resourceLoader.getResources(),
 			statisticsManager    : statisticsManager,
 			soundManager         : soundManager
 		}
@@ -83,7 +84,6 @@ define(
 		Logger.debug( 'client started' )
 
 		var configurationManager = globals.configurationManager
-		var resourceLoader       = globals.resourceLoader
 		var eventManager         = globals.eventManager
 		var statisticsManager    = globals.statisticsManager
 
@@ -107,23 +107,6 @@ define(
 		var renderingContextConfig = renderingContext.getConfiguration()
 
 		Logger.debug( 'created rendering context: type=' + renderingContextConfig.type + '; size=' + renderingContextConfig.width + 'x' + renderingContextConfig.height )
-
-
-		// TODO: the resource loader should create spell texture object instances instead of raw html images
-
-		// HACK: creating textures out of images
-		var resources = resourceLoader.getResources()
-		var textures = {}
-
-		_.each(
-			resources,
-			function( resource, resourceId ) {
-				var extension =  _.last( resourceId.split( '.' ) )
-				if( extension === 'png' || extension === 'jpg' ) {
-					textures[ resourceId.replace(/images\//g, '') ] = renderingContext.createTexture( resource )
-				}
-			}
-		)
 
 
 		var zones = {
@@ -156,8 +139,6 @@ define(
 				configurationManager : configurationManager,
 				entityManager        : entityManager,
 				eventManager         : eventManager,
-				textures             : textures,
-				sounds               : resources,
 				zoneManager          : zoneManager
 			}
 		)

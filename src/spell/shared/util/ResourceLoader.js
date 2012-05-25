@@ -118,7 +118,17 @@ define(
 			updateProgress.call( this, this.resourceBundles[ resourceBundleName ] )
 		}
 
-		var createLoader = function( applicationId, eventManager, host, resourceBundleName, resourceName, loadingCompletedCallback, loadingTimedOutCallback, soundManager ) {
+		var createLoader = function(
+			applicationId,
+			eventManager,
+			host,
+			resourceBundleName,
+			resourceName,
+			loadingCompletedCallback,
+			loadingTimedOutCallback,
+			soundManager,
+			renderingContext
+		) {
 			var extension = _.last( resourceName.split( '.' ) )
 			var loaderFactory = extensionToLoaderFactory[ extension ]
 
@@ -135,7 +145,13 @@ define(
 				resourceName,
 				loadingCompletedCallback,
 				loadingTimedOutCallback,
-                ( extension === 'json' ) ? soundManager : undefined
+				( extension === 'json' ?
+					soundManager :
+					( extension === 'jpg' || extension === 'png' ?
+						renderingContext :
+						undefined
+					)
+				)
 			)
 
 			return loader
@@ -160,7 +176,8 @@ define(
 							resourceName,
 							_.bind( resourceLoadingCompletedCallback, this, resourceBundle.name, resourceName ),
 							_.bind( resourceLoadingTimedOutCallback, this, resourceBundle.name, resourceName ),
-                            this.soundManager
+                            this.soundManager,
+							this.renderingContext
 						)
 
 						if( loader !== undefined ) {
@@ -180,11 +197,12 @@ define(
 		 * public
 		 */
 
-		var ResourceLoader = function( applicationId, soundManager, eventManager, hostConfig ) {
+		var ResourceLoader = function( applicationId, soundManager, renderingContext, eventManager, hostConfig ) {
 			if( eventManager === undefined ) throw 'Argument "eventManager" is undefined.'
             if( soundManager === undefined ) throw 'Argument "soundManager" is undefined.'
 
             this.soundManager = soundManager
+			this.renderingContext = renderingContext
 			this.eventManager = eventManager
 			this.resourceBundles = {}
 			this.resources = {}

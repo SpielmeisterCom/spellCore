@@ -23,7 +23,7 @@ define(
 			this.loaded = true
 
 			var resources = {}
-			resources[ this.resourceName ] = image
+			resources[ this.resourceName ] = this.renderingContext.createTexture( image )
 
 			this.onCompleteCallback( resources )
 		}
@@ -46,8 +46,9 @@ define(
 		 * public
 		 */
 
-		var ImageLoader = function( eventManager, resourcePath, resourceBundleName, resourceName, loadingCompletedCallback, timedOutCallback ) {
+		var ImageLoader = function( eventManager, resourcePath, resourceBundleName, resourceName, loadingCompletedCallback, timedOutCallback, renderingContext ) {
 			this.eventManager       = eventManager
+			this.renderingContext   = renderingContext
 			this.resourceBundleName = resourceBundleName
 			this.resourcePath       = resourcePath
 			this.resourceName       = resourceName
