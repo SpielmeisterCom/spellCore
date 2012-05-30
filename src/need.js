@@ -72,7 +72,6 @@ var require = function( moduleName ) {
 		module.instance = resolveDependencies( moduleName )
 	}
 
-
 	return module.instance
 }
 
