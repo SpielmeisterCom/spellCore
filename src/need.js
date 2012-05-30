@@ -68,6 +68,11 @@ var require = function( moduleName ) {
 	if( !module ) throw 'Could not resolve module name \'' + moduleName + '\' to module instance.'
 
 
+	if( !module.instance ) {
+		module.instance = resolveDependencies( moduleName )
+	}
+
+
 	return module.instance
 }
 
