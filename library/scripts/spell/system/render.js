@@ -4,6 +4,7 @@ define(
 		'funkysnakes/shared/config/constants',
 		'spell/shared/util/Events',
 
+		'glmatrix/vec2',
 		'glmatrix/vec3',
 		'glmatrix/mat4',
 		'spell/shared/util/platform/underscore'
@@ -12,6 +13,7 @@ define(
 		constants,
 		Events,
 
+		vec2,
 		vec3,
 		mat4,
 		_
@@ -23,9 +25,14 @@ define(
 		 * private
 		 */
 
-		var position = vec3.create( [ 0, 0, 0 ]),
+		var rotation    = 0,
+			scale       = vec3.create(),
+			translation = vec3.create(),
+			opacity     = 1.0
+
+		var appearanceComponentId = 'spell/component/core/graphics2d/appearance',
 			renderDataComponentId = 'spell/component/core/graphics2d/renderData',
-			appearanceComponentId = 'spell/component/core/graphics2d/appearance'
+			positionComponentId   = 'spell/component/core/position'
 
 
 		var createEntitiesSortedByPath = function( entitiesByPass ) {
@@ -64,48 +71,39 @@ define(
 			_.each(
 				entities,
 				function( entity ) {
+					var entityAppearance  = entity[ appearanceComponentId ],
+						entityRenderData  = entity[ renderDataComponentId ]
+
 					context.save()
 					{
-						var entityRenderData  = entity[ renderDataComponentId ],
-							entityAppearance  = entity[ appearanceComponentId ],
-							renderDataOpacity = entityRenderData.opacity,
-							appearanceOpacity = entityAppearance.opacity
+						var texture = textures[ entityAppearance.textureId ]
 
-						// appearances without a texture id are drawn as colored rectangles
-						if( !entityAppearance.textureId &&
-							entityAppearance.color ) {
-
-							context.translate( entityRenderData.position )
-							context.setFillStyleColor( entityAppearance.color )
-							context.fillRect(
-								0,
-								0,
-								entityAppearance.scale[ 0 ],
-								entityAppearance.scale[ 1 ]
-							)
-
-						} else {
-							var texture = textures[ entityAppearance.textureId ]
-
-							if( !texture ) throw 'The texture id \'' + entityAppearance.textureId + '\' could not be resolved.'
+						if( !texture ) throw 'The texture id \'' + entityAppearance.textureId + '\' could not be resolved.'
 
 
-							if( appearanceOpacity !== 1.0 ||
-									renderDataOpacity !== 1.0 ) {
+						opacity = entityAppearance.opacity * entityRenderData.opacity
 
-								context.setGlobalAlpha( appearanceOpacity * renderDataOpacity )
-							}
-
-							// object to world space transformation go here
-							context.translate( entityRenderData.position )
-							context.rotate( entityRenderData.orientation )
-
-							// 'appearance' transformations go here
-							context.translate( entityAppearance.translation )
-							context.scale( [ texture.width, texture.height, 1 ] )
-
-							context.drawTexture( texture, 0, 0, 1, 1 )
+						if( opacity !== 1.0 ) {
+							context.setGlobalAlpha( opacity )
 						}
+
+						// object to world space transformation go here
+						vec2.add( entity[ positionComponentId ], entityRenderData.translation, translation )
+						vec2.set( entityRenderData.scale, scale )
+
+						context.translate( translation )
+						context.scale( scale )
+						context.rotate( entityRenderData.rotation )
+
+						// appearance transformations go here
+						vec2.set( entityAppearance.translation, translation )
+						vec2.multiply( entityAppearance.scale, [ texture.width, texture.height ], scale )
+
+						context.translate( translation )
+						context.scale( scale )
+						context.rotate( entityAppearance.rotation )
+
+						context.drawTexture( texture, 0, 0, 1, 1 )
 					}
 					context.restore()
 				}

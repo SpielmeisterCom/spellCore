@@ -4,11 +4,6 @@
 	"name" : "appearance",
 	"attributes" : [
 		{
-			"name" : "textureId",
-			"type" : "assetTextureId",
-			"default" : "spell/textures/not_defined"
-		},
-		{
 			"name" : "rotation",
 			"type" : "number",
 			"default" : 0
@@ -20,8 +15,13 @@
 		},
 		{
 			"name" : "translation",
-			"type" : "vec3",
-			"default" : [ 0, 0, 0 ]
+			"type" : "vec2",
+			"default" : [ 0, 0 ]
+		},
+		{
+			"name" : "textureId",
+			"type" : "assetTextureId",
+			"default" : "spell/textures/not_defined"
 		}
 	]
 }

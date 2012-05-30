@@ -4,17 +4,17 @@
 	"name" : "renderData",
 	"attributes" : [
 		{
-			"name" : "position",
-			"type" : "vec3",
-			"default" : [ 0, 0, 0 ]
-		},
-		{
-			"name" : "orientation",
+			"name" : "rotation",
 			"type" : "number",
 			"default" : 0
 		},
 		{
 			"name" : "scale",
+			"type" : "vec2",
+			"default" : [ 1, 1 ]
+		},
+		{
+			"name" : "translation",
 			"type" : "vec2",
 			"default" : [ 0, 0 ]
 		},
