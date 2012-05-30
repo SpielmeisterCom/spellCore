@@ -22,6 +22,11 @@
 			"name" : "textureId",
 			"type" : "assetTextureId",
 			"default" : "spell/textures/not_defined"
+		},
+		{
+			"name" : "opacity",
+			"type" : "number",
+			"default" : 1.0
 		}
 	]
 }

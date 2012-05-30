@@ -25,8 +25,7 @@ define(
 		 * private
 		 */
 
-		var rotation    = 0,
-			scale       = vec3.create(),
+		var scale       = vec3.create(),
 			translation = vec3.create(),
 			opacity     = 1.0
 
@@ -91,19 +90,19 @@ define(
 						vec2.add( entity[ positionComponentId ], entityRenderData.translation, translation )
 						vec2.set( entityRenderData.scale, scale )
 
+						context.rotate( entityRenderData.rotation )
 						context.translate( translation )
 						context.scale( scale )
-						context.rotate( entityRenderData.rotation )
 
 						// appearance transformations go here
 						vec2.set( entityAppearance.translation, translation )
 						vec2.multiply( entityAppearance.scale, [ texture.width, texture.height ], scale )
 
+						context.rotate( entityAppearance.rotation )
 						context.translate( translation )
 						context.scale( scale )
-						context.rotate( entityAppearance.rotation )
 
-						context.drawTexture( texture, 0, 0, 1, 1 )
+						context.drawTexture( texture, -0.5, -0.5, 1, 1 )
 					}
 					context.restore()
 				}
