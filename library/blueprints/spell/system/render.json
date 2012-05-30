@@ -1,0 +1,17 @@
+{
+	"type" : "systemBlueprint",
+	"namespace" : "spell/system",
+	"name" : "render",
+
+	"input" : [
+		{
+			"name" : "entities",
+			"components" : [
+				"spell/component/core/position",
+				"spell/component/core/graphics2d/appearance",
+				"spell/component/core/graphics2d/renderData"
+			]
+		}
+	],
+	"scriptId" : "spell/system/render"
+}

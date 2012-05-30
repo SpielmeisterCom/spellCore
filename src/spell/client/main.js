@@ -48,6 +48,9 @@ define(
 			Logger.setLogLevel( Logger.LOG_LEVEL_DEBUG )
 		}
 
+		Logger.debug( 'client started' )
+
+
 		var eventManager         = new EventManager()
 		var configurationManager = new ConfigurationManager( eventManager, parameters )
 
@@ -78,42 +81,17 @@ define(
 			soundManager         : soundManager
 		}
 
-
-		// TODO: enter initial zone
-
-		Logger.debug( 'client started' )
-
 		var configurationManager = globals.configurationManager
 		var eventManager         = globals.eventManager
 		var statisticsManager    = globals.statisticsManager
 
 //		PlatformKit.registerOnScreenResize( _.bind( onScreenResized, onScreenResized, eventManager ) )
 
-		// creating entityManager
-//		var componentConstructors = {
-//			'markedForDestruction' : markedForDestruction,
-//			'position'             : position,
-//			'orientation'          : orientation,
-//			'collisionCircle'      : collisionCircle,
-//			'shield'               : shield,
-//			'tailElement'          : tailElement,
-//			'amountTailElements'   : amountTailElements
-//		}
-
-//		globals.entityManager = new EntityManager( entities, componentConstructors )
-
-
 		var renderingContext       = globals.renderingContext
 		var renderingContextConfig = renderingContext.getConfiguration()
 
 		Logger.debug( 'created rendering context: type=' + renderingContextConfig.type + '; size=' + renderingContextConfig.width + 'x' + renderingContextConfig.height )
 
-
-		var zones = {
-			base: baseZone
-		}
-
-		var zoneManager = new ZoneManager( eventManager, zones, globals )
 
 		var blueprintManager = new BlueprintManager()
 
@@ -131,6 +109,18 @@ define(
 			}
 		)
 
+		_.each(
+			runtimeModule.systemBlueprints,
+			function( systemBlueprint ) {
+				blueprintManager.add( systemBlueprint )
+			}
+		)
+
+
+		var mainLoop    = createMainLoop( eventManager, statisticsManager )
+		var zoneManager = new ZoneManager( globals, eventManager, blueprintManager, mainLoop )
+
+
 		var entityManager = new EntityManager( blueprintManager )
 
 		_.extend(
@@ -144,18 +134,15 @@ define(
 		)
 
 
-		var startZone = _.find(
+		var zoneConfig = _.find(
 			runtimeModule.zones,
 			function( iter ) {
 				return iter.name === runtimeModule.startZone
 			}
 		)
 
-		zoneManager.createZone( 'base', startZone )
+		zoneManager.startZone( zoneConfig )
 
-
-		var mainLoop = createMainLoop( eventManager, statisticsManager )
-
-		PlatformKit.callNextFrame( mainLoop )
+		mainLoop.run()
 	}
 )

@@ -1,22 +1,23 @@
 {
 	"type" : "systemBlueprint",
-	"namespace" : "projectName/systems",
+	"namespace" : "projectName/system",
 	"name" : "collisionBroadphase",
 
 	"input" : [
 		{
 			"name" : "dynamicCollidableEntities",
 			"components" : [
-				"spelljs/collision/axisAlignedBoundingBox",
-				"spelljs/collision/dynamicCollidable"
+				"spell/collision/axisAlignedBoundingBox",
+				"spell/collision/dynamicCollidable"
 			]
 		},
 		{
 			"name" : "staticCollidableEntities",
 			"components" : [
-				"spelljs/collision/axisAlignedBoundingBox",
-				"spelljs/collision/staticCollidable"
+				"spell/collision/axisAlignedBoundingBox",
+				"spell/collision/staticCollidable"
 			]
 		}
-	]
+	],
+	"moduleId" : "projectName/system/collisionBroadphase"
 }

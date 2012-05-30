@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/executeCreateDebugBuild',
 	[
+		'spell/shared/amd/extractModuleHeader',
 		'spell/shared/build/copyFile',
 		'spell/shared/build/createReducedEntityConfig',
 		'spell/shared/build/executable/buildFlashExecutable',
@@ -20,6 +21,8 @@ define(
 		'spell/shared/util/platform/underscore'
 	],
 	function(
+		extractModuleHeader,
+
 		copyFile,
 		createReducedEntityConfig,
 		buildFlashExecutable,
@@ -45,7 +48,8 @@ define(
 		 * private
 		 */
 
-		var RELATIVE_BLUEPRINT_LIBRARY_PATH = '/library/blueprints'
+		var LIBRARY_BLUEPRINTS_PATH = '/library/blueprints'
+		var LIBRARY_SCRIPTS_PATH = '/library/scripts'
 
 		var runtimeModuleRequirejsTemplate = [
 			'define(',
@@ -56,11 +60,11 @@ define(
 			')'
 		].join( '\n' )
 
-		var createBlueprintFilePaths = function( libraryPaths ) {
+		var createFilePaths = function( paths ) {
 			var filePathPatterns = _.map(
-				libraryPaths,
+				paths,
 				function( libraryPath ) {
-					return libraryPath + '/**/*.json'
+					return libraryPath + '/**/*.{js,json}'
 				}
 			)
 
@@ -133,12 +137,19 @@ define(
 				loadBlueprints( blueprintManager, blueprints, 'entityBlueprint' )
 			)
 
+			if( errors.length > 0 ) return errors
+
+
+			errors = errors.concat(
+				loadBlueprints( blueprintManager, blueprints, 'systemBlueprint' )
+			)
+
 			return errors
 		}
 
 		var loadBlueprintsFromLibrary = function( blueprintManager, libraryPaths ) {
 			var errors = [],
-				filePaths = createBlueprintFilePaths( libraryPaths )
+				filePaths = createFilePaths( libraryPaths )
 
 			errors = errors.concat(
 				loadBlueprintsFromPaths( blueprintManager, filePaths )
@@ -160,6 +171,64 @@ define(
 			)
 
 			return errors
+		}
+
+		var loadScriptsFromLibrary = function( paths, scripts ) {
+			var errors = [],
+				filePaths = createFilePaths( paths )
+
+			scripts = _.reduce(
+				filePaths,
+				function( memo, filePath ) {
+					var data = fs.readFileSync( filePath, 'utf-8'),
+					moduleHeader = extractModuleHeader( data )
+
+					if( !moduleHeader.name ) {
+						console.error( 'Error: Anonymous module in file \'' + filePath + '\' is not supported.' )
+						return memo
+					}
+
+					memo[ moduleHeader.name ] = data
+
+					return memo
+				},
+				scripts
+			)
+
+			return errors
+		}
+
+		var hasAllScripts = function( scripts, systemBlueprintIds ) {
+			var errors = []
+
+//			_.each(
+//				systemBlueprintIds,
+//				function( blueprintId ) {
+////					if( !blueprintManager.hasBlueprint( blueprintId ) ) {
+////						errors.push( 'Error: Required blueprint \'' + blueprintId + '\' could not be found.' )
+////					}
+//
+//					var scriptId = blueprintManager.getBlueprint( blueprintId ).scriptId
+//
+//
+//				}
+//			)
+
+			return errors
+		}
+
+		var createScriptList = function( scripts, scriptIds ) {
+			return _.values( _.pick( scripts, scriptIds ) )
+		}
+
+		var createDependencyScriptIds = function( blueprintManager, systemBlueprintIds ) {
+			return _.reduce(
+				systemBlueprintIds,
+				function( memo, blueprintId ) {
+					return memo.concat( blueprintManager.getBlueprint( blueprintId).scriptId )
+				},
+				[]
+			)
 		}
 
 		/**
@@ -214,10 +283,11 @@ define(
 					// WORKAROUND: a specialized solution; until requirements are more clear this has to do
 					var entity = blueprintManager.createEntity( entityConfig.blueprintId, entityConfig.config )
 
-					if( _.has( entity, 'appearance' ) &&
-						_.has( entity.appearance, 'textureId' ) ) {
+					var componentId = 'spell/component/core/graphics2d/appearance',
+						entityAppearance = _.has( entity, componentId ) ? entity[ componentId ] : null
 
-						var textureId = entity.appearance.textureId
+					if( entityAppearance ) {
+						var textureId = entityAppearance.textureId
 
 						if( !_.include( memo, textureId ) ) {
 							memo.push( textureId )
@@ -244,25 +314,26 @@ define(
 					return {
 						name : zone.name,
 						entities : reducedEntityConfig,
+						systems : zone.systems,
 						resources : createReferencedResources( blueprintManager, reducedEntityConfig )
 					}
 				}
 			)
 		}
 
-		var createRuntimeModule = function( projectName, startZoneId, zones, componentBlueprints, entityBlueprints ) {
+		var createRuntimeModule = function( projectName, startZoneId, zones, componentBlueprints, entityBlueprints, systemBlueprints, scripts ) {
 			var runtimeModule = {
 				name: projectName,
 				startZone : startZoneId,
 				zones : zones,
 				componentBlueprints : componentBlueprints,
-				entityBlueprints : entityBlueprints
+				entityBlueprints : entityBlueprints,
+				systemBlueprints : systemBlueprints
 			}
 
-			return _s.sprintf(
-				runtimeModuleRequirejsTemplate,
-				JSON.stringify( runtimeModule )
-			)
+			return _s.sprintf( runtimeModuleRequirejsTemplate, JSON.stringify( runtimeModule ) ) +
+				'\n\n' +
+				scripts.join( '\n\n' )
 		}
 
 
@@ -272,7 +343,7 @@ define(
 
 		return function( target, spellPath, projectPath, projectFilePath, callback ) {
 			var errors               = [],
-				projectBlueprintPath = projectPath + RELATIVE_BLUEPRINT_LIBRARY_PATH
+				projectBlueprintPath = projectPath + LIBRARY_BLUEPRINTS_PATH
 
 			// parsing project config file
 			var data = fs.readFileSync( projectFilePath, 'utf-8'),
@@ -299,12 +370,30 @@ define(
 
 			// determine all blueprints that are referenced in the project
 			var entityBlueprintIds    = _.unique( jsonPath( projectConfig, '$.zones[*].entities[*].blueprintId' ) ),
-				componentBlueprintIds = createDependencyComponentBlueprintIds( blueprintManager, entityBlueprintIds )
+				componentBlueprintIds = createDependencyComponentBlueprintIds( blueprintManager, entityBlueprintIds),
+				systemBlueprintIds    = _.unique( _.flatten( jsonPath( projectConfig, '$.zones[*].systems[*]' ) ))
 
 
 			// check if the required blueprints are available
 			errors = hasAllBlueprints( blueprintManager, entityBlueprintIds )
 			errors = errors.concat( hasAllBlueprints( blueprintManager, componentBlueprintIds ) )
+			errors = errors.concat( hasAllBlueprints( blueprintManager, systemBlueprintIds ) )
+
+			if( _.size( errors ) > 0 ) callback( errors )
+
+
+			// determine scripts that need to be included
+			var scripts = {}
+			errors.concat(
+				loadScriptsFromLibrary( [ projectPath + LIBRARY_SCRIPTS_PATH ], scripts )
+			)
+
+			if( _.size( errors ) > 0 ) callback( errors )
+
+
+			var usedScriptIds = createDependencyScriptIds( blueprintManager, systemBlueprintIds )
+
+			errors.concat( hasAllScripts( scripts, usedScriptIds ) )
 
 			if( _.size( errors ) > 0 ) callback( errors )
 
@@ -379,7 +468,9 @@ define(
 				projectConfig.startZone,
 				zoneList,
 				createBlueprintList( blueprintManager, componentBlueprintIds ),
-				createBlueprintList( blueprintManager, entityBlueprintIds )
+				createBlueprintList( blueprintManager, entityBlueprintIds ),
+				createBlueprintList( blueprintManager, systemBlueprintIds ),
+				createScriptList( scripts, usedScriptIds )
 			)
 
 

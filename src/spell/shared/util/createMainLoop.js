@@ -1,10 +1,10 @@
 define(
-	"spell/shared/util/createMainLoop",
+	'spell/shared/util/createMainLoop',
 	[
-		"spell/shared/util/Events",
-		"spell/shared/util/Timer",
-		"spell/shared/util/platform/Types",
-		"spell/shared/util/platform/PlatformKit",
+		'spell/shared/util/Events',
+		'spell/shared/util/Timer',
+		'spell/shared/util/platform/Types',
+		'spell/shared/util/platform/PlatformKit',
 
 		'spell/shared/util/platform/underscore'
 	],
@@ -16,75 +16,63 @@ define(
 
 		_
 	) {
-		"use strict"
+		'use strict'
 
 
-		var allowedDeltaInMs = 20
+		/**
+		 * private
+		 */
+
+		var allowedDeltaInMs = 20,
+			DEFAULT_UPDATE_INTERVAL_IN_MS = 20
 
 
-		return function(
-			eventManager,
-			statisticsManager
-		) {
+		var MainLoop = function( eventManager, statisticsManager, updateIntervalInMs ) {
+			this.updateIntervalInMs  = updateIntervalInMs || DEFAULT_UPDATE_INTERVAL_IN_MS
+			this.renderCallback      = null
+			this.updateCallback      = null
+			this.accumulatedTimeInMs = 0
+
 			// Until the proper remote game time is computed local time will have to do.
-			var initialLocalGameTimeInMs = Types.Time.getCurrentInMs(),
-				timer                    = new Timer( eventManager, statisticsManager, initialLocalGameTimeInMs ),
-				localTimeInMs            = initialLocalGameTimeInMs
+			var initialLocalGameTimeInMs = Types.Time.getCurrentInMs()
+			this.timer = new Timer( eventManager, statisticsManager, initialLocalGameTimeInMs )
+		}
 
-			// Since the main loop supports arbitrary update intervals but can't publish events for every possible
-			// update interval, we need to maintain a set of all update intervals that subscribers are interested in.
-			var updateIntervals = {}
+		MainLoop.prototype = {
+			setRenderCallback : function( f ) {
+				this.renderCallback = f
+			},
+			setUpdateCallback : function( f ) {
+				this.updateCallback = f
+			},
+			run : function() {
+				var timer = this.timer
+				timer.update()
 
-			eventManager.subscribe(
-				Events.SUBSCRIBE,
-				function( scope, subscriber ) {
-					if( scope[ 0 ] !== Events.LOGIC_UPDATE ) return
+				var clockSpeedFactor    = 1.0,
+					localTimeInMs       = timer.getLocalTime(),
+					elapsedTimeInMs     = timer.getElapsedTime(),
+					accumulatedTimeInMs = this.accumulatedTimeInMs + elapsedTimeInMs * clockSpeedFactor,
+					updateIntervalInMs  = this.updateIntervalInMs
 
-					var interval = scope[ 1 ]
+				if( this.updateCallback ) {
+					/**
+					 * Only simulate, if not too much time has accumulated to prevent CPU overload. This can happen when the browser tab has been in the
+					 * background for a while and requestAnimationFrame is used.
+					 */
+					while( accumulatedTimeInMs > updateIntervalInMs ) {
+						if( accumulatedTimeInMs <= 5 * updateIntervalInMs ) {
+							this.updateCallback( localTimeInMs, updateIntervalInMs )
+						}
 
-					if( updateIntervals.hasOwnProperty( interval ) ) return
-
-					updateIntervals[ interval ] = {
-						accumulatedTimeInMs : 0,
-						localTimeInMs       : localTimeInMs
+						accumulatedTimeInMs -= updateIntervalInMs
+						localTimeInMs += updateIntervalInMs
 					}
 				}
-			)
 
-			var clockSpeedFactor, elapsedTimeInMs
-			clockSpeedFactor = 1.0
-
-			var mainLoop = function() {
-				timer.update()
-				localTimeInMs   = timer.getLocalTime()
-				elapsedTimeInMs = timer.getElapsedTime()
-
-				_.each(
-					updateIntervals,
-					function( updateInterval, deltaTimeInMsAsString ) {
-						var deltaTimeInMs = parseInt( deltaTimeInMsAsString )
-
-						updateInterval.accumulatedTimeInMs += elapsedTimeInMs * clockSpeedFactor
-
-						while( updateInterval.accumulatedTimeInMs > deltaTimeInMs ) {
-							// Only simulate, if not too much time has accumulated to prevent CPU overload. This can happen, if
-							// the browser tab has been in the background for a while and requestAnimationFrame is used.
-							if( updateInterval.accumulatedTimeInMs <= 5 * deltaTimeInMs ) {
-								eventManager.publish(
-									[ Events.LOGIC_UPDATE, deltaTimeInMsAsString ],
-									[ updateInterval.localTimeInMs, deltaTimeInMs / 1000 ]
-								)
-							}
-
-							updateInterval.accumulatedTimeInMs -= deltaTimeInMs
-							updateInterval.localTimeInMs   += deltaTimeInMs
-						}
-					}
-				)
-
-
-				eventManager.publish( Events.RENDER_UPDATE, [ localTimeInMs, elapsedTimeInMs ] )
-
+				if( this.renderCallback ) {
+					this.renderCallback( localTimeInMs, updateIntervalInMs )
+				}
 
 //				var localGameTimeDeltaInMs = timer.getRemoteTime() - localTimeInMs
 //
@@ -100,10 +88,19 @@ define(
 //					clockSpeedFactor = 1.0
 //				}
 
-				PlatformKit.callNextFrame( mainLoop )
+				PlatformKit.callNextFrame(
+					_.bind( this.run, this )
+				)
 			}
+		}
 
-			return mainLoop
+
+		/**
+		 * public
+		 */
+
+		return function( eventManager, statisticsManager, updateInterval ) {
+			return new MainLoop( eventManager, statisticsManager, updateInterval )
 		}
 	}
 )

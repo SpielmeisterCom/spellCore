@@ -31,6 +31,40 @@ define(
 		 */
 
 		var LIBRARY_BLUEPRINTS_PATH = '/library/blueprints'
+		var LIBRARY_SCRIPTS_PATH    = '/library/scripts'
+
+		/**
+		 * Copies the contents of source path to target path recursively
+		 *
+		 * @param sourcePath
+		 * @param targetPath
+		 */
+		var copyDirectory = function( sourcePath, targetPath ) {
+			var relativeFilePaths = glob.sync(
+				'/**/*.{js,json}',
+				{
+					root : sourcePath,
+					nomount : true
+				}
+			)
+
+			_.each(
+				relativeFilePaths,
+				function( relativeFilePath ) {
+					var sourceFilePath = path.join( sourcePath, relativeFilePath ),
+						targetFilePath = path.join( targetPath, relativeFilePath ),
+						targetDirectoryPath = path.dirname( targetFilePath )
+
+					if( path.existsSync( targetFilePath ) ) return
+
+					if( !path.existsSync( targetDirectoryPath ) ) {
+						mkdirp.sync( targetDirectoryPath )
+					}
+
+					copyFile( sourceFilePath, targetFilePath )
+				}
+			)
+		}
 
 
 		/**
@@ -82,31 +116,9 @@ define(
 				)
 			}
 
-			// copy spell sdk blueprints
-			var relativeFilePaths = glob.sync(
-				'/**/*.json',
-				{
-					root : spellPath + LIBRARY_BLUEPRINTS_PATH,
-					nomount : true
-				}
-			)
-
-			_.each(
-				relativeFilePaths,
-				function( relativeFilePath ) {
-					var sourceFilePath = path.join( spellPath, LIBRARY_BLUEPRINTS_PATH, relativeFilePath),
-						targetFilePath = path.join( projectPath, LIBRARY_BLUEPRINTS_PATH, relativeFilePath),
-						targetDirectoryPath = path.dirname( targetFilePath )
-
-					if( path.existsSync( targetFilePath ) ) return
-
-					if( !path.existsSync( targetDirectoryPath ) ) {
-						mkdirp.sync( targetDirectoryPath )
-					}
-
-					copyFile( sourceFilePath, targetFilePath )
-				}
-			)
+			// copy spell sdk blueprints, scripts
+			copyDirectory( spellPath + LIBRARY_BLUEPRINTS_PATH, projectPath + LIBRARY_BLUEPRINTS_PATH )
+			copyDirectory( spellPath + LIBRARY_SCRIPTS_PATH, projectPath + LIBRARY_SCRIPTS_PATH )
 
 
 			// populate public directory
