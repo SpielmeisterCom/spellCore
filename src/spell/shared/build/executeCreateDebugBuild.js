@@ -198,21 +198,17 @@ define(
 			return errors
 		}
 
-		var hasAllScripts = function( scripts, systemBlueprintIds ) {
+		var hasAllScripts = function( scripts, usedScriptIds ) {
 			var errors = []
 
-//			_.each(
-//				systemBlueprintIds,
-//				function( blueprintId ) {
-////					if( !blueprintManager.hasBlueprint( blueprintId ) ) {
-////						errors.push( 'Error: Required blueprint \'' + blueprintId + '\' could not be found.' )
-////					}
-//
-//					var scriptId = blueprintManager.getBlueprint( blueprintId ).scriptId
-//
-//
-//				}
-//			)
+			_.each(
+				usedScriptIds,
+				function( scriptId ) {
+					if( !scripts[ scriptId ] ) {
+						errors.push( 'Error: Could not find script for script id \'' + scriptId + '\'.' )
+					}
+				}
+			)
 
 			return errors
 		}
