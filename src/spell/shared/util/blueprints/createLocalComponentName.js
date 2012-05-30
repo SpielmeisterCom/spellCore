@@ -12,7 +12,8 @@ define(
 		return function( componentBlueprintId, importName ) {
 			if( importName ) return importName
 
-			return _.last( componentBlueprintId.split( '/' ) )
+//			return _.last( componentBlueprintId.split( '/' ) )
+			return componentBlueprintId
 		}
 	}
 )
