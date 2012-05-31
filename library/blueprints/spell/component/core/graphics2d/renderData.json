@@ -1,6 +1,6 @@
 {
 	"type" : "componentBlueprint",
-	"namespace" : "spell/component/core/graphics2d",
+	"namespace" : "spell.component.core.graphics2d",
 	"name" : "renderData",
 	"attributes" : [
 		{

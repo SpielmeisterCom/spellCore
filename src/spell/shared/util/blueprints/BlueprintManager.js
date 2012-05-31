@@ -157,7 +157,7 @@ define(
 		}
 
 		var addBlueprint = function( blueprints, entityTemplates, definition ) {
-			var blueprintId = definition.namespace + '/' + definition.name
+			var blueprintId = definition.namespace + '.' + definition.name
 
 			if( _.has( blueprints, blueprintId ) ) throw 'Error: Blueprint definition \'' + blueprintId + '\' already exists.'
 

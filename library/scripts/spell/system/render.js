@@ -29,9 +29,9 @@ define(
 			translation = vec3.create(),
 			opacity     = 1.0
 
-		var appearanceComponentId = 'spell/component/core/graphics2d/appearance',
-			renderDataComponentId = 'spell/component/core/graphics2d/renderData',
-			positionComponentId   = 'spell/component/core/position'
+		var appearanceComponentId = 'spell.component.core.graphics2d.appearance',
+			renderDataComponentId = 'spell.component.core.graphics2d.renderData',
+			positionComponentId   = 'spell.component.core.position'
 
 
 		var createEntitiesSortedByPath = function( entitiesByPass ) {

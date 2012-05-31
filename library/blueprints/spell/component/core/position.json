@@ -1,6 +1,6 @@
 {
 	"type" : "componentBlueprint",
-	"namespace" : "spell/component/core",
+	"namespace" : "spell.component.core",
 	"name" : "position",
 	"attributes" : [
 		{

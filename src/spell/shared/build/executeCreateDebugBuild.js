@@ -279,7 +279,7 @@ define(
 					// WORKAROUND: a specialized solution; until requirements are more clear this has to do
 					var entity = blueprintManager.createEntity( entityConfig.blueprintId, entityConfig.config )
 
-					var componentId = 'spell/component/core/graphics2d/appearance',
+					var componentId = 'spell.component.core.graphics2d.appearance',
 						entityAppearance = _.has( entity, componentId ) ? entity[ componentId ] : null
 
 					if( entityAppearance ) {
@@ -366,8 +366,8 @@ define(
 
 			// determine all blueprints that are referenced in the project
 			var entityBlueprintIds    = _.unique( jsonPath( projectConfig, '$.zones[*].entities[*].blueprintId' ) ),
-				componentBlueprintIds = createDependencyComponentBlueprintIds( blueprintManager, entityBlueprintIds),
-				systemBlueprintIds    = _.unique( _.flatten( jsonPath( projectConfig, '$.zones[*].systems[*]' ) ))
+				componentBlueprintIds = createDependencyComponentBlueprintIds( blueprintManager, entityBlueprintIds ),
+				systemBlueprintIds    = _.unique( _.flatten( jsonPath( projectConfig, '$.zones[*].systems[*]' ) ) )
 
 
 			// check if the required blueprints are available
