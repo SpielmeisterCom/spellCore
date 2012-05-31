@@ -75,6 +75,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 		return ( isHtml5AudioSupported && Modernizr.canvas && Modernizr.websockets )
 	}
 
+	var isWebGlCapable = function() {
+		return Modernizr.webgl
+	}
+
 	var isFlashCapable = function() {
 		return swfobject.hasFlashPlayerVersion( MIN_FLASH_PLAYER_VERSION )
 	}
@@ -91,6 +95,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 			} else if( isFlashCapable() ) {
 				config.platform = 'flash'
 			}
+		}
+
+		if( config.platform === 'html5' &&
+			!config.renderingBackEnd &&
+			isWebGlCapable() ) {
+
+			config.renderingBackEnd = 'webgl'
 		}
 
 		if( !config.verbose ) {
@@ -126,16 +137,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 
 		if( config.verbose ) console.log( 'stage-zero-loader: chose ' + config.platform + ' platform' )
 
-		var parameters = {
-			id : config.id,
-			verbose : config.verbose
-		}
-
 		if( config.platform === 'html5' ) {
-			loadHtml5Executable( parameters, config.verbose )
+			loadHtml5Executable( config, config.verbose )
 
 		} else {
-			loadFlashExecutable( parameters, config.verbose )
+			loadFlashExecutable( config, config.verbose )
 		}
 	}
 
