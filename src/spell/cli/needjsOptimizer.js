@@ -1,8 +1,7 @@
 define(
 	'spell/cli/needjsOptimizer',
 	[
-		'spell/shared/amd/extractModuleHeader',
-
+		'amd-helper',
 		'commander',
 		'fs',
 		'glob',
@@ -12,8 +11,7 @@ define(
 		'spell/shared/util/platform/underscore'
 	],
 	function(
-		extractModuleHeader,
-
+		amdHelper,
 		commander,
 		fs,
 		glob,
@@ -30,40 +28,6 @@ define(
 			return val.split( ',' )
 		}
 
-		var isModuleIncluded = function( ListedModules, moduleName ) {
-			return _.any(
-				ListedModules,
-				function( listedModuleName ) {
-					return _s.startsWith( moduleName, listedModuleName )
-				}
-			)
-		}
-
-		var traceDependencies = function( modules, blackListModules, moduleName ) {
-			if( isModuleIncluded( blackListModules, moduleName ) ) {
-				return []
-			}
-
-			var result = [ moduleName ],
-				module = modules[ moduleName ]
-
-			if( !module ) throw 'Error: Could not find module \'' + moduleName + '\'.'
-
-			// iterate
-			return _.reduce(
-				module.dependencies,
-				function( memo, dependencyModuleName ) {
-					memo = _.union(
-						memo,
-						traceDependencies( modules, blackListModules, dependencyModuleName )
-					)
-
-					return memo
-				},
-				result
-			)
-		}
-
 		var printModuleContents = function( sourcePath, moduleNames ) {
 			_.each(
 				moduleNames.reverse(),
@@ -72,34 +36,6 @@ define(
 						fs.readFileSync( sourcePath + '/' + moduleName + '.js').toString( 'utf-8' )
 					)
 				}
-			)
-		}
-
-		var createModuleList = function( sourcePath ) {
-			var filePattern = sourcePath + '/**/*.js',
-				filePaths = glob.sync( filePattern, {} )
-
-			return _.reduce(
-				filePaths,
-				function( memo, filePath ) {
-					var fileContent = fs.readFileSync( filePath ).toString( 'utf-8'),
-						moduleHeader = extractModuleHeader( fileContent )
-
-					if( !moduleHeader ) return memo
-
-					if( !moduleHeader.name ) {
-						console.error( 'Error: Anonymous module in file \'' + filePath + '\' is not supported.' )
-						return memo
-					}
-
-					memo[ moduleHeader.name ] = {
-						dependencies : moduleHeader.dependencies,
-						source : fileContent
-					}
-
-					return memo
-				},
-				{}
 			)
 		}
 
@@ -121,7 +57,7 @@ define(
 				function( memo, moduleName ) {
 					return _.union(
 						memo,
-						traceDependencies( modules, [], moduleName )
+						amdHelper.traceDependencies( modules, [], moduleName )
 					)
 				},
 				[]
@@ -161,15 +97,15 @@ define(
 				console.error( 'Error: Could not read base directory \'' + sourcePath + '\'.' )
 			}
 
-			var modules                 = createModuleList( sourcePath ),
-				entryModuleDependencies = traceDependencies( modules, blackListModules, entryModuleName ),
+			var modules                 = amdHelper.loadModules( sourcePath ),
+				entryModuleDependencies = amdHelper.traceDependencies( modules, blackListModules, entryModuleName ),
 				resultModules           = null
 
 			if( !commander.extract ) {
 				resultModules = entryModuleDependencies
 
 			} else {
-				resultModules = _.without(
+				resultModules = _.difference(
 					traceExtractNamespaceDependencies( modules, extractNamespace ),
 					entryModuleDependencies
 				)

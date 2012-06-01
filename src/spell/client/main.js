@@ -17,8 +17,6 @@ define(
 		'spell/shared/util/Logger',
 		'spell/shared/util/platform/PlatformKit',
 
-		'glmatrix/vec2',
-
 		'spell/shared/util/platform/underscore'
 	],
 	function(
@@ -37,9 +35,6 @@ define(
 		Events,
 		Logger,
 		PlatformKit,
-
-		// WORKAROUND: forcing include of vec2
-		vec2,
 
 		_,
 

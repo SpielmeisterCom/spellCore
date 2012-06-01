@@ -1,7 +1,7 @@
 define(
 	'spell/shared/build/executeCreateDebugBuild',
 	[
-		'spell/shared/amd/extractModuleHeader',
+		'spell/shared/ast/filterNodes',
 		'spell/shared/build/copyFile',
 		'spell/shared/build/createReducedEntityConfig',
 		'spell/shared/build/executable/buildFlashExecutable',
@@ -10,6 +10,7 @@ define(
 		'spell/shared/build/isFile',
 		'spell/shared/util/blueprints/BlueprintManager',
 
+		'amd-helper',
 		'fs',
 		'glob',
 		'util',
@@ -21,8 +22,7 @@ define(
 		'spell/shared/util/platform/underscore'
 	],
 	function(
-		extractModuleHeader,
-
+		filterNodes,
 		copyFile,
 		createReducedEntityConfig,
 		buildFlashExecutable,
@@ -31,6 +31,7 @@ define(
 		isFile,
 		BlueprintManager,
 
+		amdHelper,
 		fs,
 		glob,
 		util,
@@ -181,7 +182,7 @@ define(
 				filePaths,
 				function( memo, filePath ) {
 					var data = fs.readFileSync( filePath, 'utf-8'),
-					moduleHeader = extractModuleHeader( data )
+					moduleHeader = amdHelper.extractModuleHeader( data )
 
 					if( !moduleHeader.name ) {
 						console.error( 'Error: Anonymous module in file \'' + filePath + '\' is not supported.' )
@@ -213,8 +214,11 @@ define(
 			return errors
 		}
 
-		var createScriptList = function( scripts, scriptIds ) {
-			return _.values( _.pick( scripts, scriptIds ) )
+		var createModuleList = function( modules, moduleNames ) {
+			return _.pluck(
+				_.pick( modules, moduleNames ),
+				'source'
+			)
 		}
 
 		var createDependencyScriptIds = function( blueprintManager, systemBlueprintIds ) {
@@ -317,7 +321,7 @@ define(
 			)
 		}
 
-		var createRuntimeModule = function( projectName, startZoneId, zones, componentBlueprints, entityBlueprints, systemBlueprints, scripts ) {
+		var createRuntimeModule = function( projectName, startZoneId, zones, componentBlueprints, entityBlueprints, systemBlueprints, modules ) {
 			var runtimeModule = {
 				name: projectName,
 				startZone : startZoneId,
@@ -329,7 +333,57 @@ define(
 
 			return _s.sprintf( runtimeModuleRequirejsTemplate, JSON.stringify( runtimeModule ) ) +
 				'\n\n' +
-				scripts.join( '\n\n' )
+				modules.join( '\n' )
+		}
+
+		var createContainedModulesList = function( source ) {
+			var nodes = filterNodes(
+				source,
+				function( node ) {
+					if( node.type === 'CallExpression' &&
+						node.callee.type === 'Identifier' &&
+						node.callee.name === 'define' ) {
+
+						if( node.arguments.length === 0 ) return false
+
+						return node.arguments[ 0 ].type === 'Literal'
+					}
+				}
+			)
+
+			return _.map(
+				nodes,
+				function( node ) {
+					return node.arguments[ 0 ].value
+				}
+			)
+		}
+
+		/**
+		 * Determines the dependencies of the script modules which are not already resolved by the spell engine include.
+		 *
+		 * @param engineSource
+		 * @param spellSourcePath
+		 * @param scriptModules
+		 */
+		var traceScriptModuleDependencies = function( engineSource, modules, scriptModules, usedScriptIds ) {
+			var includedModuleNames = createContainedModulesList( engineSource )
+
+			// the available modules include the script modules
+			_.extend( modules, scriptModules )
+
+			var scriptModuleDependencies = _.reduce(
+				usedScriptIds,
+				function( memo, scriptModuleName ) {
+					return _.union(
+						memo,
+						amdHelper.traceDependencies( modules, includedModuleNames, scriptModuleName )
+					)
+				},
+				[]
+			)
+
+			return scriptModuleDependencies
 		}
 
 
@@ -379,19 +433,28 @@ define(
 
 
 			// determine scripts that need to be included
-			var scripts = {}
-			errors.concat(
-				loadScriptsFromLibrary( [ projectPath + LIBRARY_SCRIPTS_PATH ], scripts )
-			)
+			var modules       = amdHelper.loadModules( spellPath + '/src' ),
+				scriptModules = amdHelper.loadModules( projectPath + LIBRARY_SCRIPTS_PATH ),
+				usedScriptIds = createDependencyScriptIds( blueprintManager, systemBlueprintIds )
+
+			errors.concat( hasAllScripts( scriptModules, usedScriptIds ) )
 
 			if( _.size( errors ) > 0 ) callback( errors )
 
 
-			var usedScriptIds = createDependencyScriptIds( blueprintManager, systemBlueprintIds )
+			// reading engine source file
+			var spellEngineSourceFilePath = spellPath + '/build/spell.js'
 
-			errors.concat( hasAllScripts( scripts, usedScriptIds ) )
+			if( !path.existsSync( spellEngineSourceFilePath ) ) {
+				errors.push( 'Error: Could not locate engine include file \'' + spellEngineSourceFilePath + '\'.' )
+				callback( errors )
+			}
 
-			if( _.size( errors ) > 0 ) callback( errors )
+			var engineSource = fs.readFileSync( spellEngineSourceFilePath ).toString( 'utf-8' )
+
+
+			// Determine dependencies of scripts. Include those modules which are not already included in the engine file in the runtime module.
+			var scriptModuleDependencies = traceScriptModuleDependencies( engineSource, modules, scriptModules, usedScriptIds )
 
 
 			// copy referenced resources to output path
@@ -406,10 +469,10 @@ define(
 				)
 			)
 
-			var relativeAssetsPath = '/library/assets',
-				spellTexturesPath    = spellPath + relativeAssetsPath,
-				projectTexturesPath  = projectPath + relativeAssetsPath,
-				outputResourcesPath   = projectPath + '/public/output/resources'
+			var relativeAssetsPath  = '/library/assets',
+				spellTexturesPath   = spellPath + relativeAssetsPath,
+				projectTexturesPath = projectPath + relativeAssetsPath,
+				outputResourcesPath = projectPath + '/public/output/resources'
 
 			_.each(
 				resourceIds,
@@ -445,15 +508,9 @@ define(
 
 			// generating executables
 			var tempPath = projectPath + '/build', // directory for build related temporary files
-				executablesOutputPath = projectPath + '/public/output',
-				spellEngineSource = spellPath + '/build/spell.js'
+				executablesOutputPath = projectPath + '/public/output'
 
-			if( !path.existsSync( spellEngineSource ) ) {
-				errors.push( 'Error: Could not locate engine include file \'' + spellEngineSource + '\'.' )
-				callback( errors )
-			}
 
-			var engineSource = fs.readFileSync( spellEngineSource ).toString( 'utf-8' )
 
 			if( !path.existsSync( tempPath) ) {
 				fs.mkdirSync( tempPath )
@@ -466,7 +523,10 @@ define(
 				createBlueprintList( blueprintManager, componentBlueprintIds ),
 				createBlueprintList( blueprintManager, entityBlueprintIds ),
 				createBlueprintList( blueprintManager, systemBlueprintIds ),
-				createScriptList( scripts, usedScriptIds )
+				createModuleList(
+					_.extend( modules, scriptModules ),
+					scriptModuleDependencies
+				)
 			)
 
 
