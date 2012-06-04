@@ -7,6 +7,7 @@ define(
 		'glmatrix/vec2',
 		'glmatrix/vec3',
 		'glmatrix/mat4',
+
 		'spell/shared/util/platform/underscore'
 	],
 	function(
@@ -16,6 +17,7 @@ define(
 		vec2,
 		vec3,
 		mat4,
+
 		_
 	) {
 		'use strict'

@@ -59,8 +59,6 @@ define(
 
 
 							action.executing = isExecuting
-
-							console.log( actorEntity )
 						}
 					)
 				}
