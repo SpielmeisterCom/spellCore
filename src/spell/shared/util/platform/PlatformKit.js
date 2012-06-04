@@ -2,6 +2,8 @@ define(
 	'spell/shared/util/platform/PlatformKit',
 	[
 		'spell/shared/util/platform/private/callNextFrame',
+		'spell/shared/util/platform/private/createHost',
+		'spell/shared/util/platform/private/createJsonCoder',
 		'spell/shared/util/platform/private/createSocket',
 		'spell/shared/util/platform/private/graphics/RenderingFactory',
 		'spell/shared/util/platform/private/registerTimer',
@@ -13,13 +15,12 @@ define(
 		'spell/shared/util/platform/private/configurationOptions',
 		'spell/shared/util/platform/private/system/features',
         'spell/shared/util/platform/private/graphics/Viewporter',
-		'spell/shared/util/platform/private/sound/SoundManager',
-		'spell/shared/util/math',
-
-		'spell/shared/util/platform/underscore'
+		'spell/shared/util/platform/private/sound/SoundManager'
 	],
 	function(
 		callNextFrame,
+		createHost,
+		createJsonCoder,
 		createSocket,
 		RenderingFactory,
 		registerTimer,
@@ -31,27 +32,17 @@ define(
 		configurationOptions,
 		features,
         Viewporter,
-		SoundManager,
-		math,
-
-		_
+		SoundManager
 	) {
 		'use strict'
 
 
 		var getHost = function() {
-			return document.location.host
+			return createHost()
 		}
 
 		var getPlatformInfo = function() {
 			return 'html5'
-		}
-
-		var getJson = function() {
-			return {
-				encode : _.bind( JSON.stringify, JSON ),
-				decode : _.bind( JSON.parse, JSON )
-			}
 		}
 
 		var createInput = function( eventManager, Events ) {
@@ -75,7 +66,7 @@ define(
 			getHost                : getHost,
 			configurationOptions   : configurationOptions,
 			getPlatformInfo        : getPlatformInfo,
-			getJsonCoder           : getJson,
+			getJsonCoder           : createJsonCoder,
 			createInput            : createInput,
 			features               : features,
 			registerOnScreenResize : registerOnScreenResize,

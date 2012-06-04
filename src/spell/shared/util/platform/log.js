@@ -1,18 +1,20 @@
 define(
 	'spell/shared/util/platform/log',
-	function() {
+	[
+		'spell/shared/util/platform/private/log'
+	],
+	function(
+		log
+	) {
 		'use strict'
 
 
-		var log = function( message ) {
-			if( console === undefined ) return
-
-
+		var logWrapper = function( message ) {
 			var now = new Date()
 
-			console.log( '[' + now.toDateString() + ' ' + now.toLocaleTimeString() + '] ' +  message )
+			log( '[' + now.toDateString() + ' ' + now.toLocaleTimeString() + '] ' +  message )
 		}
 
-		return log
+		return logWrapper
 	}
 )
