@@ -138,6 +138,11 @@ define(
 			draw( context, this.textures, createEntitiesSortedByPath( entities ) )
 		}
 
+		var init = function( globals ) {}
+
+		var cleanUp = function( globals ) {}
+
+
 		/**
 		 * public
 		 */
@@ -174,6 +179,8 @@ define(
 		}
 
 		Renderer.prototype = {
+			cleanup : cleanUp,
+			init : init,
 			process : process
 		}
 

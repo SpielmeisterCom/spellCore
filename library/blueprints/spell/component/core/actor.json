@@ -1,0 +1,17 @@
+{
+	"type" : "componentBlueprint",
+	"namespace" : "spell.component.core",
+	"name" : "actor",
+	"attributes" : [
+		{
+			"name" : "id",
+			"type" : "string"
+		},
+		{
+			"name" : "actions",
+			"type" : "object",
+			"default" : {}
+		}
+	]
+}
+

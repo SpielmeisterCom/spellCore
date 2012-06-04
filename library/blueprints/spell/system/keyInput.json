@@ -1,0 +1,21 @@
+{
+	"type" : "systemBlueprint",
+	"namespace" : "spell.system",
+	"name" : "keyInput",
+
+	"input" : [
+		{
+			"name" : "inputDefinitionEntities",
+			"components" : [
+				"spell.component.core.inputDefinition"
+			]
+		},
+		{
+			"name" : "actorEntities",
+			"components" : [
+				"spell.component.core.actor"
+			]
+		}
+	],
+	"scriptId" : "spell/system/keyInput"
+}

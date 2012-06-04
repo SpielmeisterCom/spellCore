@@ -40,6 +40,11 @@ define(
 			var system = new SystemConstructor( globals ),
 				processFunc = _.bind( system.process, system )
 
+
+			// HACK: create systems properly (see init, cleanUp)
+			system.init( globals )
+
+
 			return function( globals, timeInMs, deltaTimeInMs ) {
 				var args = [ globals, timeInMs, deltaTimeInMs ]
 
