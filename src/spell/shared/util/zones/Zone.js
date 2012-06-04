@@ -23,6 +23,15 @@ define(
 		 * private
 		 */
 
+		var invoke = function( items, functionName, args ) {
+			_.each(
+				items,
+				function( item ) {
+					item.prototype[ functionName ].apply( item, args )
+				}
+			)
+		}
+
 		var createSystem = function( globals, blueprintManager, entities, systemBlueprintId ) {
 			var blueprint = blueprintManager.getBlueprint( systemBlueprintId),
 				constructorArgs = [ globals ]
@@ -31,6 +40,7 @@ define(
 				blueprint.input,
 				function( memo, entityGroup ) {
 					return memo.concat(
+						// TODO: replace this when the switch to component list driven entity system is performed
 						entities.executeQuery(
 							entities.prepareQuery( entityGroup.components )
 						).elements
@@ -45,15 +55,6 @@ define(
 
 
 			return create( SystemConstructor, constructorArgs )
-		}
-
-		var invoke = function( items, functionName, args ) {
-			_.each(
-				items,
-				function( item ) {
-					item.prototype[ functionName ].apply( item, args )
-				}
-			)
 		}
 
 		var createSystems = function( globals, blueprintManager, entities, systemBlueprintIds ) {
