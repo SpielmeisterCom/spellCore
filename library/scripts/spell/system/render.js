@@ -131,13 +131,13 @@ define(
 //			)
 		}
 
-		var process = function( globals, timeInMs, deltaTimeInMs, entities ) {
+		var process = function( globals, timeInMs, deltaTimeInMs ) {
 			var context = this.context
 
 			// clear color buffer
 			context.clear()
 
-			draw( context, this.textures, createEntitiesSortedByPath( entities ) )
+			draw( context, this.textures, createEntitiesSortedByPath( this.entities ) )
 		}
 
 		var init = function( globals ) {}
@@ -149,9 +149,10 @@ define(
 		 * public
 		 */
 
-		var Renderer = function( globals ) {
+		var Renderer = function( globals, entities ) {
 			this.textures = globals.resources
 			this.context  = globals.renderingContext
+			this.entities = entities
 
 			var eventManager = globals.eventManager,
 				context = this.context

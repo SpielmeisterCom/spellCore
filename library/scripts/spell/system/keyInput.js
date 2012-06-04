@@ -71,10 +71,11 @@ define(
 		 * @param globals
 		 * @param timeInMs
 		 * @param deltaTimeInMs
-		 * @param inputDefinitionEntities
-		 * @param actorEntities
 		 */
-		var process = function( globals, timeInMs, deltaTimeInMs, inputDefinitionEntities, actorEntities ) {
+		var process = function( globals, timeInMs, deltaTimeInMs ) {
+			var actorEntities = this.actorEntities,
+				inputDefinitionEntities = this.inputDefinitionEntities
+
 			_.each(
 				this.inputEvents,
 				function( inputEvent ) {
@@ -90,9 +91,11 @@ define(
 		 * public
 		 */
 
-		var KeyInput = function( globals ) {
+		var KeyInput = function( globals, inputDefinitionEntities, actorEntities ) {
 			this.inputEvents  = globals.inputEvents
 			this.inputManager = globals.inputManager
+			this.actorEntities = actorEntities
+			this.inputDefinitionEntities = inputDefinitionEntities
 		}
 
 		KeyInput.prototype = {

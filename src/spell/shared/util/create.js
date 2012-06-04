@@ -1,7 +1,7 @@
 define(
-	"spell/shared/util/create",
+	'spell/shared/util/create',
 	function() {
-		"use strict"
+		'use strict'
 
 
 		var create = function( constructor, args ) {
@@ -16,7 +16,7 @@ define(
 		}
 
 
-		create.NO_CONSTRUCTOR_ERROR = "The first argument for create must be a constructor. You passed in "
+		create.NO_CONSTRUCTOR_ERROR = 'The first argument for create must be a constructor. You passed in '
 
 
 		return create
