@@ -173,7 +173,7 @@ define(
 
 			var onCompilingCompleted = function( errors, stderr, stdout ) {
 				// TODO: parse stderr to get to the real compiler errors
-				next( errors )
+				next( stdout )
 			}
 
 			compile( flexSdkPath, compilerConfigFilePath, onCompilingCompleted )
