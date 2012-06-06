@@ -33,7 +33,8 @@ define(
 
 		var appearanceComponentId = 'spell.component.core.graphics2d.appearance',
 			renderDataComponentId = 'spell.component.core.graphics2d.renderData',
-			positionComponentId   = 'spell.component.core.position'
+			positionComponentId   = 'spell.component.core.position',
+			rotationComponentId   = 'spell.component.core.rotation'
 
 
 		var createEntitiesSortedByPath = function( entitiesByPass ) {
@@ -100,7 +101,7 @@ define(
 						vec2.set( entityAppearance.translation, translation )
 						vec2.multiply( entityAppearance.scale, [ texture.width, texture.height ], scale )
 
-						context.rotate( entityAppearance.rotation )
+						context.rotate( entityAppearance.rotation + entity[ rotationComponentId ] )
 						context.translate( translation )
 						context.scale( scale )
 

@@ -1,0 +1,12 @@
+{
+	"type" : "componentBlueprint",
+	"namespace" : "spell.component.core",
+	"name" : "rotation",
+	"attributes" : [
+		{
+			"name" : "value",
+			"type" : "Number",
+			"default" : 0
+		}
+	]
+}

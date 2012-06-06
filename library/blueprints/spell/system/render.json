@@ -8,6 +8,7 @@
 			"name" : "entities",
 			"components" : [
 				"spell.component.core.position",
+				"spell.component.core.rotation",
 				"spell.component.core.graphics2d.appearance",
 				"spell.component.core.graphics2d.renderData"
 			]
