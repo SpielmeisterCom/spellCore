@@ -26,7 +26,9 @@ define(
 
 		var cleanUp = function( globals ) {}
 
-		var processEvent = function( inputDefinitionEntities, actorEntities, inputEvent ) {
+		var processEvent = function( inputDefinitionEntities, actorEntities ) {
+			var inputEvent = this
+
 			_.each(
 				inputDefinitionEntities,
 				function( definition ) {
@@ -57,7 +59,6 @@ define(
 								return
 							}
 
-
 							action.executing = isExecuting
 						}
 					)
@@ -73,15 +74,7 @@ define(
 		 * @param deltaTimeInMs
 		 */
 		var process = function( globals, timeInMs, deltaTimeInMs ) {
-			var actorEntities = this.actorEntities,
-				inputDefinitionEntities = this.inputDefinitionEntities
-
-			_.each(
-				this.inputEvents,
-				function( inputEvent ) {
-					processEvent( inputDefinitionEntities, actorEntities, inputEvent )
-				}
-			)
+			_.invoke( this.inputEvents, processEvent, this.inputDefinitionEntities, this.actorEntities )
 
 			this.inputEvents.length = 0
 		}
