@@ -108,7 +108,8 @@ define(
 				resources            : resourceLoader.getResources(),
 				statisticsManager    : statisticsManager,
 				soundManager         : soundManager,
-				zoneManager          : zoneManager
+				zoneManager          : zoneManager,
+				runtimeModule        : runtimeModule
 			}
 		)
 
@@ -127,6 +128,8 @@ define(
 				return iter.name === runtimeModule.startZone
 			}
 		)
+
+		if( !zoneConfig ) throw 'Error: Could not find start zone \'' + runtimeModule.startZone + '\'.'
 
 		zoneManager.startZone( zoneConfig )
 

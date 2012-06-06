@@ -23,6 +23,16 @@ define(
 		 * private
 		 */
 
+		var requireScript = function( scriptId ) {
+			if( !scriptId ) throw 'Error: No script id provided.'
+
+			var module = require( scriptId )
+
+			if( !module ) throw 'Error: Could not resolve script id \'' + scriptId + '\' to module.'
+
+			return module
+		}
+
 		var invoke = function( items, functionName, args ) {
 			_.each(
 				items,
@@ -32,45 +42,32 @@ define(
 			)
 		}
 
-		var createSystem = function( globals, blueprintManager, entities, systemBlueprintId ) {
-			var blueprint = blueprintManager.getBlueprint( systemBlueprintId),
-				constructorArgs = [ globals ]
+		var createSystem = function( globals, blueprintManager, zoneEntityManager, systemBlueprintId ) {
+			var blueprint = blueprintManager.getBlueprint( systemBlueprintId ),
+				constructor = requireScript( blueprint.scriptId),
+				entities = zoneEntityManager.zoneEntities
 
-			constructorArgs = _.reduce(
+			var constructorArgs = _.reduce(
 				blueprint.input,
 				function( memo, entityGroup ) {
 					return memo.concat(
 						// TODO: replace this when the switch to component list driven entity system is performed
 						entities.executeQuery(
-							entities.prepareQuery( entityGroup.components )
+								entities.prepareQuery( entityGroup.components )
 						).elements
 					)
 				},
-				constructorArgs
+				[ globals ]
 			)
 
-			var SystemConstructor = require( blueprint.scriptId )
-
-			if( !SystemConstructor ) throw 'Error: Could not resolve script id \'' + blueprint.scriptId + '\' to module.'
-
-
-			return create( SystemConstructor, constructorArgs )
+			return create( constructor, constructorArgs )
 		}
 
-		var createSystems = function( globals, blueprintManager, entities, systemBlueprintIds ) {
+		var createSystems = function( globals, blueprintManager, zoneEntityManager, systemBlueprintIds ) {
 			return _.map(
 				systemBlueprintIds,
 				function( systemBlueprintId ) {
-					return createSystem( globals, blueprintManager, entities, systemBlueprintId )
-				}
-			)
-		}
-
-		var createInitialEntities = function( entityManager, entityConfigs ) {
-			_.each(
-				entityConfigs,
-				function( entityConfig ) {
-					entityManager.createEntity( entityConfig.blueprintId, entityConfig.config )
+					return createSystem( globals, blueprintManager, zoneEntityManager, systemBlueprintId )
 				}
 			)
 		}
@@ -85,6 +82,7 @@ define(
 			this.blueprintManager = blueprintManager
 			this.renderSystems    = null
 			this.updateSystems    = null
+			this.script           = null
 		}
 
 		Zone.prototype = {
@@ -95,38 +93,24 @@ define(
 				invoke( this.updateSystems, 'process', [ this.globals, timeInMs, deltaTimeInMs ] )
 			},
 			init: function( globals, zoneConfig ) {
-				var eventManager   = globals.eventManager,
-					resourceLoader = globals.resourceLoader,
-					entities       = new Entities(),
-					entityManager  = new ZoneEntityManager( globals.entityManager, entities )
+				var zoneEntityManager = new ZoneEntityManager( globals.entityManager, new Entities() )
 
-				this.entities      = entities
-				this.entityManager = entityManager
-				this.renderSystems = createSystems( globals, this.blueprintManager, entities, zoneConfig.systems.render )
-				this.updateSystems = createSystems( globals, this.blueprintManager, entities, zoneConfig.systems.update )
-
-				invoke( this.renderSystems, 'init', [ this.globals ] )
-				invoke( this.updateSystems, 'init', [ this.globals ] )
-
-				if( _.size( zoneConfig.resources ) === 0 ) {
-					createInitialEntities( entityManager, zoneConfig.entities )
-					return
+				if( zoneConfig.scriptId ) {
+					this.script = requireScript( zoneConfig.scriptId )
+					this.script.init( this.globals, zoneEntityManager, zoneConfig )
 				}
 
-				eventManager.subscribe(
-					[ Events.RESOURCE_LOADING_COMPLETED, 'zoneResources' ],
-					function() {
-						createInitialEntities( entityManager, zoneConfig.entities )
-					}
-				)
+				this.renderSystems = createSystems( globals, this.blueprintManager, zoneEntityManager, zoneConfig.systems.render )
+				this.updateSystems = createSystems( globals, this.blueprintManager, zoneEntityManager, zoneConfig.systems.update )
 
-				// trigger loading of zone resources
-				resourceLoader.addResourceBundle( 'zoneResources', zoneConfig.resources )
-				resourceLoader.start()
+				invoke( this.renderSystems, 'init', [ this.globals, zoneConfig ] )
+				invoke( this.updateSystems, 'init', [ this.globals, zoneConfig ] )
 			},
 			destroy: function( globals ) {
-				invoke( this.renderSystems, 'cleanUp', [ this.globals ] )
-				invoke( this.updateSystems, 'cleanUp', [ this.globals ] )
+				invoke( this.renderSystems, 'cleanUp', [ this.globals, zoneConfig ] )
+				invoke( this.updateSystems, 'cleanUp', [ this.globals, zoneConfig ] )
+
+				this.script.cleanUp( this.globals )
 			}
 		}
 

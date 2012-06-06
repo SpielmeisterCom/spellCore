@@ -312,10 +312,11 @@ define(
 					)
 
 					return {
-						name : zone.name,
 						entities : reducedEntityConfig,
-						systems : zone.systems,
-						resources : createReferencedResources( blueprintManager, reducedEntityConfig )
+						name : zone.name,
+						resources : createReferencedResources( blueprintManager, reducedEntityConfig ),
+						scriptId : zone.scriptId,
+						systems : zone.systems
 					}
 				}
 			)
@@ -363,8 +364,10 @@ define(
 		 * Determines the dependencies of the script modules which are not already resolved by the spell engine include.
 		 *
 		 * @param engineSource
-		 * @param spellSourcePath
+		 * @param modules
 		 * @param scriptModules
+		 * @param usedScriptIds
+		 * @return {*}
 		 */
 		var traceScriptModuleDependencies = function( engineSource, modules, scriptModules, usedScriptIds ) {
 			var includedModuleNames = createContainedModulesList( engineSource )
@@ -434,8 +437,17 @@ define(
 
 			// determine scripts that need to be included
 			var modules       = amdHelper.loadModules( spellPath + '/src' ),
-				scriptModules = amdHelper.loadModules( projectPath + LIBRARY_SCRIPTS_PATH ),
-				usedScriptIds = createDependencyScriptIds( blueprintManager, systemBlueprintIds )
+				scriptModules = amdHelper.loadModules( projectPath + LIBRARY_SCRIPTS_PATH )
+
+			// system script ids
+			var usedScriptIds = createDependencyScriptIds( blueprintManager, systemBlueprintIds )
+
+			// zone script ids
+			usedScriptIds = usedScriptIds.concat(
+				_.unique(
+					jsonPath( projectConfig, '$.zones[*].scriptId' )
+				)
+			)
 
 			errors.concat( hasAllScripts( scriptModules, usedScriptIds ) )
 

@@ -1,7 +1,12 @@
 define(
-	"spell/shared/util/zones/ZoneEntityManager",
-	function() {
-		"use strict"
+	'spell/shared/util/zones/ZoneEntityManager',
+	[
+		'spell/shared/util/platform/underscore'
+	],
+	function(
+		_
+	) {
+		'use strict'
 
 
 		function ZoneEntityManager( globalEntityManager, zoneEntities, listeners ) {
@@ -17,6 +22,17 @@ define(
 				this.zoneEntities.add( entity )
 				this.listeners.forEach( function( listener ) { listener.onCreateEntity( entityType, args, entity ) } )
 				return entity
+			},
+
+			createEntities: function( entityConfigs ) {
+				var self = this
+
+				_.each(
+					entityConfigs,
+					function( entityConfig ) {
+						self.createEntity( entityConfig.blueprintId, entityConfig.config )
+					}
+				)
 			},
 
 			destroyEntity: function( entity ) {
