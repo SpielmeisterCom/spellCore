@@ -71,7 +71,7 @@ define(
 				}
 
 				if( this.renderCallback ) {
-					this.renderCallback( localTimeInMs, updateIntervalInMs )
+					this.renderCallback( localTimeInMs, elapsedTimeInMs )
 				}
 
 //				var localGameTimeDeltaInMs = timer.getRemoteTime() - localTimeInMs
