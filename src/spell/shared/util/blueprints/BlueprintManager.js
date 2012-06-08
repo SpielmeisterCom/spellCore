@@ -23,6 +23,18 @@ define(
 			BLUEPRINT_TYPE_SYSTEM    : 'systemBlueprint'
 		}
 
+		var createName = function() {
+		    return _.reduce(
+		        arguments,
+		        function( memo, argument ) {
+		            if( argument === '' ) return memo
+
+		            return memo + ( memo !== '' ? '.' : '' )  + argument
+		        },
+		        ''
+		    )
+		}
+
 		var isValidComponentBlueprint = function( blueprint ) {
 			// check for ambiguous attribute names
 			var attributeNameCounts = _.reduce(
@@ -171,7 +183,7 @@ define(
 		}
 
 		var addBlueprint = function( blueprints, entityTemplates, definition ) {
-			var blueprintId = definition.namespace + '.' + definition.name
+			var blueprintId = createName( definition.namespace, definition.name )
 
 			if( _.has( blueprints, blueprintId ) ) throw 'Error: Blueprint definition \'' + blueprintId + '\' already exists.'
 
