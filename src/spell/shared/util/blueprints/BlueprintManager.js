@@ -107,13 +107,15 @@ define(
 		}
 
 		var updateComponent = function( component, attributeConfig, isSingleAttributeComponent ) {
-			if( isSingleAttributeComponent ) {
-				for( var property in attributeConfig ) {
-					return _.clone( attributeConfig[ property ] )
-				}
-			}
+			if( attributeConfig === undefined ) {
+				return component
 
-			return _.extend( component, attributeConfig )
+			} else if( isSingleAttributeComponent ) {
+				return  _.clone( attributeConfig )
+
+			} else {
+				return _.extend( component, attributeConfig )
+			}
 		}
 
 		var createEntityTemplate = function( blueprints, entityBlueprint ) {
@@ -140,19 +142,26 @@ define(
 			)
 		}
 
-		var updateEntity = function( blueprintId, entity, entityConfig ) {
+		var updateEntity = function( blueprints, blueprintId, entity, entityConfig ) {
 			return _.reduce(
 				entityConfig,
-				function( memo, componentConfig, componentName ) {
-					if( !memo[ componentName ] ) {
-						throw 'Error: Entity template for entity blueprint \'' + blueprintId + '\' is missing component \'' + componentName + '\'.' +
+				function( memo, componentConfig, componentId ) {
+					var componentBlueprint = getBlueprint( blueprints, componentId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
+
+					if( !_.has( memo, componentId ) ) {
+
+
+						console.log( memo )
+
+
+						throw 'Error: Entity template for entity blueprint \'' + blueprintId + '\' is missing component \'' + componentId + '\'.' +
 							' Maybe you forgot to add the component to the entity blueprint?'
 					}
 
-					updateComponent(
-						memo[ componentName ],
+					memo[ componentId ] = updateComponent(
+						memo[ componentId ],
 						componentConfig,
-						isSingleAttributeComponent( memo[ componentName ] )
+						isSingleAttributeComponent( componentBlueprint.attributes )
 					)
 
 					return memo
@@ -190,10 +199,10 @@ define(
 		}
 
 		var isSingleAttributeComponent = function( attributes ) {
-//			if( !attributes ) throw 'Error: \'attributes\' is of type falsy.'
-			if( !attributes ) console.trace()
+			if( attributes === undefined ) throw 'Error: \'attributes\' is of type falsy.'
 
-			return _.size( attributes ) === 1
+			return _.isObject( attributes ) &&
+				_.size( attributes ) === 1
 		}
 
 
@@ -222,6 +231,7 @@ define(
 				if( !entityTemplate ) throw 'Error: Could not find entity template for blueprint id \'' + blueprintId + '\'.'
 
 				return updateEntity(
+					this.blueprints,
 					blueprintId,
 					deepClone( this.entityTemplates[ blueprintId ] ),
 					entityConfig
