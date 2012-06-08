@@ -44,13 +44,34 @@ define(
 		 */
 		vec2.multiply = function( vec, vec2, dest ) {
 			if( !dest || vec === dest ) {
-				vec[0] *= vec2[0]
-				vec[1] *= vec2[1]
+				vec[ 0 ] *= vec2[ 0 ]
+				vec[ 1 ] *= vec2[ 1 ]
 				return vec
 			}
 
 			dest[ 0 ] = vec[ 0 ] * vec2[ 0 ]
 			dest[ 1 ] = vec[ 1 ] * vec2[ 1 ]
+			return dest
+		}
+
+		/**
+		 * Performs a vector multiplication
+		 *
+		 * @param {vec2} vec First operand
+		 * @param {float} s Second operand
+		 * @param {vec2} [dest] vec2 receiving operation result. If not specified result is written to vec
+		 *
+		 * @returns {vec2} dest if specified, vec otherwise
+		 */
+		vec2.multiplyScalar = function( vec, s, dest ) {
+			if( !dest || vec === dest ) {
+				vec[ 0 ] *= s
+				vec[ 1 ] *= s
+				return vec
+			}
+
+			dest[ 0 ] = vec[ 0 ] * s
+			dest[ 1 ] = vec[ 1 ] * s
 			return dest
 		}
 
