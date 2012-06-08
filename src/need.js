@@ -59,7 +59,7 @@ var define = function( moduleName, dependencies, moduleBody ) {
 }
 
 
-var require = function( moduleName ) {
+var require = function( moduleName, args ) {
 	if( !moduleName ) throw 'No module name provided.'
 
 
@@ -69,12 +69,8 @@ var require = function( moduleName ) {
 
 
 	if( !module.instance ) {
-		module.instance = resolveDependencies( moduleName )
+		module.instance = resolveDependencies( moduleName, args )
 	}
 
 	return module.instance
-}
-
-enterMain = function( moduleName, args ) {
-	resolveDependencies( moduleName, args )
 }

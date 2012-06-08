@@ -24,7 +24,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 
 ;( function( document ) {
 	var MIN_FLASH_PLAYER_VERSION = '10.1.0',
-		DEFAULT_CONTAINER_ID = 'spell'
+		DEFAULT_CONTAINER_ID = 'spell',
+		engineInstance = null
 
 	var getUrlParameters = function() {
 		var url = window.location.href
@@ -86,6 +87,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 	var setDefaults = function( config ) {
 		if( !config.id ) {
 			config.id = 'spell'
+		}
+
+		if( !config.debug ) {
+			config.debug = false
 		}
 
 		if( !config.platform ) {
@@ -154,7 +159,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 			function() {
 				if( verbose ) printLaunching()
 
-				enterMain( 'spell/client/main', parameters )
+				engineInstance = require( 'spell/client/main', parameters )
+				engineInstance.start()
 			}
 		)
 	}
@@ -176,6 +182,16 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 		)
 	}
 
+	var addDebugAPI = function( obj ) {
+		obj.setDebugCallback = function( fn ) {
+			engineInstance.setDebugCallback( fn )
+		}
+
+		obj.sendDebugMessage = function( message ) {
+			engineInstance.sendDebugMessage( message )
+		}
+	}
+
 	var printLoading = function() {
 		console.log( 'stage-zero-loader: loading executable' )
 	}
@@ -191,6 +207,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 			setUrlParameters( config )
 			setDefaults( config )
 
+			if( config.debug ) {
+				addDebugAPI( this )
+			}
+
 			if( !hasContainer( config.id ) ) {
 				console.log( 'Error: \'' + config.id + '\' is not a valid dom node id. Could not start engine.' )
 				return
@@ -201,7 +221,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 
 			} else {
 				var message = 'Your browser does not meet the minimum requirements in order to run SpellJS. :('
-				document.getElementById( config.id ).innerHTML = '<p>' + message + '</p>';
+				document.getElementById( config.id ).innerHTML = '<p>' + message + '</p>'
 			}
 		}
 	}

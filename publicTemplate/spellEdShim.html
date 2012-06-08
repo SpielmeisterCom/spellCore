@@ -9,45 +9,53 @@
 	<body>
 		<div id="spell"></div>
 		<script type="text/javascript">
-			var editorOrigin = 'http://localhost:3000'
+			( function() {
+				var editorOrigin = 'http://localhost:3000'
 
-			function getParam( name ) {
-				name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-				var regexS = '[\\?&]'+name+'=([^&#]*)';
-				var regex = new RegExp( regexS );
-				var results = regex.exec( window.location.href );
-				if( results == null )
-					return '';
-				else
-					return results[1];
-			}
+				var getParam = function( name ) {
+					name = name.replace( /[\[]/, "\\\[" ).replace( /[\]]/, "\\\]" )
+					var regexS = '[\\?&]' + name + '=([^&#]*)'
+					var regex = new RegExp( regexS )
+					var results = regex.exec( window.location.href )
 
-			function receiveMessage( event ) {
-				if( event.origin !== editorOrigin ) {
-					console.log( 'event.origin: ' + event.origin )
-					console.log( 'Error: origin does not match.' )
-
-					return
+					return ( results == null ? '' : results[ 1 ] )
 				}
 
-				if( event.data.type === 'run' ) {
-					var config = {
-						platform : 'html5'
+				var receiveMessage = function( event ) {
+					if( event.origin !== editorOrigin ) {
+						console.log( 'event.origin: ' + event.origin )
+						console.log( 'Error: origin does not match.' )
+
+						return
 					}
 
-					spell.start( config )
+					if( event.data.type === 'run' ) {
+						var config = {
+							debug : true,
+							platform : 'html5'
+						}
+
+						spell.start( config )
+
+					} else if( event.data.type === 'debug' ) {
+						spell.sendDebugMessage( event.data )
+					}
 				}
-			}
 
-			window.addEventListener( 'message', receiveMessage, false )
+				var init = function() {
+					window.addEventListener( 'message', receiveMessage, false )
 
-			parent.window.postMessage(
-				{
-					action: 'initialized',
-					iframeId: getParam( 'iframeId' )
-				},
-				editorOrigin
-			)
+					parent.window.postMessage(
+						{
+							action: 'initialized',
+							iframeId: getParam( 'iframeId' )
+						},
+						editorOrigin
+					)
+				}
+
+				init()
+			} )()
 		</script>
 	</body>
 </html>
