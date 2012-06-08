@@ -64,17 +64,20 @@ define(
         }
 
 		var keyHandler = function( event ) {
-			inputEvents.push( {
-				type           : event.type,
-				keyCode        : event.keyCode,
+			inputEvents.push( createKeyEvent( event.type, event.keyCode ) )
+		}
+
+		var createKeyEvent = function( type, keyCode ) {
+			return {
+				type           : type,
+				keyCode        : keyCode,
 				sequenceNumber : nextSequenceNumber++
-			} )
+			}
 		}
 
 
 		var InputManager = function( configurationManager ) {
 			this.nativeInput = PlatformKit.createInput( configurationManager )
-
 		}
 
 		InputManager.prototype = {
@@ -104,6 +107,9 @@ define(
 			},
 			getInputEvents : function() {
 				return inputEvents
+			},
+			injectKeyEvent : function( type, keyCode ) {
+				inputEvents.push( createKeyEvent( type, keyCode ) )
 			}
 		}
 

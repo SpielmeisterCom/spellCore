@@ -15,6 +15,7 @@ define(
 		'spell/shared/util/StatisticsManager',
 		'spell/shared/util/Events',
 		'spell/shared/util/Logger',
+		'spell/shared/util/createDebugMessageHandler',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/shared/util/platform/underscore'
@@ -34,6 +35,7 @@ define(
 		StatisticsManager,
 		Events,
 		Logger,
+		createDebugMessageHandler,
 		PlatformKit,
 
 		_,
@@ -69,6 +71,44 @@ define(
 			)
 		}
 
+		var globals              = {},
+			eventManager         = new EventManager(),
+			configurationManager = new ConfigurationManager( eventManager, parameters ),
+			renderingContext     = PlatformKit.RenderingFactory.createContext2d(
+				eventManager,
+				configurationManager.id,
+				1024,
+				768,
+				configurationManager.renderingBackEnd
+			),
+			soundManager         = PlatformKit.createSoundManager(),
+			inputManager         = new InputManager( configurationManager ),
+			resourceLoader       = new ResourceLoader( runtimeModule.name, soundManager, renderingContext, eventManager, configurationManager.resourceServer ),
+			statisticsManager    = new StatisticsManager(),
+			blueprintManager     = new BlueprintManager(),
+			mainLoop             = createMainLoop( eventManager, statisticsManager ),
+			zoneManager          = new ZoneManager( globals, eventManager, blueprintManager, mainLoop )
+
+		statisticsManager.init()
+
+		_.extend(
+			globals,
+			{
+				configurationManager : configurationManager,
+				eventManager         : eventManager,
+				entityManager        : new EntityManager( blueprintManager ),
+				inputManager         : inputManager,
+				inputEvents          : inputManager.getInputEvents(),
+				renderingContext     : renderingContext,
+				resourceLoader       : resourceLoader,
+				resources            : resourceLoader.getResources(),
+				statisticsManager    : statisticsManager,
+				soundManager         : soundManager,
+				zoneManager          : zoneManager,
+				runtimeModule        : runtimeModule
+			}
+		)
+
 
 		/**
 		 * public
@@ -80,45 +120,6 @@ define(
 			}
 
 			Logger.debug( 'client started' )
-
-
-			var globals              = {},
-				eventManager         = new EventManager(),
-				configurationManager = new ConfigurationManager( eventManager, parameters ),
-				renderingContext     = PlatformKit.RenderingFactory.createContext2d(
-					eventManager,
-					configurationManager.id,
-					1024,
-					768,
-					configurationManager.renderingBackEnd
-				),
-				soundManager         = PlatformKit.createSoundManager(),
-				inputManager         = new InputManager( configurationManager ),
-				resourceLoader       = new ResourceLoader( runtimeModule.name, soundManager, renderingContext, eventManager, configurationManager.resourceServer ),
-				statisticsManager    = new StatisticsManager(),
-				blueprintManager     = new BlueprintManager(),
-				mainLoop             = createMainLoop( eventManager, statisticsManager ),
-				zoneManager          = new ZoneManager( globals, eventManager, blueprintManager, mainLoop )
-
-			statisticsManager.init()
-
-			_.extend(
-				globals,
-				{
-					configurationManager : configurationManager,
-					eventManager         : eventManager,
-					entityManager        : new EntityManager( blueprintManager ),
-					inputManager         : inputManager,
-					inputEvents          : inputManager.getInputEvents(),
-					renderingContext     : renderingContext,
-					resourceLoader       : resourceLoader,
-					resources            : resourceLoader.getResources(),
-					statisticsManager    : statisticsManager,
-					soundManager         : soundManager,
-					zoneManager          : zoneManager,
-					runtimeModule        : runtimeModule
-				}
-			)
 
 //			PlatformKit.registerOnScreenResize( _.bind( onScreenResized, onScreenResized, eventManager ) )
 
@@ -160,10 +161,7 @@ define(
 			 *
 			 * @param message
 			 */
-			sendDebugMessage : function( message ) {
-				// TODO: Unterstützung für das injecten von Tastenereignissen einbauen
-				console.log( message )
-			}
+			sendDebugMessage : createDebugMessageHandler( inputManager )
 		}
 	}
 )

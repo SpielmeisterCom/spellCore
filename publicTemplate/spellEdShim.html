@@ -12,6 +12,22 @@
 			( function() {
 				var editorOrigin = 'http://localhost:3000'
 
+				/**
+				 * Thanks to John Resig. http://ejohn.org/blog/flexible-javascript-events/
+				 *
+				 * @param obj
+				 * @param type
+				 * @param fn
+				 */
+				var addEvent = function( obj, type, fn ) {
+				  if ( obj.attachEvent ) {
+				    obj['e'+type+fn] = fn;
+				    obj[type+fn] = function(){obj['e'+type+fn]( window.event );}
+				    obj.attachEvent( 'on'+type, obj[type+fn] );
+				  } else
+				    obj.addEventListener( type, fn, false );
+				}
+
 				var getParam = function( name ) {
 					name = name.replace( /[\[]/, "\\\[" ).replace( /[\]]/, "\\\]" )
 					var regexS = '[\\?&]' + name + '=([^&#]*)'
@@ -21,40 +37,65 @@
 					return ( results == null ? '' : results[ 1 ] )
 				}
 
-				var receiveMessage = function( event ) {
-					if( event.origin !== editorOrigin ) {
-						console.log( 'event.origin: ' + event.origin )
-						console.log( 'Error: origin does not match.' )
-
-						return
-					}
-
-					if( event.data.type === 'run' ) {
-						var config = {
-							debug : true,
-							platform : 'html5'
-						}
-
-						spell.start( config )
-
-					} else if( event.data.type === 'debug' ) {
-						spell.sendDebugMessage( event.data )
-					}
-				}
-
-				var init = function() {
-					window.addEventListener( 'message', receiveMessage, false )
-
+				var sendMessageToEditor = function( action ) {
 					parent.window.postMessage(
 						{
-							action: 'initialized',
-							iframeId: getParam( 'iframeId' )
+							action : 'spell.' + action,
+							iframeId : getParam( 'iframeId' )
 						},
 						editorOrigin
 					)
 				}
 
-				init()
+				var init = function() {
+					sendMessageToEditor( 'initialized' )
+				}
+
+				var handleMessageFromEditor = function( event ) {
+					if( event.origin !== editorOrigin ) {
+						console.log( 'Error: origin \'' + event.origin + '\' does not match.' )
+
+						return
+					}
+
+					if( event.data.type === 'spelled.run' ) {
+						var config = {
+							debug : true,
+							platform : 'html5'
+						}
+
+						spell.onInitialized = init
+						spell.start( config )
+
+					} else if( event.data.type === 'spelled.debug' ) {
+						spell.sendDebugMessage( event.data )
+					}
+				}
+
+				var registerMouseFocusHandlers = function() {
+					addEvent(
+						document.body,
+						'focus',
+						function( event ) {
+							sendMessageToEditor( 'focus' )
+						}
+					)
+
+					addEvent(
+						document.body,
+						'blur',
+						function( event ) {
+							sendMessageToEditor( 'blur' )
+						}
+					)
+				}
+
+				var registerMessageHandler = function() {
+					addEvent( window, 'message', handleMessageFromEditor )
+				}
+
+				registerMouseFocusHandlers()
+				registerMessageHandler()
 			} )()
 		</script>
 	</body>

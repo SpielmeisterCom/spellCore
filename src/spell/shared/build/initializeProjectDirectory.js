@@ -133,9 +133,13 @@ define(
 			_.each(
 				fileNames,
 				function( fileName ) {
+					var projectDirectoryFilePath = projectPath + '/public/' + fileName
+
+					if( path.existsSync( projectDirectoryFilePath ) ) return
+
 					copyFile(
 						spellPath + '/publicTemplate/' + fileName,
-						projectPath + '/public/' + fileName
+						projectDirectoryFilePath
 					)
 				}
 			)

@@ -24,8 +24,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 
 ;( function( document ) {
 	var MIN_FLASH_PLAYER_VERSION = '10.1.0',
-		DEFAULT_CONTAINER_ID = 'spell',
-		engineInstance = null
+		DEFAULT_CONTAINER_ID = 'spell'
 
 	var getUrlParameters = function() {
 		var url = window.location.href
@@ -129,7 +128,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 		return false
 	}
 
-	var process = function( config ) {
+	var process = function( config, spellObject, onInitialized ) {
 		if( !config.platform ) {
 			throw 'Error: Invalid config. Property \'platform\' is not defined.'
 		}
@@ -143,14 +142,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 		if( config.verbose ) console.log( 'stage-zero-loader: chose ' + config.platform + ' platform' )
 
 		if( config.platform === 'html5' ) {
-			loadHtml5Executable( config, config.verbose )
+			loadHtml5Executable( config, config.verbose, spellObject, onInitialized )
 
 		} else {
 			loadFlashExecutable( config, config.verbose )
 		}
 	}
 
-	var loadHtml5Executable = function( parameters, verbose ) {
+	var loadHtml5Executable = function( config, verbose, spellObject, onInitialized ) {
 		if( verbose ) printLoading()
 
 		head.js(
@@ -159,8 +158,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 			function() {
 				if( verbose ) printLaunching()
 
-				engineInstance = require( 'spell/client/main', parameters )
+				var engineInstance = require( 'spell/client/main', config )
+
+				if( config.debug ) addDebugAPI( spellObject, engineInstance )
+
 				engineInstance.start()
+
+				if( onInitialized ) onInitialized()
 			}
 		)
 	}
@@ -182,12 +186,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 		)
 	}
 
-	var addDebugAPI = function( obj ) {
-		obj.setDebugCallback = function( fn ) {
+	var addDebugAPI = function( spellObject, engineInstance ) {
+		spellObject.setDebugCallback = function( fn ) {
 			engineInstance.setDebugCallback( fn )
 		}
 
-		obj.sendDebugMessage = function( message ) {
+		spellObject.sendDebugMessage = function( message ) {
 			engineInstance.sendDebugMessage( message )
 		}
 	}
@@ -217,12 +221,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 			}
 
 			if( isBrowserCapable( config ) ) {
-				process( config )
+				process( config, this, this.onInitialized )
 
 			} else {
 				var message = 'Your browser does not meet the minimum requirements in order to run SpellJS. :('
 				document.getElementById( config.id ).innerHTML = '<p>' + message + '</p>'
 			}
-		}
+		},
+		onInitialized : undefined
 	}
 } )( document )

@@ -22,10 +22,6 @@ define(
 			return _.has( nativeEventMap, eventName )
 		}
 
-		function getScreenOffset() {
-			return getOffset( document.getElementById( 'spell-canvas' ) )
-		}
-
 		function getOffset( element ) {
 			var box = element.getBoundingClientRect()
 
@@ -49,7 +45,7 @@ define(
 			event.preventDefault()
 
 			var touch = event.changedTouches[ 0 ]
-			var offset = getScreenOffset()
+			var offset = getOffset( this.container )
 			var screenSize = this.configurationManager.screenSize
 
 			var position = [
@@ -86,7 +82,7 @@ define(
         var nativeMouseHandler = function( callback, event ) {
             event.preventDefault()
 
-			var offset = getScreenOffset()
+			var offset = getOffset( this.container )
 			var screenSize = this.configurationManager.screenSize
 
 			var position = [
@@ -144,6 +140,7 @@ define(
 
 		var Input = function( configurationManager ) {
 			this.configurationManager = configurationManager
+			this.container = document.getElementById( configurationManager.id )
 		}
 
 		var setListener = function( eventName, callback ) {
@@ -151,7 +148,7 @@ define(
 
 			var nativeEvent = nativeEventMap[ eventName ]
 
-            document.body[ 'on' + nativeEvent.eventName ] = _.bind( nativeEvent.handler, this, callback )
+			this.container[ 'on' + nativeEvent.eventName ] = _.bind( nativeEvent.handler, this, callback )
 		}
 
 		var removeListener = function( eventName ) {
@@ -159,7 +156,7 @@ define(
 
 			var nativeEvent = nativeEventMap[ eventName ]
 
-            document.body[ 'on' + nativeEvent.eventName ] = null
+			this.container[ 'on' + nativeEvent.eventName ] = null
 		}
 
 		Input.prototype = {
