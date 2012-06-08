@@ -106,7 +106,7 @@ define(
 				invoke( this.renderSystems, 'init', [ this.globals, zoneConfig ] )
 				invoke( this.updateSystems, 'init', [ this.globals, zoneConfig ] )
 			},
-			destroy: function( globals ) {
+			destroy: function( globals, zoneConfig ) {
 				invoke( this.renderSystems, 'cleanUp', [ this.globals, zoneConfig ] )
 				invoke( this.updateSystems, 'cleanUp', [ this.globals, zoneConfig ] )
 
