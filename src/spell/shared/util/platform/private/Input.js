@@ -18,6 +18,23 @@ define(
 		/**
 		 * private
 		 */
+
+		/**
+		 * Thanks to John Resig. http://ejohn.org/blog/flexible-javascript-events/
+		 *
+		 * @param obj
+		 * @param type
+		 * @param fn
+		 */
+		var addEvent = function( obj, type, fn ) {
+		  if ( obj.attachEvent ) {
+		    obj['e'+type+fn] = fn;
+		    obj[type+fn] = function(){obj['e'+type+fn]( window.event );}
+		    obj.attachEvent( 'on'+type, obj[type+fn] );
+		  } else
+		    obj.addEventListener( type, fn, false );
+		}
+
 		var isEventSupported = function( eventName ) {
 			return _.has( nativeEventMap, eventName )
 		}
@@ -148,7 +165,7 @@ define(
 
 			var nativeEvent = nativeEventMap[ eventName ]
 
-			this.container[ 'on' + nativeEvent.eventName ] = _.bind( nativeEvent.handler, this, callback )
+			addEvent( document.body, nativeEvent.eventName, _.bind( nativeEvent.handler, this, callback ) )
 		}
 
 		var removeListener = function( eventName ) {
