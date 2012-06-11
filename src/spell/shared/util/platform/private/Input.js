@@ -97,8 +97,6 @@ define(
 		}
 
         var nativeMouseHandler = function( callback, event ) {
-            event.preventDefault()
-
 			var offset = getOffset( this.container )
 			var screenSize = this.configurationManager.screenSize
 
