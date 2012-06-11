@@ -161,11 +161,6 @@ define(
 					var componentBlueprint = getBlueprint( blueprints, componentId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
 
 					if( !_.has( memo, componentId ) ) {
-
-
-						console.log( memo )
-
-
 						throw 'Error: Entity template for entity blueprint \'' + blueprintId + '\' is missing component \'' + componentId + '\'.' +
 							' Maybe you forgot to add the component to the entity blueprint?'
 					}
