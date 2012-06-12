@@ -1,8 +1,6 @@
 define(
 	'spell/client/main',
 	[
-		'funkysnakes/client/zones/base',
-
 		'spell/client/runtimeModule',
 		'spell/shared/util/createMainLoop',
 		'spell/shared/util/entities/EntityManager',
@@ -21,8 +19,6 @@ define(
 		'spell/shared/util/platform/underscore'
 	],
 	function(
-		baseZone,
-
 		runtimeModule,
 		createMainLoop,
 		EntityManager,
