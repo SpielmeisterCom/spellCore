@@ -11,3 +11,7 @@ debug:
 
 deploy:
 	node node_modules/.bin/r.js -o baseUrl=src optimize=uglify name=spell/client/main out=build/spell.min.js
+
+.PHONY: docs
+docs:
+	jsduck src --output=docs/generated
