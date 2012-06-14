@@ -1,3 +1,6 @@
 [submodule "vendor/spellas"]
 	path = vendor/spellas
 	url = git@git.spielmeister.com:/spellas.git
+[submodule "vendor/jsduck"]
+	path = vendor/jsduck
+	url = https://github.com/senchalabs/jsduck.git
