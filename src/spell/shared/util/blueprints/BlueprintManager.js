@@ -102,8 +102,8 @@ define(
 			throw 'Error: Could not find a blueprint with id \'' + blueprintId + ( blueprintType ? '\' of type ' + blueprintType : '' ) + '.'
 		}
 
-		var createComponentTemplate = function( componentBlueprint ) {
-			if( _.size( componentBlueprint.attributes ) === 1 ) {
+		var createComponentTemplate = function( componentBlueprint, hasSingleAttribute ) {
+			if( hasSingleAttribute ) {
 				return _.clone( componentBlueprint.attributes[ 0 ][ 'default' ] )
 			}
 
@@ -118,11 +118,11 @@ define(
 			)
 		}
 
-		var updateComponent = function( component, attributeConfig, isSingleAttributeComponent ) {
+		var updateComponent = function( component, attributeConfig, hasSingleAttribute ) {
 			if( attributeConfig === undefined ) {
 				return component
 
-			} else if( isSingleAttributeComponent ) {
+			} else if( hasSingleAttribute ) {
 				return  _.clone( attributeConfig )
 
 			} else {
@@ -140,12 +140,13 @@ define(
 					if( !componentBlueprint ) throwCouldNotFindBlueprint( componentBlueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
 
 
-					var localComponentName = createLocalComponentName( componentBlueprintId, componentConfig.importName )
+					var localComponentName = createLocalComponentName( componentBlueprintId, componentConfig.importName ),
+						hasSingleAttribute = isSingleAttributeComponent( componentBlueprint.attributes )
 
 					memo[ localComponentName ] = updateComponent(
-						createComponentTemplate( componentBlueprint ),
+						createComponentTemplate( componentBlueprint, hasSingleAttribute ),
 						componentConfig.config,
-						isSingleAttributeComponent( componentBlueprint.attributes )
+						hasSingleAttribute
 					)
 
 					return memo
@@ -209,7 +210,8 @@ define(
 			if( attributes === undefined ) throw 'Error: \'attributes\' is of type falsy.'
 
 			return _.isObject( attributes ) &&
-				_.size( attributes ) === 1
+				_.size( attributes ) === 1 &&
+				attributes[ 0 ].name === 'value'
 		}
 
 
