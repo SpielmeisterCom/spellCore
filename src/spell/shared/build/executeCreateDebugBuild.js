@@ -281,10 +281,10 @@ define(
 				entities,
 				function( memo, entityConfig ) {
 					// WORKAROUND: a specialized solution; until requirements are more clear this has to do
-					var entity = blueprintManager.createEntity( entityConfig.blueprintId, entityConfig.config )
+					var entityComponents = blueprintManager.createEntityComponents( entityConfig.blueprintId, entityConfig.config )
 
 					var componentId = 'spell.component.core.graphics2d.appearance',
-						entityAppearance = _.has( entity, componentId ) ? entity[ componentId ] : null
+						entityAppearance = _.has( entityComponents, componentId ) ? entityComponents[ componentId ] : null
 
 					if( entityAppearance ) {
 						var textureId = entityAppearance.textureId

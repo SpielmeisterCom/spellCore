@@ -234,7 +234,7 @@ define(
 
 				addBlueprint( this.blueprints, this.entityTemplates, definition )
 			},
-			createEntity : function( blueprintId, entityConfig ) {
+			createEntityComponents : function( blueprintId, entityConfig ) {
 				var entityTemplate = this.entityTemplates[ blueprintId ]
 
 				if( !entityTemplate ) throw 'Error: Could not find entity template for blueprint id \'' + blueprintId + '\'.'
@@ -251,6 +251,17 @@ define(
 			},
 			getBlueprint : function( blueprintId ) {
 				return getBlueprint( this.blueprints, blueprintId )
+			},
+			getBlueprintIds : function( blueprintType ) {
+				if( !_.contains( blueprintTypes, blueprintType ) ) throw 'Error: Blueprint type \'' + blueprintType + '\' is not supported.'
+
+				return _.reduce(
+					this.blueprints,
+					function( memo, blueprint, blueprintId ) {
+						return blueprint.type === blueprintType ? memo.concat( blueprintId ) : memo
+					},
+					[]
+				)
 			},
 
 			/**

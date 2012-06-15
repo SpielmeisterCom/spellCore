@@ -3,16 +3,12 @@ define(
 	[
 		'spell/shared/util/create',
 		'spell/shared/util/Events',
-		'spell/shared/util/entities/Entities',
-		'spell/shared/util/zones/ZoneEntityManager',
 
 		'spell/shared/util/platform/underscore'
 	],
 	function(
 		create,
 		Events,
-		Entities,
-		ZoneEntityManager,
 
 		_
 	) {
@@ -42,20 +38,16 @@ define(
 			)
 		}
 
-		var createSystem = function( globals, blueprintManager, zoneEntityManager, systemBlueprintId ) {
+		var createSystem = function( globals, blueprintManager, entityManager, systemBlueprintId ) {
 			var blueprint = blueprintManager.getBlueprint( systemBlueprintId ),
-				constructor = requireScript( blueprint.scriptId),
-				entities = zoneEntityManager.zoneEntities
+				constructor = requireScript( blueprint.scriptId )
 
 			var constructorArgs = _.reduce(
 				blueprint.input,
-				function( memo, entityGroup ) {
-					return memo.concat(
-						// TODO: replace this when the switch to component list driven entity system is performed
-						entities.executeQuery(
-								entities.prepareQuery( entityGroup.components )
-						).elements
-					)
+				function( memo, inputDefinition ) {
+					memo.push( entityManager.getComponentsById( inputDefinition.blueprintId ) )
+
+					return memo
 				},
 				[ globals ]
 			)
@@ -63,11 +55,14 @@ define(
 			return create( constructor, constructorArgs )
 		}
 
-		var createSystems = function( globals, blueprintManager, zoneEntityManager, systemBlueprintIds ) {
+		var createSystems = function( globals, systemBlueprintIds ) {
+			var blueprintManager = globals.blueprintManager,
+				entityManager    = globals.entityManager
+
 			return _.map(
 				systemBlueprintIds,
 				function( systemBlueprintId ) {
-					return createSystem( globals, blueprintManager, zoneEntityManager, systemBlueprintId )
+					return createSystem( globals, blueprintManager, entityManager, systemBlueprintId )
 				}
 			)
 		}
@@ -77,9 +72,9 @@ define(
 		 * public
 		 */
 
-		var Zone = function( globals, blueprintManager ) {
+		var Zone = function( globals ) {
 			this.globals          = globals
-			this.blueprintManager = blueprintManager
+			this.blueprintManager = globals.blueprintManager
 			this.renderSystems    = null
 			this.updateSystems    = null
 			this.script           = null
@@ -93,15 +88,15 @@ define(
 				invoke( this.updateSystems, 'process', [ this.globals, timeInMs, deltaTimeInMs ] )
 			},
 			init: function( globals, zoneConfig ) {
-				var zoneEntityManager = new ZoneEntityManager( globals.entityManager, new Entities() )
+				var entityManager = globals.entityManager
 
 				if( zoneConfig.scriptId ) {
 					this.script = requireScript( zoneConfig.scriptId )
-					this.script.init( this.globals, zoneEntityManager, zoneConfig )
+					this.script.init( this.globals, entityManager, zoneConfig )
 				}
 
-				this.renderSystems = createSystems( globals, this.blueprintManager, zoneEntityManager, zoneConfig.systems.render )
-				this.updateSystems = createSystems( globals, this.blueprintManager, zoneEntityManager, zoneConfig.systems.update )
+				this.renderSystems = createSystems( globals, zoneConfig.systems.render )
+				this.updateSystems = createSystems( globals, zoneConfig.systems.update )
 
 				invoke( this.renderSystems, 'init', [ this.globals, zoneConfig ] )
 				invoke( this.updateSystems, 'init', [ this.globals, zoneConfig ] )

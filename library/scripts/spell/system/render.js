@@ -1,7 +1,6 @@
 define(
 	'spell/system/render',
 	[
-		'funkysnakes/shared/config/constants',
 		'spell/shared/util/Events',
 
 		'glmatrix/vec2',
@@ -11,7 +10,6 @@ define(
 		'spell/shared/util/platform/underscore'
 	],
 	function(
-		constants,
 		Events,
 
 		vec2,
@@ -27,29 +25,8 @@ define(
 		 * private
 		 */
 
-		var scale       = vec3.create(),
-			translation = vec3.create(),
-			opacity     = 1.0
-
-		var appearanceComponentId = 'spell.component.core.graphics2d.appearance',
-			renderDataComponentId = 'spell.component.core.graphics2d.renderData',
-			positionComponentId   = 'spell.component.core.position',
-			rotationComponentId   = 'spell.component.core.rotation'
-
-
-		var createEntitiesSortedByPath = function( entitiesByPass ) {
-			var passA,
-				passB
-
-			return _.toArray( entitiesByPass ).sort(
-				function( a, b ) {
-					passA = a[ renderDataComponentId ].pass
-					passB = b[ renderDataComponentId ].pass
-
-					return ( passA < passB ? -1 : ( passA > passB ? 1 : 0 ) )
-				}
-			)
-		}
+		var tmp     = vec3.create(),
+			opacity = 1.0
 
 		var createWorldToViewMatrix = function( matrix, aspectRatio ) {
 			// world space to view space matrix
@@ -69,41 +46,66 @@ define(
 			mat4.translate( matrix, [ 0, 0, 0 ] ) // camera is located at (0/0/0); WATCH OUT: apply inverse translation
 		}
 
-		var draw = function( context, textures, entities ) {
+		var createSortedByPass = function( renderDatas ) {
+			return _.reduce(
+				renderDatas,
+				function( memo, renderData, id ) {
+					return memo.concat( {
+						id : id,
+						value : renderData
+					} )
+				},
+				[]
+			).sort(
+				function( a, b ) {
+					var passA = a.value.pass
+					var passB = b.value.pass
+
+					return ( passA < passB ? -1 : ( passA > passB ? 1 : 0 ) )
+				}
+			)
+		}
+
+		var draw = function( context, textures, positions, rotations, appearances, renderDatasSortedByPass ) {
 			_.each(
-				entities,
-				function( entity ) {
-					var entityAppearance  = entity[ appearanceComponentId ],
-						entityRenderData  = entity[ renderDataComponentId ]
+				renderDatasSortedByPass,
+				function( renderDataSortedByPass ) {
+					var id         = renderDataSortedByPass.id,
+						appearance = appearances[ id ],
+						renderData = renderDataSortedByPass.value
 
 					context.save()
 					{
-						var texture = textures[ entityAppearance.textureId ]
+						var texture = textures[ appearance.textureId ]
 
-						if( !texture ) throw 'The texture id \'' + entityAppearance.textureId + '\' could not be resolved.'
+						if( !texture ) throw 'The texture id \'' + appearance.textureId + '\' could not be resolved.'
 
 
-						opacity = entityAppearance.opacity * entityRenderData.opacity
+						opacity = appearance.opacity * renderData.opacity
 
 						if( opacity !== 1.0 ) {
 							context.setGlobalAlpha( opacity )
 						}
 
 						// object to world space transformation go here
-						vec2.add( entity[ positionComponentId ], entityRenderData.translation, translation )
-						vec2.set( entityRenderData.scale, scale )
+						context.rotate( renderData.rotation )
 
-						context.rotate( entityRenderData.rotation )
-						context.translate( translation )
-						context.scale( scale )
+						vec2.add( positions[ id ], renderData.translation, tmp )
+						context.translate( tmp )
+
+						vec2.set( renderData.scale, tmp ) // vec2 -> vec3
+						context.scale( tmp )
+
 
 						// appearance transformations go here
-						vec2.set( entityAppearance.translation, translation )
-						vec2.multiply( entityAppearance.scale, [ texture.width, texture.height ], scale )
+						context.rotate( appearance.rotation + rotations[ id ] )
 
-						context.rotate( entityAppearance.rotation + entity[ rotationComponentId ] )
-						context.translate( translation )
-						context.scale( scale )
+						vec2.set( appearance.translation, tmp ) // vec2 -> vec3
+						context.translate( tmp )
+
+						vec2.multiply( appearance.scale, [ texture.width, texture.height ], tmp )
+						context.scale( tmp )
+
 
 						context.drawTexture( texture, -0.5, -0.5, 1, 1 )
 					}
@@ -117,13 +119,13 @@ define(
 //			_.each(
 //				entities,
 //				function( entity ) {
-//					var entityRenderData = entity.renderData
+//					var renderData = entity.renderData
 //
 //					context.save()
 //					{
 //						// object to world space transformation go here
-//						context.translate( entityRenderData.position )
-//						context.rotate( entityRenderData.orientation )
+//						context.translate( renderData.position )
+//						context.rotate( renderData.orientation )
 //
 //						context.fillRect( -2, -2, 4, 4 )
 //					}
@@ -138,7 +140,8 @@ define(
 			// clear color buffer
 			context.clear()
 
-			draw( context, this.textures, createEntitiesSortedByPath( this.entities ) )
+			// TODO: renderData should be presorted on the component list level by a user defined index, not here on every rendering tick
+			draw( context, this.textures, this.positions, this.rotations, this.appearances, createSortedByPass( this.renderDatas ) )
 		}
 
 		var init = function( globals ) {}
@@ -150,10 +153,13 @@ define(
 		 * public
 		 */
 
-		var Renderer = function( globals, entities ) {
-			this.textures = globals.resources
-			this.context  = globals.renderingContext
-			this.entities = entities
+		var Renderer = function( globals, positions, rotations, appearances, renderDatas ) {
+			this.textures    = globals.resources
+			this.context     = globals.renderingContext
+			this.positions   = positions
+			this.rotations   = rotations
+			this.appearances = appearances
+			this.renderDatas = renderDatas
 
 			var eventManager = globals.eventManager,
 				context = this.context
@@ -166,9 +172,11 @@ define(
 
 			// setting up the viewport
 			var viewportPositionX = 0,
-				viewportPositionY = 0
+				viewportPositionY = 0,
+				maxWidth = 1024,
+				maxHeight = 768
 
-			context.viewport( viewportPositionX, viewportPositionY, constants.maxWidth, constants.maxHeight )
+			context.viewport( viewportPositionX, viewportPositionY, maxWidth, maxHeight )
 
 			eventManager.subscribe(
 				Events.SCREEN_RESIZED,

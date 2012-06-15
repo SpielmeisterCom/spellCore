@@ -1,12 +1,21 @@
 define(
-	"spell/shared/util/entities/EntityManager",
+	'spell/shared/util/entities/EntityManager',
 	[
-		"spell/shared/util/create"
+		'spell/shared/util/create',
+
+		'spell/shared/util/platform/underscore'
 	],
 	function(
-		create
+		create,
+
+		_
 	) {
-		"use strict"
+		'use strict'
+
+
+		/**
+		 * private
+		 */
 
 		var nextEntityId = 0
 
@@ -14,48 +23,68 @@ define(
 			return nextEntityId++
 		}
 
+		var createComponentList = function( componentBlueprintIds ) {
+			return _.reduce(
+				componentBlueprintIds,
+				function( memo, componentBlueprintId ) {
+					memo[ componentBlueprintId ] = []
 
-		var EntityManager = function( blueprintManager ) {
-			this.blueprintManager = blueprintManager
+					return memo
+				},
+				{}
+			)
+		}
 
-			this.nextId = 0
+		var addComponents = function( components, entityId, entityComponents ) {
+			_.each(
+				entityComponents,
+				function( entityComponent, entityComponentId ) {
+					components[ entityComponentId ][ entityId ] = entityComponent
+				}
+			)
 		}
 
 
-		EntityManager.COMPONENT_TYPE_NOT_KNOWN = "The type of component you tried to add is not known. Component type: "
-		EntityManager.ENTITY_TYPE_NOT_KNOWN    = "The type of entity you tried to create is not known. Entity type: "
+		/**
+		 * public
+		 */
 
+		var EntityManager = function( blueprintManager ) {
+			this.blueprintManager = blueprintManager
+			this.components = createComponentList( blueprintManager.getBlueprintIds( 'componentBlueprint' ) )
+		}
 
 		EntityManager.prototype = {
 			createEntity: function( blueprintId, entityConfig ) {
-				if( !this.blueprintManager.hasBlueprint( blueprintId ) ) throw 'Error: Unknown blueprint \'' + blueprintId + '\'. Could not create entity.'
+				if( !this.blueprintManager.hasBlueprint( blueprintId ) ) {
+					throw 'Error: Unknown blueprint \'' + blueprintId + '\'. Could not create entity.'
+				}
 
-				var entity = this.blueprintManager.createEntity( blueprintId, entityConfig )
-				entity.id = getNextEntityId()
+				var id = getNextEntityId()
 
-				return entity
-			}//,
+				addComponents(
+					this.components,
+					id,
+					this.blueprintManager.createEntityComponents( blueprintId, entityConfig )
+				)
 
-//			addComponent: function( entity, componentType, args ) {
-//				var constructor = this.componentConstructors[ componentType ]
-//
-//				if ( constructor === undefined ) {
-//					throw EntityManager.COMPONENT_TYPE_NOT_KNOWN + componentType
-//				}
-//
-//				var component = create( constructor, args )
-//				entity[ componentType ] = component
-//
-//				return component
-//			},
-//
-//			removeComponent: function( entity, componentType ) {
-//				var component = entity[ componentType ]
-//
-//				delete entity[ componentType ]
-//
-//				return component
-//			}
+				return id
+			},
+
+			createEntities: function( entityConfigs ) {
+				var self = this
+
+				_.each(
+					entityConfigs,
+					function( entityConfig ) {
+						self.createEntity( entityConfig.blueprintId, entityConfig.config )
+					}
+				)
+			},
+
+			getComponentsById : function( componentBlueprintId ) {
+				return this.components[ componentBlueprintId ]
+			}
 		}
 
 

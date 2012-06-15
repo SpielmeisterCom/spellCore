@@ -83,27 +83,9 @@ define(
 			statisticsManager    = new StatisticsManager(),
 			blueprintManager     = new BlueprintManager(),
 			mainLoop             = createMainLoop( eventManager, statisticsManager ),
-			zoneManager          = new ZoneManager( globals, eventManager, blueprintManager, mainLoop )
+			zoneManager          = new ZoneManager( globals, mainLoop )
 
 		statisticsManager.init()
-
-		_.extend(
-			globals,
-			{
-				configurationManager : configurationManager,
-				eventManager         : eventManager,
-				entityManager        : new EntityManager( blueprintManager ),
-				inputManager         : inputManager,
-				inputEvents          : inputManager.getInputEvents(),
-				renderingContext     : renderingContext,
-				resourceLoader       : resourceLoader,
-				resources            : resourceLoader.getResources(),
-				statisticsManager    : statisticsManager,
-				soundManager         : soundManager,
-				zoneManager          : zoneManager,
-				runtimeModule        : runtimeModule
-			}
-		)
 
 
 		/**
@@ -117,13 +99,34 @@ define(
 
 			Logger.debug( 'client started' )
 
+
+			loadBlueprints( blueprintManager, runtimeModule )
+
+			_.extend(
+				globals,
+				{
+					configurationManager : configurationManager,
+					blueprintManager     : blueprintManager,
+					eventManager         : eventManager,
+					entityManager        : new EntityManager( blueprintManager ),
+					inputManager         : inputManager,
+					inputEvents          : inputManager.getInputEvents(),
+					renderingContext     : renderingContext,
+					resourceLoader       : resourceLoader,
+					resources            : resourceLoader.getResources(),
+					statisticsManager    : statisticsManager,
+					soundManager         : soundManager,
+					zoneManager          : zoneManager,
+					runtimeModule        : runtimeModule
+				}
+			)
+
+
 //			PlatformKit.registerOnScreenResize( _.bind( onScreenResized, onScreenResized, eventManager ) )
 
 			var renderingContextConfig = renderingContext.getConfiguration()
 			Logger.debug( 'created rendering context: type=' + renderingContextConfig.type + '; size=' + renderingContextConfig.width + 'x' + renderingContextConfig.height )
 
-
-			loadBlueprints( blueprintManager, runtimeModule )
 
 
 			var zoneConfig = _.find(

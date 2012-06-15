@@ -5,16 +5,12 @@
 
 	"input" : [
 		{
-			"name" : "inputDefinitionEntities",
-			"components" : [
-				"spell.component.core.inputDefinition"
-			]
+			"name" : "actors",
+			"blueprintId" : "spell.component.core.actor"
 		},
 		{
-			"name" : "actorEntities",
-			"components" : [
-				"spell.component.core.actor"
-			]
+			"name" : "inputDefinitions",
+			"blueprintId" : "spell.component.core.inputDefinition"
 		}
 	],
 	"scriptId" : "spell/system/keyInput"

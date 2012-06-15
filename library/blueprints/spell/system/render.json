@@ -5,13 +5,20 @@
 
 	"input" : [
 		{
-			"name" : "entities",
-			"components" : [
-				"spell.component.core.position",
-				"spell.component.core.rotation",
-				"spell.component.core.graphics2d.appearance",
-				"spell.component.core.graphics2d.renderData"
-			]
+			"name" : "positions",
+			"blueprintId" : "spell.component.core.position"
+		},
+		{
+			"name" : "rotations",
+			"blueprintId" : "spell.component.core.rotation"
+		},
+		{
+			"name" : "appearances",
+			"blueprintId" : "spell.component.core.graphics2d.appearance"
+		},
+		{
+			"name" : "renderDatas",
+			"blueprintId" : "spell.component.core.graphics2d.renderData"
 		}
 	],
 	"scriptId" : "spell/system/render"

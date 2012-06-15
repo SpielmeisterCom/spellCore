@@ -1,18 +1,15 @@
 define(
 	'funkysnakes/server/main',
 	[
-		"funkysnakes/server/components",
-		"funkysnakes/server/entities",
-		"funkysnakes/server/zones/game",
 		"funkysnakes/server/util/createMainLoop",
 		"funkysnakes/shared/util/networkProtocol",
 
 		'spell/server/build/createServer',
 		'spell/server/util/connect/extDirect',
 		"spell/server/util/network/network",
+		'spell/shared/util/blueprints/BlueprintManager',
 		"spell/shared/util/network/Messages",
 		"spell/shared/util/EventManager",
-		"spell/shared/util/entities/Entities",
 		"spell/shared/util/entities/EntityManager",
 		"spell/shared/util/zones/ZoneManager",
 		"spell/shared/util/Logger",
@@ -26,18 +23,15 @@ define(
 		'spell/shared/util/platform/underscore'
 	],
 	function(
-		components,
-		entities,
-		gameZone,
 		createMainLoop,
 		networkProtocol,
 
 		createBuildServer,
 		extDirect,
 		network,
+		BlueprintManager,
 		Messages,
 		EventManager,
-		Entities,
 		EntityManager,
 		ZoneManager,
 		Logger,
@@ -157,15 +151,12 @@ define(
 
 
 			var eventManager = new EventManager()
-			var entityManager = new EntityManager( entities, components )
+			var entityManager = new EntityManager( new BlueprintManager() )
 
-			var globals = {}
+			var globals = {},
+				mainLoop = undefined
 
-			var zones = {
-				game : gameZone
-			}
-
-			var zoneManager = new ZoneManager( eventManager, zones, globals )
+			var zoneManager = new ZoneManager( globals, mainLoop )
 
 			var clients = connection.clients
 
