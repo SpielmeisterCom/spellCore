@@ -1,0 +1,11 @@
+{
+	"type" : "entityBlueprint",
+	"namespace" : "spell.entity",
+	"name" : "camera",
+	"components" : [
+		{
+			"blueprintId" : "spell.component.core.graphics2d.camera",
+			"config" : {}
+		}
+	]
+}
