@@ -83,7 +83,11 @@ define(
 			},
 
 			getComponentsById : function( componentBlueprintId ) {
-				return this.components[ componentBlueprintId ]
+				var components = this.components[ componentBlueprintId ]
+
+				if( !components ) throw 'Error: No component list for component blueprint id \'' + componentBlueprintId +  '\' available.'
+
+				return components
 			}
 		}
 
