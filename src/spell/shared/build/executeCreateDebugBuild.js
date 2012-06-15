@@ -233,30 +233,20 @@ define(
 
 		/**
 		 * Returns all dependent component blueprint ids
-		 *
-		 * @param blueprintId - entity blueprint id
 		 */
-		var getDependencyComponentBlueprintIds = function( blueprintManager, blueprintId ) {
-			return jsonPath( blueprintManager.getBlueprint( blueprintId ), '$.components[*].blueprintId' )
-		}
-
-		/**
-		 * Create a list of unique component blueprint ids that are referenced by the provided entity blueprint.
-		 *
-		 * @param entityBlueprintIds
-		 * @param blueprintManager
-		 * @return {*}
-		 */
-		var createDependencyComponentBlueprintIds = function( blueprintManager, entityBlueprintIds ) {
-			return _.unique(
-				_.flatten(
-					_.map(
-						entityBlueprintIds,
-						function( entityBlueprintId ) {
-							return getDependencyComponentBlueprintIds( blueprintManager, entityBlueprintId )
-						}
+		var getDependencyBlueprintIds = function( blueprintManager, blueprintIds, path ) {
+			return _.reduce(
+				blueprintIds,
+				function( memo, blueprintId ) {
+					return _.union(
+						memo,
+						jsonPath(
+							blueprintManager.getBlueprint( blueprintId ),
+							path
+						)
 					)
-				)
+				},
+				[]
 			)
 		}
 
@@ -423,8 +413,11 @@ define(
 
 			// determine all blueprints that are referenced in the project
 			var entityBlueprintIds    = _.unique( jsonPath( projectConfig, '$.zones[*].entities[*].blueprintId' ) ),
-				componentBlueprintIds = createDependencyComponentBlueprintIds( blueprintManager, entityBlueprintIds ),
-				systemBlueprintIds    = _.unique( _.flatten( jsonPath( projectConfig, '$.zones[*].systems[*]' ) ) )
+				systemBlueprintIds    = _.unique( _.flatten( jsonPath( projectConfig, '$.zones[*].systems[*]' ) )),
+				componentBlueprintIds = _.union(
+					getDependencyBlueprintIds( blueprintManager, entityBlueprintIds, '$.components[*].blueprintId' ),
+					getDependencyBlueprintIds( blueprintManager, systemBlueprintIds, '$.input[*].blueprintId' )
+				)
 
 
 			// check if the required blueprints are available
