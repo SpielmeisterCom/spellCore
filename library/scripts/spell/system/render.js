@@ -25,8 +25,9 @@ define(
 		 * private
 		 */
 
-		var tmp     = vec3.create(),
-			opacity = 1.0
+		var tmp             = vec3.create(),
+			opacity         = 1.0,
+			currentCameraId = undefined
 
 		var createWorldToViewMatrix = function( matrix, aspectRatio ) {
 			// world space to view space matrix
@@ -134,11 +135,50 @@ define(
 //			)
 		}
 
+		var setCamera = function( context, cameras, worldToView ) {
+			if( _.size( cameras ) === 0 ) return
+
+			// Gets the first active camera. More than one camera being active is an undefined state and the first found active is used.
+			var activeCameraId = undefined
+
+			var activeCamera = _.find(
+				cameras,
+				function( camera, id ) {
+					if( camera.active ) {
+						activeCameraId = id
+
+						return true
+					}
+
+					return false
+				}
+			)
+
+			if( currentCameraId === activeCameraId ) return
+
+			currentCameraId = activeCameraId
+
+			// setting up the camera geometry
+			var halfWidth  = activeCamera.width / 2,
+				halfHeight = activeCamera.height / 2
+
+			mat4.ortho( -halfWidth, halfWidth, -halfHeight, halfHeight, 0, 100, worldToView )
+
+			// translating with the inverse camera position
+			vec2.set( activeCamera.position, tmp )
+			vec2.multiplyScalar( tmp, -1 )
+			mat4.translate( worldToView, tmp )
+
+			context.setViewMatrix( worldToView )
+		}
+
 		var process = function( globals, timeInMs, deltaTimeInMs ) {
 			var context = this.context
 
 			// clear color buffer
 			context.clear()
+
+			setCamera( context, this.cameras, this.worldToView )
 
 			// TODO: renderData should be presorted on the component list level by a user defined index, not here on every rendering tick
 			draw( context, this.textures, this.positions, this.rotations, this.appearances, createSortedByPass( this.renderDatas ) )
@@ -153,13 +193,14 @@ define(
 		 * public
 		 */
 
-		var Renderer = function( globals, positions, rotations, appearances, renderDatas ) {
+		var Renderer = function( globals, positions, rotations, appearances, renderDatas, cameras ) {
 			this.textures    = globals.resources
 			this.context     = globals.renderingContext
 			this.positions   = positions
 			this.rotations   = rotations
 			this.appearances = appearances
 			this.renderDatas = renderDatas
+			this.cameras     = cameras
 
 			var eventManager = globals.eventManager,
 				context = this.context

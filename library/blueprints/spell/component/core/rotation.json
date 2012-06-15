@@ -5,7 +5,7 @@
 	"attributes" : [
 		{
 			"name" : "value",
-			"type" : "Number",
+			"type" : "number",
 			"default" : 0
 		}
 	]

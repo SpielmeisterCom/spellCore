@@ -1,0 +1,27 @@
+{
+	"type" : "componentBlueprint",
+	"namespace" : "spell.component.core.graphics2d",
+	"name" : "camera",
+	"attributes" : [
+		{
+			"name" : "position",
+			"type" : "vec2",
+			"default" : [ 0, 0 ]
+		},
+		{
+			"name" : "width",
+			"type" : "integer",
+			"default" : 320
+		},
+		{
+			"name" : "height",
+			"type" : "integer",
+			"default" : 240
+		},
+		{
+			"name" : "active",
+			"type" : "boolean",
+			"default" : false
+		}
+	]
+}
