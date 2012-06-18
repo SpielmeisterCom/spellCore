@@ -19,14 +19,19 @@
 			"default" : [ 0, 0 ]
 		},
 		{
-			"name" : "textureId",
-			"type" : "assetTextureId",
-			"default" : "spell/textures/not_defined"
-		},
-		{
 			"name" : "opacity",
 			"type" : "number",
 			"default" : 1.0
+		},
+		{
+			"name" : "pass",
+			"type" : "integer",
+			"default" : 1
+		},
+		{
+			"name" : "textureId",
+			"type" : "assetTextureId",
+			"default" : "spell/textures/not_defined"
 		}
 	]
 }

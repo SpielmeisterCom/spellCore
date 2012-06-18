@@ -26,7 +26,6 @@ define(
 		 */
 
 		var tmp             = vec3.create(),
-			opacity         = 1.0,
 			currentCameraId = undefined
 
 		var createWorldToViewMatrix = function( matrix, aspectRatio ) {
@@ -67,13 +66,12 @@ define(
 			)
 		}
 
-		var draw = function( context, textures, positions, rotations, appearances, renderDatasSortedByPass ) {
+		var draw = function( context, textures, positions, rotations, appearancesSortedByPass ) {
 			_.each(
-				renderDatasSortedByPass,
-				function( renderDataSortedByPass ) {
-					var id         = renderDataSortedByPass.id,
-						appearance = appearances[ id ],
-						renderData = renderDataSortedByPass.value
+				appearancesSortedByPass,
+				function( appearanceSortedByPass ) {
+					var id         = appearanceSortedByPass.id,
+						appearance = appearanceSortedByPass.value
 
 					context.save()
 					{
@@ -82,20 +80,17 @@ define(
 						if( !texture ) throw 'The texture id \'' + appearance.textureId + '\' could not be resolved.'
 
 
-						opacity = appearance.opacity * renderData.opacity
-
-						if( opacity !== 1.0 ) {
-							context.setGlobalAlpha( opacity )
+						if( appearance.opacity !== 1.0 ) {
+							context.setGlobalAlpha( appearance.opacity )
 						}
-
 						// object to world space transformation go here
-						context.rotate( renderData.rotation )
+//						context.rotate( renderData.rotation )
 
-						vec2.add( positions[ id ], renderData.translation, tmp )
+						vec2.set( positions[ id ], tmp )
 						context.translate( tmp )
 
-						vec2.set( renderData.scale, tmp ) // vec2 -> vec3
-						context.scale( tmp )
+//						vec2.set( renderData.scale, tmp ) // vec2 -> vec3
+//						context.scale( tmp )
 
 
 						// appearance transformations go here
@@ -180,7 +175,7 @@ define(
 			setCamera( context, this.cameras, this.worldToView )
 
 			// TODO: renderData should be presorted on the component list level by a user defined index, not here on every rendering tick
-			draw( context, this.textures, this.positions, this.rotations, this.appearances, createSortedByPass( this.renderDatas ) )
+			draw( context, this.textures, this.positions, this.rotations, createSortedByPass( this.appearances ) )
 		}
 
 		var init = function( globals ) {}
@@ -192,13 +187,12 @@ define(
 		 * public
 		 */
 
-		var Renderer = function( globals, positions, rotations, appearances, renderDatas, cameras ) {
+		var Renderer = function( globals, positions, rotations, appearances, cameras ) {
 			this.textures    = globals.resources
 			this.context     = globals.renderingContext
 			this.positions   = positions
 			this.rotations   = rotations
 			this.appearances = appearances
-			this.renderDatas = renderDatas
 			this.cameras     = cameras
 
 			var eventManager = globals.eventManager,

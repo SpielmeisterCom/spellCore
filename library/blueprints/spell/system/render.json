@@ -15,10 +15,6 @@
 		{
 			"name" : "appearances",
 			"blueprintId" : "spell.component.core.graphics2d.appearance"
-		},
-		{
-			"name" : "renderDatas",
-			"blueprintId" : "spell.component.core.graphics2d.renderData"
 		}
 	],
 	"scriptId" : "spell/system/render"
