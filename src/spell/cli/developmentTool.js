@@ -1,7 +1,7 @@
 define(
 	'spell/cli/developmentTool',
 	[
-		'funkysnakes/server/main',
+		'spell/server/main',
 
 		'spell/shared/build/executeCreateDebugBuild',
 		'spell/shared/build/initializeProjectDirectory',
