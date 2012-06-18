@@ -166,8 +166,7 @@ define(
 
 			// translating with the inverse camera position
 			vec2.set( activeCamera.position, tmp )
-			vec2.multiplyScalar( tmp, -1 )
-			mat4.translate( worldToView, tmp )
+			mat4.translate( worldToView, vec2.negate( tmp ) )
 
 			context.setViewMatrix( worldToView )
 		}

@@ -1,17 +1,26 @@
 define(
-	"spell/shared/util/platform/Types",
+	'spell/shared/util/platform/Types',
 	[
-		"spell/shared/util/platform/private/createNativeFloatArray",
-		"spell/shared/util/platform/private/Time"
+		'spell/shared/util/platform/private/nativeType/createFloatArray',
+		'spell/shared/util/platform/private/nativeType/createIntegerArray',
+		'spell/shared/util/platform/private/nativeType/hasFloatArraySupport',
+		'spell/shared/util/platform/private/nativeType/hasIntegerArraySupport',
+		'spell/shared/util/platform/private/Time'
 	],
 	function(
-		createNativeFloatArray,
+		createFloatArray,
+		createIntegerArray,
+		hasFloatArraySupport,
+		hasIntegerArraySupport,
 		Time
 	) {
-		"use strict"
+		'use strict'
 
 		return {
-			createNativeFloatArray : createNativeFloatArray,
+			createFloatArray       : createFloatArray,
+			createIntegerArray     : createIntegerArray,
+			hasFloatArraySupport   : hasFloatArraySupport,
+			hasIntegerArraySupport : hasIntegerArraySupport,
 			Time                   : Time
 		}
 	}

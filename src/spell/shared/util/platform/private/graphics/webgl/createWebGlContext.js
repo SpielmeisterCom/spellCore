@@ -7,7 +7,7 @@ define(
 
 		'spell/shared/util/color',
 		'spell/shared/util/math',
-		'spell/shared/util/platform/private/createNativeFloatArray',
+		'spell/shared/util/platform/private/nativeType/createFloatArray',
 
 		'glmatrix/vec3',
 		'glmatrix/mat3',
@@ -20,7 +20,7 @@ define(
 
 		color,
 		math,
-		createNativeFloatArray,
+		createFloatArray,
 
 		vec3,
 		mat3,
@@ -173,7 +173,7 @@ define(
 
 
 			// setting up vertices
-			var vertices = createNativeFloatArray( 12 )
+			var vertices = createFloatArray( 12 )
 			vertices[ 0 ]  = 0.0
 			vertices[ 1 ]  = 0.0
 			vertices[ 2 ]  = 0.0
@@ -199,7 +199,7 @@ define(
 
 
 			// setting up texture coordinates
-			var textureCoordinates = createNativeFloatArray( 8 )
+			var textureCoordinates = createFloatArray( 8 )
 			textureCoordinates[ 0 ] = 0.0
 			textureCoordinates[ 1 ] = 0.0
 			textureCoordinates[ 2 ] = 1.0

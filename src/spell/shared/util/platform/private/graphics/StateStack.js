@@ -1,13 +1,13 @@
 define(
 	'spell/shared/util/platform/private/graphics/StateStack',
 	[
-		'spell/shared/util/platform/private/createNativeFloatArray',
+		'spell/shared/util/platform/private/nativeType/createFloatArray',
 
 		'glmatrix/mat4',
 		'spell/shared/util/platform/underscore'
 	],
 	function(
-		createNativeFloatArray,
+		createFloatArray,
 
 		mat4,
 		_
@@ -29,7 +29,7 @@ define(
 
 		var createDefaultState = function() {
 			var opacity        = 1.0,
-				fillStyleColor = createNativeFloatArray( 4 ),
+				fillStyleColor = createFloatArray( 4 ),
 				matrix         = mat4.create()
 
 			fillStyleColor[ 0 ] = 1.0
