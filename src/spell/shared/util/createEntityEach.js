@@ -1,24 +1,36 @@
 define(
-	'spell/shared/util/create',
-	function() {
+	'spell/shared/util/createEntityEach',
+	[
+		'spell/shared/util/platform/underscore'
+	],
+	function(
+		_
+	) {
 		'use strict'
 
 
-		var create = function( constructor, args ) {
-			if ( constructor.prototype === undefined ) {
-				throw create.NO_CONSTRUCTOR_ERROR + constructor
+		return function( primaryComponents, argumentComponents, iterator ) {
+			if( !_.isArray( argumentComponents ) ) {
+				argumentComponents = [ argumentComponents ]
 			}
 
-			var object = {}
-			object.prototype = constructor.prototype
-			var returnedObject = constructor.apply( object, args )
-			return returnedObject || object
+			return function() {
+				var ids    = _.keys( primaryComponents ),
+					numIds = ids.length
+
+				for( var i = 0; i < numIds; i++ ) {
+					var id = ids[ i ],
+						primaryComponent = [ primaryComponents[ id ] ],
+						numArgumentComponentsList = argumentComponents.length,
+						args = ( arguments ? _.toArray( arguments ).concat( primaryComponent ) : [ primaryComponent ] )
+
+					for( var j = 0; j < numArgumentComponentsList; j++ ) {
+						args.push( argumentComponents[ j ][ i ] )
+					}
+
+					iterator.apply( null, args )
+				}
+			}
 		}
-
-
-		create.NO_CONSTRUCTOR_ERROR = 'The first argument for create must be a constructor. You passed in '
-
-
-		return create
 	}
 )
