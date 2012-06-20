@@ -271,7 +271,11 @@ define(
 			 * @return {*}
 			 */
 			isSingleAttributeComponent : function( blueprintId ) {
-				return isSingleAttributeComponent( getBlueprint( this.blueprints, blueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT ).attributes )
+				var blueprint = getBlueprint( this.blueprints, blueprintId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
+
+				if( !blueprint ) throw 'Error: Could not find component blueprint with id \'' + blueprintId + '\'.'
+
+				return isSingleAttributeComponent( blueprint.attributes )
 			}
 		}
 
