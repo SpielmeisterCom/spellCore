@@ -66,23 +66,38 @@ define(
 			)
 		}
 
-		var draw = function( context, textures, positions, rotations, appearancesSortedByPass ) {
+		var createAnimationOffset = function( deltaTimeInMs, animationOffset, animationSpeedFactor, numFrames, frameDuration, loop ) {
+			var animationLengthInMs = numFrames * frameDuration,
+				animationOffsetInMs = Math.floor( numFrames * frameDuration * animationOffset ) + deltaTimeInMs * animationSpeedFactor
+
+			if( animationOffsetInMs > animationLengthInMs ) {
+				if( !loop ) return 1.0
+
+				animationOffsetInMs = animationOffsetInMs % animationLengthInMs
+			}
+
+			return animationOffsetInMs / animationLengthInMs
+		}
+
+		var draw = function( context, deltaTimeInMs, assets, resources, positions, rotations, renderComponentSorted ) {
 			_.each(
-				appearancesSortedByPass,
-				function( appearanceSortedByPass ) {
-					var id         = appearanceSortedByPass.id,
-						appearance = appearanceSortedByPass.value
+				renderComponentSorted,
+				function( renderComponent ) {
+					var id              = renderComponent.id,
+						renderComponent = renderComponent.value
 
 					context.save()
 					{
-						var texture = textures[ appearance.textureId ]
+						var asset   = assets[ renderComponent.assetId ],
+							texture = resources[ asset.resourceId ]
 
-						if( !texture ) throw 'The texture id \'' + appearance.textureId + '\' could not be resolved.'
+						if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
 
 
-						if( appearance.opacity !== 1.0 ) {
-							context.setGlobalAlpha( appearance.opacity )
+						if( renderComponent.opacity !== 1.0 ) {
+							context.setGlobalAlpha( renderComponent.opacity )
 						}
+
 						// object to world space transformation go here
 //						context.rotate( renderData.rotation )
 
@@ -94,16 +109,40 @@ define(
 
 
 						// appearance transformations go here
-						context.rotate( appearance.rotation + rotations[ id ] )
+						context.rotate( renderComponent.rotation + rotations[ id ] )
 
-						vec2.set( appearance.translation, tmp ) // vec2 -> vec3
+						vec2.set( renderComponent.translation, tmp ) // vec2 -> vec3
 						context.translate( tmp )
 
-						vec2.multiply( appearance.scale, [ texture.width, texture.height ], tmp )
-						context.scale( tmp )
 
+						if( asset.type === 'appearance' ) {
+							vec2.multiply( renderComponent.scale, [ texture.width, texture.height ], tmp )
+							context.scale( tmp )
 
-						context.drawTexture( texture, -0.5, -0.5, 1, 1 )
+							context.drawTexture( texture, -0.5, -0.5, 1, 1 )
+
+						} else {
+							var animation   = asset.animations[ renderComponent.animationId ],
+								frameWidth  = asset.frameWidth,
+								frameHeight = asset.frameHeight
+
+							vec2.multiply( renderComponent.scale, [ frameWidth, frameHeight ], tmp )
+							context.scale( tmp )
+
+							renderComponent.animationOffset = createAnimationOffset(
+								deltaTimeInMs,
+								renderComponent.animationOffset,
+								renderComponent.animationSpeedFactor,
+								animation.numFrames,
+								animation.frameDuration,
+								animation.loop
+							)
+
+							var frameId = Math.floor( renderComponent.animationOffset * ( animation.numFrames - 1 ) ),
+								offset = animation.offsets[ frameId ]
+
+							context.drawSubTexture( texture, offset[ 0 ], offset[ 1 ], frameWidth, frameHeight, -0.5, -0.5, 1, 1 )
+						}
 					}
 					context.restore()
 				}
@@ -175,7 +214,7 @@ define(
 			setCamera( context, this.cameras, this.worldToView )
 
 			// TODO: renderData should be presorted on the component list level by a user defined index, not here on every rendering tick
-			draw( context, this.textures, this.positions, this.rotations, createSortedByPass( this.appearances ) )
+			draw( context, deltaTimeInMs, this.assets, this.resources, this.positions, this.rotations, createSortedByPass( this.renderComponents ) )
 		}
 
 		var init = function( globals ) {}
@@ -187,13 +226,14 @@ define(
 		 * public
 		 */
 
-		var Renderer = function( globals, positions, rotations, appearances, cameras ) {
-			this.textures    = globals.resources
-			this.context     = globals.renderingContext
-			this.positions   = positions
-			this.rotations   = rotations
-			this.appearances = appearances
-			this.cameras     = cameras
+		var Renderer = function( globals, positions, rotations, renderComponents, cameras ) {
+			this.assets           = globals.assets
+			this.resources        = globals.resources
+			this.context          = globals.renderingContext
+			this.positions        = positions
+			this.rotations        = rotations
+			this.renderComponents = renderComponents
+			this.cameras          = cameras
 
 			var eventManager = globals.eventManager,
 				context = this.context

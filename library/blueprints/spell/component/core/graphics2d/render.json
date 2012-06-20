@@ -1,7 +1,7 @@
 {
 	"type" : "componentBlueprint",
 	"namespace" : "spell.component.core.graphics2d",
-	"name" : "appearance",
+	"name" : "render",
 	"attributes" : [
 		{
 			"name" : "rotation",
@@ -29,9 +29,24 @@
 			"default" : 1
 		},
 		{
-			"name" : "textureId",
-			"type" : "assetTextureId",
-			"default" : "spell/textures/not_defined"
+			"name" : "assetId",
+			"type" : "assetId:appearance",
+			"default" : "appearance:spell/not_defined"
+		},
+		{
+			"name" : "animationId",
+			"type" : "string",
+			"default" : ""
+		},
+		{
+			"name" : "animationSpeedFactor",
+			"type" : "number",
+			"default" : 1.0
+		},
+		{
+			"name" : "animationOffset",
+			"type" : "number",
+			"default" : 0
 		}
 	]
 }

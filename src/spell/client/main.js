@@ -2,6 +2,7 @@ define(
 	'spell/client/main',
 	[
 		'spell/client/runtimeModule',
+		'spell/client/util/createAssets',
 		'spell/shared/util/createMainLoop',
 		'spell/shared/util/entities/EntityManager',
 		'spell/shared/util/zones/ZoneManager',
@@ -20,6 +21,7 @@ define(
 	],
 	function(
 		runtimeModule,
+		createAssets,
 		createMainLoop,
 		EntityManager,
 		ZoneManager,
@@ -105,6 +107,7 @@ define(
 			_.extend(
 				globals,
 				{
+					assets               : createAssets( runtimeModule.assets ),
 					configurationManager : configurationManager,
 					blueprintManager     : blueprintManager,
 					eventManager         : eventManager,

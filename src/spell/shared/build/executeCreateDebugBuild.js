@@ -9,6 +9,7 @@ define(
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
 		'spell/shared/util/blueprints/BlueprintManager',
+		'spell/shared/util/createAssetId',
 
 		'amd-helper',
 		'fs',
@@ -30,6 +31,7 @@ define(
 		isDirectory,
 		isFile,
 		BlueprintManager,
+		createAssetId,
 
 		amdHelper,
 		fs,
@@ -61,11 +63,22 @@ define(
 			')'
 		].join( '\n' )
 
-		var createFilePaths = function( paths ) {
+		var createFilePaths = function( paths, extensions ) {
+			if( !extensions ||
+				extensions.length === 0 ) {
+
+				return
+			}
+
+			var pathSuffix = ( extensions.length === 1 ?
+				'/**/*.' + extensions[ 0 ] :
+				'/**/*.{' + extensions.join( ',' ) + '}'
+			)
+
 			var filePathPatterns = _.map(
 				paths,
 				function( libraryPath ) {
-					return libraryPath + '/**/*.{js,json}'
+					return libraryPath + pathSuffix
 				}
 			)
 
@@ -150,7 +163,7 @@ define(
 
 		var loadBlueprintsFromLibrary = function( blueprintManager, libraryPaths ) {
 			var errors = [],
-				filePaths = createFilePaths( libraryPaths )
+				filePaths = createFilePaths( libraryPaths, [ 'json' ] )
 
 			errors = errors.concat(
 				loadBlueprintsFromPaths( blueprintManager, filePaths )
@@ -169,31 +182,6 @@ define(
 						errors.push( 'Error: Required blueprint \'' + blueprintId + '\' could not be found.' )
 					}
 				}
-			)
-
-			return errors
-		}
-
-		var loadScriptsFromLibrary = function( paths, scripts ) {
-			var errors = [],
-				filePaths = createFilePaths( paths )
-
-			scripts = _.reduce(
-				filePaths,
-				function( memo, filePath ) {
-					var data = fs.readFileSync( filePath, 'utf-8'),
-					moduleHeader = amdHelper.extractModuleHeader( data )
-
-					if( !moduleHeader.name ) {
-						console.error( 'Error: Anonymous module in file \'' + filePath + '\' is not supported.' )
-						return memo
-					}
-
-					memo[ moduleHeader.name ] = data
-
-					return memo
-				},
-				scripts
 			)
 
 			return errors
@@ -273,6 +261,10 @@ define(
 					// WORKAROUND: a specialized solution; until requirements are more clear this has to do
 					var entityComponents = blueprintManager.createEntityComponents( entityConfig.blueprintId, entityConfig.config )
 
+
+					console.log( entityComponents )
+
+
 					var componentId = 'spell.component.core.graphics2d.appearance',
 						entityAppearance = _.has( entityComponents, componentId ) ? entityComponents[ componentId ] : null
 
@@ -304,7 +296,7 @@ define(
 					return {
 						entities : reducedEntityConfig,
 						name : zone.name,
-						resources : createReferencedResources( blueprintManager, reducedEntityConfig ),
+//						resources : createReferencedResources( blueprintManager, reducedEntityConfig ),
 						scriptId : zone.scriptId,
 						systems : zone.systems
 					}
@@ -312,17 +304,19 @@ define(
 			)
 		}
 
-		var createRuntimeModule = function( projectName, startZoneId, zones, componentBlueprints, entityBlueprints, systemBlueprints, modules ) {
+		var createRuntimeModule = function( projectName, startZoneId, zones, componentBlueprints, entityBlueprints, systemBlueprints, assets, resources, modules ) {
 			var runtimeModule = {
 				name: projectName,
 				startZone : startZoneId,
 				zones : zones,
 				componentBlueprints : componentBlueprints,
 				entityBlueprints : entityBlueprints,
-				systemBlueprints : systemBlueprints
+				systemBlueprints : systemBlueprints,
+				resources : resources,
+				assets : assets
 			}
 
-			return _s.sprintf( runtimeModuleRequirejsTemplate, JSON.stringify( runtimeModule ) ) +
+			return _s.sprintf( runtimeModuleRequirejsTemplate, JSON.stringify( runtimeModule, null, '\t' ) ) +
 				'\n\n' +
 				modules.join( '\n' )
 		}
@@ -377,6 +371,36 @@ define(
 			)
 
 			return scriptModuleDependencies
+		}
+
+		var createAssetList = function( projectAssetsPath ) {
+			var filePaths = createFilePaths( [ projectAssetsPath ], [ 'json' ] )
+
+			return _.reduce(
+				filePaths,
+				function( memo, filePath ) {
+					var asset   = JSON.parse( fs.readFileSync( filePath, 'utf-8') ),
+						assetId = createAssetId( asset.type, asset.namespace, asset.name )
+
+					if( _.has( memo, assetId ) ) throw 'Error: Duplicate definition of asset \'' + assetId + '\'.'
+
+					var record = {
+						type : asset.type,
+						resourceId : asset.file
+					}
+
+					if( asset.config ) record.config = asset.config
+
+					memo[ assetId ] = record
+
+					return memo
+				},
+				{}
+			)
+		}
+
+		var createResourceList = function( assets ) {
+			return _.unique( _.pluck( assets, 'resourceId' ) )
 		}
 
 
@@ -464,20 +488,13 @@ define(
 
 			// copy referenced resources to output path
 			var zoneList = createZoneList( blueprintManager, projectConfig.zones )
-			var resourceIds = _.unique(
-				_.reduce(
-					zoneList,
-					function( memo, zone ) {
-						return memo.concat( zone.resources )
-					},
-					[]
-				)
-			)
 
 			var relativeAssetsPath  = '/library/assets',
 				spellTexturesPath   = spellPath + relativeAssetsPath,
-				projectTexturesPath = projectPath + relativeAssetsPath,
-				outputResourcesPath = projectPath + '/public/output/resources'
+				projectAssetsPath   = projectPath + relativeAssetsPath,
+				outputResourcesPath = projectPath + '/public/output/resources',
+				assets              = createAssetList( projectAssetsPath ),
+				resourceIds         = createResourceList( assets )
 
 			_.each(
 				resourceIds,
@@ -496,7 +513,7 @@ define(
 						return
 					}
 
-					inputFilePath = projectTexturesPath + '/' + resourceId
+					inputFilePath = projectAssetsPath + '/' + resourceId
 
 					if( isFile( inputFilePath ) ) {
 						copyFile( inputFilePath, outputFilePath )
@@ -528,6 +545,8 @@ define(
 				createBlueprintList( blueprintManager, componentBlueprintIds ),
 				createBlueprintList( blueprintManager, entityBlueprintIds ),
 				createBlueprintList( blueprintManager, systemBlueprintIds ),
+				assets,
+				resourceIds,
 				createModuleList(
 					_.extend( modules, scriptModules ),
 					scriptModuleDependencies

@@ -79,7 +79,6 @@ define(
 				'public',
 				'public/output',
 				'public/output/resources',
-				'public/output/resources/textures',
 				'library',
 				'library/blueprints',
 				'library/assets'
