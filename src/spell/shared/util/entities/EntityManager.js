@@ -27,7 +27,7 @@ define(
 			return _.reduce(
 				componentBlueprintIds,
 				function( memo, componentBlueprintId ) {
-					memo[ componentBlueprintId ] = []
+					memo[ componentBlueprintId ] = {}
 
 					return memo
 				},
