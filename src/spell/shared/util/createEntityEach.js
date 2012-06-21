@@ -25,7 +25,7 @@ define(
 						args = ( arguments ? _.toArray( arguments ).concat( primaryComponent ) : [ primaryComponent ] )
 
 					for( var j = 0; j < numArgumentComponentsList; j++ ) {
-						args.push( argumentComponents[ j ][ i ] )
+						args.push( argumentComponents[ j ][ id ] )
 					}
 
 					iterator.apply( null, args )
