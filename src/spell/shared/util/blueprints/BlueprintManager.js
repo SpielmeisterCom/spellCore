@@ -191,7 +191,7 @@ define(
 				attributes[ 0 ].name === 'value'
 		}
 
-		var createEntity = function( blueprints, blueprintId, entity, config ) {
+		var createEntityFromBlueprint = function( blueprints, blueprintId, entity, config ) {
 			return _.reduce(
 				config,
 				function( memo, componentConfig, componentId ) {
@@ -214,7 +214,7 @@ define(
 			)
 		}
 
-		var createAnonymousEntity = function( blueprints, config ) {
+		var createEntity = function( blueprints, config ) {
 			return _.reduce(
 				config,
 				function( memo, componentConfig, componentId ) {
@@ -260,10 +260,10 @@ define(
 
 					if( !entityPrototype ) throw 'Error: Could not find entity prototype for blueprint id \'' + blueprintId + '\'.'
 
-					return createEntity( this.blueprints, blueprintId, deepClone( entityPrototype ), config )
+					return createEntityFromBlueprint( this.blueprints, blueprintId, deepClone( entityPrototype ), config )
 
 				} else {
-					return createAnonymousEntity( this.blueprints, config )
+					return createEntity( this.blueprints, config )
 				}
 			},
 
