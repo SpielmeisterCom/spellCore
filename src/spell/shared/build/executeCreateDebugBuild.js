@@ -247,41 +247,6 @@ define(
 			)
 		}
 
-		/**
-		 * Creates a list of resources that are referenced by the provided entity config list
-		 *
-		 * @param blueprintManager
-		 * @param entities
-		 * @return {*}
-		 */
-		var createReferencedResources = function( blueprintManager, entities ) {
-			return _.reduce(
-				entities,
-				function( memo, entityConfig ) {
-					// WORKAROUND: a specialized solution; until requirements are more clear this has to do
-					var entityComponents = blueprintManager.createEntityComponents( entityConfig.blueprintId, entityConfig.config )
-
-
-					console.log( entityComponents )
-
-
-					var componentId = 'spell.component.core.graphics2d.appearance',
-						entityAppearance = _.has( entityComponents, componentId ) ? entityComponents[ componentId ] : null
-
-					if( entityAppearance ) {
-						var textureId = entityAppearance.textureId
-
-						if( !_.include( memo, textureId ) ) {
-							memo.push( textureId )
-						}
-					}
-
-					return memo
-				},
-				[]
-			)
-		}
-
 		var createZoneList = function( blueprintManager, zones ) {
 			return _.map(
 				zones,
@@ -296,7 +261,6 @@ define(
 					return {
 						entities : reducedEntityConfig,
 						name : zone.name,
-//						resources : createReferencedResources( blueprintManager, reducedEntityConfig ),
 						scriptId : zone.scriptId,
 						systems : zone.systems
 					}
