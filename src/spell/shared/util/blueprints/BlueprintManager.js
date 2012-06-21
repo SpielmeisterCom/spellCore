@@ -155,30 +155,7 @@ define(
 			)
 		}
 
-		var updateEntity = function( blueprints, blueprintId, entity, entityConfig ) {
-			return _.reduce(
-				entityConfig,
-				function( memo, componentConfig, componentId ) {
-					var componentBlueprint = getBlueprint( blueprints, componentId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
-
-					if( !_.has( memo, componentId ) ) {
-						throw 'Error: Entity template for entity blueprint \'' + blueprintId + '\' is missing component \'' + componentId + '\'.' +
-							' Maybe you forgot to add the component to the entity blueprint?'
-					}
-
-					memo[ componentId ] = updateComponent(
-						memo[ componentId ],
-						componentConfig,
-						isSingleAttributeComponent( componentBlueprint.attributes )
-					)
-
-					return memo
-				},
-				entity
-			)
-		}
-
-		var addBlueprint = function( blueprints, entityTemplates, definition ) {
+		var addBlueprint = function( blueprints, entityPrototype, definition ) {
 			var blueprintId = createName( definition.namespace, definition.name )
 
 			if( _.has( blueprints, blueprintId ) ) throw 'Error: Blueprint definition \'' + blueprintId + '\' already exists.'
@@ -187,7 +164,7 @@ define(
 			blueprints[ blueprintId ] = definition
 
 			if( definition.type === blueprintTypes.BLUEPRINT_TYPE_ENTITY ) {
-				entityTemplates[ blueprintId ] = createEntityTemplate( blueprints, definition )
+				entityPrototype[ blueprintId ] = createEntityTemplate( blueprints, definition )
 			}
 		}
 
@@ -214,6 +191,48 @@ define(
 				attributes[ 0 ].name === 'value'
 		}
 
+		var createEntity = function( blueprints, blueprintId, entity, config ) {
+			return _.reduce(
+				config,
+				function( memo, componentConfig, componentId ) {
+					var componentBlueprint = getBlueprint( blueprints, componentId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT )
+
+					if( !_.has( memo, componentId ) ) {
+						throw 'Error: Entity template for entity blueprint \'' + blueprintId + '\' is missing component \'' + componentId + '\'.' +
+							' Maybe you forgot to add the component to the entity blueprint?'
+					}
+
+					memo[ componentId ] = updateComponent(
+						memo[ componentId ],
+						componentConfig,
+						isSingleAttributeComponent( componentBlueprint.attributes )
+					)
+
+					return memo
+				},
+				entity
+			)
+		}
+
+		var createAnonymousEntity = function( blueprints, config ) {
+			return _.reduce(
+				config,
+				function( memo, componentConfig, componentId ) {
+					var componentBlueprint = getBlueprint( blueprints, componentId, blueprintTypes.BLUEPRINT_TYPE_COMPONENT ),
+						hasSingleAttribute = isSingleAttributeComponent( componentBlueprint.attributes )
+
+					memo[ componentId ] = updateComponent(
+						createComponentTemplate( componentBlueprint, hasSingleAttribute ),
+						componentConfig,
+						hasSingleAttribute
+					)
+
+					return memo
+				},
+				{}
+			)
+		}
+
 
 		/**
 		 * public
@@ -221,7 +240,7 @@ define(
 
 		function BlueprintManager() {
 			this.blueprints = {}
-			this.entityTemplates = {}
+			this.entityPrototypes = {}
 		}
 
 		BlueprintManager.prototype = {
@@ -232,26 +251,30 @@ define(
 					throw 'Error: The format of the supplied blueprint definition is invalid.'
 				}
 
-				addBlueprint( this.blueprints, this.entityTemplates, definition )
+				addBlueprint( this.blueprints, this.entityPrototypes, definition )
 			},
-			createEntityComponents : function( blueprintId, entityConfig ) {
-				var entityTemplate = this.entityTemplates[ blueprintId ]
 
-				if( !entityTemplate ) throw 'Error: Could not find entity template for blueprint id \'' + blueprintId + '\'.'
+			createEntityComponents : function( blueprintId, config ) {
+				if( blueprintId ) {
+					var entityPrototype = this.entityPrototypes[ blueprintId ]
 
-				return updateEntity(
-					this.blueprints,
-					blueprintId,
-					deepClone( this.entityTemplates[ blueprintId ] ),
-					entityConfig
-				)
+					if( !entityPrototype ) throw 'Error: Could not find entity prototype for blueprint id \'' + blueprintId + '\'.'
+
+					return createEntity( this.blueprints, blueprintId, deepClone( entityPrototype ), config )
+
+				} else {
+					return createAnonymousEntity( this.blueprints, config )
+				}
 			},
+
 			hasBlueprint : function( blueprintId ) {
 				return !!getBlueprint( this.blueprints, blueprintId )
 			},
+
 			getBlueprint : function( blueprintId ) {
 				return getBlueprint( this.blueprints, blueprintId )
 			},
+
 			getBlueprintIds : function( blueprintType ) {
 				if( !_.contains( blueprintTypes, blueprintType ) ) throw 'Error: Blueprint type \'' + blueprintType + '\' is not supported.'
 

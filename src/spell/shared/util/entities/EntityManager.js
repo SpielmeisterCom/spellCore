@@ -44,6 +44,51 @@ define(
 			)
 		}
 
+		/**
+		 * Parses the createEntity method argument object
+		 * @param argumentObject
+		 * @return {*}
+		 */
+		var extractCreateEntityArguments = function( argumentObject ) {
+			var arg0 = argumentObject[ 0 ],
+				arg1 = argumentObject[ 1 ],
+				blueprintId,
+				config
+
+			if( !arg0 ) return
+
+			if( !arg1 ) {
+				if( _.isObject( arg0 ) ) {
+					/**
+					 * arg0 =  { ... } // config
+					 */
+
+					config = arg0
+
+				} else if( _.isString( arg0 ) ) {
+					/**
+					 * arg0 = 'blueprintId'
+					 */
+
+					blueprintId = arg0
+				}
+
+			} else {
+				/**
+				 * arg0 = 'blueprintId'
+				 * arg1 = { ... } // config
+				 */
+
+				blueprintId = arg0
+				config      = arg1
+			}
+
+			return {
+				blueprintId : blueprintId,
+				config : config
+			}
+		}
+
 
 		/**
 		 * public
@@ -55,8 +100,19 @@ define(
 		}
 
 		EntityManager.prototype = {
-			createEntity: function( blueprintId, entityConfig ) {
-				if( !this.blueprintManager.hasBlueprint( blueprintId ) ) {
+			createEntity: function() {
+				var args = extractCreateEntityArguments( arguments )
+
+				if( !args ) throw 'Error: Supplied invalid arguments.'
+
+				var blueprintId = args.blueprintId,
+					config      = args.config
+
+				if( !blueprintId && !config ) {
+					throw 'Error: Supplied invalid arguments.'
+				}
+
+				if( blueprintId && !this.blueprintManager.hasBlueprint( blueprintId ) ) {
 					throw 'Error: Unknown blueprint \'' + blueprintId + '\'. Could not create entity.'
 				}
 
@@ -65,19 +121,24 @@ define(
 				addComponents(
 					this.components,
 					id,
-					this.blueprintManager.createEntityComponents( blueprintId, entityConfig )
+					this.blueprintManager.createEntityComponents( blueprintId, config || {} )
 				)
 
 				return id
 			},
 
-			createEntities: function( entityConfigs ) {
+			createEntities : function( entityConfigs ) {
 				var self = this
 
 				_.each(
 					entityConfigs,
 					function( entityConfig ) {
-						self.createEntity( entityConfig.blueprintId, entityConfig.config )
+						if( _.has( entityConfig, 'blueprintId' ) ) {
+							self.createEntity( entityConfig.blueprintId, entityConfig.config )
+
+						} else {
+							self.createEntity( entityConfig.config )
+						}
 					}
 				)
 			},
