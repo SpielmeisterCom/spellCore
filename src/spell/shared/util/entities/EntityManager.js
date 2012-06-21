@@ -38,21 +38,39 @@ define(
 		var addComponents = function( components, entityId, entityComponents ) {
 			_.each(
 				entityComponents,
-				function( entityComponent, entityComponentId ) {
-					components[ entityComponentId ][ entityId ] = entityComponent
+				function( component, componentId ) {
+					components[ componentId ][ entityId ] = component
 				}
 			)
 		}
 
+		var removeComponents = function( components, entityId, entityComponentId ) {
+			if( entityComponentId ) {
+				// remove a single component from the entity
+				delete components[ entityComponentId ][ entityId ]
+
+			} else {
+				// remove all components, that is "remove the entity"
+				_.each(
+					components,
+					function( componentList ) {
+						if( !_.has( componentList, entityId ) ) return
+
+						delete componentList[ entityId ]
+					}
+				)
+			}
+		}
+
 		/**
-		 * Parses the createEntity method argument object
-		 * @param argumentObject
+		 * Extracts blueprintId and config object from the arguments
+		 *
+		 * @param arg0 first argument
+		 * @param arg1 second argument
 		 * @return {*}
 		 */
-		var extractCreateEntityArguments = function( argumentObject ) {
-			var arg0 = argumentObject[ 0 ],
-				arg1 = argumentObject[ 1 ],
-				blueprintId,
+		var extractCreateArguments = function( arg0, arg1 ) {
+			var blueprintId,
 				config
 
 			if( !arg0 ) return
@@ -100,8 +118,15 @@ define(
 		}
 
 		EntityManager.prototype = {
-			createEntity: function() {
-				var args = extractCreateEntityArguments( arguments )
+			/**
+			 * Creates an entity
+			 *
+			 * @param arg0 can be a blueprintId or a config object
+			 * @param arg1 a config object
+			 * @return {*}
+			 */
+			createEntity : function( arg0, arg1 ) {
+				var args = extractCreateArguments( arg0, arg1 )
 
 				if( !args ) throw 'Error: Supplied invalid arguments.'
 
@@ -116,15 +141,26 @@ define(
 					throw 'Error: Unknown blueprint \'' + blueprintId + '\'. Could not create entity.'
 				}
 
-				var id = getNextEntityId()
+				var entityId = getNextEntityId()
 
 				addComponents(
 					this.components,
-					id,
-					this.blueprintManager.createEntityComponents( blueprintId, config || {} )
+					entityId,
+					this.blueprintManager.createComponents( blueprintId, config || {} )
 				)
 
-				return id
+				return entityId
+			},
+
+			/**
+			 * Removes an entity
+			 *
+			 * @param entityId the id of the entity to remove
+			 */
+			removeEntity : function( entityId ) {
+				if( !entityId ) throw 'Error: Missing entity id.'
+
+				removeComponents( this.components, entityId )
 			},
 
 			createEntities : function( entityConfigs ) {
@@ -141,6 +177,56 @@ define(
 						}
 					}
 				)
+			},
+
+			/**
+			 * Adds a component to an entity
+			 *
+			 * @param entityId the id of the entity that the component belongs to
+			 * @param arg1 can be a blueprintId or config object
+			 * @param arg2 config object
+			 * @return {*}
+			 */
+			addComponent : function( entityId, arg1, arg2 ) {
+				if( !entityId ) throw 'Error: Missing entity id.'
+
+				var args = extractCreateArguments( arg1, arg2 ),
+					entityConfig = {}
+					entityConfig[ args.blueprintId ] = args.config
+
+				addComponents(
+					this.components,
+					entityId,
+					this.blueprintManager.createComponents( null, entityConfig )
+				)
+			},
+
+			/**
+			 * Removes a component from an entity
+			 *
+			 * @param entityId the id of the entity that the component belongs to
+			 * @param componentId the id (blueprint id) of the component to remove
+			 * @return {*}
+			 */
+			removeComponent : function( entityId, componentId ) {
+				if( !entityId ) throw 'Error: Missing entity id.'
+
+				removeComponents( this.components, entityId, componentId )
+			},
+
+			/**
+			 * Returns true if an entity has a component
+			 *
+			 * @param entityId the id of the entity to check
+			 * @param componentId the id of the component to check
+			 * @return {Boolean}
+			 */
+			hasComponent : function( entityId, componentId ) {
+				var componentList = this.components[ componentId ]
+
+				if( !componentList ) return false
+
+				return !!componentList[ entityId ]
 			},
 
 			getComponentsById : function( componentBlueprintId ) {

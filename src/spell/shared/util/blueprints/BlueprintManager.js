@@ -191,7 +191,7 @@ define(
 				attributes[ 0 ].name === 'value'
 		}
 
-		var createEntityFromBlueprint = function( blueprints, blueprintId, entity, config ) {
+		var createComponentsFromEntityBlueprint = function( blueprints, blueprintId, entity, config ) {
 			return _.reduce(
 				config,
 				function( memo, componentConfig, componentId ) {
@@ -214,7 +214,7 @@ define(
 			)
 		}
 
-		var createEntity = function( blueprints, config ) {
+		var createComponents = function( blueprints, config ) {
 			return _.reduce(
 				config,
 				function( memo, componentConfig, componentId ) {
@@ -254,16 +254,16 @@ define(
 				addBlueprint( this.blueprints, this.entityPrototypes, definition )
 			},
 
-			createEntityComponents : function( blueprintId, config ) {
-				if( blueprintId ) {
-					var entityPrototype = this.entityPrototypes[ blueprintId ]
+			createComponents : function( entityBlueprintId, config ) {
+				if( entityBlueprintId ) {
+					var entityPrototype = this.entityPrototypes[ entityBlueprintId ]
 
-					if( !entityPrototype ) throw 'Error: Could not find entity prototype for blueprint id \'' + blueprintId + '\'.'
+					if( !entityPrototype ) throw 'Error: Could not find entity prototype for blueprint id \'' + entityBlueprintId + '\'.'
 
-					return createEntityFromBlueprint( this.blueprints, blueprintId, deepClone( entityPrototype ), config )
+					return createComponentsFromEntityBlueprint( this.blueprints, entityBlueprintId, deepClone( entityPrototype ), config )
 
 				} else {
-					return createEntity( this.blueprints, config )
+					return createComponents( this.blueprints, config )
 				}
 			},
 
