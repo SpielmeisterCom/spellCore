@@ -154,14 +154,14 @@ define(
 			var globals = {},
 				mainLoop = undefined
 
-			var SceneManager = new SceneManager( globals, mainLoop )
+			var sceneManager = new SceneManager( globals, mainLoop )
 
 			var clients = connection.clients
 
 			globals.clients       = clients
 			globals.entityManager = entityManager
 			globals.eventManager  = eventManager
-			globals.SceneManager   = SceneManager
+			globals.sceneManager  = sceneManager
 
 
 

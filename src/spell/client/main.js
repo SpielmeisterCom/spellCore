@@ -85,7 +85,7 @@ define(
 			statisticsManager    = new StatisticsManager(),
 			templateManager      = new TemplateManager(),
 			mainLoop             = createMainLoop( eventManager, statisticsManager ),
-			SceneManager         = new SceneManager( globals, mainLoop )
+			sceneManager         = new SceneManager( globals, mainLoop )
 
 		statisticsManager.init()
 
@@ -119,7 +119,7 @@ define(
 					resources            : resourceLoader.getResources(),
 					statisticsManager    : statisticsManager,
 					soundManager         : soundManager,
-					SceneManager         : SceneManager,
+					sceneManager         : sceneManager,
 					runtimeModule        : runtimeModule
 				}
 			)
@@ -141,7 +141,7 @@ define(
 
 			if( !sceneConfig ) throw 'Error: Could not find start scene \'' + runtimeModule.startScene + '\'.'
 
-			SceneManager.startScene( sceneConfig )
+			sceneManager.startScene( sceneConfig )
 
 			mainLoop.run()
 		}
