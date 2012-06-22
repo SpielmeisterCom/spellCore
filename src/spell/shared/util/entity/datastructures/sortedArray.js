@@ -1,5 +1,5 @@
 define(
-	"spell/shared/util/entities/datastructures/sortedArray",
+	"spell/shared/util/entity/datastructures/sortedArray",
 	[
 		'spell/shared/util/platform/underscore'
 	],

@@ -4,7 +4,7 @@ define(
 		'spell/client/runtimeModule',
 		'spell/client/util/createAssets',
 		'spell/shared/util/createMainLoop',
-		'spell/shared/util/entities/EntityManager',
+		'spell/shared/util/entity/EntityManager',
 		'spell/shared/util/scene/SceneManager',
 		'spell/shared/util/template/TemplateManager',
 		'spell/shared/util/ConfigurationManager',

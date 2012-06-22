@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/entities/EntityManager',
+	'spell/shared/util/entity/EntityManager',
 	[
 		'spell/shared/util/create',
 

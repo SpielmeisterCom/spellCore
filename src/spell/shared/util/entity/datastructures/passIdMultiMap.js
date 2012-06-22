@@ -1,7 +1,7 @@
 define(
-	'spell/shared/util/entities/datastructures/passIdMultiMap',
+	'spell/shared/util/entity/datastructures/passIdMultiMap',
 	[
-		'spell/shared/util/entities/datastructures/multiMap'
+		'spell/shared/util/entity/datastructures/multiMap'
 	],
 	function(
 		multiMap

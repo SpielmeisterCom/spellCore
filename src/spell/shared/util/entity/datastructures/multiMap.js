@@ -1,5 +1,5 @@
 define(
-	"spell/shared/util/entities/datastructures/multiMap",
+	"spell/shared/util/entity/datastructures/multiMap",
 	[
 		'spell/shared/util/platform/underscore'
 	],

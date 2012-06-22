@@ -9,7 +9,7 @@ define(
 		'spell/shared/util/networkProtocol',
 		'spell/shared/util/network/Messages',
 		'spell/shared/util/EventManager',
-		'spell/shared/util/entities/EntityManager',
+		'spell/shared/util/entity/EntityManager',
 		'spell/shared/util/scene/SceneManager',
 		'spell/shared/util/Logger',
 		'spell/shared/util/platform/PlatformKit',
