@@ -11,7 +11,7 @@ define(
 
 		return createEnumesqueObject( [
 			/**
-			 * The client sends this message to the server. The server responds with a ZONE_CHANGE message.
+			 * The client sends this message to the server. The server responds with a SCENE_CHANGE message.
 			 */
 			'JOIN_ANY_GAME',
 

@@ -247,12 +247,12 @@ define(
 			)
 		}
 
-		var createZoneList = function( blueprintManager, zones ) {
+		var createSceneList = function( blueprintManager, scenes ) {
 			return _.map(
-				zones,
-				function( zone ) {
+				scenes,
+				function( scene ) {
 					var reducedEntityConfig = _.map(
-						zone.entities,
+						scene.entities,
 						function( entityConfig ) {
 							return createReducedEntityConfig( blueprintManager, entityConfig )
 						}
@@ -260,19 +260,19 @@ define(
 
 					return {
 						entities : reducedEntityConfig,
-						name : zone.name,
-						scriptId : zone.scriptId,
-						systems : zone.systems
+						name : scene.name,
+						scriptId : scene.scriptId,
+						systems : scene.systems
 					}
 				}
 			)
 		}
 
-		var createRuntimeModule = function( projectName, startZoneId, zones, componentBlueprints, entityBlueprints, systemBlueprints, assets, resources, modules ) {
+		var createRuntimeModule = function( projectName, startSceneId, scenes, componentBlueprints, entityBlueprints, systemBlueprints, assets, resources, modules ) {
 			var runtimeModule = {
 				name: projectName,
-				startZone : startZoneId,
-				zones : zones,
+				startScene : startSceneId,
+				scenes : scenes,
 				componentBlueprints : componentBlueprints,
 				entityBlueprints : entityBlueprints,
 				systemBlueprints : systemBlueprints,
@@ -414,8 +414,8 @@ define(
 
 
 			// determine all blueprints that are referenced in the project
-			var entityBlueprintIds    = _.unique( jsonPath( projectConfig, '$.zones[*].entities[*].blueprintId' ) ),
-				systemBlueprintIds    = _.unique( _.flatten( jsonPath( projectConfig, '$.zones[*].systems[*]' ) )),
+			var entityBlueprintIds    = _.unique( jsonPath( projectConfig, '$.scenes[*].entities[*].blueprintId' ) ),
+				systemBlueprintIds    = _.unique( _.flatten( jsonPath( projectConfig, '$.scenes[*].systems[*]' ) )),
 				componentBlueprintIds = _.union(
 					getDependencyBlueprintIds( blueprintManager, entityBlueprintIds, '$.components[*].blueprintId' ),
 					getDependencyBlueprintIds( blueprintManager, systemBlueprintIds, '$.input[*].blueprintId' )
@@ -437,10 +437,10 @@ define(
 			// system script ids
 			var usedScriptIds = createDependencyScriptIds( blueprintManager, systemBlueprintIds )
 
-			// zone script ids
+			// scene script ids
 			usedScriptIds = usedScriptIds.concat(
 				_.unique(
-					jsonPath( projectConfig, '$.zones[*].scriptId' )
+					jsonPath( projectConfig, '$.scenes[*].scriptId' )
 				)
 			)
 
@@ -465,7 +465,7 @@ define(
 
 
 			// copy referenced resources to output path
-			var zoneList = createZoneList( blueprintManager, projectConfig.zones )
+			var sceneList = createSceneList( blueprintManager, projectConfig.scenes )
 
 			var relativeAssetsPath  = '/library/assets',
 				spellTexturesPath   = spellPath + relativeAssetsPath,
@@ -518,8 +518,8 @@ define(
 
 			var runtimeModuleSource = createRuntimeModule(
 				projectConfig.name,
-				projectConfig.startZone,
-				zoneList,
+				projectConfig.startScene,
+				sceneList,
 				createBlueprintList( blueprintManager, componentBlueprintIds ),
 				createBlueprintList( blueprintManager, entityBlueprintIds ),
 				createBlueprintList( blueprintManager, systemBlueprintIds ),

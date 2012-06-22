@@ -29,8 +29,8 @@ define(
 			// MISC
 			'RENDER_UPDATE',
 			'LOGIC_UPDATE',
-			'CREATE_ZONE',
-			'DESTROY_ZONE',
+			'CREATE_SCENE',
+			'DESTROY_SCENE',
 			'SCREEN_RESIZED'
 		] )
 	}

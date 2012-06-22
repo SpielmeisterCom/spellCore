@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/zones/Zone',
+	'spell/shared/util/scene/Scene',
 	[
 		'spell/shared/util/create',
 		'spell/shared/util/Events',
@@ -77,7 +77,7 @@ define(
 		 * public
 		 */
 
-		var Zone = function( globals ) {
+		var Scene = function( globals ) {
 			this.globals          = globals
 			this.blueprintManager = globals.blueprintManager
 			this.renderSystems    = null
@@ -85,35 +85,35 @@ define(
 			this.script           = null
 		}
 
-		Zone.prototype = {
+		Scene.prototype = {
 			render: function( timeInMs, deltaTimeInMs ) {
 				invoke( this.renderSystems, 'process', [ this.globals, timeInMs, deltaTimeInMs ] )
 			},
 			update: function( timeInMs, deltaTimeInMs ) {
 				invoke( this.updateSystems, 'process', [ this.globals, timeInMs, deltaTimeInMs ] )
 			},
-			init: function( globals, zoneConfig ) {
+			init: function( globals, sceneConfig ) {
 				var entityManager = globals.entityManager
 
-				if( zoneConfig.scriptId ) {
-					this.script = requireScript( zoneConfig.scriptId )
-					this.script.init( this.globals, entityManager, zoneConfig )
+				if( sceneConfig.scriptId ) {
+					this.script = requireScript( sceneConfig.scriptId )
+					this.script.init( this.globals, entityManager, sceneConfig )
 				}
 
-				this.renderSystems = createSystems( globals, zoneConfig.systems.render )
-				this.updateSystems = createSystems( globals, zoneConfig.systems.update )
+				this.renderSystems = createSystems( globals, sceneConfig.systems.render )
+				this.updateSystems = createSystems( globals, sceneConfig.systems.update )
 
-				invoke( this.renderSystems, 'init', [ this.globals, zoneConfig ] )
-				invoke( this.updateSystems, 'init', [ this.globals, zoneConfig ] )
+				invoke( this.renderSystems, 'init', [ this.globals, sceneConfig ] )
+				invoke( this.updateSystems, 'init', [ this.globals, sceneConfig ] )
 			},
-			destroy: function( globals, zoneConfig ) {
-				invoke( this.renderSystems, 'cleanUp', [ this.globals, zoneConfig ] )
-				invoke( this.updateSystems, 'cleanUp', [ this.globals, zoneConfig ] )
+			destroy: function( globals, sceneConfig ) {
+				invoke( this.renderSystems, 'cleanUp', [ this.globals, sceneConfig ] )
+				invoke( this.updateSystems, 'cleanUp', [ this.globals, sceneConfig ] )
 
 				this.script.cleanUp( this.globals )
 			}
 		}
 
-		return Zone
+		return Scene
 	}
 )

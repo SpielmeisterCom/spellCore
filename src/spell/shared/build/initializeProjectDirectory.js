@@ -99,10 +99,10 @@ define(
 			if( !isFile( projectFilePath ) ) {
 				var data = {
 					"name": projectName,
-					"startZone": "Zone1",
-					"zones": [
+					"startScene": "Scene1",
+					"scenes": [
 						{
-							"name": "Zone1",
+							"name": "Scene1",
 							"entities": []
 						}
 					]

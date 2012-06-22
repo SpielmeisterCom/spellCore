@@ -10,7 +10,7 @@ define(
 		'spell/shared/util/network/Messages',
 		'spell/shared/util/EventManager',
 		'spell/shared/util/entities/EntityManager',
-		'spell/shared/util/zones/ZoneManager',
+		'spell/shared/util/scene/SceneManager',
 		'spell/shared/util/Logger',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/Types',
@@ -31,7 +31,7 @@ define(
 		Messages,
 		EventManager,
 		EntityManager,
-		ZoneManager,
+		SceneManager,
 		Logger,
 		PlatformKit,
 		Types,
@@ -154,42 +154,42 @@ define(
 			var globals = {},
 				mainLoop = undefined
 
-			var zoneManager = new ZoneManager( globals, mainLoop )
+			var SceneManager = new SceneManager( globals, mainLoop )
 
 			var clients = connection.clients
 
 			globals.clients       = clients
 			globals.entityManager = entityManager
 			globals.eventManager  = eventManager
-			globals.zoneManager   = zoneManager
+			globals.SceneManager   = SceneManager
 
 
 
-			var gameZones = {}
+			var gameScenes = {}
 
-			var findGameZoneWithOpenPlayerSlot = function( zones ) {
+			var findGameSceneWithOpenPlayerSlot = function( scenes ) {
 				return _.find(
-					zones,
-					function( zone ) {
-						return zone.hasOpenPlayerSlot()
+					scenes,
+					function( scene ) {
+						return scene.hasOpenPlayerSlot()
 					}
 				)
 			}
 
-			var findGameZoneWithClient = function( zones, clientId ) {
+			var findGameSceneWithClient = function( scenes, clientId ) {
 				return _.find(
-					zones,
-					function( zone ) {
-						return zone.clients[ clientId ] !== undefined
+					scenes,
+					function( scene ) {
+						return scene.clients[ clientId ] !== undefined
 					}
 				)
 			}
 
-			var onZoneTransition = function( zone, nextZone ) {
-				delete gameZones[ zone.id ]
+			var onSceneTransition = function( scene, nextScene ) {
+				delete gameScenes[ scene.id ]
 
-				if( nextZone ) {
-					gameZones[ nextZone.id ] = nextZone
+				if( nextScene ) {
+					gameScenes[ nextScene.id ] = nextScene
 				}
 			}
 
@@ -199,13 +199,13 @@ define(
 
 				onDisconnect: function( client ) {
 					Logger.info( 'client ' + client.id + ' disconnected' )
-					var zone = findGameZoneWithClient( gameZones, client.id )
+					var scene = findGameSceneWithClient( gameScenes, client.id )
 
-					if( zone ) {
-						zone.removeClient( client )
+					if( scene ) {
+						scene.removeClient( client )
 
 					} else {
-						Logger.error( 'Could not find a zone with client ' + client.id + '.' )
+						Logger.error( 'Could not find a scene with client ' + client.id + '.' )
 					}
 				},
 
@@ -213,20 +213,20 @@ define(
 					if( message.type !== Messages.JOIN_ANY_GAME ) return
 
 
-					var zone = findGameZoneWithOpenPlayerSlot( gameZones )
+					var scene = findGameSceneWithOpenPlayerSlot( gameScenes )
 
-					if( !zone ) {
-						zone = zoneManager.createZone(
+					if( !scene ) {
+						scene = SceneManager.createScene(
 							'game',
 							{
-								onZoneTransition : onZoneTransition
+								onSceneTransition : onSceneTransition
 							}
 						)
 					}
 
-					zone.addClient( client )
-					client.zone = zone
-					gameZones[ zone.id ] = zone
+					scene.addClient( client )
+					client.scene = scene
+					gameScenes[ scene.id ] = scene
 				}
 			} )
 

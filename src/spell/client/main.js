@@ -5,7 +5,7 @@ define(
 		'spell/client/util/createAssets',
 		'spell/shared/util/createMainLoop',
 		'spell/shared/util/entities/EntityManager',
-		'spell/shared/util/zones/ZoneManager',
+		'spell/shared/util/scene/SceneManager',
 		'spell/shared/util/blueprints/BlueprintManager',
 		'spell/shared/util/ConfigurationManager',
 		'spell/shared/util/EventManager',
@@ -24,7 +24,7 @@ define(
 		createAssets,
 		createMainLoop,
 		EntityManager,
-		ZoneManager,
+		SceneManager,
 		BlueprintManager,
 		ConfigurationManager,
 		EventManager,
@@ -85,7 +85,7 @@ define(
 			statisticsManager    = new StatisticsManager(),
 			blueprintManager     = new BlueprintManager(),
 			mainLoop             = createMainLoop( eventManager, statisticsManager ),
-			zoneManager          = new ZoneManager( globals, mainLoop )
+			SceneManager          = new SceneManager( globals, mainLoop )
 
 		statisticsManager.init()
 
@@ -119,7 +119,7 @@ define(
 					resources            : resourceLoader.getResources(),
 					statisticsManager    : statisticsManager,
 					soundManager         : soundManager,
-					zoneManager          : zoneManager,
+					SceneManager          : SceneManager,
 					runtimeModule        : runtimeModule
 				}
 			)
@@ -132,16 +132,16 @@ define(
 
 
 
-			var zoneConfig = _.find(
-				runtimeModule.zones,
+			var sceneConfig = _.find(
+				runtimeModule.scenes,
 				function( iter ) {
-					return iter.name === runtimeModule.startZone
+					return iter.name === runtimeModule.startScene
 				}
 			)
 
-			if( !zoneConfig ) throw 'Error: Could not find start zone \'' + runtimeModule.startZone + '\'.'
+			if( !sceneConfig ) throw 'Error: Could not find start scene \'' + runtimeModule.startScene + '\'.'
 
-			zoneManager.startZone( zoneConfig )
+			SceneManager.startScene( sceneConfig )
 
 			mainLoop.run()
 		}

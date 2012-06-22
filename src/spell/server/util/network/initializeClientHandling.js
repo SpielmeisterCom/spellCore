@@ -45,7 +45,7 @@ define(
 				isPristine  : true,
 
 				initialized : false,
-				zone        : null,
+				scene        : null,
 
 				send: function( type, data ) {
 					websocketConnection.sendUTF( this.protocol.encode( type, data ) )
