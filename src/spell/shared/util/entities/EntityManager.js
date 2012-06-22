@@ -23,11 +23,11 @@ define(
 			return nextEntityId++
 		}
 
-		var createComponentList = function( componentBlueprintIds ) {
+		var createComponentList = function( componentTemplateIds ) {
 			return _.reduce(
-				componentBlueprintIds,
-				function( memo, componentBlueprintId ) {
-					memo[ componentBlueprintId ] = {}
+				componentTemplateIds,
+				function( memo, componentTemplateId ) {
+					memo[ componentTemplateId ] = {}
 
 					return memo
 				},
@@ -63,14 +63,14 @@ define(
 		}
 
 		/**
-		 * Extracts blueprintId and config object from the arguments
+		 * Extracts templateId and config object from the arguments
 		 *
 		 * @param arg0 first argument
 		 * @param arg1 second argument
 		 * @return {*}
 		 */
 		var extractCreateArguments = function( arg0, arg1 ) {
-			var blueprintId,
+			var templateId,
 				config
 
 			if( !arg0 ) return
@@ -85,24 +85,24 @@ define(
 
 				} else if( _.isString( arg0 ) ) {
 					/**
-					 * arg0 = 'blueprintId'
+					 * arg0 = 'templateId'
 					 */
 
-					blueprintId = arg0
+					templateId = arg0
 				}
 
 			} else {
 				/**
-				 * arg0 = 'blueprintId'
+				 * arg0 = 'templateId'
 				 * arg1 = { ... } // config
 				 */
 
-				blueprintId = arg0
+				templateId = arg0
 				config      = arg1
 			}
 
 			return {
-				blueprintId : blueprintId,
+				templateId : templateId,
 				config : config
 			}
 		}
@@ -112,16 +112,16 @@ define(
 		 * public
 		 */
 
-		var EntityManager = function( blueprintManager ) {
-			this.blueprintManager = blueprintManager
-			this.components = createComponentList( blueprintManager.getBlueprintIds( 'componentBlueprint' ) )
+		var EntityManager = function( templateManager ) {
+			this.templateManager = templateManager
+			this.components = createComponentList( templateManager.getTemplateIds( 'componentTemplate' ) )
 		}
 
 		EntityManager.prototype = {
 			/**
 			 * Creates an entity
 			 *
-			 * @param arg0 can be a blueprintId or a config object
+			 * @param arg0 can be a templateId or a config object
 			 * @param arg1 a config object
 			 * @return {*}
 			 */
@@ -130,15 +130,15 @@ define(
 
 				if( !args ) throw 'Error: Supplied invalid arguments.'
 
-				var blueprintId = args.blueprintId,
+				var templateId = args.templateId,
 					config      = args.config
 
-				if( !blueprintId && !config ) {
+				if( !templateId && !config ) {
 					throw 'Error: Supplied invalid arguments.'
 				}
 
-				if( blueprintId && !this.blueprintManager.hasBlueprint( blueprintId ) ) {
-					throw 'Error: Unknown blueprint \'' + blueprintId + '\'. Could not create entity.'
+				if( templateId && !this.templateManager.hasTemplate( templateId ) ) {
+					throw 'Error: Unknown template \'' + templateId + '\'. Could not create entity.'
 				}
 
 				var entityId = getNextEntityId()
@@ -146,7 +146,7 @@ define(
 				addComponents(
 					this.components,
 					entityId,
-					this.blueprintManager.createComponents( blueprintId, config || {} )
+					this.templateManager.createComponents( templateId, config || {} )
 				)
 
 				return entityId
@@ -169,8 +169,8 @@ define(
 				_.each(
 					entityConfigs,
 					function( entityConfig ) {
-						if( _.has( entityConfig, 'blueprintId' ) ) {
-							self.createEntity( entityConfig.blueprintId, entityConfig.config )
+						if( _.has( entityConfig, 'templateId' ) ) {
+							self.createEntity( entityConfig.templateId, entityConfig.config )
 
 						} else {
 							self.createEntity( entityConfig.config )
@@ -183,7 +183,7 @@ define(
 			 * Adds a component to an entity
 			 *
 			 * @param entityId the id of the entity that the component belongs to
-			 * @param arg1 can be a blueprintId or config object
+			 * @param arg1 can be a templateId or config object
 			 * @param arg2 config object
 			 * @return {*}
 			 */
@@ -192,12 +192,12 @@ define(
 
 				var args = extractCreateArguments( arg1, arg2 ),
 					entityConfig = {}
-					entityConfig[ args.blueprintId ] = args.config
+					entityConfig[ args.templateId ] = args.config
 
 				addComponents(
 					this.components,
 					entityId,
-					this.blueprintManager.createComponents( null, entityConfig )
+					this.templateManager.createComponents( null, entityConfig )
 				)
 			},
 
@@ -205,7 +205,7 @@ define(
 			 * Removes a component from an entity
 			 *
 			 * @param entityId the id of the entity that the component belongs to
-			 * @param componentId the id (blueprint id) of the component to remove
+			 * @param componentId the id (template id) of the component to remove
 			 * @return {*}
 			 */
 			removeComponent : function( entityId, componentId ) {
@@ -229,10 +229,10 @@ define(
 				return !!componentList[ entityId ]
 			},
 
-			getComponentsById : function( componentBlueprintId ) {
-				var components = this.components[ componentBlueprintId ]
+			getComponentsById : function( componentTemplateId ) {
+				var components = this.components[ componentTemplateId ]
 
-				if( !components ) throw 'Error: No component list for component blueprint id \'' + componentBlueprintId +  '\' available.'
+				if( !components ) throw 'Error: No component list for component template id \'' + componentTemplateId +  '\' available.'
 
 				return components
 			}

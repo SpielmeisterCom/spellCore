@@ -1,7 +1,7 @@
 define(
 	'spell/shared/build/createReducedEntityConfig',
 	[
-		'spell/shared/util/blueprints/createLocalComponentName',
+		'spell/shared/util/template/createLocalComponentName',
 
 		'spell/shared/util/platform/underscore'
 	],
@@ -10,14 +10,14 @@ define(
 
 		_
 	) {
-		var compileComponents = function( blueprintManager, componentsInSpellEdFormat ) {
+		var compileComponents = function( templateManager, componentsInSpellEdFormat ) {
 			return _.reduce(
 				componentsInSpellEdFormat,
 				function( memo, iter ) {
-					var componentName = createLocalComponentName( iter.blueprintId ),
+					var componentName = createLocalComponentName( iter.templateId ),
 						attributeConfig = iter.config
 
-					if( blueprintManager.isSingleAttributeComponent( iter.blueprintId ) ) {
+					if( templateManager.isSingleAttributeComponent( iter.templateId ) ) {
 						for( var propertyName in attributeConfig ) {
 							memo[ componentName ] = _.clone( attributeConfig[ propertyName ] )
 						}
@@ -42,11 +42,11 @@ define(
 		/**
 		 * Creates reduced entity config (the spell runtime module format).
 		 */
-		return function( blueprintManager, entityInSpellEdFormat ) {
+		return function( templateManager, entityInSpellEdFormat ) {
 			return {
-				name        : entityInSpellEdFormat.name,
-				blueprintId : entityInSpellEdFormat.blueprintId,
-				config      : compileComponents( blueprintManager, entityInSpellEdFormat.components )
+				name       : entityInSpellEdFormat.name,
+				templateId : entityInSpellEdFormat.templateId,
+				config     : compileComponents( templateManager, entityInSpellEdFormat.components )
 			}
 		}
 	}

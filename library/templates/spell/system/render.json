@@ -1,0 +1,29 @@
+{
+	"type" : "systemTemplate",
+	"namespace" : "spell.system",
+	"name" : "render",
+
+	"input" : [
+		{
+			"name" : "transforms",
+			"templateId" : "spell.component.2d.transform"
+		},
+		{
+			"name" : "appearances",
+			"templateId" : "spell.component.2d.graphics.appearance"
+		},
+		{
+			"name" : "animatedAppearances",
+			"templateId" : "spell.component.2d.graphics.animatedAppearance"
+		},
+		{
+			"name" : "visualObjects",
+			"templateId" : "spell.component.visualObject"
+		},
+		{
+			"name" : "cameras",
+			"templateId" : "spell.component.2d.graphics.camera"
+		}
+	],
+	"scriptId" : "spell/system/render"
+}

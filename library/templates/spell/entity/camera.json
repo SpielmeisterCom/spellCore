@@ -1,0 +1,15 @@
+{
+	"type" : "entityTemplate",
+	"namespace" : "spell.entity",
+	"name" : "camera",
+	"components" : [
+		{
+			"templateId" : "spell.component.2d.transform",
+			"config" : {}
+		},
+		{
+			"templateId" : "spell.component.2d.graphics.camera",
+			"config" : {}
+		}
+	]
+}

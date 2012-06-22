@@ -30,7 +30,7 @@ define(
 		 * private
 		 */
 
-		var LIBRARY_BLUEPRINTS_PATH = '/library/blueprints'
+		var LIBRARY_TEMPLATES_PATH = '/library/templates'
 		var LIBRARY_SCRIPTS_PATH    = '/library/scripts'
 
 		/**
@@ -80,7 +80,7 @@ define(
 				'public/output',
 				'public/output/resources',
 				'library',
-				'library/blueprints',
+				'library/templates',
 				'library/assets'
 			]
 
@@ -115,8 +115,8 @@ define(
 				)
 			}
 
-			// copy spell sdk blueprints, scripts
-			copyDirectory( spellPath + LIBRARY_BLUEPRINTS_PATH, projectPath + LIBRARY_BLUEPRINTS_PATH )
+			// copy spell sdk templates, scripts
+			copyDirectory( spellPath + LIBRARY_TEMPLATES_PATH, projectPath + LIBRARY_TEMPLATES_PATH )
 			copyDirectory( spellPath + LIBRARY_SCRIPTS_PATH, projectPath + LIBRARY_SCRIPTS_PATH )
 
 

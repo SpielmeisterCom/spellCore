@@ -8,7 +8,7 @@ define(
 		'spell/shared/build/executable/buildHtml5Executable',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
-		'spell/shared/util/blueprints/BlueprintManager',
+		'spell/shared/util/template/TemplateManager',
 		'spell/shared/util/createAssetId',
 
 		'amd-helper',
@@ -30,7 +30,7 @@ define(
 		buildHtml5Executable,
 		isDirectory,
 		isFile,
-		BlueprintManager,
+		TemplateManager,
 		createAssetId,
 
 		amdHelper,
@@ -51,7 +51,7 @@ define(
 		 * private
 		 */
 
-		var LIBRARY_BLUEPRINTS_PATH = '/library/blueprints'
+		var LIBRARY_TEMPLATES_PATH = '/library/templates'
 		var LIBRARY_SCRIPTS_PATH = '/library/scripts'
 
 		var runtimeModuleRequirejsTemplate = [
@@ -90,21 +90,21 @@ define(
 			return glob.sync( filePathPattern, {} )
 		}
 
-		var loadBlueprints = function( blueprintManager, blueprints, type ) {
+		var loadTemplates = function( templateManager, templates, type ) {
 			var errors = []
 
 			_.each(
-				_.filter( blueprints, function( blueprint ) { return blueprint.blueprint.type === type } ),
-				function( blueprint ) {
+				_.filter( templates, function( template ) { return template.template.type === type } ),
+				function( template ) {
 					try {
-						blueprintManager.add( blueprint.blueprint )
+						templateManager.add( template.template )
 
 					} catch( e ) {
-						var regex = /Error: Blueprint definition '(.*)' already exists./,
+						var regex = /Error: Template definition '(.*)' already exists./,
 							match = e.match( regex )
 
 						if( match ) {
-							errors.push( 'Error: Overwriting of blueprint \'' + match[ 1 ] + '\' by blueprint definition in file \'' + blueprint.filePath + '\' was prevented.' )
+							errors.push( 'Error: Overwriting of template \'' + match[ 1 ] + '\' by template definition in file \'' + template.filePath + '\' was prevented.' )
 						}
 					}
 				}
@@ -113,16 +113,16 @@ define(
 			return errors
 		}
 
-		var loadBlueprintsFromPaths = function( blueprintManager, filePaths ) {
+		var loadTemplatesFromPaths = function( templateManager, filePaths ) {
 			var errors = []
 
-			var blueprints = _.reduce(
+			var templates = _.reduce(
 				filePaths,
 				function( memo, filePath ) {
 					var data = fs.readFileSync( filePath, 'utf-8')
 
 					try {
-						var blueprint = JSON.parse( data )
+						var template = JSON.parse( data )
 
 					} catch( e ) {
 						if( _s.startsWith( e, 'SyntaxError' ) ) {
@@ -133,7 +133,7 @@ define(
 					}
 
 					return memo.concat( {
-						blueprint : blueprint,
+						template : template,
 						filePath : filePath
 					} )
 				},
@@ -141,45 +141,45 @@ define(
 			)
 
 			errors = errors.concat(
-				loadBlueprints( blueprintManager, blueprints, 'componentBlueprint' )
+				loadTemplates( templateManager, templates, 'componentTemplate' )
 			)
 
 			if( errors.length > 0 ) return errors
 
 
 			errors = errors.concat(
-				loadBlueprints( blueprintManager, blueprints, 'entityBlueprint' )
+				loadTemplates( templateManager, templates, 'entityTemplate' )
 			)
 
 			if( errors.length > 0 ) return errors
 
 
 			errors = errors.concat(
-				loadBlueprints( blueprintManager, blueprints, 'systemBlueprint' )
+				loadTemplates( templateManager, templates, 'systemTemplate' )
 			)
 
 			return errors
 		}
 
-		var loadBlueprintsFromLibrary = function( blueprintManager, libraryPaths ) {
+		var loadTemplatesFromLibrary = function( templateManager, libraryPaths ) {
 			var errors = [],
 				filePaths = createFilePaths( libraryPaths, [ 'json' ] )
 
 			errors = errors.concat(
-				loadBlueprintsFromPaths( blueprintManager, filePaths )
+				loadTemplatesFromPaths( templateManager, filePaths )
 			)
 
 			return errors
 		}
 
-		var hasAllBlueprints = function( blueprintManager, blueprintIds ) {
+		var hasAllTemplates = function( templateManager, templateIds ) {
 			var errors = []
 
 			_.each(
-				blueprintIds,
-				function( blueprintId ) {
-					if( !blueprintManager.hasBlueprint( blueprintId ) ) {
-						errors.push( 'Error: Required blueprint \'' + blueprintId + '\' could not be found.' )
+				templateIds,
+				function( templateId ) {
+					if( !templateManager.hasTemplate( templateId ) ) {
+						errors.push( 'Error: Required template \'' + templateId + '\' could not be found.' )
 					}
 				}
 			)
@@ -209,27 +209,27 @@ define(
 			)
 		}
 
-		var createDependencyScriptIds = function( blueprintManager, systemBlueprintIds ) {
+		var createDependencyScriptIds = function( templateManager, systemTemplateIds ) {
 			return _.reduce(
-				systemBlueprintIds,
-				function( memo, blueprintId ) {
-					return memo.concat( blueprintManager.getBlueprint( blueprintId).scriptId )
+				systemTemplateIds,
+				function( memo, templateId ) {
+					return memo.concat( templateManager.getTemplate( templateId).scriptId )
 				},
 				[]
 			)
 		}
 
 		/**
-		 * Returns all dependent component blueprint ids
+		 * Returns all dependent component template ids
 		 */
-		var getDependencyBlueprintIds = function( blueprintManager, blueprintIds, path ) {
+		var getDependencyTemplateIds = function( templateManager, templateIds, path ) {
 			return _.reduce(
-				blueprintIds,
-				function( memo, blueprintId ) {
+				templateIds,
+				function( memo, templateId ) {
 					return _.union(
 						memo,
 						jsonPath(
-							blueprintManager.getBlueprint( blueprintId ),
+							templateManager.getTemplate( templateId ),
 							path
 						)
 					)
@@ -238,23 +238,23 @@ define(
 			)
 		}
 
-		var createBlueprintList = function( blueprintManager, blueprintIds ) {
+		var createTemplateList = function( templateManager, templateIds ) {
 			return _.map(
-				blueprintIds,
-				function( blueprintId ) {
-					return blueprintManager.getBlueprint( blueprintId )
+				templateIds,
+				function( templateId ) {
+					return templateManager.getTemplate( templateId )
 				}
 			)
 		}
 
-		var createSceneList = function( blueprintManager, scenes ) {
+		var createSceneList = function( templateManager, scenes ) {
 			return _.map(
 				scenes,
 				function( scene ) {
 					var reducedEntityConfig = _.map(
 						scene.entities,
 						function( entityConfig ) {
-							return createReducedEntityConfig( blueprintManager, entityConfig )
+							return createReducedEntityConfig( templateManager, entityConfig )
 						}
 					)
 
@@ -268,14 +268,14 @@ define(
 			)
 		}
 
-		var createRuntimeModule = function( projectName, startSceneId, scenes, componentBlueprints, entityBlueprints, systemBlueprints, assets, resources, modules ) {
+		var createRuntimeModule = function( projectName, startSceneId, scenes, componentTemplates, entityTemplates, systemTemplates, assets, resources, modules ) {
 			var runtimeModule = {
 				name: projectName,
 				startScene : startSceneId,
 				scenes : scenes,
-				componentBlueprints : componentBlueprints,
-				entityBlueprints : entityBlueprints,
-				systemBlueprints : systemBlueprints,
+				componentTemplates : componentTemplates,
+				entityTemplates : entityTemplates,
+				systemTemplates : systemTemplates,
 				resources : resources,
 				assets : assets
 			}
@@ -388,7 +388,7 @@ define(
 
 		return function( target, spellPath, projectPath, projectFilePath, callback ) {
 			var errors               = [],
-				projectBlueprintPath = projectPath + LIBRARY_BLUEPRINTS_PATH
+				projectTemplatePath = projectPath + LIBRARY_TEMPLATES_PATH
 
 			// parsing project config file
 			var data = fs.readFileSync( projectFilePath, 'utf-8'),
@@ -406,26 +406,26 @@ define(
 			}
 
 
-			// read all blueprint files from blueprint library
-			var blueprintManager = new BlueprintManager()
-			errors = loadBlueprintsFromLibrary( blueprintManager, [ projectBlueprintPath ] )
+			// read all template files from template library
+			var templateManager = new TemplateManager()
+			errors = loadTemplatesFromLibrary( templateManager, [ projectTemplatePath ] )
 
 			if( _.size( errors ) > 0 ) callback( errors )
 
 
-			// determine all blueprints that are referenced in the project
-			var entityBlueprintIds    = _.unique( jsonPath( projectConfig, '$.scenes[*].entities[*].blueprintId' ) ),
-				systemBlueprintIds    = _.unique( _.flatten( jsonPath( projectConfig, '$.scenes[*].systems[*]' ) )),
-				componentBlueprintIds = _.union(
-					getDependencyBlueprintIds( blueprintManager, entityBlueprintIds, '$.components[*].blueprintId' ),
-					getDependencyBlueprintIds( blueprintManager, systemBlueprintIds, '$.input[*].blueprintId' )
+			// determine all templates that are referenced in the project
+			var entityTemplateIds    = _.unique( jsonPath( projectConfig, '$.scenes[*].entities[*].templateId' ) ),
+				systemTemplateIds    = _.unique( _.flatten( jsonPath( projectConfig, '$.scenes[*].systems[*]' ) )),
+				componentTemplateIds = _.union(
+					getDependencyTemplateIds( templateManager, entityTemplateIds, '$.components[*].templateId' ),
+					getDependencyTemplateIds( templateManager, systemTemplateIds, '$.input[*].templateId' )
 				)
 
 
-			// check if the required blueprints are available
-			errors = hasAllBlueprints( blueprintManager, entityBlueprintIds )
-			errors = errors.concat( hasAllBlueprints( blueprintManager, componentBlueprintIds ) )
-			errors = errors.concat( hasAllBlueprints( blueprintManager, systemBlueprintIds ) )
+			// check if the required templates are available
+			errors = hasAllTemplates( templateManager, entityTemplateIds )
+			errors = errors.concat( hasAllTemplates( templateManager, componentTemplateIds ) )
+			errors = errors.concat( hasAllTemplates( templateManager, systemTemplateIds ) )
 
 			if( _.size( errors ) > 0 ) callback( errors )
 
@@ -435,7 +435,7 @@ define(
 				scriptModules = amdHelper.loadModules( projectPath + LIBRARY_SCRIPTS_PATH )
 
 			// system script ids
-			var usedScriptIds = createDependencyScriptIds( blueprintManager, systemBlueprintIds )
+			var usedScriptIds = createDependencyScriptIds( templateManager, systemTemplateIds )
 
 			// scene script ids
 			usedScriptIds = usedScriptIds.concat(
@@ -465,7 +465,7 @@ define(
 
 
 			// copy referenced resources to output path
-			var sceneList = createSceneList( blueprintManager, projectConfig.scenes )
+			var sceneList = createSceneList( templateManager, projectConfig.scenes )
 
 			var relativeAssetsPath  = '/library/assets',
 				spellTexturesPath   = spellPath + relativeAssetsPath,
@@ -520,9 +520,9 @@ define(
 				projectConfig.name,
 				projectConfig.startScene,
 				sceneList,
-				createBlueprintList( blueprintManager, componentBlueprintIds ),
-				createBlueprintList( blueprintManager, entityBlueprintIds ),
-				createBlueprintList( blueprintManager, systemBlueprintIds ),
+				createTemplateList( templateManager, componentTemplateIds ),
+				createTemplateList( templateManager, entityTemplateIds ),
+				createTemplateList( templateManager, systemTemplateIds ),
 				assets,
 				resourceIds,
 				createModuleList(

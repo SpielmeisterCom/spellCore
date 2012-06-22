@@ -1,16 +1,16 @@
 {
-	"type" : "systemBlueprint",
+	"type" : "systemTemplate",
 	"namespace" : "spell.system",
 	"name" : "keyInput",
 
 	"input" : [
 		{
 			"name" : "actors",
-			"blueprintId" : "spell.component.actor"
+			"templateId" : "spell.component.actor"
 		},
 		{
 			"name" : "inputDefinitions",
-			"blueprintId" : "spell.component.inputDefinition"
+			"templateId" : "spell.component.inputDefinition"
 		}
 	],
 	"scriptId" : "spell/system/keyInput"

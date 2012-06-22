@@ -1,5 +1,5 @@
 {
-	"type" : "componentBlueprint",
+	"type" : "componentTemplate",
 	"namespace" : "spell.component",
 	"name" : "visualObject",
 	"doc" : "adds an visual representation to an entity",

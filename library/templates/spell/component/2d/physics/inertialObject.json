@@ -1,5 +1,5 @@
 {
-	"type" : "componentBlueprint",
+	"type" : "componentTemplate",
 	"namespace" : "spellReferenceProject.component.2d.physics",
 	"name" : "inertialObject",
 	"attributes" : [

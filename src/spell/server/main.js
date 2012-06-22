@@ -5,7 +5,7 @@ define(
 		'spell/server/util/createMainLoop',
 		'spell/server/util/connect/extDirect',
 		'spell/server/util/network/network',
-		'spell/shared/util/blueprints/BlueprintManager',
+		'spell/shared/util/template/TemplateManager',
 		'spell/shared/util/networkProtocol',
 		'spell/shared/util/network/Messages',
 		'spell/shared/util/EventManager',
@@ -26,7 +26,7 @@ define(
 		createMainLoop,
 		extDirect,
 		network,
-		BlueprintManager,
+		TemplateManager,
 		networkProtocol,
 		Messages,
 		EventManager,
@@ -149,7 +149,7 @@ define(
 
 
 			var eventManager = new EventManager()
-			var entityManager = new EntityManager( new BlueprintManager() )
+			var entityManager = new EntityManager( new TemplateManager() )
 
 			var globals = {},
 				mainLoop = undefined

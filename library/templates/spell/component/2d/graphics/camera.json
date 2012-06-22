@@ -1,5 +1,5 @@
 {
-	"type" : "componentBlueprint",
+	"type" : "componentTemplate",
 	"namespace" : "spell.component.2d.graphics",
 	"name" : "camera",
 	"attributes" : [

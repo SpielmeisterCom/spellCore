@@ -1,10 +1,10 @@
 {
-	"type" : "entityBlueprint",
+	"type" : "entityTemplate",
 	"namespace" : "spell.entity",
 	"name" : "inputDefinition",
 	"components" : [
 		{
-			"blueprintId" : "spell.component.inputDefinition",
+			"templateId" : "spell.component.inputDefinition",
 			"config" : {}
 		}
 	]

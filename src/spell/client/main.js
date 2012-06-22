@@ -6,7 +6,7 @@ define(
 		'spell/shared/util/createMainLoop',
 		'spell/shared/util/entities/EntityManager',
 		'spell/shared/util/scene/SceneManager',
-		'spell/shared/util/blueprints/BlueprintManager',
+		'spell/shared/util/template/TemplateManager',
 		'spell/shared/util/ConfigurationManager',
 		'spell/shared/util/EventManager',
 		'spell/shared/util/InputManager',
@@ -25,7 +25,7 @@ define(
 		createMainLoop,
 		EntityManager,
 		SceneManager,
-		BlueprintManager,
+		TemplateManager,
 		ConfigurationManager,
 		EventManager,
 		InputManager,
@@ -46,25 +46,25 @@ define(
 
 		var debugCallback
 
-		var loadBlueprints = function( blueprintManager, runtimeModule ) {
+		var loadTemplates = function( templateManager, runtimeModule ) {
 			_.each(
-				runtimeModule.componentBlueprints,
-				function( componentBlueprint ) {
-					blueprintManager.add( componentBlueprint )
+				runtimeModule.componentTemplates,
+				function( componentTemplate ) {
+					templateManager.add( componentTemplate )
 				}
 			)
 
 			_.each(
-				runtimeModule.entityBlueprints,
-				function( entityBlueprint ) {
-					blueprintManager.add( entityBlueprint )
+				runtimeModule.entityTemplates,
+				function( entityTemplate ) {
+					templateManager.add( entityTemplate )
 				}
 			)
 
 			_.each(
-				runtimeModule.systemBlueprints,
-				function( systemBlueprint ) {
-					blueprintManager.add( systemBlueprint )
+				runtimeModule.systemTemplates,
+				function( systemTemplate ) {
+					templateManager.add( systemTemplate )
 				}
 			)
 		}
@@ -83,9 +83,9 @@ define(
 			inputManager         = new InputManager( configurationManager ),
 			resourceLoader       = new ResourceLoader( runtimeModule.name, soundManager, renderingContext, eventManager, configurationManager.resourceServer ),
 			statisticsManager    = new StatisticsManager(),
-			blueprintManager     = new BlueprintManager(),
+			templateManager      = new TemplateManager(),
 			mainLoop             = createMainLoop( eventManager, statisticsManager ),
-			SceneManager          = new SceneManager( globals, mainLoop )
+			SceneManager         = new SceneManager( globals, mainLoop )
 
 		statisticsManager.init()
 
@@ -102,16 +102,16 @@ define(
 			Logger.debug( 'client started' )
 
 
-			loadBlueprints( blueprintManager, runtimeModule )
+			loadTemplates( templateManager, runtimeModule )
 
 			_.extend(
 				globals,
 				{
 					assets               : createAssets( runtimeModule.assets ),
 					configurationManager : configurationManager,
-					blueprintManager     : blueprintManager,
+					templateManager      : templateManager,
 					eventManager         : eventManager,
-					entityManager        : new EntityManager( blueprintManager ),
+					entityManager        : new EntityManager( templateManager ),
 					inputManager         : inputManager,
 					inputEvents          : inputManager.getInputEvents(),
 					renderingContext     : renderingContext,
@@ -119,7 +119,7 @@ define(
 					resources            : resourceLoader.getResources(),
 					statisticsManager    : statisticsManager,
 					soundManager         : soundManager,
-					SceneManager          : SceneManager,
+					SceneManager         : SceneManager,
 					runtimeModule        : runtimeModule
 				}
 			)

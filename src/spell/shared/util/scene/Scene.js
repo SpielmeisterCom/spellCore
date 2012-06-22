@@ -42,14 +42,14 @@ define(
 			)
 		}
 
-		var createSystem = function( globals, blueprintManager, entityManager, systemBlueprintId ) {
-			var blueprint = blueprintManager.getBlueprint( systemBlueprintId ),
-				constructor = requireScript( blueprint.scriptId )
+		var createSystem = function( globals, templateManager, entityManager, systemTemplateId ) {
+			var template = templateManager.getTemplate( systemTemplateId ),
+				constructor = requireScript( template.scriptId )
 
 			var constructorArgs = _.reduce(
-				blueprint.input,
+				template.input,
 				function( memo, inputDefinition ) {
-					memo.push( entityManager.getComponentsById( inputDefinition.blueprintId ) )
+					memo.push( entityManager.getComponentsById( inputDefinition.templateId ) )
 
 					return memo
 				},
@@ -60,14 +60,14 @@ define(
 			return create( constructor, constructorArgs )
 		}
 
-		var createSystems = function( globals, systemBlueprintIds ) {
-			var blueprintManager = globals.blueprintManager,
+		var createSystems = function( globals, systemTemplateIds ) {
+			var templateManager = globals.templateManager,
 				entityManager    = globals.entityManager
 
 			return _.map(
-				systemBlueprintIds,
-				function( systemBlueprintId ) {
-					return createSystem( globals, blueprintManager, entityManager, systemBlueprintId )
+				systemTemplateIds,
+				function( systemTemplateId ) {
+					return createSystem( globals, templateManager, entityManager, systemTemplateId )
 				}
 			)
 		}
@@ -79,7 +79,7 @@ define(
 
 		var Scene = function( globals ) {
 			this.globals          = globals
-			this.blueprintManager = globals.blueprintManager
+			this.templateManager = globals.templateManager
 			this.renderSystems    = null
 			this.updateSystems    = null
 			this.script           = null
