@@ -349,8 +349,14 @@ define(
 					if( _.has( memo, assetId ) ) throw 'Error: Duplicate definition of asset \'' + assetId + '\'.'
 
 					var record = {
-						type : asset.type,
-						resourceId : asset.file
+						type : asset.type
+					}
+
+					if( asset.type === 'animation' ) {
+						record.assetId = asset.assetId
+
+					} else {
+						record.resourceId = asset.file
 					}
 
 					if( asset.config ) record.config = asset.config
@@ -364,7 +370,15 @@ define(
 		}
 
 		var createResourceList = function( assets ) {
-			return _.unique( _.pluck( assets, 'resourceId' ) )
+			return _.reduce(
+				assets,
+				function( memo, asset ) {
+					if( !_.has( asset, 'resourceId' ) ) return memo
+
+					return _.union( memo, asset.resourceId )
+				},
+				[]
+			)
 		}
 
 

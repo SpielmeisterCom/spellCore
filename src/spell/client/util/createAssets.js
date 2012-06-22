@@ -24,31 +24,29 @@ define(
 			]
 		}
 
-		var createAnimatedAppearanceAsset = function( asset ) {
-			var numX = Math.floor( asset.config.textureWidth / asset.config.frameWidth ),
-				numY = Math.floor( asset.config.textureHeight / asset.config.frameHeight ),
-				createFrameOffsetPartial = _.bind( createFrameOffset, null, asset.config.frameWidth, asset.config.frameHeight )
+		var createAnimationAsset = function( assets, asset ) {
+			var spriteSheetAssetId = asset.assetId,
+				spriteSheetAsset   = assets[ spriteSheetAssetId ]
 
-			return _.reduce(
-				asset.config.animations,
-				function( memo, animation, animationId ) {
-					memo.animations[ animationId ] = {
-						frameDuration : animation.frameDuration,
-						loop          : animation.loop,
-						numFrames     : _.size( animation.frameIds ),
-						offsets       : _.map( animation.frameIds, function( frameId ) { return createFrameOffsetPartial( numX, numY, frameId ) } )
-					}
+			if( !spriteSheetAsset ) throw 'Error: Could not find asset with id \'' + spriteSheetAssetId + '\'.'
 
-					return memo
-				},
-				{
-					type : asset.type,
-					resourceId : asset.resourceId,
-					frameWidth : asset.config.frameWidth,
-					frameHeight : asset.config.frameHeight,
-					animations : {}
-				}
-			)
+			var frameWidth  = spriteSheetAsset.config.frameWidth,
+				frameHeight = spriteSheetAsset.config.frameHeight,
+				numX        = Math.floor( spriteSheetAsset.config.textureWidth / frameWidth ),
+				numY        = Math.floor( spriteSheetAsset.config.textureHeight / frameHeight ),
+				numFrames   = _.size( asset.config.frameIds),
+				createFrameOffsetPartial = _.bind( createFrameOffset, null, frameWidth, frameHeight )
+
+			return {
+				type :          asset.type,
+				resourceId :    spriteSheetAsset.resourceId,
+				frameWidth :    frameWidth,
+				frameHeight :   frameHeight,
+				frameDuration : asset.config.duration / numFrames,
+				frameOffsets :  _.map( asset.config.frameIds, function( frameId ) { return createFrameOffsetPartial( numX, numY, frameId ) } ),
+				numFrames :     numFrames,
+				looped :        asset.config.looped
+			}
 		}
 
 
@@ -59,15 +57,15 @@ define(
 		return function( assets ) {
 			return _.reduce(
 				assets,
-				function( memo, asset, id ) {
+				function( memo, asset, id, assets ) {
 					if( asset.type === 'appearance' ) {
 						memo[ id ] = createAppearanceAsset( asset )
 
-					} else if( asset.type === 'animatedAppearance' ) {
-						memo[ id ] = createAnimatedAppearanceAsset( asset )
+					} else if( asset.type === 'animation' ) {
+						memo[ id ] = createAnimationAsset( assets, asset )
 
 					} else {
-						throw 'Error: Unknown asset type \'' + asset.type + '\'.'
+						memo[ id ] = asset
 					}
 
 					return memo
