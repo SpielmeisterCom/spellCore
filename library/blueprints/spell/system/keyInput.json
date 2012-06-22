@@ -6,11 +6,11 @@
 	"input" : [
 		{
 			"name" : "actors",
-			"blueprintId" : "spell.component.core.actor"
+			"blueprintId" : "spell.component.actor"
 		},
 		{
 			"name" : "inputDefinitions",
-			"blueprintId" : "spell.component.core.inputDefinition"
+			"blueprintId" : "spell.component.inputDefinition"
 		}
 	],
 	"scriptId" : "spell/system/keyInput"

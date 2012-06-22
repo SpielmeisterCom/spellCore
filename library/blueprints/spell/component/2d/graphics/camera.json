@@ -1,13 +1,8 @@
 {
 	"type" : "componentBlueprint",
-	"namespace" : "spell.component.core.graphics2d",
+	"namespace" : "spell.component.2d.graphics",
 	"name" : "camera",
 	"attributes" : [
-		{
-			"name" : "position",
-			"type" : "vec2",
-			"default" : [ 0, 0 ]
-		},
 		{
 			"name" : "width",
 			"type" : "integer",

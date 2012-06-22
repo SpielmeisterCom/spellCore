@@ -4,7 +4,11 @@
 	"name" : "camera",
 	"components" : [
 		{
-			"blueprintId" : "spell.component.core.graphics2d.camera",
+			"blueprintId" : "spell.component.2d.transform",
+			"config" : {}
+		},
+		{
+			"blueprintId" : "spell.component.2d.graphics.camera",
 			"config" : {}
 		}
 	]

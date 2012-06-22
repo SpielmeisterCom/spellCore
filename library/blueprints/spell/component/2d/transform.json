@@ -1,0 +1,22 @@
+{
+	"type" : "componentBlueprint",
+	"namespace" : "spell.component.2d",
+	"name" : "transform",
+	"attributes" : [
+		{
+			"name" : "position",
+			"type" : "vec2",
+			"default" : [ 0, 0 ]
+		},
+		{
+			"name" : "rotation",
+			"type" : "number",
+			"default" : 0
+		},
+		{
+			"name" : "scale",
+			"type" : "vec2",
+			"default" : [ 1, 1 ]
+		}
+	]
+}

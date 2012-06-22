@@ -1,0 +1,12 @@
+{
+	"type" : "componentBlueprint",
+	"namespace" : "spell.component.2d.graphics",
+	"name" : "appearance",
+	"attributes" : [
+		{
+			"name" : "assetId",
+			"type" : "assetId:appearance",
+			"default" : "appearance:spell/not_defined"
+		}
+	]
+}

@@ -1,0 +1,20 @@
+{
+	"type" : "componentBlueprint",
+	"namespace" : "spell.component",
+	"name" : "visualObject",
+	"doc" : "adds an visual representation to an entity",
+	"attributes" : [
+		{
+			"name" : "layer",
+			"type" : "integer",
+			"default" : 1,
+			"doc" : "the layer that the entity is drawn on"
+		},
+		{
+			"name" : "opacity",
+			"type" : "number",
+			"default" : 1.0,
+			"doc" : "the opacity that the entity is drawn with"
+		}
+	]
+}

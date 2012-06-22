@@ -5,20 +5,24 @@
 
 	"input" : [
 		{
-			"name" : "positions",
-			"blueprintId" : "spell.component.core.position"
+			"name" : "transforms",
+			"blueprintId" : "spell.component.2d.transform"
 		},
 		{
-			"name" : "rotations",
-			"blueprintId" : "spell.component.core.rotation"
+			"name" : "appearances",
+			"blueprintId" : "spell.component.2d.graphics.appearance"
 		},
 		{
-			"name" : "renderComponents",
-			"blueprintId" : "spell.component.core.graphics2d.render"
+			"name" : "animatedAppearances",
+			"blueprintId" : "spell.component.2d.graphics.animatedAppearance"
+		},
+		{
+			"name" : "visualObjects",
+			"blueprintId" : "spell.component.visualObject"
 		},
 		{
 			"name" : "cameras",
-			"blueprintId" : "spell.component.core.graphics2d.camera"
+			"blueprintId" : "spell.component.2d.graphics.camera"
 		}
 	],
 	"scriptId" : "spell/system/render"

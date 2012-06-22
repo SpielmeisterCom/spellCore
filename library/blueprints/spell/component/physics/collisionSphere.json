@@ -1,0 +1,15 @@
+{
+	"type" : "componentBlueprint",
+	"namespace" : "spell.component.physics",
+	"name" : "collisionSphere",
+	"title" : "Collision Sphere",
+	"doc" : "provides a collision sphere for 2d, 3d and higher dimensions",
+	"attributes" : [
+		{
+			"name" : "radius",
+			"doc" : "the radius of the sphere",
+			"type" : "number",
+			"default" : 1
+		}
+	]
+}
