@@ -79,10 +79,8 @@ define(
 		 */
 
 		var KeyInput = function( globals, actors, inputDefinitions ) {
-			this.inputEvents      = globals.inputEvents
-			this.inputManager     = globals.inputManager
-			this.actors           = actors
-			this.inputDefinitions = inputDefinitions
+			this.inputEvents  = globals.inputEvents
+			this.inputManager = globals.inputManager
 		}
 
 		KeyInput.prototype = {

@@ -46,18 +46,18 @@ define(
 			var template = templateManager.getTemplate( systemTemplateId ),
 				constructor = requireScript( template.scriptId )
 
-			var constructorArgs = _.reduce(
+			var componentsInput = _.reduce(
 				template.input,
 				function( memo, inputDefinition ) {
-					memo.push( entityManager.getComponentsById( inputDefinition.templateId ) )
+					memo[ inputDefinition.name ] = entityManager.getComponentsById( inputDefinition.templateId )
 
 					return memo
 				},
-				[ globals ]
+				{}
 			)
 
 			// TODO: Fix create. Returned instances do not support prototype chain method look-up. O_o
-			return create( constructor, constructorArgs )
+			return create( constructor, [ globals ], componentsInput )
 		}
 
 		var createSystems = function( globals, systemTemplateIds ) {
