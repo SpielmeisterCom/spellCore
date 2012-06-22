@@ -2,12 +2,10 @@ define(
 	'spell/shared/util/template/TemplateManager',
 	[
 		'spell/shared/util/deepClone',
-		'spell/shared/util/template/createLocalComponentName',
 		'spell/shared/util/platform/underscore'
 	],
 	function(
 		deepClone,
-		createLocalComponentName,
 		_
 	) {
 		'use strict'
@@ -59,14 +57,14 @@ define(
 		}
 
 		var isValidEntityTemplate = function( template ) {
-			// check for ambiguous local component names
+			// check for duplicate components
 			var componentNameCounts = _.reduce(
 				template.components,
 				function( memo, componentConfig ) {
-					var localComponentName = createLocalComponentName( componentConfig.templateId, componentConfig.importName )
+					var templateId = componentConfig.templateId
 
-					memo[ localComponentName ] = ( _.has( memo, localComponentName ) ?
-						memo[ localComponentName ] += 1 :
+					memo[ templateId ] = ( _.has( memo, templateId ) ?
+						memo[ templateId ] += 1 :
 						1
 					)
 
@@ -140,10 +138,9 @@ define(
 					if( !componentTemplate ) throwCouldNotFindTemplate( componentTemplateId, templateTypes.TEMPLATE_TYPE_COMPONENT )
 
 
-					var localComponentName = createLocalComponentName( componentTemplateId, componentConfig.importName ),
-						hasSingleAttribute = isSingleAttributeComponent( componentTemplate.attributes )
+					var hasSingleAttribute = isSingleAttributeComponent( componentTemplate.attributes )
 
-					memo[ localComponentName ] = updateComponent(
+					memo[ componentTemplateId ] = updateComponent(
 						createComponentTemplate( componentTemplate, hasSingleAttribute ),
 						componentConfig.config,
 						hasSingleAttribute
