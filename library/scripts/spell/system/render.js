@@ -46,7 +46,7 @@ define(
 			mat4.translate( matrix, [ 0, 0, 0 ] ) // camera is located at (0/0/0); WATCH OUT: apply inverse translation
 		}
 
-		var createSortedByPass = function( renderDatas ) {
+		var createSortedByLayer = function( renderDatas ) {
 			return _.reduce(
 				renderDatas,
 				function( memo, renderData, id ) {
@@ -58,10 +58,10 @@ define(
 				[]
 			).sort(
 				function( a, b ) {
-					var passA = a.value.pass
-					var passB = b.value.pass
+					var layerA = a.value.layer
+					var layerB = b.value.layer
 
-					return ( passA < passB ? -1 : ( passA > passB ? 1 : 0 ) )
+					return ( layerA < layerB ? -1 : ( layerA > layerB ? 1 : 0 ) )
 				}
 			)
 		}
@@ -79,97 +79,71 @@ define(
 			return animationOffsetInMs / animationLengthInMs
 		}
 
-		var draw = function( context, deltaTimeInMs, assets, resources, positions, rotations, renderComponentSorted ) {
+		var draw = function( context, deltaTimeInMs, assets, resources, transforms, appearances, animatedAppearances, sortedVisualObjects ) {
 			_.each(
-				renderComponentSorted,
-				function( renderComponent ) {
-					var id              = renderComponent.id,
-						renderComponent = renderComponent.value
+				sortedVisualObjects,
+				function( visualObject ) {
+					var id           = visualObject.id,
+						visualObject = visualObject.value,
+						transform    = transforms[ id ]
 
 					context.save()
 					{
-						var asset   = assets[ renderComponent.assetId ],
-							texture = resources[ asset.resourceId ]
+						var appearance          = appearances[ id ] || animatedAppearances[ id ],
+							asset               = assets[ appearance.assetId ],
+							texture             = resources[ asset.resourceId ],
+							visualObjectOpacity = visualObject.opacity
 
 						if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
 
 
-						if( renderComponent.opacity !== 1.0 ) {
-							context.setGlobalAlpha( renderComponent.opacity )
+						if( visualObjectOpacity !== 1.0 ) {
+							context.setGlobalAlpha( visualObjectOpacity )
 						}
 
 						// object to world space transformation go here
-//						context.rotate( renderData.rotation )
-
-						vec2.set( positions[ id ], tmp )
+						vec2.set( transform.position, tmp )
 						context.translate( tmp )
 
-//						vec2.set( renderData.scale, tmp ) // vec2 -> vec3
-//						context.scale( tmp )
-
-
-						// appearance transformations go here
-						context.rotate( renderComponent.rotation + rotations[ id ] )
-
-						vec2.set( renderComponent.translation, tmp ) // vec2 -> vec3
-						context.translate( tmp )
-
+						context.rotate( transform.rotation )
 
 						if( asset.type === 'appearance' ) {
-							vec2.multiply( renderComponent.scale, [ texture.width, texture.height ], tmp )
+							vec2.multiply( transform.scale, [ texture.width, texture.height ], tmp )
 							context.scale( tmp )
 
 							context.drawTexture( texture, -0.5, -0.5, 1, 1 )
 
 						} else {
-							var animation   = asset.animations[ renderComponent.animationId ],
-								frameWidth  = asset.frameWidth,
-								frameHeight = asset.frameHeight
+							// asset.type === 'animation'
 
-							vec2.multiply( renderComponent.scale, [ frameWidth, frameHeight ], tmp )
+							var assetFrameWidth  = asset.frameWidth,
+								assetFrameHeight = asset.frameHeight,
+								assetNumFrames   = asset.numFrames
+
+							vec2.multiply( transform.scale, [ assetFrameWidth, assetFrameHeight ], tmp )
 							context.scale( tmp )
 
-							renderComponent.animationOffset = createAnimationOffset(
+							appearance.animationOffset = createAnimationOffset(
 								deltaTimeInMs,
-								renderComponent.animationOffset,
-								renderComponent.animationSpeedFactor,
-								animation.numFrames,
-								animation.frameDuration,
-								animation.loop
+								appearance.animationOffset,
+								appearance.animationSpeedFactor,
+								assetNumFrames,
+								asset.frameDuration,
+								asset.looped
 							)
 
-							var frameId = Math.floor( renderComponent.animationOffset * ( animation.numFrames - 1 ) ),
-								offset = animation.offsets[ frameId ]
+							var frameId = Math.floor( appearance.animationOffset * ( assetNumFrames - 1 ) ),
+								frameOffset = asset.frameOffsets[ frameId ]
 
-							context.drawSubTexture( texture, offset[ 0 ], offset[ 1 ], frameWidth, frameHeight, -0.5, -0.5, 1, 1 )
+							context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameWidth, assetFrameHeight, -0.5, -0.5, 1, 1 )
 						}
 					}
 					context.restore()
 				}
 			)
-
-//			// draw origins
-//			context.setFillStyleColor( [ 1.0, 0.0, 1.0 ] )
-//
-//			_.each(
-//				entities,
-//				function( entity ) {
-//					var renderData = entity.renderData
-//
-//					context.save()
-//					{
-//						// object to world space transformation go here
-//						context.translate( renderData.position )
-//						context.rotate( renderData.orientation )
-//
-//						context.fillRect( -2, -2, 4, 4 )
-//					}
-//					context.restore()
-//				}
-//			)
 		}
 
-		var setCamera = function( context, cameras, worldToView ) {
+		var setCamera = function( context, cameras, transforms, worldToView ) {
 			if( _.size( cameras ) === 0 ) return
 
 			// Gets the first active camera. More than one camera being active is an undefined state and the first found active is used.
@@ -199,7 +173,7 @@ define(
 			mat4.ortho( -halfWidth, halfWidth, -halfHeight, halfHeight, 0, 100, worldToView )
 
 			// translating with the inverse camera position
-			vec2.set( activeCamera.position, tmp )
+			vec2.set( transforms[ currentCameraId ].position, tmp )
 			mat4.translate( worldToView, vec2.negate( tmp ) )
 
 			context.setViewMatrix( worldToView )
@@ -211,10 +185,19 @@ define(
 			// clear color buffer
 			context.clear()
 
-			setCamera( context, this.cameras, this.worldToView )
+			setCamera( context, this.cameras, this.transforms, this.worldToView )
 
-			// TODO: renderData should be presorted on the component list level by a user defined index, not here on every rendering tick
-			draw( context, deltaTimeInMs, this.assets, this.resources, this.positions, this.rotations, createSortedByPass( this.renderComponents ) )
+			// TODO: visualObjects should be presorted on the component list level by a user defined index, not here on every rendering tick
+			draw(
+				context,
+				deltaTimeInMs,
+				this.assets,
+				this.resources,
+				this.transforms,
+				this.appearances,
+				this.animatedAppearances,
+				createSortedByLayer( this.visualObjects )
+			)
 		}
 
 		var init = function( globals ) {}
