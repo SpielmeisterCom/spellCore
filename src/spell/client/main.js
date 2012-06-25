@@ -17,7 +17,9 @@ define(
 		'spell/shared/util/createDebugMessageHandler',
 		'spell/shared/util/platform/PlatformKit',
 
-		'spell/shared/util/platform/underscore'
+		'spell/shared/util/platform/underscore',
+
+		'glmatrix/glmatrix'
 	],
 	function(
 		runtimeModule,
@@ -37,6 +39,9 @@ define(
 		PlatformKit,
 
 		_,
+
+		// NOTE: forcing the build system to include glmatrix into the platform agnostic part of the engine
+		glmatrix,
 
 		// configuration parameters passed in from stage zero loader
 		parameters
