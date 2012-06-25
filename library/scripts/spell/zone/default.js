@@ -1,5 +1,5 @@
 define(
-	'spell/zone/default',
+	'spell/scene/default',
 	[
 		'spell/shared/util/Events',
 
@@ -19,24 +19,24 @@ define(
 
 		return {
 			cleanup : {},
-			init : function( globals, zoneEntityManager, zoneConfig ) {
+			init : function( globals, sceneEntityManager, sceneConfig ) {
 				var eventManager     = globals.eventManager,
 					resourceLoader   = globals.resourceLoader,
 					runtimeModule    = globals.runtimeModule,
-					resourceBundleId = zoneConfig.name
+					resourceBundleId = sceneConfig.name
 
 				if( _.size( runtimeModule.resources ) === 0 ) {
-					zoneEntityManager.createEntities( zoneConfig.entities )
+					sceneEntityManager.createEntities( sceneConfig.entities )
 
 				} else {
 					eventManager.subscribe(
 						[ Events.RESOURCE_LOADING_COMPLETED, resourceBundleId ],
 						function() {
-							zoneEntityManager.createEntities( zoneConfig.entities )
+							sceneEntityManager.createEntities( sceneConfig.entities )
 						}
 					)
 
-					// trigger loading of zone resources
+					// trigger loading of scene resources
 					resourceLoader.addResourceBundle( resourceBundleId, runtimeModule.resources )
 					resourceLoader.start()
 				}
