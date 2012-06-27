@@ -1,0 +1,16 @@
+{
+	"type" : "componentTemplate",
+	"namespace" : "spell.component.entityComposite",
+	"name" : "children",
+	"title" : "Children Entities",
+	"doc" : "This component holds references to entities that are subordinate to the current entity.",
+	"attributes" : [
+		{
+			"name" : "ids",
+			"doc" : "a list of children entity ids",
+			"type" : "list",
+			"default" : []
+		}
+	]
+}
+

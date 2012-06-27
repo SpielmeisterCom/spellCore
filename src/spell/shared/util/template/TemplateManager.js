@@ -188,19 +188,18 @@ define(
 				attributes[ 0 ].name === 'value'
 		}
 
-		var createComponentsFromEntityTemplate = function( templates, templateId, entity, config ) {
+		var createComponentsFromEntityTemplate = function( templates, entityTemplateId, entity, config ) {
 			return _.reduce(
 				config,
 				function( memo, componentConfig, componentId ) {
 					var componentTemplate = getTemplate( templates, componentId, templateTypes.TEMPLATE_TYPE_COMPONENT )
 
-					if( !_.has( memo, componentId ) ) {
-						throw 'Error: Entity template for entity template \'' + templateId + '\' is missing component \'' + componentId + '\'.' +
-							' Maybe you forgot to add the component to the entity template?'
+					if( !componentTemplate ) {
+						throw 'Error: Could not find component template \'' + componentId + '\' for \'' + entityTemplateId + '\'.'
 					}
 
 					memo[ componentId ] = updateComponent(
-						memo[ componentId ],
+						memo[ componentId ] || {},
 						componentConfig,
 						isSingleAttributeComponent( componentTemplate.attributes )
 					)

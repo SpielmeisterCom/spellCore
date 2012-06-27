@@ -9,6 +9,14 @@
 			"templateId" : "spell.component.2d.transform"
 		},
 		{
+			"name" : "roots",
+			"templateId" : "spell.component.entityComposite.root"
+		},
+		{
+			"name" : "childrenComponents",
+			"templateId" : "spell.component.entityComposite.children"
+		},
+		{
 			"name" : "appearances",
 			"templateId" : "spell.component.2d.graphics.appearance"
 		},

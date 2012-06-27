@@ -46,20 +46,24 @@ define(
 			mat4.translate( matrix, [ 0, 0, 0 ] ) // camera is located at (0/0/0); WATCH OUT: apply inverse translation
 		}
 
-		var createSortedByLayer = function( renderDatas ) {
+		var createSortedByLayer = function( roots, visualObjects ) {
 			return _.reduce(
-				renderDatas,
-				function( memo, renderData, id ) {
+				roots,
+				function( memo, root, id ) {
+					var visualObject = visualObjects[ id ]
+
+					if( !visualObject ) return memo
+
 					return memo.concat( {
 						id : id,
-						value : renderData
+						layer : visualObject.layer
 					} )
 				},
 				[]
 			).sort(
 				function( a, b ) {
-					var layerA = a.value.layer
-					var layerB = b.value.layer
+					var layerA = a.layer
+					var layerB = b.layer
 
 					return ( layerA < layerB ? -1 : ( layerA > layerB ? 1 : 0 ) )
 				}
@@ -79,68 +83,86 @@ define(
 			return animationOffsetInMs / animationLengthInMs
 		}
 
-		var draw = function( context, deltaTimeInMs, assets, resources, transforms, appearances, animatedAppearances, sortedVisualObjects ) {
-			_.each(
-				sortedVisualObjects,
-				function( visualObject ) {
-					var id           = visualObject.id,
-						visualObject = visualObject.value,
-						transform    = transforms[ id ]
+		var drawVisualObject = function(
+			context,
+			assets,
+			resources,
+			transforms,
+			appearances,
+			animatedAppearances,
+			childrenComponents,
+			visualObjects,
+			deltaTimeInMs,
+			id,
+			next
+		) {
+			var visualObject = visualObjects[ id ],
+				transform    = transforms[ id ]
 
-					context.save()
-					{
-						var appearance          = appearances[ id ] || animatedAppearances[ id ],
-							asset               = assets[ appearance.assetId ],
-							texture             = resources[ asset.resourceId ],
-							visualObjectOpacity = visualObject.opacity
+			context.save()
+			{
+				var appearance          = appearances[ id ] || animatedAppearances[ id ],
+					asset               = assets[ appearance.assetId ],
+					texture             = resources[ asset.resourceId ],
+					visualObjectOpacity = visualObject.opacity
 
-						if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
+				if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
 
 
-						if( visualObjectOpacity !== 1.0 ) {
-							context.setGlobalAlpha( visualObjectOpacity )
-						}
-
-						// object to world space transformation go here
-						vec2.set( transform.position, tmp )
-						context.translate( tmp )
-
-						context.rotate( transform.rotation )
-
-						if( asset.type === 'appearance' ) {
-							vec2.multiply( transform.scale, [ texture.width, texture.height ], tmp )
-							context.scale( tmp )
-
-							context.drawTexture( texture, -0.5, -0.5, 1, 1 )
-
-						} else {
-							// asset.type === 'animation'
-
-							var assetFrameWidth  = asset.frameWidth,
-								assetFrameHeight = asset.frameHeight,
-								assetNumFrames   = asset.numFrames
-
-							vec2.multiply( transform.scale, [ assetFrameWidth, assetFrameHeight ], tmp )
-							context.scale( tmp )
-
-							appearance.animationOffset = createAnimationOffset(
-								deltaTimeInMs,
-								appearance.animationOffset,
-								appearance.animationSpeedFactor,
-								assetNumFrames,
-								asset.frameDuration,
-								asset.looped
-							)
-
-							var frameId = Math.floor( appearance.animationOffset * ( assetNumFrames - 1 ) ),
-								frameOffset = asset.frameOffsets[ frameId ]
-
-							context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameWidth, assetFrameHeight, -0.5, -0.5, 1, 1 )
-						}
-					}
-					context.restore()
+				if( visualObjectOpacity !== 1.0 ) {
+					context.setGlobalAlpha( visualObjectOpacity )
 				}
-			)
+
+				// object to world space transformation go here
+				vec2.set( transform.position, tmp )
+				context.translate( tmp )
+
+				context.rotate( transform.rotation )
+
+				if( asset.type === 'appearance' ) {
+					vec2.multiply( transform.scale, [ texture.width, texture.height ], tmp )
+					context.scale( tmp )
+
+					context.drawTexture( texture, -0.5, -0.5, 1, 1 )
+
+				} else {
+					// asset.type === 'animation'
+
+					var assetFrameWidth  = asset.frameWidth,
+						assetFrameHeight = asset.frameHeight,
+						assetNumFrames   = asset.numFrames
+
+					vec2.multiply( transform.scale, [ assetFrameWidth, assetFrameHeight ], tmp )
+					context.scale( tmp )
+
+					appearance.animationOffset = createAnimationOffset(
+						deltaTimeInMs,
+						appearance.animationOffset,
+						appearance.animationSpeedFactor,
+						assetNumFrames,
+						asset.frameDuration,
+						asset.looped
+					)
+
+					var frameId = Math.floor( appearance.animationOffset * ( assetNumFrames - 1 ) ),
+						frameOffset = asset.frameOffsets[ frameId ]
+
+					context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameWidth, assetFrameHeight, -0.5, -0.5, 1, 1 )
+				}
+
+				// draw children
+				var children = childrenComponents[ id ]
+
+				if( children ) {
+					var childrenIds    = children.ids,
+						numChildrenIds = childrenIds.length
+
+					for( var i = 0; i < numChildrenIds; i++ ) {
+						next( deltaTimeInMs, childrenIds[ i ], next )
+					}
+				}
+			}
+			context.restore()
 		}
 
 		var setCamera = function( context, cameras, transforms, worldToView ) {
@@ -180,7 +202,8 @@ define(
 		}
 
 		var process = function( globals, timeInMs, deltaTimeInMs ) {
-			var context = this.context
+			var context = this.context,
+				drawVisualObjectPartial = this.drawVisualObjectPartial
 
 			// clear color buffer
 			context.clear()
@@ -188,15 +211,11 @@ define(
 			setCamera( context, this.cameras, this.transforms, this.worldToView )
 
 			// TODO: visualObjects should be presorted on the component list level by a user defined index, not here on every rendering tick
-			draw(
-				context,
-				deltaTimeInMs,
-				this.assets,
-				this.resources,
-				this.transforms,
-				this.appearances,
-				this.animatedAppearances,
-				createSortedByLayer( this.visualObjects )
+			_.each(
+				createSortedByLayer( this.roots, this.visualObjects ),
+				function( visualObject ) {
+					drawVisualObjectPartial( deltaTimeInMs, visualObject.id, drawVisualObjectPartial )
+				}
 			)
 		}
 
@@ -213,6 +232,18 @@ define(
 			this.assets    = globals.assets
 			this.resources = globals.resources
 			this.context   = globals.renderingContext
+			this.drawVisualObjectPartial = _.bind(
+				drawVisualObject,
+				null,
+				this.context,
+				this.assets,
+				this.resources,
+				this.transforms,
+				this.appearances,
+				this.animatedAppearances,
+				this.childrenComponents,
+				this.visualObjects
+			)
 
 			var eventManager = globals.eventManager,
 				context = this.context

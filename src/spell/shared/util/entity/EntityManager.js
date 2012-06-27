@@ -17,7 +17,9 @@ define(
 		 * private
 		 */
 
-		var nextEntityId = 0
+		var nextEntityId        = 0,
+			rootComponentId     = 'spell.component.entityComposite.root',
+			childrenComponentId = 'spell.component.entityComposite.children'
 
 		var getNextEntityId = function() {
 			return nextEntityId++
@@ -63,48 +65,118 @@ define(
 		}
 
 		/**
-		 * Extracts templateId and config object from the arguments
+		 * Normalizes the provided entity config
 		 *
-		 * @param arg0 first argument
-		 * @param arg1 second argument
+		 * @param arg0 can be either a entity template id or a entity config
 		 * @return {*}
 		 */
-		var extractCreateArguments = function( arg0, arg1 ) {
+		var normalizeEntityConfig = function( arg0 ) {
+			var templateId, config, children
+
+			if( !arg0 ) return
+
+			if( _.isString( arg0 ) ) {
+				templateId = arg0
+
+			} else if( _.isObject( arg0 ) ) {
+				var hasTemplateId = _.has( arg0, 'templateId'),
+					hasConfig     = _.has( arg0, 'config' )
+
+				if( hasTemplateId ) templateId = arg0.templateId
+				if( hasConfig ) config = arg0.config
+				if( !hasTemplateId && !hasConfig ) config = arg0
+				if( _.has( arg0, 'children' ) ) children = arg0.children
+			}
+
+			return {
+				templateId : templateId,
+				config : config,
+				children : children
+			}
+		}
+
+		/**
+		 * Normalizes the provided component config
+		 *
+		 * @param arg0 can be either a component template id or a component config
+		 * @return {*}
+		 */
+		var normalizeComponentConfig = function( arg0 ) {
 			var templateId,
 				config
 
 			if( !arg0 ) return
 
-			if( !arg1 ) {
-				if( _.isObject( arg0 ) ) {
-					/**
-					 * arg0 =  { ... } // config
-					 */
+			if( _.isString( arg0 ) ) {
+				templateId = arg0
+				config = {}
 
-					config = arg0
-
-				} else if( _.isString( arg0 ) ) {
-					/**
-					 * arg0 = 'templateId'
-					 */
-
-					templateId = arg0
+			} else if( _.isObject( arg0 ) ) {
+				if( !_.has( arg0, 'templateId' ) ) {
+					throw 'Error: Supplied invalid arguments.'
 				}
 
-			} else {
-				/**
-				 * arg0 = 'templateId'
-				 * arg1 = { ... } // config
-				 */
-
-				templateId = arg0
-				config      = arg1
+				templateId = arg0.templateId
+				config = arg0.config || {}
 			}
 
-			return {
-				templateId : templateId,
-				config : config
+			var result = {}
+			result[ templateId ] = config
+
+			return result
+		}
+
+		var createEntityCompositeConfig = function( isRoot, childEntityIds ) {
+			var result = {}
+
+			if( isRoot ) result[ rootComponentId ] = {}
+
+			if( _.size( childEntityIds ) > 0 ) {
+				result[ childrenComponentId ] = {
+					"ids" : childEntityIds
+				}
 			}
+
+			return result
+		}
+
+		var createEntity = function( components, templateManager, entityConfig, isRoot ) {
+			isRoot = ( isRoot === true || isRoot === undefined )
+			entityConfig = normalizeEntityConfig( entityConfig )
+
+			if( !entityConfig ) throw 'Error: Supplied invalid arguments.'
+
+			var templateId = entityConfig.templateId,
+				config     = entityConfig.config
+
+			if( !templateId && !config ) {
+				throw 'Error: Supplied invalid arguments.'
+			}
+
+			if( templateId && !templateManager.hasTemplate( templateId ) ) {
+				throw 'Error: Unknown template \'' + templateId + '\'. Could not create entity.'
+			}
+
+			// creating child entities
+			var childEntityIds = _.map(
+				entityConfig.children,
+				function( entityConfig ) {
+					return createEntity( components, templateManager, entityConfig, false )
+				}
+			)
+
+			// creating current entity
+			_.extend( config, createEntityCompositeConfig( isRoot, childEntityIds ) )
+
+			var entityId = getNextEntityId()
+
+			addComponents(
+				components,
+				entityId,
+				templateManager.createComponents( templateId, config || {} )
+			)
+
+			return entityId
 		}
 
 
@@ -121,35 +193,11 @@ define(
 			/**
 			 * Creates an entity
 			 *
-			 * @param arg0 can be a templateId or a config object
-			 * @param arg1 a config object
+			 * @param arg0 an entity template id or an entity config
 			 * @return {*}
 			 */
-			createEntity : function( arg0, arg1 ) {
-				var args = extractCreateArguments( arg0, arg1 )
-
-				if( !args ) throw 'Error: Supplied invalid arguments.'
-
-				var templateId = args.templateId,
-					config      = args.config
-
-				if( !templateId && !config ) {
-					throw 'Error: Supplied invalid arguments.'
-				}
-
-				if( templateId && !this.templateManager.hasTemplate( templateId ) ) {
-					throw 'Error: Unknown template \'' + templateId + '\'. Could not create entity.'
-				}
-
-				var entityId = getNextEntityId()
-
-				addComponents(
-					this.components,
-					entityId,
-					this.templateManager.createComponents( templateId, config || {} )
-				)
-
-				return entityId
+			createEntity : function( arg0 ) {
+				return createEntity( this.components, this.templateManager, arg0 )
 			},
 
 			/**
@@ -169,12 +217,7 @@ define(
 				_.each(
 					entityConfigs,
 					function( entityConfig ) {
-						if( _.has( entityConfig, 'templateId' ) ) {
-							self.createEntity( entityConfig.templateId, entityConfig.config )
-
-						} else {
-							self.createEntity( entityConfig.config )
-						}
+						self.createEntity( entityConfig )
 					}
 				)
 			},
@@ -183,21 +226,16 @@ define(
 			 * Adds a component to an entity
 			 *
 			 * @param entityId the id of the entity that the component belongs to
-			 * @param arg1 can be a templateId or config object
-			 * @param arg2 config object
+			 * @param arg1 can be a component template id or a component template config
 			 * @return {*}
 			 */
-			addComponent : function( entityId, arg1, arg2 ) {
+			addComponent : function( entityId, arg1 ) {
 				if( !entityId ) throw 'Error: Missing entity id.'
-
-				var args = extractCreateArguments( arg1, arg2 ),
-					entityConfig = {}
-					entityConfig[ args.templateId ] = args.config
 
 				addComponents(
 					this.components,
 					entityId,
-					this.templateManager.createComponents( null, entityConfig )
+					this.templateManager.createComponents( null, normalizeComponentConfig( arg1 ) )
 				)
 			},
 

@@ -63,6 +63,10 @@ define(
 			')'
 		].join( '\n' )
 
+		var rootComponentId              = 'spell.component.entityComposite.root',
+			childrenComponentId          = 'spell.component.entityComposite.children',
+			requiredComponentTemplateIds = [ rootComponentId, childrenComponentId ]
+
 		var createFilePaths = function( paths, extensions ) {
 			if( !extensions ||
 				extensions.length === 0 ) {
@@ -418,7 +422,8 @@ define(
 				systemTemplateIds    = _.unique( _.flatten( jsonPath( projectConfig, '$.scenes[*].systems[*]' ) )),
 				componentTemplateIds = _.union(
 					getDependencyTemplateIds( templateManager, entityTemplateIds, '$.components[*].templateId' ),
-					getDependencyTemplateIds( templateManager, systemTemplateIds, '$.input[*].templateId' )
+					getDependencyTemplateIds( templateManager, systemTemplateIds, '$.input[*].templateId' ),
+					requiredComponentTemplateIds
 				)
 
 
