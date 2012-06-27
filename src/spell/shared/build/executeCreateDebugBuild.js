@@ -94,12 +94,27 @@ define(
 			return glob.sync( filePathPattern, {} )
 		}
 
+		var checkTemplateValidity = function( template ) {
+			var entityId = template.namespace + '.' + template.name,
+				childEntityIds = jsonPath( template, '$..children[*].templateId' )
+
+			if( _.contains( childEntityIds, entityId ) ) {
+				return 'Error: Entity template \'' + entityId + '\' contains a reference to itself via its children.'
+			}
+
+			return false
+		}
+
 		var loadTemplates = function( templateManager, templates, type ) {
 			var errors = []
 
 			_.each(
 				_.filter( templates, function( template ) { return template.template.type === type } ),
 				function( template ) {
+					var error = checkTemplateValidity( template.template )
+
+					if( error ) errors.push( checkTemplateValidity( template.template ) )
+
 					try {
 						templateManager.add( template.template )
 
@@ -109,6 +124,9 @@ define(
 
 						if( match ) {
 							errors.push( 'Error: Overwriting of template \'' + match[ 1 ] + '\' by template definition in file \'' + template.filePath + '\' was prevented.' )
+
+						} else {
+							errors.push( e.toString() )
 						}
 					}
 				}
@@ -132,7 +150,7 @@ define(
 						if( _s.startsWith( e, 'SyntaxError' ) ) {
 							errors.push( 'Error: Unexpected token \'' + _.last( e.toString().split( ' ' ) ) + '\' while parsing file \'' + filePath + '\'.' )
 
-							return errors
+							return memo
 						}
 					}
 

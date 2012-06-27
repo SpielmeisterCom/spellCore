@@ -73,10 +73,16 @@ define(
 				{}
 			)
 
-			return !_.any(
+			_.each(
 				componentNameCounts,
-				function( iter ) { return iter > 1 }
+				function( componentNameCount, componentName ) {
+					if( componentNameCount > 1 ) {
+						throw 'Error: Entity template \'' + template.templateId + '\' has duplicate component of type \'' + componentName + '\'.'
+					}
+				}
 			)
+
+			return true
 		}
 
 		var isValidDefinition = function( template ) {
