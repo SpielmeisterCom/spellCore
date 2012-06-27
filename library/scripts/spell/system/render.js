@@ -114,7 +114,7 @@ define(
 				}
 
 				// object to world space transformation go here
-				vec2.set( transform.position, tmp )
+				vec2.set( transform.translation, tmp )
 				context.translate( tmp )
 
 				context.rotate( transform.rotation )
@@ -195,7 +195,7 @@ define(
 			mat4.ortho( -halfWidth, halfWidth, -halfHeight, halfHeight, 0, 100, worldToView )
 
 			// translating with the inverse camera position
-			vec2.set( transforms[ currentCameraId ].position, tmp )
+			vec2.set( transforms[ currentCameraId ].translation, tmp )
 			mat4.translate( worldToView, vec2.negate( tmp ) )
 
 			context.setViewMatrix( worldToView )
