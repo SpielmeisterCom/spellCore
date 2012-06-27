@@ -31,7 +31,7 @@ define(
 		 */
 
 		var LIBRARY_TEMPLATES_PATH = '/library/templates'
-		var LIBRARY_SCRIPTS_PATH    = '/library/scripts'
+		var LIBRARY_SCRIPTS_PATH   = '/library/scripts'
 
 		/**
 		 * Copies the contents of source path to target path recursively

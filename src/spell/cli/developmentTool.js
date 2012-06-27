@@ -5,6 +5,7 @@ define(
 
 		'spell/shared/build/executeCreateDebugBuild',
 		'spell/shared/build/initializeProjectDirectory',
+		'spell/shared/build/exportDeploymentArchive',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
 
@@ -18,6 +19,7 @@ define(
 
 		executeCreateDebugBuild,
 		initializeProjectDirectory,
+		exportDeploymentArchive,
 		isDirectory,
 		isFile,
 
@@ -37,16 +39,16 @@ define(
 			console.error( tmp.join( '\n' ) )
 		}
 
-		var onBuildComplete = function( errors ) {
+		var onComplete = function( action, errors ) {
 			if( errors &&
 				errors.length > 0 ) {
 
 				printErrors( errors )
-				console.log( 'build failed' )
+				console.log( action + ' failed' )
 				process.exit()
 
 			} else {
-				console.log( 'build completed' )
+				console.log( action + ' completed' )
 			}
 		}
 
@@ -73,9 +75,6 @@ define(
 				ALL   : 'all'
 			}
 
-	//		var executeCreateDeployBuild = function( projectFilePath ) {
-	//		}
-
 			var buildCommand = function( projectFilePath, target, version ) {
 				var errors = []
 
@@ -100,7 +99,7 @@ define(
 					console.log( 'creating debug build for target \'' + target + '\'...' )
 
 					if( isFile( projectFilePath ) ) {
-						executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, onBuildComplete )
+						executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, _.bind( onComplete, null, 'build' ) )
 
 					} else {
 						printErrors( 'Error: Missing project file \'' + projectFilePath + '\'.' )
@@ -140,6 +139,14 @@ define(
 				}
 			}
 
+			var exportCommand = function( projectPath, command ) {
+				var outputFilePath = _.isString( command.file ) ?
+					path.resolve( command.file ) :
+					path.resolve( projectPath, 'export.zip' )
+
+				exportDeploymentArchive( projectPath, outputFilePath, _.bind( onComplete, null, 'export' ) )
+			}
+
 			var infoCommand = function( spellPath, projectPath, projectFilePath ) {
 				console.log( 'spell sdk path:\t\t' + spellPath )
 				console.log( 'project path:\t\t' + projectPath )
@@ -167,6 +174,12 @@ define(
 				.command( 'init' )
 				.description( 'initialize the current working directory with spell project scaffolding' )
 				.action( _.bind( initCommand, this, spellPath, projectPath, projectFilePath ) )
+
+			commander
+				.command( 'export' )
+				.option( '-f, --file [file]', 'the name of the output file' )
+				.description( 'export a deployment ready version into a zip archive' )
+				.action( _.bind( exportCommand, this, projectPath ) )
 
 			commander
 				.command( 'info' )

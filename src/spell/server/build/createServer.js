@@ -2,12 +2,14 @@ define(
 	'spell/server/build/createServer',
 	[
 		'spell/shared/build/executeCreateDebugBuild',
+		'spell/shared/build/exportDeploymentArchive',
 		'spell/shared/build/initializeProjectDirectory',
 
 		'spell/shared/util/platform/underscore'
 	],
 	function(
 		executeCreateDebugBuild,
+		exportDeploymentArchive,
 		initializeProjectDirectory,
 
 		_
@@ -21,12 +23,11 @@ define(
             console.error( tmp.join( '\n' ) )
         }
 
-        var onBuildComplete = function( errors ) {
+        var onComplete = function( errors ) {
             if( errors &&
                 errors.length > 0 ) {
 
                 printErrors( errors )
-
             }
         }
 
@@ -55,7 +56,7 @@ define(
 				projectPath     = projectsPath + '/' + payload[ 1 ],
 				projectFilePath = projectPath + '/' + payload[ 2 ]
 
-			return executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, onBuildComplete )
+			return executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, onComplete )
 		}
 
 		/**
@@ -77,6 +78,28 @@ define(
 			return initializeProjectDirectory( spellPath, projectName, projectPath, projectFilePath )
 		}
 
+		/**
+		 * RPC call handler
+		 *
+		 * @param projectsPath
+		 * @param req
+		 * @param res
+		 * @param payload
+		 * 	payload[ 0 ] : relative project path in projects directory
+		 * 	payload[ 1 ] : relative output file path in projects directory
+		 *
+		 * @param next
+		 * @return {*}
+		 */
+		var exportDeployment = function( projectsPath, outputFilePath, req, res, payload, next  ) {
+			var projectName    = payload[ 0 ],
+				outputFileName = payload[ 1 ],
+				projectPath    = projectsPath + '/' + projectName,
+				outputFilePath = projectsPath + '/' + outputFileName
+
+			return exportDeploymentArchive( projectPath, outputFilePath, onComplete )
+		}
+
 
 		/**
 		 * public
@@ -94,6 +117,11 @@ define(
 						name: 'initDirectory',
 						len: 2,
 						func: _.bind( initDirectory, null, spellPath, projectsPath )
+					},
+					{
+						name: 'exportDeployment',
+						len: 2,
+						func: _.bind( exportDeployment, null, projectsPath )
 					}
 				]
 			}
