@@ -78,7 +78,7 @@ define(
 		 * public
 		 */
 
-		var KeyInput = function( globals, actors, inputDefinitions ) {
+		var KeyInput = function( globals ) {
 			this.inputEvents  = globals.inputEvents
 			this.inputManager = globals.inputManager
 		}
