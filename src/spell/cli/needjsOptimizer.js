@@ -93,7 +93,7 @@ define(
 				return
 			}
 
-			if( !path.existsSync( sourcePath ) ) {
+			if( !fs.existsSync( sourcePath ) ) {
 				console.error( 'Error: Could not read base directory \'' + sourcePath + '\'.' )
 			}
 

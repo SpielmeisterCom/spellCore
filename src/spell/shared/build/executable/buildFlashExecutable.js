@@ -6,7 +6,6 @@ define(
 		'child_process',
 		'fs',
 		'mkdirp',
-		'path',
 		'xmlbuilder',
 
 		'underscore.string',
@@ -18,7 +17,6 @@ define(
 		child_process,
 		fs,
 		mkdirp,
-		path,
 		xmlbuilder,
 
 		_s,
@@ -110,7 +108,7 @@ define(
 				.ele( 'output' )
 					.txt( outputFilePath )
 
-			if( path.existsSync( compilerConfigFilePath ) ) {
+			if( fs.existsSync( compilerConfigFilePath ) ) {
 				fs.unlinkSync( compilerConfigFilePath )
 			}
 
@@ -138,7 +136,7 @@ define(
 
 			var tmpSourcePath = tempPath + '/src/Spielmeister'
 
-			if( !path.existsSync( tmpSourcePath ) ) {
+			if( !fs.existsSync( tmpSourcePath ) ) {
 				mkdirp.sync( tmpSourcePath )
 			}
 
@@ -164,7 +162,7 @@ define(
 				flashOutputPath        = outputPath + '/flash',
 				outputFilePath         = flashOutputPath + '/spell.swf'
 
-			if( !path.existsSync( flashOutputPath ) ) {
+			if( !fs.existsSync( flashOutputPath ) ) {
 				fs.mkdirSync( flashOutputPath )
 			}
 

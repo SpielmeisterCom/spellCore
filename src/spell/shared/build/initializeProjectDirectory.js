@@ -55,9 +55,9 @@ define(
 						targetFilePath = path.join( targetPath, relativeFilePath ),
 						targetDirectoryPath = path.dirname( targetFilePath )
 
-					if( path.existsSync( targetFilePath ) ) return
+					if( fs.existsSync( targetFilePath ) ) return
 
-					if( !path.existsSync( targetDirectoryPath ) ) {
+					if( !fs.existsSync( targetDirectoryPath ) ) {
 						mkdirp.sync( targetDirectoryPath )
 					}
 
@@ -134,7 +134,7 @@ define(
 				function( fileName ) {
 					var projectDirectoryFilePath = projectPath + '/public/' + fileName
 
-					if( path.existsSync( projectDirectoryFilePath ) ) return
+					if( fs.existsSync( projectDirectoryFilePath ) ) return
 
 					copyFile(
 						spellPath + '/publicTemplate/' + fileName,

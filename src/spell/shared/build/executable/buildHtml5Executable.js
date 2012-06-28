@@ -26,7 +26,7 @@ define(
 
 			var outputPath = path.dirname( outputFilePath )
 
-			if( !path.existsSync( outputPath ) ) {
+			if( !fs.existsSync( outputPath ) ) {
 				fs.mkdirSync( outputPath )
 			}
 
@@ -65,7 +65,7 @@ define(
 			var errors = [],
 				html5OutputPath = outputPath + '/html5'
 
-			if( !path.existsSync( html5OutputPath ) ) {
+			if( !fs.existsSync( html5OutputPath ) ) {
 				fs.mkdirSync( html5OutputPath )
 			}
 

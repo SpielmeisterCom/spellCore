@@ -475,7 +475,7 @@ define(
 			// reading engine source file
 			var spellEngineSourceFilePath = spellPath + '/build/spell.js'
 
-			if( !path.existsSync( spellEngineSourceFilePath ) ) {
+			if( !fs.existsSync( spellEngineSourceFilePath ) ) {
 				errors.push( 'Error: Could not locate engine include file \'' + spellEngineSourceFilePath + '\'.' )
 				callback( errors )
 			}
@@ -535,7 +535,7 @@ define(
 
 
 
-			if( !path.existsSync( tempPath) ) {
+			if( !fs.existsSync( tempPath) ) {
 				fs.mkdirSync( tempPath )
 			}
 

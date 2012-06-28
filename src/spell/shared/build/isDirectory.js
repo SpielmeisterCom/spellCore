@@ -1,15 +1,13 @@
 define(
 	'spell/shared/build/isDirectory',
 	[
-		'fs',
-		'path'
+		'fs'
 	],
 	function(
-		fs,
-		path
+		fs
 	) {
 		return function( directoryPath ) {
-			if( path.existsSync( directoryPath ) ) {
+			if( fs.existsSync( directoryPath ) ) {
 				var stat = fs.lstatSync( directoryPath )
 
 				if( stat.isDirectory() ) {

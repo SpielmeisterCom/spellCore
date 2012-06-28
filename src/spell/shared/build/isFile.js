@@ -1,15 +1,13 @@
 define(
 	'spell/shared/build/isFile',
 	[
-		'fs',
-		'path'
+		'fs'
 	],
 	function(
-		fs,
-		path
+		fs
 	) {
 		return function( filePath ) {
-			if( path.existsSync( filePath ) ) {
+			if( fs.existsSync( filePath ) ) {
 				var stat = fs.lstatSync( filePath )
 
 				if( stat.isFile() ) {

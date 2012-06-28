@@ -115,7 +115,7 @@ define(
 					userId = command.user || process.getuid(),
 					projectsPath = path.resolve( cwd + ( command.projectsRoot ? '/' + command.projectsRoot : '' ) )
 
-				if( !path.existsSync( projectsPath ) ) {
+				if( !fs.existsSync( projectsPath ) ) {
 					errors.push( 'Error: No valid projects directory supplied. Unable to start build server. ' +
 						'See \'' + executableName + ' start-server --help\'.' )
 				}

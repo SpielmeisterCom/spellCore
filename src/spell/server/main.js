@@ -17,7 +17,7 @@ define(
 
 		'connect',
 		'connect-cors',
-		'path',
+		'fs',
 
 		'spell/shared/util/platform/underscore'
 	],
@@ -38,7 +38,7 @@ define(
 
 		connect,
 		cors,
-		path,
+		fs,
 
 		_
 	) {
@@ -60,7 +60,7 @@ define(
 		}
 
 		var isValidProjectPath = function( projectsPath, projectPathToCheck ) {
-			return path.existsSync( projectsPath + projectPathToCheck )
+			return fs.existsSync( projectsPath + projectPathToCheck )
 		}
 
 		var rewriteUrlToRealProjectPath = function( projectsPath ) {

@@ -66,7 +66,7 @@ define(
 				projectsPath = path.resolve( projectPath, '..' ),
 				projectName  = path.basename( projectPath )
 
-			if( !path.existsSync( outputPath ) ) {
+			if( !fs.existsSync( outputPath ) ) {
 				mkdirp.sync( outputPath )
 			}
 
