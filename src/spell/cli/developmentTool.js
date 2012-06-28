@@ -142,7 +142,7 @@ define(
 			var exportCommand = function( projectPath, command ) {
 				var outputFilePath = _.isString( command.file ) ?
 					path.resolve( command.file ) :
-					path.resolve( projectPath, 'export.zip' )
+					path.resolve( projectPath, 'export.tar' )
 
 				exportDeploymentArchive( projectPath, outputFilePath, _.bind( onComplete, null, 'export' ) )
 			}

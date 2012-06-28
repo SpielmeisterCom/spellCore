@@ -1,24 +1,60 @@
 define(
 	'spell/shared/build/exportDeploymentArchive',
 	[
-		'child_process',
+		'spell/shared/build/isFile',
+
+		'fs',
+		'glob',
 		'mkdirp',
 		'path',
-
-		'underscore.string'
+		'tar-async'
 	],
 	function(
-		child_process,
+		isFile,
+
+		fs,
+		glob,
 		mkdirp,
 		path,
-
-		_s
+		tar
 	) {
 		'use strict'
+
 
 		/**
 		 * private
 		 */
+
+		/**
+		 * Writes list of files to a tar "tape"
+		 *
+		 * @param tape
+		 * @param rootPath
+		 * @param filePaths
+		 */
+		var writeFiles = function( tape, rootPath, filePaths ) {
+			var filePath = filePaths.shift()
+
+			if( filePath ) {
+				var absoluteFilePath = path.join( rootPath, filePath )
+				if( isFile( absoluteFilePath ) ) {
+					var data = fs.readFileSync( absoluteFilePath )
+
+					tape.append(
+						filePath,
+						data,
+						function() {
+							writeFiles( tape, rootPath, filePaths )
+						}
+					)
+				} else {
+					writeFiles( tape, rootPath, filePaths )
+				}
+
+			} else {
+				tape.close()
+			}
+		}
 
 
 		/**
@@ -26,27 +62,27 @@ define(
 		 */
 
 		return function( projectPath, outputFilePath, next ) {
-			var outputPath = path.dirname( outputFilePath),
-				exportPath = path.resolve( projectPath, 'public' )
-
-			console.log( 'exportPath:\t' + exportPath )
-			console.log( 'outputPath:\t' + outputPath )
-			console.log( 'outputFilePath:\t' + outputFilePath )
-
+			var outputPath   = path.dirname( outputFilePath ),
+				projectsPath = path.resolve( projectPath, '..' ),
+				projectName  = path.basename( projectPath )
 
 			if( !path.existsSync( outputPath ) ) {
 				mkdirp.sync( outputPath )
 			}
 
-			// create zip archive
-			var command = _s.sprintf( 'zip -r %1$s %2$s', outputFilePath, exportPath ),
-				options = {
-					env : {
-						LC_ALL : 'en_US'
-					}
-				}
+			// create tar archive
+			var tape = new tar( {
+				output : fs.createWriteStream( outputFilePath )
+			} )
 
-			child_process.exec( command, options, next )
+			var filePaths = glob.sync(
+				projectName + '/public/**',
+				{
+					cwd : projectsPath
+				}
+			)
+
+			writeFiles( tape, projectsPath, filePaths )
 		}
 	}
 )

@@ -91,11 +91,11 @@ define(
 		 * @param next
 		 * @return {*}
 		 */
-		var exportDeployment = function( projectsPath, outputFilePath, req, res, payload, next  ) {
+		var exportDeployment = function( projectsPath, req, res, payload, next  ) {
 			var projectName    = payload[ 0 ],
 				outputFileName = payload[ 1 ],
-				projectPath    = projectsPath + '/' + projectName,
-				outputFilePath = projectsPath + '/' + outputFileName
+				projectPath    = path.join( projectsPath, path.normalize( projectName ) ),
+				outputFilePath = path.join( projectsPath, path.normalize( outputFileName ) )
 
 			return exportDeploymentArchive( projectPath, outputFilePath, onComplete )
 		}
