@@ -144,7 +144,7 @@ define(
 						asset.looped
 					)
 
-					var frameId = Math.floor( appearance.animationOffset * ( assetNumFrames - 1 ) ),
+					var frameId = Math.round( appearance.animationOffset * ( assetNumFrames - 1 ) ),
 						frameOffset = asset.frameOffsets[ frameId ]
 
 					context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameWidth, assetFrameHeight, -0.5, -0.5, 1, 1 )
