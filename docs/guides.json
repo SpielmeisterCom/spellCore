@@ -1,0 +1,10 @@
+[
+	{
+		"title": "Introduction",
+		"items": [{
+			"name": "getting_started",
+			"title": "Getting started with SpellJS",
+			"description": "This introduction to SpellJS explains how you can get started."
+		}]
+	}
+]
