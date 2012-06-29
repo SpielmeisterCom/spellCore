@@ -14,4 +14,4 @@ deploy:
 
 .PHONY: docs
 docs:
-	jsduck src --output=docs/generated
+	jsduck src --guides docs/guides.json --output=docs/generated
