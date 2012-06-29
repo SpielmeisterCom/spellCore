@@ -2,9 +2,31 @@
 	{
 		"title": "Introduction",
 		"items": [{
-			"name": "getting_started",
-			"title": "Getting started with SpellJS",
+			"name": "intro_getting_started",
+			"title": "Getting Started with SpellJS",
 			"description": "This introduction to SpellJS explains how you can get started."
+		}, 
+                {
+                        "name": "intro_working_with_editor",
+                        "title": "Working with the Spell Editor",
+                        "description": ""
+                }]
+	},
+
+	{
+
+		"title": "Key Concepts",
+		"items": [{
+                        "name": "concepts_entities_components",
+                        "title": "Entities and Components",
+                        "description": ""
+
+		},
+		{
+                        "name": "concepts_systems",
+                        "title": "Systems",
+                        "description": ""
+
 		}]
 	}
 ]
