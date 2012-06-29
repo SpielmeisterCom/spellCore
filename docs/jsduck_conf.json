@@ -1,0 +1,9 @@
+{
+	"--title": "SpellJS documentation",
+	"--guides": "guides.json",
+	"--output": "generated",
+	"--": [
+		"../src",
+		"components.js"
+	]
+}
