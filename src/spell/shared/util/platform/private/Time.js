@@ -4,7 +4,7 @@ define(
 		"use strict"
 
 		return {
-			/**
+			/*
 			 * Returns the number of milliseconds since midnight January 1, 1970, UTC.
 			 */
 			getCurrentInMs: function() {

@@ -29,7 +29,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * private
 		 */
 
@@ -56,7 +56,7 @@ define(
 			textureMatrix = mat3.create()
 
 
-		/**
+		/*
 		 * Creates a projection matrix that normalizes the transformation behaviour to that of the normalized canvas-2d (that is origin is in bottom left,
 		 * positive x-axis to the right, positive y-axis up, screen space coordinates as input. The matrix transforms from screen space to clip space.
 		 *
@@ -107,7 +107,7 @@ define(
 			setupShader()
 		}
 
-		/**
+		/*
 		 * Creates a wrapper context for the backend context.
 		 */
 		var createWrapperContext = function() {
@@ -136,7 +136,7 @@ define(
 			}
 		}
 
-		/**
+		/*
 		 * Returns a rendering context. Once a context has been created additional calls to this method return the same context instance.
 		 *
 		 * @param canvas - the canvas dom element
@@ -255,7 +255,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 
@@ -293,7 +293,7 @@ define(
 			mat4.rotateZ( currentState.matrix, -u )
 		}
 
-		/**
+		/*
 		 * Clears the color buffer with the clear color
 		 */
 		var clear = function() {
@@ -445,7 +445,7 @@ define(
 			gl.uniformMatrix4fv( uniformLocation, false, screenSpaceShimMatrix )
 		}
 
-		/**
+		/*
 		 * Returns an object describing the current configuration of the rendering backend.
 		 */
 		var getConfiguration = function() {
@@ -456,7 +456,7 @@ define(
 			}
 		}
 
-		/**
+		/*
 		 * Returns instance of texture class
 		 *
 		 * The public interface of the texture class consists of the two attributes width and height.
@@ -475,13 +475,13 @@ define(
 
 
 			return {
-				/**
+				/*
 				 * Public
 				 */
 				width  : image.width,
 				height : image.height,
 
-				/**
+				/*
 				 * Private
 				 *
 				 * This is an implementation detail of the class. If you write code that depends on this you better know what you are doing.

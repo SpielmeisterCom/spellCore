@@ -10,7 +10,7 @@ define(
 		"use strict";
 		
 		
-		/**
+		/*
 		 * Scans a given directory and returns an array with the paths of all the files in the directory and its sub-
 		 * directories. The paths will be relative to the scanned array.
 		 *

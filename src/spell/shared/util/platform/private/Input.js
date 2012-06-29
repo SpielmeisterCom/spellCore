@@ -15,11 +15,11 @@ define(
 		"use strict"
 
 
-		/**
+		/*
 		 * private
 		 */
 
-		/**
+		/*
 		 * Thanks to John Resig. http://ejohn.org/blog/flexible-javascript-events/
 		 *
 		 * @param obj
@@ -118,7 +118,7 @@ define(
             } )
         }
 
-		/**
+		/*
 		 * maps the internal event name to to native event name and callback
 		 */
 		var nativeEventMap = {
@@ -149,7 +149,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

@@ -9,7 +9,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * Creates an object with the properties defined by the array "keys". Each property has a unique Number.
 		 */
 		return function( keys ) {

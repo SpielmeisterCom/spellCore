@@ -9,7 +9,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * Returns the smallest free player id.
 		 *
 		 * @param playerEntities

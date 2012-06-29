@@ -95,7 +95,7 @@ define(
 		statisticsManager.init()
 
 
-		/**
+		/*
 		 * public
 		 */
 
@@ -154,7 +154,7 @@ define(
 		return {
 			start : start,
 
-			/**
+			/*
 			 * This callback is called when the engine instance sends message to the editing environment.
 			 *
 			 * @param fn
@@ -163,7 +163,7 @@ define(
 				debugCallback = fn
 			},
 
-			/**
+			/*
 			 * This method is used to send debug messages to the engine instance.
 			 *
 			 * @param message

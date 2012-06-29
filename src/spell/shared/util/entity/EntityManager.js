@@ -1,3 +1,6 @@
+/*
+ * @class spell.shared.util.entity.EntityManager
+ */
 define(
 	'spell/shared/util/entity/EntityManager',
 	[
@@ -13,7 +16,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * private
 		 */
 
@@ -64,7 +67,7 @@ define(
 			}
 		}
 
-		/**
+		/*
 		 * Normalizes the provided entity config
 		 *
 		 * @param arg0 can be either a entity template id or a entity config
@@ -95,7 +98,7 @@ define(
 			}
 		}
 
-		/**
+		/*
 		 * Normalizes the provided component config
 		 *
 		 * @param arg0 can be either a component template id or a component config
@@ -180,7 +183,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 
@@ -190,7 +193,7 @@ define(
 		}
 
 		EntityManager.prototype = {
-			/**
+			/*
 			 * Creates an entity
 			 *
 			 * @param arg0 an entity template id or an entity config
@@ -200,7 +203,7 @@ define(
 				return createEntity( this.components, this.templateManager, arg0 )
 			},
 
-			/**
+			/*
 			 * Removes an entity
 			 *
 			 * @param entityId the id of the entity to remove
@@ -222,7 +225,7 @@ define(
 				)
 			},
 
-			/**
+			/*
 			 * Adds a component to an entity
 			 *
 			 * @param entityId the id of the entity that the component belongs to
@@ -239,7 +242,7 @@ define(
 				)
 			},
 
-			/**
+			/*
 			 * Removes a component from an entity
 			 *
 			 * @param entityId the id of the entity that the component belongs to
@@ -252,7 +255,7 @@ define(
 				removeComponents( this.components, entityId, componentId )
 			},
 
-			/**
+			/*
 			 * Returns true if an entity has a component
 			 *
 			 * @param entityId the id of the entity to check

@@ -9,7 +9,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * Returns a middleware module for the connect webserver that handles extDirect requests
 		 */
 		return function( remotingUrl, remotingNamespace, remotingActions ) {

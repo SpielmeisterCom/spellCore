@@ -15,7 +15,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * public
 		 */
 

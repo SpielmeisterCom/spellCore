@@ -32,11 +32,11 @@ define(
         }
 
 
-		/**
+		/*
 		 * private
 		 */
 
-		/**
+		/*
 		 * RPC call handler
 		 *
 		 * @param spellPath
@@ -59,7 +59,7 @@ define(
 			return executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, onComplete )
 		}
 
-		/**
+		/*
 		 * RPC call handler
 		 *
 		 * @param spellPath
@@ -78,7 +78,7 @@ define(
 			return initializeProjectDirectory( spellPath, projectName, projectPath, projectFilePath )
 		}
 
-		/**
+		/*
 		 * RPC call handler
 		 *
 		 * @param projectsPath
@@ -101,7 +101,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

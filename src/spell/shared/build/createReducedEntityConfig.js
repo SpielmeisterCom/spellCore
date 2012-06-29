@@ -68,7 +68,7 @@ define(
 			return entityConfig
 		}
 
-		/**
+		/*
 		 * Creates reduced entity config (the spell runtime module format).
 		 */
 		return function( templateManager, entityConfigSpellEdFormat ) {

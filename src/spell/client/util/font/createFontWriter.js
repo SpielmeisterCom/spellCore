@@ -4,7 +4,7 @@ define(
 		"use strict"
 
 
-		/**
+		/*
 		 * NOTE: The code that deals with text rendering should not know anything about world scaling or screen dimensions. It should only blit text on a
 		 * texture which can then be used to do the actual drawing on the color buffer.
 		 */

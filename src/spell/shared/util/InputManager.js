@@ -22,14 +22,14 @@ define(
 			"ySize" : 768
 		}
 
-		/**
+		/*
 		 * private
 		 */
 
 		var nextSequenceNumber = 0
 
 
-		/**
+		/*
 		 * public
 		 */
 

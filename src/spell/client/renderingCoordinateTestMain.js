@@ -83,7 +83,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * Setting up the transformation related components
 		 */
 
@@ -157,7 +157,7 @@ define(
 
 
 		var runTest = function() {
-			/**
+			/*
 			 * The expected result in all test cases is that the color buffer is covered completely with the test pattern.
 			 *
 			 * http://www.songho.ca/opengl/gl_transform.html

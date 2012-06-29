@@ -20,7 +20,7 @@ define(
 			return false
 		}
 
-		/**
+		/*
 		 * These are the platform specific options.
 		 */
 		var validOptions = {
@@ -31,7 +31,7 @@ define(
 			}
 		}
 
-		/**
+		/*
 		 * These options are used when they are not overridden by the environment configuration set up by the stage-0-loader.
 		 */
 		var defaultOptions = {

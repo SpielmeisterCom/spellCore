@@ -21,11 +21,11 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * private
 		 */
 
-		/**
+		/*
 		 * Writes list of files to a tar "tape"
 		 *
 		 * @param tape
@@ -57,7 +57,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

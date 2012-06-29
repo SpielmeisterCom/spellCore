@@ -25,11 +25,11 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * private
 		 */
 
-		/**
+		/*
 		 * Returns the player entity of the client with id clientId.
 		 *
 		 * @param entities
@@ -46,7 +46,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

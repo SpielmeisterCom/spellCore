@@ -17,7 +17,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * private
 		 */
 
@@ -45,7 +45,7 @@ define(
 			}
 		}
 
-		/**
+		/*
 		 * Returns true if a resource bundle with the provided name exists, false otherwise.
 		 *
 		 * @param resourceBundles
@@ -55,7 +55,7 @@ define(
 			return _.has( resourceBundles, name )
 		}
 
-		/**
+		/*
 		 * Returns true if a resource with the provided name exists, false otherwise.
 		 *
 		 * @param resources
@@ -193,7 +193,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

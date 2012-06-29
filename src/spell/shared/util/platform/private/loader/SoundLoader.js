@@ -19,7 +19,7 @@ define(
 		"use strict"
 
 
-		/**
+		/*
 		 * private
 		 */
 
@@ -81,7 +81,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 
@@ -101,7 +101,7 @@ define(
 				var extension = _.last( fileName.split( '.' ) )
 
 				if( extension === "json" ) {
-					/**
+					/*
 					 * The html5 back-end uses sound sprites by default. Therefore loading of the sound set config can be skipped and the sound sprite config
 					 * can be loaded directly.
 					 */

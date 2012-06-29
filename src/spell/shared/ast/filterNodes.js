@@ -6,7 +6,7 @@ define(
 	function(
 		falafel
 	) {
-		/**
+		/*
 		 *
 		 */
 		return function( source, iterator ) {

@@ -13,7 +13,7 @@ define(
 		"use strict"
 
 
-		/**
+		/*
 		 * private
 		 */
 
@@ -41,7 +41,7 @@ define(
 		}
 
 		var onReadyStateChange = function( request ) {
-			/**
+			/*
 			 * readyState === 4 means "DONE"; see https://developer.mozilla.org/en/DOM/XMLHttpRequest
 			 */
 			if( request.readyState !== 4 ) return
@@ -50,7 +50,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

@@ -20,7 +20,7 @@ define(
 		_s,
 		_
 	) {
-		/**
+		/*
 		 * private
 		 */
 
@@ -65,7 +65,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

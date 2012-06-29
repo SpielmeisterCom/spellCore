@@ -9,7 +9,7 @@ define(
 			this.orientation = 0
 			this.scale       = [ 1, 1 ]
 
-			/**
+			/*
 			 * The render pass the entity is rendered in. Lower number means earlier rendering in the render process.
 			 */
 			this.pass = ( args.pass !== undefined ? args.pass : 0 )

@@ -18,7 +18,7 @@ define(
 
         var context = null
 
-		/**
+		/*
 		 * Creates a rendering context
 		 *
          * @param eventManager - Eventmanager

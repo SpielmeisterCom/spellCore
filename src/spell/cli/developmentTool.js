@@ -28,7 +28,7 @@ define(
 		path,
 		_
 	) {
-		/**
+		/*
 		 * private
 		 */
 
@@ -53,7 +53,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

@@ -9,7 +9,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * Creates all the necessary entities for the new player.
 		 *
 		 * @param entityManager

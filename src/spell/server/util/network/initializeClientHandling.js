@@ -15,14 +15,14 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * private
 		 */
 
 		var clientNumber = 0
 		var protocolName = 'socketrocket-0.1'
 
-		/**
+		/*
 		 * Returns true if at least one of the requested protocols is supported, false otherwise.
 		 *
 		 * @param requestedProtocols
@@ -54,7 +54,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

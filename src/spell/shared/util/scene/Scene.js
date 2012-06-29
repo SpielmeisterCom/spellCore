@@ -15,7 +15,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * private
 		 */
 
@@ -29,7 +29,7 @@ define(
 			return module
 		}
 
-		/**
+		/*
 		 * TODO: Remove this custom invoke that knows how to handle the borked instances produced by the "create" constructor wrapper function.
 		 * Instances created by "create" for some unknown reason do not support prototype chain method look-up. See "Fix create"
 		 */
@@ -73,7 +73,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

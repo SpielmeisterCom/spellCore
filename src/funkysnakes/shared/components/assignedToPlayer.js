@@ -4,7 +4,7 @@ define(
 		"use strict"
 
 
-		/**
+		/*
 		 * playerId = -1 means entity is neutral
 		 */
 		return function( playerId ) {

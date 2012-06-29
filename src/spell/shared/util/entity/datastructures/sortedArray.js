@@ -9,7 +9,7 @@ define(
 		"use strict"
 
 
-		/**
+		/*
 		 * An array of entities that are sorted by a specific criteria.
 		 * This data structure should be used, if a system expects entities sorted according to a specific criteria.
 		 *

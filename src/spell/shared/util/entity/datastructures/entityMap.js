@@ -9,7 +9,7 @@ define(
 		"use strict"
 
 
-		/**
+		/*
 		 * A map that uses an arbitrary property of an entity as its key.
 		 * This data structure should be used, if you need to efficiently access entities based on a specific property.
 		 *

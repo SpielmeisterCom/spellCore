@@ -11,7 +11,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * private
 		 */
 
@@ -236,7 +236,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 
@@ -289,7 +289,7 @@ define(
 				)
 			},
 
-			/**
+			/*
 			 * Returns true if the component is a single attribute component, false otherwise.
 			 *
 			 * @param templateId - component template id

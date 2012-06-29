@@ -47,7 +47,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * private
 		 */
 
@@ -241,7 +241,7 @@ define(
 			)
 		}
 
-		/**
+		/*
 		 * Returns all dependent component template ids
 		 */
 		var getDependencyTemplateIds = function( templateManager, templateIds, path ) {
@@ -330,7 +330,7 @@ define(
 			)
 		}
 
-		/**
+		/*
 		 * Determines the dependencies of the script modules which are not already resolved by the spell engine include.
 		 *
 		 * @param engineSource
@@ -404,7 +404,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

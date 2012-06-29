@@ -1,3 +1,11 @@
+/*
+ * @class glmatrix.glmatrix
+ * gl-matrix - High performance matrix and vector operations for WebGL
+ * @author Brandon Jones
+ * @author Colin MacKenzie IV
+ * @version 1.3.7
+ *
+ */
 define(
 	"glmatrix/glmatrix",
 	[
@@ -6,13 +14,6 @@ define(
 	function(
 		Types
 	) {
-		/**
-		* @fileoverview gl-matrix - High performance matrix and vector operations for WebGL
-		* @author Brandon Jones
-		* @author Colin MacKenzie IV
-		* @version 1.3.7
-		*/
-
 		/*
 		* Copyright (c) 2012 Brandon Jones, Colin MacKenzie IV
 		*
@@ -50,7 +51,7 @@ define(
 			var y = Types.createFloatArray(1);
 			var i = Types.createIntegerArray(y.buffer);
 
-			/**
+			/*
 			* Fast way to calculate the inverse square root,
 			* see http://jsperf.com/inverse-square-root/5
 			*
@@ -75,13 +76,13 @@ define(
 			glMath.invsqrt = function(number) { return 1.0 / Math.sqrt(number); };
 		}
 
-		/**
+		/*
 		* @class 3 Dimensional Vector
 		* @name vec3
 		*/
 			var vec3 = {};
 
-		/**
+		/*
 		* Creates a new instance of a vec3 using the default array type
 		* Any javascript array-like objects containing at least 3 numeric elements can serve as a vec3
 		*
@@ -103,7 +104,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Creates a new instance of a vec3, initializing it with the given arguments
 		*
 		* @param {number} x X value
@@ -122,7 +123,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Copies the values of one vec3 to another
 		*
 		* @param {vec3} vec vec3 containing values to copy
@@ -138,7 +139,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Compares two vectors for equality within a certain margin of error
 		*
 		* @param {vec3} a First vector
@@ -154,7 +155,7 @@ define(
 				);
 			};
 
-		/**
+		/*
 		* Performs a vector addition
 		*
 		* @param {vec3} vec First operand
@@ -177,7 +178,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Performs a vector subtraction
 		*
 		* @param {vec3} vec First operand
@@ -200,7 +201,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Performs a vector multiplication
 		*
 		* @param {vec3} vec First operand
@@ -223,7 +224,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Negates the components of a vec3
 		*
 		* @param {vec3} vec vec3 to negate
@@ -240,7 +241,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Multiplies the components of a vec3 by a scalar value
 		*
 		* @param {vec3} vec vec3 to scale
@@ -263,7 +264,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Generates a unit vector of the same direction as the provided vec3
 		* If vector length is 0, returns [0, 0, 0]
 		*
@@ -297,7 +298,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Generates the cross product of two vec3s
 		*
 		* @param {vec3} vec First operand
@@ -318,7 +319,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Caclulates the length of a vec3
 		*
 		* @param {vec3} vec vec3 to calculate length of
@@ -330,7 +331,7 @@ define(
 				return Math.sqrt(x * x + y * y + z * z);
 			};
 
-		/**
+		/*
 		* Caclulates the squared length of a vec3
 		*
 		* @param {vec3} vec vec3 to calculate squared length of
@@ -342,7 +343,7 @@ define(
 				return x * x + y * y + z * z;
 			};
 
-		/**
+		/*
 		* Caclulates the dot product of two vec3s
 		*
 		* @param {vec3} vec First operand
@@ -354,7 +355,7 @@ define(
 				return vec[0] * vec2[0] + vec[1] * vec2[1] + vec[2] * vec2[2];
 			};
 
-		/**
+		/*
 		* Generates a unit vector pointing from one vector to another
 		*
 		* @param {vec3} vec Origin vec3
@@ -385,7 +386,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Performs a linear interpolation between two vec3
 		*
 		* @param {vec3} vec First vector
@@ -405,7 +406,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Calculates the euclidian distance between two vec3
 		*
 		* Params:
@@ -425,7 +426,7 @@ define(
 			// Pre-allocated to prevent unecessary garbage collection
 			var unprojectMat = null;
 			var unprojectVec = createFloatArray(4);
-		/**
+		/*
 		* Projects the specified vec3 from screen space into object space
 		* Based on the <a href="http://webcvs.freedesktop.org/mesa/Mesa/src/glu/mesa/project.c?revision=1.4&view=markup">Mesa gluUnProject implementation</a>
 		*
@@ -470,7 +471,7 @@ define(
 			var zUnitVec3 = vec3.createFrom(0,0,1);
 
 			var tmpvec3 = vec3.create();
-		/**
+		/*
 		* Generates a quaternion of rotation between two given normalized vectors
 		*
 		* @param {vec3} a Normalized source vector
@@ -509,7 +510,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Returns a string representation of a vector
 		*
 		* @param {vec3} vec Vector to represent as a string
@@ -520,13 +521,13 @@ define(
 				return '[' + vec[0] + ', ' + vec[1] + ', ' + vec[2] + ']';
 			};
 
-		/**
+		/*
 		* @class 3x3 Matrix
 		* @name mat3
 		*/
 			var mat3 = {};
 
-		/**
+		/*
 		* Creates a new instance of a mat3 using the default array type
 		* Any javascript array-like object containing at least 9 numeric elements can serve as a mat3
 		*
@@ -558,7 +559,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Creates a new instance of a mat3, initializing it with the given arguments
 		*
 		* @param {number} m00
@@ -589,7 +590,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Calculates the determinant of a mat3
 		*
 		* @param {mat3} mat mat3 to calculate determinant of
@@ -604,7 +605,7 @@ define(
 				return a00 * (a22 * a11 - a12 * a21) + a01 * (-a22 * a10 + a12 * a20) + a02 * (a21 * a10 - a11 * a20);
 			};
 
-		/**
+		/*
 		* Calculates the inverse matrix of a mat3
 		*
 		* @param {mat3} mat mat3 to calculate inverse of
@@ -641,7 +642,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Performs a matrix multiplication
 		*
 		* @param {mat3} mat First operand
@@ -678,7 +679,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Transforms the vec2 according to the given mat3.
 		*
 		* @param {mat3} matrix mat3 to multiply against
@@ -695,7 +696,7 @@ define(
 			  return dest;
 			};
 
-		/**
+		/*
 		* Transforms the vec3 according to the given mat3
 		*
 		* @param {mat3} matrix mat3 to multiply against
@@ -714,7 +715,7 @@ define(
 			  return dest;
 			};
 
-		/**
+		/*
 		* Copies the values of one mat3 to another
 		*
 		* @param {mat3} mat mat3 containing values to copy
@@ -735,7 +736,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Compares two matrices for equality within a certain margin of error
 		*
 		* @param {mat3} a First matrix
@@ -757,7 +758,7 @@ define(
 				);
 			};
 
-		/**
+		/*
 		* Sets a mat3 to an identity matrix
 		*
 		* @param {mat3} dest mat3 to set
@@ -778,7 +779,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Transposes a mat3 (flips the values over the diagonal)
 		*
 		* Params:
@@ -814,7 +815,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Copies the elements of a mat3 into the upper 3x3 elements of a mat4
 		*
 		* @param {mat3} mat mat3 containing values to copy
@@ -848,7 +849,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Returns a string representation of a mat3
 		*
 		* @param {mat3} mat mat3 to represent as a string
@@ -861,13 +862,13 @@ define(
 					', ' + mat[6] + ', ' + mat[7] + ', ' + mat[8] + ']';
 			};
 
-		/**
+		/*
 		* @class 4x4 Matrix
 		* @name mat4
 		*/
 			var mat4 = {};
 
-		/**
+		/*
 		* Creates a new instance of a mat4 using the default array type
 		* Any javascript array-like object containing at least 16 numeric elements can serve as a mat4
 		*
@@ -900,7 +901,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Creates a new instance of a mat4, initializing it with the given arguments
 		*
 		* @param {number} m00
@@ -945,7 +946,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Copies the values of one mat4 to another
 		*
 		* @param {mat4} mat mat4 containing values to copy
@@ -973,7 +974,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Compares two matrices for equality within a certain margin of error
 		*
 		* @param {mat4} a First matrix
@@ -1002,7 +1003,7 @@ define(
 				);
 			};
 
-		/**
+		/*
 		* Sets a mat4 to an identity matrix
 		*
 		* @param {mat4} dest mat4 to set
@@ -1030,7 +1031,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Transposes a mat4 (flips the values over the diagonal)
 		*
 		* @param {mat4} mat mat4 to transpose
@@ -1079,7 +1080,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Calculates the determinant of a mat4
 		*
 		* @param {mat4} mat mat4 to calculate determinant of
@@ -1101,7 +1102,7 @@ define(
 						a20 * a01 * a12 * a33 - a00 * a21 * a12 * a33 - a10 * a01 * a22 * a33 + a00 * a11 * a22 * a33);
 			};
 
-		/**
+		/*
 		* Calculates the inverse matrix of a mat4
 		*
 		* @param {mat4} mat mat4 to calculate inverse of
@@ -1158,7 +1159,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Copies the upper 3x3 elements of a mat4 into another mat4
 		*
 		* @param {mat4} mat mat4 containing values to copy
@@ -1189,7 +1190,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Copies the upper 3x3 elements of a mat4 into a mat3
 		*
 		* @param {mat4} mat mat4 containing values to copy
@@ -1213,7 +1214,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Calculates the inverse of the upper 3x3 elements of a mat4 and copies the result into a mat3
 		* The resulting matrix is useful for calculating transformed normals
 		*
@@ -1254,7 +1255,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Performs a matrix multiplication
 		*
 		* @param {mat4} mat First operand
@@ -1309,7 +1310,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Transforms a vec3 with the given matrix
 		* 4th vector component is implicitly '1'
 		*
@@ -1331,7 +1332,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Transforms a vec4 with the given matrix
 		*
 		* @param {mat4} mat mat4 to transform the vector with
@@ -1353,7 +1354,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Translates a matrix by the given vector
 		*
 		* @param {mat4} mat mat4 to translate
@@ -1391,7 +1392,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Scales a matrix by the given vector
 		*
 		* @param {mat4} mat mat4 to scale
@@ -1438,7 +1439,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Rotates a matrix by the given angle around the specified axis
 		* If rotating around a primary axis (X,Y,Z) one of the specialized rotation functions should be used instead for performance
 		*
@@ -1508,7 +1509,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Rotates a matrix by the given angle around the X axis
 		*
 		* @param {mat4} mat mat4 to rotate
@@ -1556,7 +1557,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Rotates a matrix by the given angle around the Y axis
 		*
 		* @param {mat4} mat mat4 to rotate
@@ -1604,7 +1605,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Rotates a matrix by the given angle around the Z axis
 		*
 		* @param {mat4} mat mat4 to rotate
@@ -1653,7 +1654,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Generates a frustum matrix with the given bounds
 		*
 		* @param {number} left Left bound of the frustum
@@ -1690,7 +1691,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Generates a perspective projection matrix with the given bounds
 		*
 		* @param {number} fovy Vertical field of view
@@ -1707,7 +1708,7 @@ define(
 				return mat4.frustum(-right, right, -top, top, near, far, dest);
 			};
 
-		/**
+		/*
 		* Generates a orthogonal projection matrix with the given bounds
 		*
 		* @param {number} left Left bound of the frustum
@@ -1744,7 +1745,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Generates a look-at matrix with the given eye position, focal point, and up axis
 		*
 		* @param {vec3} eye Position of the viewer
@@ -1836,7 +1837,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Creates a matrix from a quaternion rotation and vector translation
 		* This is equivalent to (but much faster than):
 		*
@@ -1891,7 +1892,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Returns a string representation of a mat4
 		*
 		* @param {mat4} mat mat4 to represent as a string
@@ -1905,13 +1906,13 @@ define(
 					', ' + mat[12] + ', ' + mat[13] + ', ' + mat[14] + ', ' + mat[15] + ']';
 			};
 
-		/**
+		/*
 		* @class Quaternion
 		* @name quat4
 		*/
 			var quat4 = {};
 
-		/**
+		/*
 		* Creates a new instance of a quat4 using the default array type
 		* Any javascript array containing at least 4 numeric elements can serve as a quat4
 		*
@@ -1934,7 +1935,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Creates a new instance of a quat4, initializing it with the given arguments
 		*
 		* @param {number} x X value
@@ -1955,7 +1956,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Copies the values of one quat4 to another
 		*
 		* @param {quat4} quat quat4 containing values to copy
@@ -1972,7 +1973,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Compares two quaternions for equality within a certain margin of error
 		*
 		* @param {quat4} a First vector
@@ -1989,7 +1990,7 @@ define(
 				);
 			};
 
-		/**
+		/*
 		* Creates a new identity Quat4
 		*
 		* @param {quat4} [dest] quat4 receiving copied values
@@ -2007,7 +2008,7 @@ define(
 
 			var identityQuat4 = quat4.identity();
 
-		/**
+		/*
 		* Calculates the W component of a quat4 from the X, Y, and Z components.
 		* Assumes that quaternion is 1 unit in length.
 		* Any existing W component will be ignored.
@@ -2031,7 +2032,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Calculates the dot product of two quaternions
 		*
 		* @param {quat4} quat First operand
@@ -2043,7 +2044,7 @@ define(
 				return quat[0]*quat2[0] + quat[1]*quat2[1] + quat[2]*quat2[2] + quat[3]*quat2[3];
 			};
 
-		/**
+		/*
 		* Calculates the inverse of a quat4
 		*
 		* @param {quat4} quat quat4 to calculate inverse of
@@ -2073,7 +2074,7 @@ define(
 			};
 
 
-		/**
+		/*
 		* Calculates the conjugate of a quat4
 		* If the quaternion is normalized, this function is faster than quat4.inverse and produces the same result.
 		*
@@ -2096,7 +2097,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Calculates the length of a quat4
 		*
 		* Params:
@@ -2109,7 +2110,7 @@ define(
 				return Math.sqrt(x * x + y * y + z * z + w * w);
 			};
 
-		/**
+		/*
 		* Generates a unit quaternion of the same direction as the provided quat4
 		* If quaternion length is 0, returns [0, 0, 0, 0]
 		*
@@ -2139,7 +2140,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Performs quaternion addition
 		*
 		* @param {quat4} quat First operand
@@ -2163,7 +2164,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Performs a quaternion multiplication
 		*
 		* @param {quat4} quat First operand
@@ -2186,7 +2187,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Transforms a vec3 with the given quaternion
 		*
 		* @param {quat4} quat quat4 to transform the vector with
@@ -2215,7 +2216,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Multiplies the components of a quaternion by a scalar value
 		*
 		* @param {quat4} quat to scale
@@ -2239,7 +2240,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Calculates a 3x3 matrix from the given quat4
 		*
 		* @param {quat4} quat quat4 to create matrix from
@@ -2280,7 +2281,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Calculates a 4x4 matrix from the given quat4
 		*
 		* @param {quat4} quat quat4 to create matrix from
@@ -2329,7 +2330,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Performs a spherical linear interpolation between two quat4
 		*
 		* @param {quat4} quat First quaternion
@@ -2380,7 +2381,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Creates a quaternion from the given 3x3 rotation matrix.
 		* If dest is omitted, a new quaternion will be created.
 		*
@@ -2429,7 +2430,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Alias. See the description for quat4.fromRotationMatrix().
 		*/
 			mat3.toQuat4 = quat4.fromRotationMatrix;
@@ -2437,7 +2438,7 @@ define(
 			(function() {
 				var mat = mat3.create();
 
-		/**
+		/*
 		* Creates a quaternion from the 3 given vectors. They must be perpendicular
 		* to one another and represent the X, Y and Z axes.
 		*
@@ -2473,7 +2474,7 @@ define(
 				};
 			})();
 
-		/**
+		/*
 		* Sets a quat4 to the Identity and returns it.
 		*
 		* @param {quat4} [dest] quat4 to set. If omitted, a
@@ -2490,7 +2491,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Sets a quat4 from the given angle and rotation axis,
 		* then returns it. If dest is not given, a new quat4 is created.
 		*
@@ -2515,7 +2516,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Stores the angle and axis in a vec4, where the XYZ components represent
 		* the axis and the W (4th) component is the angle in radians.
 		*
@@ -2551,7 +2552,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Returns a string representation of a quaternion
 		*
 		* @param {quat4} quat quat4 to represent as a string
@@ -2562,13 +2563,13 @@ define(
 				return '[' + quat[0] + ', ' + quat[1] + ', ' + quat[2] + ', ' + quat[3] + ']';
 			};
 
-		/**
+		/*
 		* @class 2 Dimensional Vector
 		* @name vec2
 		*/
 			var vec2 = {};
 
-		/**
+		/*
 		* Creates a new vec2, initializing it from vec if vec
 		* is given.
 		*
@@ -2588,7 +2589,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Creates a new instance of a vec2, initializing it with the given arguments
 		*
 		* @param {number} x X value
@@ -2605,7 +2606,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Adds the vec2's together. If dest is given, the result
 		* is stored there. Otherwise, the result is stored in vecB.
 		*
@@ -2621,7 +2622,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Subtracts vecB from vecA. If dest is given, the result
 		* is stored there. Otherwise, the result is stored in vecB.
 		*
@@ -2637,7 +2638,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Multiplies vecA with vecB. If dest is given, the result
 		* is stored there. Otherwise, the result is stored in vecB.
 		*
@@ -2653,7 +2654,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Divides vecA by vecB. If dest is given, the result
 		* is stored there. Otherwise, the result is stored in vecB.
 		*
@@ -2669,7 +2670,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Scales vecA by some scalar number. If dest is given, the result
 		* is stored there. Otherwise, the result is stored in vecA.
 		*
@@ -2688,7 +2689,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Calculates the euclidian distance between two vec2
 		*
 		* Params:
@@ -2703,7 +2704,7 @@ define(
 				return Math.sqrt(x*x + y*y);
 			};
 
-		/**
+		/*
 		* Copies the values of one vec2 to another
 		*
 		* @param {vec2} vec vec2 containing values to copy
@@ -2717,7 +2718,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Compares two vectors for equality within a certain margin of error
 		*
 		* @param {vec2} a First vector
@@ -2732,7 +2733,7 @@ define(
 				);
 			};
 
-		/**
+		/*
 		* Negates the components of a vec2
 		*
 		* @param {vec2} vec vec2 to negate
@@ -2747,7 +2748,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Normlize a vec2
 		*
 		* @param {vec2} vec vec2 to normalize
@@ -2768,7 +2769,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Computes the cross product of two vec2's. Note that the cross product must by definition
 		* produce a 3D vector. If a dest vector is given, it will contain the resultant 3D vector.
 		* Otherwise, a scalar number will be returned, representing the vector's Z coordinate, since
@@ -2798,7 +2799,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Caclulates the length of a vec2
 		*
 		* @param {vec2} vec vec2 to calculate length of
@@ -2810,7 +2811,7 @@ define(
 			  return Math.sqrt(x * x + y * y);
 			};
 
-		/**
+		/*
 		* Caclulates the squared length of a vec2
 		*
 		* @param {vec2} vec vec2 to calculate squared length of
@@ -2822,7 +2823,7 @@ define(
 			  return x * x + y * y;
 			};
 
-		/**
+		/*
 		* Caclulates the dot product of two vec2s
 		*
 		* @param {vec2} vecA First operand
@@ -2834,7 +2835,7 @@ define(
 				return vecA[0] * vecB[0] + vecA[1] * vecB[1];
 			};
 
-		/**
+		/*
 		* Generates a 2D unit vector pointing from one vector to another
 		*
 		* @param {vec2} vecA Origin vec2
@@ -2863,7 +2864,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Performs a linear interpolation between two vec2
 		*
 		* @param {vec2} vecA First vector
@@ -2880,7 +2881,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Returns a string representation of a vector
 		*
 		* @param {vec2} vec Vector to represent as a string
@@ -2891,13 +2892,13 @@ define(
 				return '[' + vec[0] + ', ' + vec[1] + ']';
 			};
 
-		/**
+		/*
 		* @class 2x2 Matrix
 		* @name mat2
 		*/
 			var mat2 = {};
 
-		/**
+		/*
 		* Creates a new 2x2 matrix. If src is given, the new matrix
 		* is initialized to those values.
 		*
@@ -2918,7 +2919,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Creates a new instance of a mat2, initializing it with the given arguments
 		*
 		* @param {number} m00
@@ -2939,7 +2940,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Copies the values of one mat2 to another
 		*
 		* @param {mat2} mat mat2 containing values to copy
@@ -2955,7 +2956,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Compares two matrices for equality within a certain margin of error
 		*
 		* @param {mat2} a First matrix
@@ -2972,7 +2973,7 @@ define(
 				);
 			};
 
-		/**
+		/*
 		* Sets a mat2 to an identity matrix
 		*
 		* @param {mat2} [dest] mat2 to set. If omitted a new one will be created.
@@ -2988,7 +2989,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Transposes a mat2 (flips the values over the diagonal)
 		*
 		* @param {mat2} mat mat2 to transpose
@@ -3012,7 +3013,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Calculates the determinant of a mat2
 		*
 		* @param {mat2} mat mat2 to calculate determinant of
@@ -3023,7 +3024,7 @@ define(
 			  return mat[0] * mat[3] - mat[2] * mat[1];
 			};
 
-		/**
+		/*
 		* Calculates the inverse matrix of a mat2
 		*
 		* @param {mat2} mat mat2 to calculate inverse of
@@ -3045,7 +3046,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Performs a matrix multiplication
 		*
 		* @param {mat2} matA First operand
@@ -3067,7 +3068,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Rotates a 2x2 matrix by an angle
 		*
 		* @param {mat2} mat The matrix to rotate
@@ -3091,7 +3092,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Multiplies the vec2 by the given 2x2 matrix
 		*
 		* @param {mat2} matrix the 2x2 matrix to multiply against
@@ -3108,7 +3109,7 @@ define(
 			  return dest;
 			};
 
-		/**
+		/*
 		* Scales the mat2 by the dimensions in the given vec2
 		*
 		* @param {mat2} matrix the 2x2 matrix to scale
@@ -3132,7 +3133,7 @@ define(
 			  return dest;
 			};
 
-		/**
+		/*
 		* Returns a string representation of a mat2
 		*
 		* @param {mat2} mat mat2 to represent as a string
@@ -3143,13 +3144,13 @@ define(
 				return '[' + mat[0] + ', ' + mat[1] + ', ' + mat[2] + ', ' + mat[3] + ']';
 			};
 
-		/**
+		/*
 		* @class 4 Dimensional Vector
 		* @name vec4
 		*/
 			var vec4 = {};
 
-		/**
+		/*
 		* Creates a new vec4, initializing it from vec if vec
 		* is given.
 		*
@@ -3173,7 +3174,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Creates a new instance of a vec4, initializing it with the given arguments
 		*
 		* @param {number} x X value
@@ -3194,7 +3195,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Adds the vec4's together. If dest is given, the result
 		* is stored there. Otherwise, the result is stored in vecB.
 		*
@@ -3212,7 +3213,7 @@ define(
 			  return dest;
 			};
 
-		/**
+		/*
 		* Subtracts vecB from vecA. If dest is given, the result
 		* is stored there. Otherwise, the result is stored in vecB.
 		*
@@ -3230,7 +3231,7 @@ define(
 			  return dest;
 			};
 
-		/**
+		/*
 		* Multiplies vecA with vecB. If dest is given, the result
 		* is stored there. Otherwise, the result is stored in vecB.
 		*
@@ -3248,7 +3249,7 @@ define(
 			  return dest;
 			};
 
-		/**
+		/*
 		* Divides vecA by vecB. If dest is given, the result
 		* is stored there. Otherwise, the result is stored in vecB.
 		*
@@ -3266,7 +3267,7 @@ define(
 			  return dest;
 			};
 
-		/**
+		/*
 		* Scales vecA by some scalar number. If dest is given, the result
 		* is stored there. Otherwise, the result is stored in vecA.
 		*
@@ -3287,7 +3288,7 @@ define(
 			  return dest;
 			};
 
-		/**
+		/*
 		* Copies the values of one vec4 to another
 		*
 		* @param {vec4} vec vec4 containing values to copy
@@ -3303,7 +3304,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Compares two vectors for equality within a certain margin of error
 		*
 		* @param {vec4} a First vector
@@ -3320,7 +3321,7 @@ define(
 				);
 			};
 
-		/**
+		/*
 		* Negates the components of a vec4
 		*
 		* @param {vec4} vec vec4 to negate
@@ -3337,7 +3338,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Caclulates the length of a vec2
 		*
 		* @param {vec2} vec vec2 to calculate length of
@@ -3349,7 +3350,7 @@ define(
 			  return Math.sqrt(x * x + y * y + z * z + w * w);
 			};
 
-		/**
+		/*
 		* Caclulates the squared length of a vec4
 		*
 		* @param {vec4} vec vec4 to calculate squared length of
@@ -3361,7 +3362,7 @@ define(
 			  return x * x + y * y + z * z + w * w;
 			};
 
-		/**
+		/*
 		* Performs a linear interpolation between two vec4
 		*
 		* @param {vec4} vecA First vector
@@ -3380,7 +3381,7 @@ define(
 				return dest;
 			};
 
-		/**
+		/*
 		* Returns a string representation of a vector
 		*
 		* @param {vec4} vec Vector to represent as a string

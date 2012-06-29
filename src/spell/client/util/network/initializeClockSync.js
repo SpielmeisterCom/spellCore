@@ -25,17 +25,17 @@ define(
 		var MEDIUM_SYNC_FREQUENCY = 2
 		var LOW_SYNC_FREQUENCY = 1
 
-		/**
+		/*
 		 * the minimum number of performed clock synchronization round trips until clock synchronization is established
 		 */
 		var minNumberOfClockSyncRoundTrips = 5
 
-		/**
+		/*
 		 * the frequency at which clock synchronization is performed
 		 */
 		var synchronizationFrequency = HIGH_SYNC_FREQUENCY
 
-		/**
+		/*
 		 * the number of measurements the computation is based on
 		 */
 		var numberOfOneWayLatencyMeasurements = 5

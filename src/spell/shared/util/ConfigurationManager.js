@@ -15,11 +15,11 @@ define(
 		"use strict"
 
 
-		/**
+		/*
 		 * private
 		 */
 
-		/**
+		/*
 		 * Generates a structure holding server host configuration information
 		 *
 		 * The returned structure looks like this:
@@ -55,7 +55,7 @@ define(
 			}
 		}
 
-		/**
+		/*
 		 * These are the platform agnostic options.
 		 *
 		 * gameserver/resourceServer - "internal" means "same as the server that the client was delivered from"; "*" matches any valid host/port combination, i.e. "acme.org:8080"
@@ -83,7 +83,7 @@ define(
 			}
 		}
 
-		/**
+		/*
 		 * These options are used when they are not overridden by the environment configuration set up by the stage-0-loader.
 		 */
 		var defaultOptions = {
@@ -156,7 +156,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

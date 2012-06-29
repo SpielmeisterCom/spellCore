@@ -9,7 +9,7 @@ define(
 		"use strict"
 
 
-		/**
+		/*
 		 * private
 		 */
 
@@ -35,7 +35,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 
@@ -49,7 +49,7 @@ define(
 				this.addSeries( 'totalTimeSpent', 'total time spent', 'ms' )
 				this.addSeries( 'timeSpentRendering', 'time spent rendering', 'ms' )
 			},
-			/**
+			/*
 			 * call this method to signal the beginning of a new measurement period
 			 */
 			startTick: function() {

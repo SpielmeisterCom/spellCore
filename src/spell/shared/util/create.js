@@ -12,7 +12,7 @@ define(
 		var NO_CONSTRUCTOR_ERROR = 'The first argument for create must be a constructor. You passed in '
 
 
-		/**
+		/*
 		 * public
 		 */
 

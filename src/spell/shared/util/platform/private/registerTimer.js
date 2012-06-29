@@ -4,7 +4,7 @@ define(
 		"use strict";
 
 
-		/**
+		/*
 		 * callback - the callback to call
 		 * timeInMs - the number of milliseconds that the callback is delayed by
 		 */

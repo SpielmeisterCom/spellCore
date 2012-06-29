@@ -19,7 +19,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * private
 		 */
 
@@ -56,7 +56,7 @@ define(
 					updateIntervalInMs  = this.updateIntervalInMs
 
 				if( this.updateCallback ) {
-					/**
+					/*
 					 * Only simulate, if not too much time has accumulated to prevent CPU overload. This can happen when the browser tab has been in the
 					 * background for a while and requestAnimationFrame is used.
 					 */
@@ -95,7 +95,7 @@ define(
 		}
 
 
-		/**
+		/*
 		 * public
 		 */
 

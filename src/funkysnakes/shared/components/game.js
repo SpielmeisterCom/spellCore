@@ -11,7 +11,7 @@ define(
 			this.players    = []
 			this.start      = false
 
-			/**
+			/*
 			 * waitingForStart, running
 			 * @type {String}
 			 */
