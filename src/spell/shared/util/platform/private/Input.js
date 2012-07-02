@@ -66,8 +66,8 @@ define(
 			var screenSize = this.configurationManager.screenSize
 
 			var position = [
-				( touch.pageX - offset[ 0 ] ) / screenSize.width,
-				( touch.pageY - offset[ 1 ] ) / screenSize.height
+				( touch.pageX - offset[ 0 ] ) / screenSize[ 0 ],
+				( touch.pageY - offset[ 1 ] ) / screenSize[ 1 ]
 			]
 
 			// if the event missed the display it gets ignored
@@ -101,8 +101,8 @@ define(
 			var screenSize = this.configurationManager.screenSize
 
 			var position = [
-				( event.pageX - offset[ 0 ] ) / screenSize.width,
-				( event.pageY - offset[ 1 ] ) / screenSize.height
+				( event.pageX - offset[ 0 ] ) / screenSize[ 0 ],
+				( event.pageY - offset[ 1 ] ) / screenSize[ 1 ]
 			]
 
             // if the event missed the display it gets ignored

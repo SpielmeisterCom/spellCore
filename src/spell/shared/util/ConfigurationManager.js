@@ -49,10 +49,7 @@ define(
 
 			var parts = value.split( 'x' )
 
-			return {
-				width  : parseInt( parts[ 0 ] ),
-				height : parseInt( parts[ 1 ] )
-			}
+			return [ parseInt( parts[ 0 ] ), parseInt( parts[ 1 ] ) ]
 		}
 
 		/*
