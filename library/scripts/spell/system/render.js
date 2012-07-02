@@ -1,6 +1,8 @@
 define(
 	'spell/system/render',
 	[
+		'spell/client/2d/graphics/createWorldToViewMatrix',
+		'spell/client/2d/graphics/drawCoordinateGrid',
 		'spell/shared/util/Events',
 
 		'spell/math/vec2',
@@ -10,6 +12,8 @@ define(
 		'spell/shared/util/platform/underscore'
 	],
 	function(
+		createWorldToViewMatrix,
+		drawCoordinateGrid,
 		Events,
 
 		vec2,
@@ -25,26 +29,9 @@ define(
 		 * private
 		 */
 
-		var tmp             = vec3.create(),
-			currentCameraId = undefined
-
-		var createWorldToViewMatrix = function( matrix, aspectRatio ) {
-			// world space to view space matrix
-			var cameraWidth  = 1024,
-				cameraHeight = 768
-
-			mat4.ortho(
-				0,
-				cameraWidth,
-				0,
-				cameraHeight,
-				0,
-				1000,
-				matrix
-			)
-
-			mat4.translate( matrix, [ 0, 0, 0 ] ) // camera is located at (0/0/0); WATCH OUT: apply inverse translation
-		}
+		var tmpVec3 = vec3.create(),
+			tmpMat4 = mat4.identity(),
+			currentCameraId
 
 		var createSortedByLayer = function( roots, visualObjects ) {
 			return _.reduce(
@@ -114,14 +101,14 @@ define(
 				}
 
 				// object to world space transformation go here
-				vec2.set( transform.translation, tmp )
-				context.translate( tmp )
+				vec2.set( transform.translation, tmpVec3 )
+				context.translate( tmpVec3 )
 
 				context.rotate( transform.rotation )
 
 				if( asset.type === 'appearance' ) {
-					vec2.multiply( transform.scale, [ texture.width, texture.height ], tmp )
-					context.scale( tmp )
+					vec2.multiply( transform.scale, [ texture.width, texture.height ], tmpVec3 )
+					context.scale( tmpVec3 )
 
 					context.drawTexture( texture, -0.5, -0.5, 1, 1 )
 
@@ -132,8 +119,8 @@ define(
 						assetFrameHeight = asset.frameHeight,
 						assetNumFrames   = asset.numFrames
 
-					vec2.multiply( transform.scale, [ assetFrameWidth, assetFrameHeight ], tmp )
-					context.scale( tmp )
+					vec2.multiply( transform.scale, [ assetFrameWidth, assetFrameHeight ], tmpVec3 )
+					context.scale( tmpVec3 )
 
 					appearance.animationOffset = createAnimationOffset(
 						deltaTimeInMs,
@@ -165,13 +152,13 @@ define(
 			context.restore()
 		}
 
-		var setCamera = function( context, cameras, transforms, worldToView ) {
+		var getActiveCameraId = function( cameras ) {
 			if( _.size( cameras ) === 0 ) return
 
 			// Gets the first active camera. More than one camera being active is an undefined state and the first found active is used.
 			var activeCameraId = undefined
 
-			var activeCamera = _.find(
+			_.any(
 				cameras,
 				function( camera, id ) {
 					if( camera.active ) {
@@ -184,31 +171,49 @@ define(
 				}
 			)
 
-			if( currentCameraId === activeCameraId ) return
+			if( currentCameraId !== activeCameraId ) currentCameraId = activeCameraId
 
-			currentCameraId = activeCameraId
+			return currentCameraId
+		}
 
+		var createCameraDimensions = function( camera, transform ) {
+			return ( camera && transform ?
+				[ camera.width * transform.scale[ 0 ], camera.height * transform.scale[ 1 ] ] :
+				undefined
+			)
+		}
+
+		var setCamera = function( context, cameraDimensions, position ) {
 			// setting up the camera geometry
-			var halfWidth  = activeCamera.width / 2,
-				halfHeight = activeCamera.height / 2
+			var halfWidth  = cameraDimensions[ 0 ] / 2,
+				halfHeight = cameraDimensions[ 1 ] / 2
 
-			mat4.ortho( -halfWidth, halfWidth, -halfHeight, halfHeight, 0, 100, worldToView )
+			mat4.ortho( -halfWidth, halfWidth, -halfHeight, halfHeight, 0, 100, tmpMat4 )
 
 			// translating with the inverse camera position
-			vec2.set( transforms[ currentCameraId ].translation, tmp )
-			mat4.translate( worldToView, vec2.negate( tmp ) )
+			vec2.set( position, tmpVec3 )
+			mat4.translate( tmpMat4, vec2.negate( tmpVec3 ) )
 
-			context.setViewMatrix( worldToView )
+			context.setViewMatrix( tmpMat4 )
 		}
 
 		var process = function( globals, timeInMs, deltaTimeInMs ) {
 			var context = this.context,
+				cameras = this.cameras,
 				drawVisualObjectPartial = this.drawVisualObjectPartial
+
+			// set the camera
+			var activeCameraId   = getActiveCameraId( cameras ),
+				camera           = cameras[ activeCameraId ],
+				cameraTransform  = this.transforms[ activeCameraId ],
+				cameraDimensions = createCameraDimensions( camera, cameraTransform )
+
+			if( cameraDimensions && cameraTransform ) {
+				setCamera( context, cameraDimensions, cameraTransform.translation )
+			}
 
 			// clear color buffer
 			context.clear()
-
-			setCamera( context, this.cameras, this.transforms, this.worldToView )
 
 			// TODO: visualObjects should be presorted on the component list level by a user defined index, not here on every rendering tick
 			_.each(
@@ -217,6 +222,13 @@ define(
 					drawVisualObjectPartial( deltaTimeInMs, visualObject.id, drawVisualObjectPartial )
 				}
 			)
+
+			// draw coordinate grid
+			var debugGrid = true
+
+			if( debugGrid && cameraDimensions && cameraTransform ) {
+				drawCoordinateGrid( context, this.screenSize, cameraDimensions, cameraTransform )
+			}
 		}
 
 		var init = function( globals ) {}
@@ -229,9 +241,10 @@ define(
 		 */
 
 		var Renderer = function( globals ) {
-			this.assets    = globals.assets
-			this.resources = globals.resources
-			this.context   = globals.renderingContext
+			this.screenSize = globals.configurationManager.screenSize
+			this.assets     = globals.assets
+			this.resources  = globals.resources
+			this.context    = globals.renderingContext
 			this.drawVisualObjectPartial = _.bind(
 				drawVisualObject,
 				null,
@@ -249,18 +262,13 @@ define(
 				context = this.context
 
 			// setting up the view space matrix
-			this.worldToView = mat4.create()
-			mat4.identity( this.worldToView )
-			createWorldToViewMatrix( this.worldToView, 4 / 3 )
-			context.setViewMatrix( this.worldToView )
+			context.setViewMatrix( createWorldToViewMatrix( tmpMat4, this.screenSize ) )
 
 			// setting up the viewport
 			var viewportPositionX = 0,
-				viewportPositionY = 0,
-				maxWidth = 1024,
-				maxHeight = 768
+				viewportPositionY = 0
 
-			context.viewport( viewportPositionX, viewportPositionY, maxWidth, maxHeight )
+			context.viewport( viewportPositionX, viewportPositionY, this.screenSize[ 0 ], this.screenSize[ 1 ] )
 
 			eventManager.subscribe(
 				Events.SCREEN_RESIZED,
