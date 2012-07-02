@@ -2,10 +2,14 @@ define(
 	'spell/shared/util/template/TemplateManager',
 	[
 		'spell/shared/util/deepClone',
+		'spell/shared/util/template/TemplateTypes',
+
 		'spell/shared/util/platform/underscore'
 	],
 	function(
 		deepClone,
+		TemplateTypes,
+
 		_
 	) {
 		'use strict'
@@ -14,12 +18,6 @@ define(
 		/*
 		 * private
 		 */
-
-		var templateTypes = {
-			TEMPLATE_TYPE_ENTITY    : 'entityTemplate',
-			TEMPLATE_TYPE_COMPONENT : 'componentTemplate',
-			TEMPLATE_TYPE_SYSTEM    : 'systemTemplate'
-		}
 
 		var createName = function() {
 		    return _.reduce(
@@ -88,14 +86,14 @@ define(
 		var isValidDefinition = function( template ) {
 			var templateType = template.type
 
-			if( !_.contains( templateTypes, templateType ) ) return false
+			if( !_.contains( TemplateTypes, templateType ) ) return false
 
 
-			if( templateType === templateTypes.TEMPLATE_TYPE_COMPONENT ) {
+			if( templateType === TemplateTypes.COMPONENT ) {
 				return isValidComponentTemplate( template )
 			}
 
-			if( templateType === templateTypes.TEMPLATE_TYPE_ENTITY ) {
+			if( templateType === TemplateTypes.ENTITY ) {
 				return isValidEntityTemplate( template )
 			}
 
@@ -139,9 +137,9 @@ define(
 				entityTemplate.components,
 				function( memo, componentConfig ) {
 					var componentTemplateId = componentConfig.templateId,
-						componentTemplate = getTemplate( templates, componentTemplateId, templateTypes.TEMPLATE_TYPE_COMPONENT )
+						componentTemplate = getTemplate( templates, componentTemplateId, TemplateTypes.COMPONENT )
 
-					if( !componentTemplate ) throwCouldNotFindTemplate( componentTemplateId, templateTypes.TEMPLATE_TYPE_COMPONENT )
+					if( !componentTemplate ) throwCouldNotFindTemplate( componentTemplateId, TemplateTypes.COMPONENT )
 
 
 					var hasSingleAttribute = isSingleAttributeComponent( componentTemplate.attributes )
@@ -166,7 +164,7 @@ define(
 
 			templates[ templateId ] = definition
 
-			if( definition.type === templateTypes.TEMPLATE_TYPE_ENTITY ) {
+			if( definition.type === TemplateTypes.ENTITY ) {
 				entityPrototype[ templateId ] = createEntityTemplate( templates, definition )
 			}
 		}
@@ -198,7 +196,7 @@ define(
 			return _.reduce(
 				config,
 				function( memo, componentConfig, componentId ) {
-					var componentTemplate = getTemplate( templates, componentId, templateTypes.TEMPLATE_TYPE_COMPONENT )
+					var componentTemplate = getTemplate( templates, componentId, TemplateTypes.COMPONENT )
 
 					if( !componentTemplate ) {
 						throw 'Error: Could not find component template \'' + componentId + '\' for \'' + entityTemplateId + '\'.'
@@ -220,7 +218,7 @@ define(
 			return _.reduce(
 				config,
 				function( memo, componentConfig, componentId ) {
-					var componentTemplate = getTemplate( templates, componentId, templateTypes.TEMPLATE_TYPE_COMPONENT ),
+					var componentTemplate = getTemplate( templates, componentId, TemplateTypes.COMPONENT ),
 						hasSingleAttribute = isSingleAttributeComponent( componentTemplate.attributes )
 
 					memo[ componentId ] = updateComponent(
@@ -278,7 +276,7 @@ define(
 			},
 
 			getTemplateIds : function( templateType ) {
-				if( !_.contains( templateTypes, templateType ) ) throw 'Error: Template type \'' + templateType + '\' is not supported.'
+				if( !_.contains( TemplateTypes, templateType ) ) throw 'Error: Template type \'' + templateType + '\' is not supported.'
 
 				return _.reduce(
 					this.templates,
@@ -296,7 +294,7 @@ define(
 			 * @return {*}
 			 */
 			isSingleAttributeComponent : function( templateId ) {
-				var template = getTemplate( this.templates, templateId, templateTypes.TEMPLATE_TYPE_COMPONENT )
+				var template = getTemplate( this.templates, templateId, TemplateTypes.COMPONENT )
 
 				if( !template ) throw 'Error: Could not find component template with id \'' + templateId + '\'.'
 

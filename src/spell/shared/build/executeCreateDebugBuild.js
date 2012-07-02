@@ -9,6 +9,7 @@ define(
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
 		'spell/shared/util/template/TemplateManager',
+		'spell/shared/util/template/TemplateTypes',
 		'spell/shared/util/createAssetId',
 
 		'amd-helper',
@@ -31,6 +32,7 @@ define(
 		isDirectory,
 		isFile,
 		TemplateManager,
+		TemplateTypes,
 		createAssetId,
 
 		amdHelper,
@@ -47,7 +49,7 @@ define(
 		'use strict'
 
 
-		/*
+		/**
 		 * private
 		 */
 
@@ -62,10 +64,6 @@ define(
 			'	}',
 			')'
 		].join( '\n' )
-
-		var rootComponentId              = 'spell.component.entityComposite.root',
-			childrenComponentId          = 'spell.component.entityComposite.children',
-			requiredComponentTemplateIds = [ rootComponentId, childrenComponentId ]
 
 		var createFilePaths = function( paths, extensions ) {
 			if( !extensions ||
@@ -163,21 +161,21 @@ define(
 			)
 
 			errors = errors.concat(
-				loadTemplates( templateManager, templates, 'componentTemplate' )
+				loadTemplates( templateManager, templates, TemplateTypes.COMPONENT )
 			)
 
 			if( errors.length > 0 ) return errors
 
 
 			errors = errors.concat(
-				loadTemplates( templateManager, templates, 'entityTemplate' )
+				loadTemplates( templateManager, templates, TemplateTypes.ENTITY )
 			)
 
 			if( errors.length > 0 ) return errors
 
 
 			errors = errors.concat(
-				loadTemplates( templateManager, templates, 'systemTemplate' )
+				loadTemplates( templateManager, templates, TemplateTypes.SYSTEM )
 			)
 
 			return errors
@@ -236,25 +234,6 @@ define(
 				systemTemplateIds,
 				function( memo, templateId ) {
 					return memo.concat( templateManager.getTemplate( templateId).scriptId )
-				},
-				[]
-			)
-		}
-
-		/*
-		 * Returns all dependent component template ids
-		 */
-		var getDependencyTemplateIds = function( templateManager, templateIds, path ) {
-			return _.reduce(
-				templateIds,
-				function( memo, templateId ) {
-					return _.union(
-						memo,
-						jsonPath(
-							templateManager.getTemplate( templateId ),
-							path
-						)
-					)
 				},
 				[]
 			)
@@ -330,7 +309,7 @@ define(
 			)
 		}
 
-		/*
+		/**
 		 * Determines the dependencies of the script modules which are not already resolved by the spell engine include.
 		 *
 		 * @param engineSource
@@ -404,7 +383,7 @@ define(
 		}
 
 
-		/*
+		/**
 		 * public
 		 */
 
@@ -435,14 +414,10 @@ define(
 			if( _.size( errors ) > 0 ) callback( errors )
 
 
-			// determine all templates that are referenced in the project
-			var entityTemplateIds    = _.unique( jsonPath( projectConfig, '$.scenes[*].entities[*].templateId' ) ),
-				systemTemplateIds    = _.unique( _.flatten( jsonPath( projectConfig, '$.scenes[*].systems[*]' ) )),
-				componentTemplateIds = _.union(
-					getDependencyTemplateIds( templateManager, entityTemplateIds, '$.components[*].templateId' ),
-					getDependencyTemplateIds( templateManager, systemTemplateIds, '$.input[*].templateId' ),
-					requiredComponentTemplateIds
-				)
+			// determine all templates
+			var entityTemplateIds    = templateManager.getTemplateIds( TemplateTypes.ENTITY ),
+				systemTemplateIds    = templateManager.getTemplateIds( TemplateTypes.SYSTEM ),
+				componentTemplateIds = templateManager.getTemplateIds( TemplateTypes.COMPONENT )
 
 
 			// check if the required templates are available
