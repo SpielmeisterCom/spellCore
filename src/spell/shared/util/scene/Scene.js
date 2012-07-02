@@ -2,12 +2,14 @@ define(
 	'spell/shared/util/scene/Scene',
 	[
 		'spell/shared/util/create',
+		'spell/shared/util/entityConfig/flatten',
 		'spell/shared/util/Events',
 
 		'spell/shared/util/platform/underscore'
 	],
 	function(
 		create,
+		flattenEntityConfig,
 		Events,
 
 		_
@@ -18,6 +20,9 @@ define(
 		/*
 		 * private
 		 */
+
+		var cameraEntityTemplateId    = 'spell.entity.2d.graphics.camera',
+			cameraComponentTemplateId = 'spell.component.2d.graphics.camera'
 
 		var requireScript = function( scriptId ) {
 			if( !scriptId ) throw 'Error: No script id provided.'
@@ -72,6 +77,30 @@ define(
 			)
 		}
 
+		var hasActiveCamera = function( sceneConfig ) {
+			return _.any(
+				flattenEntityConfig( sceneConfig.entities ),
+				function( entityConfig ) {
+					return ( entityConfig.templateId === cameraEntityTemplateId ?
+						entityConfig.config[ cameraComponentTemplateId ].active :
+						false
+					)
+				}
+			)
+		}
+
+		var createDefaultCamera = function( entityManager ) {
+			var entityConfig = {}
+			entityConfig[ cameraComponentTemplateId ] = {
+				active : true
+			}
+
+			entityManager.createEntity( {
+				templateId : cameraEntityTemplateId,
+				config : entityConfig
+			} )
+ 		}
+
 
 		/*
 		 * public
@@ -94,6 +123,10 @@ define(
 			},
 			init: function( globals, sceneConfig ) {
 				var entityManager = globals.entityManager
+
+				if( !hasActiveCamera( sceneConfig ) ) {
+					createDefaultCamera( entityManager )
+				}
 
 				if( sceneConfig.scriptId ) {
 					this.script = requireScript( sceneConfig.scriptId )

@@ -1,6 +1,6 @@
 {
 	"type" : "entityTemplate",
-	"namespace" : "spell.entity",
+	"namespace" : "spell.entity.2d.graphics",
 	"name" : "camera",
 	"components" : [
 		{
