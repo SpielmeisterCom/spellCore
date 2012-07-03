@@ -6,7 +6,7 @@ define(
 		"spell/server/util/network/nextNetworkId",
 		"spell/shared/util/map",
 
-		"glmatrix/vec3",
+		"spell/math/vec3",
 		'spell/shared/util/platform/underscore'
 	],
 	function(

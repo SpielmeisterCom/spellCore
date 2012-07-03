@@ -3,7 +3,7 @@ define(
 	[
 		'spell/shared/util/platform/private/nativeType/createFloatArray',
 
-		'glmatrix/mat4',
+		'spell/math/mat4',
 		'spell/shared/util/platform/underscore'
 	],
 	function(

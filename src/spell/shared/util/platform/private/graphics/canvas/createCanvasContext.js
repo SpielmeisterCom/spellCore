@@ -4,7 +4,7 @@ define(
 		'spell/shared/util/platform/private/graphics/StateStack',
 		'spell/shared/util/color',
 
-		'glmatrix/mat4'
+		'spell/math/mat4'
 	],
 	function(
 		StateStack,

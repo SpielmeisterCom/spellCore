@@ -1,7 +1,7 @@
 define(
 	"funkysnakes/shared/util/collisionBetween",
 	[
-		"glmatrix/vec3"
+		"spell/math/vec3"
 	],
 	function(
 		vec3

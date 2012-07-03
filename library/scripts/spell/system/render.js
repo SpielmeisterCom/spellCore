@@ -3,9 +3,9 @@ define(
 	[
 		'spell/shared/util/Events',
 
-		'glmatrix/vec2',
-		'glmatrix/vec3',
-		'glmatrix/mat4',
+		'spell/math/vec2',
+		'spell/math/vec3',
+		'spell/math/mat4',
 
 		'spell/shared/util/platform/underscore'
 	],

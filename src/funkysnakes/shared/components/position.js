@@ -1,7 +1,7 @@
 define(
 	"funkysnakes/shared/components/position",
 	[
-		"glmatrix/vec3"
+		"spell/math/vec3"
 	],
 	function(
 		vec3

@@ -8,7 +8,7 @@ define(
 		'spell/shared/util/Logger',
 		'spell/shared/util/platform/PlatformKit',
 
-		'glmatrix/mat4'
+		'spell/math/mat4'
 	],
 	function(
 		ConfigurationManager,

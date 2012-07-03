@@ -1,7 +1,7 @@
 define(
 	"funkysnakes/client/components/cloud",
 	[
-		"glmatrix/vec3"
+		"spell/math/vec3"
 	],
 	function(
 		vec3

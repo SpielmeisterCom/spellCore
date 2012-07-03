@@ -4,7 +4,7 @@ define(
 		"funkysnakes/shared/config/constants",
 		"spell/server/util/network/nextNetworkId",
 
-		"glmatrix/vec3",
+		"spell/math/vec3",
 		'spell/shared/util/platform/underscore'
 	],
 	function(

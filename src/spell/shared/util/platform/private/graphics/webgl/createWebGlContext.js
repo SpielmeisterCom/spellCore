@@ -9,9 +9,9 @@ define(
 		'spell/shared/util/math',
 		'spell/shared/util/platform/private/nativeType/createFloatArray',
 
-		'glmatrix/vec3',
-		'glmatrix/mat3',
-		'glmatrix/mat4'
+		'spell/math/vec3',
+		'spell/math/mat3',
+		'spell/math/mat4'
 	],
 	function(
 		StateStack,

@@ -6,7 +6,7 @@ define(
 		"spell/shared/util/network/snapshots",
 		"spell/shared/util/math",
 
-		"glmatrix/vec3",
+		"spell/math/vec3",
 		'spell/shared/util/platform/underscore'
 	],
 	function(

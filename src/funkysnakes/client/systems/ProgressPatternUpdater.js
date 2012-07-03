@@ -5,7 +5,7 @@ define(
 		'spell/shared/util/math',
 		'spell/shared/util/random/XorShift32',
 
-		'glmatrix/vec3',
+		'spell/math/vec3',
 		'spell/shared/util/platform/underscore'
 	],
 	function(

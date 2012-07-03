@@ -3,8 +3,8 @@ define(
 	[
 		"funkysnakes/shared/config/constants",
 
-		"glmatrix/vec3",
-		"glmatrix/mat4",
+		"spell/math/vec3",
+		"spell/math/mat4",
 		'spell/shared/util/platform/underscore'
 	],
 	function(

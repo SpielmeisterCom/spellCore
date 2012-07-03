@@ -4,7 +4,7 @@ define(
 		"funkysnakes/shared/config/constants",
 		"funkysnakes/shared/util/speedOf",
 
-		"glmatrix/vec3",
+		"spell/math/vec3",
 
 		'spell/shared/util/platform/underscore'
 	],
