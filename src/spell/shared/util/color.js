@@ -1,18 +1,17 @@
 define(
-	"spell/shared/util/color",
+	'spell/shared/util/color',
 	[
-		"spell/shared/util/math",
+		'spell/shared/util/math',
 
-		"spell/math/vec3",
+		'spell/math/vec3',
 		'spell/shared/util/platform/underscore'
 	],
 	function(
 		MathHelper,
 
-		vec3,
-		_
+		vec3
 	) {
-		"use strict"
+		'use strict'
 
 
 		var toRange = function( value ) {
@@ -50,28 +49,18 @@ define(
 
 
 		var formatCanvas = function( vec ) {
-			if( vec[ 3 ] === undefined ) {
-				return 'rgb('
+			if( vec.length === 4 ) {
+				return 'rgba('
 					+ toRange( vec[ 0 ] ) + ', '
 					+ toRange( vec[ 1 ] ) + ', '
-					+ toRange( vec[ 2 ] ) + ')'
+					+ toRange( vec[ 2 ] ) + ', '
+					+ Math.max( 0, Math.min( vec[ 3 ], 1 ) ) + ')'
 			}
 
-			return 'rgba('
+			return 'rgb('
 				+ toRange( vec[ 0 ] ) + ', '
 				+ toRange( vec[ 1 ] ) + ', '
-				+ toRange( vec[ 2 ] ) + ', '
-				+ toRange( vec[ 3 ] ) + ')'
-		}
-
-
-		var isVec3Color = function( vec ) {
-			return _.size( vec ) === 3
-		}
-
-
-		var isVec4Color = function( vec ) {
-			return _.size( vec ) === 4
+				+ toRange( vec[ 2 ] ) + ')'
 		}
 
 
@@ -79,9 +68,7 @@ define(
 			createRgb    : createRgb,
 			createRgba   : createRgba,
 			createRandom : createRandom,
-			formatCanvas : formatCanvas,
-			isVec3Color  : isVec3Color,
-			isVec4Color  : isVec4Color
+			formatCanvas : formatCanvas
 		}
 	}
 )

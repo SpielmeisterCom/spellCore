@@ -470,7 +470,10 @@ define(
 				projectAssetsPath   = projectPath + relativeAssetsPath,
 				outputResourcesPath = projectPath + '/public/output/resources',
 				assets              = createAssetList( projectAssetsPath ),
-				resourceIds         = createResourceList( assets )
+				resourceIds         = _.union(
+					createResourceList( assets ),
+					'spell/OpenSans14px.png'
+				)
 
 			_.each(
 				resourceIds,

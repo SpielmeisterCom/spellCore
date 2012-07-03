@@ -2,12 +2,16 @@ define(
 	'spell/client/2d/graphics/drawCoordinateGrid',
 	[
 		'spell/client/2d/graphics/createWorldToViewMatrix',
+		'spell/client/2d/graphics/drawText',
+		'spell/client/2d/graphics/fonts/OpenSans14px',
 
 		'glmatrix/vec4',
 		'glmatrix/mat4'
 	],
 	function(
 		createWorldToViewMatrix,
+		drawText,
+		OpenSans14px,
 
 		vec4,
 		mat4
@@ -15,8 +19,12 @@ define(
 		'use strict'
 
 
-		var tmpVec4 = vec4.create(),
-			tmpMat4 = mat4.identity()
+		var tmpMat4         = mat4.identity(),
+			lineOpacity     = 0.5,
+			paleLineColor   = vec4.create( [ 0.4, 0.4, 0.4, lineOpacity ] ),
+			brightLineColor = vec4.create( [ 0.7, 0.7, 0.7, lineOpacity ] ),
+			XAxisColor      = vec4.create( [ 0, 0, 0.7, lineOpacity ] ),
+			YAxisColor      = vec4.create( [ 0, 0.7, 0, lineOpacity ] )
 
 		var computeGridLineStepSize = function( s ) {
 		    var log = Math.log( s ) / Math.log( 10 )
@@ -41,85 +49,65 @@ define(
 			return Math.floor( range / stepSize )
 		}
 
-		var drawGridLinesY = function( context, height, stepSize, startX, y, invScale, worldToScreenTranslation, numLines ) {
+		var drawGridLinesY = function( context, resources, height, stepSize, startX, y, invScale, worldToScreenTranslation, numLines ) {
 			var nextStepSize = stepSize * 10,
 				scaledY = Math.round( ( y + worldToScreenTranslation[ 1  ] ) * invScale),
+				scaledX,
 				x
 
 			for( var i = 0; i <= numLines; i++ ) {
 				x = ( startX + i * stepSize )
+				scaledX = Math.round( ( x + worldToScreenTranslation[ 0 ] ) * invScale )
 
 				// determining the color
-				if( x === 0 ) {
-					tmpVec4[ 0 ] = 0
-					tmpVec4[ 1 ] = 0.85
-					tmpVec4[ 2 ] = 0
-					tmpVec4[ 3 ] = 1.0
-
-				} else if( x % nextStepSize === 0 ) {
-					tmpVec4[ 0 ] = 0.75
-					tmpVec4[ 1 ] = 0.75
-					tmpVec4[ 2 ] = 0.75
-					tmpVec4[ 3 ] = 1.0
-
-				} else {
-					tmpVec4[ 0 ] = 0.25
-					tmpVec4[ 1 ] = 0.25
-					tmpVec4[ 2 ] = 0.25
-					tmpVec4[ 3 ] = 1.0
-				}
-
-				context.setFillStyleColor( tmpVec4 )
-				context.fillRect(
-					Math.round( ( x + worldToScreenTranslation[ 0 ] ) * invScale ),
-					scaledY,
-					1,
-					height
+				context.setFillStyleColor(
+					( x === 0 ?
+						YAxisColor :
+						( x % nextStepSize === 0 ?
+							brightLineColor :
+							paleLineColor
+						)
+					)
 				)
+
+				// draw line
+				context.fillRect( scaledX, scaledY, 1, height )
+
+				// draw label
+				drawText( context, resources, OpenSans14px, scaledX + 3, scaledY, x )
 			}
 		}
 
-		var drawGridLinesX = function( context, width, stepSize, startY, x, invScale, worldToScreenTranslation, numLines ) {
+		var drawGridLinesX = function( context, resources, width, stepSize, startY, x, invScale, worldToScreenTranslation, numLines ) {
 			var nextStepSize = stepSize * 10,
 				scaledX = Math.round( ( x + worldToScreenTranslation[ 0 ] ) * invScale ),
+				scaledY,
 				y
 
 			for( var i = 0; i <= numLines; i++ ) {
 				y = ( startY + i * stepSize )
+				scaledY = Math.round( ( y + worldToScreenTranslation[ 1 ] ) * invScale )
 
 				// determining the color
-				if( y === 0 ) {
-					tmpVec4[ 0 ] = 0
-					tmpVec4[ 1 ] = 0
-					tmpVec4[ 2 ] = 0.85
-					tmpVec4[ 3 ] = 1.0
-
-				} else if( y % nextStepSize === 0 ) {
-					tmpVec4[ 0 ] = 0.75
-					tmpVec4[ 1 ] = 0.75
-					tmpVec4[ 2 ] = 0.75
-					tmpVec4[ 3 ] = 1.0
-
-				} else {
-					tmpVec4[ 0 ] = 0.25
-					tmpVec4[ 1 ] = 0.25
-					tmpVec4[ 2 ] = 0.25
-					tmpVec4[ 3 ] = 1.0
-				}
-
-				context.setFillStyleColor( tmpVec4 )
-				context.fillRect(
-					scaledX,
-					Math.round( ( y + worldToScreenTranslation[ 1 ] ) * invScale ),
-					width,
-					1
+				context.setFillStyleColor(
+					( y === 0 ?
+						XAxisColor :
+						( y % nextStepSize === 0 ?
+							brightLineColor :
+							paleLineColor
+						)
+					)
 				)
 
-				y += stepSize
+				// draw line
+				context.fillRect( scaledX, scaledY, width, 1 )
+
+				// draw label
+				drawText( context, resources, OpenSans14px, scaledX + 3, scaledY, y )
 			}
 		}
 
-		return function( context, screenSize, cameraDimensions, cameraTransform ) {
+		return function( context, resources, screenSize, cameraDimensions, cameraTransform ) {
 			var position     = cameraTransform.translation,
 				scale        = cameraTransform.scale,
 				cameraWidth  = cameraDimensions[ 0 ],
@@ -134,11 +122,11 @@ define(
 			context.save()
 			{
 				context.setViewMatrix( createWorldToViewMatrix( tmpMat4, screenSize ) )
-				context.setGlobalAlpha( 0.66 )
 
 				// grid lines parallel to y-axis
 				drawGridLinesY(
 					context,
+					resources,
 					cameraHeight,
 					stepSize,
 					computeGridStart( minX, stepSize ),
@@ -151,6 +139,7 @@ define(
 				// grid lines parallel to x-axis
 				drawGridLinesX(
 					context,
+					resources,
 					cameraWidth,
 					stepSize,
 					computeGridStart( minY, stepSize ),

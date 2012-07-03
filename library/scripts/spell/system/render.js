@@ -230,7 +230,7 @@ define(
 				cameraDimensions &&
 				cameraTransform ) {
 
-				drawCoordinateGrid( context, configurationManager.screenSize, cameraDimensions, cameraTransform )
+				drawCoordinateGrid( context, this.resources, configurationManager.screenSize, cameraDimensions, cameraTransform )
 			}
 		}
 
