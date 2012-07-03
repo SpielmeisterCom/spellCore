@@ -5,8 +5,8 @@ define(
 		'spell/client/2d/graphics/drawText',
 		'spell/client/2d/graphics/fonts/OpenSans14px',
 
-		'glmatrix/vec4',
-		'glmatrix/mat4'
+		'spell/math/vec4',
+		'spell/math/mat4'
 	],
 	function(
 		createWorldToViewMatrix,

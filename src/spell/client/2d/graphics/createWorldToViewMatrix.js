@@ -1,7 +1,7 @@
 define(
 	'spell/client/2d/graphics/createWorldToViewMatrix',
 	[
-		'glmatrix/mat4'
+		'spell/math/mat4'
 	],
 	function(
 		mat4
