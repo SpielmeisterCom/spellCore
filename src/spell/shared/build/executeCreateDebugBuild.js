@@ -49,7 +49,7 @@ define(
 		'use strict'
 
 
-		/**
+		/*
 		 * private
 		 */
 
@@ -309,7 +309,7 @@ define(
 			)
 		}
 
-		/**
+		/*
 		 * Determines the dependencies of the script modules which are not already resolved by the spell engine include.
 		 *
 		 * @param engineSource
