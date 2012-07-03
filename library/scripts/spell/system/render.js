@@ -224,10 +224,13 @@ define(
 			)
 
 			// draw coordinate grid
-			var debugGrid = true
+			var configurationManager = this.configurationManager
 
-			if( debugGrid && cameraDimensions && cameraTransform ) {
-				drawCoordinateGrid( context, this.screenSize, cameraDimensions, cameraTransform )
+			if( configurationManager.drawCoordinateGrid &&
+				cameraDimensions &&
+				cameraTransform ) {
+
+				drawCoordinateGrid( context, configurationManager.screenSize, cameraDimensions, cameraTransform )
 			}
 		}
 
@@ -241,10 +244,10 @@ define(
 		 */
 
 		var Renderer = function( globals ) {
-			this.screenSize = globals.configurationManager.screenSize
-			this.assets     = globals.assets
-			this.resources  = globals.resources
-			this.context    = globals.renderingContext
+			this.configurationManager = globals.configurationManager
+			this.assets               = globals.assets
+			this.resources            = globals.resources
+			this.context              = globals.renderingContext
 			this.drawVisualObjectPartial = _.bind(
 				drawVisualObject,
 				null,
@@ -259,16 +262,17 @@ define(
 			)
 
 			var eventManager = globals.eventManager,
-				context = this.context
+				context = this.context,
+				screenSize = this.configurationManager.screenSize
 
 			// setting up the view space matrix
-			context.setViewMatrix( createWorldToViewMatrix( tmpMat4, this.screenSize ) )
+			context.setViewMatrix( createWorldToViewMatrix( tmpMat4, screenSize ) )
 
 			// setting up the viewport
 			var viewportPositionX = 0,
 				viewportPositionY = 0
 
-			context.viewport( viewportPositionX, viewportPositionY, this.screenSize[ 0 ], this.screenSize[ 1 ] )
+			context.viewport( viewportPositionX, viewportPositionY, screenSize[ 0 ], screenSize[ 1 ] )
 
 			eventManager.subscribe(
 				Events.SCREEN_RESIZED,

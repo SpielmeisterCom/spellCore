@@ -111,6 +111,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 		if( !config.verbose ) {
 			config.verbose = false
 		}
+
+		if( !config.drawCoordinateGrid ) {
+			config.drawCoordinateGrid = false
+		}
 	}
 
 	var isBrowserCapable = function( config ) {
@@ -210,10 +214,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 
 			setUrlParameters( config )
 			setDefaults( config )
-
-			if( config.debug ) {
-				addDebugAPI( this )
-			}
 
 			if( !hasContainer( config.id ) ) {
 				console.log( 'Error: \'' + config.id + '\' is not a valid dom node id. Could not start engine.' )

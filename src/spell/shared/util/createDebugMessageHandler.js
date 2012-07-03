@@ -4,21 +4,28 @@ define(
 		'use strict'
 
 
-		/*
-		 * Creates an object with the properties defined by the array "keys". Each property has a unique Number.
-		 */
-		return function( inputManager ) {
-			return function( message ) {
-				if( message.type === 'keyEvent' ) {
-					var payload = message.payload,
-						type = payload.type
+		return function( globals ) {
+			var messageTypeToHandler = {
+				'keyEvent' : function( payload ) {
+					var type = payload.type
 
 					if( type === 'keydown' ||
 						type === 'keyup' ) {
 
-						inputManager.injectKeyEvent( type, payload.keyCode )
+						globals.inputManager.injectKeyEvent( type, payload.keyCode )
 					}
+				},
+				'drawCoordinateGrid' : function( payload ) {
+					globals.configurationManager.drawCoordinateGrid = !!payload
 				}
+			}
+
+			return function( message ) {
+				var handler = messageTypeToHandler[ message.type ]
+
+				if( !handler ) return
+
+				handler( message.payload )
 			}
 		}
 	}

@@ -52,7 +52,11 @@ define(
 			return [ parseInt( parts[ 0 ] ), parseInt( parts[ 1 ] ) ]
 		}
 
-		/*
+		var extractDrawCoordinateGrid = function( validValues, value ) {
+			return _.contains( validValues, value ) && value
+		}
+
+		/**
 		 * These are the platform agnostic options.
 		 *
 		 * gameserver/resourceServer - "internal" means "same as the server that the client was delivered from"; "*" matches any valid host/port combination, i.e. "acme.org:8080"
@@ -60,6 +64,11 @@ define(
 		 * The property "configurable" controls if the option can be overridden by the environment configuration set up by the stage-0-loader.
 		 */
 		var validOptions = {
+			drawCoordinateGrid : {
+				validValues  : [ true, false ],
+				configurable : true,
+				extractor    : extractDrawCoordinateGrid
+			},
 			screenSize : {
 				validValues  : [ '640x480', '800x600', '1024x768' ],
 				configurable : false,
@@ -84,10 +93,11 @@ define(
 		 * These options are used when they are not overridden by the environment configuration set up by the stage-0-loader.
 		 */
 		var defaultOptions = {
-			screenSize     : '1024x768',
-			gameServer     : 'internal',
-			resourceServer : 'internal',
-			id             : 'spell' // dom node id
+			drawCoordinateGrid : false,
+			screenSize         : '1024x768',
+			gameServer         : 'internal',
+			resourceServer     : 'internal',
+			id                 : 'spell' // dom node id
 		}
 
 		var createConfiguration = function( parameters, defaultOptions, validOptions ) {

@@ -163,7 +163,7 @@ define(
 			 *
 			 * @param message
 			 */
-			sendDebugMessage : createDebugMessageHandler( inputManager )
+			sendDebugMessage : createDebugMessageHandler( globals )
 		}
 	}
 )
