@@ -1,5 +1,5 @@
 /*
- * This class is derived from glmatrix. Original Licence follows:
+ * This class is derived from glmatrix 1.3.7. Original Licence follows:
  *
  * Copyright (c) 2012 Brandon Jones, Colin MacKenzie IV
  *

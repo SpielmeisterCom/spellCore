@@ -1,5 +1,5 @@
 /*
- * This class is derived from glmatrix. Original Licence follows:
+ * This class is derived from glmatrix 1.3.7. Original Licence follows:
  *
  * Copyright (c) 2012 Brandon Jones, Colin MacKenzie IV
  *
@@ -67,6 +67,9 @@ define(
 
 		"use strict";
 		var createFloatArray = Types.createFloatArray;
+
+		// Tweak to your liking
+		var FLOAT_EPSILON = 0.000001;
 
 		var vec3 = {};
 
@@ -477,10 +480,10 @@ define(
 		var tmpvec3 = vec3.create();
 
 		/**
-		 * Generates a quaternion of rotation between two given normalized vectors
+		 * Generates a quaternion of rotation between two given normalized 3d-vectors
 		 *
-		 * @param {Float32Array} a Normalized source vec3
-		 * @param {Float32Array} b Normalized target vec3
+		 * @param {Float32Array} a Normalized source 3d-vector
+		 * @param {Float32Array} b Normalized target 3d-vector
 		 * @param {Float32Array} [dest] quat4 receiving operation result.
 		 *
 		 * @returns {Float32Array} dest if specified, a new quat4 otherwise
@@ -518,11 +521,11 @@ define(
 		};
 
 		/**
-		 * Returns a string representation of a vector
+		 * Returns a string representation of a 3d-vector
 		 *
-		 * @param {Float32Array} vec3 Vector to represent as a string
+		 * @param {Float32Array} vec3 3d-vector to represent as a string
 		 *
-		 * @returns {string} String representation of vec3
+		 * @returns {string} String representation of 3d-vector
 		 */
 		vec3.str = function (vec) {
 			return '[' + vec[0] + ', ' + vec[1] + ', ' + vec[2] + ']';
