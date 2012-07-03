@@ -4,7 +4,7 @@ define(
 		'funkysnakes/shared/config/constants',
 
 		'spell/server/util/network/nextNetworkId',
-		'spell/shared/util/random/XorShift32',
+		'spell/math/random/XorShift32',
 
 		'spell/shared/util/platform/underscore'
 	],

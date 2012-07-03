@@ -3,7 +3,7 @@ define(
 	[
 		"funkysnakes/shared/config/constants",
 
-		"spell/shared/util/random/XorShift32",
+		"spell/math/random/XorShift32",
 
 		"spell/math/vec3"
 	],

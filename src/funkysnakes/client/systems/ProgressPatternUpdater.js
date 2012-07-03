@@ -3,7 +3,7 @@ define(
 	[
 		'spell/shared/util/Events',
 		'spell/shared/util/math',
-		'spell/shared/util/random/XorShift32',
+		'spell/math/random/XorShift32',
 
 		'spell/math/vec3',
 		'spell/shared/util/platform/underscore'
