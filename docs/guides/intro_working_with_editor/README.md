@@ -1,2 +1,6 @@
-insert markdown text here
+The editor is for:
+
+WYSIWYG view of the scene
+
+Managing Assets
 

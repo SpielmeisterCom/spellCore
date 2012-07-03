@@ -1,9 +1,11 @@
 {
 	"--title": "SpellJS documentation",
 	"--guides": "guides.json",
+	"--welcome": "welcome.html",
 	"--output": "generated",
 	"--": [
 		"../src",
-		"components.js"
+		"components.js",
+        "builtin_types.js"
 	]
 }
