@@ -1,3 +1,6 @@
+/**
+ * @class spell.shared.util.platform.Types
+ */
 define(
 	'spell/shared/util/platform/Types',
 	[
