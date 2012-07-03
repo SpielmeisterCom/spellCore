@@ -57,7 +57,7 @@
  * @requires spell.shared.util.platform.Types
  */
 define(
-	"spell/math/vec3",
+	"spell/math/vec4",
 	[
 		"spell/shared/util/platform/Types"
 	],
