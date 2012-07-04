@@ -1,32 +1,37 @@
 [
 	{
 		"title": "Introduction",
-		"items": [{
-			"name": "intro_getting_started",
-			"title": "Getting Started with SpellJS",
-			"description": "This introduction to SpellJS explains how you can get started."
-		}, 
-                {
-                        "name": "intro_working_with_editor",
-                        "title": "Working with the Spell Editor",
-                        "description": ""
-                }]
+		"items": [
+			{
+				"name": "intro_framework_overview",
+				"title": "Overview of SpellJS",
+				"description": "This guide gives a brief overview of the SpellJS framework."
+			},
+			{
+				"name": "intro_getting_started",
+				"title": "Getting started with SpellJS",
+				"description": "This guide explains how you get started with creating your first app with SpellJS."
+			},
+			{
+				"name": "intro_working_with_editor",
+				"title": "Working with the Editor",
+				"description": "This guide explains how to get started with working with SpellJS' IDE SpellEd."
+			}
+		]
 	},
-
 	{
-
-		"title": "Key Concepts",
-		"items": [{
-                        "name": "concepts_entities_components",
-                        "title": "Entities and Components",
-                        "description": ""
-
-		},
-		{
-                        "name": "concepts_systems",
-                        "title": "Systems",
-                        "description": ""
-
-		}]
+		"title": "Concepts",
+		"items": [
+			{
+				"name": "concepts_entities_components",
+				"title": "Entities, Components and Systems",
+				"description": "This guide explains the basic building blocks of SpellJS' specific flavor of entity component system."
+			},
+			{
+				"name": "concepts_entity_component_vs_oop",
+				"title": "Entity Component vs. OOP",
+				"description": "This guide elaborates on the advantages of entity component based systems over object-oriented systems."
+			}
+		]
 	}
 ]
