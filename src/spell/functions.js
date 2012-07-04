@@ -10,11 +10,11 @@ Underscore.js 1.3.3
  */
 
 /**
- * @class spell.underscore
+ * @class spell.functions
  * @singleton
  */
 define(
-	'spell/underscore',
+	'spell/functions',
 	function() {
 
 		// Baseline setup
@@ -152,14 +152,8 @@ define(
 		};
 
 		/**
-		 * Alias for {@link #map}
-		 * @method
-		 */
-		_.collect = _.map;
-
-		/**
 		 * **Reduce** builds up a single result from a list of values, aka `inject`,
-		 * or `foldl`. Delegates to **ECMAScript 5**'s native `reduce` if available.
+		 * or `foldl`.
 		 *
 		 * @param obj
 		 * @param iterator
@@ -187,20 +181,7 @@ define(
 		};
 
 		/**
-		 * Alias for {@link #reduce}
-		 * @method
-		 */
-		_.foldl = _.reduce;
-
-		/**
-		 * Alias for {@link #reduce}
-		 * @method
-		 */
-		_.inject = _.reduce;
-
-		/**
 		 * The right-associative version of reduce, also known as `foldr`.
-		 * Delegates to **ECMAScript 5**'s native `reduceRight` if available.
 		 * @param obj
 		 * @param iterator
 		 * @param memo
@@ -218,12 +199,6 @@ define(
 			if (context && !initial) iterator = _.bind(iterator, context);
 			return initial ? _.reduce(reversed, iterator, memo, context) : _.reduce(reversed, iterator);
 		};
-
-		/**
-		 * Alias for {@link #reduceRight}
-		 * @method
-		 */
-		_.foldr = _.reduceRight;
 
 		/**
 		 * Return the first value which passes a truth test. Aliased as `detect`.
@@ -244,12 +219,6 @@ define(
 		};
 
 		/**
-		 * Alias for {@link #find}
-		 * @method
-		 */
-		_.detect = _.find;
-
-		/**
 		 * Return all the elements that pass a truth test.
 		 */
 		_.filter = function(obj, iterator, context) {
@@ -261,12 +230,6 @@ define(
 			});
 			return results;
 		};
-
-		/**
-		 * Alias for {@link #filter}
-		 * @method
-		 */
-		_.select = _.filter;
 
 		/**
 		 * Return all the elements for which a truth test fails.
@@ -302,12 +265,6 @@ define(
 		};
 
 		/**
-		 * Alias for {@link #every}
-		 * @method
-		 */
-		_.all = _.every;
-
-		/**
 		 * Determine if at least one element in the object matches a truth test.
 		 * @param obj
 		 * @param iterator
@@ -328,18 +285,12 @@ define(
 		_.any = any;
 
 		/**
-		 * Alias for {@link #any}
-		 * @method
-		 */
-		_.some = any;
-
-		/**
 		 * Determine if a given value is included in the array or object using `===`.
 		 * @param obj
 		 * @param target
 		 * @return {Boolean}
 		 */
-		_.include = function(obj, target) {
+		_.contains = function(obj, target) {
 			var found = false;
 			if (obj == null) return found;
 			if (nativeIndexOf && obj.indexOf === nativeIndexOf) return obj.indexOf(target) != -1;
@@ -348,12 +299,6 @@ define(
 			});
 			return found;
 		};
-
-		/**
-		 * Alias for {@link #include}
-		 * @method
-		 */
-		_.contains = _.include;
 
 		/**
 		 * Invoke a method (with arguments) on every item in a collection.
@@ -632,7 +577,7 @@ define(
 			// The `isSorted` flag is irrelevant if the array only contains two elements.
 			if (array.length < 3) isSorted = true;
 			_.reduce(initial, function (memo, value, index) {
-				if (isSorted ? _.last(memo) !== value || !memo.length : !_.include(memo, value)) {
+				if (isSorted ? _.last(memo) !== value || !memo.length : !_.contains(memo, value)) {
 					memo.push(value);
 					results.push(array[index]);
 				}
@@ -685,7 +630,7 @@ define(
 		 */
 		_.difference = function(array) {
 			var rest = _.flatten(slice.call(arguments, 1), true);
-			return _.filter(array, function(value){ return !_.include(rest, value); });
+			return _.filter(array, function(value){ return !_.contains(rest, value); });
 		};
 
 		/**
@@ -1005,12 +950,6 @@ define(
 			}
 			return names.sort();
 		};
-
-		/**
-		 * Alias for {@link #functions}
-		 * @method
-		 */
-		_.methods = _.functions;
 
 		/**
 		 * Extend a given object with all the properties in passed-in object(s).
