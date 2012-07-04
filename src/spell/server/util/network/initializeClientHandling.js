@@ -28,7 +28,7 @@ define(
 		 * @param requestedProtocols
 		 */
 		var supportsRequestedProtocol = function( requestedProtocols ) {
-			return ( _.include( requestedProtocols, protocolName ) )
+			return ( _.contains( requestedProtocols, protocolName ) )
 		}
 
 		var createClient = function( clientId, protocol, websocketConnection  ) {

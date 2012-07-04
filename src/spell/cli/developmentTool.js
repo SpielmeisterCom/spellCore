@@ -81,10 +81,10 @@ define(
 				if( !version ) version = buildVersions.DEBUG
 				if( !target ) target = buildTargets.HTML5
 
-				if( !_.include( _.values( buildTargets ), target ) ) {
+				if( !_.contains( _.values( buildTargets ), target ) ) {
 					errors.push( 'Error: \'' + target + '\' is not a valid target. See \'' + executableName + ' --help\'.' )
 
-				} else if( !_.include( _.values( buildVersions ), version ) ) {
+				} else if( !_.contains( _.values( buildVersions ), version ) ) {
 					errors.push( 'Error: \'' + version + '\' is not a valid version. See \'' + executableName + ' --help\'.' )
 				}
 
