@@ -10,7 +10,7 @@
 			{
 				"name": "intro_getting_started",
 				"title": "Getting started with SpellJS",
-				"description": "This guide explains how you get started with creating your first app with SpellJS."
+				"description": "This guide explains how you get started with creating your first game with SpellJS."
 			},
 			{
 				"name": "intro_working_with_editor",
@@ -29,7 +29,7 @@
 			},
 			{
 				"name": "concepts_entity_component_vs_oop",
-				"title": "Entity Component vs. OOP",
+				"title": "Entity component system vs. OOP based system",
 				"description": "This guide elaborates on the advantages of entity component based systems over object-oriented systems."
 			}
 		]
