@@ -4,13 +4,13 @@ define(
 		'spell/shared/util/platform/private/graphics/StateStack',
 		'spell/shared/util/color',
 
-		'spell/math/mat4'
+		'spell/math/mat3'
 	],
 	function(
 		StateStack,
 		color,
 
-		mat4
+		mat3
 	) {
 		'use strict'
 
@@ -25,16 +25,16 @@ define(
 		var currentState = stateStack.getTop()
 
 		// world space to view space transformation matrix
-		var worldToView = mat4.create()
-		mat4.identity( worldToView )
+		var worldToView = mat3.create()
+		mat3.identity( worldToView )
 
 		// view space to screen space transformation matrix
-		var viewToScreen = mat4.create()
-		mat4.identity( viewToScreen )
+		var viewToScreen = mat3.create()
+		mat3.identity( viewToScreen )
 
 		// accumulated transformation world space to screen space transformation matrix
-		var worldToScreen = mat4.create()
-		mat4.identity( worldToScreen )
+		var worldToScreen = mat3.create()
+		mat3.identity( worldToScreen )
 
 
 		/*
@@ -65,15 +65,15 @@ define(
 		}
 
 		var updateWorldToScreen = function( viewToScreen, worldToView ) {
-			mat4.multiply( viewToScreen, worldToView, worldToScreen )
+			mat3.multiply( viewToScreen, worldToView, worldToScreen )
 
 			context.setTransform(
 				worldToScreen[ 0 ],
 				worldToScreen[ 1 ],
+				worldToScreen[ 3 ],
 				worldToScreen[ 4 ],
-				worldToScreen[ 5 ],
-				worldToScreen[ 12 ],
-				worldToScreen[ 13 ]
+				worldToScreen[ 6 ],
+				worldToScreen[ 7 ]
 			)
 		}
 
@@ -84,17 +84,15 @@ define(
 			var cameraWidth  = context.canvas.width,
 				cameraHeight = context.canvas.height
 
-			mat4.ortho(
+			mat3.ortho(
 				-cameraWidth / 2,
 				cameraWidth / 2,
 				-cameraHeight / 2,
 				cameraHeight / 2,
-				0,
-				1000,
 				worldToView
 			)
 
-			mat4.translate( worldToView, [ -cameraWidth / 2, -cameraHeight / 2, 0 ] ) // WATCH OUT: apply inverse translation for camera position
+			mat3.translate( worldToView, [ -cameraWidth / 2, -cameraHeight / 2 ] ) // WATCH OUT: apply inverse translation for camera position
 
 			updateWorldToScreen( viewToScreen, worldToView )
 		}
@@ -175,15 +173,15 @@ define(
 		}
 
 		var scale = function( vec ) {
-			mat4.scale( currentState.matrix, vec )
+			mat3.scale( currentState.matrix, vec )
 		}
 
 		var translate = function( vec ) {
-			mat4.translate( currentState.matrix, vec )
+			mat3.translate( currentState.matrix, vec )
 		}
 
 		var rotate = function( u ) {
-			mat4.rotateZ( currentState.matrix, -u )
+			mat3.rotate( currentState.matrix, u )
 		}
 
 		/*
@@ -216,10 +214,10 @@ define(
 				context.transform(
 					modelToWorld[ 0 ],
 					modelToWorld[ 1 ],
+					modelToWorld[ 3 ],
 					modelToWorld[ 4 ],
-					modelToWorld[ 5 ],
-					modelToWorld[ 12 ],
-					modelToWorld[ 13 ]
+					modelToWorld[ 6 ],
+					modelToWorld[ 7 ]
 				)
 
 				// rotating the image so that it is not upside down
@@ -245,10 +243,10 @@ define(
 				context.transform(
 					modelToWorld[ 0 ],
 					modelToWorld[ 1 ],
+					modelToWorld[ 3 ],
 					modelToWorld[ 4 ],
-					modelToWorld[ 5 ],
-					modelToWorld[ 12 ],
-					modelToWorld[ 13 ]
+					modelToWorld[ 6 ],
+					modelToWorld[ 7 ]
 				)
 
 				// rotating the image so that it is not upside down
@@ -273,10 +271,10 @@ define(
 				context.transform(
 					modelToWorld[ 0 ],
 					modelToWorld[ 1 ],
+					modelToWorld[ 3 ],
 					modelToWorld[ 4 ],
-					modelToWorld[ 5 ],
-					modelToWorld[ 12 ],
-					modelToWorld[ 13 ]
+					modelToWorld[ 6 ],
+					modelToWorld[ 7 ]
 				)
 
 				// rotating the image so that it is not upside down
@@ -296,26 +294,26 @@ define(
 		}
 
 		var transform = function( matrix ) {
-			mat4.multiply( currentState.matrix, matrix )
+			mat3.multiply( currentState.matrix, matrix )
 		}
 
 		var setTransform = function( matrix ) {
-			mat4.set( matrix, currentState.matrix )
+			mat3.set( matrix, currentState.matrix )
 		}
 
 		var setViewMatrix = function( matrix ) {
-			mat4.set( matrix, worldToView )
+			mat3.set( matrix, worldToView )
 
 			updateWorldToScreen( viewToScreen, worldToView )
 		}
 
 		var viewport = function( x, y, width, height ) {
-			mat4.identity( viewToScreen )
+			mat3.identity( viewToScreen )
 
 			viewToScreen[ 0 ] = width * 0.5
-			viewToScreen[ 5 ] = height * 0.5 * -1 // mirroring y-axis
-			viewToScreen[ 12 ] = x + width * 0.5
-			viewToScreen[ 13 ] = y + height * 0.5
+			viewToScreen[ 4 ] = height * 0.5 * -1 // mirroring y-axis
+			viewToScreen[ 6 ] = x + width * 0.5
+			viewToScreen[ 7 ] = y + height * 0.5
 
 			updateWorldToScreen( viewToScreen, worldToView )
 

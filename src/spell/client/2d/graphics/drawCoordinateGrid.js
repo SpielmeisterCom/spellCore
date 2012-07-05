@@ -6,7 +6,7 @@ define(
 		'spell/client/2d/graphics/fonts/OpenSans14px',
 
 		'spell/math/vec4',
-		'spell/math/mat4'
+		'spell/math/mat3'
 	],
 	function(
 		createWorldToViewMatrix,
@@ -14,12 +14,12 @@ define(
 		OpenSans14px,
 
 		vec4,
-		mat4
+		mat3
 	) {
 		'use strict'
 
 
-		var tmpMat4         = mat4.identity(),
+		var tmpMat3         = mat3.identity(),
 			lineOpacity     = 0.5,
 			paleLineColor   = vec4.create( [ 0.4, 0.4, 0.4, lineOpacity ] ),
 			brightLineColor = vec4.create( [ 0.7, 0.7, 0.7, lineOpacity ] ),
@@ -121,7 +121,7 @@ define(
 
 			context.save()
 			{
-				context.setViewMatrix( createWorldToViewMatrix( tmpMat4, screenSize ) )
+				context.setViewMatrix( createWorldToViewMatrix( tmpMat3, screenSize ) )
 
 				// grid lines parallel to y-axis
 				drawGridLinesY(

@@ -415,6 +415,142 @@ define(
 				', ' + mat[6] + ', ' + mat[7] + ', ' + mat[8] + ']';
 		};
 
+		/**
+		 * Translates a matrix by the given vector
+		 *
+		 * @param {Float32Array} mat 3x3-matrix to translate
+		 * @param {Float32Array} vec 2d-vector specifying the translation
+		 * @param {Float32Array} [dest] 3x3-matrix receiving operation result. If not specified result is written to mat
+		 *
+		 * @returns {Float32Array} dest if specified, mat otherwise
+		 */
+		mat3.translate = function (mat, vec, dest) {
+			var x = vec[0], y = vec[1],
+				a00, a01, a02,
+				a10, a11, a12;
+
+			if (!dest || mat === dest) {
+				mat[6] = mat[0] * x + mat[3] * y + mat[6];
+				mat[7] = mat[1] * x + mat[4] * y + mat[7];
+				mat[8] = mat[2] * x + mat[5] * y + mat[8];
+				return mat;
+			}
+
+			a00 = mat[0];
+			a01 = mat[3];
+			a02 = mat[6];
+			a10 = mat[1];
+			a11 = mat[4];
+			a12 = mat[7];
+
+			dest[0] = a00;
+			dest[3] = a01;
+			dest[6] = a02;
+			dest[1] = a10;
+			dest[4] = a11;
+			dest[7] = a12;
+
+			dest[6] = a00 * x + a10 * y + mat[6];
+			dest[7] = a01 * x + a11 * y + mat[7];
+			dest[8] = a02 * x + a12 * y + mat[8];
+			return dest;
+		};
+
+		/**
+		 * Scales a 3x3-matrix by the given 3d-vector
+		 *
+		 * @param {Float32Array} mat 3x3-matrix to scale
+		 * @param {Float32Array} vec 2d-vector specifying the scale for each axis
+		 * @param {Float32Array} [dest] 3x3-matrix receiving operation result. If not specified result is written to mat
+		 *
+		 * @returns {Float32Array} dest if specified, mat otherwise
+		 */
+		mat3.scale = function (mat, vec, dest) {
+			var x = vec[0], y = vec[1];
+
+			if (!dest || mat === dest) {
+				mat[0] *= x;
+				mat[1] *= x;
+				mat[2] *= x;
+				mat[3] *= y;
+				mat[4] *= y;
+				mat[5] *= y;
+				return mat;
+			}
+
+			dest[0] = mat[0] * x;
+			dest[1] = mat[1] * x;
+			dest[2] = mat[2] * x;
+			dest[3] = mat[3] * y;
+			dest[4] = mat[4] * y;
+			dest[5] = mat[5] * y;
+			dest[6] = mat[6];
+			dest[7] = mat[7];
+			dest[8] = mat[8];
+			return dest;
+		};
+
+		/**
+		 * Rotates a 3x3-matrix by the given angle
+		 *
+		 * @param {Float32Array} mat 3x3-matrix to rotate
+		 * @param {Number} angle Angle (in radians) to rotate
+		 * @param {Float32Array} [dest] 3x3-matrix receiving operation result. If not specified result is written to mat
+		 *
+		 * @returns {Float32Array} dest if specified, mat otherwise
+		 */
+		mat3.rotate = function (mat, angle, dest) {
+			if (!dest) {
+				dest = mat;
+			}
+
+			var sine   = Math.sin( -angle ),
+				cosine = Math.cos( -angle ),
+				a00    = mat[ 0 ],
+				a01    = mat[ 1 ],
+				a02    = mat[ 2 ],
+				a10    = mat[ 3 ],
+				a11    = mat[ 4 ],
+				a12    = mat[ 5 ]
+
+			dest[ 0 ] = a00 * cosine + a10 * sine
+			dest[ 1 ] = a01 * cosine + a11 * sine
+			dest[ 2 ] = a02 * cosine + a12 * sine
+			dest[ 3 ] = a00 * -sine  + a10 * cosine
+			dest[ 4 ] = a01 * -sine  + a11 * cosine
+			dest[ 5 ] = a02 * -sine  + a12 * cosine
+			return dest;
+		};
+
+		/**
+		 * Generates a orthogonal projection matrix with the given bounds
+		 *
+		 * @param {Number} left Left bound of the frustum
+		 * @param {Number} right Right bound of the frustum
+		 * @param {Number} bottom Bottom bound of the frustum
+		 * @param {Number} top Top bound of the frustum
+		 * @param {Float32Array} [dest] 3x3 frustum matrix will be written into
+		 *
+		 * @returns {Float32Array} dest if specified, a new 3x3-matrix otherwise
+		 */
+		mat3.ortho = function (left, right, bottom, top, dest) {
+			if (!dest) {
+				dest = mat3.create();
+			}
+			var rl = (right - left),
+				tb = (top - bottom);
+			dest[0] = 2 / rl;
+			dest[1] = 0;
+			dest[2] = 0;
+			dest[3] = 0;
+			dest[4] = 2 / tb;
+			dest[5] = 0;
+			dest[6] = -(left + right) / rl;
+			dest[7] = -(top + bottom) / tb;
+			dest[8] = 1;
+			return dest;
+		};
+
 		return mat3;
 	}
 )

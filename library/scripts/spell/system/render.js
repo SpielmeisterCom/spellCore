@@ -6,8 +6,7 @@ define(
 		'spell/shared/util/Events',
 
 		'spell/math/vec2',
-		'spell/math/vec3',
-		'spell/math/mat4',
+		'spell/math/mat3',
 
 		'spell/functions'
 	],
@@ -17,8 +16,7 @@ define(
 		Events,
 
 		vec2,
-		vec3,
-		mat4,
+		mat3,
 
 		_
 	) {
@@ -29,8 +27,8 @@ define(
 		 * private
 		 */
 
-		var tmpVec3 = vec3.create(),
-			tmpMat4 = mat4.identity(),
+		var tmpVec2 = vec2.create(),
+			tmpMat3 = mat3.identity(),
 			currentCameraId
 
 		var createSortedByLayer = function( roots, visualObjects ) {
@@ -101,14 +99,13 @@ define(
 				}
 
 				// object to world space transformation go here
-				vec2.set( transform.translation, tmpVec3 )
-				context.translate( tmpVec3 )
+				context.translate( transform.translation )
 
 				context.rotate( transform.rotation )
 
 				if( asset.type === 'appearance' ) {
-					vec2.multiply( transform.scale, [ texture.width, texture.height ], tmpVec3 )
-					context.scale( tmpVec3 )
+					vec2.multiply( transform.scale, [ texture.width, texture.height ], tmpVec2 )
+					context.scale( tmpVec2 )
 
 					context.drawTexture( texture, -0.5, -0.5, 1, 1 )
 
@@ -119,8 +116,8 @@ define(
 						assetFrameHeight = asset.frameHeight,
 						assetNumFrames   = asset.numFrames
 
-					vec2.multiply( transform.scale, [ assetFrameWidth, assetFrameHeight ], tmpVec3 )
-					context.scale( tmpVec3 )
+					vec2.multiply( transform.scale, [ assetFrameWidth, assetFrameHeight ], tmpVec2 )
+					context.scale( tmpVec2 )
 
 					appearance.animationOffset = createAnimationOffset(
 						deltaTimeInMs,
@@ -188,13 +185,12 @@ define(
 			var halfWidth  = cameraDimensions[ 0 ] / 2,
 				halfHeight = cameraDimensions[ 1 ] / 2
 
-			mat4.ortho( -halfWidth, halfWidth, -halfHeight, halfHeight, 0, 100, tmpMat4 )
+			mat3.ortho( -halfWidth, halfWidth, -halfHeight, halfHeight, tmpMat3 )
 
 			// translating with the inverse camera position
-			vec2.set( position, tmpVec3 )
-			mat4.translate( tmpMat4, vec2.negate( tmpVec3 ) )
+			mat3.translate( tmpMat3, vec2.negate( position, tmpVec2 ) )
 
-			context.setViewMatrix( tmpMat4 )
+			context.setViewMatrix( tmpMat3 )
 		}
 
 		var process = function( globals, timeInMs, deltaTimeInMs ) {
@@ -266,7 +262,7 @@ define(
 				screenSize = this.configurationManager.screenSize
 
 			// setting up the view space matrix
-			context.setViewMatrix( createWorldToViewMatrix( tmpMat4, screenSize ) )
+			context.setViewMatrix( createWorldToViewMatrix( tmpMat3, screenSize ) )
 
 			// setting up the viewport
 			var viewportPositionX = 0,

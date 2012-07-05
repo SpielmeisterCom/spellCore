@@ -3,19 +3,18 @@ define(
 	function() {
 		return {
 			vertex: [
-				"attribute vec3 aVertexPosition;",
-				"attribute vec2 aTextureCoord;",
+				"attribute vec2 aVertexPosition;",
 
-				"uniform mat4 uScreenSpaceShimMatrix;",
-				"uniform mat4 uModelViewMatrix;",
+				"uniform mat3 uScreenSpaceShimMatrix;",
+				"uniform mat3 uModelViewMatrix;",
 				"uniform mat3 uTextureMatrix;",
 
 				"varying vec2 vTextureCoord;",
 
 
 				"void main( void ) {",
-					"vTextureCoord = ( uTextureMatrix * vec3( aTextureCoord, 1.0 ) ).st;",
-					"gl_Position = uScreenSpaceShimMatrix * uModelViewMatrix * vec4( aVertexPosition, 1.0 );",
+					"vTextureCoord = ( uTextureMatrix * vec3( aVertexPosition, 1.0 ) ).st;",
+					"gl_Position = vec4( uScreenSpaceShimMatrix * uModelViewMatrix * vec3( aVertexPosition, 1.0 ), 1.0 );",
 				"}"
 			].join( "\n" ),
 

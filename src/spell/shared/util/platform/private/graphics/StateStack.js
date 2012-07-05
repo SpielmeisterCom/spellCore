@@ -3,13 +3,13 @@ define(
 	[
 		'spell/shared/util/platform/private/nativeType/createFloatArray',
 
-		'spell/math/mat4',
+		'spell/math/mat3',
 		'spell/functions'
 	],
 	function(
 		createFloatArray,
 
-		mat4,
+		mat3,
 		_
 	) {
 		'use strict'
@@ -30,14 +30,14 @@ define(
 		var createDefaultState = function() {
 			var opacity        = 1.0,
 				fillStyleColor = createFloatArray( 4 ),
-				matrix         = mat4.create()
+				matrix         = mat3.create()
 
 			fillStyleColor[ 0 ] = 1.0
 			fillStyleColor[ 1 ] = 1.0
 			fillStyleColor[ 2 ] = 1.0
 			fillStyleColor[ 3 ] = 1.0
 
-			mat4.identity( matrix )
+			mat3.identity( matrix )
 
 			return createState( opacity, fillStyleColor, matrix )
 		}
@@ -50,7 +50,7 @@ define(
 			target.color[ 2 ] = source.color[ 2 ]
 			target.color[ 3 ] = source.color[ 3 ]
 
-			mat4.set( source.matrix, target.matrix )
+			mat3.set( source.matrix, target.matrix )
 		}
 
 

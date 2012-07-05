@@ -1,26 +1,24 @@
 define(
 	'spell/client/2d/graphics/createWorldToViewMatrix',
 	[
-		'spell/math/mat4'
+		'spell/math/mat3'
 	],
 	function(
-		mat4
+		mat3
 	) {
 		'use strict'
 
 
 		return function( matrix, cameraDimensions ) {
-			mat4.ortho(
+			mat3.ortho(
 				0,
 				cameraDimensions[ 0 ],
 				0,
 				cameraDimensions[ 1 ],
-				0,
-				1000,
 				matrix
 			)
 
-			mat4.translate( matrix, [ 0, 0, 0 ] ) // camera is located at (0/0/0); WATCH OUT: apply inverse translation
+			mat3.translate( matrix, [ 0, 0 ] ) // camera is located at (0/0); WATCH OUT: apply inverse translation
 
 			return matrix
 		}
