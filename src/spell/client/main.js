@@ -17,6 +17,17 @@ define(
 		'spell/shared/util/createDebugMessageHandler',
 		'spell/shared/util/platform/PlatformKit',
 
+		// Forcing the build system to include the math modules in the platform agnostic engine package.
+		// Do _not_ remove unless you know exactly what you are doing!
+		'spell/math/mat2',
+		'spell/math/mat3',
+		'spell/math/mat4',
+		'spell/math/quat4',
+		'spell/math/util',
+		'spell/math/vec2',
+		'spell/math/vec3',
+		'spell/math/vec4',
+
 		'spell/functions'
 	],
 	function(
@@ -35,6 +46,15 @@ define(
 		Logger,
 		createDebugMessageHandler,
 		PlatformKit,
+
+		mat2,
+		mat3,
+		mat4,
+		quat4,
+		util,
+		vec2,
+		vec3,
+		vec4,
 
 		_,
 
