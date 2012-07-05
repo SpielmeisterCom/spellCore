@@ -29,13 +29,11 @@ The result of this alternative approach will be:
 * a representation that expresses dependencies between data and logic explicitly by composition, not implicitly by deep inheritance
 
 
-
 ## Further reading
 
 * [Evolve your hierarchy - Mick West][1]
 * [Entity Systems are the future of MMOG development - t-machine.org][2]
 * [Why use an entity framework for game development? - Richard Lord][3]
-
 
 
 [1]: http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/ "Evolve your hierarchy - Mick West"
