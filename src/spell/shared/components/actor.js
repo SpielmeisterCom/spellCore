@@ -1,7 +1,7 @@
 define(
 	'spell/shared/components/actor',
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

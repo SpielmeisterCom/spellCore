@@ -10,7 +10,7 @@ define(
 		'mkdirp',
 		'path',
 		'util',
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		copyFile,

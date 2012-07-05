@@ -1,7 +1,7 @@
 define(
 	"funkysnakes/client/systems/updateHoverAnimations",
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

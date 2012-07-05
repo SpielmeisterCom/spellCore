@@ -1,7 +1,7 @@
 define(
 	'spell/shared/util/entityConfig/walk',
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

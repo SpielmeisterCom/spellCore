@@ -12,7 +12,7 @@ define(
 		'commander',
 		'fs',
 		'path',
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		serverMain,

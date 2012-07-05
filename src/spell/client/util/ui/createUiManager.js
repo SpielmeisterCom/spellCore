@@ -4,7 +4,7 @@ define(
         "spell/client/util/ui/Button",
         "spell/client/util/ui/ToggleButton",
 
-        'spell/shared/util/platform/underscore'
+        'spell/functions'
     ],
 	function(
         Button,

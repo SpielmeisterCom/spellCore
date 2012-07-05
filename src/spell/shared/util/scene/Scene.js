@@ -5,7 +5,7 @@ define(
 		'spell/shared/util/entityConfig/flatten',
 		'spell/shared/util/Events',
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		create,

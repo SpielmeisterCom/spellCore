@@ -1,7 +1,7 @@
 define(
 	"funkysnakes/client/systems/sendActorStateUpdate",
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

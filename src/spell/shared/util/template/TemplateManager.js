@@ -4,7 +4,7 @@ define(
 		'spell/shared/util/deepClone',
 		'spell/shared/util/template/TemplateTypes',
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		deepClone,

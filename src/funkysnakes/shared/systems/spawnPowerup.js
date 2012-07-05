@@ -6,7 +6,7 @@ define(
 		'spell/server/util/network/nextNetworkId',
 		'spell/math/random/XorShift32',
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		constants,

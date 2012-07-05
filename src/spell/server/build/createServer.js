@@ -5,7 +5,7 @@ define(
 		'spell/shared/build/exportDeploymentArchive',
 		'spell/shared/build/initializeProjectDirectory',
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		executeCreateDebugBuild,

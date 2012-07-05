@@ -4,7 +4,7 @@ define(
 		"spell/shared/util/network/Messages",
 		"spell/shared/util/network/snapshots",
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		Messages,

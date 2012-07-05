@@ -3,7 +3,7 @@ define(
 	[
 		'spell/shared/util/network/Messages',
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		Messages,

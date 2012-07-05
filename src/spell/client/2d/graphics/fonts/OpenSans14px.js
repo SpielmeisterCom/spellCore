@@ -1,7 +1,7 @@
 define(
 	'spell/client/2d/graphics/fonts/OpenSans14px',
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

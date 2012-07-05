@@ -9,7 +9,7 @@ define(
 		'spell/server/util/network/nextNetworkId',
 		'spell/shared/util/network/Messages',
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		constants,

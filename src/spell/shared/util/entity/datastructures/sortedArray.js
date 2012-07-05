@@ -1,7 +1,7 @@
 define(
 	"spell/shared/util/entity/datastructures/sortedArray",
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

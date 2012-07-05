@@ -5,7 +5,7 @@ define(
 		"spell/server/util/network/nextNetworkId",
 
 		"spell/math/vec3",
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		constants,

@@ -3,7 +3,7 @@ define(
 	[
 		"funkysnakes/shared/config/constants",
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		constants,

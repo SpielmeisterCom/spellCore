@@ -17,7 +17,7 @@ define(
 		'spell/shared/util/createDebugMessageHandler',
 		'spell/shared/util/platform/PlatformKit',
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		runtimeModule,

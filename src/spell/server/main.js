@@ -19,7 +19,7 @@ define(
 		'connect-cors',
 		'fs',
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		createBuildServer,

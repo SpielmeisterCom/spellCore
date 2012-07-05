@@ -3,7 +3,7 @@ define(
 	[
 		'spell/shared/util/input/keyCodes',
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		keyCodes,

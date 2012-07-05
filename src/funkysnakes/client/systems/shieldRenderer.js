@@ -5,7 +5,7 @@ define(
 
 		"spell/math/vec3",
 		"spell/math/mat4",
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		constants,

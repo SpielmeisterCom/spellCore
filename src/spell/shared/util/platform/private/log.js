@@ -1,7 +1,7 @@
 define(
 	'spell/shared/util/platform/private/log',
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

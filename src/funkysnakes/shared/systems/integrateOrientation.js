@@ -1,7 +1,7 @@
 define(
 	"funkysnakes/shared/systems/integrateOrientation",
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

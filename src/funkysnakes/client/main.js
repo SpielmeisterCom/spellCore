@@ -27,7 +27,7 @@ define(
 		'spell/shared/util/math',
 		"spell/shared/util/platform/Types",
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		entities,

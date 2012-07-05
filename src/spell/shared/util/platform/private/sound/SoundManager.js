@@ -3,7 +3,7 @@ define(
 	[
 		"spell/shared/components/sound/soundEmitter",
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		soundEmitterConstructor,

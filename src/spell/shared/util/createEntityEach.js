@@ -1,7 +1,7 @@
 define(
 	'spell/shared/util/createEntityEach',
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

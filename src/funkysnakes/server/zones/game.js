@@ -30,7 +30,7 @@ define(
 		"spell/shared/util/Events",
 		"spell/shared/util/Logger",
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		endGame,

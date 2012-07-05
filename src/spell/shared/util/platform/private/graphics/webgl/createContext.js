@@ -1,7 +1,7 @@
 define(
 	"spell/shared/util/platform/private/graphics/webgl/createContext",
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

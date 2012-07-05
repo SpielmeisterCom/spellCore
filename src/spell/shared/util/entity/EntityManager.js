@@ -6,7 +6,7 @@ define(
 	[
 		'spell/shared/util/create',
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		create,

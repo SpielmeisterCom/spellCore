@@ -3,7 +3,7 @@ define(
 	[
 		"spell/shared/util/network/snapshots",
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		snapshots,

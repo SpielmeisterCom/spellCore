@@ -6,7 +6,7 @@ define(
 		'spell/math/random/XorShift32',
 
 		'spell/math/vec3',
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		Events,

@@ -1,7 +1,7 @@
 define(
 	"funkysnakes/client/systems/applyPowerupEffects",
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

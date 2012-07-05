@@ -4,7 +4,7 @@ define(
 		'spell/shared/util/platform/private/nativeType/createFloatArray',
 
 		'spell/math/mat4',
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		createFloatArray,

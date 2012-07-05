@@ -9,7 +9,7 @@ define(
 		'xmlbuilder',
 
 		'underscore.string',
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		isFile,

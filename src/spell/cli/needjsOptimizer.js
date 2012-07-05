@@ -8,7 +8,7 @@ define(
 		'path',
 
 		'underscore.string',
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		amdHelper,

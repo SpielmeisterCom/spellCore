@@ -7,7 +7,7 @@ define(
 		"spell/shared/util/map",
 
 		"spell/math/vec3",
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		collisionBetween,

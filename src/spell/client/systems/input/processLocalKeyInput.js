@@ -1,7 +1,7 @@
 define(
 	"spell/client/systems/input/processLocalKeyInput",
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

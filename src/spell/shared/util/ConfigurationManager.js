@@ -4,7 +4,7 @@ define(
 		"spell/shared/util/platform/PlatformKit",
 		"spell/shared/util/Events",
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		PlatformKit,

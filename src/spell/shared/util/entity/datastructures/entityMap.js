@@ -1,7 +1,7 @@
 define(
 	"spell/shared/util/entity/datastructures/entityMap",
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

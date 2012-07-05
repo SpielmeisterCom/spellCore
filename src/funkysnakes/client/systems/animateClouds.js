@@ -6,7 +6,7 @@ define(
 		"spell/shared/util/math",
 
 		"spell/math/vec3",
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		constants,

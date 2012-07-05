@@ -1,7 +1,7 @@
 define(
 	"spell/shared/util/forestMultiMap",
 	[
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		_

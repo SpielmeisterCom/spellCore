@@ -7,7 +7,7 @@ define(
 		"spell/shared/util/CircularBuffer",
 		"spell/shared/util/Logger",
 
-		'spell/shared/util/platform/underscore'
+		'spell/functions'
 	],
 	function(
 		Events,
