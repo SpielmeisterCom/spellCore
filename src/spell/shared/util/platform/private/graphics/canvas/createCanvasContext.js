@@ -345,8 +345,7 @@ define(
 				/*
 				 * Public
 				 */
-				width  : image.width,
-				height : image.height,
+				dimensions : [ image.width, image.height ],
 
 				/*
 				 * Private

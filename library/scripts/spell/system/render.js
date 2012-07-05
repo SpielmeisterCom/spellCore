@@ -104,7 +104,7 @@ define(
 				context.rotate( transform.rotation )
 
 				if( asset.type === 'appearance' ) {
-					vec2.multiply( transform.scale, [ texture.width, texture.height ], tmpVec2 )
+					vec2.multiply( transform.scale, texture.dimensions, tmpVec2 )
 					context.scale( tmpVec2 )
 
 					context.drawTexture( texture, -0.5, -0.5, 1, 1 )
@@ -112,11 +112,10 @@ define(
 				} else {
 					// asset.type === 'animation'
 
-					var assetFrameWidth  = asset.frameWidth,
-						assetFrameHeight = asset.frameHeight,
-						assetNumFrames   = asset.numFrames
+					var assetFrameDimensions = asset.frameDimensions,
+						assetNumFrames       = asset.numFrames
 
-					vec2.multiply( transform.scale, [ assetFrameWidth, assetFrameHeight ], tmpVec2 )
+					vec2.multiply( transform.scale, assetFrameDimensions, tmpVec2 )
 					context.scale( tmpVec2 )
 
 					appearance.animationOffset = createAnimationOffset(
@@ -131,7 +130,7 @@ define(
 					var frameId = Math.round( appearance.animationOffset * ( assetNumFrames - 1 ) ),
 						frameOffset = asset.frameOffsets[ frameId ]
 
-					context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameWidth, assetFrameHeight, -0.5, -0.5, 1, 1 )
+					context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameDimensions[ 0 ], assetFrameDimensions[ 1 ], -0.5, -0.5, 1, 1 )
 				}
 
 				// draw children

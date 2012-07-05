@@ -346,8 +346,8 @@ define(
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
 
 			// setting up the texture matrix
-			var tw = texture.width,
-				th = texture.height
+			var tw = texture.dimensions[ 0 ],
+				th = texture.dimensions[ 1 ]
 
 			updateTextureMatrix(
 				sw / tw,
@@ -450,8 +450,7 @@ define(
 				/*
 				 * Public
 				 */
-				width  : image.width,
-				height : image.height,
+				dimensions : [ image.width, image.height ],
 
 				/*
 				 * Private

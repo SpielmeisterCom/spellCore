@@ -38,14 +38,13 @@ define(
 				createFrameOffsetPartial = _.bind( createFrameOffset, null, frameWidth, frameHeight )
 
 			return {
-				type :          asset.type,
-				resourceId :    spriteSheetAsset.resourceId,
-				frameWidth :    frameWidth,
-				frameHeight :   frameHeight,
-				frameDuration : asset.config.duration / numFrames,
-				frameOffsets :  _.map( asset.config.frameIds, function( frameId ) { return createFrameOffsetPartial( numX, numY, frameId ) } ),
-				numFrames :     numFrames,
-				looped :        asset.config.looped
+				type            : asset.type,
+				resourceId      : spriteSheetAsset.resourceId,
+				frameDimensions : [ frameWidth, frameHeight ],
+				frameDuration   : asset.config.duration / numFrames,
+				frameOffsets    : _.map( asset.config.frameIds, function( frameId ) { return createFrameOffsetPartial( numX, numY, frameId ) } ),
+				numFrames       : numFrames,
+				looped          : asset.config.looped
 			}
 		}
 
