@@ -45,7 +45,7 @@ define(
 			setUpdateCallback : function( f ) {
 				this.updateCallback = f
 			},
-			run : function() {
+			callEveryFrame : function( currentTimeInMs ) {
 				var timer = this.timer
 				timer.update()
 
@@ -88,9 +88,11 @@ define(
 //					clockSpeedFactor = 1.0
 //				}
 
-				PlatformKit.callNextFrame(
-					_.bind( this.run, this )
-				)
+				PlatformKit.callNextFrame( this.callEveryFramePartial )
+			},
+			run : function() {
+				this.callEveryFramePartial = _.bind( this.callEveryFrame, this )
+				this.callEveryFramePartial( Types.Time.getCurrentInMs() )
 			}
 		}
 
