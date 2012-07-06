@@ -59,8 +59,12 @@
  */
 define(
 	"spell/math/mat3",
-	["spell/shared/util/platform/Types"],
-	function (Types) {
+	[
+		"spell/shared/util/platform/Types"
+	],
+	function(
+		Types
+	) {
 
 		"use strict";
 		var createFloatArray = Types.createFloatArray;
@@ -376,7 +380,7 @@ define(
 		 */
 		mat3.toMat4 = function (mat, dest) {
 			if (!dest) {
-				dest = mat4.create();
+				dest = Types.createFloatArray( 16 );
 			}
 
 			dest[15] = 1;

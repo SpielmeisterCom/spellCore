@@ -61,9 +61,14 @@ define(
 	"spell/math/vec3",
 	[
 		"spell/shared/util/platform/Types",
-		"spell/math/quat4"
+		"spell/math/quat4",
+		"spell/math/mat4"
 	],
-	function (Types, quat4) {
+	function(
+		Types,
+		quat4,
+		mat4
+	) {
 
 		"use strict";
 		var createFloatArray = Types.createFloatArray;
@@ -496,7 +501,7 @@ define(
 			var d = vec3.dot(a, b);
 			var axis = tmpvec3;
 			if (d >= 1.0) {
-				quat4.set(identityQuat4, dest);
+				quat4.set(quat4.identity, dest);
 			} else if (d < (0.000001 - 1.0)) {
 				vec3.cross(xUnitVec3, a, axis);
 				if (vec3.length(axis) < 0.000001)
