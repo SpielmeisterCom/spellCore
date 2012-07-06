@@ -1,11 +1,28 @@
 /*
- * Underscore.js 1.3.3
- * (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
- * Underscore is freely distributable under the MIT license.
- * Portions of Underscore are inspired or borrowed from Prototype,
- * Oliver Steele's Functional, and John Resig's Micro-Templating.
- * For all details and documentation:
- * http://documentcloud.github.com/underscore
+ * Licence Notice Underscore.js 1.3.3:
+ *
+ * Copyright (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
  */
 
 /**
@@ -23,34 +40,59 @@ define(
 		var _ = {}
 
 		/**
-		 * Is a given value an array?
+		 * Returns *true* if **object** is an Array.
 		 *
-		 * @type {*}
-		 * @method
+		 * Examples:
+		 *
+		 *     (function(){ return _.isArray(arguments); })();
+		 *     //=> false
+		 *     _.isArray([1,2,3]);
+		 *     => true
+		 *
+		 * @param {Object} object
+		 * @returns {Boolean}
 		 */
 		_.isArray = platformImpl.isArray
 
 		/**
-		 * Is a given variable an object?
+		 * Returns *true* if **value** is an Object.
 		 *
-		 * @param object
+		 * Examples:
+		 *
+		 *     _.isObject({});
+		 *     //=> true
+		 *     _.isObject(1);
+		 *     //=> false
+		 *
+		 * @param {Object} value
 		 * @return {Boolean}
 		 */
 		_.isObject = platformImpl.isObject
 
 		/**
-		 * Return the number of elements in an object.
+		 * Return the number of values in the **list**.
 		 *
-		 * @param object
-		 * @return {*}
+		 * Example:
+		 *
+		 *     _.size({one : 1, two : 2, three : 3})
+		 *     //=> 3
+		 *
+		 * @param {Object} list
+		 * @return {Number}
 		 */
 		_.size = platformImpl.size
 
 		/**
-		 * Safely convert anything iterable into a real, live array.
+		 * Converts the **list** (anything that can be iterated over), into a real Array.
+		 * Useful for transmuting the arguments object.
 		 *
-		 * @param object
-		 * @return {*}
+		 * Example:
+		 *
+		 *     (function(){ return _.toArray(arguments).slice(1); })(1, 2, 3, 4);
+		 *     //=> [2, 3, 4]
+		 *
+		 * @param {Object} list
+		 * @return {Array}
 		 */
 		_.toArray = platformImpl.toArray
 
@@ -70,7 +112,7 @@ define(
 		 *
 		 * @param {Array|Object} list An Array or an Object with key/value pairs
 		 * @param {Function} iterator Iterator function. The arguments for this function will be *(element, index, list)*
-		 * if object is an Array and *(value, key, list)*
+		 * if object is an Array and *(value, key, list)* if it's an Object
 		 * @param {Object} [context] The context in which the iterator should be bound to
 		 * @returns {void}
 		 */
@@ -91,49 +133,69 @@ define(
 		 *
 		 * @param {Array|Object} list An Array or an Object with key/value pairs
 		 * @param {Function} iterator Iterator function. The arguments for this function will be *(element, index, list)*
-		 * if object is an Array and *(value, key, list)*
+		 * if object is an Array and *(value, key, list)* if it's an Object
 		 * @param {Object} [context] The context in which the iterator should be bound to
 		 * @returns {Array} Array with the values of **list** mapped through the **iterator** transformation function
 		 */
 		_.map = platformImpl.map
 
 		/**
-		 * Get the last element of an array. Passing **n** will return the last N
-		 * values in the array. The **guard** check allows it to work with `_.map`.
+		 * Returns the last element of an **array**. Passing **n** will return the last n elements of the array.
 		 *
-		 * @param array
-		 * @param n
-		 * @param guard
-		 * @return {*}
+		 * Example:
+		 *
+		 *     _.last([5, 4, 3, 2, 1]);
+		 *     //=> 1
+		 *
+		 * @param {Array} array
+		 * @param {Number} [n]
+		 * @return {Array|Object}
 		 */
 		_.last = platformImpl.last
 
 		/**
-		 * Return all the elements that pass a truth test
+		 * Looks through each value in the **list**, returning an array of all the values that pass a
+		 * truth test (**iterator**).
 		 *
-		 * @param object
-		 * @param iterator
-		 * @param context
-		 * @return {*}
+		 * Example:
+		 *
+		 *     var evens = _.filter([1, 2, 3, 4, 5, 6], function(num){ return num % 2 == 0; });
+		 *     //=> [2, 4, 6]
+		 *
+		 * @param {Array} list
+		 * @param {Function} iterator
+		 * @param {Object} [context]
+		 * @return {Array}
 		 */
 		_.filter = platformImpl.filter
 
 		/**
-		 * Has own property?
+		 * Does the object contain the given key?
 		 *
-		 * @param object
-		 * @param key
-		 * @return {*}
+		 * Example:
+		 *
+		 *     _.has({a: 1, b: 2, c: 3}, "b");
+		 *     //=> true
+		 *
+		 * @param {Object} object
+		 * @param {String} key
+		 * @return {Boolean}
 		 */
 		_.has = platformImpl.has
 
 		/**
-		 * Determine if at least one element in the object matches a truth test.
+		 * Returns *true* if any of the values in the **list** pass the **iterator** truth test.
+		 * Short-circuits and stops traversing the list if a *true* element is found.
 		 *
-		 * @param object
-		 * @param iterator
-		 * @param context
-		 * @return {*}
+		 * Example:
+		 *
+		 *     _.any([null, 0, 'yes', false], function(value) { return value; });
+		 *     //=> true
+		 *
+		 * @param {Array} object
+		 * @param {Function} iterator
+		 * @param [context]
+		 * @return {Boolean}
 		 */
 		_.any = platformImpl.any
 
@@ -149,37 +211,74 @@ define(
 		 * @param {Array} list
 		 * @param {Function} iterator
 		 * @param {Object} [context]
-		 * @return {*}
+		 * @return {Object}
 		 */
 		_.find = platformImpl.find
 
 		/**
-		 * Run a function **n** times.
+		 * Invokes the given **iterator** function *n* times.
 		 *
-		 * @param n
-		 * @param iterator
-		 * @param context
+		 * Example:
+		 *
+		 *     _.times(3, function(){ genie.grantWish(); });
+		 *
+		 * @param {Number} n
+		 * @param {Function} iterator
+		 * @param {Object} [context]
 		 */
 		_.times = platformImpl.times
 
 		/**
-		 * Extend a given object with all the properties in passed-in object(s).
+		 * Copy all of the properties in the **source** objects over to the **destination** object,
+		 * and return the **destination** object. It's in-order, so the last source will override
+		 * properties of the same name in previous arguments.
 		 *
-		 * @param object
-		 * @return {*}
+		 * Example:
+		 *
+		 *     _.extend({name : 'moe'}, {age : 50});
+		 *     //=> {name : 'moe', age : 50}
+		 *
+		 * @param {Object} destination
+		 * @param {Object...} sources
+		 * @return {Object}
 		 */
 		_.extend = platformImpl.extend
 
+		/**
+		 * Returns *true* if all of the values in the **list** pass the **iterator** truth test.
+		 *
+		 * Example:
+		 *
+		 *     _.all([true, 1, null, 'yes'], function(value) { return value; });
+		 *     //=> false
+		 *
+		 * @param {Array} list
+		 * @param {Function} iterator
+		 * @param {Object} [context]
+		 * @returns {Boolean}
+		 */
 		_.all = platformImpl.all
 
 		/**
-		 * Generate an integer Array containing an arithmetic progression. A port of
-		 * the native Python `range()` function. See
-		 * [the Python documentation](http://docs.python.org/library/functions.html#range).
+		 * A function to create flexibly-numbered lists of integers, handy for each and map loops.
+		 * Returns a list of integers from **start** to **stop**, incremented (or decremented) by **step**.
 		 *
-		 * @param start
-		 * @param stop
-		 * @param step
+		 * Examples:
+		 *
+		 *     _.range(10);
+		 *     //=> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+		 *     _.range(1, 11);
+		 *     //=> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+		 *     _.range(0, 30, 5);
+		 *     //=> [0, 5, 10, 15, 20, 25]
+		 *     _.range(0, -10, -1);
+		 *     //=> [0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
+		 *     _.range(0, 0);
+		 *     => []
+		 *
+		 * @param {Number} start
+		 * @param {Number} stop
+		 * @param {Number} [step] defaults to 1 of omitted
 		 * @return {Array}
 		 */
 		_.range = platformImpl.range
@@ -204,182 +303,299 @@ define(
 		_.reduce = platformImpl.reduce
 
 		/**
-		 * Create a function bound to a given object (assigning `this`, and arguments,
-		 * optionally). Binding with arguments is also known as `curry`.
+		 * Bind a **function** to an **object**, meaning that whenever the function is called,
+		 * the value of *this* will be the **object**. Optionally, bind **arguments** to the **function**
+		 * to pre-fill them, also known as partial application.
 		 *
-		 * @param func
-		 * @param context
-		 * @return {*}
+		 * Example:
+		 *
+		 *     var func = function(greeting){ return greeting + ': ' + this.name };
+		 *     func = _.bind(func, {name : 'moe'}, 'hi');
+		 *     func();
+		 *     //=> 'hi: moe'
+		 *
+		 * @param {Function} function
+		 * @param {Object} object
+		 * @param {Object...} [arguments]
+		 * @return {Function}
 		 */
 		_.bind = platformImpl.bind
 
 		/**
-		 * Return all the elements for which a truth test fails.
+		 * Returns the values in **list** without the elements that the truth test (**iterator**) passes.
+		 * The opposite of {@link #filter}.
 		 *
-		 * @param object
-		 * @param iterator
-		 * @param context
+		 * Example:
+		 *
+		 *     var odds = _.reject([1, 2, 3, 4, 5, 6], function(num){ return num % 2 == 0; });
+		 *     //=> [1, 3, 5]
+		 *
+		 * @param {Array} list
+		 * @param {Function} iterator
+		 * @param {Object} [context]
 		 * @return {Array}
 		 */
 		_.reject = platformImpl.reject
 
 		/**
-		 * Create a (shallow-cloned) duplicate of an object.
+		 * Create a shallow-copied clone of the **object**. Any nested objects or arrays will be
+		 * copied by reference, not duplicated.
 		 *
-		 * @param object
-		 * @return {*}
+		 * Example:
+		 *
+		 *     _.clone({name : 'moe'});
+		 *     //=> {name : 'moe'};
+		 *
+		 * @param {Object} object
+		 * @return {Object}
 		 */
 		_.clone = platformImpl.clone
 
 		/**
-		 * Fill in a given object with default properties.
+		 * Fill in missing properties in **object** with default values from the **defaults** objects,
+		 * and return the object. As soon as the property is filled, further defaults will have no effect.
 		 *
-		 * @param object
-		 * @return {*}
+		 * Example:
+		 *
+		 *     var iceCream = {flavor : "chocolate"};
+		 *     _.defaults(iceCream, {flavor : "vanilla", sprinkles : "lots"});
+		 *     //=> {flavor : "chocolate", sprinkles : "lots"}
+		 *
+		 *
+		 * @param {Object} object
+		 * @param {Object...} defaults
+		 * @return {Object}
 		 */
 		_.defaults = platformImpl.defaults
 
 		/**
-		 * If the browser doesn't supply us with indexOf (I'm looking at you, **MSIE**),
-		 * we need this function. Return the position of the first occurrence of an
-		 * item in an array, or -1 if the item is not included in the array.
-		 * If the array is large and already in sort order, pass `true`
-		 * for **isSorted** to use binary search.
+		 * Returns the index at which **value** can be found in the **array**, or -1 if value is not present
+		 * in the **array**.  If you're working with a large array, and you know that the array is already
+		 * sorted, pass *true* for **isSorted** to use a faster binary search.
 		 *
-		 * @param array
-		 * @param item
-		 * @param isSorted
-		 * @return {*}
+		 * Example:
+		 *
+		 *     _.indexOf([1, 2, 3], 2);
+		 *     //=> 1
+		 *
+		 * @param {Array} array
+		 * @param {Object} value
+		 * @param {Boolean} [isSorted]
+		 * @return {Number}
 		 */
 		_.indexOf = platformImpl.indexOf
 
 		/**
-		 * Is a given value a string?
+		 * Returns true if object is a String.
 		 *
-		 * @param object
+		 *     _.isString("moe");
+		 *     //=> true
+		 *
+		 * @param {Object} object
 		 * @return {Boolean}
 		 */
 		_.isString = platformImpl.isString
 
 		/**
-		 * Is a given array, string, or object empty?
-		 * An "empty" object has no enumerable own-properties.
+		 * Returns *true* if **object** contains no values.
 		 *
-		 * @param object
+		 * Example:
+		 *
+		 *     _.isEmpty([1, 2, 3]);
+		 *     //=> false
+		 *     _.isEmpty({});
+		 *     //=> true
+         *
+		 * @param {Object} object
 		 * @return {Boolean}
 		 */
 		_.isEmpty = platformImpl.isEmpty
 
 		/**
-		 * Retrieve the names of an object's properties.
+		 * Retrieve all the names of the **object**'s properties.
 		 *
-		 * @type {*}
-		 * @method
+		 * Example:
+		 *
+		 *     _.keys({one : 1, two : 2, three : 3});
+		 *     //=> ["one", "two", "three"]
+		 *
+		 * @param {Object} object
+		 * @returns {Array}
 		 */
 		_.keys = platformImpl.keys
 
 		/**
-		 * Is a given value a function?
+		 * Returns true if object is a Function.
 		 *
-		 * @param object
+		 * Example:
+		 *
+		 *     _.isFunction(alert);
+		 *     //=> true
+		 *
+		 * @param {Object} object
 		 * @return {Boolean}
 		 */
 		_.isFunction = platformImpl.isFunction
 
 		/**
-		 * Determine if a given value is included in the array or object using `===`.
+		 * Returns *true* if the **value** is present in the **list**, using === to test equality.
 		 *
-		 * @param object
-		 * @param target
+		 * Example:
+		 *
+		 *     _.contains([1, 2, 3], 3);
+		 *     //=> true
+		 *
+		 * @param {Array} list
+		 * @param {Object} value
 		 * @return {Boolean}
 		 */
 		_.contains = platformImpl.contains
 
 		/**
-		 * Invoke a method (with arguments) on every item in a collection.
+		 * Calls the method named by **methodName** on each value in the list. Any extra **arguments**
+		 * passed to invoke will be forwarded on to the method invocation.
 		 *
-		 * @param object
-		 * @param method
-		 * @return {*}
+		 * Example:
+		 *
+		 *     _.invoke([[5, 1, 7], [3, 2, 1]], 'sort');
+		 *     //=> [[1, 5, 7], [1, 2, 3]]
+		 *
+		 * @param {Array} list
+		 * @param {String} methodName
+		 * @param {Object...} arguments
+		 * @return {Array}
 		 */
 		_.invoke = platformImpl.invoke
 
 		/**
-		 * Return a completely flattened version of an array.
+		 * Flattens a nested **array** (the nesting can be to any depth). If you pass **shallow**,
+		 * the array will only be flattened a single level.
 		 *
-		 * @param array
-		 * @param shallow
-		 * @return {*}
+		 * Examples:
+		 *
+		 *     _.flatten([1, [2], [3, [[4]]]]);
+		 *     //=> [1, 2, 3, 4];
+		 *
+		 *     _.flatten([1, [2], [3, [[4]]]], true);
+		 *     //=> [1, 2, 3, [[4]]];
+		 *
+		 * @param {Array} array
+		 * @param {Boolean} shallow
+		 * @return {Array}
 		 */
 		_.flatten = platformImpl.flatten
 
 		/**
-		 * Return a copy of the object only containing the whitelisted properties.
+		 * Return a copy of the **object**, filtered to only have values for the whitelisted keys specified in **keys**.
 		 *
-		 * @param object
+		 * Example:
+		 *
+		 *     _.pick({name : 'moe', age: 50, userid : 'moe1'}, ['name', 'age']);
+		 *     //=> {name : 'moe', age : 50}
+		 *
+		 * @param {Object} object
+		 * @param {Array} keys Array containing the keys for the whitelist in **object**
 		 * @return {Object}
 		 */
 		_.pick = platformImpl.pick
 
 		/**
-		 * Computes the union of the passed-in arrays: the list of unique items, in order, that are present in one or more of the arrays.
+		 * Computes the union of the passed-in **arrays**: the list of unique items, in order,
+		 * that are present in one or more of the **arrays**.
 		 *
-		 * @param array
-		 * @return {*}
+		 * Example:
+		 *
+		 *     _.union([1, 2, 3], [101, 2, 1, 10], [2, 1]);
+		 *     //=> [1, 2, 3, 101, 10]
+		 *
+		 * @param {Array...} arrays
+		 * @return {Array}
 		 */
 		_.union = platformImpl.union
 
 		/**
-		 * Similar to without, but returns the values from array that are not present in the other arrays.
+		 * Returns the values from **array** that are not present in the **other** arrays.
 		 *
-		 * @param array
-		 * @param others
-		 * @return {*}
+		 * Example:
+		 *
+		 *     _.difference([1, 2, 3, 4, 5], [5, 2, 10]);
+		 *     //=> [1, 3, 4]
+		 *
+		 * @param {Array} array
+		 * @param {Array...} others
+		 * @return {Array}
 		 */
 		_.difference = platformImpl.difference
 
 		/**
-		 * Return all of the values of the object's properties.
+		 * Return all of the values of the **object**'s properties.
 		 *
-		 * @param object
+		 * Example:
+		 *
+		 *     _.values({one : 1, two : 2, three : 3});
+		 *     //=> [1, 2, 3]
+		 *
+		 * @param {Object} object
 		 * @return {Array}
 		 */
 		_.values = platformImpl.values
 
 		/**
-		 * Produces a duplicate-free version of the array, using === to test object equality. If you know in advance that the array is sorted, passing true for
-		 * isSorted will run a much faster algorithm. If you want to compute unique items based on a transformation, pass an iterator function.
+		 * Produces a duplicate-free version of the **array**, using === to test object equality.
+		 * If you know in advance that the array is sorted, passing *true* for **isSorted** will run a much faster
+		 * algorithm.
 		 *
-		 * @param array
+		 * Example:
+		 *     _.uniq([1, 2, 1, 3, 1, 4]);
+		 *     //=> [1, 2, 3, 4]
+		 *
+		 * @param {Array} array
 		 * @param {Boolean} [isSorted]
-		 * @param {Function} [iterator]
 		 * @return {Array}
 		 */
 		_.unique = platformImpl.unique
 
 		/**
-		 * Returns everything but the last entry of the array. Especially useful on the arguments object. Pass n to exclude the last n elements from the result.
+		 * Returns everything but the last entry of the **array**.
+		 * Especially useful on the arguments object. Pass **n** to exclude the last n elements from the result.
 		 *
-		 * @param array
-		 * @param n
+		 * Example:
+		 *
+		 *     _.initial([5, 4, 3, 2, 1]);
+		 *     //=> [5, 4, 3, 2]
+		 *
+		 * @param {Array} array
+		 * @param {Number} [n] Exclude the last n elments from the result
 		 * @return {Array}
 		 */
 		_.initial = platformImpl.initial
 
 		/**
-		 * A convenient version of what is perhaps the most common use-case for map: extracting a list of property values.
+		 * A convenient version of what is perhaps the most common use-case for {@link #map}:
+		 * extracting a list of property values.
 		 *
-		 * @param list
-		 * @param propertyName
+		 * Example:
+		 *
+		 *     var stooges = [{name : 'moe', age : 40}, {name : 'larry', age : 50}, {name : 'curly', age : 60}];
+		 *     _.pluck(stooges, 'name');
+		 *     //=> ["moe", "larry", "curly"]
+		 *
+		 * @param {Array} list Array with associative arrays in it
+		 * @param {String|Number} propertyName key that will be used to lookup the value in the elements of **list**
 		 * @return {Array}
 		 */
 		_.pluck = platformImpl.pluck
 
 		/**
-		 * Merges together the values of each of the arrays with the values at the corresponding position. Useful when you have separate data sources that
-		 * are coordinated through matching array indexes. If you're working with a matrix of nested arrays, zip.apply can transpose the matrix in a similar
-		 * fashion.
+		 * Merges together the values of each of the **arrays** with the values at the corresponding position.
+		 * Useful when you have separate data sources that are coordinated through matching array indexes.
 		 *
+		 * Example:
+		 *
+		 *     _.zip(['moe', 'larry', 'curly'], [30, 40, 50], [true, false, false]);
+		 *     //=> [["moe", 30, true], ["larry", 40, false], ["curly", 50, false]]
+		 *
+		 * @param {Array...} arrays
 		 * @return {Array}
 		 */
 		_.zip = platformImpl.zip
