@@ -1,9 +1,6 @@
 # Getting started with SpellJS
 
-SpellJS is a cross-platform middleware with integrated editor
+## Scripts
 
-The editor runs completely in the browser
-
-you program in JavaScript with an entity component system
-
+about scripts and amd modules
 
