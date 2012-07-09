@@ -6,6 +6,7 @@ define(
 		'spell/shared/util/Events',
 
 		'spell/math/vec2',
+		'spell/math/vec4',
 		'spell/math/mat3',
 
 		'spell/functions'
@@ -16,6 +17,7 @@ define(
 		Events,
 
 		vec2,
+		vec4,
 		mat3,
 
 		_
@@ -27,8 +29,9 @@ define(
 		 * private
 		 */
 
-		var tmpVec2 = vec2.create(),
-			tmpMat3 = mat3.identity(),
+		var tmpVec2  = vec2.create(),
+			tmpMat3  = mat3.identity(),
+			darkGrey = vec4.create( [ 0.125, 0.125, 0.125, 1.0 ] ),
 			currentCameraId
 
 		var createSortedByLayer = function( roots, visualObjects ) {
@@ -259,6 +262,8 @@ define(
 			var eventManager = globals.eventManager,
 				context = this.context,
 				screenSize = this.configurationManager.screenSize
+
+			context.setClearColor( darkGrey )
 
 			// setting up the view space matrix
 			context.setViewMatrix( createWorldToViewMatrix( tmpMat3, screenSize ) )
