@@ -6,7 +6,7 @@
 		{
 			"name" : "assetId",
 			"type" : "assetId:appearance",
-			"default" : "appearance:spell/not_defined"
+			"default" : "appearance:spell.defaultAppearance"
 		}
 	]
 }
