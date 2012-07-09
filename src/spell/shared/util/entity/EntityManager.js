@@ -150,7 +150,7 @@ define(
 			if( !entityConfig ) throw 'Error: Supplied invalid arguments.'
 
 			var templateId = entityConfig.templateId,
-				config     = entityConfig.config
+				config     = entityConfig.config || {}
 
 			if( !templateId && !config ) {
 				throw 'Error: Supplied invalid arguments.'
