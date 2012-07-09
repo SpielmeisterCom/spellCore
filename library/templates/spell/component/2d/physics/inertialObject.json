@@ -1,6 +1,6 @@
 {
 	"type" : "componentTemplate",
-	"namespace" : "spellReferenceProject.component.2d.physics",
+	"namespace" : "spell.component.2d.physics",
 	"name" : "inertialObject",
 	"attributes" : [
 		{
