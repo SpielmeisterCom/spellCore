@@ -30,8 +30,9 @@ define(
 		 * private
 		 */
 
-		var LIBRARY_TEMPLATES_PATH = '/library/templates'
-		var LIBRARY_SCRIPTS_PATH   = '/library/scripts'
+		var LIBRARY_TEMPLATES_PATH = '/library/templates',
+			LIBRARY_SCRIPTS_PATH   = '/library/scripts',
+			LIBRARY_ASSETS_PATH    = '/library/assets'
 
 		/*
 		 * Copies the contents of source path to target path recursively
@@ -103,6 +104,7 @@ define(
 					"scenes": [
 						{
 							"name": "Scene1",
+							"scriptId": "spell/scene/default",
 							"entities": []
 						}
 					]
@@ -118,6 +120,7 @@ define(
 			// copy spell sdk templates, scripts
 			copyDirectory( spellPath + LIBRARY_TEMPLATES_PATH, projectPath + LIBRARY_TEMPLATES_PATH )
 			copyDirectory( spellPath + LIBRARY_SCRIPTS_PATH, projectPath + LIBRARY_SCRIPTS_PATH )
+			copyDirectory( spellPath + LIBRARY_ASSETS_PATH, projectPath + LIBRARY_ASSETS_PATH )
 
 
 			// populate public directory
