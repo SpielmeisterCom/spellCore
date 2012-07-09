@@ -5,6 +5,7 @@ define(
 		'spell/client/2d/graphics/drawText',
 		'spell/client/2d/graphics/fonts/OpenSans14px',
 
+		'spell/math/vec2',
 		'spell/math/vec4',
 		'spell/math/mat3'
 	],
@@ -13,6 +14,7 @@ define(
 		drawText,
 		OpenSans14px,
 
+		vec2,
 		vec4,
 		mat3
 	) {
@@ -20,6 +22,7 @@ define(
 
 
 		var tmpMat3         = mat3.identity(),
+			invScale        = vec2.create(),
 			lineOpacity     = 0.5,
 			paleLineColor   = vec4.create( [ 0.4, 0.4, 0.4, lineOpacity ] ),
 			brightLineColor = vec4.create( [ 0.7, 0.7, 0.7, lineOpacity ] ),
@@ -109,7 +112,6 @@ define(
 
 		return function( context, resources, screenSize, cameraDimensions, cameraTransform ) {
 			var position     = cameraTransform.translation,
-				scale        = cameraTransform.scale,
 				cameraWidth  = cameraDimensions[ 0 ],
 				cameraHeight = cameraDimensions[ 1 ],
 				minX         = position[ 0 ] - cameraWidth / 2,
@@ -119,6 +121,8 @@ define(
 				stepSize     = computeGridLineStepSize( cameraWidth ),
 				worldToScreenTranslation = [ -minX, -minY ]
 
+			vec2.divide( screenSize, cameraDimensions, invScale )
+
 			context.save()
 			{
 				context.setViewMatrix( createWorldToViewMatrix( tmpMat3, screenSize ) )
@@ -127,11 +131,11 @@ define(
 				drawGridLinesY(
 					context,
 					resources,
-					cameraHeight,
+					screenSize[ 1 ],
 					stepSize,
 					computeGridStart( minX, stepSize ),
 					minY,
-					1 / scale[ 1 ],
+					invScale[ 1 ],
 					worldToScreenTranslation,
 					computeNumLines( cameraWidth, stepSize )
 				)
@@ -140,11 +144,11 @@ define(
 				drawGridLinesX(
 					context,
 					resources,
-					cameraWidth,
+					screenSize[ 0 ],
 					stepSize,
 					computeGridStart( minY, stepSize ),
 					minX,
-					1 / scale[ 0 ],
+					invScale[ 0 ],
 					worldToScreenTranslation,
 					computeNumLines( cameraHeight, stepSize )
 				)
