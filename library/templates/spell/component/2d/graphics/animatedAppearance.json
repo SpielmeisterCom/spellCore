@@ -1,27 +1,24 @@
 {
-	"type" : "componentTemplate",
-	"namespace" : "spell.component.2d.graphics",
-	"name" : "animatedAppearance",
-	"attributes" : [
+	"name": "animatedAppearance",
+	"namespace": "spell.component.2d.graphics",
+	"type": "componentTemplate",
+	"title": "2d Animation",
+	"doc": "",
+	"attributes": [
 		{
-			"name" : "assetId",
-			"type" : "assetId:animatedAppearance",
-			"default" : "animatedAppearance:spell/not_defined"
+			"name": "assetId",
+			"type": "assetId:animatedAppearance",
+			"default": "animatedAppearance:spell.not_defined"
 		},
 		{
-			"name" : "animationId",
-			"type" : "string",
-			"default" : ""
+			"name": "animationSpeedFactor",
+			"type": "number",
+			"default": 1
 		},
 		{
-			"name" : "animationSpeedFactor",
-			"type" : "number",
-			"default" : 1.0
-		},
-		{
-			"name" : "animationOffset",
-			"type" : "number",
-			"default" : 0
+			"name": "animationOffset",
+			"type": "number",
+			"default": 0
 		}
 	]
 }
