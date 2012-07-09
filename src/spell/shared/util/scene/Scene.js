@@ -81,10 +81,17 @@ define(
 			return _.any(
 				flattenEntityConfig( sceneConfig.entities ),
 				function( entityConfig ) {
-					return ( entityConfig.templateId === cameraEntityTemplateId ?
-						entityConfig.config[ cameraComponentTemplateId ].active :
-						false
-					)
+					if( entityConfig.templateId !== cameraEntityTemplateId ||
+						!entityConfig.config ) {
+
+						return false
+					}
+
+					var cameraComponent = entityConfig.config[ cameraComponentTemplateId ]
+
+					if( !cameraComponent ) return false
+
+					return cameraComponent.active
 				}
 			)
 		}
