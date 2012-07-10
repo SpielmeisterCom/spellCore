@@ -1,7 +1,6 @@
 define(
 	'spell/client/2d/graphics/drawCoordinateGrid',
 	[
-		'spell/client/2d/graphics/createWorldToViewMatrix',
 		'spell/client/2d/graphics/drawText',
 		'spell/client/2d/graphics/fonts/OpenSans14px',
 
@@ -10,7 +9,6 @@ define(
 		'spell/math/mat3'
 	],
 	function(
-		createWorldToViewMatrix,
 		drawText,
 		OpenSans14px,
 
@@ -125,7 +123,10 @@ define(
 
 			context.save()
 			{
-				context.setViewMatrix( createWorldToViewMatrix( tmpMat3, screenSize ) )
+				// world to view matrix
+				mat3.ortho( 0, screenSize[ 0 ], 0, screenSize[ 1 ], tmpMat3 )
+
+				context.setViewMatrix( tmpMat3 )
 
 				// grid lines parallel to y-axis
 				drawGridLinesY(

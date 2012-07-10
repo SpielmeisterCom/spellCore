@@ -63,8 +63,6 @@ define(
 		 * @param matrix
 		 */
 		var createScreenSpaceShimMatrix = function( width, height, matrix ) {
-			mat3.identity( matrix )
-
 			mat3.ortho(
 				0,
 				width,
