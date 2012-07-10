@@ -36,12 +36,6 @@ define(
 		}
 
 		var createEntityConfigSpellFormat = function( templateManager, entityConfigSpellEdFormat ) {
-			if( !_.has( entityConfigSpellEdFormat, 'templateId' ) &&
-				!_.has( entityConfigSpellEdFormat, 'components' ) ) {
-
-				throw 'Error: Entity config is insufficient. Both properties \'templateId\' and \'components\' are missing. Only one of them can be omitted at a time.'
-			}
-
 			var entityConfig = {}
 
 			if( _.has( entityConfigSpellEdFormat, 'name' ) ) {

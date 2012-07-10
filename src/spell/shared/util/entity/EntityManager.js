@@ -86,8 +86,7 @@ define(
 					hasConfig     = _.has( arg0, 'config' )
 
 				if( hasTemplateId ) templateId = arg0.templateId
-				if( hasConfig ) config = arg0.config
-				if( !hasTemplateId && !hasConfig ) config = arg0
+				config = ( hasConfig ? arg0.config : {} )
 				if( _.has( arg0, 'children' ) ) children = arg0.children
 			}
 
