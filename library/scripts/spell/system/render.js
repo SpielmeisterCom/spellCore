@@ -1,7 +1,6 @@
 define(
 	'spell/system/render',
 	[
-		'spell/client/2d/graphics/createWorldToViewMatrix',
 		'spell/client/2d/graphics/drawCoordinateGrid',
 		'spell/shared/util/Events',
 
@@ -12,7 +11,6 @@ define(
 		'spell/functions'
 	],
 	function(
-		createWorldToViewMatrix,
 		drawCoordinateGrid,
 		Events,
 
@@ -265,8 +263,10 @@ define(
 
 			context.setClearColor( darkGrey )
 
-			// setting up the view space matrix
-			context.setViewMatrix( createWorldToViewMatrix( tmpMat3, screenSize ) )
+			// world to view matrix
+			mat3.ortho( 0, screenSize[ 0 ], 0, screenSize[ 1 ], tmpMat3 )
+
+			context.setViewMatrix( tmpMat3 )
 
 			// setting up the viewport
 			var viewportPositionX = 0,
