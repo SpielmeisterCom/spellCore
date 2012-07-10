@@ -2,21 +2,25 @@
 	"type" : "componentTemplate",
 	"namespace" : "spell.component.2d.graphics",
 	"name" : "camera",
+	"title" : "2D Camera",
 	"attributes" : [
 		{
 			"name" : "width",
 			"type" : "integer",
-			"default" : 320
+			"default" : 320,
+			"doc" : "the width of the section of the scene in logical units captured by the camera"
 		},
 		{
 			"name" : "height",
 			"type" : "integer",
-			"default" : 240
+			"default" : 240,
+			"doc" : "the height of the section of the scene in logical units captured by the camera"
 		},
 		{
 			"name" : "active",
 			"type" : "boolean",
-			"default" : false
+			"default" : false,
+			"doc" : "controls if the camera is active"
 		}
 	]
 }

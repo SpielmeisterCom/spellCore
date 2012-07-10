@@ -28,5 +28,20 @@
 				"description": "This guide elaborates on the advantages of entity component based systems over object-oriented systems."
 			}
 		]
+	},
+	{
+		"title": "Included Entities and Components",
+		"items": [
+			{
+				"name": "included_entities",
+				"title": "Entities",
+				"description": "This guide lists all entities which are included in the SpellJS framework."
+			},
+			{
+				"name": "included_components",
+				"title": "Components",
+				"description": "This guide lists all components which are included in the SpellJS framework."
+			}
+		]
 	}
 ]

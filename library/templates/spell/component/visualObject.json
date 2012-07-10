@@ -2,7 +2,8 @@
 	"type" : "componentTemplate",
 	"namespace" : "spell.component",
 	"name" : "visualObject",
-	"doc" : "adds an visual representation to an entity",
+	"title" : "Visual Object",
+	"doc" : "the visual representation of an entity",
 	"attributes" : [
 		{
 			"name" : "layer",

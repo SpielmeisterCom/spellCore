@@ -2,16 +2,19 @@
 	"type" : "componentTemplate",
 	"namespace" : "spell.component.2d.physics",
 	"name" : "inertialObject",
+	"title" : "Inertial Object",
 	"attributes" : [
 		{
 			"name" : "mass",
 			"type" : "number",
-			"default" : 1
+			"default" : 1,
+			"doc" : "the mass of the object"
 		},
 		{
 			"name" : "velocity",
 			"type" : "vec2",
-			"default" : [ 0, 0 ]
+			"default" : [ 0, 0 ],
+			"doc" : "the velocity of the object"
 		}
 	]
 }

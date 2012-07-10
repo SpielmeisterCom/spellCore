@@ -2,21 +2,26 @@
 	"type" : "componentTemplate",
 	"namespace" : "spell.component.2d",
 	"name" : "transform",
+	"title" : "2D Transformation",
+	"doc" : "transformation of the local origin of the entity relative to its parent",
 	"attributes" : [
 		{
 			"name" : "translation",
 			"type" : "vec2",
-			"default" : [ 0, 0 ]
+			"default" : [ 0, 0 ],
+			"doc" : "translation part of the local origin"
 		},
 		{
 			"name" : "rotation",
 			"type" : "number",
-			"default" : 0
+			"default" : 0,
+			"doc" : "rotation part of the local origin"
 		},
 		{
 			"name" : "scale",
 			"type" : "vec2",
-			"default" : [ 1, 1 ]
+			"default" : [ 1, 1 ],
+			"doc" : "scale part of the local origin"
 		}
 	]
 }

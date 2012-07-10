@@ -2,6 +2,7 @@
 	"type" : "entityTemplate",
 	"namespace" : "spell.entity.2d.graphics",
 	"name" : "camera",
+	"title" : "2D Camera",
 	"components" : [
 		{
 			"templateId" : "spell.component.2d.transform",

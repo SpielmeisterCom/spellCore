@@ -2,15 +2,18 @@
 	"type" : "componentTemplate",
 	"namespace" : "spell.component",
 	"name" : "inputDefinition",
+	"title" : "Mapping of keys to actions",
 	"attributes" : [
 		{
 			"name" : "actorId",
-			"type" : "string"
+			"type" : "string",
+			"doc" : "the id of the actor that is controlled by this mapping"
 		},
 		{
 			"name" : "keyToAction",
 			"type" : "object",
-			"default" : {}
+			"default" : {},
+			"doc" : "the keys to actions mapping"
 		}
 	]
 }
