@@ -58,16 +58,7 @@
 						return
 					}
 
-					if( event.data.type === 'spelled.run' ) {
-						var config = {
-							debug : true,
-							platform : 'html5'
-						}
-
-						spell.onInitialized = init
-						spell.start( config )
-
-					} else if( event.data.type === 'spelled.debug' ) {
+					if( event.data.type === 'spelled.debug' ) {
 						spell.sendDebugMessage( event.data )
 					}
 				}
@@ -96,6 +87,14 @@
 
 				registerMouseFocusHandlers()
 				registerMessageHandler()
+
+				var config = {
+					debug : true,
+					platform : 'html5'
+				}
+
+				spell.onInitialized = init
+				spell.start( config )
 			} )()
 		</script>
 	</body>
