@@ -2,7 +2,7 @@
 	"type" : "entityTemplate",
 	"namespace" : "spell.entity",
 	"name" : "inputDefinition",
-	"title" : "Mapping of keys to actions",
+	"title" : "Input Definition",
 	"components" : [
 		{
 			"templateId" : "spell.component.inputDefinition",

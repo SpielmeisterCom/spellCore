@@ -30,17 +30,56 @@
 		]
 	},
 	{
-		"title": "Included Entities and Components",
+		"title": "Entity templates",
 		"items": [
 			{
-				"name": "included_entities",
-				"title": "Entities",
-				"description": "This guide lists all entities which are included in the SpellJS framework."
+				"name": "entity_template_spell_entity_2d_graphics_camera",
+				"title": "2D Camera"
 			},
 			{
-				"name": "included_components",
-				"title": "Components",
-				"description": "This guide lists all components which are included in the SpellJS framework."
+				"name": "entity_template_spell_entity_inputDefinition",
+				"title": "Input Definition"
+			}
+		]
+	},
+	{
+		"title": "Component templates",
+		"items": [
+			{
+				"name": "component_template_spell_component_actor",
+				"title": "Actor"
+			},
+			{
+				"name": "component_template_spell_component_physics_collisionSphere",
+				"title": "Collision Sphere"
+			},
+			{
+				"name": "component_template_spell_component_inputDefinition",
+				"title": "Input Definition"
+			},
+			{
+				"name": "component_template_spell_component_2d_graphics_animatedAppearance",
+				"title": "2D Animation"
+			},
+			{
+				"name": "component_template_spell_component_2d_graphics_appearance",
+				"title": "2D Appearance"
+			},
+			{
+				"name": "component_template_spell_component_2d_graphics_camera",
+				"title": "2D Camera"
+			},
+			{
+				"name": "component_template_spell_component_2d_transform",
+				"title": "2D Transformation"
+			},
+			{
+				"name": "component_template_spell_component_2d_physics_inertialObject",
+				"title": "2D Inertial Object"
+			},
+			{
+				"name": "component_template_spell_component_visualObject",
+				"title": "Visual Object"
 			}
 		]
 	}
