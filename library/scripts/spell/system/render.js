@@ -56,17 +56,17 @@ define(
 			)
 		}
 
-		var createAnimationOffset = function( deltaTimeInMs, animationOffset, animationSpeedFactor, numFrames, frameDuration, loop ) {
+		var createOffset = function( deltaTimeInMs, offset, replaySpeed, numFrames, frameDuration, loop ) {
 			var animationLengthInMs = numFrames * frameDuration,
-				animationOffsetInMs = Math.floor( numFrames * frameDuration * animationOffset ) + deltaTimeInMs * animationSpeedFactor
+				offsetInMs = Math.floor( numFrames * frameDuration * offset ) + deltaTimeInMs * replaySpeed
 
-			if( animationOffsetInMs > animationLengthInMs ) {
+			if( offsetInMs > animationLengthInMs ) {
 				if( !loop ) return 1.0
 
-				animationOffsetInMs = animationOffsetInMs % animationLengthInMs
+				offsetInMs = offsetInMs % animationLengthInMs
 			}
 
-			return animationOffsetInMs / animationLengthInMs
+			return offsetInMs / animationLengthInMs
 		}
 
 		var drawVisualObject = function(
@@ -119,16 +119,16 @@ define(
 					vec2.multiply( transform.scale, assetFrameDimensions, tmpVec2 )
 					context.scale( tmpVec2 )
 
-					appearance.animationOffset = createAnimationOffset(
+					appearance.offset = createOffset(
 						deltaTimeInMs,
-						appearance.animationOffset,
-						appearance.animationSpeedFactor,
+						appearance.offset,
+						appearance.replaySpeed,
 						assetNumFrames,
 						asset.frameDuration,
 						asset.looped
 					)
 
-					var frameId = Math.round( appearance.animationOffset * ( assetNumFrames - 1 ) ),
+					var frameId = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
 						frameOffset = asset.frameOffsets[ frameId ]
 
 					context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameDimensions[ 0 ], assetFrameDimensions[ 1 ], -0.5, -0.5, 1, 1 )
