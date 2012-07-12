@@ -1,101 +1,101 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>SpellEd</title>
-		<link rel="stylesheet" href="main.css" type="text/css" />
-		<script type="text/javascript" src="spell.js"></script>
-	</head>
+<head>
+	<title>SpellEd</title>
+	<link rel="stylesheet" href="main.css" type="text/css" />
+	<script type="text/javascript" src="spell.js"></script>
+</head>
 
-	<body>
-		<div id="spell"></div>
-		<script type="text/javascript">
-			( function() {
-				var editorOrigin = 'http://localhost:3000'
+<body>
+<div id="spell"></div>
+<script type="text/javascript">
+	( function() {
+		var editorOrigin = 'http://localhost:3000'
 
-				/**
-				 * Thanks to John Resig. http://ejohn.org/blog/flexible-javascript-events/
-				 *
-				 * @param obj
-				 * @param type
-				 * @param fn
-				 */
-				var addEvent = function( obj, type, fn ) {
-				  if ( obj.attachEvent ) {
-				    obj['e'+type+fn] = fn;
-				    obj[type+fn] = function(){obj['e'+type+fn]( window.event );}
-				    obj.attachEvent( 'on'+type, obj[type+fn] );
-				  } else
-				    obj.addEventListener( type, fn, false );
-				}
+		/**
+		 * Thanks to John Resig. http://ejohn.org/blog/flexible-javascript-events/
+		 *
+		 * @param obj
+		 * @param type
+		 * @param fn
+		 */
+		var addEvent = function( obj, type, fn ) {
+			if ( obj.attachEvent ) {
+				obj['e'+type+fn] = fn;
+				obj[type+fn] = function(){obj['e'+type+fn]( window.event );}
+				obj.attachEvent( 'on'+type, obj[type+fn] );
+			} else
+				obj.addEventListener( type, fn, false );
+		}
 
-				var getParam = function( name ) {
-					name = name.replace( /[\[]/, "\\\[" ).replace( /[\]]/, "\\\]" )
-					var regexS = '[\\?&]' + name + '=([^&#]*)'
-					var regex = new RegExp( regexS )
-					var results = regex.exec( window.location.href )
+		var getParam = function( name ) {
+			name = name.replace( /[\[]/, "\\\[" ).replace( /[\]]/, "\\\]" )
+			var regexS = '[\\?&]' + name + '=([^&#]*)'
+			var regex = new RegExp( regexS )
+			var results = regex.exec( window.location.href )
 
-					return ( results == null ? '' : results[ 1 ] )
-				}
+			return ( results == null ? '' : results[ 1 ] )
+		}
 
-				var sendMessageToEditor = function( action ) {
-					parent.window.postMessage(
-						{
-							action : 'spell.' + action,
-							iframeId : getParam( 'iframeId' )
-						},
-						editorOrigin
-					)
-				}
+		var sendMessageToEditor = function( action ) {
+			parent.window.postMessage(
+					{
+						action : 'spell.' + action,
+						iframeId : getParam( 'iframeId' )
+					},
+					editorOrigin
+			)
+		}
 
-				var init = function() {
-					sendMessageToEditor( 'initialized' )
-				}
+		var init = function() {
+			sendMessageToEditor( 'initialized' )
+		}
 
-				var handleMessageFromEditor = function( event ) {
-					if( event.origin !== editorOrigin ) {
-						console.log( 'Error: origin \'' + event.origin + '\' does not match.' )
+		var handleMessageFromEditor = function( event ) {
+			if( event.origin !== editorOrigin ) {
+				console.log( 'Error: origin \'' + event.origin + '\' does not match.' )
 
-						return
+				return
+			}
+
+			if( event.data.type === 'spelled.debug' ) {
+				spell.sendDebugMessage( event.data.data )
+			}
+		}
+
+		var registerMouseFocusHandlers = function() {
+			addEvent(
+					document.body,
+					'focus',
+					function( event ) {
+						sendMessageToEditor( 'focus' )
 					}
+			)
 
-					if( event.data.type === 'spelled.debug' ) {
-						spell.sendDebugMessage( event.data )
+			addEvent(
+					document.body,
+					'blur',
+					function( event ) {
+						sendMessageToEditor( 'blur' )
 					}
-				}
+			)
+		}
 
-				var registerMouseFocusHandlers = function() {
-					addEvent(
-						document.body,
-						'focus',
-						function( event ) {
-							sendMessageToEditor( 'focus' )
-						}
-					)
+		var registerMessageHandler = function() {
+			addEvent( window, 'message', handleMessageFromEditor )
+		}
 
-					addEvent(
-						document.body,
-						'blur',
-						function( event ) {
-							sendMessageToEditor( 'blur' )
-						}
-					)
-				}
+		registerMouseFocusHandlers()
+		registerMessageHandler()
 
-				var registerMessageHandler = function() {
-					addEvent( window, 'message', handleMessageFromEditor )
-				}
+		var config = {
+			debug : true,
+			platform : 'html5'
+		}
 
-				registerMouseFocusHandlers()
-				registerMessageHandler()
-
-				var config = {
-					debug : true,
-					platform : 'html5'
-				}
-
-				spell.onInitialized = init
-				spell.start( config )
-			} )()
-		</script>
-	</body>
+		spell.onInitialized = init
+		spell.start( config )
+	} )()
+</script>
+</body>
 </html>
