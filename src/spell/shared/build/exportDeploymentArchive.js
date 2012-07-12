@@ -41,7 +41,7 @@ define(
 					var data = fs.readFileSync( absoluteFilePath )
 
 					tape.append(
-						filePath,
+						filePath.replace( /\/public/, '' ),
 						data,
 						function() {
 							writeFiles( tape, rootPath, filePaths )
