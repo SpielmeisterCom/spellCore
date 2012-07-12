@@ -4,6 +4,7 @@ define(
 		'spell/shared/build/executeCreateDebugBuild',
 		'spell/shared/build/exportDeploymentArchive',
 		'spell/shared/build/initializeProjectDirectory',
+		'path',
 
 		'spell/functions'
 	],
@@ -11,6 +12,7 @@ define(
 		executeCreateDebugBuild,
 		exportDeploymentArchive,
 		initializeProjectDirectory,
+		path,
 
 		_
 	) {
