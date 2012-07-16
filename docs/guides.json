@@ -11,6 +11,11 @@
 				"name": "intro_getting_started",
 				"title": "Getting started with SpellJS",
 				"description": "This guide explains how you get started with creating your first game using SpellJS' IDE SpellEd."
+			},
+			{
+				"name": "intro_creating_a_system_from_scratch",
+				"title": "Creating a system from scratch",
+				"description": "This guide explains how a system is created from scratch and added to a scene."
 			}
 		]
 	},
@@ -21,6 +26,11 @@
 				"name": "concepts_entities_components",
 				"title": "Entities, Components and Systems",
 				"description": "This guide explains the basic building blocks of SpellJS' specific flavor of entity component system."
+			},
+			{
+				"name": "concepts_systems",
+				"title": "Systems",
+				"description": "This guide illustrates the basic concept of systems in SpellJS."
 			},
 			{
 				"name": "concepts_entity_component_vs_oop",
