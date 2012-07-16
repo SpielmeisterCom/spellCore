@@ -140,11 +140,13 @@ define(
 					this.script.init( this.globals, entityManager, sceneConfig )
 				}
 
-				this.renderSystems = createSystems( globals, sceneConfig.systems.render )
-				this.updateSystems = createSystems( globals, sceneConfig.systems.update )
+				if( sceneConfig.systems ) {
+					this.renderSystems = createSystems( globals, sceneConfig.systems.render )
+					this.updateSystems = createSystems( globals, sceneConfig.systems.update )
 
-				invoke( this.renderSystems, 'init', [ this.globals, sceneConfig ] )
-				invoke( this.updateSystems, 'init', [ this.globals, sceneConfig ] )
+					invoke( this.renderSystems, 'init', [ this.globals, sceneConfig ] )
+					invoke( this.updateSystems, 'init', [ this.globals, sceneConfig ] )
+				}
 			},
 			destroy: function( globals, sceneConfig ) {
 				invoke( this.renderSystems, 'cleanUp', [ this.globals, sceneConfig ] )
