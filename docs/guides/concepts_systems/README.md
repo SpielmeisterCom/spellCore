@@ -115,14 +115,14 @@ entered side effect hell. Try to avoid this for your own sake.
 Systems are executed in a fixed order. This order can be changed during editing time but not during runtime. It is always guaranteed that changes performed by
 *system A* to the game state are visible to *system B* when *system B* is set to execute after *system A* by the predefined order.
 
-### Execution type
-Systems can be assigned to two different execution types.
+### Execution group
+Systems can be assigned to two different execution groups.
 
-The first type is called *render*. Systems assigned to this type are executed everytime a render tick is performed. The amount of render ticks might vary
-depending on your concrete workload but will max out at about the refresh rate of the devices display. Usually only systems related to rendering or related
-should be assigned to this type.
+The first group is called *render*. Systems assigned to this group are executed everytime a render tick is performed. The amount of render ticks might vary
+depending on your concrete workload but will max out at about the refresh rate of the devices display. Usually only systems related to rendering should be
+assigned to this type.
 
-The other type is called *update*. Systems assigned to this type are executed every update tick. Update ticks are done periodically at a fixed rate of 50Hz.
+The other group is called *update*. Systems assigned to this group are executed every update tick. Update ticks are done periodically at a fixed rate of 50Hz.
 
 
 
