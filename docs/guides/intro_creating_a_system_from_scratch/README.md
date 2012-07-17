@@ -19,7 +19,7 @@ Here is an example of a small system that adds a "gravity pull" behaviour to you
 **The view of the gravity system template in SpellEd.**
 
 As you can see in the input panel the gravity system processes all entities that have a *spell.component.visualObject* and *spell.component.2d.transform*
-component. The associated system implementation is in the script *script/system/gravity*.
+component. The associated system implementation is located in the script *script/system/gravity*.
 
 
 ## Implementing the system
@@ -72,7 +72,7 @@ define(
 
 Now you have to perform one final step to use the newly created system in your scene. First open the Scene Editor, select the systems node in the scene tree on
 the left and click on the add button in the inspector view to the right. In the dialog that opens chose "render" as system type and check the box in front of
-the gravity system in the "Available Systems" list.
+the gravity system in the "Available Systems" list and complete the process with a click on the "Add" button at the bottom.
 
 {@img addGravitySystemToScene.png adding the gravity system to the scene}
 
