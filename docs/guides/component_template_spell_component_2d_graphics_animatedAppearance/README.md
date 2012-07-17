@@ -1,8 +1,8 @@
-# 2D Animation (component template)
+# 2D Animated Appearance (component template)
 
 ## Usage
 
-The *2D Animation* component describes the graphical representation of the entity it is assigned to.
+The * 2D Animated Appearance* component describes the graphical representation of the entity it is assigned to.
 
 
 ## Attributes

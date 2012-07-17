@@ -1,8 +1,8 @@
-# 2D Appearance (component template)
+# 2D Static Appearance (component template)
 
 ## Usage
 
-The *2D Appearance* component describes the graphical representation of the entity it is assigned to.
+The *2D Static Appearance* component describes the graphical representation of the entity it is assigned to.
 
 
 ## Attributes

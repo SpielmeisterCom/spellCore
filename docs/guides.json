@@ -33,6 +33,11 @@
 				"description": "This guide illustrates the basic concept of systems in SpellJS."
 			},
 			{
+				"name": "concepts_assets",
+				"title": "Assets",
+				"description": "This guide illustrates the basic concept of assets in SpellJS."
+			},
+			{
 				"name": "concepts_entity_component_vs_oop",
 				"title": "Entity component system vs. OOP based system",
 				"description": "This guide elaborates on the advantages of entity component based systems over object-oriented systems."
@@ -90,6 +95,23 @@
 			{
 				"name": "component_template_spell_component_visualObject",
 				"title": "Visual Object"
+			}
+		]
+	},
+	{
+		"title": "Asset Types",
+		"items": [
+			{
+				"name": "asset_type_2d_animated_appearance",
+				"title": "2D Animated Appearance"
+			},
+			{
+				"name": "asset_type_2d_static_appearance",
+				"title": "2D Static Appearance"
+			},
+			{
+				"name": "asset_type_sprite_sheet",
+				"title": "Sprite Sheet"
 			}
 		]
 	}
