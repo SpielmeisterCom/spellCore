@@ -2,7 +2,7 @@
 	"type" : "componentTemplate",
 	"namespace" : "spell.component.2d.graphics",
 	"name" : "appearance",
-	"title" : "2D Appearance",
+	"title" : "2D Static Appearance",
 	"attributes" : [
 		{
 			"name" : "assetId",
