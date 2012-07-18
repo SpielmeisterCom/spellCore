@@ -26,6 +26,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 	var MIN_FLASH_PLAYER_VERSION = '10.1.0',
 		DEFAULT_CONTAINER_ID = 'spell'
 
+	var isFirefox = function() {
+		var match = navigator.userAgent.match( /.*Firefox\/(\d+)/ )
+
+		return !!match
+	}
+
 	var getUrlParameters = function() {
 		var url = window.location.href
 		var map = {}
@@ -76,7 +82,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 	}
 
 	var isWebGlCapable = function() {
-		return Modernizr.webgl
+		return Modernizr.webgl && !isFirefox()
 	}
 
 	var isFlashCapable = function() {
