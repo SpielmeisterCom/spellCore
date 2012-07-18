@@ -62,10 +62,10 @@ define(
 
 ### Accessing input
 
-All components which are declared as input for a system in its system template can be accessed by their aliasing name as instance members of the system. These
-data structures are called **component lists**. The injection of the component list into the system instance is done by the engine automatically when a system
-gets created. If for example a system declares the component *spell.component.2d.transform* with the aliasing name "myTransformComponents" as its required input
-the *component list* of all transform components can be accessed through the this pointer as shown below.
+All components which are declared as input for a system in its system template can be accessed by their local aliasing name as instance members of the system.
+These data structures are called **component dictionaries**. The injection of a component dictionary into a system instance is done by the engine automatically
+when a system gets created. If for example a system declares the component *spell.component.2d.transform* with the local alias "myTransformComponents" as its
+required input the *component dictionary* of all transform components can be accessed through the this pointer as shown below.
 
 <pre><code>
 ...
@@ -92,19 +92,41 @@ Foo.prototype = {
 </code></pre>
 
 
-### Working with component lists
+### Component dictionary structure
 
-As stated before input is presented to a system in form of component lists. There are a couple of things you should keep in mind when working with them.
+The following example shows the structure of the *spell.component.2d.transform* component dictionary. The data structure is shown in JavaScript object notation.
+Note that the keys of the dictionary are entity ids. The associated values are the component instances. In the example only two entities with the ids 0 and 3
+have a *spell.component.2d.transform* component.
 
-* Component lists are just regular JavaScript objects with the keys being entity ids and the value being the component instances. As a consequence you must
-not make any assumptions about iteration order when iterating over the component list.
+<pre><code>
+{
+	0 : {
+		rotation : 0,
+		scale : [ 2, 2 ],
+		translation : [ 0, 100 ]
+	},
+	3 : {
+		rotation : 1.57,
+		scale : [ 1, 1 ],
+		translation : [ 50, 50 ]
+	},
+}
+</code></pre>
+
+
+### Working with component dictionaries
+
+As stated before input is presented to a system in form of component dictionaries. There are a couple of things you should keep in mind when working with them.
+
+* Component dictionaries are just regular JavaScript objects with the keys being entity ids and the value being the component instances. As a consequence you must
+not make any assumptions about iteration order when iterating over the component dictionary.
 
 * It is usually a very bad idea to keep references to individual component instances in the system instance scope around between two processing calls. This is
 considered an anti pattern because other systems might also manipulate entities and their components. This manipulation includes the deletion of entities too.
 So if another system decides that it is time to delete an entity whilst your system is still keeping a reference to one of its components you have successfully
 entered side effect hell. Try to avoid this for your own sake.
 
-* Manipulating component lists must not be done manually but rather through means provided by the framework. Otherwise things might break.
+* Manipulating component dictionaries must not be done manually but rather through means provided by the framework. Otherwise things might break.
 
 **TODO: add link to relevant entity/component creation/deletion api documentation**
 
