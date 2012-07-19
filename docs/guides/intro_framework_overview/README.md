@@ -1,19 +1,19 @@
 # Overview of SpellJS
 
 SpellJS is a cross-platform framework for the development of games based on the HTML5 technology stack. It offers a convenient abstraction layer that hides all
-the platform specific implementation details that exist on the various target browser environments and mobile handsets.
+platform specific implementation details that exist on the various target browser environments and mobile handsets.
 
 
 ## Developing with SpellJS
 
 The SpellJS engine is designed to work as a runtime for your content. This means that SpellJS can not be included as a library into your project on a source
-code level. Rather your SpellJS project consists of a collection of scenes, custom game objects a.k.a *entities*, associated behaviour (code) and assets (textures, sounds,
-animations, etc.). Your project gets compiled into a runtime friendly representation during the build process. The resulting compiled project or *runtime
-module* can be executed by the SpellJS engine.
+code level. Rather your SpellJS project consists of a collection of *scenes*, custom game objects called *entities*, associated behaviour implemented in
+*systems* and *assets* (textures, sounds, animations, etc.). Your project gets compiled into a runtime friendly representation during a build process. The
+resulting compiled product - the *runtime module* - can be executed by the SpellJS engine.
 
 Developing a project with the SpellJS framework is done primarily in the SpellJS editor called *SpellEd*. SpellEd is an integrated development environment that
-makes it easy to design complex scenes and user defined entities and entity behaviour. Creating and managing assets is also done in SpellEd. Custom behaviour of
-entities is defined in JavaScript code. The SpellJS framework offers a comprehensible api that alleviates tasks often encountered during the development of
+makes it easy to design complex scenes and define custom entities and entity behaviour. Creating and managing assets is also done in SpellEd. Custom behaviour
+of entities is defined in JavaScript code. The SpellJS framework offers a comprehensible api that alleviates tasks often encountered during the development of
 games.
 
 
