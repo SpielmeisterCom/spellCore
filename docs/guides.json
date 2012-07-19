@@ -38,6 +38,11 @@
 				"description": "This guide illustrates the basic concept of assets in SpellJS."
 			},
 			{
+				"name": "concepts_logging",
+				"title": "Logging",
+				"description": ""
+			},
+			{
 				"name": "concepts_entity_component_vs_oop",
 				"title": "Entity component system vs. OOP based system",
 				"description": "This guide elaborates on the advantages of entity component based systems over object-oriented systems."

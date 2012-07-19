@@ -16,6 +16,7 @@ define(
 		'spell/shared/util/createLogger',
 		'spell/shared/util/createDebugMessageHandler',
 		'spell/shared/util/platform/PlatformKit',
+		'spell/shared/util/platform/initDebugEnvironment',
 
 		// Forcing the build system to include the math modules in the platform agnostic engine package.
 		// Do _not_ remove unless you know exactly what you are doing!
@@ -46,6 +47,7 @@ define(
 		createLogger,
 		createDebugMessageHandler,
 		PlatformKit,
+		initDebugEnvironment,
 
 		mat2,
 		mat3,
@@ -119,6 +121,7 @@ define(
 		var start = function() {
 			if( parameters.debug ) {
 				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
+				initDebugEnvironment( logger )
 			}
 
 			logger.debug( 'client started' )
