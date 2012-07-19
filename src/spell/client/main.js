@@ -13,7 +13,7 @@ define(
 		'spell/shared/util/ResourceLoader',
 		'spell/shared/util/StatisticsManager',
 		'spell/shared/util/Events',
-		'spell/shared/util/Logger',
+		'spell/shared/util/createLogger',
 		'spell/shared/util/createDebugMessageHandler',
 		'spell/shared/util/platform/PlatformKit',
 
@@ -43,7 +43,7 @@ define(
 		ResourceLoader,
 		StatisticsManager,
 		Events,
-		Logger,
+		createLogger,
 		createDebugMessageHandler,
 		PlatformKit,
 
@@ -63,8 +63,6 @@ define(
 	) {
 		'use strict'
 
-
-		var debugCallback
 
 		var loadTemplates = function( templateManager, runtimeModule ) {
 			_.each(
@@ -89,8 +87,12 @@ define(
 			)
 		}
 
-		var globals              = {},
-			eventManager         = new EventManager(),
+		var logger = createLogger(),
+			globals = {
+			logger : logger
+		}
+
+		var eventManager         = new EventManager(),
 			configurationManager = new ConfigurationManager( eventManager, parameters ),
 			renderingContext     = PlatformKit.RenderingFactory.createContext2d(
 				eventManager,
@@ -101,7 +103,7 @@ define(
 			),
 			soundManager         = PlatformKit.createSoundManager(),
 			inputManager         = new InputManager( configurationManager ),
-			resourceLoader       = new ResourceLoader( runtimeModule.name, soundManager, renderingContext, eventManager, configurationManager.resourceServer ),
+			resourceLoader       = new ResourceLoader( globals, runtimeModule.name, soundManager, renderingContext, eventManager, configurationManager.resourceServer ),
 			statisticsManager    = new StatisticsManager(),
 			templateManager      = new TemplateManager(),
 			mainLoop             = createMainLoop( eventManager, statisticsManager ),
@@ -115,11 +117,11 @@ define(
 		 */
 
 		var start = function() {
-			if( parameters.verbose ) {
-				Logger.setLogLevel( Logger.LOG_LEVEL_DEBUG )
+			if( parameters.debug ) {
+				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
 			}
 
-			Logger.debug( 'client started' )
+			logger.debug( 'client started' )
 
 
 			loadTemplates( templateManager, runtimeModule )
@@ -148,7 +150,7 @@ define(
 //			PlatformKit.registerOnScreenResize( _.bind( onScreenResized, onScreenResized, eventManager ) )
 
 			var renderingContextConfig = renderingContext.getConfiguration()
-			Logger.debug( 'created rendering context: type=' + renderingContextConfig.type + '; size=' + renderingContextConfig.width + 'x' + renderingContextConfig.height )
+			logger.debug( 'created rendering context: type=' + renderingContextConfig.type + '; size=' + renderingContextConfig.width + 'x' + renderingContextConfig.height )
 
 
 
@@ -174,8 +176,8 @@ define(
 			 *
 			 * @param fn
 			 */
-			setDebugCallback : function( fn ) {
-				debugCallback = fn
+			setSendMessageToEditor : function( fn ) {
+				logger.setSendMessageToEditor( fn )
 			},
 
 			/*

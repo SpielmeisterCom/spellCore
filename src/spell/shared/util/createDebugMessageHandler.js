@@ -6,16 +6,7 @@ define(
 
 		return function( globals ) {
 			var messageTypeToHandler = {
-				'keyEvent' : function( payload ) {
-					var type = payload.type
-
-					if( type === 'keydown' ||
-						type === 'keyup' ) {
-
-						globals.inputManager.injectKeyEvent( type, payload.keyCode )
-					}
-				},
-				'drawCoordinateGrid' : function( payload ) {
+				'spelled.debug.drawCoordinateGrid' : function( payload ) {
 					globals.configurationManager.drawCoordinateGrid = !!payload
 				}
 			}

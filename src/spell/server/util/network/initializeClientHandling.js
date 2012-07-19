@@ -1,13 +1,13 @@
 define(
 	'spell/server/util/network/initializeClientHandling',
 	[
-		'spell/shared/util/Logger',
+		'spell/shared/util/createLogger',
 
 		'websocket',
 		'spell/functions'
 	],
 	function(
-		Logger,
+		createLogger,
 
 		websocket,
 		_
@@ -21,6 +21,7 @@ define(
 
 		var clientNumber = 0
 		var protocolName = 'socketrocket-0.1'
+		var logger = createLogger()
 
 		/*
 		 * Returns true if at least one of the requested protocols is supported, false otherwise.
@@ -84,7 +85,7 @@ define(
 				var clientId = wsConnection.socket._peername.address + ':' + wsConnection.socket._peername.port,
 					client = createClient( clientId, protocol, wsConnection )
 
-				Logger.info( 'client ' + clientId + ' connected' )
+				logger.info( 'client ' + clientId + ' connected' )
 
 
 				clients[ clientId ] = client
@@ -119,7 +120,7 @@ define(
 						)
 
 			        } else if (messageObject.type === 'binary') {
-			            Logger.warn( 'Received Binary Message of ' + message.binaryData.length + ' bytes (which is not implemented)' );
+			            logger.warn( 'Received Binary Message of ' + message.binaryData.length + ' bytes (which is not implemented)' );
 			        }
 			    });
 

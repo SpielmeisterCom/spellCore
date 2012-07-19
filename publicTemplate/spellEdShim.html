@@ -37,18 +37,19 @@
 			return ( results == null ? '' : results[ 1 ] )
 		}
 
-		var sendMessageToEditor = function( action ) {
+		var sendMessageToEditor = function( type, payload ) {
 			parent.window.postMessage(
-					{
-						action : 'spell.' + action,
-						iframeId : getParam( 'iframeId' )
-					},
-					editorOrigin
+				{
+					type : type,
+					payload : payload,
+					iframeId : getParam( 'iframeId' )
+				},
+				editorOrigin
 			)
 		}
 
-		var init = function() {
-			sendMessageToEditor( 'initialized' )
+		var onInitialized = function() {
+			sendMessageToEditor( 'spell.initialized' )
 		}
 
 		var handleMessageFromEditor = function( event ) {
@@ -58,34 +59,17 @@
 				return
 			}
 
-			if( event.data.type === 'spelled.debug' ) {
-				spell.sendDebugMessage( event.data.data )
+			var index = event.data.type.indexOf( 'spelled.debug' )
+
+			if( event.data.type.indexOf( 'spelled.debug' ) === 0 ) {
+				spell.sendDebugMessage( event.data )
 			}
-		}
-
-		var registerMouseFocusHandlers = function() {
-			addEvent(
-					document.body,
-					'focus',
-					function( event ) {
-						sendMessageToEditor( 'focus' )
-					}
-			)
-
-			addEvent(
-					document.body,
-					'blur',
-					function( event ) {
-						sendMessageToEditor( 'blur' )
-					}
-			)
 		}
 
 		var registerMessageHandler = function() {
 			addEvent( window, 'message', handleMessageFromEditor )
 		}
 
-		registerMouseFocusHandlers()
 		registerMessageHandler()
 
 		var config = {
@@ -93,8 +77,7 @@
 			platform : 'html5'
 		}
 
-		spell.onInitialized = init
-		spell.start( config )
+		spell.start( config, onInitialized, sendMessageToEditor )
 	} )()
 </script>
 </body>

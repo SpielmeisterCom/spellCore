@@ -9,12 +9,6 @@ define(
 		'use strict'
 
 
-		var logWrapper = function( message ) {
-			var now = new Date()
-
-			log( '[' + now.toDateString() + ' ' + now.toLocaleTimeString() + '] ' +  message )
-		}
-
-		return logWrapper
+		return log
 	}
 )

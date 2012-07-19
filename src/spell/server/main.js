@@ -11,7 +11,7 @@ define(
 		'spell/shared/util/EventManager',
 		'spell/shared/util/entity/EntityManager',
 		'spell/shared/util/scene/SceneManager',
-		'spell/shared/util/Logger',
+		'spell/shared/util/createLogger',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/Types',
 
@@ -32,7 +32,7 @@ define(
 		EventManager,
 		EntityManager,
 		SceneManager,
-		Logger,
+		createLogger,
 		PlatformKit,
 		Types,
 
@@ -48,6 +48,8 @@ define(
 		/*
 		 * private
 		 */
+
+		var logger = createLogger()
 
 		var isRoot = function() {
 			return process.getuid() === 0
@@ -113,12 +115,12 @@ define(
 
 			if( port < 1024 ) {
 				if( unprivilegedUserId === undefined ) {
-					Logger.error( 'Please supply the username of the user that the server is going to run as.' )
+					logger.error( 'Please supply the username of the user that the server is going to run as.' )
 					process.exit()
 				}
 
 				if( !isRoot() ) {
-					Logger.error( 'Binding to ports less than 1024 requires root privileges. The script must be started with root privileges.' )
+					logger.error( 'Binding to ports less than 1024 requires root privileges. The script must be started with root privileges.' )
 					process.exit()
 				}
 			}
@@ -198,14 +200,14 @@ define(
 				},
 
 				onDisconnect: function( client ) {
-					Logger.info( 'client ' + client.id + ' disconnected' )
+					logger.info( 'client ' + client.id + ' disconnected' )
 					var scene = findGameSceneWithClient( gameScenes, client.id )
 
 					if( scene ) {
 						scene.removeClient( client )
 
 					} else {
-						Logger.error( 'Could not find a scene with client ' + client.id + '.' )
+						logger.error( 'Could not find a scene with client ' + client.id + '.' )
 					}
 				},
 

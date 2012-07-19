@@ -5,7 +5,7 @@ define(
 		'spell/shared/util/EventManager',
 		'spell/shared/util/ResourceLoader',
 		'spell/shared/util/Events',
-		'spell/shared/util/Logger',
+		'spell/shared/util/createLogger',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/math/mat4'
@@ -15,7 +15,7 @@ define(
 		EventManager,
 		ResourceLoader,
 		Events,
-		Logger,
+		createLogger,
 		PlatformKit,
 
 		mat4
@@ -23,7 +23,8 @@ define(
 		'use strict'
 
 
-		Logger.setLogLevel( Logger.LOG_LEVEL_DEBUG )
+		var logger = createLogger()
+		logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
 
 
 		var bufferWidth          = 320
@@ -175,11 +176,11 @@ define(
 		eventManager.subscribe(
 			[ Events.RESOURCE_LOADING_COMPLETED, 'bundle1' ],
 			function( event ) {
-				Logger.info( 'loading completed' )
+				logger.info( 'loading completed' )
 
 				texture = context.createTexture( resourceLoader.getResources()[ resourceUris[ 0 ] ] )
 
-				Logger.info( 'running test' )
+				logger.info( 'running test' )
 				runTest()
 			}
 		)

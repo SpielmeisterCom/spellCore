@@ -3,15 +3,17 @@ define(
 	[
 		"spell/shared/util/Events",
 		"spell/shared/util/platform/PlatformKit",
-		"spell/shared/util/Logger"
+		"spell/shared/util/createLogger"
 	],
 	function(
 		Events,
 		PlatformKit,
-		Logger
+		createLogger
 	) {
 		"use strict"
 
+
+		var logger = createLogger()
 
 		return function( eventManager, statisticsManager, host, protocol ) {
 			statisticsManager.addSeries( "charsSent", "chars/s" )
@@ -33,7 +35,7 @@ define(
 						socket.send( message )
 
 					} catch ( e ) {
-						Logger.debug( 'FIXME: Could not send message, because the socket is not connected yet. Will retry in 0.5 sec' )
+						logger.debug( 'FIXME: Could not send message, because the socket is not connected yet. Will retry in 0.5 sec' )
 
 						PlatformKit.registerTimer(
 							function() {

@@ -5,7 +5,6 @@ define(
 		"spell/shared/util/platform/Types",
 		"spell/shared/util/platform/PlatformKit",
 		"spell/shared/util/CircularBuffer",
-		"spell/shared/util/Logger",
 
 		'spell/functions'
 	],
@@ -14,7 +13,6 @@ define(
 		Types,
 		PlatformKit,
 		CircularBuffer,
-		Logger,
 
 		_
 	) {

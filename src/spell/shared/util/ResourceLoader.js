@@ -3,14 +3,12 @@ define(
 	[
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/Events',
-		'spell/shared/util/Logger',
 
 		'spell/functions'
 	],
 	function(
 		PlatformKit,
 		Events,
-		Logger,
 
 		_
 	) {
@@ -112,8 +110,8 @@ define(
 			updateProgress.call( this, this.resourceBundles[ resourceBundleName ] )
 		}
 
-		var resourceLoadingTimedOutCallback = function( resourceBundleName, resourceName ) {
-			Logger.debug( 'Loading "' + resourceName + '" failed with a timeout. In case the execution environment is safari this message can be ignored.' )
+		var resourceLoadingTimedOutCallback = function( logger, resourceBundleName, resourceName ) {
+			logger.debug( 'Loading "' + resourceName + '" failed with a timeout. In case the execution environment is safari this message can be ignored.' )
 
 			updateProgress.call( this, this.resourceBundles[ resourceBundleName ] )
 		}
@@ -157,7 +155,7 @@ define(
 			return loader
 		}
 
-		var startLoadingResourceBundle = function( resourceBundle ) {
+		var startLoadingResourceBundle = function( logger, resourceBundle ) {
 			_.each(
 				resourceBundle.resources,
 				_.bind(
@@ -175,7 +173,7 @@ define(
 							resourceBundle.name,
 							resourceName,
 							_.bind( resourceLoadingCompletedCallback, this, resourceBundle.name, resourceName ),
-							_.bind( resourceLoadingTimedOutCallback, this, resourceBundle.name, resourceName ),
+							_.bind( resourceLoadingTimedOutCallback, this, logger, resourceBundle.name, resourceName ),
                             this.soundManager,
 							this.renderingContext
 						)
@@ -197,7 +195,7 @@ define(
 		 * public
 		 */
 
-		var ResourceLoader = function( applicationId, soundManager, renderingContext, eventManager, hostConfig ) {
+		var ResourceLoader = function( globals, applicationId, soundManager, renderingContext, eventManager, hostConfig ) {
 			if( eventManager === undefined ) throw 'Argument "eventManager" is undefined.'
             if( soundManager === undefined ) throw 'Argument "soundManager" is undefined.'
 
@@ -208,6 +206,7 @@ define(
 			this.resources = {}
 			this.host = ( hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host )
 			this.applicationId = applicationId
+			this.logger = globals.logger
 		}
 
 		ResourceLoader.prototype = {
@@ -228,6 +227,8 @@ define(
 			},
 
 			start: function() {
+				var logger = this.logger
+
 				_.each(
 					this.resourceBundles,
 					_.bind(
@@ -235,7 +236,7 @@ define(
 							if( resourceBundle.state !== STATE_WAITING_FOR_PROCESSING ) return
 
 							resourceBundle.state = STATE_PROCESSING
-							startLoadingResourceBundle.call( this, resourceBundle )
+							startLoadingResourceBundle.call( this, logger, resourceBundle )
 						},
 						this
 					)

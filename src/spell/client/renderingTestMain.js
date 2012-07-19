@@ -5,7 +5,7 @@ define(
 		"spell/shared/util/EventManager",
 		"spell/shared/util/ResourceLoader",
         'spell/shared/util/InputManager',
-		"spell/shared/util/Logger",
+		"spell/shared/util/createLogger",
 		"spell/shared/util/platform/PlatformKit",
 		"spell/shared/util/Events"
 	],
@@ -14,14 +14,15 @@ define(
 		EventManager,
 		ResourceLoader,
         InputManager,
-		Logger,
+		createLogger,
 		PlatformKit,
 		Events
 	) {
 		"use strict"
 
 
-		Logger.setLogLevel( Logger.LOG_LEVEL_DEBUG )
+		var logger = createLogger()
+		logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
 
 		var bufferWidth  = 512
 		var bufferHeight = 384
@@ -90,14 +91,14 @@ define(
 		eventManager.subscribe(
 			[ Events.RESOURCE_PROGRESS, "bundle1" ],
 			function( event ) {
-				Logger.info( event )
+				logger.info( event )
 			}
 		)
 
 		eventManager.subscribe(
 			[ Events.RESOURCE_LOADING_COMPLETED, "bundle1" ],
 			function( event ) {
-				Logger.info( "loading completed" )
+				logger.info( "loading completed" )
 
                 resources = resourceLoader.getResources()
 				draw()
@@ -107,7 +108,7 @@ define(
 		eventManager.subscribe(
 			[ Events.RESOURCE_ERROR, "bundle1" ],
 			function( event ) {
-				Logger.info( "Error while loading '" + event + "'." )
+				logger.info( "Error while loading '" + event + "'." )
 			}
 		)
 
