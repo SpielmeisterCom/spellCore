@@ -11,11 +11,6 @@
 				"name": "intro_getting_started",
 				"title": "Getting started with SpellJS",
 				"description": "This guide explains how you get started with creating your first game using SpellJS' IDE SpellEd."
-			},
-			{
-				"name": "intro_creating_a_system_from_scratch",
-				"title": "Creating a system from scratch",
-				"description": "This guide explains how a system is created from scratch and added to a scene."
 			}
 		]
 	},
@@ -23,31 +18,56 @@
 		"title": "Concepts",
 		"items": [
 			{
-				"name": "concepts_entities_components",
-				"title": "Entities, Components and Systems",
-				"description": "This guide explains the basic building blocks of SpellJS' specific flavor of entity component system."
-			},
-			{
-				"name": "concepts_systems",
-				"title": "Systems",
-				"description": "This guide illustrates the basic concept of systems in SpellJS."
-			},
-			{
 				"name": "concepts_assets",
 				"title": "Assets",
 				"description": "This guide illustrates the basic concept of assets in SpellJS."
 			},
 			{
-				"name": "concepts_logging",
-				"title": "Logging",
-				"description": ""
+				"name": "concepts_entities_components",
+				"title": "Entities, Components and Systems",
+				"description": "This guide explains the basic building blocks of SpellJS' specific flavor of entity component system."
 			},
 			{
 				"name": "concepts_entity_component_vs_oop",
 				"title": "Entity component system vs. OOP based system",
 				"description": "This guide elaborates on the advantages of entity component based systems over object-oriented systems."
+			},
+			{
+				"name": "concepts_logging",
+				"title": ">>> STUB - Logging",
+				"description": ""
+			},
+			{
+				"name": "concepts_scenes",
+				"title": ">>> STUB - Scenes",
+				"description": ""
+			},
+			{
+				"name": "concepts_scripts",
+				"title": ">>> STUB - Scripts",
+				"description": ""
+			},
+			{
+				"name": "concepts_systems",
+				"title": "Systems",
+				"description": "This guide illustrates the basic concept of systems in SpellJS."
 			}
 		]
+	},
+		{
+			"title": "Tutorials",
+			"items": [
+				{
+					"name": "tutorials_creating_a_system_from_scratch",
+					"title": "Creating a system from scratch",
+					"description": "This guide explains how a system is created from scratch and added to a scene."
+				},
+				{
+					"name": "tutorials_creating_entities_dynamically",
+					"title": ">>> STUB - Creating entities dynamically",
+					"description": ""
+				}
+			]
 	},
 	{
 		"title": "Entity templates",
@@ -66,18 +86,6 @@
 		"title": "Component templates",
 		"items": [
 			{
-				"name": "component_template_spell_component_actor",
-				"title": "Actor"
-			},
-			{
-				"name": "component_template_spell_component_physics_collisionSphere",
-				"title": "Collision Sphere"
-			},
-			{
-				"name": "component_template_spell_component_inputDefinition",
-				"title": "Input Definition"
-			},
-			{
 				"name": "component_template_spell_component_2d_graphics_animatedAppearance",
 				"title": "2D Animation"
 			},
@@ -90,12 +98,24 @@
 				"title": "2D Camera"
 			},
 			{
+				"name": "component_template_spell_component_2d_physics_inertialObject",
+				"title": "2D Inertial Object"
+			},
+			{
 				"name": "component_template_spell_component_2d_transform",
 				"title": "2D Transformation"
 			},
 			{
-				"name": "component_template_spell_component_2d_physics_inertialObject",
-				"title": "2D Inertial Object"
+				"name": "component_template_spell_component_actor",
+				"title": "Actor"
+			},
+			{
+				"name": "component_template_spell_component_physics_collisionSphere",
+				"title": "Collision Sphere"
+			},
+			{
+				"name": "component_template_spell_component_inputDefinition",
+				"title": "Input Definition"
 			},
 			{
 				"name": "component_template_spell_component_visualObject",

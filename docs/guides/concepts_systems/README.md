@@ -24,7 +24,7 @@ systems' input and to assign a script which contains the implementation.
 
 ## System implementation
 
-Since a systems' implementation is done in a script all [standard rules related to script definition](#!/guide/concepts_scripts) apply.
+Since a systems' implementation is done in a script all standard rules related to [script definition](#!/guide/concepts_scripts) apply.
 
 ### A basic system skeleton
 
@@ -126,9 +126,8 @@ considered an anti pattern because other systems might also manipulate entities 
 So if another system decides that it is time to delete an entity whilst your system is still keeping a reference to one of its components you have successfully
 entered side effect hell. Try to avoid this for your own sake.
 
-* Manipulating component dictionaries must not be done manually but rather through means provided by the framework. Otherwise things might break.
-
-**TODO: add link to relevant entity/component creation/deletion api documentation**
+* Manipulating component dictionaries must not be done manually but rather through means provided by the framework
+([Creating entities dynamically](#!/guide/tutorials_creating_entities_dynamically)). Otherwise things might break.
 
 
 ## System execution
