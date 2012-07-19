@@ -54,13 +54,17 @@ define(
 			}
 
 			var logWrapper = function( level, text ) {
-				var message = createMessage( level, text )
-
 				if( sendMessageToEditor ) {
-					sendMessageToEditor( 'spell.debug.consoleMessage', message )
+					sendMessageToEditor(
+						'spell.debug.consoleMessage',
+						{
+							level : logLevels[ level ],
+							text : text
+						}
+					)
 				}
 
-				log( getTimeStamp() + ' ' + message )
+				log( getTimeStamp() + ' ' + createMessage( level, text ) )
 			}
 
 			var debug = function( message ) {
