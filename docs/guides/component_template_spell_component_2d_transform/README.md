@@ -9,16 +9,16 @@ structure the resulting transformation is to entity parent coordinate space.
 
 ## Attributes
 
-### rotation ( number )
+### rotation ( number, default: 0 )
 
 The **rotation** attribute specifies the rotation of the local origin of the entity. Values must be provided in radians.
 
 
-### scale ( vec2 )
+### scale ( vec2, default: [ 1, 1 ] )
 
 The **scale** attribute specifies the scale of the local origin of the entity.
 
 
-### translation ( vec2 )
+### translation ( vec2, default: [ 0, 0 ] )
 
 The **translation** attribute specifies the translation of the local origin of the entity.

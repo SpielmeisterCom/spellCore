@@ -7,6 +7,6 @@ The *Collision Sphere* component specifies the properties of a sphere used for c
 
 ## Attributes
 
-### radius ( number )
+### radius ( number, default: 1 )
 
 The **radius** attribute declares the radius of the collision sphere in logical units.

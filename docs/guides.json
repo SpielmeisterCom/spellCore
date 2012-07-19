@@ -33,19 +33,14 @@
 				"description": "This guide elaborates on the advantages of entity component based systems over object-oriented systems."
 			},
 			{
-				"name": "concepts_logging",
-				"title": ">>> STUB - Logging",
-				"description": ""
-			},
-			{
 				"name": "concepts_scenes",
-				"title": ">>> STUB - Scenes",
-				"description": ""
+				"title": "Scenes",
+				"description": "This guide explains how scenes can be used for managing different states of a game."
 			},
 			{
 				"name": "concepts_scripts",
-				"title": ">>> STUB - Scripts",
-				"description": ""
+				"title": "Scripts",
+				"description": "This guide explains how scripts are used to manage code."
 			},
 			{
 				"name": "concepts_systems",
@@ -64,8 +59,13 @@
 				},
 				{
 					"name": "tutorials_creating_entities_dynamically",
-					"title": ">>> STUB - Creating entities dynamically",
-					"description": ""
+					"title": "Creating entities dynamically",
+					"description": "This guide elaborates how entities can be managed during runtime of the application."
+				},
+				{
+					"name": "tutorials_logging",
+					"title": "Logging",
+					"description": "This guide explains the logging functionality of the framework."
 				}
 			]
 	},

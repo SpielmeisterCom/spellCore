@@ -7,6 +7,6 @@ The *2D Static Appearance* component describes the graphical representation of t
 
 ## Attributes
 
-### assetId ( assetId:appearance )
+### assetId ( assetId:appearance, default: spell.defaultAppearance )
 
 The **assetId** attribute value specifies which appearance asset should be used for rendering the entity.

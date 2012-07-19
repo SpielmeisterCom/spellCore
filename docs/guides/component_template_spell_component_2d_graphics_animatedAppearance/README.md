@@ -12,12 +12,12 @@ The * 2D Animated Appearance* component describes the graphical representation o
 The **assetId** attribute value specifies which animatedAppearance asset should be used for rendering the entity.
 
 
-### replaySpeed ( number )
+### replaySpeed ( number, default: 1 )
 
 The **replaySpeed** attribute value specifies the speed at which the animation is played. The default value is 1. A replay speed of 2 means doubled speed.
 
 
-### offset ( integer )
+### offset ( integer, default: 0 )
 
 The **offset** attribute value specifies the current offset in milliseconds into the played animation. This value is incremented automatically during playback.
 It can be used for seeking in the animation when manipulated directly.

@@ -8,11 +8,11 @@ included in a simple 2d elastic collision physics simulation.
 
 ## Attributes
 
-### mass ( number )
+### mass ( number, default: 1 )
 
 The **mass** attribute specifies the mass of the entity.
 
 
-### velocity ( vec2 )
+### velocity ( vec2, default: [ 0, 0 ] )
 
 The **velocity** attribute specifies the current velocity of the entity.

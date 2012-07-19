@@ -10,13 +10,13 @@ The *Visual Object* component is used to tag an entity for rendering to the scre
 
 ## Attributes
 
-### layer ( integer )
+### layer ( integer, default: 1 )
 
 The **layer** attribute value indicates on which layer the entity must be rendered. Layers with higher values are rendered after or "over" layers with a lower
 value. With the help of the layer mechanic foreground and background entities can be easily declared.
 
 
-### opacity ( number )
+### opacity ( number, default: 1.0 )
 
 The **opacity** attribute declares with which opacity the entity must be rendered. Valid values are in the range from 0.0 - 1.0. This opacity value is
 multiplied with any opacity value defined in the used appearance component of the entity in order to produce the final opacity value used for rendering.

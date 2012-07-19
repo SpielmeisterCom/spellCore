@@ -21,7 +21,7 @@ determining the size of the section of the world that is rendered is computed by
 height attribute's value.
 
 
-### active ( boolean )
+### active ( boolean, default: false )
 
 The **active** attribute value specifies if the camera should be used by the engine as the current camera entity. Currently only one active camera entity at
 any one time is supported. If more than one camera entity is active the SpellJS engine chooses one of them at random. If you want to use multiple camera
