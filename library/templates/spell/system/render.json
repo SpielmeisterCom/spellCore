@@ -1,5 +1,6 @@
 {
 	"type" : "systemTemplate",
+	"readonly" : true,
 	"namespace" : "spell.system",
 	"name" : "render",
 

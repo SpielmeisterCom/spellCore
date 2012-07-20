@@ -1,5 +1,6 @@
 {
 	"type" : "componentTemplate",
+	"readonly" : true,
 	"namespace" : "spell.component",
 	"name" : "visualObject",
 	"title" : "Visual Object",

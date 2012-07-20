@@ -1,5 +1,6 @@
 {
 	"type" : "componentTemplate",
+	"readonly" : true,
 	"namespace" : "spell.component.entityComposite",
 	"name" : "children",
 	"title" : "Children Entities",

@@ -1,9 +1,9 @@
 {
 	"type" : "componentTemplate",
+	"readonly" : true,
 	"namespace" : "spell.component",
 	"name" : "inputDefinition",
-	"title" : "Input Definition",
-	"doc" : "Maps keys to actions",
+	"title" : "Mapping of keys to actions",
 	"attributes" : [
 		{
 			"name" : "actorId",

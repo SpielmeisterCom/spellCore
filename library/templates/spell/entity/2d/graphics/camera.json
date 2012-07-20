@@ -1,5 +1,6 @@
 {
 	"type" : "entityTemplate",
+	"readonly" : true,
 	"namespace" : "spell.entity.2d.graphics",
 	"name" : "camera",
 	"title" : "2D Camera",

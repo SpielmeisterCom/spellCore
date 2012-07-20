@@ -1,5 +1,6 @@
 {
 	"type" : "componentTemplate",
+	"readonly" : true,
 	"namespace" : "spell.component.2d",
 	"name" : "transform",
 	"title" : "2D Transformation",

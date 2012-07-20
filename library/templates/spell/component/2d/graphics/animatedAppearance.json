@@ -1,5 +1,6 @@
 {
 	"name": "animatedAppearance",
+	"readonly" : true,
 	"namespace": "spell.component.2d.graphics",
 	"type": "componentTemplate",
 	"title": "2D Animated Appearance",

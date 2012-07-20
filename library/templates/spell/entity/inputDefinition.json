@@ -1,8 +1,9 @@
 {
 	"type" : "entityTemplate",
+	"readonly" : true,
 	"namespace" : "spell.entity",
 	"name" : "inputDefinition",
-	"title" : "Input Definition",
+	"title" : "Mapping of keys to actions",
 	"components" : [
 		{
 			"templateId" : "spell.component.inputDefinition",
