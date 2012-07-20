@@ -2,10 +2,10 @@
 	"--title": "SpellJS documentation",
 	"--guides": "guides.json",
 	"--welcome": "welcome.html",
+	"--head-html": "<link rel=\"stylesheet\" href=\"resources/css/960.css\" type=\"text/css\">\n  <link rel=\"stylesheet\" href=\"resources/css/welcome.css\" type=\"text/css\">",
 	"--output": "generated",
 	"--": [
 		"../src",
-		"components.js",
         "builtin_types.js"
 	]
 }
