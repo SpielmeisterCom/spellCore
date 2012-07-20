@@ -56,9 +56,10 @@ define(
 		var executeCreateDebugBuildWrapper = function( spellPath, projectsPath, req, res, payload, next ) {
 			var target          = payload[ 0 ],
 				projectPath     = projectsPath + '/' + payload[ 1 ],
-				projectFilePath = projectPath + '/' + payload[ 2 ]
+				projectFilePath = projectPath + '/' + payload[ 2 ],
+				minified        = true
 
-			return executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, onComplete )
+			return executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, minified, onComplete )
 		}
 
 		/*

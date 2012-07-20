@@ -387,7 +387,7 @@ define(
 		 * public
 		 */
 
-		return function( target, spellPath, projectPath, projectFilePath, callback ) {
+		return function( target, spellPath, projectPath, projectFilePath, minify, callback ) {
 			var errors               = [],
 				projectTemplatePath = projectPath + LIBRARY_TEMPLATES_PATH
 
@@ -542,6 +542,7 @@ define(
 					platformAdapterSource,
 					engineSource,
 					runtimeModuleSource,
+					minify,
 					callback
 				)
 
@@ -555,6 +556,7 @@ define(
 					projectPath,
 					runtimeModuleSource,
 					engineSource,
+					minify,
 					callback
 				)
 

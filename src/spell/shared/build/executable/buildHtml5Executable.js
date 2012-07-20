@@ -3,6 +3,7 @@ define(
 	[
 		'spell/shared/build/copyFile',
 		'spell/shared/build/isFile',
+		'spell/shared/build/minifySource',
 
 		'fs',
 		'path'
@@ -10,6 +11,7 @@ define(
 	function(
 		copyFile,
 		isFile,
+		minifySource,
 
 		fs,
 		path
@@ -40,18 +42,22 @@ define(
 			return errors
 		}
 
-		var writeEngineInclude = function( spellPath, outputFilePath, platformAdapterSource, engineSource ) {
-			var errors = []
+		var createEngineInclude = function( spellPath, platformAdapterSource, engineSource, minify ) {
+			var needjs = fs.readFileSync( spellPath + '/src/need.js'),
+			 	source = needjs + '\n' + engineSource + '\n' + platformAdapterSource
 
-			var needjs = fs.readFileSync( spellPath + '/src/need.js' ),
-				data   = needjs + '\n' + engineSource + '\n' + platformAdapterSource
+			return minify ? minifySource( source ) : source
+		}
+
+		var writeEngineInclude = function( outputFilePath, source ) {
+			var errors = []
 
 			// delete file if it already exists
 			if( isFile( outputFilePath ) ) {
 				fs.unlinkSync( outputFilePath )
 			}
 
-			fs.writeFileSync( outputFilePath, data, 'utf-8' )
+			fs.writeFileSync( outputFilePath, source, 'utf-8' )
 
 			return errors
 		}
@@ -61,7 +67,7 @@ define(
 		 * public
 		 */
 
-		return function( spellPath, outputPath, platformAdapterSource, engineSource, runtimeModule, next ) {
+		return function( spellPath, outputPath, platformAdapterSource, engineSource, runtimeModule, minify, next ) {
 			var errors = [],
 				html5OutputPath = outputPath + '/html5'
 
@@ -79,8 +85,10 @@ define(
 			// writing engine include
 			outputFilePath = html5OutputPath + '/spell.js'
 
-			errors = writeEngineInclude( spellPath, outputFilePath, platformAdapterSource, engineSource )
-
+			errors = writeEngineInclude(
+				outputFilePath,
+				createEngineInclude( spellPath, platformAdapterSource, engineSource, minify )
+			)
 
 			next( errors )
 		}

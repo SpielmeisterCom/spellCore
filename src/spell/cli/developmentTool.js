@@ -75,11 +75,13 @@ define(
 				ALL   : 'all'
 			}
 
-			var buildCommand = function( projectFilePath, target, version ) {
+			var buildCommand = function( projectFilePath, target, version, command ) {
 				var errors = []
 
 				if( !version ) version = buildVersions.DEBUG
 				if( !target ) target = buildTargets.HTML5
+
+				var minify = !!command.minify
 
 				if( !_.contains( _.values( buildTargets ), target ) ) {
 					errors.push( 'Error: \'' + target + '\' is not a valid target. See \'' + executableName + ' --help\'.' )
@@ -99,7 +101,7 @@ define(
 					console.log( 'creating debug build for target \'' + target + '\'...' )
 
 					if( isFile( projectFilePath ) ) {
-						executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, _.bind( onComplete, null, 'build' ) )
+						executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, minify, _.bind( onComplete, null, 'build' ) )
 
 					} else {
 						printErrors( 'Error: Missing project file \'' + projectFilePath + '\'.' )
@@ -159,6 +161,7 @@ define(
 
 			commander
 				.command( 'build [version] [target]' )
+				.option( '-m, --minify', 'if supplied the engine gets minified' )
 				.description( 'build a specific version [deploy, debug (default)] for a specific target [flash, html5 (default)]' )
 				.action( _.bind( buildCommand, this, projectFilePath ) )
 

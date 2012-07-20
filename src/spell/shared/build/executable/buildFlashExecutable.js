@@ -2,6 +2,7 @@ define(
 	'spell/shared/build/executable/buildFlashExecutable',
 	[
 		'spell/shared/build/isFile',
+		'spell/shared/build/minifySource',
 
 		'child_process',
 		'fs',
@@ -13,6 +14,7 @@ define(
 	],
 	function(
 		isFile,
+		minifySource,
 
 		child_process,
 		fs,
@@ -131,7 +133,7 @@ define(
 		 * public
 		 */
 
-		return function( tempPath, outputPath, spellAsPath, projectPath, runtimeModule, engineSource, next ) {
+		return function( tempPath, outputPath, spellAsPath, projectPath, runtimeModule, engineSource, minify, next ) {
 			var errors = []
 
 			var tmpSourcePath = tempPath + '/src/Spielmeister'
@@ -145,7 +147,7 @@ define(
 
 			writeFile(
 				engineSourceFilePath,
-				createActionScriptWrapperClass( 'SpellEngine', engineSource )
+				createActionScriptWrapperClass( 'SpellEngine', minify ? minifySource( engineSource ) : engineSource )
 			)
 
 			// write runtime module source wrapper class file
