@@ -1,5 +1,5 @@
 define(
-	"spell/shared/util/Hashing",
+	"spell/shared/math/hash/md5",
 	function() {
 		"use strict"
 
@@ -385,9 +385,7 @@ define(
 		}
 
 
-		return {
-			md5: hex_md5
-		}
+		return hex_md5
 	}
 )
 
