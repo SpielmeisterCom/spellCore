@@ -13,7 +13,7 @@ define(
 		'spell/shared/util/ResourceLoader',
 		'spell/shared/util/StatisticsManager',
 		'spell/shared/util/Events',
-		'spell/shared/util/createLogger',
+		'spell/shared/util/Logger',
 		'spell/shared/util/createDebugMessageHandler',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
@@ -44,7 +44,7 @@ define(
 		ResourceLoader,
 		StatisticsManager,
 		Events,
-		createLogger,
+		Logger,
 		createDebugMessageHandler,
 		PlatformKit,
 		initDebugEnvironment,
@@ -89,7 +89,7 @@ define(
 			)
 		}
 
-		var logger = createLogger(),
+		var logger = new Logger(),
 			globals = {
 			logger : logger
 		}

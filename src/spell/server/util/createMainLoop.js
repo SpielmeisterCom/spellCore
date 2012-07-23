@@ -2,7 +2,7 @@ define(
 	'spell/server/util/createMainLoop',
 	[
 		'spell/shared/util/Events',
-		'spell/shared/util/createLogger',
+		'spell/shared/util/Logger',
 		'spell/shared/util/platform/Types',
 		'spell/shared/util/platform/PlatformKit',
 
@@ -10,7 +10,7 @@ define(
 	],
 	function(
 		Events,
-		createLogger,
+		Logger,
 		Types,
 		PlatformKit,
 
@@ -22,7 +22,7 @@ define(
 		var maxAllowedTimeDifferenceInMs = 20,
 			heartBeatIntervalInMs        = 5000,
 			lastHeartBeatTimeInMs        = 0,
-			logger                       = createLogger()
+			logger                       = new Logger()
 
 
 		var logHeartbeat = function( localTimeInMs ) {

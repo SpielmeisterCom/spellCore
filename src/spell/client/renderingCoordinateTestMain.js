@@ -5,7 +5,7 @@ define(
 		'spell/shared/util/EventManager',
 		'spell/shared/util/ResourceLoader',
 		'spell/shared/util/Events',
-		'spell/shared/util/createLogger',
+		'spell/shared/util/Logger',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/math/mat4'
@@ -15,7 +15,7 @@ define(
 		EventManager,
 		ResourceLoader,
 		Events,
-		createLogger,
+		Logger,
 		PlatformKit,
 
 		mat4
@@ -23,7 +23,7 @@ define(
 		'use strict'
 
 
-		var logger = createLogger()
+		var logger = new Logger()
 		logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
 
 

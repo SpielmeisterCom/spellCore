@@ -1,13 +1,13 @@
 define(
 	'spell/server/util/network/initializeClientHandling',
 	[
-		'spell/shared/util/createLogger',
+		'spell/shared/util/Logger',
 
 		'websocket',
 		'spell/functions'
 	],
 	function(
-		createLogger,
+		Logger,
 
 		websocket,
 		_
@@ -21,7 +21,7 @@ define(
 
 		var clientNumber = 0
 		var protocolName = 'socketrocket-0.1'
-		var logger = createLogger()
+		var logger = new Logger()
 
 		/*
 		 * Returns true if at least one of the requested protocols is supported, false otherwise.

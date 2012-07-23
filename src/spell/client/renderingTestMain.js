@@ -5,7 +5,7 @@ define(
 		"spell/shared/util/EventManager",
 		"spell/shared/util/ResourceLoader",
         'spell/shared/util/InputManager',
-		"spell/shared/util/createLogger",
+		"spell/shared/util/Logger",
 		"spell/shared/util/platform/PlatformKit",
 		"spell/shared/util/Events"
 	],
@@ -14,14 +14,14 @@ define(
 		EventManager,
 		ResourceLoader,
         InputManager,
-		createLogger,
+		Logger,
 		PlatformKit,
 		Events
 	) {
 		"use strict"
 
 
-		var logger = createLogger()
+		var logger = new Logger()
 		logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
 
 		var bufferWidth  = 512

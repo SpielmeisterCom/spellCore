@@ -3,17 +3,17 @@ define(
 	[
 		"spell/shared/util/Events",
 		"spell/shared/util/platform/PlatformKit",
-		"spell/shared/util/createLogger"
+		"spell/shared/util/Logger"
 	],
 	function(
 		Events,
 		PlatformKit,
-		createLogger
+		Logger
 	) {
 		"use strict"
 
 
-		var logger = createLogger()
+		var logger = new Logger()
 
 		return function( eventManager, statisticsManager, host, protocol ) {
 			statisticsManager.addSeries( "charsSent", "chars/s" )

@@ -11,7 +11,7 @@ define(
 		'spell/shared/util/EventManager',
 		'spell/shared/util/entity/EntityManager',
 		'spell/shared/util/scene/SceneManager',
-		'spell/shared/util/createLogger',
+		'spell/shared/util/Logger',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/Types',
 
@@ -32,7 +32,7 @@ define(
 		EventManager,
 		EntityManager,
 		SceneManager,
-		createLogger,
+		Logger,
 		PlatformKit,
 		Types,
 
@@ -49,7 +49,7 @@ define(
 		 * private
 		 */
 
-		var logger = createLogger()
+		var logger = new Logger()
 
 		var isRoot = function() {
 			return process.getuid() === 0
