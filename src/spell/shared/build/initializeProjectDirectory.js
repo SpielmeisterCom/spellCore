@@ -107,7 +107,14 @@ define(
 							"scriptId": "spell/scene/default",
 							"entities": []
 						}
-					]
+					],
+					"systems": {
+						"update": [],
+						"render": [
+							"spell.system.keyInput",
+							"spell.system.render"
+						]
+					}
 				}
 
 				fs.writeFileSync(
