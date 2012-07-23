@@ -2,7 +2,6 @@ define(
 	'spell/shared/build/executable/buildFlashExecutable',
 	[
 		'spell/shared/build/isFile',
-		'spell/shared/build/minifySource',
 
 		'child_process',
 		'fs',
@@ -14,7 +13,6 @@ define(
 	],
 	function(
 		isFile,
-		minifySource,
 
 		child_process,
 		fs,
@@ -147,7 +145,7 @@ define(
 
 			writeFile(
 				engineSourceFilePath,
-				createActionScriptWrapperClass( 'SpellEngine', minify ? minifySource( engineSource ) : engineSource )
+				createActionScriptWrapperClass( 'SpellEngine', /*minify ? minifySource( engineSource ) :*/ engineSource )
 			)
 
 			// write runtime module source wrapper class file

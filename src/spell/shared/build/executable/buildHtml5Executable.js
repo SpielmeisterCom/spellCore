@@ -3,7 +3,10 @@ define(
 	[
 		'spell/shared/build/copyFile',
 		'spell/shared/build/isFile',
-		'spell/shared/build/minifySource',
+		'spell/shared/build/ast/anonymizeModuleIdentifiers',
+		'spell/shared/build/ast/createAST',
+		'spell/shared/build/ast/createSource',
+		'spell/shared/build/ast/minifyAST',
 
 		'fs',
 		'path'
@@ -11,7 +14,10 @@ define(
 	function(
 		copyFile,
 		isFile,
-		minifySource,
+		anonymizeModuleIdentifiers,
+		createAST,
+		createSource,
+		minifyAST,
 
 		fs,
 		path
@@ -42,11 +48,15 @@ define(
 			return errors
 		}
 
-		var createEngineInclude = function( spellPath, platformAdapterSource, engineSource, minify ) {
-			var needjs = fs.readFileSync( spellPath + '/src/need.js'),
-			 	source = needjs + '\n' + engineSource + '\n' + platformAdapterSource
+		var processSource = function( sourceChunk, minify, anonymizeModules ) {
+			if( !minify && !anonymizeModules ) return sourceChunk
 
-			return minify ? minifySource( source ) : source
+			var ast = createAST( sourceChunk )
+
+			if( anonymizeModules ) ast = anonymizeModuleIdentifiers( ast )
+			if( minify ) ast = minifyAST( ast )
+
+			return createSource( ast, !minify )
 		}
 
 		var writeEngineInclude = function( outputFilePath, source ) {
@@ -67,7 +77,7 @@ define(
 		 * public
 		 */
 
-		return function( spellPath, outputPath, platformAdapterSource, engineSource, runtimeModule, minify, next ) {
+		return function( spellPath, outputPath, platformAdapterSource, engineSource, runtimeModuleSource, minify, anonymizeModules, next ) {
 			var errors = [],
 				html5OutputPath = outputPath + '/html5'
 
@@ -77,7 +87,14 @@ define(
 
 			// writing runtime module
 			var outputFilePath = html5OutputPath + '/data.js'
-			errors = writeRuntimeModule( outputFilePath, runtimeModule )
+			errors = writeRuntimeModule(
+				outputFilePath,
+				processSource(
+					runtimeModuleSource,
+					minify,
+					anonymizeModules
+				)
+			)
 
 			if( errors.length > 0 ) return errors
 
@@ -85,9 +102,19 @@ define(
 			// writing engine include
 			outputFilePath = html5OutputPath + '/spell.js'
 
+			var sourceChunks = [
+				fs.readFileSync( spellPath + '/src/need.js'),
+				engineSource,
+				platformAdapterSource
+			]
+
 			errors = writeEngineInclude(
 				outputFilePath,
-				createEngineInclude( spellPath, platformAdapterSource, engineSource, minify )
+				processSource(
+					sourceChunks.join( '\n' ),
+					minify,
+					anonymizeModules
+				)
 			)
 
 			next( errors )

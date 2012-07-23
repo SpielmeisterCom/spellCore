@@ -6,6 +6,7 @@ define(
 		'spell/shared/build/createReducedEntityConfig',
 		'spell/shared/build/executable/buildFlashExecutable',
 		'spell/shared/build/executable/buildHtml5Executable',
+		'spell/shared/build/hashModuleIdentifier',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
 		'spell/shared/util/template/TemplateManager',
@@ -29,6 +30,7 @@ define(
 		createReducedEntityConfig,
 		buildFlashExecutable,
 		buildHtml5Executable,
+		hashModuleIdentifier,
 		isDirectory,
 		isFile,
 		TemplateManager,
@@ -248,7 +250,18 @@ define(
 			)
 		}
 
-		var createSceneList = function( templateManager, scenes ) {
+		var anonymizeScriptIds = function( templates ) {
+			return _.map(
+				templates,
+				function( template ) {
+					template.scriptId = hashModuleIdentifier( template.scriptId )
+
+					return template
+				}
+			)
+		}
+
+		var createSceneList = function( templateManager, scenes, anonymizeModules ) {
 			return _.map(
 				scenes,
 				function( scene ) {
@@ -262,7 +275,7 @@ define(
 					return {
 						entities : reducedEntityConfig,
 						name : scene.name,
-						scriptId : scene.scriptId,
+						scriptId : anonymizeModules ? hashModuleIdentifier( scene.scriptId ) : scene.scriptId,
 						systems : scene.systems
 					}
 				}
@@ -387,7 +400,7 @@ define(
 		 * public
 		 */
 
-		return function( target, spellPath, projectPath, projectFilePath, minify, callback ) {
+		return function( target, spellPath, projectPath, projectFilePath, minify, anonymizeModules, callback ) {
 			var errors               = [],
 				projectTemplatePath = projectPath + LIBRARY_TEMPLATES_PATH
 
@@ -463,7 +476,7 @@ define(
 
 
 			// copy referenced resources to output path
-			var sceneList = createSceneList( templateManager, projectConfig.scenes )
+			var sceneList = createSceneList( templateManager, projectConfig.scenes, anonymizeModules )
 
 			var relativeAssetsPath  = '/library/assets',
 				spellTexturesPath   = spellPath + relativeAssetsPath,
@@ -523,7 +536,10 @@ define(
 				sceneList,
 				createTemplateList( templateManager, componentTemplateIds ),
 				createTemplateList( templateManager, entityTemplateIds ),
-				createTemplateList( templateManager, systemTemplateIds ),
+				( anonymizeModules ?
+					anonymizeScriptIds( createTemplateList( templateManager, systemTemplateIds ) ) :
+					createTemplateList( templateManager, systemTemplateIds )
+				),
 				assets,
 				resourceIds,
 				createModuleList(
@@ -543,6 +559,7 @@ define(
 					engineSource,
 					runtimeModuleSource,
 					minify,
+					anonymizeModules,
 					callback
 				)
 
@@ -557,6 +574,7 @@ define(
 					runtimeModuleSource,
 					engineSource,
 					minify,
+//					anonymizeModules,
 					callback
 				)
 

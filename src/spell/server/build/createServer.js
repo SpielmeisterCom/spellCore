@@ -54,12 +54,13 @@ define(
 		 * @return {*}
 		 */
 		var executeCreateDebugBuildWrapper = function( spellPath, projectsPath, req, res, payload, next ) {
-			var target          = payload[ 0 ],
-				projectPath     = projectsPath + '/' + payload[ 1 ],
-				projectFilePath = projectPath + '/' + payload[ 2 ],
-				minified        = true
+			var target           = payload[ 0 ],
+				projectPath      = projectsPath + '/' + payload[ 1 ],
+				projectFilePath  = projectPath + '/' + payload[ 2 ],
+				minified         = true,
+				anonymizeModules = true
 
-			return executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, minified, onComplete )
+			return executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, minified, anonymizeModules, onComplete )
 		}
 
 		/*
