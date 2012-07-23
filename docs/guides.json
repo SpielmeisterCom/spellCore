@@ -43,6 +43,11 @@
 				"description": "This guide explains how scripts are used to manage code."
 			},
 			{
+				"name": "concepts_spell_globals_object",
+				"title": "Spell Globals Object",
+				"description": "This guide illustrates the usage of the spell globals object."
+			},
+			{
 				"name": "concepts_systems",
 				"title": "Systems",
 				"description": "This guide illustrates the basic concept of systems in SpellJS."
@@ -63,9 +68,9 @@
 					"description": "This guide elaborates how entities can be managed during runtime of the application."
 				},
 				{
-					"name": "tutorials_logging",
-					"title": "Logging",
-					"description": "This guide explains the logging functionality of the framework."
+					"name": "tutorials_using_console_logging",
+					"title": "Using console logging",
+					"description": "This guide explains the logging functionality provided by the framework."
 				}
 			]
 	},
