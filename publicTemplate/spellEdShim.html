@@ -10,8 +10,6 @@
 <div id="spell"></div>
 <script type="text/javascript">
 	( function() {
-		var editorOrigin = 'http://localhost:3000'
-
 		/**
 		 * Thanks to John Resig. http://ejohn.org/blog/flexible-javascript-events/
 		 *
@@ -44,7 +42,7 @@
 					payload : payload,
 					iframeId : getParam( 'iframeId' )
 				},
-				editorOrigin
+				'*'
 			)
 		}
 
@@ -53,12 +51,6 @@
 		}
 
 		var handleMessageFromEditor = function( event ) {
-			if( event.origin !== editorOrigin ) {
-				console.log( 'Error: origin \'' + event.origin + '\' does not match.' )
-
-				return
-			}
-
 			var index = event.data.type.indexOf( 'spelled.debug' )
 
 			if( event.data.type.indexOf( 'spelled.debug' ) === 0 ) {
