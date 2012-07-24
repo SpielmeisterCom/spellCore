@@ -1,5 +1,5 @@
 define(
-	"spell/math/hash/Sha256",
+	"spell/math/hash/SHA256",
 	function() {
 		/* A JavaScript implementation of the SHA family of hashes, as defined in FIPS
 		 * PUB 180-2 as well as the corresponding HMAC implementation as defined in
@@ -13,7 +13,7 @@ define(
 		 */
 
 		var charSize = 8,
-		b64pad = "",
+		b64pad = "=",
 		hexCase = 0,
 
 		str2binb = function (str)
