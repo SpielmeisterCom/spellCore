@@ -1,4 +1,4 @@
 /build
-/spelljs.iml
 /docs/generated/*
 /.idea
+/*.iml
