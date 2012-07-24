@@ -261,7 +261,7 @@ define(
 			)
 		}
 
-		var createSceneList = function( templateManager, scenes, anonymizeModules ) {
+		var createSceneList = function( templateManager, scenes, anonymizeModuleIdentifiers ) {
 			return _.map(
 				scenes,
 				function( scene ) {
@@ -275,7 +275,7 @@ define(
 					return {
 						entities : reducedEntityConfig,
 						name : scene.name,
-						scriptId : anonymizeModules ? hashModuleIdentifier( scene.scriptId ) : scene.scriptId,
+						scriptId : anonymizeModuleIdentifiers ? hashModuleIdentifier( scene.scriptId ) : scene.scriptId,
 						systems : scene.systems
 					}
 				}
@@ -400,7 +400,7 @@ define(
 		 * public
 		 */
 
-		return function( target, spellPath, projectPath, projectFilePath, minify, anonymizeModules, callback ) {
+		return function( target, spellPath, projectPath, projectFilePath, minify, anonymizeModuleIdentifiers, callback ) {
 			var errors               = [],
 				projectTemplatePath = projectPath + LIBRARY_TEMPLATES_PATH
 
@@ -476,7 +476,7 @@ define(
 
 
 			// copy referenced resources to output path
-			var sceneList = createSceneList( templateManager, projectConfig.scenes, anonymizeModules )
+			var sceneList = createSceneList( templateManager, projectConfig.scenes, anonymizeModuleIdentifiers )
 
 			var relativeAssetsPath  = '/library/assets',
 				spellTexturesPath   = spellPath + relativeAssetsPath,
@@ -536,7 +536,7 @@ define(
 				sceneList,
 				createTemplateList( templateManager, componentTemplateIds ),
 				createTemplateList( templateManager, entityTemplateIds ),
-				( anonymizeModules ?
+				( anonymizeModuleIdentifiers ?
 					anonymizeScriptIds( createTemplateList( templateManager, systemTemplateIds ) ) :
 					createTemplateList( templateManager, systemTemplateIds )
 				),
@@ -559,7 +559,7 @@ define(
 					engineSource,
 					runtimeModuleSource,
 					minify,
-					anonymizeModules,
+					anonymizeModuleIdentifiers,
 					callback
 				)
 
@@ -574,7 +574,7 @@ define(
 					runtimeModuleSource,
 					engineSource,
 					minify,
-//					anonymizeModules,
+					anonymizeModuleIdentifiers,
 					callback
 				)
 

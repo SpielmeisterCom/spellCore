@@ -3,10 +3,7 @@ define(
 	[
 		'spell/shared/build/copyFile',
 		'spell/shared/build/isFile',
-		'spell/shared/build/ast/anonymizeModuleIdentifiers',
-		'spell/shared/build/ast/createAST',
-		'spell/shared/build/ast/createSource',
-		'spell/shared/build/ast/minifyAST',
+		'spell/shared/build/processSource',
 
 		'fs',
 		'path'
@@ -14,10 +11,7 @@ define(
 	function(
 		copyFile,
 		isFile,
-		anonymizeModuleIdentifiers,
-		createAST,
-		createSource,
-		minifyAST,
+		processSource,
 
 		fs,
 		path
@@ -46,17 +40,6 @@ define(
 			fs.writeFileSync( outputFilePath, runtimeModuleSource, 'utf-8' )
 
 			return errors
-		}
-
-		var processSource = function( sourceChunk, minify, anonymizeModules ) {
-			if( !minify && !anonymizeModules ) return sourceChunk
-
-			var ast = createAST( sourceChunk )
-
-			if( anonymizeModules ) ast = anonymizeModuleIdentifiers( ast )
-			if( minify ) ast = minifyAST( ast )
-
-			return createSource( ast, !minify )
 		}
 
 		var writeEngineInclude = function( outputFilePath, source ) {
@@ -89,11 +72,7 @@ define(
 			var outputFilePath = html5OutputPath + '/data.js'
 			errors = writeRuntimeModule(
 				outputFilePath,
-				processSource(
-					runtimeModuleSource,
-					minify,
-					anonymizeModules
-				)
+				processSource( runtimeModuleSource, minify, anonymizeModules )
 			)
 
 			if( errors.length > 0 ) return errors
@@ -110,11 +89,7 @@ define(
 
 			errors = writeEngineInclude(
 				outputFilePath,
-				processSource(
-					sourceChunks.join( '\n' ),
-					minify,
-					anonymizeModules
-				)
+				processSource( sourceChunks.join( '\n' ), minify, anonymizeModules )
 			)
 
 			next( errors )

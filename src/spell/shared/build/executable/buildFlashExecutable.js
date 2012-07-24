@@ -2,6 +2,7 @@ define(
 	'spell/shared/build/executable/buildFlashExecutable',
 	[
 		'spell/shared/build/isFile',
+		'spell/shared/build/processSource',
 
 		'child_process',
 		'fs',
@@ -13,6 +14,7 @@ define(
 	],
 	function(
 		isFile,
+		processSource,
 
 		child_process,
 		fs,
@@ -64,7 +66,7 @@ define(
 			fs.writeFileSync( filePath, data )
 		}
 
-		var writeCompilerConfigFile = function( projectPath, spellAsPath, flexSdkPath, compilerConfigFilePath, outputFilePath ) {
+		var writeCompilerConfigFile = function( projectPath, spellAsPath, flexSdkPath, compilerConfigFilePath, outputFilePath, anonymizeModuleIdentifiers ) {
 			var doc = xmlbuilder.create()
 
 			doc.begin( 'flex-config' )
@@ -95,6 +97,14 @@ define(
 					.up()
 					.ele( 'debug' )
 						.txt( 'true' )
+					.up()
+					.ele( 'define' )
+						.ele( 'name' )
+							.txt( 'CONFIG::anonymizeModuleIdentifiers' )
+						.up()
+						.ele( 'value' )
+							.txt( anonymizeModuleIdentifiers.toString() )
+						.up()
 					.up()
 				.up()
 				.ele( 'file-specs' )
@@ -131,7 +141,7 @@ define(
 		 * public
 		 */
 
-		return function( tempPath, outputPath, spellAsPath, projectPath, runtimeModule, engineSource, minify, next ) {
+		return function( tempPath, outputPath, spellAsPath, projectPath, runtimeModule, engineSource, minify, anonymizeModuleIdentifiers, next ) {
 			var errors = []
 
 			var tmpSourcePath = tempPath + '/src/Spielmeister'
@@ -145,7 +155,10 @@ define(
 
 			writeFile(
 				engineSourceFilePath,
-				createActionScriptWrapperClass( 'SpellEngine', /*minify ? minifySource( engineSource ) :*/ engineSource )
+				createActionScriptWrapperClass(
+					'SpellEngine',
+					processSource( engineSource, minify, anonymizeModuleIdentifiers )
+				)
 			)
 
 			// write runtime module source wrapper class file
@@ -153,7 +166,10 @@ define(
 
 			writeFile(
 				runtimeModuleSourceFilePath,
-				createActionScriptWrapperClass( 'RuntimeModule', runtimeModule )
+				createActionScriptWrapperClass(
+					'RuntimeModule',
+					processSource( runtimeModule, minify, anonymizeModuleIdentifiers )
+				)
 			)
 
 			// create config and compile
@@ -166,7 +182,7 @@ define(
 				fs.mkdirSync( flashOutputPath )
 			}
 
-			writeCompilerConfigFile( projectPath, spellAsPath, flexSdkPath, compilerConfigFilePath, outputFilePath )
+			writeCompilerConfigFile( projectPath, spellAsPath, flexSdkPath, compilerConfigFilePath, outputFilePath, anonymizeModuleIdentifiers )
 
 
 			var onCompilingCompleted = function( errors, stderr, stdout ) {
