@@ -481,7 +481,7 @@ define(
 			var relativeAssetsPath  = '/library/assets',
 				spellTexturesPath   = spellPath + relativeAssetsPath,
 				projectAssetsPath   = projectPath + relativeAssetsPath,
-				outputResourcesPath = projectPath + '/public/output/resources',
+				outputResourcesPath = projectPath + '/output/resources',
 				assets              = createAssetList( projectAssetsPath ),
 				resourceIds         = _.union(
 					createResourceList( assets ),
