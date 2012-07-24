@@ -77,9 +77,8 @@ define(
 
 			// create directory structure
 			var paths = [
-				'public',
-				'public/output',
-				'public/output/resources',
+				'output',
+				'output/resources',
 				'library',
 				'library/templates',
 				'library/assets'
@@ -142,7 +141,7 @@ define(
 			_.each(
 				fileNames,
 				function( fileName ) {
-					var projectDirectoryFilePath = projectPath + '/public/' + fileName
+					var projectDirectoryFilePath = projectPath + '/output/' + fileName
 
 					if( fs.existsSync( projectDirectoryFilePath ) ) return
 
@@ -155,7 +154,7 @@ define(
 
 			copyFile(
 				spellPath + '/src/spell/client/stageZeroLoader.js',
-				projectPath + '/public/spell.js'
+				projectPath + '/output/spell.js'
 			)
 
 

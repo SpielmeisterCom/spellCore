@@ -522,7 +522,7 @@ define(
 
 			// generating executables
 			var tempPath = projectPath + '/build', // directory for build related temporary files
-				executablesOutputPath = projectPath + '/public/output'
+				executablesOutputPath = projectPath + '/output'
 
 
 

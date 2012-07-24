@@ -163,8 +163,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 		if( verbose ) printLoading()
 
 		head.js(
-			'output/html5/spell.js',
-			'output/html5/data.js',
+			'html5/spell.js',
+			'html5/data.js',
 			function() {
 				if( verbose ) printLaunching()
 
