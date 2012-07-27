@@ -66,20 +66,20 @@ define(
 			fs.writeFileSync( filePath, data )
 		}
 
-		var writeCompilerConfigFile = function( projectPath, spellAsPath, flexSdkPath, compilerConfigFilePath, outputFilePath, anonymizeModuleIdentifiers ) {
+		var writeCompilerConfigFile = function( projectPath, spellFlashPath, flexSdkPath, compilerConfigFilePath, outputFilePath, anonymizeModuleIdentifiers ) {
 			var doc = xmlbuilder.create()
 
 			doc.begin( 'flex-config' )
 				.ele( 'compiler' )
 					.ele( 'source-path' )
 						.ele( 'path-element' )
-							.txt( spellAsPath + '/src' )
+							.txt( spellFlashPath + '/src' )
 						.up()
 						.ele( 'path-element' )
-							.txt( spellAsPath + '/lib/AS3WebSocket/src' )
+							.txt( spellFlashPath + '/lib/AS3WebSocket/src' )
 						.up()
 						.ele( 'path-element' )
-							.txt( spellAsPath + '/lib/Coral/src' )
+							.txt( spellFlashPath + '/lib/Coral/src' )
 						.up()
 						.ele( 'path-element' )
 							.txt( projectPath + '/build/src' )
@@ -87,7 +87,7 @@ define(
 					.up()
 					.ele( 'library-path' )
 						.ele( 'path-element' )
-							.txt( spellAsPath + '/lib/AS3WebSocket/lib/as3corelib.swc' )
+							.txt( spellFlashPath + '/lib/AS3WebSocket/lib/as3corelib.swc' )
 						.up()
 					.up()
 					.ele( 'external-library-path' )
@@ -109,7 +109,7 @@ define(
 				.up()
 				.ele( 'file-specs' )
 					.ele( 'path-element' )
-						.txt( spellAsPath + '/src/Spielmeister/SpellMain.as' )
+						.txt( spellFlashPath + '/src/Spielmeister/SpellMain.as' )
 					.up()
 				.up()
 				.ele( 'warnings' )
@@ -141,7 +141,7 @@ define(
 		 * public
 		 */
 
-		return function( tempPath, outputPath, spellAsPath, projectPath, runtimeModule, engineSource, minify, anonymizeModuleIdentifiers, next ) {
+		return function( tempPath, outputPath, spellFlashPath, projectPath, runtimeModule, engineSource, minify, anonymizeModuleIdentifiers, next ) {
 			var errors = []
 
 			var tmpSourcePath = tempPath + '/src/Spielmeister'
@@ -173,7 +173,7 @@ define(
 			)
 
 			// create config and compile
-			var flexSdkPath            = spellAsPath + '/vendor/flex_sdk_4.1.0.16076A_mpl',
+			var flexSdkPath            = spellFlashPath + '/vendor/flex_sdk_4.1.0.16076A_mpl',
 				compilerConfigFilePath = tempPath + '/compile-config.xml',
 				flashOutputPath        = outputPath + '/flash',
 				outputFilePath         = flashOutputPath + '/spell.swf'
@@ -182,7 +182,7 @@ define(
 				fs.mkdirSync( flashOutputPath )
 			}
 
-			writeCompilerConfigFile( projectPath, spellAsPath, flexSdkPath, compilerConfigFilePath, outputFilePath, anonymizeModuleIdentifiers )
+			writeCompilerConfigFile( projectPath, spellFlashPath, flexSdkPath, compilerConfigFilePath, outputFilePath, anonymizeModuleIdentifiers )
 
 
 			var onCompilingCompleted = function( errors, stderr, stdout ) {

@@ -57,7 +57,7 @@ define(
 		 * public
 		 */
 
-		return function( argv, cwd, spellPath ) {
+		return function( argv, cwd, spellCorePath ) {
 			var executableName  = 'sappre',
 				projectPath     = cwd,
 				projectFilename = 'project.json',
@@ -102,7 +102,7 @@ define(
 					console.log( 'creating debug build for target \'' + target + '\'...' )
 
 					if( isFile( projectFilePath ) ) {
-						executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, minify, anonymizeModules, _.bind( onComplete, null, 'build' ) )
+						executeCreateDebugBuild( target, spellCorePath, projectPath, projectFilePath, minify, anonymizeModules, _.bind( onComplete, null, 'build' ) )
 
 					} else {
 						printErrors( 'Error: Missing project file \'' + projectFilePath + '\'.' )
@@ -127,12 +127,12 @@ define(
 					printErrors( errors )
 
 				} else {
-					serverMain( spellPath, projectsPath, userId, command.port )
+					serverMain( spellCorePath, projectsPath, userId, command.port )
 				}
 			}
 
-			var initCommand = function( spellPath, projectPath, projectFilePath ) {
-				var errors = initializeProjectDirectory( spellPath, path.basename( projectPath ), projectPath, projectFilePath )
+			var initCommand = function( spellCorePath, projectPath, projectFilePath ) {
+				var errors = initializeProjectDirectory( spellCorePath, path.basename( projectPath ), projectPath, projectFilePath )
 
 				if( errors.length > 0 ) {
 					printErrors( errors )
@@ -150,8 +150,8 @@ define(
 				exportDeploymentArchive( projectPath, outputFilePath, _.bind( onComplete, null, 'export' ) )
 			}
 
-			var infoCommand = function( spellPath, projectPath, projectFilePath ) {
-				console.log( 'spell sdk path:\t\t' + spellPath )
+			var infoCommand = function( spellCorePath, projectPath, projectFilePath ) {
+				console.log( 'spell sdk path:\t\t' + spellCorePath )
 				console.log( 'project path:\t\t' + projectPath )
 				console.log( 'project file path:\t' + projectFilePath )
 			}
@@ -178,7 +178,7 @@ define(
 			commander
 				.command( 'init' )
 				.description( 'initialize the current working directory with spell project scaffolding' )
-				.action( _.bind( initCommand, this, spellPath, projectPath, projectFilePath ) )
+				.action( _.bind( initCommand, this, spellCorePath, projectPath, projectFilePath ) )
 
 			commander
 				.command( 'export' )
@@ -189,7 +189,7 @@ define(
 			commander
 				.command( 'info' )
 				.description( 'print information about current environment' )
-				.action( _.bind( infoCommand, this, spellPath, projectPath, projectFilePath ) )
+				.action( _.bind( infoCommand, this, spellCorePath, projectPath, projectFilePath ) )
 
 			commander.parse( argv )
 		}

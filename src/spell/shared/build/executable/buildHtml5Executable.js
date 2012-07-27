@@ -60,7 +60,7 @@ define(
 		 * public
 		 */
 
-		return function( spellPath, outputPath, platformAdapterSource, engineSource, runtimeModuleSource, minify, anonymizeModules, next ) {
+		return function( spellCorePath, outputPath, platformAdapterSource, engineSource, runtimeModuleSource, minify, anonymizeModules, next ) {
 			var errors = [],
 				html5OutputPath = outputPath + '/html5'
 
@@ -82,7 +82,7 @@ define(
 			outputFilePath = html5OutputPath + '/spell.js'
 
 			var sourceChunks = [
-				fs.readFileSync( spellPath + '/src/need.js'),
+				fs.readFileSync( spellCorePath + '/src/need.js'),
 				engineSource,
 				platformAdapterSource
 			]

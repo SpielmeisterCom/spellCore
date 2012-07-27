@@ -83,7 +83,7 @@ define(
 			}
 		}
 
-		var createHttpServer = function( spellPath, projectsPath, port ) {
+		var createHttpServer = function( spellCorePath, projectsPath, port ) {
 			return connect()
 				.use( connect.favicon() )
 				.use( connect.logger( 'dev' ) )
@@ -96,7 +96,7 @@ define(
 					extDirect(
 						'http://localhost:8080/router/',
 						'SpellBuild',
-						createBuildServer( spellPath, projectsPath )
+						createBuildServer( spellCorePath, projectsPath )
 					)
 				)
 				.use( rewriteUrlToRealProjectPath( projectsPath ) )
@@ -109,7 +109,7 @@ define(
 		 * public
 		 */
 
-		return function( spellPath, projectsPath, unprivilegedUserId, port ) {
+		return function( spellCorePath, projectsPath, unprivilegedUserId, port ) {
 			port = port || 8080
 
 
@@ -134,7 +134,7 @@ define(
 				'binding to ports',
 				function() {
 					flashPolicyFile = network.initializeFlashPolicyFileServer( 843 )
-					httpServer      = createHttpServer( spellPath, projectsPath, port )
+					httpServer      = createHttpServer( spellCorePath, projectsPath, port )
 					connection      = network.initializeClientHandling( httpServer, networkProtocol )
 
 					network.initializePathService( connection )

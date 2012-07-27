@@ -400,9 +400,10 @@ define(
 		 * public
 		 */
 
-		return function( target, spellPath, projectPath, projectFilePath, minify, anonymizeModuleIdentifiers, callback ) {
-			var errors               = [],
-				projectTemplatePath = projectPath + LIBRARY_TEMPLATES_PATH
+		return function( target, spellCorePath, projectPath, projectFilePath, minify, anonymizeModuleIdentifiers, callback ) {
+			var errors              = [],
+				projectTemplatePath = projectPath + LIBRARY_TEMPLATES_PATH,
+				spellEnginePath     = path.resolve( spellCorePath + '/../..' )
 
 			// parsing project config file
 			var data = fs.readFileSync( projectFilePath, 'utf-8'),
@@ -442,7 +443,7 @@ define(
 
 
 			// determine scripts that need to be included
-			var modules       = amdHelper.loadModules( spellPath + '/src' ),
+			var modules       = amdHelper.loadModules( spellCorePath + '/src' ),
 				scriptModules = amdHelper.loadModules( projectPath + LIBRARY_SCRIPTS_PATH )
 
 			// system script ids
@@ -461,7 +462,7 @@ define(
 
 
 			// reading engine source file
-			var spellEngineSourceFilePath = spellPath + '/build/spell.js'
+			var spellEngineSourceFilePath = spellCorePath + '/build/spell.js'
 
 			if( !fs.existsSync( spellEngineSourceFilePath ) ) {
 				errors.push( 'Error: Could not locate engine include file \'' + spellEngineSourceFilePath + '\'.' )
@@ -479,7 +480,7 @@ define(
 			var sceneList = createSceneList( templateManager, projectConfig.scenes, anonymizeModuleIdentifiers )
 
 			var relativeAssetsPath  = '/library/assets',
-				spellTexturesPath   = spellPath + relativeAssetsPath,
+				spellTexturesPath   = spellCorePath + relativeAssetsPath,
 				projectAssetsPath   = projectPath + relativeAssetsPath,
 				outputResourcesPath = projectPath + '/output/resources',
 				assets              = createAssetList( projectAssetsPath ),
@@ -550,10 +551,10 @@ define(
 
 
 			if( target === 'html5' ) {
-				var platformAdapterSource = fs.readFileSync( spellPath + '/build/spell.html5.js' ).toString( 'utf-8')
+				var platformAdapterSource = fs.readFileSync( spellCorePath + '/build/spell.html5.js' ).toString( 'utf-8')
 
 				buildHtml5Executable(
-					spellPath,
+					spellCorePath,
 					executablesOutputPath,
 					platformAdapterSource,
 					engineSource,
@@ -564,12 +565,12 @@ define(
 				)
 
 			} else if( target === 'flash' ) {
-				var spellAsPath = spellPath + '/vendor/spellas'
+				var spellFlashPath = spellEnginePath + '/modules/spellFlash'
 
 				buildFlashExecutable(
 					tempPath,
 					executablesOutputPath,
-					spellAsPath,
+					spellFlashPath,
 					projectPath,
 					runtimeModuleSource,
 					engineSource,

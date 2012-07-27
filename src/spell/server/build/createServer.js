@@ -41,7 +41,7 @@ define(
 		/*
 		 * RPC call handler
 		 *
-		 * @param spellPath
+		 * @param spellCorePath
 		 * @param projectsPath
 		 * @param req
 		 * @param res
@@ -53,20 +53,20 @@ define(
 		 * @param next
 		 * @return {*}
 		 */
-		var executeCreateDebugBuildWrapper = function( spellPath, projectsPath, req, res, payload, next ) {
+		var executeCreateDebugBuildWrapper = function( spellCorePath, projectsPath, req, res, payload, next ) {
 			var target           = payload[ 0 ],
 				projectPath      = projectsPath + '/' + payload[ 1 ],
 				projectFilePath  = projectPath + '/' + payload[ 2 ],
 				minified         = true,
 				anonymizeModules = true
 
-			return executeCreateDebugBuild( target, spellPath, projectPath, projectFilePath, minified, anonymizeModules, onComplete )
+			return executeCreateDebugBuild( target, spellCorePath, projectPath, projectFilePath, minified, anonymizeModules, onComplete )
 		}
 
 		/*
 		 * RPC call handler
 		 *
-		 * @param spellPath
+		 * @param spellCorePath
 		 * @param projectsPath
 		 * @param req
 		 * @param res
@@ -74,12 +74,12 @@ define(
 		 * @param next
 		 * @return {*}
 		 */
-		var initDirectory = function( spellPath, projectsPath, req, res, payload, next  ) {
+		var initDirectory = function( spellCorePath, projectsPath, req, res, payload, next  ) {
 			var projectName     = payload[ 0 ],
 				projectPath     = projectsPath + '/' + projectName,
 				projectFilePath = projectsPath + '/' + payload[ 1 ]
 
-			return initializeProjectDirectory( spellPath, projectName, projectPath, projectFilePath )
+			return initializeProjectDirectory( spellCorePath, projectName, projectPath, projectFilePath )
 		}
 
 		/*
@@ -109,18 +109,18 @@ define(
 		 * public
 		 */
 
-		return function( spellPath, projectsPath ) {
+		return function( spellCorePath, projectsPath ) {
 			return {
 				ProjectActions: [
 					{
 						name: 'executeCreateDebugBuild',
 						len: 3,
-						func: _.bind( executeCreateDebugBuildWrapper, null, spellPath, projectsPath )
+						func: _.bind( executeCreateDebugBuildWrapper, null, spellCorePath, projectsPath )
 					},
 					{
 						name: 'initDirectory',
 						len: 2,
-						func: _.bind( initDirectory, null, spellPath, projectsPath )
+						func: _.bind( initDirectory, null, spellCorePath, projectsPath )
 					},
 					{
 						name: 'exportDeployment',

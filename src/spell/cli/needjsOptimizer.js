@@ -69,7 +69,7 @@ define(
 		 * public
 		 */
 
-		return function( argv, cwd, spellPath ) {
+		return function( argv, cwd, spellCorePath ) {
 			var executableName  = 'n.js'
 
 			commander
