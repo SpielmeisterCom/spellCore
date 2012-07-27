@@ -41,7 +41,7 @@ define(
 					var data = fs.readFileSync( absoluteFilePath )
 
 					tape.append(
-						filePath.replace( /\/public/, '' ),
+						filePath.replace( /\/output/, '' ),
 						data,
 						function() {
 							writeFiles( tape, rootPath, filePaths )
@@ -76,7 +76,7 @@ define(
 			} )
 
 			var filePaths = glob.sync(
-				projectName + '/public/**',
+				projectName + '/output/**',
 				{
 					cwd : projectsPath
 				}
