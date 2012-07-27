@@ -2,13 +2,13 @@ define(
 	"spell/shared/util/platform/private/Input",
 	[
 		"spell/shared/util/input/keyCodes",
-		"spell/shared/util/math",
+		"spell/math/util",
 
 		'spell/functions'
 	],
 	function(
 		keyCodes,
-		math,
+		mathUtil,
 
 		_
 	) {
@@ -71,8 +71,8 @@ define(
 			]
 
 			// if the event missed the display it gets ignored
-			if( !math.isInInterval( position[ 0 ], 0.0, 1.0 ) ||
-				!math.isInInterval( position[ 1 ], 0.0, 1.0 ) ) {
+			if( !mathUtil.isInInterval( position[ 0 ], 0.0, 1.0 ) ||
+				!mathUtil.isInInterval( position[ 1 ], 0.0, 1.0 ) ) {
 
 				return
 			}
@@ -106,8 +106,8 @@ define(
 			]
 
             // if the event missed the display it gets ignored
-            if( !math.isInInterval( position[ 0 ], 0.0, 1.0 ) ||
-                !math.isInInterval( position[ 1 ], 0.0, 1.0 ) ) {
+            if( !mathUtil.isInInterval( position[ 0 ], 0.0, 1.0 ) ||
+                !mathUtil.isInInterval( position[ 1 ], 0.0, 1.0 ) ) {
 
                 return
             }

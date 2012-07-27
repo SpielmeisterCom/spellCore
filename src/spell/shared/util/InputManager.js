@@ -2,17 +2,11 @@ define(
 	"spell/shared/util/InputManager",
 	[
 		"spell/shared/util/input/keyCodes",
-		"spell/shared/util/math",
-		"spell/shared/util/platform/PlatformKit",
-
-		'spell/functions'
+		"spell/shared/util/platform/PlatformKit"
 	],
 	function(
 		keyCodes,
-		math,
-		PlatformKit,
-
-		_
+		PlatformKit
 	) {
 		"use strict"
 

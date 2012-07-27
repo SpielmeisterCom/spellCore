@@ -6,7 +6,6 @@ define(
 		'spell/shared/util/platform/private/graphics/webgl/shaders',
 
 		'spell/shared/util/color',
-		'spell/shared/util/math',
 		'spell/shared/util/platform/private/nativeType/createFloatArray',
 
 		'spell/math/vec3',
@@ -18,7 +17,6 @@ define(
 		shaders,
 
 		color,
-		math,
 		createFloatArray,
 
 		vec3,

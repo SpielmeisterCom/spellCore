@@ -1,13 +1,13 @@
 define(
 	'spell/shared/util/color',
 	[
-		'spell/shared/util/math',
+		'spell/math/util',
 
 		'spell/math/vec3',
 		'spell/functions'
 	],
 	function(
-		MathHelper,
+		mathUtil,
 
 		vec3
 	) {
@@ -15,7 +15,7 @@ define(
 
 
 		var toRange = function( value ) {
-			return Math.round( MathHelper.clamp( value, 0, 1 ) * 255 )
+			return Math.round( mathUtil.clamp( value, 0, 1 ) * 255 )
 		}
 
 

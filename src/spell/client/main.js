@@ -155,7 +155,7 @@ define(
 			PlatformKit.registerOnScreenResize( _.bind( onScreenResize, null, eventManager ) )
 
 			var renderingContextConfig = renderingContext.getConfiguration()
-			logger.debug( 'created rendering context: type=' + renderingContextConfig.type + '; size=' + renderingContextConfig.width + 'x' + renderingContextConfig.height )
+			logger.debug( 'created rendering context (' + renderingContextConfig.type + ')' )
 
 
 			var sceneConfig = _.find(
