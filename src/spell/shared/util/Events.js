@@ -31,7 +31,7 @@ define(
 			'LOGIC_UPDATE',
 			'CREATE_SCENE',
 			'DESTROY_SCENE',
-			'SCREEN_RESIZED'
+			'SCREEN_RESIZE'
 		] )
 	}
 )

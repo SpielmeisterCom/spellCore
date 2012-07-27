@@ -15,6 +15,7 @@ define(
 		'spell/shared/util/Events',
 		'spell/shared/util/Logger',
 		'spell/shared/util/createDebugMessageHandler',
+		'spell/client/util/onScreenResize',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
 
@@ -46,6 +47,7 @@ define(
 		Events,
 		Logger,
 		createDebugMessageHandler,
+		onScreenResize,
 		PlatformKit,
 		initDebugEnvironment,
 
@@ -150,11 +152,10 @@ define(
 			)
 
 
-//			PlatformKit.registerOnScreenResize( _.bind( onScreenResized, onScreenResized, eventManager ) )
+			PlatformKit.registerOnScreenResize( _.bind( onScreenResize, null, eventManager ) )
 
 			var renderingContextConfig = renderingContext.getConfiguration()
 			logger.debug( 'created rendering context: type=' + renderingContextConfig.type + '; size=' + renderingContextConfig.width + 'x' + renderingContextConfig.height )
-
 
 
 			var sceneConfig = _.find(

@@ -49,6 +49,17 @@ define("spell/math/util",
 			}
 		}
 
+		mathUtil.clamp = function( value, lowerBound, upperBound ) {
+			if ( value < lowerBound) return lowerBound;
+			if ( value > upperBound) return upperBound;
+
+			return value;
+		}
+
+		mathUtil.isInInterval = function( value, lowerBound, upperBound ) {
+			return ( value >= lowerBound && value <= upperBound )
+		}
+
 		return mathUtil;
 	}
 

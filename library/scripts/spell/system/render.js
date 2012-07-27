@@ -230,6 +230,11 @@ define(
 			}
 		}
 
+		var initColorBuffer = function( context, screenDimensions, viewportPosition ) {
+			context.resizeColorBuffer( screenDimensions[ 0 ], screenDimensions[ 1 ] )
+			context.viewport( viewportPosition[ 0 ], viewportPosition[ 1 ], screenDimensions[ 0 ], screenDimensions [ 1 ] )
+		}
+
 		var init = function( globals ) {}
 
 		var cleanUp = function( globals ) {}
@@ -269,20 +274,15 @@ define(
 			context.setViewMatrix( tmpMat3 )
 
 			// setting up the viewport
-			var viewportPositionX = 0,
-				viewportPositionY = 0
+			var viewportPosition = [ 0, 0 ]
 
-			context.viewport( viewportPositionX, viewportPositionY, screenSize[ 0 ], screenSize[ 1 ] )
+			initColorBuffer( context, screenSize, viewportPosition )
 
 			eventManager.subscribe(
-				Events.SCREEN_RESIZED,
-				_.bind(
-					function( screenWidth, screenHeight ) {
-						context.resizeColorBuffer( screenWidth, screenHeight )
-						context.viewport( viewportPositionX, viewportPositionY, screenWidth, screenHeight )
-					},
-					this
-				)
+				Events.SCREEN_RESIZE,
+				function( newSize ) {
+					initColorBuffer( context, newSize, viewportPosition )
+				}
 			)
 		}
 

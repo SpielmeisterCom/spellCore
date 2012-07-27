@@ -171,11 +171,10 @@ define(
 			_.extend( this, createConfiguration( parameters, defaultOptions, validOptions ) )
 
 			eventManager.subscribe(
-				[ Events.SCREEN_RESIZED ],
+				[ Events.SCREEN_RESIZE ],
 				_.bind(
-					function( width, height ) {
-						this.screenSize.width  = width
-						this.screenSize.height = height
+					function( newSize ) {
+						this.screenSize = newSize
 					},
 					this
 				)

@@ -33,7 +33,7 @@ define(
 			}
 
 			var publishScreenResizedEvent = function() {
-				var offset = getOffset( document.getElementById( 'spell-canvas' ) )
+				var offset = getOffset( document.getElementById( 'spell' ) )
 				var width  = window.innerWidth - offset[ 0 ]
 				var height = window.innerHeight - offset[ 1 ]
 
