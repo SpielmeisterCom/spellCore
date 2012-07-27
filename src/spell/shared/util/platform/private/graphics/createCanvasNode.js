@@ -4,7 +4,7 @@ define(
 		return function( id, width, height ) {
 			var container = document.getElementById( id )
 
-			if( !container ) throw 'Could not find a container with the id "spell" in the DOM tree.'
+			if( !container ) throw 'Could not find a container with the id ' + id + ' in the DOM tree.'
 
 
 			var canvas = document.createElement( "canvas" )

@@ -49,8 +49,9 @@ define(
 			return new Input( eventManager, Events )
 		}
 
-        var registerOnScreenResize = function( callback ) {
-            Viewporter.renderViewport( callback )
+        var registerOnScreenResize = function( id, callback ) {
+			var viewporter = new Viewporter( id )
+			viewporter.renderViewport( callback )
         }
 
 		var createSoundManager = function() {
