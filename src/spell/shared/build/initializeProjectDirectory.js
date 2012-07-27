@@ -42,7 +42,7 @@ define(
 		 */
 		var copyDirectory = function( sourcePath, targetPath ) {
 			var relativeFilePaths = glob.sync(
-				'/**/*.{js,json}',
+				'/**/*',
 				{
 					root : sourcePath,
 					nomount : true
@@ -56,6 +56,7 @@ define(
 						targetFilePath = path.join( targetPath, relativeFilePath ),
 						targetDirectoryPath = path.dirname( targetFilePath )
 
+					if( isDirectory( sourceFilePath ) ) return
 					if( fs.existsSync( targetFilePath ) ) return
 
 					if( !fs.existsSync( targetDirectoryPath ) ) {
