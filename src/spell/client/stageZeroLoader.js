@@ -183,7 +183,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 		if( verbose ) printLoading()
 
 		swfobject.embedSWF(
-			'output/flash/spell.swf',
+			'flash/spell.swf',
 			'spell',
 			'1024',
 			'768',
