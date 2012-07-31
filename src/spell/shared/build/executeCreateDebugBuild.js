@@ -3,7 +3,6 @@ define(
 	[
 		'spell/shared/ast/filterNodes',
 		'spell/shared/build/copyFile',
-		'spell/shared/build/createReducedEntityConfig',
 		'spell/shared/build/executable/buildFlashExecutable',
 		'spell/shared/build/executable/buildHtml5Executable',
 		'spell/shared/build/hashModuleIdentifier',
@@ -27,7 +26,6 @@ define(
 	function(
 		filterNodes,
 		copyFile,
-		createReducedEntityConfig,
 		buildFlashExecutable,
 		buildHtml5Executable,
 		hashModuleIdentifier,
@@ -261,22 +259,15 @@ define(
 			)
 		}
 
-		var createSceneList = function( templateManager, scenes, anonymizeModuleIdentifiers ) {
+		var createSceneList = function( scenes, anonymizeModuleIdentifiers ) {
 			return _.map(
 				scenes,
 				function( scene ) {
-					var reducedEntityConfig = _.map(
-						scene.entities,
-						function( entityConfig ) {
-							return createReducedEntityConfig( templateManager, entityConfig )
-						}
-					)
-
 					return {
-						entities : reducedEntityConfig,
-						name : scene.name,
+						entities : scene.entities,
+						name :     scene.name,
 						scriptId : anonymizeModuleIdentifiers ? hashModuleIdentifier( scene.scriptId ) : scene.scriptId,
-						systems : scene.systems
+						systems :  scene.systems
 					}
 				}
 			)
@@ -477,7 +468,7 @@ define(
 
 
 			// copy referenced resources to output path
-			var sceneList = createSceneList( templateManager, projectConfig.scenes, anonymizeModuleIdentifiers )
+			var sceneList = createSceneList( projectConfig.scenes, anonymizeModuleIdentifiers )
 
 			var relativeAssetsPath  = '/library/assets',
 				spellTexturesPath   = spellCorePath + relativeAssetsPath,

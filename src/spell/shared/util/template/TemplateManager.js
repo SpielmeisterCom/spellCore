@@ -104,11 +104,7 @@ define(
 			throw 'Error: Could not find a template with id \'' + templateId + ( templateType ? '\' of type ' + templateType : '' ) + '.'
 		}
 
-		var createComponentTemplate = function( componentTemplate, hasSingleAttribute ) {
-			if( hasSingleAttribute ) {
-				return _.clone( componentTemplate.attributes[ 0 ][ 'default' ] )
-			}
-
+		var createComponentTemplate = function( componentTemplate ) {
 			return _.reduce(
 				componentTemplate.attributes,
 				function( memo, attributeConfig ) {
@@ -120,12 +116,9 @@ define(
 			)
 		}
 
-		var updateComponent = function( component, attributeConfig, hasSingleAttribute ) {
+		var updateComponent = function( component, attributeConfig ) {
 			if( attributeConfig === undefined ) {
 				return component
-
-			} else if( hasSingleAttribute ) {
-				return  _.clone( attributeConfig )
 
 			} else {
 				return _.extend( component, attributeConfig )
@@ -141,14 +134,7 @@ define(
 
 					if( !componentTemplate ) throwCouldNotFindTemplate( componentTemplateId, TemplateTypes.COMPONENT )
 
-
-					var hasSingleAttribute = isSingleAttributeComponent( componentTemplate.attributes )
-
-					memo[ componentTemplateId ] = updateComponent(
-						createComponentTemplate( componentTemplate, hasSingleAttribute ),
-						componentConfig.config,
-						hasSingleAttribute
-					)
+					memo[ componentTemplateId ] = updateComponent( createComponentTemplate( componentTemplate ), componentConfig.config )
 
 					return memo
 				},
@@ -184,14 +170,6 @@ define(
 			)
 		}
 
-		var isSingleAttributeComponent = function( attributes ) {
-			if( attributes === undefined ) throw 'Error: \'attributes\' is of type falsy.'
-
-			return _.isObject( attributes ) &&
-				_.size( attributes ) === 1 &&
-				attributes[ 0 ].name === 'value'
-		}
-
 		var createComponentsFromEntityTemplate = function( templates, entityTemplateId, entity, config ) {
 			return _.reduce(
 				config,
@@ -202,11 +180,7 @@ define(
 						throw 'Error: Could not find component template \'' + componentId + '\' for \'' + entityTemplateId + '\'.'
 					}
 
-					memo[ componentId ] = updateComponent(
-						memo[ componentId ] || {},
-						componentConfig,
-						isSingleAttributeComponent( componentTemplate.attributes )
-					)
+					memo[ componentId ] = updateComponent( memo[ componentId ] || {}, componentConfig )
 
 					return memo
 				},
@@ -218,14 +192,9 @@ define(
 			return _.reduce(
 				config,
 				function( memo, componentConfig, componentId ) {
-					var componentTemplate = getTemplate( templates, componentId, TemplateTypes.COMPONENT ),
-						hasSingleAttribute = isSingleAttributeComponent( componentTemplate.attributes )
+					var componentTemplate = getTemplate( templates, componentId, TemplateTypes.COMPONENT )
 
-					memo[ componentId ] = updateComponent(
-						createComponentTemplate( componentTemplate, hasSingleAttribute ),
-						componentConfig,
-						hasSingleAttribute
-					)
+					memo[ componentId ] = updateComponent( createComponentTemplate( componentTemplate ), componentConfig )
 
 					return memo
 				},
@@ -285,20 +254,6 @@ define(
 					},
 					[]
 				)
-			},
-
-			/*
-			 * Returns true if the component is a single attribute component, false otherwise.
-			 *
-			 * @param templateId - component template id
-			 * @return {*}
-			 */
-			isSingleAttributeComponent : function( templateId ) {
-				var template = getTemplate( this.templates, templateId, TemplateTypes.COMPONENT )
-
-				if( !template ) throw 'Error: Could not find component template with id \'' + templateId + '\'.'
-
-				return isSingleAttributeComponent( template.attributes )
 			}
 		}
 
