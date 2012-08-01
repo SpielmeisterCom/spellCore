@@ -1,17 +1,10 @@
 {
-	"type" : "entityTemplate",
-	"readonly" : true,
-	"namespace" : "spell.entity.2d.graphics",
-	"name" : "camera",
-	"title" : "2D Camera",
-	"components" : [
-		{
-			"templateId" : "spell.component.2d.transform",
-			"config" : {}
-		},
-		{
-			"templateId" : "spell.component.2d.graphics.camera",
-			"config" : {}
-		}
-	]
+	"name": "camera",
+	"namespace": "spell.entity.2d.graphics",
+	"type": "entityTemplate",
+	"config": {
+		"spell.component.2d.transform": {},
+		"spell.component.2d.graphics.camera": {}
+	},
+	"children": []
 }
