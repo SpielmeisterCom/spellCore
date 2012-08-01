@@ -127,14 +127,13 @@ define(
 
 		var createEntityTemplate = function( templates, entityTemplate ) {
 			return _.reduce(
-				entityTemplate.components,
-				function( memo, componentConfig ) {
-					var componentTemplateId = componentConfig.templateId,
-						componentTemplate = getTemplate( templates, componentTemplateId, TemplateTypes.COMPONENT )
+				entityTemplate.config,
+				function( memo, componentConfig, componentTemplateId ) {
+					var componentTemplate = getTemplate( templates, componentTemplateId, TemplateTypes.COMPONENT )
 
 					if( !componentTemplate ) throwCouldNotFindTemplate( componentTemplateId, TemplateTypes.COMPONENT )
 
-					memo[ componentTemplateId ] = updateComponent( createComponentTemplate( componentTemplate ), componentConfig.config )
+					memo[ componentTemplateId ] = updateComponent( createComponentTemplate( componentTemplate ), componentConfig )
 
 					return memo
 				},
@@ -142,7 +141,7 @@ define(
 			)
 		}
 
-		var addTemplate = function( templates, entityPrototype, definition ) {
+		var addTemplate = function( templates, entityPrototypes, definition ) {
 			var templateId = createName( definition.namespace, definition.name )
 
 			if( _.has( templates, templateId ) ) throw 'Error: Template definition \'' + templateId + '\' already exists.'
@@ -151,7 +150,7 @@ define(
 			templates[ templateId ] = definition
 
 			if( definition.type === TemplateTypes.ENTITY ) {
-				entityPrototype[ templateId ] = createEntityTemplate( templates, definition )
+				entityPrototypes[ templateId ] = createEntityTemplate( templates, definition )
 			}
 		}
 
