@@ -20,12 +20,26 @@ define(
 		 * private
 		 */
 
-		var nextEntityId        = 0,
+		var nextEntityId        = 1,
 			rootComponentId     = 'spell.component.entityComposite.root',
 			childrenComponentId = 'spell.component.entityComposite.children'
 
-		var getNextEntityId = function() {
-			return nextEntityId++
+		/**
+		 * Returns an entity id. If an entity config already has an entity id it must be processed by this function too. This is necessary because otherwise
+		 * the engine can not guarantee that a generated entity id is not already in use.
+		 *
+		 * @param {Integer} id
+		 * @return {Integer}
+		 */
+		var getEntityId = function( id ) {
+			if( id ) {
+				nextEntityId = Math.max( id + 1, nextEntityId )
+
+				return id
+
+			} else {
+				return nextEntityId++
+			}
 		}
 
 		var createComponentList = function( componentTemplateIds ) {
@@ -44,6 +58,11 @@ define(
 			_.each(
 				entityComponents,
 				function( component, componentId ) {
+					if( !!components[ componentId ][ entityId ] ) {
+						throw 'Error: Adding a component to the entity with id \'' + entityId + '\' failed because the requested id is already in use. ' +
+							'Please make sure that no duplicate entity ids are used.'
+					}
+
 					components[ componentId ][ entityId ] = component
 				}
 			)
@@ -74,9 +93,9 @@ define(
 		 * @return {*}
 		 */
 		var normalizeEntityConfig = function( arg0 ) {
-			var templateId, config, children
-
 			if( !arg0 ) return
+
+			var templateId, config, children
 
 			if( _.isString( arg0 ) ) {
 				templateId = arg0
@@ -91,9 +110,10 @@ define(
 			}
 
 			return {
-				templateId : templateId,
-				config : config,
-				children : children
+				children   : children,
+				config     : config,
+				id         : arg0.id ? arg0.id : undefined,
+				templateId : templateId
 			}
 		}
 
@@ -143,7 +163,7 @@ define(
 		}
 
 		var createEntity = function( components, templateManager, entityConfig, isRoot ) {
-			isRoot = ( isRoot === true || isRoot === undefined )
+			isRoot       = ( isRoot === true || isRoot === undefined )
 			entityConfig = normalizeEntityConfig( entityConfig )
 
 			if( !entityConfig ) throw 'Error: Supplied invalid arguments.'
@@ -170,7 +190,7 @@ define(
 			// creating current entity
 			_.extend( config, createEntityCompositeConfig( isRoot, childEntityIds ) )
 
-			var entityId = getNextEntityId()
+			var entityId = getEntityId( parseInt( entityConfig.id ) )
 
 			addComponents(
 				components,
@@ -188,7 +208,7 @@ define(
 
 		var EntityManager = function( templateManager ) {
 			this.templateManager = templateManager
-			this.components = createComponentList( templateManager.getTemplateIds( 'componentTemplate' ) )
+			this.components      = createComponentList( templateManager.getTemplateIds( 'componentTemplate' ) )
 		}
 
 		EntityManager.prototype = {
