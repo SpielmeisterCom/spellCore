@@ -113,12 +113,12 @@ define(
 		 * public
 		 */
 
-		var Scene = function( globals ) {
-			this.globals          = globals
-			this.templateManager = globals.templateManager
-			this.renderSystems    = null
-			this.updateSystems    = null
-			this.script           = null
+		var Scene = function( globals, templateManager ) {
+			this.globals         = globals
+			this.templateManager = templateManager
+			this.renderSystems   = null
+			this.updateSystems   = null
+			this.script          = null
 		}
 
 		Scene.prototype = {

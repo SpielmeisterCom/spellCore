@@ -600,6 +600,20 @@ define(
 		 */
 		_.zip = platformImpl.zip
 
+		/**
+		 * Creates a version of the function that will only be run after first being called count times. Useful for
+		 * grouping asynchronous responses, where you want to be sure that all the async calls have finished, before
+		 * proceeding.
+		 *
+		 * Example:
+		 *
+		 *     var lock = _.after( 3, function() { // resuming with doing stuff after third call to "lock" function } )
+		 *
+		 * @param {Number} count The count after which the callback function is called.
+		 * @param {Function} function The callback function to call after the **count** times.
+		 */
+		_.after = platformImpl.after
+
 		return _
 	}
 )

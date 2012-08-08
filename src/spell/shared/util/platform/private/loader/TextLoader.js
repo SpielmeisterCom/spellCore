@@ -1,7 +1,7 @@
 define(
-	"spell/shared/util/platform/private/loader/TextLoader",
+	'spell/shared/util/platform/private/loader/TextLoader',
 	[
-		"spell/shared/util/Events",
+		'spell/shared/util/Events',
 
 		'spell/functions'
 	],
@@ -10,7 +10,7 @@ define(
 
 		_
 	) {
-		"use strict"
+		'use strict'
 
 
 		/*
@@ -28,9 +28,7 @@ define(
 				return
 			}
 
-			this.onCompleteCallback(
-				request.response
-			)
+			this.onCompleteCallback( request.response )
 		}
 
 		var onError = function( event ) {
@@ -42,7 +40,7 @@ define(
 
 		var onReadyStateChange = function( request ) {
 			/*
-			 * readyState === 4 means "DONE"; see https://developer.mozilla.org/en/DOM/XMLHttpRequest
+			 * readyState === 4 means 'DONE'; see https://developer.mozilla.org/en/DOM/XMLHttpRequest
 			 */
 			if( request.readyState !== 4 ) return
 
@@ -54,18 +52,18 @@ define(
 		 * public
 		 */
 
-		var TextLoader = function( eventManager, host, resourceBundleName, resourceUri, loadingCompletedCallback, timedOutCallback ) {
+		var TextLoader = function( eventManager, resourcePath, resourceBundleName, resourceName, loadingCompletedCallback, timedOutCallback ) {
 			this.eventManager       = eventManager
-			this.host               = host
+			this.resourcePath       = resourcePath
 			this.resourceBundleName = resourceBundleName
-			this.resourceUri        = resourceUri
+			this.resourceName       = resourceName
 			this.onCompleteCallback = loadingCompletedCallback
 			this.loaded             = false
 		}
 
 		TextLoader.prototype = {
 			start: function() {
-				var url = this.host + "/" + this.resourceUri
+				var url = this.resourcePath + '/' + this.resourceName
 
 				var request = new XMLHttpRequest()
 				request.onload             = _.bind( onLoad, this, request )

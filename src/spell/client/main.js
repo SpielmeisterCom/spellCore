@@ -1,8 +1,8 @@
 define(
 	'spell/client/main',
 	[
-		'spell/client/runtimeModule',
-		'spell/client/util/createAssets',
+		'spell/client/util/loadResources',
+		'spell/client/util/onScreenResize',
 		'spell/shared/util/createMainLoop',
 		'spell/shared/util/entity/EntityManager',
 		'spell/shared/util/scene/SceneManager',
@@ -12,10 +12,8 @@ define(
 		'spell/shared/util/InputManager',
 		'spell/shared/util/ResourceLoader',
 		'spell/shared/util/StatisticsManager',
-		'spell/shared/util/Events',
 		'spell/shared/util/Logger',
 		'spell/shared/util/createDebugMessageHandler',
-		'spell/client/util/onScreenResize',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
 
@@ -33,8 +31,8 @@ define(
 		'spell/functions'
 	],
 	function(
-		runtimeModule,
-		createAssets,
+		loadResources,
+		onScreenResize,
 		createMainLoop,
 		EntityManager,
 		SceneManager,
@@ -44,10 +42,8 @@ define(
 		InputManager,
 		ResourceLoader,
 		StatisticsManager,
-		Events,
 		Logger,
 		createDebugMessageHandler,
-		onScreenResize,
 		PlatformKit,
 		initDebugEnvironment,
 
@@ -63,136 +59,168 @@ define(
 		_,
 
 		// configuration parameters passed in from stage zero loader
-		parameters
+		stageZeroConfig
 	) {
 		'use strict'
 
 
-		var loadTemplates = function( templateManager, runtimeModule ) {
-			_.each(
-				runtimeModule.componentTemplates,
-				function( componentTemplate ) {
-					templateManager.add( componentTemplate )
-				}
-			)
-
-			_.each(
-				runtimeModule.entityTemplates,
-				function( entityTemplate ) {
-					templateManager.add( entityTemplate )
-				}
-			)
-
-			_.each(
-				runtimeModule.systemTemplates,
-				function( systemTemplate ) {
-					templateManager.add( systemTemplate )
-				}
-			)
-		}
-
-		var logger = new Logger(),
-			globals = {
-			logger : logger
-		}
-
-		var eventManager         = new EventManager(),
-			configurationManager = new ConfigurationManager( eventManager, parameters ),
-			renderingContext     = PlatformKit.RenderingFactory.createContext2d(
-				eventManager,
-				configurationManager.id,
-				1024,
-				768,
-				configurationManager.renderingBackEnd
-			),
-			soundManager         = PlatformKit.createSoundManager(),
-			inputManager         = new InputManager( configurationManager ),
-			resourceLoader       = new ResourceLoader( globals, runtimeModule.name, soundManager, renderingContext, eventManager, configurationManager.resourceServer ),
-			statisticsManager    = new StatisticsManager(),
-			templateManager      = new TemplateManager(),
-			mainLoop             = createMainLoop( eventManager, statisticsManager ),
-			sceneManager         = new SceneManager( globals, mainLoop )
-
-		statisticsManager.init()
-
-
-		/*
-		 * public
+		/**
+		 * This function is called as soon as all external resources are loaded. From this moment on it is safe to assume that all static content has been
+		 * loaded and is ready to use.
 		 */
+		var postLoadedResources = function() {
+			var globals = this.globals
+
+			globals.entityManager = new EntityManager( globals.templateManager )
+
+			globals.logger.debug( 'loading resources completed' )
+
+			PlatformKit.registerOnScreenResize(
+				globals.configurationManager.id,
+				_.bind( onScreenResize, null, globals.eventManager )
+			)
+
+			var renderingContextConfig = globals.renderingContext.getConfiguration()
+			globals.logger.debug( 'created rendering context (' + renderingContextConfig.type + ')' )
+
+
+			var sceneConfig = _.find(
+				globals.runtimeModule.scenes,
+				function( iter ) {
+					return iter.name === globals.runtimeModule.startScene
+				}
+			)
+
+			if( !sceneConfig ) throw 'Error: Could not find start scene \'' + globals.runtimeModule.startScene + '\'.'
+
+			globals.sceneManager.startScene( sceneConfig )
+
+			globals.mainLoop.run()
+		}
 
 		var start = function() {
-			if( parameters.debug ) {
-				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
-				initDebugEnvironment( logger )
+			var globals = this.globals
+
+			if( !globals.runtimeModule ) {
+				throw 'Error: No runtime module defined. Please provide a runtime module.'
 			}
 
-			logger.debug( 'client started' )
+			globals.logger.debug( 'client started' )
 
-
-			loadTemplates( templateManager, runtimeModule )
+			var resourceLoader = new ResourceLoader(
+				globals,
+				globals.runtimeModule.name,
+				globals.soundManager,
+				globals.renderingContext,
+				globals.eventManager,
+				globals.configurationManager.resourceServer
+			)
 
 			_.extend(
 				globals,
 				{
-					assets               : createAssets( runtimeModule.assets ),
-					configurationManager : configurationManager,
-					templateManager      : templateManager,
-					eventManager         : eventManager,
-					entityManager        : new EntityManager( templateManager ),
-					inputManager         : inputManager,
-					inputEvents          : inputManager.getInputEvents(),
-					renderingContext     : renderingContext,
-					resourceLoader       : resourceLoader,
-					resources            : resourceLoader.getResources(),
-					statisticsManager    : statisticsManager,
-					soundManager         : soundManager,
-					sceneManager         : sceneManager,
-					runtimeModule        : runtimeModule
+					resourceLoader : resourceLoader,
+					resources      : resourceLoader.getResources()
 				}
 			)
 
-
-			PlatformKit.registerOnScreenResize(
-				configurationManager.id,
-				_.bind( onScreenResize, null, eventManager )
+			loadResources(
+				globals,
+				_.bind( postLoadedResources, this )
 			)
-
-			var renderingContextConfig = renderingContext.getConfiguration()
-			logger.debug( 'created rendering context (' + renderingContextConfig.type + ')' )
-
-
-			var sceneConfig = _.find(
-				runtimeModule.scenes,
-				function( iter ) {
-					return iter.name === runtimeModule.startScene
-				}
-			)
-
-			if( !sceneConfig ) throw 'Error: Could not find start scene \'' + runtimeModule.startScene + '\'.'
-
-			sceneManager.startScene( sceneConfig )
-
-			mainLoop.run()
 		}
 
-		return {
+		var init = function( config ) {
+			var globals              = {},
+				logger               = new Logger(),
+				eventManager         = new EventManager(),
+				configurationManager = new ConfigurationManager( eventManager, config ),
+				renderingContext     = PlatformKit.RenderingFactory.createContext2d(
+					eventManager,
+					configurationManager.id,
+					1024,
+					768,
+					configurationManager.renderingBackEnd
+				),
+				soundManager      = PlatformKit.createSoundManager(),
+				inputManager      = new InputManager( configurationManager ),
+				statisticsManager = new StatisticsManager(),
+				templateManager   = new TemplateManager(),
+				mainLoop          = createMainLoop( eventManager, statisticsManager),
+				sceneManager      = new SceneManager( globals, templateManager, mainLoop )
+
+			statisticsManager.init()
+
+			_.extend(
+				globals,
+				{
+					configurationManager : configurationManager,
+					eventManager         : eventManager,
+					inputEvents          : inputManager.getInputEvents(),
+					inputManager         : inputManager,
+					logger               : logger,
+					mainLoop             : mainLoop,
+					renderingContext     : renderingContext,
+					runtimeModule        : undefined,
+					sceneManager         : sceneManager,
+					soundManager         : soundManager,
+					statisticsManager    : statisticsManager,
+					templateManager      : templateManager,
+				}
+			)
+
+			this.globals = globals
+
+
+			if( config.debug ) {
+				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
+				initDebugEnvironment( logger )
+			}
+
+			this.debugMessageHandler = createDebugMessageHandler(
+				this.globals,
+				_.bind( this.start, this )
+			)
+		}
+
+
+		var main = function() {
+			this.globals             = undefined
+			this.debugMessageHandler = undefined
+			init.call( this, stageZeroConfig )
+		}
+
+		main.prototype = {
 			start : start,
 
 			/*
 			 * This callback is called when the engine instance sends message to the editing environment.
 			 *
-			 * @param fn
+			 * @param {Function} fn
 			 */
 			setSendMessageToEditor : function( fn ) {
-				logger.setSendMessageToEditor( fn )
+				this.globals.logger.setSendMessageToEditor( fn )
 			},
 
 			/*
 			 * This method is used to send debug messages to the engine instance.
 			 *
-			 * @param message
+			 * @param {Object} message
 			 */
-			sendDebugMessage : createDebugMessageHandler( globals )
+			sendDebugMessage : function( message ) {
+				this.debugMessageHandler( message )
+			},
+
+			/**
+			 * Sets the runtime module that the engine executes once it is started.
+			 *
+			 * @param {Object} module
+			 */
+			setRuntimeModule : function( module ) {
+				this.globals.runtimeModule = module
+			}
 		}
+
+		return new main()
 	}
 )

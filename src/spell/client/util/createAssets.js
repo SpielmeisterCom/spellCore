@@ -13,8 +13,10 @@ define(
 		 * private
 		 */
 
-		var createAppearanceAsset = function( config ) {
-			return config
+		var createAssetId = function( type, resourceName ) {
+			var baseName = resourceName.match( /(.*)\.[^.]+$/ )[ 1 ]
+
+			return type + ':' + baseName.replace( /\//g, '.' )
 		}
 
 		var createFrameOffset = function( frameWidth, frameHeight, numX, numY, frameId ) {
@@ -53,23 +55,45 @@ define(
 		 * public
 		 */
 
-		return function( assets ) {
-			return _.reduce(
-				assets,
-				function( memo, asset, id, assets ) {
-					if( asset.type === 'appearance' ) {
-						memo[ id ] = createAppearanceAsset( asset )
+		return function( assetDefinitions ) {
+			// in a first pass all assets which do not depend on other assets are created
+			var assets = _.reduce(
+				assetDefinitions,
+				function( memo, assetDefinition, resourceName ) {
+					var assetId = createAssetId( assetDefinition.type, resourceName )
 
-					} else if( asset.type === 'animation' ) {
-						memo[ id ] = createAnimationAsset( assets, asset )
+					if( assetDefinition.type === 'appearance') {
+						memo[ assetId ] = {
+							resourceId : assetDefinition.file,
+							type       : assetDefinition.type
+						}
 
-					} else {
-						memo[ id ] = asset
+					} else if( assetDefinition.type === 'spriteSheet' ) {
+						memo[ assetId ] = {
+							config     : assetDefinition.config,
+							resourceId : assetDefinition.file,
+							type       : assetDefinition.type
+						}
 					}
 
 					return memo
 				},
 				{}
+			)
+
+			// in a second pass all assets that reference other assets are created
+			return _.reduce(
+				assetDefinitions,
+				function( memo, assetDefinition, resourceName ) {
+					var assetId = createAssetId( assetDefinition.type, resourceName )
+
+					if( assetDefinition.type === 'animation' ) {
+						memo[ assetId ] = createAnimationAsset( memo, assetDefinition )
+					}
+
+					return memo
+				},
+				assets
 			)
 		}
 	}

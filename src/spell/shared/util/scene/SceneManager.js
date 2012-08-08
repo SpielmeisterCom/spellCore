@@ -19,14 +19,15 @@ define(
 		 * public
 		 */
 
-		var SceneManager = function( globals, mainLoop ) {
-			this.globals          = globals
-			this.mainLoop         = mainLoop
+		var SceneManager = function( globals, templateManager, mainLoop ) {
+			this.globals         = globals
+			this.mainLoop        = mainLoop
+			this.templateManager = templateManager
 		}
 
 		SceneManager.prototype = {
 			startScene: function( sceneConfig ) {
-				var scene = new Scene( this.globals )
+				var scene = new Scene( this.globals, this.templateManager )
 				scene.init( this.globals, sceneConfig )
 
 				this.mainLoop.setRenderCallback( _.bind( scene.render, scene ) )

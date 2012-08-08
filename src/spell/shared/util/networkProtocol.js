@@ -9,7 +9,7 @@ define(
 		'use strict'
 
 
-		var jsonCoder = PlatformKit.getJsonCoder()
+		var jsonCoder = PlatformKit.jsonCoder
 
 		return {
 			encode: function( messageType, messageData ) {

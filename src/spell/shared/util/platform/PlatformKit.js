@@ -3,7 +3,7 @@ define(
 	[
 		'spell/shared/util/platform/private/callNextFrame',
 		'spell/shared/util/platform/private/createHost',
-		'spell/shared/util/platform/private/createJsonCoder',
+		'spell/shared/util/platform/private/jsonCoder',
 		'spell/shared/util/platform/private/createSocket',
 		'spell/shared/util/platform/private/graphics/RenderingFactory',
 		'spell/shared/util/platform/private/registerTimer',
@@ -20,7 +20,7 @@ define(
 	function(
 		callNextFrame,
 		createHost,
-		createJsonCoder,
+		jsonCoder,
 		createSocket,
 		RenderingFactory,
 		registerTimer,
@@ -67,7 +67,7 @@ define(
 			getHost                : getHost,
 			configurationOptions   : configurationOptions,
 			getPlatformInfo        : getPlatformInfo,
-			getJsonCoder           : createJsonCoder,
+			jsonCoder              : jsonCoder,
 			createInput            : createInput,
 			features               : features,
 			registerOnScreenResize : registerOnScreenResize,

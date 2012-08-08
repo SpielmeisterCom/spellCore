@@ -23,23 +23,24 @@ define(
 		var STATE_PROCESSING = 1
 		var STATE_COMPLETED = 2
 
-		var RESOURCE_PATH = 'output/resources'
+		var BASE_URL = 'library'
 
 		var extensionToLoaderFactory = {
-			'png'  : PlatformKit.createImageLoader,
-			'jpg'  : PlatformKit.createImageLoader,
-			'json' : PlatformKit.createSoundLoader,
-			'txt'  : PlatformKit.createTextLoader
+			'image' : PlatformKit.createImageLoader,
+			'text'  : PlatformKit.createTextLoader
 		}
 
 
-		var createResourceBundle = function( name, resources ) {
+		var createResourceBundle = function( name, resources, config ) {
 			return {
+				afterLoad             : config.afterLoad,
+				baseUrl               : config.baseUrl,
 				name                  : name,
-				state                 : STATE_WAITING_FOR_PROCESSING,
 				resources             : resources,
 				resourcesTotal        : resources.length,
-				resourcesNotCompleted : resources.length
+				resourcesNotCompleted : resources.length,
+				state                 : STATE_WAITING_FOR_PROCESSING,
+				type                  : config.type
 			}
 		}
 
@@ -76,38 +77,35 @@ define(
 			if( resourceBundle.resourcesNotCompleted === 0 ) {
 				resourceBundle.state = STATE_COMPLETED
 
-				this.eventManager.publish( [ Events.RESOURCE_LOADING_COMPLETED, resourceBundle.name ] )
+				this.eventManager.publish(
+					[ Events.RESOURCE_LOADING_COMPLETED, resourceBundle.name ],
+					[ _.pick( this.resources, resourceBundle.resources ) ]
+				)
 			}
 		}
 
-		var checkResourceAlreadyLoaded = function( loadedResources, resourceName ) {
-			_.each(
-				loadedResources,
-				_.bind(
-					function( loadedResource, loadedResourceName ) {
-						if( !_.has( this.resources, loadedResourceName ) ) return
+		var checkResourceAlreadyLoaded = function( loadedResource, resourceName ) {
+			if( !_.has( this.resources, resourceName ) ) return
 
-						throw 'Error: sub-resource "' + loadedResourceName + '" from resource "' + resourceName + '" already exists.'
-					},
-					this
-				)
-			)
+			throw 'Error: Resource "' + resourceName + '" already loaded.'
 		}
 
-		var resourceLoadingCompletedCallback = function( resourceBundleName, resourceName, loadedResources ) {
-			if( loadedResources === undefined ||
-				_.size( loadedResources ) === 0 ) {
-
+		var resourceLoadingCompletedCallback = function( resourceBundleName, resourceName, loadedResource ) {
+			if( !loadedResource ) {
 				throw 'Resource "' + resourceName + '" from resource bundle "' + resourceBundleName + '" is undefined or empty on loading completed.'
 			}
 
-			// making sure the loaded resources were not already returned earlier
-			checkResourceAlreadyLoaded.call( this, loadedResources, resourceName )
+			// making sure the loaded resource was not already returned earlier
+			checkResourceAlreadyLoaded.call( this, loadedResource, resourceName )
 
-			// add newly loaded resources to cache
-			_.extend( this.resources, loadedResources )
+			var resourceBundle = this.resourceBundles[ resourceBundleName ]
 
-			updateProgress.call( this, this.resourceBundles[ resourceBundleName ] )
+			// add newly loaded resources to cache, run trough afterLoad callback if available
+			this.resources[ resourceName ] = resourceBundle.afterLoad ?
+				resourceBundle.afterLoad( loadedResource ) :
+				loadedResource
+
+			updateProgress.call( this, resourceBundle )
 		}
 
 		var resourceLoadingTimedOutCallback = function( logger, resourceBundleName, resourceName ) {
@@ -120,21 +118,27 @@ define(
 			applicationId,
 			eventManager,
 			host,
+			baseUrl,
 			resourceBundleName,
 			resourceName,
 			loadingCompletedCallback,
 			loadingTimedOutCallback,
 			soundManager,
-			renderingContext
+			renderingContext,
+			type
 		) {
-			var extension = _.last( resourceName.split( '.' ) )
+			var extension = ( type === 'auto' ?
+				_.last( resourceName.split( '.' ) )
+				: type
+			)
+
 			var loaderFactory = extensionToLoaderFactory[ extension ]
 
 			if( loaderFactory === undefined ) {
 				throw 'Could not create loader factory for resource "' + resourceName + '".'
 			}
 
-			var resourcePath = host + '/' + applicationId + '/' + RESOURCE_PATH
+			var resourcePath = host + '/' + applicationId + '/' + baseUrl
 
 			var loader = loaderFactory(
 				eventManager,
@@ -170,12 +174,14 @@ define(
 							this.applicationId,
 							this.eventManager,
 							this.host,
+							resourceBundle.baseUrl,
 							resourceBundle.name,
 							resourceName,
 							_.bind( resourceLoadingCompletedCallback, this, resourceBundle.name, resourceName ),
 							_.bind( resourceLoadingTimedOutCallback, this, logger, resourceBundle.name, resourceName ),
                             this.soundManager,
-							this.renderingContext
+							this.renderingContext,
+							resourceBundle.type
 						)
 
 						if( loader !== undefined ) {
@@ -188,6 +194,14 @@ define(
 					this
 				)
 			)
+		}
+
+		var normalizeConfig = function( config ) {
+			return {
+				afterLoad : _.isFunction( config.afterLoad ) ? config.afterLoad : undefined,
+				baseUrl   : config.baseUrl ? config.baseUrl : BASE_URL,
+				type      : config.type ? config.type : 'auto'
+			}
 		}
 
 
@@ -210,7 +224,7 @@ define(
 		}
 
 		ResourceLoader.prototype = {
-			addResourceBundle: function( name, resources ) {
+			addResourceBundle: function( name, resources, config ) {
 				if( _.size( resources ) === 0 ) {
 					throw 'Resource group with name "' + name + '" has zero assigned resources.'
 				}
@@ -219,16 +233,14 @@ define(
 					throw 'Resource group with name "' + name + '" already exists.'
 				}
 
-
 				this.resourceBundles[ name ] = createResourceBundle(
 					name,
-					resources
+					resources,
+					normalizeConfig( config )
 				)
 			},
 
 			start: function() {
-				var logger = this.logger
-
 				_.each(
 					this.resourceBundles,
 					_.bind(
@@ -236,7 +248,7 @@ define(
 							if( resourceBundle.state !== STATE_WAITING_FOR_PROCESSING ) return
 
 							resourceBundle.state = STATE_PROCESSING
-							startLoadingResourceBundle.call( this, logger, resourceBundle )
+							startLoadingResourceBundle.call( this, this.logger, resourceBundle )
 						},
 						this
 					)

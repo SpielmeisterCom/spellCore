@@ -39,8 +39,15 @@ define(
 			// wire up all events to probe the lock
 			_.each(
 				config.events,
-				function( scope ) {
-					eventManager.subscribe( scope, lock )
+				function( event ) {
+					eventManager.subscribe(
+						event.scope,
+						function( eventArgs ) {
+							if( event.subscriber ) event.subscriber( eventArgs )
+
+							lock()
+						}
+					)
 				}
 			)
 		}
@@ -55,10 +62,7 @@ define(
 		}
 
 		EventManager.prototype = {
-			subscribe: function(
-				scope,
-				subscriber
-			) {
+			subscribe: function( scope, subscriber ) {
 				scope = normalize( scope )
 
 				forestMultiMap.add(
@@ -70,10 +74,7 @@ define(
 				this.publish( Events.SUBSCRIBE, [ scope, subscriber ] )
 			},
 
-			unsubscribe: function(
-				scope,
-				subscriber
-			) {
+			unsubscribe: function( scope, subscriber ) {
 				scope = normalize( scope )
 
 				forestMultiMap.remove(
@@ -85,10 +86,7 @@ define(
 				this.publish( Events.UNSUBSCRIBE, [ scope, subscriber ] )
 			},
 
-			publish: function(
-				scope,
-				eventArgs
-			) {
+			publish: function( scope, eventArgs ) {
 				scope = normalize( scope )
 
 				var subscribersInScope = forestMultiMap.get(
@@ -103,20 +101,29 @@ define(
 				return true
 			},
 
-			waitFor: function( scope ) {
+			waitFor: function( scope, subscriber ) {
+				scope = normalize( scope )
+
 				waitForChainConfig = {
-					events : [ scope ]
+					events : [ {
+						scope      : scope,
+						subscriber : subscriber
+					} ]
 				}
 
 				return this
 			},
 
-			and: function( scope ) {
+			and: function( scope, subscriber ) {
 				// check if pending chain call exists
 				if( !waitForChainConfig ) throw 'A call to the method "and" must be chained to a previous call to "waitFor".'
 
+				scope = normalize( scope )
 
-				waitForChainConfig.events.push( scope )
+				waitForChainConfig.events.push( {
+					scope      : scope,
+					subscriber : subscriber
+				} )
 
 				return this
 			},
@@ -124,7 +131,6 @@ define(
 			resume: function( callback ) {
 				// check if pending chain call exists, return otherwise
 				if( !waitForChainConfig ) throw 'A call to the method "resume" must be chained to a previous call to "waitFor" or "and".'
-
 
 				waitForChainConfig.callback = callback
 

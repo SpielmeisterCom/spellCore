@@ -22,10 +22,7 @@ define(
 
 			this.loaded = true
 
-			var resources = {}
-			resources[ this.resourceName ] = this.renderingContext.createTexture( image )
-
-			this.onCompleteCallback( resources )
+			this.onCompleteCallback( image )
 		}
 
 		var onError = function( event ) {

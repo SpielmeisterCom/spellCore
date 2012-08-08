@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/entityConfig/walk',
+	'spell/config/entity/recursiveWalk',
 	[
 		'spell/functions'
 	],
@@ -9,7 +9,7 @@ define(
 		'use strict'
 
 
-		var walkEntityConfig = function( entityConfigs, iterator ) {
+		var walk = function( entityConfigs, iterator ) {
 			var numEntityConfigs = entityConfigs.length
 
 			for( var i = 0; i < numEntityConfigs; i++ ) {
@@ -19,16 +19,16 @@ define(
 
 				var entityConfigChildren = entityConfig.children
 
-				if( !entityConfigChildren || entityConfigChildren.length === 0 ) return
-
-				walkEntityConfig( entityConfigChildren, iterator )
+				if( !!entityConfigChildren && entityConfigChildren.length > 0 ) {
+					walk( entityConfigChildren, iterator )
+				}
 			}
 		}
 
 		return function( arg0, iterator ) {
 			var entityConfigs = _.isArray( arg0 ) ? arg0 : [ arg0 ]
 
-			return walkEntityConfig( entityConfigs, iterator )
+			return walk( entityConfigs, iterator )
 		}
 	}
 )
