@@ -3,6 +3,7 @@ define(
 	[
 		'spell/client/util/loadResources',
 		'spell/client/util/onScreenResize',
+		'spell/client/staticInclude',
 		'spell/shared/util/createMainLoop',
 		'spell/shared/util/entity/EntityManager',
 		'spell/shared/util/scene/SceneManager',
@@ -17,22 +18,12 @@ define(
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
 
-		// Forcing the build system to include the math modules in the platform agnostic engine package.
-		// Do _not_ remove unless you know exactly what you are doing!
-		'spell/math/mat2',
-		'spell/math/mat3',
-		'spell/math/mat4',
-		'spell/math/quat4',
-		'spell/math/util',
-		'spell/math/vec2',
-		'spell/math/vec3',
-		'spell/math/vec4',
-
 		'spell/functions'
 	],
 	function(
 		loadResources,
 		onScreenResize,
+		staticInclude,
 		createMainLoop,
 		EntityManager,
 		SceneManager,
@@ -46,15 +37,6 @@ define(
 		createDebugMessageHandler,
 		PlatformKit,
 		initDebugEnvironment,
-
-		mat2,
-		mat3,
-		mat4,
-		quat4,
-		util,
-		vec2,
-		vec3,
-		vec4,
 
 		_,
 
