@@ -164,33 +164,37 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 	}
 
 	var loadHtml5Executable = function( runtimeModule, config, spellObject, onInitialized, debugMessageCallback ) {
+		var startHtml5Executable = function() {
+			if( config.verbose ) printLaunching()
+
+			var engineInstance = require( 'spell/client/main', config )
+
+			if( config.debug ) {
+				addDebugAPI( spellObject, engineInstance, debugMessageCallback )
+			}
+
+			if( runtimeModule ) {
+				engineInstance.setRuntimeModule( runtimeModule )
+			}
+
+			if( !config.development ) {
+				engineInstance.start()
+			}
+
+			if( onInitialized ) {
+				onInitialized()
+			}
+		}
+
 		if( config.verbose ) printLoading()
 
-		head.js(
-			'html5/spell.js',
-			'html5/data.js',
-			function() {
-				if( config.verbose ) printLaunching()
+		var args = [ 'html5/spell.js', startHtml5Executable ]
 
-				var engineInstance = require( 'spell/client/main', config )
+		if( !config.development ) {
+			args.unshift( 'html5/data.js' )
+		}
 
-				if( config.debug ) {
-					addDebugAPI( spellObject, engineInstance, debugMessageCallback )
-				}
-
-				if( runtimeModule ) {
-					engineInstance.setRuntimeModule( runtimeModule )
-				}
-
-				if( !config.development ) {
-					engineInstance.start()
-				}
-
-				if( onInitialized ) {
-					onInitialized()
-				}
-			}
-		)
+		head.js.apply( null, args )
 	}
 
 	var loadFlashExecutable = function( parameters, verbose ) {
