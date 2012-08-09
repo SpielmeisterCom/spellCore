@@ -75,7 +75,7 @@ define(
 
 		return function( spellPath, projectName, projectPath, projectFilePath ) {
 			var errors          = [],
-				publicDirName   = 'output',
+				publicDirName   = 'public',
 				outputPath      = projectPath + '/' + publicDirName,
 				html5OutputPath = outputPath + '/html5'
 
