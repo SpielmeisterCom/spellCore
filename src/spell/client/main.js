@@ -109,7 +109,6 @@ define(
 
 			var resourceLoader = new ResourceLoader(
 				globals,
-				globals.runtimeModule.name,
 				globals.soundManager,
 				globals.renderingContext,
 				globals.eventManager,

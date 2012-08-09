@@ -115,7 +115,6 @@ define(
 		}
 
 		var createLoader = function(
-			applicationId,
 			eventManager,
 			host,
 			baseUrl,
@@ -138,7 +137,7 @@ define(
 				throw 'Could not create loader factory for resource "' + resourceName + '".'
 			}
 
-			var resourcePath = host + '/' + applicationId + '/' + baseUrl
+			var resourcePath = baseUrl
 
 			var loader = loaderFactory(
 				eventManager,
@@ -171,7 +170,6 @@ define(
 						}
 
 						var loader = createLoader(
-							this.applicationId,
 							this.eventManager,
 							this.host,
 							resourceBundle.baseUrl,
@@ -209,7 +207,7 @@ define(
 		 * public
 		 */
 
-		var ResourceLoader = function( globals, applicationId, soundManager, renderingContext, eventManager, hostConfig ) {
+		var ResourceLoader = function( globals, soundManager, renderingContext, eventManager, hostConfig ) {
 			if( eventManager === undefined ) throw 'Argument "eventManager" is undefined.'
             if( soundManager === undefined ) throw 'Argument "soundManager" is undefined.'
 
@@ -219,8 +217,6 @@ define(
 			this.resourceBundles = {}
 			this.resources = {}
 			this.host = ( hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host )
-			this.applicationId = applicationId
-			this.logger = globals.logger
 		}
 
 		ResourceLoader.prototype = {
