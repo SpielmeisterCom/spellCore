@@ -1,76 +1,101 @@
-var need = {
-	modules: {}
-}
+/**
+ * need.js - A requiresque require.js replacement for usage in browsers.
+ */
 
-var resolveDependencies = function( moduleName, config ) {
-	if( !moduleName ) throw 'No module name was provided.'
+( function( document ) {
+	var modules = {}
 
+	var createScriptNode = function( name, source ) {
+		var script = document.createElement( 'script' )
+		script.type = 'text/javascript'
+		script.text = source
 
-	var module = need.modules[ moduleName ]
+		var head = document.getElementsByTagName( 'head' )[ 0 ]
+		head.appendChild( script )
+	}
 
-	if( !module ) throw 'Unable to find module definition for module \'' + moduleName + '\'.'
+	var loadModule = function( name ) {
+		var moduleUrl = 'library/scripts/' + name + '.js'
 
+		var request = new XMLHttpRequest()
+		request.open( 'GET', moduleUrl, false )
+		request.send( null )
 
-	var dependencies = module.dependencies,
-		args = []
+		if( request.status !== 200 ) throw 'Error: Loading \'' + moduleUrl + '\' failed.'
 
-	for( var i = 0; i < dependencies.length; i++ ) {
-		var name = dependencies[ i ],
-			dependencyModule = need.modules[ name ]
+		createScriptNode( name, request.responseText )
 
-		if( !dependencyModule ) {
-			throw 'Could not find module definition for dependency \'' + name + '\' of module \'' + moduleName + '\' . Is it included and registered via define?'
+		return modules[ name ]
+	}
+
+	var createModule = function( name, args ) {
+		var module = loadModule( name )
+
+		if( !module ) throw 'Error: Could not load module \'' + name + '\'.'
+
+		modules[ name ] = module
+
+		return module
+	}
+
+	var createModuleInstance = function( dependencies, body, config ) {
+		var args = []
+
+		if( dependencies ) {
+			for( var i = 0; i < dependencies.length; i++ ) {
+				var dependencyModuleName = dependencies[ i ],
+					dependencyModule = modules[ dependencyModuleName ]
+
+				if( !dependencyModule ) {
+					dependencyModule = createModule( dependencyModuleName )
+				}
+
+				if( !dependencyModule.instance ) {
+					dependencyModule.instance = createModuleInstance( dependencyModule.dependencies, dependencyModule.body )
+				}
+
+				args.push( dependencyModule.instance )
+			}
 		}
 
-		if( !dependencyModule.instance ) {
-			dependencyModule.instance = resolveDependencies( dependencies[ i ] )
+		if( config ) args.push( config )
+
+		return body.apply( null, args )
+	}
+
+
+	var define = function( name ) {
+		var numArguments = arguments.length
+
+		if( numArguments < 2 ||
+			numArguments > 3 ) {
+
+			throw 'Error: Module definition is invalid.'
 		}
 
-		args.push(
-			dependencyModule.instance
-		)
-	}
-
-	if( config ) args.push( config )
-
-	return module.body.apply( null, args )
-}
-
-
-var define = function( moduleName, dependencies, moduleBody ) {
-	if( arguments.length < 2 ||
-		arguments.length > 3 ) {
-
-		throw 'Module definition is invalid.'
+		modules[ name ] = {
+			body         : ( numArguments === 2 ? arguments[ 1 ] : arguments[ 2 ] ),
+			dependencies : ( numArguments === 2 ? undefined : arguments[ 1 ] )
+		}
 	}
 
 
-	if( arguments.length === 2 ) {
-		// No dependencies were provided. Thus the arguments look like this [ name, constructor ].
+	var require = function( moduleName, args ) {
+		if( !moduleName ) throw 'Error: No module name provided.'
 
-		moduleBody = dependencies
-		dependencies = []
+		var module = modules[ moduleName ]
+
+		if( !module ) {
+			module = createModule( moduleName, args )
+		}
+
+		if( !module.instance ) {
+			module.instance = createModuleInstance( module.dependencies, module.body, args )
+		}
+
+		return module.instance
 	}
 
-	need.modules[ moduleName ] = {
-		dependencies : dependencies,
-		body : moduleBody
-	}
-}
-
-
-var require = function( moduleName, args ) {
-	if( !moduleName ) throw 'No module name provided.'
-
-
-	var module = need.modules[ moduleName ]
-
-	if( !module ) throw 'Could not resolve module name \'' + moduleName + '\' to module instance.'
-
-
-	if( !module.instance ) {
-		module.instance = resolveDependencies( moduleName, args )
-	}
-
-	return module.instance
-}
+	window.define  = define
+	window.require = require
+} )( document )
