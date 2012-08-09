@@ -188,11 +188,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 
 		if( config.verbose ) printLoading()
 
-		var args = [ 'html5/spell.js', startHtml5Executable ]
+		var args = [ 'html5/spell.js' ]
 
 		if( !config.development ) {
-			args.unshift( 'html5/data.js' )
+			args.push( 'html5/data.js' )
 		}
+
+		args.push( startHtml5Executable )
 
 		head.js.apply( null, args )
 	}
