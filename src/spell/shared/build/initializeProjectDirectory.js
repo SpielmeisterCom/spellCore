@@ -74,12 +74,14 @@ define(
 		 */
 
 		return function( spellPath, projectName, projectPath, projectFilePath ) {
-			var errors = []
+			var errors          = [],
+				publicDirName   = 'output',
+				outputPath      = projectPath + '/' + publicDirName,
+				html5OutputPath = outputPath + '/html5'
 
 			// create directory structure
 			var paths = [
-				'output',
-				'output/resources',
+				publicDirName,
 				'library',
 				'library/templates',
 				'library/assets'
@@ -124,7 +126,7 @@ define(
 				)
 			}
 
-			// copy spell sdk templates, scripts
+			// copy spell sdk templates, scripts and assets
 			copyDirectory( spellPath + LIBRARY_TEMPLATES_PATH, projectPath + LIBRARY_TEMPLATES_PATH )
 			copyDirectory( spellPath + LIBRARY_SCRIPTS_PATH, projectPath + LIBRARY_SCRIPTS_PATH )
 			copyDirectory( spellPath + LIBRARY_ASSETS_PATH, projectPath + LIBRARY_ASSETS_PATH )
@@ -132,17 +134,14 @@ define(
 
 			// populate public directory
 			var fileNames = [
-				'debug.html',
-				'index.html',
 				'main.css',
-				'playerProductInstall.swf',
 				'spellEdShim.html'
 			]
 
 			_.each(
 				fileNames,
 				function( fileName ) {
-					var projectDirectoryFilePath = projectPath + '/output/' + fileName
+					var projectDirectoryFilePath = projectPath + '/' + publicDirName + '/' + fileName
 
 					if( fs.existsSync( projectDirectoryFilePath ) ) return
 
@@ -153,11 +152,27 @@ define(
 				}
 			)
 
+			// copying engine include (built for development mode)
+			if( !fs.existsSync( html5OutputPath ) ) {
+				fs.mkdirSync( html5OutputPath )
+			}
+
 			copyFile(
-				spellPath + '/src/spell/client/stageZeroLoader.js',
-				projectPath + '/output/spell.js'
+				spellPath + '/build/spell.js',
+				html5OutputPath + '/spell.js'
 			)
 
+			// copying stage zero loader
+			copyFile(
+				spellPath + '/src/spell/client/stageZeroLoader.js',
+				outputPath + '/spell.js'
+			)
+
+			// add symlink to library directory
+			fs.symlinkSync(
+				projectPath + '/library',
+				outputPath + '/library'
+			)
 
 			return errors
 		}
