@@ -1,13 +1,19 @@
-SPELL_OPTIONS = -s src -m spell/client/main -i spell/client/runtimeModule,spell/shared/util/platform/private
-SPELL_BUILD = build/spell.js
+NEEDJS_BUILD = src/need.js
+
+SPELL_COMMON_OPTIONS = -s src -m spell/client/main -i spell/client/runtimeModule,spell/shared/util/platform/private
+SPELL_COMMON_BUILD = build/spell.common.js
 
 SPELL_HTML5_OPTIONS = -s src -m spell/client/main -i spell/client/runtimeModule,spell/shared/util/platform/private -e spell/shared/util/platform/private
 SPELL_HTML5_BUILD = build/spell.html5.js
 
+SPELL_ENGINE_INCLUDE_BUILD = build/spell.js
+
 lib:
+	# build engine include for development mode
 	mkdir -p build
-	node tools/n.js $(SPELL_OPTIONS) > $(SPELL_BUILD)
+	node tools/n.js $(SPELL_COMMON_OPTIONS) > $(SPELL_COMMON_BUILD)
 	node tools/n.js $(SPELL_HTML5_OPTIONS) > $(SPELL_HTML5_BUILD)
+	cat $(NEEDJS_BUILD) $(SPELL_COMMON_BUILD) $(SPELL_HTML5_BUILD) > $(SPELL_ENGINE_INCLUDE_BUILD)
 
 .PHONY: docs
 docs:
