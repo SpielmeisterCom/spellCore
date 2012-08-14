@@ -173,7 +173,7 @@ define(
 			var outputLibraryPath = outputPath + '/library'
 
 			if( !fs.existsSync( outputLibraryPath ) ) {
-				fs.symlinkSync( projectPath + '/library', outputLibraryPath )
+				fs.symlinkSync( '../library', outputLibraryPath )
 			}
 
 			return errors
