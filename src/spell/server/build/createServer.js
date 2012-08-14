@@ -1,7 +1,6 @@
 define(
 	'spell/server/build/createServer',
 	[
-		'spell/shared/build/executeCreateDebugBuild',
 		'spell/shared/build/exportDeploymentArchive',
 		'spell/shared/build/initializeProjectDirectory',
 		'path',
@@ -9,7 +8,6 @@ define(
 		'spell/functions'
 	],
 	function(
-		executeCreateDebugBuild,
 		exportDeploymentArchive,
 		initializeProjectDirectory,
 		path,
@@ -37,31 +35,6 @@ define(
 		/*
 		 * private
 		 */
-
-		/*
-		 * RPC call handler
-		 *
-		 * @param spellCorePath
-		 * @param projectsPath
-		 * @param req
-		 * @param res
-		 * @param payload
-		 * 	payload[ 0 ] : target ( html5, flash )
-		 * 	payload[ 1 ] : relative project path in projects directory
-		 * 	payload[ 2 ] : relative project file path inside project directory
-		 *
-		 * @param next
-		 * @return {*}
-		 */
-		var executeCreateDebugBuildWrapper = function( spellCorePath, projectsPath, req, res, payload, next ) {
-			var target           = payload[ 0 ],
-				projectPath      = projectsPath + '/' + payload[ 1 ],
-				projectFilePath  = projectPath + '/' + payload[ 2 ],
-				minified         = true,
-				anonymizeModules = true
-
-			return executeCreateDebugBuild( target, spellCorePath, projectPath, projectFilePath, minified, anonymizeModules, onComplete )
-		}
 
 		/*
 		 * RPC call handler
@@ -112,11 +85,6 @@ define(
 		return function( spellCorePath, projectsPath ) {
 			return {
 				ProjectActions: [
-					{
-						name: 'executeCreateDebugBuild',
-						len: 3,
-						func: _.bind( executeCreateDebugBuildWrapper, null, spellCorePath, projectsPath )
-					},
 					{
 						name: 'initDirectory',
 						len: 2,
