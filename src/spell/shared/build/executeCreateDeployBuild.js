@@ -204,7 +204,7 @@ define(
 		}
 
 
-		return function( target, spellCorePath, projectPath, projectFilePath, minify, anonymizeModuleIdentifiers, callback ) {
+		return function( target, spellCorePath, projectPath, projectFilePath, callback ) {
 			var errors                     = [],
 				minify                     = true,
 				anonymizeModuleIdentifiers = true,

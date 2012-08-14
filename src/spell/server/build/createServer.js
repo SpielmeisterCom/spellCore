@@ -58,6 +58,7 @@ define(
 		/*
 		 * RPC call handler
 		 *
+		 * @param spellCorePath
 		 * @param projectsPath
 		 * @param req
 		 * @param res
@@ -68,13 +69,13 @@ define(
 		 * @param next
 		 * @return {*}
 		 */
-		var exportDeployment = function( projectsPath, req, res, payload, next  ) {
+		var exportDeployment = function( spellCorePath, projectsPath, req, res, payload, next  ) {
 			var projectName    = payload[ 0 ],
 				outputFileName = payload[ 1 ],
 				projectPath    = path.join( projectsPath, path.normalize( projectName ) ),
 				outputFilePath = path.join( projectsPath, path.normalize( outputFileName ) )
 
-			return exportDeploymentArchive( projectPath, outputFilePath, onComplete )
+			return exportDeploymentArchive( spellCorePath, projectPath, outputFilePath, onComplete )
 		}
 
 
@@ -93,7 +94,7 @@ define(
 					{
 						name: 'exportDeployment',
 						len: 2,
-						func: _.bind( exportDeployment, null, projectsPath )
+						func: _.bind( exportDeployment, null, spellCorePath, projectsPath )
 					}
 				]
 			}

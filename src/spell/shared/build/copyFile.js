@@ -1,17 +1,15 @@
 define(
 	'spell/shared/build/copyFile',
 	[
-		'fs',
-		'util'
+		'fs'
 	],
 	function(
-		fs,
-		util
+		fs
 	) {
 		return function( inputFilePath, outputFilePath ) {
-			util.pump(
-				fs.createReadStream( inputFilePath ),
-				fs.createWriteStream( outputFilePath )
+			fs.writeFileSync(
+				outputFilePath,
+				fs.readFileSync( inputFilePath )
 			)
 		}
 	}

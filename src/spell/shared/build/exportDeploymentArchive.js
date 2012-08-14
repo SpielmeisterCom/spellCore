@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/exportDeploymentArchive',
 	[
+		'spell/shared/build/executeCreateDeployBuild',
 		'spell/shared/build/isFile',
 
 		'fs',
@@ -10,6 +11,7 @@ define(
 		'tar-async'
 	],
 	function(
+		executeCreateDeployBuild,
 		isFile,
 
 		fs,
@@ -37,16 +39,18 @@ define(
 
 			if( filePath ) {
 				var absoluteFilePath = path.join( rootPath, filePath )
+
 				if( isFile( absoluteFilePath ) ) {
 					var data = fs.readFileSync( absoluteFilePath )
 
 					tape.append(
-						filePath.replace( /\/output/, '' ),
+						filePath.replace( /\/build\/deploy/, '' ),
 						data,
 						function() {
 							writeFiles( tape, rootPath, filePaths )
 						}
 					)
+
 				} else {
 					writeFiles( tape, rootPath, filePaths )
 				}
@@ -61,14 +65,24 @@ define(
 		 * public
 		 */
 
-		return function( projectPath, outputFilePath, next ) {
-			var outputPath   = path.dirname( outputFilePath ),
-				projectsPath = path.resolve( projectPath, '..' ),
-				projectName  = path.basename( projectPath )
+		return function( spellCorePath, projectPath, outputFilePath, next ) {
+			var outputPath      = path.dirname( outputFilePath ),
+				projectsPath    = path.resolve( projectPath, '..' ),
+				projectName     = path.basename( projectPath ),
+				projectFilePath = path.resolve( projectPath, 'project.json' )
 
 			if( !fs.existsSync( outputPath ) ) {
 				mkdirp.sync( outputPath )
 			}
+
+			// create deployment build
+			executeCreateDeployBuild(
+				'html5',
+				spellCorePath,
+				projectPath,
+				projectFilePath,
+				next
+			)
 
 			// create tar archive
 			var tape = new tar( {
@@ -76,7 +90,7 @@ define(
 			} )
 
 			var filePaths = glob.sync(
-				projectName + '/output/**',
+				projectName + '/build/deploy/**',
 				{
 					cwd : projectsPath
 				}
