@@ -82,6 +82,7 @@ define(
 			// create directory structure
 			var paths = [
 				publicDirName,
+				'build',
 				'library',
 				'library/templates',
 				'library/assets'
@@ -158,7 +159,7 @@ define(
 			}
 
 			copyFile(
-				spellPath + '/build/spell.js',
+				spellPath + '/build/spell.dev.js',
 				html5OutputPath + '/spell.js'
 			)
 
@@ -169,10 +170,11 @@ define(
 			)
 
 			// add symlink to library directory
-			fs.symlinkSync(
-				projectPath + '/library',
-				outputPath + '/library'
-			)
+			var outputLibraryPath = outputPath + '/library'
+
+			if( !fs.existsSync( outputLibraryPath ) ) {
+				fs.symlinkSync( projectPath + '/library', outputLibraryPath )
+			}
 
 			return errors
 		}

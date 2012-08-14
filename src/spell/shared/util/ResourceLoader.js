@@ -54,16 +54,6 @@ define(
 			return _.has( resourceBundles, name )
 		}
 
-		/*
-		 * Returns true if a resource with the provided name exists, false otherwise.
-		 *
-		 * @param resources
-		 * @param resourceName
-		 */
-		var isResourceInCache = function( resources, resourceName ) {
-			return _.has( resources, resourceName )
-		}
-
 		var updateProgress = function( resourceBundle ) {
 			resourceBundle.resourcesNotCompleted -= 1
 
@@ -79,13 +69,13 @@ define(
 
 				this.eventManager.publish(
 					[ Events.RESOURCE_LOADING_COMPLETED, resourceBundle.name ],
-					[ _.pick( this.resources, resourceBundle.resources ) ]
+					[ _.pick( this.cache, resourceBundle.resources ) ]
 				)
 			}
 		}
 
 		var checkResourceAlreadyLoaded = function( loadedResource, resourceName ) {
-			if( !_.has( this.resources, resourceName ) ) return
+			if( !_.has( this.cache, resourceName ) ) return
 
 			throw 'Error: Resource "' + resourceName + '" already loaded.'
 		}
@@ -95,13 +85,13 @@ define(
 				throw 'Resource "' + resourceName + '" from resource bundle "' + resourceBundleName + '" is undefined or empty on loading completed.'
 			}
 
-			// making sure the loaded resource was not already returned earlier
-			checkResourceAlreadyLoaded.call( this, loadedResource, resourceName )
+//			// making sure the loaded resource was not already returned earlier
+//			checkResourceAlreadyLoaded.call( this, loadedResource, resourceName )
 
 			var resourceBundle = this.resourceBundles[ resourceBundleName ]
 
 			// add newly loaded resources to cache, run trough afterLoad callback if available
-			this.resources[ resourceName ] = resourceBundle.afterLoad ?
+			this.cache[ resourceName ] = resourceBundle.afterLoad ?
 				resourceBundle.afterLoad( loadedResource ) :
 				loadedResource
 
@@ -163,8 +153,15 @@ define(
 				resourceBundle.resources,
 				_.bind(
 					function( resourceName ) {
-						if( isResourceInCache( this.resources, resourceName ) ) {
-							updateProgress.call( this, resourceBundle )
+						var cachedEntry = this.cache[ resourceName ]
+
+						if( cachedEntry ) {
+							resourceLoadingCompletedCallback.call(
+								this,
+								resourceBundle.name,
+								resourceName,
+								cachedEntry
+							)
 
 							return
 						}
@@ -215,7 +212,7 @@ define(
 			this.renderingContext = renderingContext
 			this.eventManager = eventManager
 			this.resourceBundles = {}
-			this.resources = {}
+			this.cache = {}
 			this.host = ( hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host )
 		}
 
@@ -236,6 +233,14 @@ define(
 				)
 			},
 
+			getResources: function() {
+				return this.cache
+			},
+
+			setCache: function( content ) {
+				this.cache = content
+			},
+
 			start: function() {
 				_.each(
 					this.resourceBundles,
@@ -249,10 +254,6 @@ define(
 						this
 					)
 				)
-			},
-
-			getResources: function() {
-				return this.resources
 			}
 		}
 

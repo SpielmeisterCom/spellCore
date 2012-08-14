@@ -80,10 +80,11 @@ define(
 			globals.mainLoop.run()
 		}
 
-		var start = function() {
+		var start = function( runtimeModule, cachedContent ) {
 			var globals = this.globals
+			globals.runtimeModule = runtimeModule
 
-			if( !globals.runtimeModule ) {
+			if( !runtimeModule ) {
 				throw 'Error: No runtime module defined. Please provide a runtime module.'
 			}
 
@@ -96,6 +97,8 @@ define(
 				globals.eventManager,
 				globals.configurationManager.resourceServer
 			)
+
+			if( cachedContent ) resourceLoader.setCache( cachedContent )
 
 			_.extend(
 				globals,
@@ -190,15 +193,6 @@ define(
 			 */
 			sendDebugMessage : function( message ) {
 				this.debugMessageHandler( message )
-			},
-
-			/**
-			 * Sets the runtime module that the engine executes once it is started.
-			 *
-			 * @param {Object} module
-			 */
-			setRuntimeModule : function( module ) {
-				this.globals.runtimeModule = module
 			}
 		}
 

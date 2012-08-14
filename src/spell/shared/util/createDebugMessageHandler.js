@@ -11,7 +11,7 @@ define(
 				},
 				'spelled.debug.executeRuntimeModule' : function( payload ) {
 					globals.runtimeModule = payload
-					startEngine()
+					startEngine( payload )
 				}
 			}
 

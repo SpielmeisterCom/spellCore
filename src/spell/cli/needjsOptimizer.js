@@ -1,6 +1,8 @@
 define(
 	'spell/cli/needjsOptimizer',
 	[
+		'spell/shared/build/processSource',
+
 		'amd-helper',
 		'commander',
 		'fs',
@@ -11,6 +13,8 @@ define(
 		'spell/functions'
 	],
 	function(
+		processSource,
+
 		amdHelper,
 		commander,
 		fs,
@@ -64,6 +68,26 @@ define(
 			)
 		}
 
+		var mangle = function( executableName, file, command ) {
+			if( !file ) {
+				console.log( 'No file was supplied. See \'' + executableName + ' compress --help\'.' )
+				process.exit( 0 )
+			}
+
+			var filePath = path.resolve( file )
+
+			if( !fs.existsSync( filePath ) ) {
+				console.log( 'Could not read file \'' + filePath + '\'.' )
+				process.exit( 0 )
+			}
+
+			var data          = fs.readFileSync( filePath, 'utf-8' ),
+				mangledSource = processSource( data, true, true )
+
+			console.log( mangledSource )
+			process.exit( 0 )
+		}
+
 
 		/*
 		 * public
@@ -74,6 +98,11 @@ define(
 
 			commander
 				.version( '0.0.1' )
+
+			commander
+				.command( 'mangle [file]' )
+				.description( 'minifies source and anonymizes amd module identifiers in the provided file' )
+				.action( _.bind( mangle, this, executableName ) )
 
 			commander
 				.option( '-s, --source-base <path>', 'the path to the source directory' )

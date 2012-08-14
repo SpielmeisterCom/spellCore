@@ -3,7 +3,7 @@ define(
 	[
 		'spell/server/main',
 
-		'spell/shared/build/executeCreateDebugBuild',
+		'spell/shared/build/executeCreateDeployBuild',
 		'spell/shared/build/initializeProjectDirectory',
 		'spell/shared/build/exportDeploymentArchive',
 		'spell/shared/build/isDirectory',
@@ -17,7 +17,7 @@ define(
 	function(
 		serverMain,
 
-		executeCreateDebugBuild,
+		executeCreateDeployBuild,
 		initializeProjectDirectory,
 		exportDeploymentArchive,
 		isDirectory,
@@ -63,32 +63,19 @@ define(
 				projectFilename = 'project.json',
 				projectFilePath = projectPath + '/' + projectFilename
 
-			var buildVersions = {
-				DEBUG      : 'debug',
-				DEPLOYMENT : 'deploy',
-				ALL        : 'all'
-			}
-
 			var buildTargets = {
 				HTML5 : 'html5',
 				FLASH : 'flash',
 				ALL   : 'all'
 			}
 
-			var buildCommand = function( projectFilePath, target, version, command ) {
+			var buildCommand = function( projectFilePath, target, command ) {
 				var errors = []
 
-				if( !version ) version = buildVersions.DEBUG
 				if( !target ) target = buildTargets.HTML5
-
-				var minify = !!command.minify,
-					anonymizeModules = !!command.anonymizeModules
 
 				if( !_.contains( _.values( buildTargets ), target ) ) {
 					errors.push( 'Error: \'' + target + '\' is not a valid target. See \'' + executableName + ' --help\'.' )
-
-				} else if( !_.contains( _.values( buildVersions ), version ) ) {
-					errors.push( 'Error: \'' + version + '\' is not a valid version. See \'' + executableName + ' --help\'.' )
 				}
 
 				if( errors.length > 0 ) {
@@ -97,19 +84,13 @@ define(
 					return
 				}
 
+				console.log( 'creating deployment build for target \'' + target + '\'...' )
 
-				if( version === buildVersions.DEBUG ) {
-					console.log( 'creating debug build for target \'' + target + '\'...' )
+				if( isFile( projectFilePath ) ) {
+					executeCreateDeployBuild( target, spellCorePath, projectPath, projectFilePath, _.bind( onComplete, null, 'build' ) )
 
-					if( isFile( projectFilePath ) ) {
-						executeCreateDebugBuild( target, spellCorePath, projectPath, projectFilePath, minify, anonymizeModules, _.bind( onComplete, null, 'build' ) )
-
-					} else {
-						printErrors( 'Error: Missing project file \'' + projectFilePath + '\'.' )
-					}
-
-				} else if( version === buildVersions.DEPLOYMENT ) {
-					console.log( 'creating deployment build...' )
+				} else {
+					printErrors( 'Error: Missing project file \'' + projectFilePath + '\'.' )
 				}
 			}
 
@@ -161,10 +142,8 @@ define(
 				.version( '0.0.1' )
 
 			commander
-				.command( 'build [version] [target]' )
-				.option( '-m, --minify', 'if supplied the engine gets minified' )
-				.option( '-a, --anonymize-modules', 'if supplied amd module identifiers get anonymized' )
-				.description( 'build a specific version [deploy, debug (default)] for a specific target [flash, html5 (default)]' )
+				.command( 'build-deploy [target]' )
+				.description( 'build for a specific target [html5 (default)]' )
 				.action( _.bind( buildCommand, this, projectFilePath ) )
 
 			commander
