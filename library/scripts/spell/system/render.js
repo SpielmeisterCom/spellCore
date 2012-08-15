@@ -2,6 +2,7 @@ define(
 	'spell/system/render',
 	[
 		'spell/client/2d/graphics/drawCoordinateGrid',
+		'spell/client/2d/graphics/drawText',
 		'spell/shared/util/Events',
 
 		'spell/math/vec2',
@@ -12,6 +13,7 @@ define(
 	],
 	function(
 		drawCoordinateGrid,
+		drawText,
 		Events,
 
 		vec2,
@@ -77,6 +79,7 @@ define(
 			transforms,
 			appearances,
 			animatedAppearances,
+			textAppearances,
 			childrenComponents,
 			visualObjects,
 			deltaTimeInMs,
@@ -88,7 +91,7 @@ define(
 
 			context.save()
 			{
-				var appearance          = appearances[ id ] || animatedAppearances[ id ],
+				var appearance          = appearances[ id ] || animatedAppearances[ id ] || textAppearances[ id ],
 					asset               = assets[ appearance.assetId ],
 					texture             = resources[ asset.resourceId ],
 					visualObjectOpacity = visualObject.opacity
@@ -106,14 +109,20 @@ define(
 				context.rotate( transform.rotation )
 
 				if( asset.type === 'appearance' ) {
+					// static appearance
 					vec2.multiply( transform.scale, texture.dimensions, tmpVec2 )
 					context.scale( tmpVec2 )
 
 					context.drawTexture( texture, -0.5, -0.5, 1, 1 )
 
-				} else {
-					// asset.type === 'animation'
+				} else if( asset.type === 'font' ) {
+					// text appearance
+					context.scale( transform.scale )
 
+					drawText( context, asset, texture, 0, 0, appearance.text )
+
+				} else if( asset.type === 'animation' ) {
+					// animated appearance
 					var assetFrameDimensions = asset.frameDimensions,
 						assetNumFrames       = asset.numFrames
 
@@ -261,6 +270,7 @@ define(
 				this.transforms,
 				this.appearances,
 				this.animatedAppearances,
+				this.textAppearances,
 				this.childrenComponents,
 				this.visualObjects
 			)

@@ -8,8 +8,8 @@
 	"attributes": [
 		{
 			"name": "assetId",
-			"type": "assetId:animatedAppearance",
-			"default": "animatedAppearance:spell.not_defined",
+			"type": "assetId:animation",
+			"default": "animation:spell.not_defined",
 			"doc" : "the appearance asset used for rendering"
 		},
 		{

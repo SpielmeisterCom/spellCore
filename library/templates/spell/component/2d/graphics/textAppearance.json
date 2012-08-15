@@ -1,0 +1,21 @@
+{
+	"type": "componentTemplate",
+	"readonly": true,
+	"namespace": "spell.component.2d.graphics",
+	"name": "textAppearance",
+	"title": "2D Text Appearance",
+	"attributes": [
+		{
+			"name": "assetId",
+			"type": "assetId:font",
+			"default": "font:spell.OpenSans14px",
+			"doc": "the appearance asset used for rendering text"
+		},
+		{
+			"name": "text",
+			"type": "string",
+			"default": "blank",
+			"doc": "the text string that is displayed"
+		}
+	]
+}

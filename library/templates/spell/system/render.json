@@ -26,6 +26,10 @@
 			"templateId" : "spell.component.2d.graphics.animatedAppearance"
 		},
 		{
+			"name" : "textAppearances",
+			"templateId" : "spell.component.2d.graphics.textAppearance"
+		},
+		{
 			"name" : "visualObjects",
 			"templateId" : "spell.component.visualObject"
 		},
