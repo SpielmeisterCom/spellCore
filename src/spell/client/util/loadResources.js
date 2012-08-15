@@ -43,16 +43,13 @@ define(
 		}
 
 		var traceResourceIds = function( assets ) {
-			// WORKAROUND: Until fonts get their own asset type loading of the font image file must be forced this way.
-			var resourceIds = [ 'spell/OpenSans14px.png' ]
-
 			return _.unique(
 				_.reduce(
 					assets,
 					function( memo, asset ) {
 						return asset.resourceId ? memo.concat( asset.resourceId ) : memo
 					},
-					resourceIds
+					[]
 				)
 			)
 		}

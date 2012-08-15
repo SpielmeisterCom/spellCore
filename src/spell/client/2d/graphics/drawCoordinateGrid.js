@@ -2,7 +2,6 @@ define(
 	'spell/client/2d/graphics/drawCoordinateGrid',
 	[
 		'spell/client/2d/graphics/drawText',
-		'spell/client/2d/graphics/fonts/OpenSans14px',
 
 		'spell/math/vec2',
 		'spell/math/vec4',
@@ -10,7 +9,6 @@ define(
 	],
 	function(
 		drawText,
-		OpenSans14px,
 
 		vec2,
 		vec4,
@@ -50,7 +48,7 @@ define(
 			return Math.floor( range / stepSize )
 		}
 
-		var drawGridLinesY = function( context, resources, height, stepSize, startX, y, invScale, worldToScreenTranslation, numLines ) {
+		var drawGridLinesY = function( context, fontAsset, fontTexture, height, stepSize, startX, y, invScale, worldToScreenTranslation, numLines ) {
 			var nextStepSize = stepSize * 10,
 				scaledY = Math.round( ( y + worldToScreenTranslation[ 1  ] ) * invScale),
 				scaledX,
@@ -75,11 +73,11 @@ define(
 				context.fillRect( scaledX, scaledY, 1, height )
 
 				// draw label
-				drawText( context, resources, OpenSans14px, scaledX + 3, scaledY, x )
+				drawText( context, fontAsset, fontTexture, scaledX + 3, scaledY, x )
 			}
 		}
 
-		var drawGridLinesX = function( context, resources, width, stepSize, startY, x, invScale, worldToScreenTranslation, numLines ) {
+		var drawGridLinesX = function( context, fontAsset, fontTexture, width, stepSize, startY, x, invScale, worldToScreenTranslation, numLines ) {
 			var nextStepSize = stepSize * 10,
 				scaledX = Math.round( ( x + worldToScreenTranslation[ 0 ] ) * invScale ),
 				scaledY,
@@ -104,11 +102,11 @@ define(
 				context.fillRect( scaledX, scaledY, width, 1 )
 
 				// draw label
-				drawText( context, resources, OpenSans14px, scaledX + 3, scaledY, y )
+				drawText( context, fontAsset, fontTexture, scaledX + 3, scaledY, y )
 			}
 		}
 
-		return function( context, resources, screenSize, cameraDimensions, cameraTransform ) {
+		return function( context, resources, fontAsset, screenSize, cameraDimensions, cameraTransform ) {
 			var position     = cameraTransform.translation,
 				cameraWidth  = cameraDimensions[ 0 ],
 				cameraHeight = cameraDimensions[ 1 ],
@@ -117,7 +115,8 @@ define(
 				maxX         = minX + cameraWidth,
 				maxY         = minY + cameraHeight,
 				stepSize     = computeGridLineStepSize( cameraWidth ),
-				worldToScreenTranslation = [ -minX, -minY ]
+				worldToScreenTranslation = [ -minX, -minY ],
+				fontTexture  = resources[ fontAsset.resourceId ]
 
 			vec2.divide( screenSize, cameraDimensions, invScale )
 
@@ -131,7 +130,8 @@ define(
 				// grid lines parallel to y-axis
 				drawGridLinesY(
 					context,
-					resources,
+					fontAsset,
+					fontTexture,
 					screenSize[ 1 ],
 					stepSize,
 					computeGridStart( minX, stepSize ),
@@ -144,7 +144,8 @@ define(
 				// grid lines parallel to x-axis
 				drawGridLinesX(
 					context,
-					resources,
+					fontAsset,
+					fontTexture,
 					screenSize[ 0 ],
 					stepSize,
 					computeGridStart( minY, stepSize ),

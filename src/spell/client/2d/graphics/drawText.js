@@ -23,15 +23,15 @@ define(
 			return charInfo.width
 		}
 
-		return function( context, resources, font, dx, dy, text ) {
+		return function( context, fontAsset, fontTexture, dx, dy, text ) {
 			text = text.toString()
 
 			var numCharacters = text.length,
-				texture       = resources[ font.resourceId ],
-				charset       = font.charset
+				charset       = fontAsset.config.charset,
+				spacing       = fontAsset.config.spacing
 
 			for( var i = 0; i < numCharacters; i++ ) {
-				dx += drawCharacter( context, texture, dx, dy, charset[ text[ i ] ] )
+				dx += drawCharacter( context, fontTexture, dx, dy, charset[ text[ i ] ] ) + spacing
 			}
 		}
     }

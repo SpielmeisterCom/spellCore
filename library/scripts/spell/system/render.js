@@ -27,9 +27,10 @@ define(
 		 * private
 		 */
 
-		var tmpVec2  = vec2.create(),
-			tmpMat3  = mat3.identity(),
-			darkGrey = vec4.create( [ 0.125, 0.125, 0.125, 1.0 ] ),
+		var tmpVec2          = vec2.create(),
+			tmpMat3          = mat3.identity(),
+			darkGrey         = vec4.create( [ 0.125, 0.125, 0.125, 1.0 ] ),
+			debugFontAssetId = 'font:spell.OpenSans14px',
 			currentCameraId
 
 		var createSortedByLayer = function( roots, visualObjects ) {
@@ -226,7 +227,7 @@ define(
 				cameraDimensions &&
 				cameraTransform ) {
 
-				drawCoordinateGrid( context, this.resources, configurationManager.screenSize, cameraDimensions, cameraTransform )
+				drawCoordinateGrid( context, this.resources, this.debugFontAsset, configurationManager.screenSize, cameraDimensions, cameraTransform )
 			}
 		}
 
@@ -245,10 +246,12 @@ define(
 		 */
 
 		var Renderer = function( globals ) {
-			this.configurationManager = globals.configurationManager
 			this.assets               = globals.assets
-			this.resources            = globals.resources
+			this.configurationManager = globals.configurationManager
 			this.context              = globals.renderingContext
+			this.debugFontAsset       = globals.assets[ debugFontAssetId ]
+			this.resources            = globals.resources
+
 			this.drawVisualObjectPartial = _.bind(
 				drawVisualObject,
 				null,

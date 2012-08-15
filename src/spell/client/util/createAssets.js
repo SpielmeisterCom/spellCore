@@ -68,7 +68,9 @@ define(
 							type       : assetDefinition.type
 						}
 
-					} else if( assetDefinition.type === 'spriteSheet' ) {
+					} else if( assetDefinition.type === 'spriteSheet' ||
+						assetDefinition.type === 'font') {
+
 						memo[ assetId ] = {
 							config     : assetDefinition.config,
 							resourceId : assetDefinition.file,

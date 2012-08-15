@@ -253,9 +253,6 @@ define(
 			// copy all files in asset directory which are not json files to the directory "build/deploy/library/assets"
 			var resourceFilePaths = createResourceFilePaths( 'library/assets', assets )
 
-			// WORKAROUND: This workaround has to stay until fonts get their own asset type.
-			resourceFilePaths.push( 'library/assets/spell/OpenSans14px.png' )
-
 			_.each(
 				resourceFilePaths,
 				function( resourceFilePath ) {
