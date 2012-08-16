@@ -4,14 +4,14 @@ define(
 		'use strict'
 
 
-		var drawCharacter = function( context, texture, dx, dy, charInfo ) {
-			var width  = charInfo.width,
-				height = charInfo.height
+		var drawCharacter = function( context, texture, dx, dy, charData, spacing ) {
+			var width  = charData.width,
+				height = charData.height
 
 			context.drawSubTexture(
 				texture,
-				charInfo.x,
-				charInfo.y,
+				charData.x,
+				charData.y,
 				width,
 				height,
 				dx,
@@ -20,7 +20,7 @@ define(
 				height
 			)
 
-			return charInfo.width
+			return charData.width + spacing
 		}
 
 		return function( context, fontAsset, fontTexture, dx, dy, text ) {
@@ -31,7 +31,14 @@ define(
 				spacing       = fontAsset.config.spacing
 
 			for( var i = 0; i < numCharacters; i++ ) {
-				dx += drawCharacter( context, fontTexture, dx, dy, charset[ text[ i ] ] ) + spacing
+				var charData = charset[ text[ i ] ]
+
+				// in case of unsupported character perform a fallback
+				if( !charData ) {
+					charData = charset[ ' ' ]
+				}
+
+				dx += drawCharacter( context, fontTexture, dx, dy, charData, spacing )
 			}
 		}
     }
