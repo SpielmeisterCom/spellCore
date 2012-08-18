@@ -119,7 +119,7 @@ define(
 					// text appearance
 					context.scale( transform.scale )
 
-					drawText( context, asset, texture, 0, 0, appearance.text )
+					drawText( context, asset, texture, 0, 0, appearance.text, appearance.spacing )
 
 				} else if( asset.type === 'animation' ) {
 					// animated appearance

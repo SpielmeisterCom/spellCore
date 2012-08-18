@@ -12,6 +12,12 @@
 			"doc": "the appearance asset used for rendering text"
 		},
 		{
+			"name": "spacing",
+			"type": "integer",
+			"default": 0,
+			"doc": "the spacing that is used to draw the characters"
+		},
+		{
 			"name": "text",
 			"type": "string",
 			"default": "blank",

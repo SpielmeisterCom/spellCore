@@ -4,31 +4,44 @@ define(
 		'use strict'
 
 
-		var drawCharacter = function( context, texture, dx, dy, charData, spacing ) {
-			var width  = charData.width,
-				height = charData.height
+		/**
+		 * Draws a character on a context.
+		 *
+		 * @param context
+		 * @param texture
+		 * @param charData
+		 * @param dx
+		 * @param dy
+		 * @param spacing the actual spacing to be used
+		 * @param fontMapSpacing the fake spacing introduced by the font map
+		 */
+		var drawCharacter = function( context, texture, charData, dx, dy, spacing, fontMapSpacing ) {
+			var doubledFontMapSpacing = fontMapSpacing * 2,
+				width                 = charData.width,
+				height                = charData.height
 
 			context.drawSubTexture(
 				texture,
-				charData.x,
+				charData.x - fontMapSpacing,
 				charData.y,
-				width,
+				width + doubledFontMapSpacing,
 				height,
-				dx,
+				dx - fontMapSpacing,
 				dy,
-				width,
+				width + doubledFontMapSpacing,
 				height
 			)
 
-			return charData.width + spacing
+			return charData.width + spacing + fontMapSpacing
 		}
 
-		return function( context, fontAsset, fontTexture, dx, dy, text ) {
-			text = text.toString()
+		return function( context, fontAsset, fontTexture, dx, dy, text, spacing ) {
+			spacing = spacing || 0
+			text    = text.toString()
 
-			var numCharacters = text.length,
-				charset       = fontAsset.config.charset,
-				spacing       = fontAsset.config.spacing
+			var numCharacters  = text.length,
+				charset        = fontAsset.config.charset,
+				fontMapSpacing = fontAsset.config.spacing
 
 			for( var i = 0; i < numCharacters; i++ ) {
 				var charData = charset[ text[ i ] ]
@@ -38,7 +51,7 @@ define(
 					charData = charset[ ' ' ]
 				}
 
-				dx += drawCharacter( context, fontTexture, dx, dy, charData, spacing )
+				dx += drawCharacter( context, fontTexture, charData, dx, dy, spacing, fontMapSpacing )
 			}
 		}
     }
