@@ -21,4 +21,5 @@ docs:
 	jsduck --config docs/jsduck_conf.json
 	cp docs/css/*.css docs/generated/resources/css
 	cp docs/images/* docs/generated/resources/images
+	cp docs/favicon.ico docs/generated/favicon.ico
 
