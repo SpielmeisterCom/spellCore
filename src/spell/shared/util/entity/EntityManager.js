@@ -1,4 +1,4 @@
-/*
+/**
  * @class spell.shared.util.entity.EntityManager
  */
 define(
@@ -212,7 +212,7 @@ define(
 		}
 
 		EntityManager.prototype = {
-			/*
+			/**
 			 * Creates an entity
 			 *
 			 * @param arg0 an entity template id or an entity config
@@ -222,7 +222,7 @@ define(
 				return createEntity( this.components, this.templateManager, arg0 )
 			},
 
-			/*
+			/**
 			 * Removes an entity
 			 *
 			 * @param entityId the id of the entity to remove
@@ -233,6 +233,9 @@ define(
 				removeComponents( this.components, entityId )
 			},
 
+			/**
+			 * TBD
+			 */
 			createEntities : function( entityConfigs ) {
 				var self = this
 
@@ -244,7 +247,7 @@ define(
 				)
 			},
 
-			/*
+			/**
 			 * Adds a component to an entity
 			 *
 			 * @param entityId the id of the entity that the component belongs to
@@ -261,9 +264,9 @@ define(
 				)
 			},
 
-			/*
+			/**
 			 * Removes a component from an entity
-			 *
+			 *-
 			 * @param entityId the id of the entity that the component belongs to
 			 * @param componentId the id (template id) of the component to remove
 			 * @return {*}
@@ -274,7 +277,7 @@ define(
 				removeComponents( this.components, entityId, componentId )
 			},
 
-			/*
+			/**
 			 * Returns true if an entity has a component
 			 *
 			 * @param entityId the id of the entity to check
