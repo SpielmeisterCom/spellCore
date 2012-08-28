@@ -3,7 +3,8 @@
  */
 
 ( function( document ) {
-	var modules = {}
+	var modules  = {},
+		BASE_URL = 'library/scripts'
 
 	var createScriptNode = function( name, source ) {
 		var script = document.createElement( 'script' )
@@ -14,12 +15,29 @@
 		head.appendChild( script )
 	}
 
-	var loadModule = function( name ) {
-		var moduleUrl = 'library/scripts/' + name + '.js'
+	var normalizeConfig = function( config ) {
+		if( !config ) {
+			config = {}
+		}
 
+		if( !config.baseUrl ) {
+			config.baseUrl = BASE_URL
+		}
+
+		return config
+	}
+
+	var createRequest = function( url ) {
 		var request = new XMLHttpRequest()
-		request.open( 'GET', moduleUrl, false )
+		request.open( 'GET', url, false )
 		request.send( null )
+
+		return request
+	}
+
+	var loadModule = function( name, baseUrl ) {
+		var moduleUrl = baseUrl + '/' + name + '.js',
+			request   = createRequest( moduleUrl )
 
 		if( request.status !== 200 ) throw 'Error: Loading \'' + moduleUrl + '\' failed.'
 
@@ -28,8 +46,8 @@
 		return modules[ name ]
 	}
 
-	var createModule = function( name, args ) {
-		var module = loadModule( name )
+	var createModule = function( name, args, config ) {
+		var module = loadModule( name, config.baseUrl )
 
 		if( !module ) throw 'Error: Could not load module \'' + name + '\'.'
 
@@ -80,13 +98,13 @@
 	}
 
 
-	var require = function( moduleName, args ) {
+	var require = function( moduleName, args, config ) {
 		if( !moduleName ) throw 'Error: No module name provided.'
 
 		var module = modules[ moduleName ]
 
 		if( !module ) {
-			module = createModule( moduleName, args )
+			module = createModule( moduleName, args, normalizeConfig( config ) )
 		}
 
 		if( !module.instance ) {

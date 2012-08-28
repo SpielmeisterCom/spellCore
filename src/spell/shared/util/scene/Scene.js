@@ -24,12 +24,12 @@ define(
 		var cameraEntityTemplateId    = 'spell.entity.2d.graphics.camera',
 			cameraComponentTemplateId = 'spell.component.2d.graphics.camera'
 
-		var requireScript = function( scriptId ) {
-			if( !scriptId ) throw 'Error: No script id provided.'
+		var loadModule = function( moduleId, config ) {
+			if( !moduleId ) throw 'Error: No module id provided.'
 
-			var module = require( scriptId )
+			var module = require( moduleId, undefined, config )
 
-			if( !module ) throw 'Error: Could not resolve script id \'' + scriptId + '\' to module.'
+			if( !module ) throw 'Error: Could not resolve module id \'' + moduleId + '\' to module.'
 
 			return module
 		}
@@ -47,9 +47,24 @@ define(
 			)
 		}
 
+		var createTemplateId = function( namespace, name ) {
+			return namespace + '.' + name
+		}
+
+		var createModuleIdFromTemplateId = function( id ) {
+			return id.replace( /\./g, '/' )
+		}
+
 		var createSystem = function( globals, templateManager, entityManager, systemTemplateId ) {
-			var template = templateManager.getTemplate( systemTemplateId ),
-				constructor = requireScript( template.scriptId )
+			var template    = templateManager.getTemplate( systemTemplateId ),
+				moduleId    = createModuleIdFromTemplateId( createTemplateId( template.namespace, template.name ) )
+
+			var constructor = loadModule(
+				moduleId,
+				{
+					baseUrl : 'library/templates'
+				}
+			)
 
 			var componentsInput = _.reduce(
 				template.input,
@@ -67,7 +82,7 @@ define(
 
 		var createSystems = function( globals, systemTemplateIds ) {
 			var templateManager = globals.templateManager,
-				entityManager    = globals.entityManager
+				entityManager   = globals.entityManager
 
 			return _.map(
 				systemTemplateIds,
@@ -136,7 +151,7 @@ define(
 				}
 
 				if( sceneConfig.scriptId ) {
-					this.script = requireScript( sceneConfig.scriptId )
+					this.script = loadModule( sceneConfig.scriptId )
 					this.script.init( this.globals, entityManager, sceneConfig )
 				}
 
