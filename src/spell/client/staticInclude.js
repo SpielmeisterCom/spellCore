@@ -15,6 +15,7 @@ define(
 		'spell/math/vec2',
 		'spell/math/vec3',
 		'spell/math/vec4',
+		'spell/math/random/XorShift32',
 		'spell/shared/util/createEntityEach'
 	],
 	function() {
