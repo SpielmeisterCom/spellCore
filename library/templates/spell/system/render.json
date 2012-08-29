@@ -37,6 +37,5 @@
 			"name" : "cameras",
 			"templateId" : "spell.component.2d.graphics.camera"
 		}
-	],
-	"scriptId" : "spell/system/render"
+	]
 }
