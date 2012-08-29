@@ -17,11 +17,11 @@ define(
 		 * private
 		 */
 
-		var init = function( globals ) {
+		var init = function( spell ) {
 			this.inputManager.init()
 		}
 
-		var cleanUp = function( globals ) {}
+		var cleanUp = function( spell ) {}
 
 		var processEvent = function( actors, inputDefinitions ) {
 			var inputEvent = this
@@ -63,11 +63,11 @@ define(
 		/**
 		 * Update the actor entities action component with the player input
 		 *
-		 * @param globals
+		 * @param spell
 		 * @param timeInMs
 		 * @param deltaTimeInMs
 		 */
-		var process = function( globals, timeInMs, deltaTimeInMs ) {
+		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			_.invoke( this.inputEvents, processEvent, this.actors, this.inputDefinitions )
 
 			this.inputEvents.length = 0
@@ -78,9 +78,9 @@ define(
 		 * public
 		 */
 
-		var KeyInput = function( globals ) {
-			this.inputEvents  = globals.inputEvents
-			this.inputManager = globals.inputManager
+		var KeyInput = function( spell ) {
+			this.inputEvents  = spell.inputEvents
+			this.inputManager = spell.inputManager
 		}
 
 		KeyInput.prototype = {

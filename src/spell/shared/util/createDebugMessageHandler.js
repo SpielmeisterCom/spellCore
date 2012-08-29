@@ -4,19 +4,19 @@ define(
 		'use strict'
 
 
-		return function( globals, startEngine ) {
+		return function( spell, startEngine ) {
 			var messageTypeToHandler = {
 				'spelled.debug.drawCoordinateGrid' : function( payload ) {
-					globals.configurationManager.drawCoordinateGrid = !!payload
+					spell.configurationManager.drawCoordinateGrid = !!payload
 				},
 				'spelled.debug.executeRuntimeModule' : function( payload ) {
-					globals.runtimeModule = payload
+					spell.runtimeModule = payload
 					startEngine( payload )
 				}
 			}
 
 			return function( message ) {
-				globals.logger.debug( 'Received message: ' + message.type )
+				spell.logger.debug( 'Received message: ' + message.type )
 
 
 				var handler = messageTypeToHandler[ message.type ]

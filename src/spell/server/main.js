@@ -153,17 +153,17 @@ define(
 			var eventManager = new EventManager()
 			var entityManager = new EntityManager( new TemplateManager() )
 
-			var globals = {},
+			var spell = {},
 				mainLoop = undefined
 
-			var sceneManager = new SceneManager( globals, mainLoop )
+			var sceneManager = new SceneManager( spell, mainLoop )
 
 			var clients = connection.clients
 
-			globals.clients       = clients
-			globals.entityManager = entityManager
-			globals.eventManager  = eventManager
-			globals.sceneManager  = sceneManager
+			spell.clients       = clients
+			spell.entityManager = entityManager
+			spell.eventManager  = eventManager
+			spell.sceneManager  = sceneManager
 
 
 

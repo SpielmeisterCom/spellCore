@@ -203,7 +203,7 @@ define(
 			context.setViewMatrix( tmpMat3 )
 		}
 
-		var process = function( globals, timeInMs, deltaTimeInMs ) {
+		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var context = this.context,
 				cameras = this.cameras,
 				drawVisualObjectPartial = this.drawVisualObjectPartial
@@ -245,21 +245,21 @@ define(
 			context.viewport( viewportPosition[ 0 ], viewportPosition[ 1 ], screenDimensions[ 0 ], screenDimensions [ 1 ] )
 		}
 
-		var init = function( globals ) {}
+		var init = function( spell ) {}
 
-		var cleanUp = function( globals ) {}
+		var cleanUp = function( spell ) {}
 
 
 		/**
 		 * public
 		 */
 
-		var Renderer = function( globals ) {
-			this.assets               = globals.assets
-			this.configurationManager = globals.configurationManager
-			this.context              = globals.renderingContext
-			this.debugFontAsset       = globals.assets[ debugFontAssetId ]
-			this.resources            = globals.resources
+		var Renderer = function( spell ) {
+			this.assets               = spell.assets
+			this.configurationManager = spell.configurationManager
+			this.context              = spell.renderingContext
+			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
+			this.resources            = spell.resources
 
 			this.drawVisualObjectPartial = _.bind(
 				drawVisualObject,
@@ -275,7 +275,7 @@ define(
 				this.visualObjects
 			)
 
-			var eventManager = globals.eventManager,
+			var eventManager = spell.eventManager,
 				context = this.context,
 				screenSize = this.configurationManager.screenSize
 

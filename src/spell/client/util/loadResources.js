@@ -55,12 +55,12 @@ define(
 		}
 
 
-		return function( globals, next ) {
-			var eventManager     = globals.eventManager,
-				renderingContext = globals.renderingContext,
-				resourceLoader   = globals.resourceLoader,
-				runtimeModule    = globals.runtimeModule,
-				templateManager  = globals.templateManager
+		return function( spell, next ) {
+			var eventManager     = spell.eventManager,
+				renderingContext = spell.renderingContext,
+				resourceLoader   = spell.resourceLoader,
+				runtimeModule    = spell.runtimeModule,
+				templateManager  = spell.templateManager
 
 			var templateBundleId = 'templates',
 				assetBundleId    = 'assets',
@@ -75,12 +75,12 @@ define(
 			).and(
 				[ Events.RESOURCE_LOADING_COMPLETED, assetBundleId ],
 				function( assets ) {
-					globals.assets = createAssets( assets )
+					spell.assets = createAssets( assets )
 
 					startLoadingResources(
 						resourceLoader,
 						resourceBundleId,
-						traceResourceIds( globals.assets ),
+						traceResourceIds( spell.assets ),
 						'library/assets',
 						'image',
 						function( resource ) {

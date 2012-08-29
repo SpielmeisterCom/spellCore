@@ -57,7 +57,7 @@ define(
 			return id.replace( /\./g, '/' )
 		}
 
-		var createSystem = function( globals, templateManager, entityManager, anonymizeModuleIdentifiers, systemTemplateId ) {
+		var createSystem = function( spell, templateManager, entityManager, anonymizeModuleIdentifiers, systemTemplateId ) {
 			var template = templateManager.getTemplate( systemTemplateId ),
 				moduleId = createModuleIdFromTemplateId( createTemplateId( template.namespace, template.name ) )
 
@@ -79,17 +79,17 @@ define(
 			)
 
 			// TODO: Fix create. Returned instances do not support prototype chain method look-up. O_o
-			return create( constructor, [ globals ], componentsInput )
+			return create( constructor, [ spell ], componentsInput )
 		}
 
-		var createSystems = function( globals, systemTemplateIds, anonymizeModuleIdentifiers ) {
-			var templateManager = globals.templateManager,
-				entityManager   = globals.entityManager
+		var createSystems = function( spell, systemTemplateIds, anonymizeModuleIdentifiers ) {
+			var templateManager = spell.templateManager,
+				entityManager   = spell.entityManager
 
 			return _.map(
 				systemTemplateIds,
 				function( systemTemplateId ) {
-					return createSystem( globals, templateManager, entityManager, anonymizeModuleIdentifiers, systemTemplateId )
+					return createSystem( spell, templateManager, entityManager, anonymizeModuleIdentifiers, systemTemplateId )
 				}
 			)
 		}
@@ -130,8 +130,8 @@ define(
 		 * public
 		 */
 
-		var Scene = function( globals, templateManager ) {
-			this.globals         = globals
+		var Scene = function( spell, templateManager ) {
+			this.spell           = spell
 			this.templateManager = templateManager
 			this.renderSystems   = null
 			this.updateSystems   = null
@@ -140,13 +140,13 @@ define(
 
 		Scene.prototype = {
 			render: function( timeInMs, deltaTimeInMs ) {
-				invoke( this.renderSystems, 'process', [ this.globals, timeInMs, deltaTimeInMs ] )
+				invoke( this.renderSystems, 'process', [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			update: function( timeInMs, deltaTimeInMs ) {
-				invoke( this.updateSystems, 'process', [ this.globals, timeInMs, deltaTimeInMs ] )
+				invoke( this.updateSystems, 'process', [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
-			init: function( globals, sceneConfig, anonymizeModuleIdentifiers ) {
-				var entityManager = globals.entityManager
+			init: function( spell, sceneConfig, anonymizeModuleIdentifiers ) {
+				var entityManager = spell.entityManager
 
 				if( !hasActiveCamera( sceneConfig ) ) {
 					createDefaultCamera( entityManager )
@@ -154,22 +154,22 @@ define(
 
 				if( sceneConfig.scriptId ) {
 					this.script = loadModule( sceneConfig.scriptId )
-					this.script.init( this.globals, entityManager, sceneConfig )
+					this.script.init( this.spell, entityManager, sceneConfig )
 				}
 
 				if( sceneConfig.systems ) {
-					this.renderSystems = createSystems( globals, sceneConfig.systems.render, anonymizeModuleIdentifiers )
-					this.updateSystems = createSystems( globals, sceneConfig.systems.update, anonymizeModuleIdentifiers )
+					this.renderSystems = createSystems( spell, sceneConfig.systems.render, anonymizeModuleIdentifiers )
+					this.updateSystems = createSystems( spell, sceneConfig.systems.update, anonymizeModuleIdentifiers )
 
-					invoke( this.renderSystems, 'init', [ this.globals, sceneConfig ] )
-					invoke( this.updateSystems, 'init', [ this.globals, sceneConfig ] )
+					invoke( this.renderSystems, 'init', [ this.spell, sceneConfig ] )
+					invoke( this.updateSystems, 'init', [ this.spell, sceneConfig ] )
 				}
 			},
-			destroy: function( globals, sceneConfig ) {
-				invoke( this.renderSystems, 'cleanUp', [ this.globals, sceneConfig ] )
-				invoke( this.updateSystems, 'cleanUp', [ this.globals, sceneConfig ] )
+			destroy: function( spell, sceneConfig ) {
+				invoke( this.renderSystems, 'cleanUp', [ this.spell, sceneConfig ] )
+				invoke( this.updateSystems, 'cleanUp', [ this.spell, sceneConfig ] )
 
-				this.script.cleanUp( this.globals )
+				this.script.cleanUp( this.spell )
 			}
 		}
 

@@ -19,16 +19,16 @@ define(
 		 * public
 		 */
 
-		var SceneManager = function( globals, templateManager, mainLoop ) {
-			this.globals         = globals
+		var SceneManager = function( spell, templateManager, mainLoop ) {
+			this.spell           = spell
 			this.mainLoop        = mainLoop
 			this.templateManager = templateManager
 		}
 
 		SceneManager.prototype = {
 			startScene: function( sceneConfig, anonymizeModuleIdentifiers ) {
-				var scene = new Scene( this.globals, this.templateManager )
-				scene.init( this.globals, sceneConfig, anonymizeModuleIdentifiers )
+				var scene = new Scene( this.spell, this.templateManager )
+				scene.init( this.spell, sceneConfig, anonymizeModuleIdentifiers )
 
 				this.mainLoop.setRenderCallback( _.bind( scene.render, scene ) )
 				this.mainLoop.setUpdateCallback( _.bind( scene.update, scene ) )

@@ -204,7 +204,7 @@ define(
 		 * public
 		 */
 
-		var ResourceLoader = function( globals, soundManager, renderingContext, eventManager, hostConfig ) {
+		var ResourceLoader = function( spell, soundManager, renderingContext, eventManager, hostConfig ) {
 			if( eventManager === undefined ) throw 'Argument "eventManager" is undefined.'
             if( soundManager === undefined ) throw 'Argument "soundManager" is undefined.'
 

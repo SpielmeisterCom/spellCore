@@ -51,58 +51,58 @@ define(
 		 * loaded and is ready to use.
 		 */
 		var postLoadedResources = function() {
-			var globals = this.globals
+			var spell = this.spell
 
-			globals.entityManager = new EntityManager( globals.templateManager )
+			spell.entityManager = new EntityManager( spell.templateManager )
 
-			globals.logger.debug( 'loading resources completed' )
+			spell.logger.debug( 'loading resources completed' )
 
 			PlatformKit.registerOnScreenResize(
-				globals.configurationManager.id,
-				_.bind( onScreenResize, null, globals.eventManager )
+				spell.configurationManager.id,
+				_.bind( onScreenResize, null, spell.eventManager )
 			)
 
-			var renderingContextConfig = globals.renderingContext.getConfiguration()
-			globals.logger.debug( 'created rendering context (' + renderingContextConfig.type + ')' )
+			var renderingContextConfig = spell.renderingContext.getConfiguration()
+			spell.logger.debug( 'created rendering context (' + renderingContextConfig.type + ')' )
 
 
 			var sceneConfig = _.find(
-				globals.runtimeModule.scenes,
+				spell.runtimeModule.scenes,
 				function( iter ) {
-					return iter.name === globals.runtimeModule.startScene
+					return iter.name === spell.runtimeModule.startScene
 				}
 			)
 
-			if( !sceneConfig ) throw 'Error: Could not find start scene \'' + globals.runtimeModule.startScene + '\'.'
+			if( !sceneConfig ) throw 'Error: Could not find start scene \'' + spell.runtimeModule.startScene + '\'.'
 
-			var anonymizeModuleIdentifiers = !globals.configurationManager.debug
-			globals.sceneManager.startScene( sceneConfig, anonymizeModuleIdentifiers )
+			var anonymizeModuleIdentifiers = !spell.configurationManager.debug
+			spell.sceneManager.startScene( sceneConfig, anonymizeModuleIdentifiers )
 
-			globals.mainLoop.run()
+			spell.mainLoop.run()
 		}
 
 		var start = function( runtimeModule, cachedContent ) {
-			var globals = this.globals
-			globals.runtimeModule = runtimeModule
+			var spell = this.spell
+			spell.runtimeModule = runtimeModule
 
 			if( !runtimeModule ) {
 				throw 'Error: No runtime module defined. Please provide a runtime module.'
 			}
 
-			globals.logger.debug( 'client started' )
+			spell.logger.debug( 'client started' )
 
 			var resourceLoader = new ResourceLoader(
-				globals,
-				globals.soundManager,
-				globals.renderingContext,
-				globals.eventManager,
-				globals.configurationManager.resourceServer
+				spell,
+				spell.soundManager,
+				spell.renderingContext,
+				spell.eventManager,
+				spell.configurationManager.resourceServer
 			)
 
 			if( cachedContent ) resourceLoader.setCache( cachedContent )
 
 			_.extend(
-				globals,
+				spell,
 				{
 					resourceLoader : resourceLoader,
 					resources      : resourceLoader.getResources()
@@ -110,13 +110,13 @@ define(
 			)
 
 			loadResources(
-				globals,
+				spell,
 				_.bind( postLoadedResources, this )
 			)
 		}
 
 		var init = function( config ) {
-			var globals              = {},
+			var spell              = {},
 				logger               = new Logger(),
 				eventManager         = new EventManager(),
 				configurationManager = new ConfigurationManager( eventManager, config ),
@@ -132,12 +132,12 @@ define(
 				statisticsManager    = new StatisticsManager(),
 				templateManager      = new TemplateManager(),
 				mainLoop             = createMainLoop( eventManager, statisticsManager),
-				sceneManager         = new SceneManager( globals, templateManager, mainLoop )
+				sceneManager         = new SceneManager( spell, templateManager, mainLoop )
 
 			statisticsManager.init()
 
 			_.extend(
-				globals,
+				spell,
 				{
 					configurationManager : configurationManager,
 					eventManager         : eventManager,
@@ -154,7 +154,7 @@ define(
 				}
 			)
 
-			this.globals = globals
+			this.spell = spell
 
 
 			if( config.debug ) {
@@ -162,7 +162,7 @@ define(
 				initDebugEnvironment( logger )
 
 				this.debugMessageHandler = createDebugMessageHandler(
-					this.globals,
+					this.spell,
 					_.bind( this.start, this )
 				)
 			}
@@ -170,7 +170,7 @@ define(
 
 
 		var main = function() {
-			this.globals             = undefined
+			this.spell               = undefined
 			this.debugMessageHandler = undefined
 			init.call( this, stageZeroConfig )
 		}
@@ -184,7 +184,7 @@ define(
 			 * @param {Function} fn
 			 */
 			setSendMessageToEditor : function( fn ) {
-				this.globals.logger.setSendMessageToEditor( fn )
+				this.spell.logger.setSendMessageToEditor( fn )
 			},
 
 			/*
