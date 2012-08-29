@@ -75,7 +75,7 @@ define(
 				if( !target ) target = buildTargets.HTML5
 
 				if( !_.contains( _.values( buildTargets ), target ) ) {
-					errors.push( 'Error: \'' + target + '\' is not a valid target. See \'' + executableName + ' --help\'.' )
+					errors.push( 'Error: \'' + target + '\' is not a valid target. See \"' + executableName + ' --help\" for usage information.' )
 				}
 
 				if( errors.length > 0 ) {
