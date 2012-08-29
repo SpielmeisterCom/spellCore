@@ -75,7 +75,8 @@ define(
 
 			if( !sceneConfig ) throw 'Error: Could not find start scene \'' + globals.runtimeModule.startScene + '\'.'
 
-			globals.sceneManager.startScene( sceneConfig )
+			var anonymizeModuleIdentifiers = !globals.configurationManager.debug
+			globals.sceneManager.startScene( sceneConfig, anonymizeModuleIdentifiers )
 
 			globals.mainLoop.run()
 		}
@@ -126,12 +127,12 @@ define(
 					768,
 					configurationManager.renderingBackEnd
 				),
-				soundManager      = PlatformKit.createSoundManager(),
-				inputManager      = new InputManager( configurationManager ),
-				statisticsManager = new StatisticsManager(),
-				templateManager   = new TemplateManager(),
-				mainLoop          = createMainLoop( eventManager, statisticsManager),
-				sceneManager      = new SceneManager( globals, templateManager, mainLoop )
+				soundManager         = PlatformKit.createSoundManager(),
+				inputManager         = new InputManager( configurationManager ),
+				statisticsManager    = new StatisticsManager(),
+				templateManager      = new TemplateManager(),
+				mainLoop             = createMainLoop( eventManager, statisticsManager),
+				sceneManager         = new SceneManager( globals, templateManager, mainLoop )
 
 			statisticsManager.init()
 
@@ -159,12 +160,12 @@ define(
 			if( config.debug ) {
 				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
 				initDebugEnvironment( logger )
-			}
 
-			this.debugMessageHandler = createDebugMessageHandler(
-				this.globals,
-				_.bind( this.start, this )
-			)
+				this.debugMessageHandler = createDebugMessageHandler(
+					this.globals,
+					_.bind( this.start, this )
+				)
+			}
 		}
 
 

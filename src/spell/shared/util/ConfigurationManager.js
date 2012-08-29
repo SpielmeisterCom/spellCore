@@ -52,7 +52,7 @@ define(
 			return [ parseInt( parts[ 0 ] ), parseInt( parts[ 1 ] ) ]
 		}
 
-		var extractDrawCoordinateGrid = function( validValues, value ) {
+		var extractBoolean = function( validValues, value ) {
 			return _.contains( validValues, value ) && value
 		}
 
@@ -67,7 +67,7 @@ define(
 			drawCoordinateGrid : {
 				validValues  : [ true, false ],
 				configurable : true,
-				extractor    : extractDrawCoordinateGrid
+				extractor    : extractBoolean
 			},
 			screenSize : {
 				validValues  : [ '640x480', '800x600', '1024x768' ],
@@ -86,6 +86,11 @@ define(
 			},
 			id : {
 				configurable : true
+			},
+			debug : {
+				validValues  : [ true, false ],
+				configurable : true,
+				extractor    : extractBoolean
 			}
 		}
 

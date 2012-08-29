@@ -1,7 +1,7 @@
 define(
 	'spell/shared/build/ast/anonymizeModuleIdentifiers',
 	[
-		'spell/shared/build/hashModuleIdentifier',
+		'spell/shared/util/hashModuleIdentifier',
 		'spell/functions',
 
 		'uglify-js'
@@ -11,9 +11,8 @@ define(
 		_,
 
 		uglify
-) {
+	) {
 		'use strict'
-
 
 
 		var uglifyProcessor = uglify.uglify,
@@ -57,7 +56,7 @@ define(
 		/**
 		 * Takes an abstract syntax tree in uglifyjs format and returns it with anonymized amd module identifiers.
 		 */
-		return function( ast ) {
+		return function( ast, blacklistedModuleIds ) {
 			return w.with_walkers(
 				{
 					'stat' : function() {
@@ -68,14 +67,22 @@ define(
 						var args = node[ 1 ][ 2 ]
 
 						// update module identifier
-						args[ 0 ][ 1 ] = hashModuleIdentifier( args[ 0 ][ 1 ] )
+						var moduleId = args[ 0 ][ 1 ]
+
+						if( !_.contains( blacklistedModuleIds, moduleId ) ) {
+							args[ 0 ][ 1 ] = hashModuleIdentifier( moduleId )
+						}
 
 						// update module dependencies
 						if( hasModuleDependencies( args ) ) {
 							args[ 1 ][ 1 ] = _.map(
 								args[ 1 ][ 1 ],
 								function( dependency ) {
-									dependency[ 1 ] = hashModuleIdentifier( dependency[ 1 ] )
+									var moduleId = dependency[ 1 ]
+
+									if( !_.contains( blacklistedModuleIds, moduleId ) ) {
+										dependency[ 1 ] = hashModuleIdentifier( dependency[ 1 ] )
+									}
 
 									return dependency
 								}

@@ -3,6 +3,7 @@ define(
 	[
 		'spell/shared/util/create',
 		'spell/shared/util/entityConfig/flatten',
+		'spell/shared/util/hashModuleIdentifier',
 		'spell/shared/util/Events',
 
 		'spell/functions'
@@ -10,6 +11,7 @@ define(
 	function(
 		create,
 		flattenEntityConfig,
+		hashModuleIdentifier,
 		Events,
 
 		_
@@ -55,12 +57,12 @@ define(
 			return id.replace( /\./g, '/' )
 		}
 
-		var createSystem = function( globals, templateManager, entityManager, systemTemplateId ) {
-			var template    = templateManager.getTemplate( systemTemplateId ),
-				moduleId    = createModuleIdFromTemplateId( createTemplateId( template.namespace, template.name ) )
+		var createSystem = function( globals, templateManager, entityManager, anonymizeModuleIdentifiers, systemTemplateId ) {
+			var template = templateManager.getTemplate( systemTemplateId ),
+				moduleId = createModuleIdFromTemplateId( createTemplateId( template.namespace, template.name ) )
 
 			var constructor = loadModule(
-				moduleId,
+				anonymizeModuleIdentifiers ? hashModuleIdentifier( moduleId ) : moduleId,
 				{
 					baseUrl : 'library/templates'
 				}
@@ -80,14 +82,14 @@ define(
 			return create( constructor, [ globals ], componentsInput )
 		}
 
-		var createSystems = function( globals, systemTemplateIds ) {
+		var createSystems = function( globals, systemTemplateIds, anonymizeModuleIdentifiers ) {
 			var templateManager = globals.templateManager,
 				entityManager   = globals.entityManager
 
 			return _.map(
 				systemTemplateIds,
 				function( systemTemplateId ) {
-					return createSystem( globals, templateManager, entityManager, systemTemplateId )
+					return createSystem( globals, templateManager, entityManager, anonymizeModuleIdentifiers, systemTemplateId )
 				}
 			)
 		}
@@ -143,7 +145,7 @@ define(
 			update: function( timeInMs, deltaTimeInMs ) {
 				invoke( this.updateSystems, 'process', [ this.globals, timeInMs, deltaTimeInMs ] )
 			},
-			init: function( globals, sceneConfig ) {
+			init: function( globals, sceneConfig, anonymizeModuleIdentifiers ) {
 				var entityManager = globals.entityManager
 
 				if( !hasActiveCamera( sceneConfig ) ) {
@@ -156,8 +158,8 @@ define(
 				}
 
 				if( sceneConfig.systems ) {
-					this.renderSystems = createSystems( globals, sceneConfig.systems.render )
-					this.updateSystems = createSystems( globals, sceneConfig.systems.update )
+					this.renderSystems = createSystems( globals, sceneConfig.systems.render, anonymizeModuleIdentifiers )
+					this.updateSystems = createSystems( globals, sceneConfig.systems.update, anonymizeModuleIdentifiers )
 
 					invoke( this.renderSystems, 'init', [ this.globals, sceneConfig ] )
 					invoke( this.updateSystems, 'init', [ this.globals, sceneConfig ] )

@@ -46,7 +46,9 @@
 		return modules[ name ]
 	}
 
-	var createModule = function( name, args, config ) {
+	var createModule = function( name, config ) {
+		config = normalizeConfig( config )
+
 		var module = loadModule( name, config.baseUrl )
 
 		if( !module ) throw 'Error: Could not load module \'' + name + '\'.'
@@ -65,7 +67,7 @@
 					dependencyModule = modules[ dependencyModuleName ]
 
 				if( !dependencyModule ) {
-					dependencyModule = createModule( dependencyModuleName )
+					dependencyModule = createModule( dependencyModuleName, config )
 				}
 
 				if( !dependencyModule.instance ) {
@@ -104,7 +106,7 @@
 		var module = modules[ moduleName ]
 
 		if( !module ) {
-			module = createModule( moduleName, args, normalizeConfig( config ) )
+			module = createModule( moduleName, config )
 		}
 
 		if( !module.instance ) {

@@ -26,9 +26,9 @@ define(
 		}
 
 		SceneManager.prototype = {
-			startScene: function( sceneConfig ) {
+			startScene: function( sceneConfig, anonymizeModuleIdentifiers ) {
 				var scene = new Scene( this.globals, this.templateManager )
-				scene.init( this.globals, sceneConfig )
+				scene.init( this.globals, sceneConfig, anonymizeModuleIdentifiers )
 
 				this.mainLoop.setRenderCallback( _.bind( scene.render, scene ) )
 				this.mainLoop.setUpdateCallback( _.bind( scene.update, scene ) )

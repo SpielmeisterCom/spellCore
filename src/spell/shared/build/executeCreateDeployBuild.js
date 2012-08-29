@@ -2,9 +2,9 @@ define(
 	'spell/shared/build/executeCreateDeployBuild',
 	[
 		'spell/shared/build/copyFile',
-		'spell/shared/build/hashModuleIdentifier',
 		'spell/shared/build/processSource',
 		'spell/shared/build/isFile',
+		'spell/shared/util/hashModuleIdentifier',
 		'spell/shared/util/template/TemplateTypes',
 
 		'amd-helper',
@@ -15,9 +15,9 @@ define(
 	],
 	function(
 		copyFile,
-		hashModuleIdentifier,
 		processSource,
 		isFile,
+		hashModuleIdentifier,
 		TemplateTypes,
 
 		amdHelper,
@@ -182,25 +182,35 @@ define(
 			)
 		}
 
-		var anonymizeScriptIds = function( template ) {
-			template.scriptId = hashModuleIdentifier( template.scriptId )
+		var loadSystemTemplateModules = function( templates, projectTemplatesPath ) {
+			var errors = []
 
-			return template
-		}
-
-		var createTemplateList = function( templates, anonymizeModuleIdentifiers ) {
-			if( !anonymizeModuleIdentifiers ) return templates
-
-			return _.map(
+			_.each(
 				templates,
 				function( template ) {
-					if( template.content.type !== TemplateTypes.SYSTEM ) return template
+					if( template.content.type !== TemplateTypes.SYSTEM ) return
 
-					template.content = anonymizeScriptIds( template.content )
+					var moduleFilePath = path.join(
+						projectTemplatesPath,
+						template.filePath.replace( /json$/, 'js' )
+					)
 
-					return template
+					var module = amdHelper.loadModule( moduleFilePath )
+
+
+					if( !module ) {
+						var templateId = template.content.namespace + '.' + template.content.name
+
+						errors.push( 'Error: Could not load module for system template \'' + templateId + '\'.' )
+
+						return
+					}
+
+					template.module = module
 				}
 			)
+
+			return errors
 		}
 
 
@@ -209,6 +219,7 @@ define(
 				minify                     = true,
 				anonymizeModuleIdentifiers = true,
 				spellEnginePath            = path.resolve( spellCorePath + '/../..' ),
+				projectTemplatesPath       = path.join( projectPath, TEMPLATES_PATH ),
 				projectAssetsPath          = path.join( projectPath, ASSETS_PATH ),
 				deployPath                 = path.join( projectPath, DEPLOY_PATH ),
 				deployHtml5Path            = path.join( deployPath, 'html5' )
@@ -218,16 +229,40 @@ define(
 			var projectConfig     = createProjectConfig( projectConfigRaw, anonymizeModuleIdentifiers )
 
 
+			// load all scripts
+			var scripts = amdHelper.loadModules( path.join( projectPath, SCRIPTS_PATH ) )
+
+
 			// load all templates
 			var templates = []
 
 			errors = errors.concat(
-				loadJsonFromLibrary( templates, path.join( projectPath, TEMPLATES_PATH ) )
+				loadJsonFromLibrary( templates, projectTemplatesPath )
 			)
 
-			templates = createTemplateList( templates, anonymizeModuleIdentifiers )
+			// load all system templates' implementations
+			errors = loadSystemTemplateModules( templates, projectTemplatesPath )
 
 			if( _.size( errors ) > 0 ) callback( errors )
+
+
+			// add source of the system template modules to scripts
+			scripts = _.extend(
+				scripts,
+				_.reduce(
+					templates,
+					function( memo, template ) {
+						var module = template.module
+
+						if( !module ) return memo
+
+						memo[ module.name ] = _.pick( module, [ 'dependencies', 'source', 'path' ] )
+
+						return memo
+					},
+					{}
+				)
+			)
 
 
 			// load all assets
@@ -238,16 +273,6 @@ define(
 			)
 
 			if( _.size( errors ) > 0 ) callback( errors )
-
-
-			// load all scripts
-			var scripts = amdHelper.loadModules( path.join( projectPath, SCRIPTS_PATH ) )
-
-			var scriptSource = processSource(
-				_.pluck( scripts, 'source' ).join( '\n' ),
-				minify,
-				anonymizeModuleIdentifiers
-			)
 
 
 			// copy all files in asset directory which are not json files to the directory "build/deploy/library/assets"
@@ -271,6 +296,12 @@ define(
 
 			// write data file to output directory -> "build/deploy/html5/data.js"
 			var resources = templates.concat( assets )
+
+			var scriptSource = processSource(
+				_.pluck( scripts, 'source' ).join( '\n' ),
+				minify,
+				anonymizeModuleIdentifiers
+			)
 
 			var dataFileContent = _s.sprintf(
 				dataFileTemplate,

@@ -17,7 +17,10 @@ define(
 
 			var ast = createAST( sourceChunk )
 
-			if( anonymizeModules ) ast = anonymizeModuleIdentifiers( ast )
+			if( anonymizeModules ) {
+				ast = anonymizeModuleIdentifiers( ast, [ 'spell/client/main', 'spell/client/runtimeModule' ] )
+			}
+
 			if( minify ) ast = minifyAST( ast )
 
 			return createSource( ast, !minify )
