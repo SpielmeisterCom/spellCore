@@ -89,30 +89,35 @@ define(
 		/*
 		 * Normalizes the provided entity config
 		 *
-		 * @param arg0 can be either a entity template id or a entity config
+		 * @param templateManager
+		 * @param arg1 can be either a entity template id or a entity config
 		 * @return {*}
 		 */
-		var normalizeEntityConfig = function( arg0 ) {
-			if( !arg0 ) return
+		var normalizeEntityConfig = function( templateManager, arg1 ) {
+			if( !arg1 ) return
 
-			var templateId, config, children
+			var config     = arg1.config || {},
+				children   = arg1.children || [],
+				templateId = _.isString( arg1 ) ? arg1 : arg1.templateId
 
-			if( _.isString( arg0 ) ) {
-				templateId = arg0
+			if( templateId ) {
+				var template = templateManager.getTemplate( templateId )
 
-			} else if( _.isObject( arg0 ) ) {
-				var hasTemplateId = _.has( arg0, 'templateId'),
-					hasConfig     = _.has( arg0, 'config' )
+				if( !template ) {
+					throw 'Error: Unknown template \'' + templateId + '\'. Could not create entity.'
+				}
 
-				if( hasTemplateId ) templateId = arg0.templateId
-				config = ( hasConfig ? arg0.config : {} )
-				if( _.has( arg0, 'children' ) ) children = arg0.children
+				if( template.children &&
+					template.children.length > 0 ) {
+
+					children = children.concat( template.children )
+				}
 			}
 
 			return {
 				children   : children,
 				config     : config,
-				id         : arg0.id ? arg0.id : undefined,
+				id         : arg1.id ? arg1.id : undefined,
 				templateId : templateId
 			}
 		}
@@ -164,7 +169,7 @@ define(
 
 		var createEntity = function( components, templateManager, entityConfig, isRoot ) {
 			isRoot       = ( isRoot === true || isRoot === undefined )
-			entityConfig = normalizeEntityConfig( entityConfig )
+			entityConfig = normalizeEntityConfig( templateManager, entityConfig )
 
 			if( !entityConfig ) throw 'Error: Supplied invalid arguments.'
 
@@ -173,10 +178,6 @@ define(
 
 			if( !templateId && !config ) {
 				throw 'Error: Supplied invalid arguments.'
-			}
-
-			if( templateId && !templateManager.hasTemplate( templateId ) ) {
-				throw 'Error: Unknown template \'' + templateId + '\'. Could not create entity.'
 			}
 
 			// creating child entities
