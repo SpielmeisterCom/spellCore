@@ -19,6 +19,15 @@ define(
 		 * private
 		 */
 
+		// for these key codes default handling is suppressed
+		var preventDefaultKeyCodes = [
+			keyCodes[ 'SPACE' ],
+			keyCodes[ 'LEFT_ARROW' ],
+			keyCodes[ 'UP_ARROW' ],
+			keyCodes[ 'RIGHT_ARROW' ],
+			keyCodes[ 'DOWN_ARROW' ],
+		]
+
 		/*
 		 * Thanks to John Resig. http://ejohn.org/blog/flexible-javascript-events/
 		 *
@@ -84,12 +93,7 @@ define(
 		}
 
 		var nativeKeyHandler = function( callback, event ) {
-			if( event.keyCode === keyCodes[ 'space' ] ||
-				event.keyCode === keyCodes[ 'left arrow' ] ||
-				event.keyCode === keyCodes[ 'up arrow' ] ||
-				event.keyCode === keyCodes[ 'right arrow' ] ||
-				event.keyCode === keyCodes[ 'down arrow' ] ) {
-
+			if( _.contains( preventDefaultKeyCodes, event.keyCode ) ) {
 				event.preventDefault()
 			}
 

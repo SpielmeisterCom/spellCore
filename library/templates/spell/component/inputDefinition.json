@@ -11,10 +11,10 @@
 			"doc" : "the id of the actor that is controlled by this mapping"
 		},
 		{
-			"name" : "keyToAction",
-			"type" : "object",
+			"name" : "assetId",
+			"type" : "assetId:keyToActionMap",
 			"default" : {},
-			"doc" : "the keys to actions mapping"
+			"doc" : "key to action mapping"
 		}
 	]
 }

@@ -1,9 +1,13 @@
 define(
 	'spell/client/util/createAssets',
 	[
+		'spell/shared/util/input/keyCodes',
+
 		'spell/functions'
 	],
 	function(
+		keyCodes,
+
 		_
 	) {
 		'use strict'
@@ -50,6 +54,18 @@ define(
 			}
 		}
 
+		var createKeyToActionMapAsset = function( asset ) {
+			return _.reduce(
+				asset.config,
+				function( memo, action, key ) {
+					memo[ keyCodes[ key ] ] = action
+
+					return memo
+				},
+				{}
+			)
+		}
+
 
 		/*
 		 * public
@@ -76,6 +92,9 @@ define(
 							resourceId : assetDefinition.file,
 							type       : assetDefinition.type
 						}
+
+					} else if( assetDefinition.type === 'keyToActionMap' ) {
+						memo[ assetId ] = createKeyToActionMapAsset( assetDefinition )
 					}
 
 					return memo
