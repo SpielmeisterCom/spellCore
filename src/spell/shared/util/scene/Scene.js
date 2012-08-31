@@ -113,18 +113,6 @@ define(
 			)
 		}
 
-		var createDefaultCamera = function( entityManager ) {
-			var entityConfig = {}
-			entityConfig[ cameraComponentTemplateId ] = {
-				active : true
-			}
-
-			entityManager.createEntity( {
-				templateId : cameraEntityTemplateId,
-				config : entityConfig
-			} )
- 		}
-
 
 		/*
 		 * public
@@ -149,7 +137,9 @@ define(
 				var entityManager = spell.entityManager
 
 				if( !hasActiveCamera( sceneConfig ) ) {
-					createDefaultCamera( entityManager )
+					spell.logger.error( 'Could not start scene "' + sceneConfig.name + '" because no camera entity was found. A scene must have at least one active camera entity.' )
+
+					return
 				}
 
 				if( sceneConfig.scriptId ) {
