@@ -118,12 +118,12 @@ define(
 		 * public
 		 */
 
-		var Scene = function( spell, templateManager ) {
-			this.spell           = spell
-			this.templateManager = templateManager
-			this.renderSystems   = null
-			this.updateSystems   = null
-			this.script          = null
+		var Scene = function( spell, entityManager ) {
+			this.spell         = spell
+			this.entityManager = entityManager
+			this.renderSystems = null
+			this.updateSystems = null
+			this.script        = null
 		}
 
 		Scene.prototype = {
@@ -134,8 +134,6 @@ define(
 				invoke( this.updateSystems, 'process', [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			init: function( spell, sceneConfig, anonymizeModuleIdentifiers ) {
-				var entityManager = spell.entityManager
-
 				if( !hasActiveCamera( sceneConfig ) ) {
 					spell.logger.error( 'Could not start scene "' + sceneConfig.name + '" because no camera entity was found. A scene must have at least one active camera entity.' )
 
@@ -144,7 +142,7 @@ define(
 
 				if( sceneConfig.scriptId ) {
 					this.script = loadModule( sceneConfig.scriptId )
-					this.script.init( this.spell, entityManager, sceneConfig )
+					this.script.init( this.spell, this.entityManager, sceneConfig )
 				}
 
 				if( sceneConfig.systems ) {

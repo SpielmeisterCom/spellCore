@@ -104,7 +104,7 @@ define(
 			throw 'Error: Could not find a template with id \'' + templateId + ( templateType ? '\' of type ' + templateType : '' ) + '.'
 		}
 
-		var createComponentTemplate = function( componentTemplate ) {
+		var createComponentPrototype = function( componentTemplate ) {
 			return _.reduce(
 				componentTemplate.attributes,
 				function( memo, attributeConfig ) {
@@ -125,7 +125,7 @@ define(
 			}
 		}
 
-		var createEntityTemplate = function( templates, entityTemplate ) {
+		var createEntityPrototype = function( assets, templates, entityTemplate ) {
 			return _.reduce(
 				entityTemplate.config,
 				function( memo, componentConfig, componentTemplateId ) {
@@ -133,7 +133,11 @@ define(
 
 					if( !componentTemplate ) throwCouldNotFindTemplate( componentTemplateId, TemplateTypes.COMPONENT )
 
-					memo[ componentTemplateId ] = updateComponent( createComponentTemplate( componentTemplate ), componentConfig )
+					memo[ componentTemplateId ] = injectAsset(
+						assets,
+						componentTemplate,
+						updateComponent( createComponentPrototype( componentTemplate ), componentConfig )
+					)
 
 					return memo
 				},
@@ -141,7 +145,7 @@ define(
 			)
 		}
 
-		var addTemplate = function( templates, entityPrototypes, definition ) {
+		var addTemplate = function( assets, templates, entityPrototypes, definition ) {
 			var templateId = createName( definition.namespace, definition.name )
 
 			if( _.has( templates, templateId ) ) throw 'Error: Template definition \'' + templateId + '\' already exists.'
@@ -150,7 +154,7 @@ define(
 			templates[ templateId ] = definition
 
 			if( definition.type === TemplateTypes.ENTITY ) {
-				entityPrototypes[ templateId ] = createEntityTemplate( templates, definition )
+				entityPrototypes[ templateId ] = createEntityPrototype( assets, templates, definition )
 			}
 		}
 
@@ -169,17 +173,50 @@ define(
 			)
 		}
 
-		var createComponentsFromEntityTemplate = function( templates, entityTemplateId, entity, config ) {
+		var hasAssetIdAttribute = function( attributeConfig ) {
+			return !!_.find(
+				attributeConfig,
+				function( attribute ) {
+					return attribute.type.indexOf( 'assetId:' ) === 0
+				}
+			)
+		}
+
+		/**
+		 * This function dereferences asset ids. If a component with an asset id attribute is found th reference is resolved and a additional asset attribute is
+		 * add to the component instance.
+		 *
+		 * @param assets
+		 * @param componentTemplate
+		 * @param component
+		 * @return {*}
+		 */
+		var injectAsset = function( assets, componentTemplate, component ) {
+			if( hasAssetIdAttribute( componentTemplate.attributes ) ) {
+				component.asset = assets[ component.assetId ]
+			}
+
+			return component
+		}
+
+		var createComponentsFromEntityTemplate = function( assets, templates, entityTemplateId, entity, componentConfig ) {
 			return _.reduce(
-				config,
-				function( memo, componentConfig, componentId ) {
+				componentConfig,
+				function( memo, attributeConfig, componentId ) {
 					var componentTemplate = getTemplate( templates, componentId, TemplateTypes.COMPONENT )
 
 					if( !componentTemplate ) {
 						throw 'Error: Could not find component template \'' + componentId + '\' for \'' + entityTemplateId + '\'.'
 					}
 
-					memo[ componentId ] = updateComponent( memo[ componentId ] || {}, componentConfig )
+					memo[ componentId ] = injectAsset(
+						assets,
+						componentTemplate,
+						updateComponent(
+							memo[ componentId ] || {},
+							attributeConfig
+						)
+					)
 
 					return memo
 				},
@@ -187,13 +224,24 @@ define(
 			)
 		}
 
-		var createComponents = function( templates, config ) {
+		var createComponents = function( assets, templates, componentConfig ) {
 			return _.reduce(
-				config,
-				function( memo, componentConfig, componentId ) {
+				componentConfig,
+				function( memo, attributeConfig, componentId ) {
 					var componentTemplate = getTemplate( templates, componentId, TemplateTypes.COMPONENT )
 
-					memo[ componentId ] = updateComponent( createComponentTemplate( componentTemplate ), componentConfig )
+					if( !componentTemplate ) {
+						throw 'Error: Could not find component template \'' + componentId + '\'.'
+					}
+
+					memo[ componentId ] = injectAsset(
+						assets,
+						componentTemplate,
+						updateComponent(
+							createComponentPrototype( componentTemplate ),
+							attributeConfig
+						)
+					)
 
 					return memo
 				},
@@ -206,8 +254,9 @@ define(
 		 * public
 		 */
 
-		function TemplateManager() {
-			this.templates = {}
+		function TemplateManager( assets ) {
+			this.assets           = assets
+			this.templates        = {}
 			this.entityPrototypes = {}
 		}
 
@@ -219,7 +268,7 @@ define(
 					throw 'Error: The format of the supplied template definition is invalid.'
 				}
 
-				addTemplate( this.templates, this.entityPrototypes, definition )
+				addTemplate( this.assets, this.templates, this.entityPrototypes, definition )
 			},
 
 			createComponents : function( entityTemplateId, config ) {
@@ -228,10 +277,16 @@ define(
 
 					if( !entityPrototype ) throw 'Error: Could not find entity prototype for template id \'' + entityTemplateId + '\'.'
 
-					return createComponentsFromEntityTemplate( this.templates, entityTemplateId, deepClone( entityPrototype ), config )
+					return createComponentsFromEntityTemplate(
+						this.assets,
+						this.templates,
+						entityTemplateId,
+						deepClone( entityPrototype, true ),
+						config
+					)
 
 				} else {
-					return createComponents( this.templates, config )
+					return createComponents( this.assets, this.templates, config )
 				}
 			},
 

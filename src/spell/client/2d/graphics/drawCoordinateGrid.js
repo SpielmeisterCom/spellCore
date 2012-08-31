@@ -106,7 +106,7 @@ define(
 			}
 		}
 
-		return function( context, resources, fontAsset, screenSize, cameraDimensions, cameraTransform ) {
+		return function( context, fontAsset, screenSize, cameraDimensions, cameraTransform ) {
 			var position     = cameraTransform.translation,
 				cameraWidth  = cameraDimensions[ 0 ],
 				cameraHeight = cameraDimensions[ 1 ],
@@ -116,7 +116,7 @@ define(
 				maxY         = minY + cameraHeight,
 				stepSize     = computeGridLineStepSize( cameraWidth ),
 				worldToScreenTranslation = [ -minX, -minY ],
-				fontTexture  = resources[ fontAsset.resourceId ]
+				fontTexture  = fontAsset.resource
 
 			vec2.divide( screenSize, cameraDimensions, invScale )
 

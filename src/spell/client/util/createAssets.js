@@ -66,6 +66,16 @@ define(
 			)
 		}
 
+		var injectResource = function( asset, resources, resourceId ) {
+			if( !asset.resourceId ) return
+
+			var resource = resources[ asset.resourceId ]
+
+			if( !resource ) throw 'Error: Could not resolve resource id \'' + asset.resourceId + '\'.'
+
+			asset.resource = resource
+		}
+
 
 		/*
 		 * public
@@ -76,10 +86,10 @@ define(
 			var assets = _.reduce(
 				assetDefinitions,
 				function( memo, assetDefinition, resourceName ) {
-					var assetId = createAssetId( assetDefinition.type, resourceName )
+					var asset
 
 					if( assetDefinition.type === 'appearance') {
-						memo[ assetId ] = {
+						asset = {
 							resourceId : assetDefinition.file,
 							type       : assetDefinition.type
 						}
@@ -87,15 +97,17 @@ define(
 					} else if( assetDefinition.type === 'spriteSheet' ||
 						assetDefinition.type === 'font') {
 
-						memo[ assetId ] = {
+						asset = {
 							config     : assetDefinition.config,
 							resourceId : assetDefinition.file,
 							type       : assetDefinition.type
 						}
 
 					} else if( assetDefinition.type === 'keyToActionMap' ) {
-						memo[ assetId ] = createKeyToActionMapAsset( assetDefinition )
+						asset = createKeyToActionMapAsset( assetDefinition )
 					}
+
+					memo[ createAssetId( assetDefinition.type, resourceName ) ] = asset
 
 					return memo
 				},
@@ -106,10 +118,8 @@ define(
 			return _.reduce(
 				assetDefinitions,
 				function( memo, assetDefinition, resourceName ) {
-					var assetId = createAssetId( assetDefinition.type, resourceName )
-
 					if( assetDefinition.type === 'animation' ) {
-						memo[ assetId ] = createAnimationAsset( memo, assetDefinition )
+						memo[ createAssetId( assetDefinition.type, resourceName ) ] = createAnimationAsset( memo, assetDefinition )
 					}
 
 					return memo

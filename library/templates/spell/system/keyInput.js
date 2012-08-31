@@ -23,16 +23,15 @@ define(
 
 		var cleanUp = function( spell ) {}
 
-		var processEvent = function( assets, actors, inputDefinitions ) {
+		var processEvent = function( actors, inputDefinitions ) {
 			var inputEvent = this
 
 			_.each(
 				inputDefinitions,
 				function( inputDefinition ) {
-					var keyToActionMapAsset = assets[ inputDefinition.assetId ]
-					if( !keyToActionMapAsset ) return
+					var keyToActionMapAsset = inputDefinition.asset,
+						actionId            = keyToActionMapAsset[ inputEvent.keyCode ]
 
-					var actionId = keyToActionMapAsset[ inputEvent.keyCode ]
 					if( !actionId ) return
 
 					var isExecuting = ( inputEvent.type === 'keydown' )
@@ -64,7 +63,7 @@ define(
 		 * @param deltaTimeInMs
 		 */
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
-			_.invoke( this.inputEvents, processEvent, this.assets, this.actors, this.inputDefinitions )
+			_.invoke( this.inputEvents, processEvent, this.actors, this.inputDefinitions )
 
 			this.inputEvents.length = 0
 		}
@@ -75,7 +74,6 @@ define(
 		 */
 
 		var KeyInput = function( spell ) {
-			this.assets       = spell.assets
 			this.inputEvents  = spell.inputEvents
 			this.inputManager = spell.inputManager
 		}

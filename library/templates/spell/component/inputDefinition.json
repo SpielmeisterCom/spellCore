@@ -13,7 +13,6 @@
 		{
 			"name" : "assetId",
 			"type" : "assetId:keyToActionMap",
-			"default" : {},
 			"doc" : "key to action mapping"
 		}
 	]

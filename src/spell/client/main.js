@@ -54,6 +54,7 @@ define(
 			var spell = this.spell
 
 			spell.entityManager = new EntityManager( spell.templateManager )
+			spell.sceneManager  = new SceneManager( spell, spell.entityManager, spell.mainLoop )
 
 			spell.logger.debug( 'loading resources completed' )
 
@@ -116,7 +117,8 @@ define(
 		}
 
 		var init = function( config ) {
-			var spell              = {},
+			var spell                = {},
+				assets               = {},
 				logger               = new Logger(),
 				eventManager         = new EventManager(),
 				configurationManager = new ConfigurationManager( eventManager, config ),
@@ -130,15 +132,15 @@ define(
 				soundManager         = PlatformKit.createSoundManager(),
 				inputManager         = new InputManager( configurationManager ),
 				statisticsManager    = new StatisticsManager(),
-				templateManager      = new TemplateManager(),
-				mainLoop             = createMainLoop( eventManager, statisticsManager),
-				sceneManager         = new SceneManager( spell, templateManager, mainLoop )
+				templateManager      = new TemplateManager( assets ),
+				mainLoop             = createMainLoop( eventManager, statisticsManager )
 
 			statisticsManager.init()
 
 			_.extend(
 				spell,
 				{
+					assets               : assets,
 					configurationManager : configurationManager,
 					eventManager         : eventManager,
 					inputEvents          : inputManager.getInputEvents(),
@@ -147,7 +149,6 @@ define(
 					mainLoop             : mainLoop,
 					renderingContext     : renderingContext,
 					runtimeModule        : undefined,
-					sceneManager         : sceneManager,
 					soundManager         : soundManager,
 					statisticsManager    : statisticsManager,
 					templateManager      : templateManager,

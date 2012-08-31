@@ -54,11 +54,22 @@ define(
 			)
 		}
 
+		var injectResource = function( resources, asset ) {
+			if( !asset.resourceId ) return
+
+			var resource = resources[ asset.resourceId ]
+
+			if( !resource ) throw 'Error: Could not resolve resource id \'' + asset.resourceId + '\'.'
+
+			asset.resource = resource
+		}
+
 
 		return function( spell, next ) {
 			var eventManager     = spell.eventManager,
 				renderingContext = spell.renderingContext,
 				resourceLoader   = spell.resourceLoader,
+				resources        = spell.resources,
 				runtimeModule    = spell.runtimeModule,
 				templateManager  = spell.templateManager
 
@@ -67,16 +78,21 @@ define(
 				resourceBundleId = 'resources'
 
 			eventManager.waitFor(
-				[ Events.RESOURCE_LOADING_COMPLETED, templateBundleId ],
-				function( templates ) {
-					_.each( templates, function( template ) { templateManager.add( template ) } )
-				}
-
-			).and(
 				[ Events.RESOURCE_LOADING_COMPLETED, assetBundleId ],
-				function( assets ) {
-					spell.assets = createAssets( assets )
+				function( loadedAssets ) {
+					_.extend( spell.assets, createAssets( loadedAssets ) )
 
+					// start loading template definition files
+					startLoadingResources(
+						resourceLoader,
+						templateBundleId,
+						resourceIdsToJsonFilenames( runtimeModule.templateIds ),
+						'library/templates',
+						'text',
+						resourceJsonDecoder
+					)
+
+					// start loading resources
 					startLoadingResources(
 						resourceLoader,
 						resourceBundleId,
@@ -90,21 +106,25 @@ define(
 				}
 
 			).and(
-				[ Events.RESOURCE_LOADING_COMPLETED, resourceBundleId ]
+				[ Events.RESOURCE_LOADING_COMPLETED, templateBundleId ],
+				function( loadedTemplates ) {
+					_.each( loadedTemplates, function( template ) { templateManager.add( template ) } )
+				}
+
+			).and(
+				[ Events.RESOURCE_LOADING_COMPLETED, resourceBundleId ],
+				function( loadedResources ) {
+					_.each(
+						spell.assets,
+						_.bind( injectResource, null, loadedResources )
+					)
+				}
 
 			).resume( function() {
 				next()
 			} )
 
-			startLoadingResources(
-				resourceLoader,
-				templateBundleId,
-				resourceIdsToJsonFilenames( runtimeModule.templateIds ),
-				'library/templates',
-				'text',
-				resourceJsonDecoder
-			)
-
+			// start loading asset definition files
 			startLoadingResources(
 				resourceLoader,
 				assetBundleId,

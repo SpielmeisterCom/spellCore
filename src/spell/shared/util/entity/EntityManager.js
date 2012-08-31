@@ -208,8 +208,8 @@ define(
 		 */
 
 		var EntityManager = function( templateManager ) {
-			this.templateManager = templateManager
 			this.components      = createComponentList( templateManager.getTemplateIds( 'componentTemplate' ) )
+			this.templateManager = templateManager
 		}
 
 		EntityManager.prototype = {

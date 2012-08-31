@@ -74,8 +74,6 @@ define(
 
 		var drawVisualObject = function(
 			context,
-			assets,
-			resources,
 			transforms,
 			appearances,
 			animatedAppearances,
@@ -92,8 +90,8 @@ define(
 			context.save()
 			{
 				var appearance          = appearances[ id ] || animatedAppearances[ id ] || textAppearances[ id ],
-					asset               = assets[ appearance.assetId ],
-					texture             = resources[ asset.resourceId ],
+					asset               = appearance.asset,
+					texture             = asset.resource,
 					visualObjectOpacity = visualObject.opacity
 
 				if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
@@ -236,7 +234,7 @@ define(
 				cameraDimensions &&
 				cameraTransform ) {
 
-				drawCoordinateGrid( context, this.resources, this.debugFontAsset, configurationManager.screenSize, cameraDimensions, cameraTransform )
+				drawCoordinateGrid( context, this.debugFontAsset, configurationManager.screenSize, cameraDimensions, cameraTransform )
 			}
 		}
 
@@ -255,18 +253,14 @@ define(
 		 */
 
 		var Renderer = function( spell ) {
-			this.assets               = spell.assets
 			this.configurationManager = spell.configurationManager
 			this.context              = spell.renderingContext
 			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
-			this.resources            = spell.resources
 
 			this.drawVisualObjectPartial = _.bind(
 				drawVisualObject,
 				null,
 				this.context,
-				this.assets,
-				this.resources,
 				this.transforms,
 				this.appearances,
 				this.animatedAppearances,
@@ -276,8 +270,8 @@ define(
 			)
 
 			var eventManager = spell.eventManager,
-				context = this.context,
-				screenSize = this.configurationManager.screenSize
+				context      = this.context,
+				screenSize   = this.configurationManager.screenSize
 
 			context.setClearColor( darkGrey )
 
