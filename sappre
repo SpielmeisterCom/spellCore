@@ -1,13 +1,8 @@
 #!/usr/bin/env node
 
-var createSpellCorePath = function( toolPath ) {
-	var parts = toolPath.split( '/' )
-	return parts.slice( 0, parts.length - 1 ).join( '/' )
-}
-
-var spellCorePath = createSpellCorePath( process.mainModule.filename )
-
-requirejs = require( 'requirejs' )
+var path          = require( 'path' ),
+	requirejs     = require( 'requirejs' ),
+	spellCorePath = path.resolve( process.mainModule.filename , '..' )
 
 requirejs.config( {
 	baseUrl: spellCorePath + '/src',
