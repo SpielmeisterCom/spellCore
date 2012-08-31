@@ -106,21 +106,8 @@ define(
 			if( !isFile( projectFilePath ) ) {
 				var data = {
 					"name": projectName,
-					"startScene": "Scene1",
-					"scenes": [
-						{
-							"name": "Scene1",
-							"scriptId": "spell/scene/default",
-							"entities": []
-						}
-					],
-					"systems": {
-						"update": [],
-						"render": [
-							"spell.system.keyInput",
-							"spell.system.render"
-						]
-					}
+					"startScene": "",
+					"scenes": []
 				}
 
 				fs.writeFileSync(
