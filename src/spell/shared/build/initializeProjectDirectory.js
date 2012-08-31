@@ -83,12 +83,11 @@ define(
 			var paths = [
 				publicDirName,
 				'build',
-				'library',
-				'library/assets',
-				LIBRARY_TEMPLATES_PATH,
+				path.join( LIBRARY_ASSETS_PATH, projectName ),
 				path.join( LIBRARY_TEMPLATES_PATH, projectName, 'component' ),
 				path.join( LIBRARY_TEMPLATES_PATH, projectName, 'entity' ),
-				path.join( LIBRARY_TEMPLATES_PATH, projectName, 'system' )
+				path.join( LIBRARY_TEMPLATES_PATH, projectName, 'system' ),
+				path.join( LIBRARY_SCRIPTS_PATH, projectName )
 			]
 
 			_.each(
