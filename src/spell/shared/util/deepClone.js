@@ -9,15 +9,8 @@ define(
 		'use strict'
 
 
-		return function deepClone( o, preserveUnclonableTypeReferences ) {
-			if( !o ) return o
-
-			var isArray    = _.isArray( o ),
-				isClonable = isArray || o.toString() !== '[object WebGLTexture]'
-
-			if( !isClonable ) {
-				return preserveUnclonableTypeReferences ? o : {}
-			}
+		return function deepClone( o ) {
+			var isArray = _.isArray( o )
 
 			if( isArray ||
 				_.isObject( o ) ) {
@@ -25,7 +18,7 @@ define(
 				var clone = isArray ? [] : {}
 
 				_.each( o, function( value, key ) {
-					clone[ key ] = deepClone( value, preserveUnclonableTypeReferences )
+					clone[ key ] = deepClone( value )
 				} )
 
 				return clone
