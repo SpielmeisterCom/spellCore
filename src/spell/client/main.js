@@ -151,7 +151,7 @@ define(
 					runtimeModule        : undefined,
 					soundManager         : soundManager,
 					statisticsManager    : statisticsManager,
-					templateManager      : templateManager,
+					templateManager      : templateManager
 				}
 			)
 
