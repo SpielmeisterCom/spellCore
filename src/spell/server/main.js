@@ -99,8 +99,6 @@ define(
 						createBuildServer( spellCorePath, projectsPath )
 					)
 				)
-				.use( rewriteUrlToRealProjectPath( projectsPath ) )
-				.use( connect.static( projectsPath ) )
 				.listen( port )
 		}
 
@@ -109,132 +107,9 @@ define(
 		 * public
 		 */
 
-		return function( spellCorePath, projectsPath, unprivilegedUserId, port ) {
+		return function( spellCorePath, projectsPath, port ) {
 			port = port || 8080
-
-
-			if( port < 1024 ) {
-				if( unprivilegedUserId === undefined ) {
-					logger.error( 'Please supply the username of the user that the server is going to run as.' )
-					process.exit()
-				}
-
-				if( !isRoot() ) {
-					logger.error( 'Binding to ports less than 1024 requires root privileges. The script must be started with root privileges.' )
-					process.exit()
-				}
-			}
-
-
-			console.log( 'The server is going to run as user \'' + unprivilegedUserId + '\' on port ' + port + ' with path \'' + projectsPath + '\' as root.' )
-
-			var flashPolicyFile, httpServer, connection
-
-			executeLogged(
-				'binding to ports',
-				function() {
-					flashPolicyFile = network.initializeFlashPolicyFileServer( 843 )
-					httpServer      = createHttpServer( spellCorePath, projectsPath, port )
-					connection      = network.initializeClientHandling( httpServer, networkProtocol )
-
-					network.initializePathService( connection )
-					network.initializeClockSyncService( connection )
-				}
-			)
-
-			executeLogged(
-				'dropping privileges',
-				function() {
-					process.setuid( unprivilegedUserId )
-				}
-			)
-
-
-			var eventManager = new EventManager()
-			var entityManager = new EntityManager( new TemplateManager() )
-
-			var spell = {},
-				mainLoop = undefined
-
-			var sceneManager = new SceneManager( spell, mainLoop )
-
-			var clients = connection.clients
-
-			spell.clients       = clients
-			spell.entityManager = entityManager
-			spell.eventManager  = eventManager
-			spell.sceneManager  = sceneManager
-
-
-
-			var gameScenes = {}
-
-			var findGameSceneWithOpenPlayerSlot = function( scenes ) {
-				return _.find(
-					scenes,
-					function( scene ) {
-						return scene.hasOpenPlayerSlot()
-					}
-				)
-			}
-
-			var findGameSceneWithClient = function( scenes, clientId ) {
-				return _.find(
-					scenes,
-					function( scene ) {
-						return scene.clients[ clientId ] !== undefined
-					}
-				)
-			}
-
-			var onSceneTransition = function( scene, nextScene ) {
-				delete gameScenes[ scene.id ]
-
-				if( nextScene ) {
-					gameScenes[ nextScene.id ] = nextScene
-				}
-			}
-
-			connection.listeners.push( {
-				onConnect: function( client ) {
-				},
-
-				onDisconnect: function( client ) {
-					logger.info( 'client ' + client.id + ' disconnected' )
-					var scene = findGameSceneWithClient( gameScenes, client.id )
-
-					if( scene ) {
-						scene.removeClient( client )
-
-					} else {
-						logger.error( 'Could not find a scene with client ' + client.id + '.' )
-					}
-				},
-
-				onMessage: function( client, message ) {
-					if( message.type !== Messages.JOIN_ANY_GAME ) return
-
-
-					var scene = findGameSceneWithOpenPlayerSlot( gameScenes )
-
-					if( !scene ) {
-						scene = SceneManager.createScene(
-							'game',
-							{
-								onSceneTransition : onSceneTransition
-							}
-						)
-					}
-
-					scene.addClient( client )
-					client.scene = scene
-					gameScenes[ scene.id ] = scene
-				}
-			} )
-
-			console.log( ' -> listening for incoming connections...\n' )
-
-			PlatformKit.callNextFrame( createMainLoop( eventManager, Types.Time.getCurrentInMs() ) )
+			var httpServer      = createHttpServer( spellCorePath, projectsPath, port )
 		}
 	}
 )

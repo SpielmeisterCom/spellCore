@@ -96,7 +96,6 @@ define(
 
 			var startServerCommand = function( command ) {
 				var errors = [],
-					userId = command.user || process.getuid(),
 					projectsPath = path.resolve( cwd + ( command.projectsRoot ? '/' + command.projectsRoot : '' ) )
 
 				if( !fs.existsSync( projectsPath ) ) {
@@ -108,7 +107,7 @@ define(
 					printErrors( errors )
 
 				} else {
-					serverMain( spellCorePath, projectsPath, userId, command.port )
+					serverMain( spellCorePath, projectsPath, command.port )
 				}
 			}
 

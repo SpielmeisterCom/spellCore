@@ -5,7 +5,7 @@ define(
 		'spell/shared/build/isFile',
 
 		'fs',
-		'glob',
+		'flob',
 		'mkdirp',
 		'path',
 		'tar-async'
@@ -15,7 +15,7 @@ define(
 		isFile,
 
 		fs,
-		glob,
+		flob,
 		mkdirp,
 		path,
 		tar
@@ -89,7 +89,7 @@ define(
 				output : fs.createWriteStream( outputFilePath )
 			} )
 
-			var filePaths = glob.sync(
+			var filePaths = flob.sync(
 				projectName + '/build/deploy/**',
 				{
 					cwd : projectsPath

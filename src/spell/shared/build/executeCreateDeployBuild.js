@@ -9,7 +9,7 @@ define(
 
 		'amd-helper',
 		'fs',
-		'glob',
+		'flob',
 		'mkdirp',
 		'path'
 	],
@@ -22,7 +22,7 @@ define(
 
 		amdHelper,
 		fs,
-		glob,
+		flob,
 		mkdirp,
 		path
 	) {
@@ -72,7 +72,7 @@ define(
 		}
 
 		var loadJsonFromLibrary = function( result, libraryPath ) {
-			var filePaths = glob.sync(
+			var filePaths = flob.sync(
 				'**/*.json',
 				{
 					nomount : true,

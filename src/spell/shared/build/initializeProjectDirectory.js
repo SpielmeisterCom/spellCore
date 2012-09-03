@@ -6,7 +6,7 @@ define(
 		'spell/shared/build/isFile',
 
 		'fs',
-		'glob',
+		'flob',
 		'mkdirp',
 		'path',
 		'util',
@@ -18,7 +18,7 @@ define(
 		isFile,
 
 		fs,
-		glob,
+		flob,
 		mkdirp,
 		path,
 		util,
@@ -41,7 +41,7 @@ define(
 		 * @param targetPath
 		 */
 		var copyDirectory = function( sourcePath, targetPath ) {
-			var relativeFilePaths = glob.sync(
+			var relativeFilePaths = flob.sync(
 				'/**/*',
 				{
 					root : sourcePath,
@@ -162,7 +162,7 @@ define(
 			var outputLibraryPath = outputPath + '/library'
 
 			if( !fs.existsSync( outputLibraryPath ) ) {
-				fs.symlinkSync( '../library', outputLibraryPath )
+				fs.symlinkSync( '../library', outputLibraryPath, 'dir' )
 			}
 
 			return errors

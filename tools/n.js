@@ -4,17 +4,12 @@
  * needjs optimizer
  */
 
-var createSpellPath = function( toolPath ) {
-	var parts = toolPath.split( '/' )
-	return parts.slice( 0, parts.length - 2 ).join( '/' )
-}
-
-var spellPath = createSpellPath( process.mainModule.filename )
-
-requirejs = require( 'requirejs' )
+var path          = require( 'path' ),
+	requirejs     = require( 'requirejs' ),
+	spellCorePath = path.resolve( process.mainModule.filename , '../..' )
 
 requirejs.config( {
-	baseUrl: spellPath + '/src',
+	baseUrl: spellCorePath + '/src',
 	nodeRequire: require
 } )
 
@@ -25,6 +20,6 @@ requirejs(
 	function(
 		needjsOptimizer
 	) {
-		needjsOptimizer( process.argv, process.cwd(), spellPath )
+		needjsOptimizer( process.argv, process.cwd(), spellCorePath )
 	}
 )
