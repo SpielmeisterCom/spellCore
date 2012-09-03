@@ -293,6 +293,21 @@ define(
 				return !!componentList[ entityId ]
 			},
 
+			/**
+			 * Returns a specific component
+			 *
+			 * @param entityId the id of the entity
+			 * @param componentId the id of the component
+			 * @return {Object}
+			 */
+			getComponent : function( entityId, componentId ) {
+				var componentList = this.components[ componentId ]
+
+				if( !componentList || !componentList[ entityId ]) return undefined
+
+				return componentList[ entityId ]
+			},
+
 			getComponentsById : function( componentTemplateId ) {
 				var components = this.components[ componentTemplateId ]
 
