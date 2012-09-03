@@ -35,27 +35,28 @@ define(
 			debugFontAssetId = 'font:spell.OpenSans14px',
 			currentCameraId
 
-		var createSortedByLayer = function( roots, visualObjects ) {
-			return _.reduce(
-				roots,
-				function( memo, root, id ) {
-					var visualObject = visualObjects[ id ]
+		var layerCompareFunction = function( a, b ) {
+			var layer1 = a.layer || 0,
+				layer2 = b.layer || 0
 
-					if( !visualObject ) return memo
+			return ( layer1 < layer2 ? -1 : ( layer1 > layer2 ? 1 : 0 ) )
+		}
 
-					return memo.concat( {
-						id : id,
-						layer : visualObject.layer
-					} )
-				},
-				[]
-			).sort(
-				function( a, b ) {
-					var layerA = a.layer
-					var layerB = b.layer
+		var createSortedByLayer = function( visualObjects, ids ) {
+			return _.pluck(
+				_.reduce(
+					ids,
+					function( memo, id ) {
+						var visualObject = visualObjects[ id ]
 
-					return ( layerA < layerB ? -1 : ( layerA > layerB ? 1 : 0 ) )
-				}
+						return memo.concat( {
+							id    : id,
+							layer : visualObject ? visualObject.layer : 0
+						} )
+					},
+					[]
+				).sort( layerCompareFunction ),
+				'id'
 			)
 		}
 
@@ -89,74 +90,75 @@ define(
 
 			context.save()
 			{
-				var appearance          = appearances[ id ] || animatedAppearances[ id ] || textAppearances[ id ],
-					asset               = appearance.asset,
-					texture             = asset.resource,
-					visualObjectOpacity = visualObject.opacity
-
-				if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
-
-
-				if( visualObjectOpacity !== 1.0 ) {
-					context.setGlobalAlpha( visualObjectOpacity )
+				if( transform ) {
+					// object to world space transformation go here
+					context.translate( transform.translation )
+					context.rotate( transform.rotation )
+					context.scale( transform.scale )
 				}
 
-				// object to world space transformation go here
-				context.translate( transform.translation )
+				if( visualObject ) {
+					var visualObjectOpacity = visualObject.opacity
 
-				context.rotate( transform.rotation )
-
-				if( asset.type === 'appearance' ) {
-					// static appearance
-					context.scale( transform.scale )
-
-					context.save()
-					{
-						context.scale( texture.dimensions )
-
-						context.drawTexture( texture, -0.5, -0.5, 1, 1 )
+					if( visualObjectOpacity !== 1.0 ) {
+						context.setGlobalAlpha( visualObjectOpacity )
 					}
-					context.restore()
 
-				} else if( asset.type === 'font' ) {
-					// text appearance
-					context.scale( transform.scale )
+					var appearance = appearances[ id ] || animatedAppearances[ id ] || textAppearances[ id ]
 
-					drawText( context, asset, texture, 0, 0, appearance.text, appearance.spacing )
+					if( appearance ) {
+						var asset   = appearance.asset,
+							texture = asset.resource
 
-				} else if( asset.type === 'animation' ) {
-					// animated appearance
-					var assetFrameDimensions = asset.frameDimensions,
-						assetNumFrames       = asset.numFrames
+						if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
 
-					appearance.offset = createOffset(
-						deltaTimeInMs,
-						appearance.offset,
-						appearance.replaySpeed,
-						assetNumFrames,
-						asset.frameDuration,
-						asset.looped
-					)
+						if( asset.type === 'appearance' ) {
+							// static appearance
+							context.save()
+							{
+								context.scale( texture.dimensions )
 
-					var frameId = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
-						frameOffset = asset.frameOffsets[ frameId ]
+								context.drawTexture( texture, -0.5, -0.5, 1, 1 )
+							}
+							context.restore()
 
-					context.scale( transform.scale )
+						} else if( asset.type === 'font' ) {
+							// text appearance
+							drawText( context, asset, texture, 0, 0, appearance.text, appearance.spacing )
 
-					context.save()
-					{
-						context.scale( assetFrameDimensions )
+						} else if( asset.type === 'animation' ) {
+							// animated appearance
+							var assetFrameDimensions = asset.frameDimensions,
+								assetNumFrames       = asset.numFrames
 
-						context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameDimensions[ 0 ], assetFrameDimensions[ 1 ], -0.5, -0.5, 1, 1 )
+							appearance.offset = createOffset(
+								deltaTimeInMs,
+								appearance.offset,
+								appearance.replaySpeed,
+								assetNumFrames,
+								asset.frameDuration,
+								asset.looped
+							)
+
+							var frameId = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
+								frameOffset = asset.frameOffsets[ frameId ]
+
+							context.save()
+							{
+								context.scale( assetFrameDimensions )
+
+								context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameDimensions[ 0 ], assetFrameDimensions[ 1 ], -0.5, -0.5, 1, 1 )
+							}
+							context.restore()
+						}
 					}
-					context.restore()
 				}
 
 				// draw children
 				var children = childrenComponents[ id ]
 
 				if( children ) {
-					var childrenIds    = children.ids,
+					var childrenIds    = createSortedByLayer( visualObjects, children.ids ),
 						numChildrenIds = childrenIds.length
 
 					for( var i = 0; i < numChildrenIds; i++ ) {
@@ -229,11 +231,15 @@ define(
 			// clear color buffer
 			context.clear()
 
-			// TODO: visualObjects should be presorted on the component list level by a user defined index, not here on every rendering tick
+			var rootTransforms = _.intersection(
+				_.keys( this.roots ),
+				_.keys( this.transforms )
+			)
+
 			_.each(
-				createSortedByLayer( this.roots, this.visualObjects ),
-				function( visualObject ) {
-					drawVisualObjectPartial( deltaTimeInMs, visualObject.id, drawVisualObjectPartial )
+				createSortedByLayer( this.visualObjects, rootTransforms ),
+				function( id ) {
+					drawVisualObjectPartial( deltaTimeInMs, id, drawVisualObjectPartial )
 				}
 			)
 
