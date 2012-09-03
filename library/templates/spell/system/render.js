@@ -108,10 +108,15 @@ define(
 
 				if( asset.type === 'appearance' ) {
 					// static appearance
-					vec2.multiply( transform.scale, texture.dimensions, tmpVec2 )
-					context.scale( tmpVec2 )
+					context.scale( transform.scale )
 
-					context.drawTexture( texture, -0.5, -0.5, 1, 1 )
+					context.save()
+					{
+						context.scale( texture.dimensions )
+
+						context.drawTexture( texture, -0.5, -0.5, 1, 1 )
+					}
+					context.restore()
 
 				} else if( asset.type === 'font' ) {
 					// text appearance
@@ -123,9 +128,6 @@ define(
 					// animated appearance
 					var assetFrameDimensions = asset.frameDimensions,
 						assetNumFrames       = asset.numFrames
-
-					vec2.multiply( transform.scale, assetFrameDimensions, tmpVec2 )
-					context.scale( tmpVec2 )
 
 					appearance.offset = createOffset(
 						deltaTimeInMs,
@@ -139,7 +141,15 @@ define(
 					var frameId = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
 						frameOffset = asset.frameOffsets[ frameId ]
 
-					context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameDimensions[ 0 ], assetFrameDimensions[ 1 ], -0.5, -0.5, 1, 1 )
+					context.scale( transform.scale )
+
+					context.save()
+					{
+						context.scale( assetFrameDimensions )
+
+						context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameDimensions[ 0 ], assetFrameDimensions[ 1 ], -0.5, -0.5, 1, 1 )
+					}
+					context.restore()
 				}
 
 				// draw children
