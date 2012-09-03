@@ -627,6 +627,14 @@ define(
 		 */
 		_.intersection = platformImpl.intersection
 
+		/**
+		 * Returns true if object is NaN.
+		 * Note: this is not the same as the native isNaN function, which will also return true if the variable is undefined.
+		 *
+		 * @param {Object} Number
+		 */
+		_.isNaN = platformImpl.isNaN
+
 		return _
 	}
 )
