@@ -614,6 +614,19 @@ define(
 		 */
 		_.after = platformImpl.after
 
+		/**
+		 * Computes the list of values that are the intersection of all the arrays. Each value in the result is present in each of the arrays.
+		 *
+		 * Example:
+		 *
+		 *     _.intersection([1, 2, 3], [101, 2, 1, 10], [2, 1]);
+		 *     //=> [1, 2]
+		 *
+		 * @param {Array...} arrays
+		 * @return {Array}
+		 */
+		_.intersection = platformImpl.intersection
+
 		return _
 	}
 )
