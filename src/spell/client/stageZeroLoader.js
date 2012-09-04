@@ -24,7 +24,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 
 ;( function( document ) {
 	var MIN_FLASH_PLAYER_VERSION = '10.1.0',
-		DEFAULT_CONTAINER_ID = 'spell'
+		DEFAULT_CONTAINER_ID = 'spell',
+		MODE = {
+			DEPLOYED : 'deployed',
+			DEVELOPMENT_EMBEDDED : 'dev_embedded',
+			DEVELOPMENT_STANDALONE : 'dev_standalone'
+		}
 
 	var isFirefox = function() {
 		var match = navigator.userAgent.match( /.*Firefox\/(\d+)/ )
@@ -122,8 +127,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 			config.drawCoordinateGrid = false
 		}
 
-		if( !config.development ) {
-			config.development = false
+		if( !config.mode ) {
+			config.mode = MODE.DEPLOYED
 		}
 	}
 
@@ -165,6 +170,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 	}
 
 	var loadHtml5Executable = function( config, spellObject, onInitialized, debugMessageCallback ) {
+		var isModeDeployed = ( config.mode === MODE.DEPLOYED )
+
 		var startHtml5Executable = function() {
 			if( config.verbose ) printLaunching()
 
@@ -174,7 +181,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 				addDebugAPI( spellObject, engineInstance, debugMessageCallback )
 			}
 
-			if( !config.development ) {
+			if( isModeDeployed ) {
 				engineInstance.start( spell.runtimeModule, spell.cache )
 			}
 
@@ -187,7 +194,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 
 		var args = [ 'html5/spell.js' ]
 
-		if( !config.development ) {
+		if( isModeDeployed ) {
 			args.push( 'html5/data.js' )
 		}
 

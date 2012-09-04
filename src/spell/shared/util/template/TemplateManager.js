@@ -129,7 +129,7 @@ define(
 			templates[ templateId ] = definition
 
 			if( definition.type === TemplateTypes.ENTITY ) {
-				entityPrototypes[ templateId ] = createComponents( assets, templates, definition.config, null, templateId )
+				entityPrototypes[ templateId ] = createComponents( assets, templates, definition.config, null, templateId, false )
 			}
 		}
 
@@ -196,7 +196,9 @@ define(
 			)
 		}
 
-		var createComponents = function( assets, templates, componentConfig, entityPrototype, entityTemplateId ) {
+		var createComponents = function( assets, templates, componentConfig, entityPrototype, entityTemplateId, injectAssets ) {
+			if( injectAssets === undefined ) injectAssets = true
+
 			var entity = applyComponentConfig(
 				entityPrototype ? deepClone( entityPrototype ) : {},
 				componentConfig
@@ -215,13 +217,14 @@ define(
 							)
 					}
 
-					entity[ componentId ] = injectAsset(
-						assets,
-						componentTemplate,
-						updateComponent(
-							createComponentPrototype( componentTemplate ),
-							attributeConfig
-						)
+					var updatedComponent = updateComponent(
+						createComponentPrototype( componentTemplate ),
+						attributeConfig
+					)
+
+					entity[ componentId ] = ( injectAssets ?
+						injectAsset( assets, componentTemplate, updatedComponent ) :
+						updatedComponent
 					)
 				}
 			)

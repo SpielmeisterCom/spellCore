@@ -36,6 +36,42 @@
 			return ( results == null ? '' : results[ 1 ] )
 		}
 
+		var loadJson = function( url, onLoad ) {
+			var onError = function() {
+				throw 'Error: Could not load \'' + url + '\'.'
+			}
+
+			var onReadyStateChange = function() {
+				/*
+				 * readyState === 4 means 'DONE'; see https://developer.mozilla.org/en/DOM/XMLHttpRequest
+				 */
+				if( this.readyState !== 4 ) return
+
+				this.onload( request )
+			}
+
+			var onLoadWrapper = function() {
+				if( !!this.loaded ) return
+
+				this.loaded = true
+
+				if( this.status !== 200 ) {
+					onError()
+
+					return
+				}
+
+				onLoad( request )
+			}
+
+			var request = new XMLHttpRequest()
+			request.onload             = onLoadWrapper
+			request.onreadystatechange = onReadyStateChange
+			request.onerror            = onError
+			request.open( 'GET', url, true )
+			request.send( null )
+		}
+
 		var sendMessageToEditor = function( type, payload ) {
 			parent.window.postMessage(
 				{
@@ -47,16 +83,35 @@
 			)
 		}
 
+		var isEmbeddedInIFrame = function() {
+			return window.location !== window.parent.location
+		}
+
+		var isEmbedded = isEmbeddedInIFrame()
+
 		var onInitialized = function() {
-			sendMessageToEditor( 'spell.initialized' )
+			if( isEmbedded ) {
+				// embedded mode, wait for messages from the editor
+				sendMessageToEditor( 'spell.initialized' )
+
+			} else {
+				// stand-alone mode, load project.json and pass it to the engine
+				loadJson(
+					'../project.json',
+					function( request ) {
+						sendMessageToEditor(
+							'spelled.debug.executeRuntimeModule',
+							JSON.parse( request.response )
+						)
+					}
+				)
+			}
 		}
 
 		var handleMessageFromEditor = function( event ) {
-			var index = event.data.type.indexOf( 'spelled.debug' )
+			var isDebugMessage = event.data.type.indexOf( 'spelled.debug' ) === 0
 
-			if( event.data.type.indexOf( 'spelled.debug' ) === 0 ) {
-				spell.sendDebugMessage( event.data )
-			}
+			if( isDebugMessage ) spell.sendDebugMessage( event.data )
 		}
 
 		var registerMessageHandler = function() {
@@ -66,7 +121,7 @@
 		registerMessageHandler()
 
 		var config = {
-			development : true,
+			mode : isEmbedded ? 'embedded' : 'standalone',
 			debug : true,
 			platform : 'html5'
 		}
