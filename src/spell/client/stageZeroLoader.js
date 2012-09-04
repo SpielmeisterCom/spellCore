@@ -83,7 +83,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 			}
 		}
 
-		return ( isHtml5AudioSupported && Modernizr.canvas && Modernizr.websockets )
+		return ( isHtml5AudioSupported && Modernizr.canvas )
 	}
 
 	var isWebGlCapable = function() {
