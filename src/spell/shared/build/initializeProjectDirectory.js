@@ -133,8 +133,6 @@ define(
 				function( fileName ) {
 					var projectDirectoryFilePath = projectPath + '/' + publicDirName + '/' + fileName
 
-					if( fs.existsSync( projectDirectoryFilePath ) ) return
-
 					copyFile(
 						spellCorePath + '/publicTemplate/' + fileName,
 						projectDirectoryFilePath
