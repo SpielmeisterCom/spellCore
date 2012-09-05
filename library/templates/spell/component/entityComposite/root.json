@@ -1,6 +1,7 @@
 {
 	"type" : "componentTemplate",
 	"readonly" : true,
+	"engineInternal" : true,
 	"namespace" : "spell.component.entityComposite",
 	"name" : "root",
 	"title" : "Root Entity",
