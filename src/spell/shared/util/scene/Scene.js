@@ -71,7 +71,13 @@ define(
 			var componentsInput = _.reduce(
 				template.input,
 				function( memo, inputDefinition ) {
-					memo[ inputDefinition.name ] = entityManager.getComponentsById( inputDefinition.templateId )
+					var componentDictionary = entityManager.getComponentDictionaryById( inputDefinition.templateId )
+
+					if( !componentDictionary ) {
+						throw 'Error: No component list for component template id \'' + inputDefinition.templateId +  '\' available.'
+					}
+
+					memo[ inputDefinition.name ] = componentDictionary
 
 					return memo
 				},

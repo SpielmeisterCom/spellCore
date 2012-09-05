@@ -4,11 +4,13 @@
 define(
 	'spell/shared/util/entity/EntityManager',
 	[
+		'spell/defines',
 		'spell/shared/util/create',
 
 		'spell/functions'
 	],
 	function(
+		defines,
 		create,
 
 		_
@@ -20,9 +22,10 @@ define(
 		 * private
 		 */
 
-		var nextEntityId        = 1,
-			rootComponentId     = 'spell.component.entityComposite.root',
-			childrenComponentId = 'spell.component.entityComposite.children'
+		var nextEntityId          = 1,
+			ROOT_COMPONENT_ID     = defines.ROOT_COMPONENT_ID,
+			CHILDREN_COMPONENT_ID = defines.CHILDREN_COMPONENT_ID,
+			NAME_COMPONENT_ID     = defines.NAME_COMPONENT_ID
 
 		/**
 		 * Returns an entity id. If no entity id is provided a new one is generated.
@@ -48,33 +51,33 @@ define(
 			)
 		}
 
-		var addComponents = function( components, entityId, entityComponents ) {
+		var addComponents = function( componentDictionaries, entityId, entityComponents ) {
 			_.each(
 				entityComponents,
 				function( component, componentId ) {
-					if( !!components[ componentId ][ entityId ] ) {
+					if( !!componentDictionaries[ componentId ][ entityId ] ) {
 						throw 'Error: Adding a component to the entity with id \'' + entityId + '\' failed because the requested id is already in use. ' +
 							'Please make sure that no duplicate entity ids are used.'
 					}
 
-					components[ componentId ][ entityId ] = component
+					componentDictionaries[ componentId ][ entityId ] = component
 				}
 			)
 		}
 
-		var removeComponents = function( components, entityId, entityComponentId ) {
+		var removeComponents = function( componentDictionaries, entityId, entityComponentId ) {
 			if( entityComponentId ) {
 				// remove a single component from the entity
-				delete components[ entityComponentId ][ entityId ]
+				delete componentDictionaries[ entityComponentId ][ entityId ]
 
 			} else {
-				// remove all components, that is "remove the entity"
+				// remove all componentDictionaries, that is "remove the entity"
 				_.each(
-					components,
-					function( componentList ) {
-						if( !_.has( componentList, entityId ) ) return
+					componentDictionaries,
+					function( componentDictionary ) {
+						if( !_.has( componentDictionary, entityId ) ) return
 
-						delete componentList[ entityId ]
+						delete componentDictionary[ entityId ]
 					}
 				)
 			}
@@ -92,6 +95,7 @@ define(
 
 			var config     = arg1.config || {},
 				children   = arg1.children || [],
+				name       = arg1.name || '',
 				templateId = _.isString( arg1 ) ? arg1 : arg1.templateId
 
 			if( templateId ) {
@@ -112,6 +116,7 @@ define(
 				children   : children,
 				config     : config,
 				id         : arg1.id ? arg1.id : undefined,
+				name       : name,
 				templateId : templateId
 			}
 		}
@@ -147,21 +152,25 @@ define(
 			return result
 		}
 
-		var createEntityCompositeConfig = function( isRoot, childEntityIds ) {
+		var createAdditionalEntityConfig = function( isRoot, childEntityIds, name ) {
 			var result = {}
 
-			if( isRoot ) result[ rootComponentId ] = {}
+			if( isRoot ) result[ ROOT_COMPONENT_ID ] = {}
 
 			if( _.size( childEntityIds ) > 0 ) {
-				result[ childrenComponentId ] = {
-					"ids" : childEntityIds
+				result[ CHILDREN_COMPONENT_ID ] = {
+					ids : childEntityIds
 				}
+			}
+
+			result[ NAME_COMPONENT_ID ] = {
+				value : name
 			}
 
 			return result
 		}
 
-		var createEntity = function( components, templateManager, entityConfig, isRoot ) {
+		var createEntity = function( componentDictionaries, templateManager, entityConfig, isRoot ) {
 			isRoot       = ( isRoot === true || isRoot === undefined )
 			entityConfig = normalizeEntityConfig( templateManager, entityConfig )
 
@@ -178,22 +187,41 @@ define(
 			var childEntityIds = _.map(
 				entityConfig.children,
 				function( entityConfig ) {
-					return createEntity( components, templateManager, entityConfig, false )
+					return createEntity( componentDictionaries, templateManager, entityConfig, false )
 				}
 			)
 
-			// creating current entity
-			_.extend( config, createEntityCompositeConfig( isRoot, childEntityIds ) )
+			// add additional components which the engine requires
+			_.extend(
+				config,
+				createAdditionalEntityConfig( isRoot, childEntityIds, entityConfig.name )
+			)
 
 			var entityId = getEntityId( entityConfig.id )
 
 			addComponents(
-				components,
+				componentDictionaries,
 				entityId,
 				templateManager.createComponents( templateId, config || {} )
 			)
 
 			return entityId
+		}
+
+		var assembleEntityInstance = function( componentDictionaries, id ) {
+			return _.reduce(
+				componentDictionaries,
+				function( memo, componentDictionary, componentId ) {
+					var component = componentDictionary[ id ]
+
+					if( component ) {
+						memo[ componentId ] = component
+					}
+
+					return memo
+				},
+				{}
+			)
 		}
 
 
@@ -202,34 +230,25 @@ define(
 		 */
 
 		var EntityManager = function( templateManager ) {
-			this.components      = createComponentList( templateManager.getTemplateIds( 'componentTemplate' ) )
-			this.templateManager = templateManager
+			this.componentDictionaries = createComponentList( templateManager.getTemplateIds( 'componentTemplate' ) )
+			this.templateManager       = templateManager
 		}
 
 		EntityManager.prototype = {
 			/**
 			 * Creates an entity
 			 *
-			 * @param arg0 an entity template id or an entity config
+			 * @param {*} arg0 an entity template id or an entity config
 			 * @return {*}
 			 */
 			createEntity : function( arg0 ) {
-				return createEntity( this.components, this.templateManager, arg0 )
+				return createEntity( this.componentDictionaries, this.templateManager, arg0 )
 			},
 
 			/**
-			 * Removes an entity
+			 * Creates entities from a list of entity configs.
 			 *
-			 * @param entityId the id of the entity to remove
-			 */
-			removeEntity : function( entityId ) {
-				if( !entityId ) throw 'Error: Missing entity id.'
-
-				removeComponents( this.components, entityId )
-			},
-
-			/**
-			 * TBD
+			 * @param {Object} entityConfigs
 			 */
 			createEntities : function( entityConfigs ) {
 				var self = this
@@ -243,74 +262,141 @@ define(
 			},
 
 			/**
-			 * Adds a component to an entity
+			 * Removes an entity
 			 *
-			 * @param entityId the id of the entity that the component belongs to
-			 * @param arg1 can be a component template id or a component template config
+			 * @param {String} id the id of the entity to remove
+			 */
+			removeEntity : function( id ) {
+				if( !id ) throw 'Error: Missing entity id.'
+
+				removeComponents( this.componentDictionaries, id )
+			},
+
+			/**
+			 * Returns an entity by its id.
+			 *
+			 * NOTE: Do not use this function to frequently query large amounts of entities. In order to process entities frequently with better performance
+			 * define a system input that matches your requirements.
+			 *
+			 * @param {String} id the entity id
+			 * @return {Object}
+			 */
+			getEntityById : function( id ) {
+				return assembleEntityInstance( this.componentDictionaries, id )
+			},
+
+			/**
+			 * Returns an array of ids of entities which have the requested name.
+			 *
+			 * @param {String} name the name of the entity
+			 * @return {Array}
+			 */
+			getEntityIdsByName : function( name ) {
+				var nameComponents = this.componentDictionaries[ NAME_COMPONENT_ID ],
+					ids            = []
+
+				for( var id in nameComponents ) {
+					if( nameComponents[ id ].value === name ) {
+						ids.push( id )
+					}
+				}
+
+				return ids
+			},
+
+			/**
+			 * Returns a collection of entities which have the requested name.
+			 *
+			 * @param {String} name the name of the entity
+			 * @return {Object}
+			 */
+			getEntitiesByName : function( name ) {
+				var ids = this.getEntityIdsByName( name )
+
+				var entities = {}
+
+				for( var i = 0, numIds = ids.length; i < numIds; i++ ) {
+					var id = ids[ i ]
+
+					entities[ id ] = this.getEntityById( id )
+				}
+
+				return entities
+			},
+
+			/**
+			 * Adds a component to an entity.
+			 *
+			 * @param {String} id the id of the entity that the component belongs to
+			 * @param {*} arg1 can be a component template id or a component template config
 			 * @return {*}
 			 */
-			addComponent : function( entityId, arg1 ) {
-				if( !entityId ) throw 'Error: Missing entity id.'
+			addComponent : function( id, arg1 ) {
+				if( !id ) throw 'Error: Missing entity id.'
 
 				addComponents(
-					this.components,
-					entityId,
+					this.componentDictionaries,
+					id,
 					this.templateManager.createComponents( null, normalizeComponentConfig( arg1 ) )
 				)
 			},
 
 			/**
-			 * Removes a component from an entity
-			 *-
-			 * @param entityId the id of the entity that the component belongs to
-			 * @param componentId the id (template id) of the component to remove
+			 * Removes a component from an entity.
+			 *
+			 * @param {String} id the id of the entity that the component belongs to
+			 * @param {String} componentId the id (template id) of the component to remove
 			 * @return {*}
 			 */
-			removeComponent : function( entityId, componentId ) {
-				if( !entityId ) throw 'Error: Missing entity id.'
+			removeComponent : function( id, componentId ) {
+				if( !id ) throw 'Error: Missing entity id.'
 
-				removeComponents( this.components, entityId, componentId )
+				removeComponents( this.componentDictionaries, id, componentId )
 			},
 
 			/**
-			 * Returns true if an entity has a component
+			 * Returns a component from a specific entity.
 			 *
-			 * @param entityId the id of the entity to check
-			 * @param componentId the id of the component to check
-			 * @return {Boolean}
-			 */
-			hasComponent : function( entityId, componentId ) {
-				var componentList = this.components[ componentId ]
-
-				if( !componentList ) return false
-
-				return !!componentList[ entityId ]
-			},
-
-			/**
-			 * Returns a specific component
-			 *
-			 * @param entityId the id of the entity
-			 * @param componentId the id of the component
+			 * @param {String} componentId the requested component id
+			 * @param {String} id the id of the requested entity
 			 * @return {Object}
 			 */
-			getComponent : function( entityId, componentId ) {
-				var componentList = this.components[ componentId ]
+			getComponentById : function( componentId, id ) {
+				var componentDictionary = this.componentDictionaries[ componentId ]
 
-				if( !componentList || !componentList[ entityId ]) return undefined
-
-				return componentList[ entityId ]
+				return componentDictionary ? componentDictionary[ id ] : undefined
 			},
 
-			getComponentsById : function( componentTemplateId ) {
-				var components = this.components[ componentTemplateId ]
+			/**
+			 * Returns a collection of components which have the requested component id and belong to entities which have the requested name.
+			 *
+			 * @param {String} componentId the requested component id
+			 * @param {String} name the requested entity name
+			 * @return {Object}
+			 */
+			getComponentsByName : function( componentId, name ) {
+				var componentDictionary = this.getComponentDictionaryById( componentId ),
+					ids                 = this.getEntityIdsByName( name )
 
-				if( !components ) throw 'Error: No component list for component template id \'' + componentTemplateId +  '\' available.'
+				if( ids.length === 0 ||
+					!componentDictionary ) {
 
-				return components
+					return []
+				}
+
+				return _.pick( componentDictionary, ids )
+			},
+
+			/**
+			 * Returns a component dictionary of a specific type.
+			 *
+			 * @param {String} componentId the requested component type / id
+			 * @return {*}
+			 */
+			getComponentDictionaryById : function( componentId ) {
+				return this.componentDictionaries[ componentId ]
 			}
 		}
-
 
 		return EntityManager
 	}

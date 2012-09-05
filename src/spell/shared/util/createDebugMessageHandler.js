@@ -14,14 +14,13 @@ define(
 					startEngine( payload )
 				},
 				'spelled.debug.updateComponent' : function( payload ) {
-					//TODO: check if the scene is correct
+					var component = spell.entityManager.getComponentById( payload.componentId, payload.entityId )
 
-					var component = spell.entityManager.getComponent( payload.entityId, payload.componentId );
-					if ( component ) {
-						spell.logger.debug( "Setting " + payload.componentId + ":" + payload.key + " = " + payload.value + " in entity " + payload.entityId)
-						component[payload.key] = payload.value
+					if( component ) {
+						component[ payload.key ] = payload.value
+
 					} else {
-						spell.logger.debug( "Could not find component " + payload.componentId + " in entity " + payload.entityId )
+						spell.logger.debug( "Could not update component " + payload.componentId + " in entity " + payload.entityId )
 					}
 				}
 			}
