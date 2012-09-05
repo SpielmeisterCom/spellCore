@@ -72,15 +72,16 @@
 			request.send( null )
 		}
 
+		var iframeId = getParam( 'iframeId' )
+
 		var sendMessageToEditor = function( type, payload ) {
-			parent.window.postMessage(
-				{
-					type : type,
-					payload : payload,
-					iframeId : getParam( 'iframeId' )
-				},
-				'*'
-			)
+			var message = {
+				type : type,
+				payload : payload,
+				iframeId : iframeId
+			}
+
+			parent.window.postMessage( JSON.stringify( message ), '*' )
 		}
 
 		var isEmbeddedInIFrame = function() {
@@ -109,9 +110,11 @@
 		}
 
 		var handleMessageFromEditor = function( event ) {
-			var isDebugMessage = event.data.type.indexOf( 'spelled.debug' ) === 0
+			var message = JSON.parse( event.data )
 
-			if( isDebugMessage ) spell.sendDebugMessage( event.data )
+			var isDebugMessage = message.type.indexOf( 'spelled.debug' ) === 0
+
+			if( isDebugMessage ) spell.sendDebugMessage( message )
 		}
 
 		var registerMessageHandler = function() {
