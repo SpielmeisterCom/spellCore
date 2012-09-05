@@ -6,15 +6,35 @@ SPELL_HTML5_BUILD = build/spell.html5.js
 SPELL_ENGINE_INCLUDE_DEV_BUILD = build/spell.dev.js
 SPELL_ENGINE_INCLUDE_DEPLOY_BUILD = build/spell.deploy.js
 
-lib:
-	# build engine include for development mode
-	mkdir -p build
-	node tools/n.js $(SPELL_COMMON_OPTIONS) > $(SPELL_COMMON_BUILD)
-	node tools/n.js $(SPELL_HTML5_OPTIONS) > $(SPELL_HTML5_BUILD)
-	cat $(NEEDJS_BUILD) $(SPELL_COMMON_BUILD) $(SPELL_HTML5_BUILD) > $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
 
+.PHONY: dev
+dev : $(SPELL_ENGINE_INCLUDE_DEV_BUILD) $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
+
+.PHONY: deploy
+deploy: $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
+	# build engine include for deployment mode
+	rm $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
+
+$(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD): $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
 	# build engine include for deployment mode
 	node tools/n.js mangle $(SPELL_ENGINE_INCLUDE_DEV_BUILD) > $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
+
+$(SPELL_ENGINE_INCLUDE_DEV_BUILD): $(SPELL_COMMON_BUILD) $(SPELL_HTML5_BUILD)
+	# build engine includes for development mode
+	mkdir -p build
+	cat $(NEEDJS_BUILD) $(SPELL_COMMON_BUILD) $(SPELL_HTML5_BUILD) > $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
+
+$(SPELL_COMMON_BUILD):
+	mkdir -p build
+	node tools/n.js $(SPELL_COMMON_OPTIONS) > $(SPELL_COMMON_BUILD)
+
+$(SPELL_HTML5_BUILD):
+	mkdir -p build
+	node tools/n.js $(SPELL_HTML5_OPTIONS) > $(SPELL_HTML5_BUILD)
+
+.PHONY: clean
+clean:
+	rm -rf build/*
 
 .PHONY: docs
 docs:

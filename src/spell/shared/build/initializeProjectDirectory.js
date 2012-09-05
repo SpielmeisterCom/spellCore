@@ -73,7 +73,7 @@ define(
 		 * public
 		 */
 
-		return function( spellPath, projectName, projectPath, projectFilePath ) {
+		return function( spellCorePath, projectName, projectPath, projectFilePath, isDevEnvironment ) {
 			var errors          = [],
 				publicDirName   = 'public',
 				outputPath      = projectPath + '/' + publicDirName,
@@ -117,9 +117,9 @@ define(
 			}
 
 			// copy spell sdk templates, scripts and assets
-			copyDirectory( path.join( spellPath, LIBRARY_TEMPLATES_PATH ), path.join( projectPath, LIBRARY_TEMPLATES_PATH ) )
-			copyDirectory( path.join( spellPath, LIBRARY_SCRIPTS_PATH ),   path.join( projectPath, LIBRARY_SCRIPTS_PATH ) )
-			copyDirectory( path.join( spellPath, LIBRARY_ASSETS_PATH ),    path.join( projectPath, LIBRARY_ASSETS_PATH ) )
+			copyDirectory( path.join( spellCorePath, LIBRARY_TEMPLATES_PATH ), path.join( projectPath, LIBRARY_TEMPLATES_PATH ) )
+			copyDirectory( path.join( spellCorePath, LIBRARY_SCRIPTS_PATH ),   path.join( projectPath, LIBRARY_SCRIPTS_PATH ) )
+			copyDirectory( path.join( spellCorePath, LIBRARY_ASSETS_PATH ),    path.join( projectPath, LIBRARY_ASSETS_PATH ) )
 
 
 			// populate public directory
@@ -136,25 +136,28 @@ define(
 					if( fs.existsSync( projectDirectoryFilePath ) ) return
 
 					copyFile(
-						spellPath + '/publicTemplate/' + fileName,
+						spellCorePath + '/publicTemplate/' + fileName,
 						projectDirectoryFilePath
 					)
 				}
 			)
 
-			// copying engine include (built for development mode)
+			// Copying engine include. Depending on the execution environment either the development or deployment version of the engine include is used
+			// for development.
 			if( !fs.existsSync( html5OutputPath ) ) {
 				fs.mkdirSync( html5OutputPath )
 			}
 
+			var engineIncludeFilename = isDevEnvironment ? 'spell.dev.js' : 'spell.deploy.js'
+
 			copyFile(
-				spellPath + '/build/spell.dev.js',
+				path.join( spellCorePath, 'build', engineIncludeFilename ),
 				html5OutputPath + '/spell.js'
 			)
 
 			// copying stage zero loader
 			copyFile(
-				spellPath + '/src/spell/client/stageZeroLoader.js',
+				spellCorePath + '/src/spell/client/stageZeroLoader.js',
 				outputPath + '/spell.js'
 			)
 

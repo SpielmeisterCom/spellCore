@@ -4,9 +4,10 @@ define(
 		'spell/server/main',
 
 		'spell/shared/build/executeCreateDeployBuild',
-		'spell/shared/build/initializeProjectDirectory',
 		'spell/shared/build/exportDeploymentArchive',
+		'spell/shared/build/isDevEnvironment',
 		'spell/shared/build/isDirectory',
+		'spell/shared/build/initializeProjectDirectory',
 		'spell/shared/build/isFile',
 
 		'commander',
@@ -18,9 +19,10 @@ define(
 		serverMain,
 
 		executeCreateDeployBuild,
-		initializeProjectDirectory,
 		exportDeploymentArchive,
+		isDevEnvironment,
 		isDirectory,
+		initializeProjectDirectory,
 		isFile,
 
 		commander,
@@ -52,16 +54,28 @@ define(
 			}
 		}
 
+		/**
+		 * Returns the execution environment, 'devel' when the system is run in a development environment, 'deploy' when in deployment environment.
+		 *
+		 * @param {String} spellCorePath
+		 * @return {String}
+		 */
+		var getEnvironment = function( spellCorePath ) {
+			var developmentEngineIncludeFilePath = path.join( spellCorePath, 'build/spell.dev.js' )
+
+			return isFile( developmentEngineIncludeFilePath ) ? 'devel' : 'deploy'
+		}
+
 
 		/*
 		 * public
 		 */
 
 		return function( argv, cwd, spellCorePath ) {
-			var executableName  = 'sappre',
-				projectPath     = cwd,
-				projectFilename = 'project.json',
-				projectFilePath = projectPath + '/' + projectFilename
+			var executableName   = 'sappre',
+				projectPath      = cwd,
+				projectFilename  = 'project.json',
+				projectFilePath  = projectPath + '/' + projectFilename
 
 			var buildTargets = {
 				HTML5 : 'html5',
@@ -111,8 +125,8 @@ define(
 				}
 			}
 
-			var initCommand = function( spellCorePath, projectPath, projectFilePath ) {
-				var errors = initializeProjectDirectory( spellCorePath, path.basename( projectPath ), projectPath, projectFilePath )
+			var initCommand = function( spellCorePath, projectPath, projectFilePath, isDevEnvironment ) {
+				var errors = initializeProjectDirectory( spellCorePath, path.basename( projectPath ), projectPath, projectFilePath, isDevEnvironment )
 
 				if( errors.length > 0 ) {
 					printErrors( errors )
@@ -156,7 +170,16 @@ define(
 			commander
 				.command( 'init' )
 				.description( 'initialize the current working directory with spell project scaffolding' )
-				.action( _.bind( initCommand, this, spellCorePath, projectPath, projectFilePath ) )
+				.action(
+					_.bind(
+						initCommand,
+						this,
+						spellCorePath,
+						projectPath,
+						projectFilePath,
+						isDevEnvironment( spellCorePath )
+					)
+				)
 
 			commander
 				.command( 'export' )
