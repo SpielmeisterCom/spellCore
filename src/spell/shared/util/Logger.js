@@ -2,10 +2,12 @@
 define(
 	'spell/shared/util/Logger',
 	[
-		'spell/shared/util/platform/log'
+		'spell/shared/util/platform/log',
+		'spell/functions'
 	],
 	function(
-		platformLog
+		platformLog,
+		_
 	) {
 		'use strict'
 
@@ -103,7 +105,10 @@ define(
 			 * @param {String} text
 			 */
 			log : function( level, text ) {
-				validate( level )
+				if( _.size( arguments ) === 1 ) {
+					text = level
+					level = LOG_LEVEL_DEBUG
+				}
 
 				if( level < this.currentLogLevel ) return
 
