@@ -9,11 +9,13 @@ define(
 		'use strict'
 
 
-//		return _.bind( console.originalLog || console.log, console )
-		return console.originalLog ?
-			_.bind( console.originalLog, console ) :
-			function( text ) {
+		return function( text ) {
+			if( console.originalLog ) {
 				console.originalLog( text )
+
+			} else {
+				console.log( text )
 			}
+		}
 	}
 )

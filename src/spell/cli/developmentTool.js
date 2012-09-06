@@ -39,6 +39,7 @@ define(
 			tmp = tmp.concat( errors )
 
 			console.error( tmp.join( '\n' ) )
+			process.exit( 1 )
 		}
 
 		var onComplete = function( action, errors ) {
@@ -47,23 +48,29 @@ define(
 
 				printErrors( errors )
 				console.log( action + ' failed' )
-				process.exit()
+				process.exit( 0 )
 
 			} else {
 				console.log( action + ' completed' )
 			}
 		}
 
-		/**
-		 * Returns the execution environment, 'devel' when the system is run in a development environment, 'deploy' when in deployment environment.
-		 *
-		 * @param {String} spellCorePath
-		 * @return {String}
-		 */
-		var getEnvironment = function( spellCorePath ) {
-			var developmentEngineIncludeFilePath = path.join( spellCorePath, 'build/spell.dev.js' )
+		var createProjectName = function( projectPath ) {
+			return path.basename( projectPath )
+		}
 
-			return isFile( developmentEngineIncludeFilePath ) ? 'devel' : 'deploy'
+		var createProjectFilePath = function( projectPath ) {
+			return path.join( projectPath, 'project.json' )
+		}
+
+		var checkProjectPath = function( projectPath ) {
+			var projectFilePath = createProjectFilePath( projectPath )
+
+			if( !isFile( projectFilePath ) ) {
+				return [ 'Error: The directory "' + projectPath + '" does not contain a spell project.' ]
+			}
+
+			return []
 		}
 
 
@@ -72,10 +79,7 @@ define(
 		 */
 
 		return function( argv, cwd, spellCorePath ) {
-			var executableName   = 'sappre',
-				projectPath      = cwd,
-				projectFilename  = 'project.json',
-				projectFilePath  = projectPath + '/' + projectFilename
+			var executableName  = 'sappre'
 
 			var buildTargets = {
 				HTML5 : 'html5',
@@ -83,8 +87,11 @@ define(
 				ALL   : 'all'
 			}
 
-			var buildCommand = function( projectFilePath, target, command ) {
-				var errors = []
+			var buildCommand = function( cwd, target, command ) {
+				var projectPath = path.resolve( cwd ),
+					errors      = checkProjectPath( projectPath )
+
+				if( errors.length > 0 ) printErrors( errors )
 
 				if( !target ) target = buildTargets.HTML5
 
@@ -92,13 +99,11 @@ define(
 					errors.push( 'Error: \'' + target + '\' is not a valid target. See \"' + executableName + ' --help\" for usage information.' )
 				}
 
-				if( errors.length > 0 ) {
-					printErrors( errors )
-
-					return
-				}
+				if( errors.length > 0 ) printErrors( errors )
 
 				console.log( 'creating deployment build for target \'' + target + '\'...' )
+
+				var projectFilePath = createProjectFilePath( projectPath )
 
 				if( isFile( projectFilePath ) ) {
 					executeCreateDeployBuild( target, spellCorePath, projectPath, projectFilePath, _.bind( onComplete, null, 'build' ) )
@@ -108,7 +113,7 @@ define(
 				}
 			}
 
-			var startServerCommand = function( command ) {
+			var startServerCommand = function( cwd, command ) {
 				var errors = [],
 					projectsPath = path.resolve( cwd + ( command.projectsRoot ? '/' + command.projectsRoot : '' ) )
 
@@ -125,8 +130,16 @@ define(
 				}
 			}
 
-			var initCommand = function( spellCorePath, projectPath, projectFilePath, isDevEnvironment ) {
-				var errors = initializeProjectDirectory( spellCorePath, path.basename( projectPath ), projectPath, projectFilePath, isDevEnvironment )
+			var initCommand = function( spellCorePath, cwd, isDevEnvironment, command ) {
+				var projectPath = path.resolve( command.directory || cwd )
+
+				errors = initializeProjectDirectory(
+					spellCorePath,
+					createProjectName( projectPath ),
+					projectPath,
+					createProjectFilePath( projectPath ),
+					isDevEnvironment
+				)
 
 				if( errors.length > 0 ) {
 					printErrors( errors )
@@ -136,18 +149,27 @@ define(
 				}
 			}
 
-			var exportCommand = function( projectPath, command ) {
+			var exportCommand = function( spellCorePath, cwd, command ) {
+				var projectPath = path.resolve( cwd ),
+					errors      = checkProjectPath( projectPath )
+
+				if( errors.length > 0 ) printErrors( errors )
+
 				var outputFilePath = _.isString( command.file ) ?
 					path.resolve( command.file ) :
 					path.resolve( projectPath, 'export.tar' )
 
-				exportDeploymentArchive( projectPath, outputFilePath, _.bind( onComplete, null, 'export' ) )
+				exportDeploymentArchive( spellCorePath, projectPath, outputFilePath, _.bind( onComplete, null, 'export' ) )
 			}
 
-			var infoCommand = function( spellCorePath, projectPath, projectFilePath ) {
+			var infoCommand = function( spellCorePath, cwd ) {
+				var projectPath = path.resolve( cwd ),
+					errors      = checkProjectPath( projectPath )
+
+				if( errors.length > 0 ) printErrors( errors )
+
 				console.log( 'spell sdk path:\t\t' + spellCorePath )
 				console.log( 'project path:\t\t' + projectPath )
-				console.log( 'project file path:\t' + projectFilePath )
 			}
 
 
@@ -157,7 +179,7 @@ define(
 			commander
 				.command( 'build-deploy [target]' )
 				.description( 'build for a specific target [html5 (default)]' )
-				.action( _.bind( buildCommand, this, projectFilePath ) )
+				.action( _.bind( buildCommand, this, cwd ) )
 
 			commander
 				.command( 'start-server' )
@@ -165,32 +187,24 @@ define(
 				.option( '-p, --port [port number]', 'the port the server runs on' )
 				.option( '-r, --projects-root [directory]', 'The path to the projects directory that contains the project directories. The default is the current working directory.' )
 				.description( 'start the dev server - run with superuser privileges to enable flash target support' )
-				.action( startServerCommand )
+				.action( _.bind( startServerCommand, this, cwd ) )
 
 			commander
 				.command( 'init' )
-				.description( 'initialize the current working directory with spell project scaffolding' )
-				.action(
-					_.bind(
-						initCommand,
-						this,
-						spellCorePath,
-						projectPath,
-						projectFilePath,
-						isDevEnvironment( spellCorePath )
-					)
-				)
+				.option( '-d, --directory [directory]', 'The path to the project directory which should be initialized. The default is the current working directory.' )
+				.description( 'initialize a project directory with project scaffolding' )
+				.action( _.bind( initCommand, this, spellCorePath, cwd, isDevEnvironment( spellCorePath ) ) )
 
 			commander
 				.command( 'export' )
 				.option( '-f, --file [file]', 'the name of the output file' )
 				.description( 'export a deployment ready version into a zip archive' )
-				.action( _.bind( exportCommand, this, projectPath ) )
+				.action( _.bind( exportCommand, this, spellCorePath, cwd ) )
 
 			commander
 				.command( 'info' )
 				.description( 'print information about current environment' )
-				.action( _.bind( infoCommand, this, spellCorePath, projectPath, projectFilePath ) )
+				.action( _.bind( infoCommand, this, spellCorePath, cwd ) )
 
 			commander.parse( argv )
 		}
