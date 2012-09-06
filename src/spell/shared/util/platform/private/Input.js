@@ -25,8 +25,17 @@ define(
 			keyCodes[ 'LEFT_ARROW' ],
 			keyCodes[ 'UP_ARROW' ],
 			keyCodes[ 'RIGHT_ARROW' ],
-			keyCodes[ 'DOWN_ARROW' ],
+			keyCodes[ 'DOWN_ARROW' ]
 		]
+
+		var preventDefault = function( event ) {
+			if( event.preventDefault ) {
+				event.preventDefault()
+
+			} else {
+				event.returnValue = false
+			}
+		}
 
 		/*
 		 * Thanks to John Resig. http://ejohn.org/blog/flexible-javascript-events/
@@ -68,7 +77,7 @@ define(
 
 		var nativeTouchHandler = function( callback, event ) {
 			event.stopPropagation()
-			event.preventDefault()
+			preventDefault( event )
 
 			var touch = event.changedTouches[ 0 ]
 			var offset = getOffset( this.container )
@@ -94,7 +103,7 @@ define(
 
 		var nativeKeyHandler = function( callback, event ) {
 			if( _.contains( preventDefaultKeyCodes, event.keyCode ) ) {
-				event.preventDefault()
+				preventDefault( event )
 			}
 
 			callback( event )
