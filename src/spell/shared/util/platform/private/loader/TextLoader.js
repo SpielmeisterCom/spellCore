@@ -22,13 +22,15 @@ define(
 
 			this.loaded = true
 
+			var response = request.response || request.responseText
+
 			if( request.status !== 200 ) {
-				onError.call( this, request.response )
+				onError.call( this, response )
 
 				return
 			}
 
-			this.onCompleteCallback( request.response )
+			this.onCompleteCallback( response )
 		}
 
 		var onError = function( event ) {

@@ -102,7 +102,7 @@
 					function( request ) {
 						sendMessageToEditor(
 							'spelled.debug.executeRuntimeModule',
-							JSON.parse( request.response )
+							JSON.parse( request.response || request.responseText )
 						)
 					}
 				)
