@@ -388,6 +388,24 @@ define(
 			},
 
 			/**
+			 * Updates the attributes of a component. Returns true when successful, false otherwise.
+			 *
+			 * @param {String} componentId the component id of the component
+			 * @param {String} entityId the id of the entity which the component belongs to
+			 * @param {Object} attributeConfig the attribute configuration change of the component
+			 * @return {Boolean}
+			 */
+			updateComponent : function( componentId, entityId, attributeConfig ) {
+				var component = this.getComponentById( componentId, entityId )
+
+				if( !component ) return false
+
+				this.templateManager.updateComponent( componentId, component, attributeConfig )
+
+				return true
+			},
+
+			/**
 			 * Returns a component dictionary of a specific type.
 			 *
 			 * @param {String} componentId the requested component type / id

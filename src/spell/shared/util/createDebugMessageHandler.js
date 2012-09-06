@@ -1,6 +1,11 @@
 define(
 	'spell/shared/util/createDebugMessageHandler',
-	function() {
+	[
+		'spell/functions'
+	],
+	function(
+		_
+	) {
 		'use strict'
 
 
@@ -14,21 +19,15 @@ define(
 					startEngine( payload )
 				},
 				'spelled.debug.updateComponent' : function( payload ) {
-					var component = spell.entityManager.getComponentById( payload.componentId, payload.entityId )
+					var success = spell.entityManager.updateComponent( payload.componentId, payload.entityId, payload.config )
 
-					if( component ) {
-						component[ payload.key ] = payload.value
-
-					} else {
-						spell.logger.debug( "Could not update component " + payload.componentId + " in entity " + payload.entityId )
+					if( !success ) {
+						spell.logger.error( 'Could not update component \'' + payload.componentId + '\' in entity ' + payload.entityId + '.' )
 					}
 				}
 			}
 
 			return function( message ) {
-				spell.logger.debug( 'Received message: ' + message.type )
-
-
 				var handler = messageTypeToHandler[ message.type ]
 
 				if( !handler ) return

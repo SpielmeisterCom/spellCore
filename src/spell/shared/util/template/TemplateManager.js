@@ -121,7 +121,16 @@ define(
 			}
 		}
 
-		var addTemplate = function( assets, templates, entityPrototypes, definition ) {
+		var hasAssetIdAttribute = function( attributeConfig ) {
+			return !!_.find(
+				attributeConfig,
+				function( attribute ) {
+					return attribute.type.indexOf( 'assetId:' ) === 0
+				}
+			)
+		}
+
+		var addTemplate = function( assets, templates, componentTemplatesWithAssets, entityPrototypes, definition ) {
 			var templateId = createName( definition.namespace, definition.name )
 
 			if( _.has( templates, templateId ) ) throw 'Error: Template definition \'' + templateId + '\' already exists.'
@@ -130,6 +139,11 @@ define(
 
 			if( definition.type === TemplateTypes.ENTITY ) {
 				entityPrototypes[ templateId ] = createComponents( assets, templates, definition.config, null, templateId, false )
+
+			} else if( definition.type === TemplateTypes.COMPONENT ) {
+				var hasAssetId = hasAssetIdAttribute( definition.attributes )
+
+				if( hasAssetId ) componentTemplatesWithAssets[ templateId ] = true
 			}
 		}
 
@@ -145,15 +159,6 @@ define(
 						template
 					)
 				)
-			)
-		}
-
-		var hasAssetIdAttribute = function( attributeConfig ) {
-			return !!_.find(
-				attributeConfig,
-				function( attribute ) {
-					return attribute.type.indexOf( 'assetId:' ) === 0
-				}
 			)
 		}
 
@@ -238,9 +243,12 @@ define(
 		 */
 
 		function TemplateManager( assets ) {
-			this.assets           = assets
-			this.templates        = {}
-			this.entityPrototypes = {}
+			this.assets                       = assets
+			this.templates                    = {}
+			this.entityPrototypes             = {}
+
+			// map of component template ids which have an asset id
+			this.componentTemplatesWithAssets = {}
 		}
 
 		TemplateManager.prototype = {
@@ -251,7 +259,13 @@ define(
 					throw 'Error: The format of the supplied template definition is invalid.'
 				}
 
-				addTemplate( this.assets, this.templates, this.entityPrototypes, definition )
+				addTemplate(
+					this.assets,
+					this.templates,
+					this.componentTemplatesWithAssets,
+					this.entityPrototypes,
+					definition
+				)
 			},
 
 			createComponents : function( entityTemplateId, config ) {
@@ -264,6 +278,18 @@ define(
 				}
 
 				return createComponents( this.assets, this.templates, config, entityPrototype, entityTemplateId )
+			},
+
+			updateComponent : function( componentId, component, attributeConfig ) {
+				updateComponent( component, attributeConfig )
+
+				if( this.componentTemplatesWithAssets[ componentId ] ) {
+					var assetIdChanged = !!attributeConfig[ 'assetId' ]
+
+					if( assetIdChanged ) {
+						injectAsset( this.assets, this.templates[ componentId ], component )
+					}
+				}
 			},
 
 			hasTemplate : function( templateId ) {
