@@ -6,7 +6,6 @@ define(
 		'amd-helper',
 		'commander',
 		'fs',
-		'glob',
 		'path',
 
 		'underscore.string',
@@ -18,7 +17,6 @@ define(
 		amdHelper,
 		commander,
 		fs,
-		glob,
 		path,
 
 		_s,
