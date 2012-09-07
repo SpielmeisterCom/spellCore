@@ -111,29 +111,21 @@ if ( !window.console ) {
 	}
 
 	var isWebGlCapable = function() {
-		if ( isFirefox() ) {
-			return false
-		}
+		if( isFirefox() ) return false
 
-		var gl = null
-		var contextNames = [ "webgl", "experimental-webgl", "webkit-3d", "moz-webgl" ]
-		var attributes = {
-			alpha: false
-		}
-		var isSupported = false
+		var gl,
+			contextNames = [ "webgl", "experimental-webgl", "webkit-3d", "moz-webgl" ],
+			attributes   = { alpha: false },
+			isSupported  = false,
+			canvas       = document.createElement( "canvas" )
 
-		var canvas = document.createElement("canvas")
-
-		for( var i=0; i < contextNames.length; i++ ) {
+		for( var i = 0; i < contextNames.length; i++ ) {
 			try {
-
 				gl = canvas.getContext( contextNames[ i ], attributes )
 
-			} catch(e) {
+			} catch( e ) {}
 
-			}
-
-			if ( gl !== null ) {
+			if( gl ) {
 				isSupported = true
 				break
 			}
