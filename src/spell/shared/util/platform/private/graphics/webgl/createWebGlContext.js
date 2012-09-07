@@ -9,7 +9,9 @@ define(
 		'spell/shared/util/platform/private/nativeType/createFloatArray',
 
 		'spell/math/vec3',
-		'spell/math/mat3'
+		'spell/math/mat3',
+
+		'spell/functions'
 	],
 	function(
 		StateStack,
@@ -20,7 +22,9 @@ define(
 		createFloatArray,
 
 		vec3,
-		mat3
+		mat3,
+
+		_
 	) {
 		'use strict'
 
@@ -34,7 +38,6 @@ define(
 		var currentState = stateStack.getTop()
 
 		var screenSpaceShimMatrix = mat3.create()
-		var shaderProgram
 
 		// view space to screen space transformation matrix
 		var viewToScreen = mat3.create()
@@ -83,8 +86,8 @@ define(
 			return matrix
 		}
 
-		var initWrapperContext = function() {
-			viewport( 0, 0, gl.canvas.width, gl.canvas.height )
+		var initWrapperContext = function( shaderProgram ) {
+			viewport( shaderProgram, 0, 0, gl.canvas.width, gl.canvas.height )
 
 			// gl initialization
 			gl.clearColor( 0.0, 0.0, 0.0, 1.0 )
@@ -97,22 +100,22 @@ define(
 			gl.disable( gl.DEPTH_TEST )
 
 			gl.activeTexture( gl.TEXTURE0 )
-
-			setupShader()
 		}
 
 		/*
 		 * Creates a wrapper context for the backend context.
 		 */
 		var createWrapperContext = function() {
-			initWrapperContext()
+			var shaderProgram = createShaderProgram()
+
+			initWrapperContext( shaderProgram )
 
 			return {
 				clear             : clear,
 				createTexture     : createWebGlTexture,
-				drawTexture       : drawTexture,
-				drawSubTexture    : drawSubTexture,
-				fillRect          : fillRect,
+				drawTexture       : _.bind( drawTexture, null, shaderProgram ),
+				drawSubTexture    : _.bind( drawSubTexture, null, shaderProgram ),
+				fillRect          : _.bind( fillRect, null, shaderProgram ),
 				getConfiguration  : getConfiguration,
 				resizeColorBuffer : resizeColorBuffer,
 				restore           : restore,
@@ -126,7 +129,7 @@ define(
 				setViewMatrix     : setViewMatrix,
 				transform         : transform,
 				translate         : translate,
-				viewport          : viewport
+				viewport          : _.bind( viewport, null, shaderProgram )
 			}
 		}
 
@@ -149,8 +152,8 @@ define(
 			return createWrapperContext()
 		}
 
-		var setupShader = function() {
-			shaderProgram = gl.createProgram()
+		var createShaderProgram = function() {
+			var shaderProgram = gl.createProgram()
 
 			var vertexShader = gl.createShader( gl.VERTEX_SHADER )
 			gl.shaderSource( vertexShader, shaders.vertex )
@@ -165,7 +168,6 @@ define(
 			gl.linkProgram( shaderProgram )
 			gl.useProgram( shaderProgram )
 
-
 			// setting up vertices
 			var vertices = createFloatArray( 8 )
 			vertices[ 0 ] = 0.0
@@ -177,30 +179,28 @@ define(
 			vertices[ 6 ] = 1.0
 			vertices[ 7 ] = 1.0
 
-
 			var vertexPositionBuffer = gl.createBuffer()
 			gl.bindBuffer( gl.ARRAY_BUFFER, vertexPositionBuffer )
 			gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW )
-
 
 			var attributeLocation = gl.getAttribLocation( shaderProgram, 'aVertexPosition' )
 			gl.vertexAttribPointer( attributeLocation, 2, gl.FLOAT, false, 0, 0 )
 			gl.enableVertexAttribArray( attributeLocation )
 
-
 			// setting up screen space shim matrix
 			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uScreenSpaceShimMatrix' )
 			gl.uniformMatrix3fv( uniformLocation, false, screenSpaceShimMatrix )
 
-
 			// setting up texture matrix
-			resetTextureMatrix( textureMatrix )
+			resetTextureMatrix( shaderProgram, textureMatrix )
+
+			return shaderProgram
 		}
 
 
 		var isTextureMatrixIdentity = false
 
-		var resetTextureMatrix = function( matrix ) {
+		var resetTextureMatrix = function( shaderProgram, matrix ) {
 			if( isTextureMatrixIdentity ) return
 
 			matrix[ 0 ] = 1.0
@@ -211,7 +211,7 @@ define(
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uTextureMatrix' ), false, matrix )
 		}
 
-		var updateTextureMatrix = function( ss, st, tt, ts, matrix ) {
+		var updateTextureMatrix = function( shaderProgram, ss, st, tt, ts, matrix ) {
 			isTextureMatrixIdentity = false
 
 			matrix[ 0 ] = ss
@@ -268,7 +268,7 @@ define(
 			gl.clear( gl.COLOR_BUFFER_BIT )
 		}
 
-		var drawTexture = function( texture, dx, dy, dw, dh ) {
+		var drawTexture = function( shaderProgram, texture, dx, dy, dw, dh ) {
 			if( texture === undefined ) throw 'Texture is undefined'
 
 
@@ -302,13 +302,13 @@ define(
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
 
 			// setting up the texture matrix
-			resetTextureMatrix( textureMatrix )
+			resetTextureMatrix( shaderProgram, textureMatrix )
 
 			// drawing
 			gl.drawArrays( gl.TRIANGLE_STRIP, 0, 4 )
 		}
 
-		var drawSubTexture = function( texture, sx, sy, sw, sh, dx, dy, dw, dh ) {
+		var drawSubTexture = function( shaderProgram, texture, sx, sy, sw, sh, dx, dy, dw, dh ) {
 			if( texture === undefined ) throw 'Texture is undefined'
 
 
@@ -346,6 +346,7 @@ define(
 				th = texture.dimensions[ 1 ]
 
 			updateTextureMatrix(
+				shaderProgram,
 				sw / tw,
 				sh / th,
 				sx / tw,
@@ -357,7 +358,7 @@ define(
 			gl.drawArrays( gl.TRIANGLE_STRIP, 0, 4 )
 		}
 
-		var fillRect = function( dx, dy, dw, dh ) {
+		var fillRect = function( shaderProgram, dx, dy, dw, dh ) {
 			// setting up fillRect mode
 			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
 			gl.uniform1i( uniformLocation, 1 )
@@ -403,7 +404,7 @@ define(
 			mat3.multiply( viewToScreen, worldToView, worldToScreen )
 		}
 
-		var viewport = function( x, y, width, height ) {
+		var viewport = function( shaderProgram, x, y, width, height ) {
 			gl.viewport( x, y , width, height )
 
 			// reinitialize screen space shim matrix
