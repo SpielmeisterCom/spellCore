@@ -36,7 +36,13 @@ define(
 		var getEntityId = function( id ) {
 			if( !id ) return nextEntityId++
 
-			return id
+			var number = parseInt( id )
+
+			if( _.isNaN( number ) ) return id
+
+			nextEntityId = Math.max( number + 1, nextEntityId )
+
+			return number
 		}
 
 		var createComponentList = function( componentTemplateIds ) {
