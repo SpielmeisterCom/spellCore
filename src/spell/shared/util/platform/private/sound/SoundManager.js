@@ -174,10 +174,16 @@ define(
         }
 
         var hasWebAudioSupport = function() {
-            try{
-                context = new webkitAudioContext()
+            try {
+				var hasWebkitAudio = !!window.webkitAudioContext
+
+				if( !hasWebkitAudio ) return false
+
+                var context = new webkitAudioContext()
+
                 return true
-            }catch( e ) {
+
+            } catch ( e ) {
                 return false
             }
         }
