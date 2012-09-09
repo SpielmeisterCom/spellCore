@@ -15,8 +15,8 @@ define(
 
 		return {
 			cleanup : {},
-			init : function( spell, entityManager, sceneConfig ) {
-				entityManager.createEntities( sceneConfig.entities )
+			init : function( spell, EntityManager, sceneConfig ) {
+				EntityManager.createEntities( sceneConfig.entities )
 			}
 		}
 	}

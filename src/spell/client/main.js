@@ -5,7 +5,7 @@ define(
 		'spell/client/util/onScreenResize',
 		'spell/client/staticInclude',
 		'spell/shared/util/createMainLoop',
-		'spell/shared/util/entity/EntityManager',
+		'spell/EntityManager',
 		'spell/shared/util/scene/SceneManager',
 		'spell/shared/util/template/TemplateManager',
 		'spell/shared/util/ConfigurationManager',
@@ -53,8 +53,8 @@ define(
 		var postLoadedResources = function() {
 			var spell = this.spell
 
-			spell.entityManager = new EntityManager( spell.templateManager )
-			spell.sceneManager  = new SceneManager( spell, spell.entityManager, spell.mainLoop )
+			spell.EntityManager = new EntityManager( spell.templateManager )
+			spell.sceneManager  = new SceneManager( spell, spell.EntityManager, spell.mainLoop )
 
 			spell.logger.debug( 'loading resources completed' )
 

@@ -19,7 +19,7 @@ define(
 					startEngine( payload )
 				},
 				'spelled.debug.updateComponent' : function( payload ) {
-					var success = spell.entityManager.updateComponent( payload.componentId, payload.entityId, payload.config )
+					var success = spell.EntityManager.updateComponent( payload.componentId, payload.entityId, payload.config )
 
 					if( !success ) {
 						spell.logger.error( 'Could not update component \'' + payload.componentId + '\' in entity ' + payload.entityId + '.' )

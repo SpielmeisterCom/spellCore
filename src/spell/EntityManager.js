@@ -1,8 +1,8 @@
 /**
- * @class spell.shared.util.entity.EntityManager
+ * @class spell..EntityManager
  */
 define(
-	'spell/shared/util/entity/EntityManager',
+	'spell/EntityManager',
 	[
 		'spell/defines',
 		'spell/shared/util/create',

@@ -57,7 +57,7 @@ define(
 			return id.replace( /\./g, '/' )
 		}
 
-		var createSystem = function( spell, templateManager, entityManager, anonymizeModuleIdentifiers, systemTemplateId ) {
+		var createSystem = function( spell, templateManager, EntityManager, anonymizeModuleIdentifiers, systemTemplateId ) {
 			var template = templateManager.getTemplate( systemTemplateId ),
 				moduleId = createModuleIdFromTemplateId( createTemplateId( template.namespace, template.name ) )
 
@@ -71,7 +71,7 @@ define(
 			var componentsInput = _.reduce(
 				template.input,
 				function( memo, inputDefinition ) {
-					var componentDictionary = entityManager.getComponentDictionaryById( inputDefinition.templateId )
+					var componentDictionary = EntityManager.getComponentDictionaryById( inputDefinition.templateId )
 
 					if( !componentDictionary ) {
 						throw 'Error: No component list for component template id \'' + inputDefinition.templateId +  '\' available.'
@@ -90,12 +90,12 @@ define(
 
 		var createSystems = function( spell, systemTemplateIds, anonymizeModuleIdentifiers ) {
 			var templateManager = spell.templateManager,
-				entityManager   = spell.entityManager
+				EntityManager   = spell.EntityManager
 
 			return _.map(
 				systemTemplateIds,
 				function( systemTemplateId ) {
-					return createSystem( spell, templateManager, entityManager, anonymizeModuleIdentifiers, systemTemplateId )
+					return createSystem( spell, templateManager, EntityManager, anonymizeModuleIdentifiers, systemTemplateId )
 				}
 			)
 		}
@@ -124,9 +124,9 @@ define(
 		 * public
 		 */
 
-		var Scene = function( spell, entityManager ) {
+		var Scene = function( spell, EntityManager ) {
 			this.spell         = spell
-			this.entityManager = entityManager
+			this.EntityManager = EntityManager
 			this.renderSystems = null
 			this.updateSystems = null
 			this.script        = null
@@ -148,7 +148,7 @@ define(
 
 				if( sceneConfig.scriptId ) {
 					this.script = loadModule( sceneConfig.scriptId )
-					this.script.init( this.spell, this.entityManager, sceneConfig )
+					this.script.init( this.spell, this.EntityManager, sceneConfig )
 				}
 
 				if( sceneConfig.systems ) {

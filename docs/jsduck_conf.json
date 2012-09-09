@@ -5,8 +5,9 @@
 	"--head-html": "<link rel=\"stylesheet\" href=\"resources/css/960.css\" type=\"text/css\">\n  <link rel=\"stylesheet\" href=\"resources/css/welcome.css\" type=\"text/css\">",
 	"--output": "generated",
 	"--": [
-		"../src/spell/math",
-		"../src/spell/shared/util/Logger",
+        "../src/spell/EntityManager.js",
+        "../src/spell/math",
+        "../src/spell/shared/util/Logger",
 		"../src/spell/shared/util/platform/PlatformKit.js",
 		"../src/spell/functions.js",
         "builtin_types.js"

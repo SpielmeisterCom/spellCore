@@ -19,15 +19,15 @@ define(
 		 * public
 		 */
 
-		var SceneManager = function( spell, entityManager, mainLoop ) {
-			this.entityManager = entityManager
+		var SceneManager = function( spell, EntityManager, mainLoop ) {
+			this.EntityManager = EntityManager
 			this.mainLoop      = mainLoop
 			this.spell         = spell
 		}
 
 		SceneManager.prototype = {
 			startScene: function( sceneConfig, anonymizeModuleIdentifiers ) {
-				var scene = new Scene( this.spell, this.entityManager )
+				var scene = new Scene( this.spell, this.EntityManager )
 				scene.init( this.spell, sceneConfig, anonymizeModuleIdentifiers )
 
 				this.mainLoop.setRenderCallback( _.bind( scene.render, scene ) )
