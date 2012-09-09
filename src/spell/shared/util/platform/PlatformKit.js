@@ -1,3 +1,7 @@
+/**
+ * @class spell.shared.util.platform.PlatformKit
+ * @singleton
+ */
 define(
 	'spell/shared/util/platform/PlatformKit',
 	[
@@ -59,17 +63,69 @@ define(
 		}
 
 		return {
+			/**
+			 * TBD
+			 *
+			 * @param {number} x X value
+			 * @param {number} y Y value
+
+			 * @returns {Float32Array} New vec2
+			 */
 			callNextFrame          : callNextFrame,
+
+			/**
+			 *
+			 */
 			registerTimer          : registerTimer,
+
+			/**
+			 *
+			 */
 			createSocket           : createSocket,
+
+			/**
+			 *
+			 */
 			createSoundManager     : createSoundManager,
+
+			/**
+			 *
+			 */
 			RenderingFactory       : RenderingFactory,
+
+			/**
+			 *
+			 */
 			getHost                : getHost,
+
+			/**
+			 *
+			 */
 			configurationOptions   : configurationOptions,
+
+			/**
+			 *
+			 */
 			getPlatformInfo        : getPlatformInfo,
+
+			/**
+			 *
+			 */
 			jsonCoder              : jsonCoder,
+
+			/**
+			 *
+			 */
 			createInput            : createInput,
+
+			/**
+			 *
+			 */
 			features               : features,
+
+			/**
+			 *
+			 */
 			registerOnScreenResize : registerOnScreenResize,
 
 			createImageLoader : function( eventManager, host, resourceBundleName, resourceUri, loadingCompletedcallback, timedOutCallback, renderingContext ) {
