@@ -7,6 +7,7 @@
 	"--": [
 		"../src/spell/math",
 		"../src/spell/shared/util/Logger",
+		"../src/spell/shared/util/platform/PlatformKit.js",
 		"../src/spell/functions.js",
         "builtin_types.js"
 	]
