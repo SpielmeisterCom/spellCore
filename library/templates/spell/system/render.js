@@ -3,6 +3,8 @@ define(
 	[
 		'spell/client/2d/graphics/drawCoordinateGrid',
 		'spell/client/2d/graphics/drawText',
+		'spell/client/util/createComprisedScreenSize',
+		'spell/client/util/createIncludedScreenSize',
 		'spell/shared/util/Events',
 
 		'spell/math/vec2',
@@ -14,6 +16,8 @@ define(
 	function(
 		drawCoordinateGrid,
 		drawText,
+		createComprisedScreenSize,
+		createIncludedScreenSize,
 		Events,
 
 		vec2,
@@ -193,13 +197,6 @@ define(
 			return currentCameraId
 		}
 
-		var createCameraDimensions = function( camera, transform ) {
-			return ( camera && transform ?
-				[ camera.width * transform.scale[ 0 ], camera.height * transform.scale[ 1 ] ] :
-				undefined
-			)
-		}
-
 		var setCamera = function( context, cameraDimensions, position ) {
 			// setting up the camera geometry
 			var halfWidth  = cameraDimensions[ 0 ] / 2,
@@ -214,18 +211,26 @@ define(
 		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
-			var context = this.context,
-				cameras = this.cameras,
-				drawVisualObjectPartial = this.drawVisualObjectPartial
+			var cameras                 = this.cameras,
+				context                 = this.context,
+				drawVisualObjectPartial = this.drawVisualObjectPartial,
+				screenSize              = this.configurationManager.screenSize,
+				screenAspectRatio       = this.overrideScreenAspectRatio || screenSize[ 0 ] / screenSize[ 1 ]
 
 			// set the camera
-			var activeCameraId   = getActiveCameraId( cameras ),
-				camera           = cameras[ activeCameraId ],
-				cameraTransform  = this.transforms[ activeCameraId ],
-				cameraDimensions = createCameraDimensions( camera, cameraTransform )
+			var activeCameraId  = getActiveCameraId( cameras ),
+				camera          = cameras[ activeCameraId ],
+				cameraTransform = this.transforms[ activeCameraId ]
 
-			if( cameraDimensions && cameraTransform ) {
-				setCamera( context, cameraDimensions, cameraTransform.translation )
+			if( camera && cameraTransform ) {
+				var effectiveCameraDimensions = vec2.multiply(
+					cameraTransform.scale,
+					createComprisedScreenSize( [ camera.width, camera.height ] , screenAspectRatio )
+				)
+
+				if( effectiveCameraDimensions ) {
+					setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
+				}
 			}
 
 			// clear color buffer
@@ -247,10 +252,10 @@ define(
 			var configurationManager = this.configurationManager
 
 			if( configurationManager.drawCoordinateGrid &&
-				cameraDimensions &&
+				effectiveCameraDimensions &&
 				cameraTransform ) {
 
-				drawCoordinateGrid( context, this.debugFontAsset, configurationManager.screenSize, cameraDimensions, cameraTransform )
+				drawCoordinateGrid( context, this.debugFontAsset, configurationManager.screenSize, effectiveCameraDimensions, cameraTransform )
 			}
 		}
 
@@ -269,11 +274,15 @@ define(
 		 */
 
 		var Renderer = function( spell ) {
-			this.configurationManager = spell.configurationManager
-			this.context              = spell.renderingContext
-			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
+			this.configurationManager      = spell.configurationManager
+			this.context                   = spell.renderingContext
+			this.debugFontAsset            = spell.assets[ debugFontAssetId ]
 
-			this.drawVisualObjectPartial = _.bind(
+			// When the override screen aspect ratio is defined the screen is set to the maximum possible size at the specific aspect ratio which fits into the
+			// bound.
+			this.overrideScreenAspectRatio = undefined
+
+			this.drawVisualObjectPartial   = _.bind(
 				drawVisualObject,
 				null,
 				this.context,
@@ -301,11 +310,35 @@ define(
 
 			initColorBuffer( context, screenSize, viewportPosition )
 
+
+			// registering event handlers
 			eventManager.subscribe(
 				Events.SCREEN_RESIZE,
-				function( newSize ) {
-					initColorBuffer( context, newSize, viewportPosition )
-				}
+				_.bind(
+					function( size ) {
+						var aspectRatio = this.overrideScreenAspectRatio || size[ 0 ] / size[ 1 ],
+							screenSize  = createIncludedScreenSize( this.configurationManager.screenSize, aspectRatio )
+
+						initColorBuffer( context, screenSize, viewportPosition )
+					},
+					this
+				)
+			)
+
+			eventManager.subscribe(
+				Events.SCREEN_ASPECT_RATIO,
+				_.bind(
+					function( aspectRatio ) {
+						var screenSize = aspectRatio ?
+							createIncludedScreenSize( this.configurationManager.screenSize, aspectRatio ) :
+							this.configurationManager.screenSize
+
+						initColorBuffer( context, screenSize, viewportPosition )
+
+						this.overrideScreenAspectRatio = aspectRatio
+					},
+					this
+				)
 			)
 		}
 
