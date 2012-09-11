@@ -1,7 +1,12 @@
 define(
-	"spell/shared/util/platform/private/graphics/Viewporter",
-	function () {
-        "use strict"
+	'spell/shared/util/platform/private/graphics/Viewporter',
+	[
+		'spell/shared/util/platform/private/getAvailableScreenSize'
+	],
+	function(
+		getAvailableScreenSize
+	) {
+        'use strict'
 
 
 		/**
@@ -40,11 +45,9 @@ define(
 				}
 
 				var publishScreenResizedEvent = function() {
-					var offset = getOffset( document.getElementById( id ) )
-					var width  = window.innerWidth - offset[ 0 ]
-					var height = window.innerHeight - offset[ 1 ]
+					var size = getAvailableScreenSize( id )
 
-					onScreenResized( width, height )
+					onScreenResized( size[ 0 ], size[ 1 ] )
 				}
 
 
@@ -180,7 +183,7 @@ define(
 								// set minimum height of content to new window height
 								document.documentElement.style.minHeight = window.innerHeight + 'px'
 
-								if( !document.getElementById(id) ) throw "Viewport element Missing"
+								if( !document.getElementById(id) ) throw 'Viewport element Missing'
 
 								// set the right height for the body wrapper to allow bottom positioned elements
 								document.getElementById(id).style.position = 'relative'
@@ -196,7 +199,7 @@ define(
 					},
 
 					triggerWindowEvent: function(name) {
-						var event = document.createEvent("Event")
+						var event = document.createEvent('Event')
 						event.initEvent(name, false, false)
 						window.dispatchEvent(event)
 					}

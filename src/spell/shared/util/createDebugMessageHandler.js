@@ -1,9 +1,17 @@
 define(
 	'spell/shared/util/createDebugMessageHandler',
 	[
+		'spell/shared/util/Events',
+		'spell/client/util/createIncludedScreenSize',
+		'spell/shared/util/platform/PlatformKit',
+
 		'spell/functions'
 	],
 	function(
+		Events,
+		createIncludedScreenSize,
+		PlatformKit,
+
 		_
 	) {
 		'use strict'
@@ -24,6 +32,9 @@ define(
 					if( !success ) {
 						spell.logger.error( 'Could not update component \'' + payload.componentId + '\' in entity ' + payload.entityId + '.' )
 					}
+				},
+				'spelled.debug.simulateScreenAspectRatio' : function( payload ) {
+					spell.eventManager.publish( Events.SCREEN_ASPECT_RATIO, [ payload.aspectRatio ] )
 				}
 			}
 

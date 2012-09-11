@@ -16,7 +16,10 @@ define(
 		'spell/math/vec3',
 		'spell/math/vec4',
 		'spell/math/random/XorShift32',
-		'spell/shared/util/createEntityEach'
+		'spell/shared/util/createEntityEach',
+		'spell/client/util/createComprisedScreenSize',
+		'spell/client/util/createIncludedScreenSize'
+
 	],
 	function() {
 		return undefined

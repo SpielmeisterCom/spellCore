@@ -31,7 +31,10 @@ define(
 			'LOGIC_UPDATE',
 			'CREATE_SCENE',
 			'DESTROY_SCENE',
-			'SCREEN_RESIZE'
+			'SCREEN_RESIZE',
+
+			// DEVELOPMENT
+			'SCREEN_ASPECT_RATIO'
 		] )
 	}
 )

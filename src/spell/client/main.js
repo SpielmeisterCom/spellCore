@@ -125,8 +125,8 @@ define(
 				renderingContext     = PlatformKit.RenderingFactory.createContext2d(
 					eventManager,
 					configurationManager.id,
-					1024,
-					768,
+					1,
+					1,
 					configurationManager.renderingBackEnd
 				),
 				soundManager         = PlatformKit.createSoundManager(),

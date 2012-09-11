@@ -9,6 +9,7 @@ define(
 		'spell/shared/util/platform/private/createHost',
 		'spell/shared/util/platform/private/jsonCoder',
 		'spell/shared/util/platform/private/createSocket',
+		'spell/shared/util/platform/private/getAvailableScreenSize',
 		'spell/shared/util/platform/private/graphics/RenderingFactory',
 		'spell/shared/util/platform/private/registerTimer',
 		'spell/shared/util/platform/private/loader/ImageLoader',
@@ -26,6 +27,7 @@ define(
 		createHost,
 		jsonCoder,
 		createSocket,
+		getAvailableScreenSize,
 		RenderingFactory,
 		registerTimer,
 		ImageLoader,
@@ -64,64 +66,64 @@ define(
 
 		return {
 			/**
-			 * TBD
 			 *
-			 * @param {number} x X value
-			 * @param {number} y Y value
-
-			 * @returns {Float32Array} New vec2
 			 */
-			callNextFrame          : callNextFrame,
+			callNextFrame : callNextFrame,
 
 			/**
 			 *
 			 */
-			registerTimer          : registerTimer,
+			registerTimer : registerTimer,
 
 			/**
 			 *
 			 */
-			createSocket           : createSocket,
+			createSocket : createSocket,
 
 			/**
 			 *
 			 */
-			createSoundManager     : createSoundManager,
+			createSoundManager : createSoundManager,
 
 			/**
 			 *
 			 */
-			RenderingFactory       : RenderingFactory,
+			RenderingFactory : RenderingFactory,
 
 			/**
 			 *
 			 */
-			getHost                : getHost,
+			getHost : getHost,
 
 			/**
 			 *
 			 */
-			configurationOptions   : configurationOptions,
+			configurationOptions : configurationOptions,
 
 			/**
 			 *
 			 */
-			getPlatformInfo        : getPlatformInfo,
+			getPlatformInfo : getPlatformInfo,
 
 			/**
 			 *
 			 */
-			jsonCoder              : jsonCoder,
+			jsonCoder : jsonCoder,
 
 			/**
 			 *
 			 */
-			createInput            : createInput,
+			createInput : createInput,
 
 			/**
 			 *
 			 */
-			features               : features,
+			features : features,
+
+			/**
+			 *
+			 */
+			getAvailableScreenSize : getAvailableScreenSize,
 
 			/**
 			 *
