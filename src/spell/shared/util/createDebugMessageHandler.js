@@ -19,9 +19,6 @@ define(
 
 		return function( spell, startEngine ) {
 			var messageTypeToHandler = {
-				'spelled.debug.drawCoordinateGrid' : function( payload ) {
-					spell.configurationManager.drawCoordinateGrid = !!payload
-				},
 				'spelled.debug.executeRuntimeModule' : function( payload ) {
 					spell.runtimeModule = payload
 					startEngine( payload )
@@ -32,6 +29,12 @@ define(
 					if( !success ) {
 						spell.logger.error( 'Could not update component \'' + payload.componentId + '\' in entity ' + payload.entityId + '.' )
 					}
+				},
+				'spelled.debug.drawCoordinateGrid' : function( payload ) {
+					spell.eventManager.publish( Events.DRAW_COORDINATE_GRID, [ !!payload ] )
+				},
+				'spelled.debug.drawTitleSafeOutline' : function( payload ) {
+					spell.eventManager.publish( Events.DRAW_TITLE_SAFE_OUTLINE, [ !!payload ] )
 				},
 				'spelled.debug.simulateScreenAspectRatio' : function( payload ) {
 					spell.eventManager.publish( Events.SCREEN_ASPECT_RATIO, [ payload.aspectRatio ] )

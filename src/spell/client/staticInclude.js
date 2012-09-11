@@ -7,6 +7,7 @@ define(
 	'spell/client/staticInclude',
 	[
 		'spell/client/2d/graphics/drawCoordinateGrid',
+		'spell/client/2d/graphics/drawTitleSafeOutline',
 		'spell/math/mat2',
 		'spell/math/mat3',
 		'spell/math/mat4',

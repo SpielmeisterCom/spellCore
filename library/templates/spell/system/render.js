@@ -3,9 +3,11 @@ define(
 	[
 		'spell/client/2d/graphics/drawCoordinateGrid',
 		'spell/client/2d/graphics/drawText',
+		'spell/client/2d/graphics/drawTitleSafeOutline',
 		'spell/client/util/createComprisedScreenSize',
 		'spell/client/util/createIncludedScreenSize',
 		'spell/shared/util/Events',
+		'spell/shared/util/platform/PlatformKit',
 
 		'spell/math/vec2',
 		'spell/math/vec4',
@@ -16,9 +18,11 @@ define(
 	function(
 		drawCoordinateGrid,
 		drawText,
+		drawTitleSafeOutline,
 		createComprisedScreenSize,
 		createIncludedScreenSize,
 		Events,
+		PlatformKit,
 
 		vec2,
 		vec4,
@@ -38,6 +42,13 @@ define(
 			darkGrey         = vec4.create( [ 0.125, 0.125, 0.125, 1.0 ] ),
 			debugFontAssetId = 'font:spell.OpenSans14px',
 			currentCameraId
+
+		var roundVec2 = function( v ) {
+			v[ 0 ] = Math.round( v[ 0 ] )
+			v[ 1 ] = Math.round( v[ 1 ] )
+
+			return v
+		}
 
 		var layerCompareFunction = function( a, b ) {
 			var layer1 = a.layer || 0,
@@ -214,7 +225,7 @@ define(
 			var cameras                 = this.cameras,
 				context                 = this.context,
 				drawVisualObjectPartial = this.drawVisualObjectPartial,
-				screenSize              = this.configurationManager.screenSize,
+				screenSize              = this.screenSize,
 				screenAspectRatio       = this.overrideScreenAspectRatio || screenSize[ 0 ] / screenSize[ 1 ]
 
 			// set the camera
@@ -248,14 +259,16 @@ define(
 				}
 			)
 
-			// draw coordinate grid
-			var configurationManager = this.configurationManager
-
-			if( configurationManager.drawCoordinateGrid &&
-				effectiveCameraDimensions &&
+			if( effectiveCameraDimensions &&
 				cameraTransform ) {
 
-				drawCoordinateGrid( context, this.debugFontAsset, configurationManager.screenSize, effectiveCameraDimensions, cameraTransform )
+				if( this.coordinateGridEnabled ) {
+					drawCoordinateGrid( context, this.debugFontAsset, screenSize, effectiveCameraDimensions, cameraTransform )
+				}
+
+				if( this.titleSafeOutlineEnabled ) {
+					drawTitleSafeOutline( context, screenSize, [ camera.width, camera.height ], cameraTransform )
+				}
 			}
 		}
 
@@ -274,15 +287,19 @@ define(
 		 */
 
 		var Renderer = function( spell ) {
-			this.configurationManager      = spell.configurationManager
-			this.context                   = spell.renderingContext
-			this.debugFontAsset            = spell.assets[ debugFontAssetId ]
+			this.configurationManager = spell.configurationManager
+			this.context              = spell.renderingContext
+			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
+			this.screenSize           = spell.configurationManager.screenSize
 
 			// When the override screen aspect ratio is defined the screen is set to the maximum possible size at the specific aspect ratio which fits into the
 			// bound.
 			this.overrideScreenAspectRatio = undefined
 
-			this.drawVisualObjectPartial   = _.bind(
+			this.coordinateGridEnabled     = false
+			this.titleSafeOutlineEnabled   = false
+
+			this.drawVisualObjectPartial = _.bind(
 				drawVisualObject,
 				null,
 				this.context,
@@ -296,7 +313,7 @@ define(
 
 			var eventManager = spell.eventManager,
 				context      = this.context,
-				screenSize   = this.configurationManager.screenSize
+				screenSize   = this.screenSize
 
 			context.setClearColor( darkGrey )
 
@@ -317,9 +334,21 @@ define(
 				_.bind(
 					function( size ) {
 						var aspectRatio = this.overrideScreenAspectRatio || size[ 0 ] / size[ 1 ],
-							screenSize  = createIncludedScreenSize( this.configurationManager.screenSize, aspectRatio )
+							screenSize  = roundVec2( createIncludedScreenSize( size, aspectRatio ) )
 
 						initColorBuffer( context, screenSize, viewportPosition )
+
+						this.screenSize = screenSize
+					},
+					this
+				)
+			)
+
+			eventManager.subscribe(
+				Events.DRAW_COORDINATE_GRID,
+				_.bind(
+					function( value ) {
+						this.coordinateGridEnabled = value
 					},
 					this
 				)
@@ -329,13 +358,26 @@ define(
 				Events.SCREEN_ASPECT_RATIO,
 				_.bind(
 					function( aspectRatio ) {
+						var availableScreenSize = PlatformKit.getAvailableScreenSize( this.configurationManager.id )
+
 						var screenSize = aspectRatio ?
-							createIncludedScreenSize( this.configurationManager.screenSize, aspectRatio ) :
-							this.configurationManager.screenSize
+							roundVec2( createIncludedScreenSize( availableScreenSize, aspectRatio ) ) :
+							availableScreenSize
 
 						initColorBuffer( context, screenSize, viewportPosition )
 
+						this.screenSize = screenSize
 						this.overrideScreenAspectRatio = aspectRatio
+					},
+					this
+				)
+			)
+
+			eventManager.subscribe(
+				Events.DRAW_TITLE_SAFE_OUTLINE,
+				_.bind(
+					function( value ) {
+						this.titleSafeOutlineEnabled = value
 					},
 					this
 				)

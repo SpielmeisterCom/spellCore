@@ -50,7 +50,7 @@ define(
 
 		var drawGridLinesY = function( context, fontAsset, fontTexture, height, stepSize, startX, y, invScale, worldToScreenTranslation, numLines ) {
 			var nextStepSize = stepSize * 10,
-				scaledY = Math.round( ( y + worldToScreenTranslation[ 1  ] ) * invScale),
+				scaledY = Math.round( ( y + worldToScreenTranslation[ 1 ] ) * invScale ),
 				scaledX,
 				x
 
