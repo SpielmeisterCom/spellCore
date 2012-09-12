@@ -1,5 +1,5 @@
 define(
-	'spell/client/util/createComprisedScreenSize',
+	'spell/client/util/createComprisedRectangle',
 	function() {
 		'use strict'
 
@@ -9,7 +9,7 @@ define(
 		 *
 		 * For example:
 		 *
-		 *   createComprisedScreenSize( [ 120, 90 ], 16/9 )
+		 *   createComprisedRectangle( [ 120, 90 ], 16/9 )
 		 *   => [ 160, 90 ]
 		 */
 		return function( dimensions, requestedAspectRatio ) {

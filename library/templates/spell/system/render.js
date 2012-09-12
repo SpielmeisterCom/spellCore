@@ -4,8 +4,8 @@ define(
 		'spell/client/2d/graphics/drawCoordinateGrid',
 		'spell/client/2d/graphics/drawText',
 		'spell/client/2d/graphics/drawTitleSafeOutline',
-		'spell/client/util/createComprisedScreenSize',
-		'spell/client/util/createIncludedScreenSize',
+		'spell/client/util/createComprisedRectangle',
+		'spell/client/util/createIncludedRectangle',
 		'spell/shared/util/Events',
 		'spell/shared/util/platform/PlatformKit',
 
@@ -19,8 +19,8 @@ define(
 		drawCoordinateGrid,
 		drawText,
 		drawTitleSafeOutline,
-		createComprisedScreenSize,
-		createIncludedScreenSize,
+		createComprisedRectangle,
+		createIncludedRectangle,
 		Events,
 		PlatformKit,
 
@@ -236,7 +236,7 @@ define(
 			if( camera && cameraTransform ) {
 				var effectiveCameraDimensions = vec2.multiply(
 					cameraTransform.scale,
-					createComprisedScreenSize( [ camera.width, camera.height ] , screenAspectRatio )
+					createComprisedRectangle( [ camera.width, camera.height ] , screenAspectRatio )
 				)
 
 				if( effectiveCameraDimensions ) {
@@ -334,7 +334,7 @@ define(
 				_.bind(
 					function( size ) {
 						var aspectRatio = this.overrideScreenAspectRatio || size[ 0 ] / size[ 1 ],
-							screenSize  = roundVec2( createIncludedScreenSize( size, aspectRatio ) )
+							screenSize  = roundVec2( createIncludedRectangle( size, aspectRatio ) )
 
 						initColorBuffer( context, screenSize, viewportPosition )
 
@@ -361,7 +361,7 @@ define(
 						var availableScreenSize = PlatformKit.getAvailableScreenSize( this.configurationManager.id )
 
 						var screenSize = aspectRatio ?
-							roundVec2( createIncludedScreenSize( availableScreenSize, aspectRatio ) ) :
+							roundVec2( createIncludedRectangle( availableScreenSize, aspectRatio ) ) :
 							availableScreenSize
 
 						initColorBuffer( context, screenSize, viewportPosition )

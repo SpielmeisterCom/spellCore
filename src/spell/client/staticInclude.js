@@ -18,9 +18,8 @@ define(
 		'spell/math/vec4',
 		'spell/math/random/XorShift32',
 		'spell/shared/util/createEntityEach',
-		'spell/client/util/createComprisedScreenSize',
-		'spell/client/util/createIncludedScreenSize'
-
+		'spell/client/util/createComprisedRectangle',
+		'spell/client/util/createIncludedRectangle'
 	],
 	function() {
 		return undefined

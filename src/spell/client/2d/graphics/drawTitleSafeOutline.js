@@ -1,13 +1,13 @@
 define(
 	'spell/client/2d/graphics/drawTitleSafeOutline',
 	[
-		'spell/client/util/createIncludedScreenSize',
+		'spell/client/util/createIncludedRectangle',
 
 		'spell/math/mat3',
 		'spell/math/vec2'
 	],
 	function(
-		createIncludedScreenSize,
+		createIncludedRectangle,
 
 		mat3,
 		vec2
@@ -45,7 +45,7 @@ define(
 				color                     = [ 1, 0, 1, 1 ],
 				scaledCameraDimensions    = vec2.multiply( cameraDimensions, scale, tmp ),
 				cameraAspectRatio         = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
-				effectiveCameraDimensions = createIncludedScreenSize( screenSize, cameraAspectRatio )
+				effectiveCameraDimensions = createIncludedRectangle( screenSize, cameraAspectRatio )
 
 			var translation = vec2.scale(
 				vec2.subtract( screenSize, effectiveCameraDimensions, tmp ),

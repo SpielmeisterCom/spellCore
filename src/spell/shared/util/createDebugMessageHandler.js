@@ -2,14 +2,12 @@ define(
 	'spell/shared/util/createDebugMessageHandler',
 	[
 		'spell/shared/util/Events',
-		'spell/client/util/createIncludedScreenSize',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'
 	],
 	function(
 		Events,
-		createIncludedScreenSize,
 		PlatformKit,
 
 		_

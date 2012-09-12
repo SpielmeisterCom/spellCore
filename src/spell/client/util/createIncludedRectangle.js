@@ -1,5 +1,5 @@
 define(
-	'spell/client/util/createIncludedScreenSize',
+	'spell/client/util/createIncludedRectangle',
 	function() {
 		'use strict'
 
@@ -9,7 +9,7 @@ define(
 		 *
 		 * For example:
 		 *
-		 *   createIncludedScreenSize( [ 120, 90 ], 16/9 )
+		 *   createIncludedRectangle( [ 120, 90 ], 16/9 )
 		 *   => [ 120, 67.5 ]
 		 */
 		return function( dimensions, requestedAspectRatio ) {
