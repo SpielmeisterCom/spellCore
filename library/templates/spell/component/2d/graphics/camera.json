@@ -22,6 +22,12 @@
 			"type" : "boolean",
 			"default" : false,
 			"doc" : "controls if the camera is active"
+		},
+		{
+			"name" : "fillUnsafeBorders",
+			"type" : "boolean",
+			"default" : false,
+			"doc" : "if true the unsafe border area is filled with the clear color"
 		}
 	]
 }

@@ -39,7 +39,7 @@ define(
 
 		var tmpVec2          = vec2.create(),
 			tmpMat3          = mat3.identity(),
-			darkGrey         = vec4.create( [ 0.125, 0.125, 0.125, 1.0 ] ),
+			clearColor       = vec4.create( [ 0, 0, 0, 1 ] ),
 			debugFontAssetId = 'font:spell.OpenSans14px',
 			currentCameraId
 
@@ -229,9 +229,9 @@ define(
 				screenAspectRatio       = this.overrideScreenAspectRatio || screenSize[ 0 ] / screenSize[ 1 ]
 
 			// set the camera
-			var activeCameraId  = getActiveCameraId( cameras ),
-				camera          = cameras[ activeCameraId ],
-				cameraTransform = this.transforms[ activeCameraId ]
+			var activeCameraId            = getActiveCameraId( cameras ),
+				camera                    = cameras[ activeCameraId ],
+				cameraTransform           = this.transforms[ activeCameraId ]
 
 			if( camera && cameraTransform ) {
 				var effectiveCameraDimensions = vec2.multiply(
@@ -258,6 +258,38 @@ define(
 					drawVisualObjectPartial( deltaTimeInMs, id, drawVisualObjectPartial )
 				}
 			)
+
+			// fill unsafe border
+			if( camera && camera.fillUnsafeBorder && cameraTransform ) {
+				var cameraDimensions       = [ camera.width, camera.height ],
+					scaledCameraDimensions = vec2.multiply( cameraDimensions, cameraTransform.scale, tmpVec2 ),
+					cameraAspectRatio      = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
+					effectiveTitleSafeDimensions = roundVec2( createIncludedRectangle( screenSize, cameraAspectRatio ) )
+
+				var offset = roundVec2( vec2.scale(
+					vec2.subtract( screenSize, effectiveTitleSafeDimensions, tmpVec2 ),
+					0.5
+				) )
+
+				context.save()
+				{
+					// world to view matrix
+					mat3.ortho( 0, screenSize[ 0 ], 0, screenSize[ 1 ], tmpMat3 )
+					context.setViewMatrix( tmpMat3 )
+
+					context.setFillStyleColor( clearColor )
+
+					if( offset[ 0 ] > 0 ) {
+						context.fillRect( 0, 0, offset[ 0 ], screenSize[ 1 ] )
+						context.fillRect( screenSize[ 0 ] - offset[ 0 ], 0, offset[ 0 ], screenSize[ 1 ] )
+
+					} else if( offset[ 1 ] > 0 ) {
+						context.fillRect( 0, 0, screenSize[ 0 ], offset[ 1 ] )
+						context.fillRect( 0, screenSize[ 1 ] - offset[ 1 ], screenSize[ 0 ], offset[ 1 ] )
+					}
+				}
+				context.restore()
+			}
 
 			if( effectiveCameraDimensions &&
 				cameraTransform ) {
@@ -315,7 +347,7 @@ define(
 				context      = this.context,
 				screenSize   = this.screenSize
 
-			context.setClearColor( darkGrey )
+			context.setClearColor( clearColor )
 
 			// world to view matrix
 			mat3.ortho( 0, screenSize[ 0 ], 0, screenSize[ 1 ], tmpMat3 )
