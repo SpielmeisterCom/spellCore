@@ -124,6 +124,7 @@ define(
 
 			// populate public directory
 			var fileNames = [
+				'bg_tile.gif',
 				'main.css',
 				'spellEdShim.html'
 			]

@@ -2,7 +2,8 @@ body {
 	text-align:center;
 	margin: 0px;
 	padding: 0px;
-	background-color: #000;
+	background-image: url(bg_tile.gif);
+	background-repeat: repeat;
 }
 
 #spell-canvas {
