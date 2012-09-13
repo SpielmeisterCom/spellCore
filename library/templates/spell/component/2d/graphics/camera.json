@@ -24,10 +24,10 @@
 			"doc" : "controls if the camera is active"
 		},
 		{
-			"name" : "fillUnsafeBorders",
+			"name" : "clearUnsafeArea",
 			"type" : "boolean",
 			"default" : false,
-			"doc" : "if true the unsafe border area is filled with the clear color"
+			"doc" : "if true the unsafe area is cleared with the clear color"
 		}
 	]
 }

@@ -259,8 +259,8 @@ define(
 				}
 			)
 
-			// fill unsafe border
-			if( camera && camera.fillUnsafeBorders && cameraTransform ) {
+			// clear unsafe area
+			if( camera && camera.clearUnsafeArea && cameraTransform ) {
 				var cameraDimensions       = [ camera.width, camera.height ],
 					scaledCameraDimensions = vec2.multiply( cameraDimensions, cameraTransform.scale, tmpVec2 ),
 					cameraAspectRatio      = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
