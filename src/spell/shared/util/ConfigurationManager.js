@@ -1,18 +1,22 @@
 define(
-	"spell/shared/util/ConfigurationManager",
+	'spell/shared/util/ConfigurationManager',
 	[
-		"spell/shared/util/platform/PlatformKit",
-		"spell/shared/util/Events",
+		'spell/client/util/createIncludedRectangle',
+		'spell/math/util',
+		'spell/shared/util/platform/PlatformKit',
+		'spell/shared/util/Events',
 
 		'spell/functions'
 	],
 	function(
+		createIncludedRectangle,
+		mathUtil,
 		PlatformKit,
 		Events,
 
 		_
 	) {
-		"use strict"
+		'use strict'
 
 
 		/*
@@ -44,16 +48,22 @@ define(
 			}
 		}
 
-		var extractScreenSize = function( validValues, value ) {
-			if( _.indexOf( validValues, value ) === -1 ) return false
-
-			var parts = value.split( 'x' )
-
-			return [ parseInt( parts[ 0 ] ), parseInt( parts[ 1 ] ) ]
+		var extractDefault = function( validValues, value ) {
+			return _.contains( validValues, value ) ? value : false
 		}
 
 		var extractBoolean = function( validValues, value ) {
 			return _.contains( validValues, value ) && value
+		}
+
+		var extractVec2 =  function( validValues, value ) {
+			if( _.isArray( value ) &&
+				value.length === 2 ) {
+
+				return value
+			}
+
+			return false
 		}
 
 		/**
@@ -64,15 +74,23 @@ define(
 		 * The property "configurable" controls if the option can be overridden by the environment configuration set up by the stage-0-loader.
 		 */
 		var validOptions = {
-			drawCoordinateGrid : {
-				validValues  : [ true, false ],
+			/**
+			 * The screen mode which the user requested. Can be either "fit" or "fixed". If set to "fit" the maximum available screen area is used and the
+			 * option "screenSize" is ignored. If set to "fixed" the option "screenSize" is used to determine the used screen size. The default is "fit".
+			 */
+			screenMode : {
+				validValues : [ 'fit', 'fixed' ],
 				configurable : true,
-				extractor    : extractBoolean
+				extractor : extractDefault
 			},
+			// The screen size which the user requested.
 			screenSize : {
-				validValues  : [ '640x480', '800x600', '1024x768' ],
-				configurable : false,
-				extractor    : extractScreenSize
+				configurable : true,
+				extractor : extractVec2
+			},
+			// The screen size which is currently used.
+			currentScreenSize : {
+				configurable : false
 			},
 			gameServer : {
 				validValues  : [ 'internal', '*' ],
@@ -98,11 +116,12 @@ define(
 		 * These options are used when they are not overridden by the environment configuration set up by the stage-0-loader.
 		 */
 		var defaultOptions = {
-			drawCoordinateGrid : false,
-			screenSize         : '1024x768',
-			gameServer         : 'internal',
-			resourceServer     : 'internal',
-			id                 : 'spell' // dom node id
+			screenMode        : 'fixed',
+			screenSize        : [ 300, 200 ],
+			currentScreenSize : [ 1, 1 ],
+			gameServer        : 'internal',
+			resourceServer    : 'internal',
+			id                : 'spell' // dom node id
 		}
 
 		var createConfiguration = function( parameters, defaultOptions, validOptions ) {
@@ -141,6 +160,8 @@ define(
 					var option = validOptions[ optionName ],
 						configValue = false
 
+					if( !option ) throw 'Error: Configuration option \'' + optionName + '\' is not supported.'
+
 					if( option.extractor ) {
 						configValue = option.extractor( option.validValues, optionValue )
 
@@ -172,14 +193,34 @@ define(
 		 * public
 		 */
 
-		var ConfigurationManager = function( eventManager, parameters ) {
-			_.extend( this, createConfiguration( parameters, defaultOptions, validOptions ) )
+		var ConfigurationManager = function( eventManager, loaderConfig, projectConfig ) {
+			loaderConfig = loaderConfig || {}
+			projectConfig = projectConfig || {}
+
+			var config = _.extend( projectConfig, loaderConfig )
+
+			_.extend( this, createConfiguration( config, defaultOptions, validOptions ) )
 
 			eventManager.subscribe(
-				[ Events.SCREEN_RESIZE ],
+				[ Events.AVAILABLE_SCREEN_SIZE_CHANGED ],
 				_.bind(
-					function( newSize ) {
-						this.screenSize = newSize
+					function( size ) {
+						var screenMode = this.screenMode || 'fit',
+							screenSize = screenMode === 'fixed' ? this.screenSize : undefined
+
+						if( screenMode === 'fit' ) {
+							this.currentScreenSize = size
+
+						} else if( screenMode === 'fixed' ) {
+							if( !screenSize ) throw 'Error: Missing config option \'screenSize\'. Could not set screen size.'
+
+							this.currentScreenSize = screenSize
+
+						} else {
+							throw 'Error: Screen mode \'' + screenMode + '\' is not supported.'
+						}
+
+						eventManager.publish( Events.SCREEN_RESIZE, [ this.currentScreenSize ] )
 					},
 					this
 				)

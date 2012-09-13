@@ -81,7 +81,7 @@ define(
 
 			var touch = event.changedTouches[ 0 ]
 			var offset = getOffset( this.container )
-			var screenSize = this.configurationManager.screenSize
+			var screenSize = this.configurationManager.currentScreenSize
 
 			var position = [
 				( touch.pageX - offset[ 0 ] ) / screenSize[ 0 ],
@@ -111,7 +111,7 @@ define(
 
         var nativeMouseHandler = function( callback, event ) {
 			var offset = getOffset( this.container )
-			var screenSize = this.configurationManager.screenSize
+			var screenSize = this.configurationManager.currentScreenSize
 
 			var position = [
 				( event.pageX - offset[ 0 ] ) / screenSize[ 0 ],

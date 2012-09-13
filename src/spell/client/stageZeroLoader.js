@@ -171,10 +171,6 @@ if ( !window.console ) {
 			config.verbose = false
 		}
 
-		if( !config.drawCoordinateGrid ) {
-			config.drawCoordinateGrid = false
-		}
-
 		if( !config.mode ) {
 			config.mode = MODE.DEPLOYED
 		}

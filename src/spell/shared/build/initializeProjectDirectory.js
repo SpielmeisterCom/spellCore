@@ -57,7 +57,6 @@ define(
 						targetDirectoryPath = path.dirname( targetFilePath )
 
 					if( isDirectory( sourceFilePath ) ) return
-					if( fs.existsSync( targetFilePath ) ) return
 
 					if( !fs.existsSync( targetDirectoryPath ) ) {
 						mkdirp.sync( targetDirectoryPath )

@@ -2,7 +2,6 @@ define(
 	'spell/client/main',
 	[
 		'spell/client/util/loadResources',
-		'spell/client/util/onScreenResize',
 		'spell/client/staticInclude',
 		'spell/shared/util/createMainLoop',
 		'spell/EntityManager',
@@ -22,7 +21,6 @@ define(
 	],
 	function(
 		loadResources,
-		onScreenResize,
 		staticInclude,
 		createMainLoop,
 		EntityManager,
@@ -58,10 +56,7 @@ define(
 
 			spell.logger.debug( 'loading resources completed' )
 
-			PlatformKit.registerOnScreenResize(
-				spell.configurationManager.id,
-				_.bind( onScreenResize, null, spell.eventManager )
-			)
+			PlatformKit.registerOnScreenResize( spell.eventManager, spell.configurationManager.id )
 
 			var renderingContextConfig = spell.renderingContext.getConfiguration()
 			spell.logger.debug( 'created rendering context (' + renderingContextConfig.type + ')' )
@@ -92,12 +87,24 @@ define(
 
 			spell.logger.debug( 'client started' )
 
+			var configurationManager = new ConfigurationManager( spell.eventManager, spell.loaderConfig, runtimeModule.config )
+
+			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
+				spell.eventManager,
+				configurationManager.id,
+				1,
+				1,
+				configurationManager.renderingBackEnd
+			)
+
+			var inputManager = new InputManager( configurationManager )
+
 			var resourceLoader = new ResourceLoader(
 				spell,
 				spell.soundManager,
 				spell.renderingContext,
 				spell.eventManager,
-				spell.configurationManager.resourceServer
+				configurationManager.resourceServer
 			)
 
 			if( cachedContent ) resourceLoader.setCache( cachedContent )
@@ -105,8 +112,12 @@ define(
 			_.extend(
 				spell,
 				{
-					resourceLoader : resourceLoader,
-					resources      : resourceLoader.getResources()
+					configurationManager : configurationManager,
+					inputEvents          : inputManager.getInputEvents(),
+					inputManager         : inputManager,
+					renderingContext     : renderingContext,
+					resourceLoader       : resourceLoader,
+					resources            : resourceLoader.getResources()
 				}
 			)
 
@@ -116,24 +127,15 @@ define(
 			)
 		}
 
-		var init = function( config ) {
-			var spell                = {},
-				assets               = {},
-				logger               = new Logger(),
-				eventManager         = new EventManager(),
-				configurationManager = new ConfigurationManager( eventManager, config ),
-				renderingContext     = PlatformKit.RenderingFactory.createContext2d(
-					eventManager,
-					configurationManager.id,
-					1,
-					1,
-					configurationManager.renderingBackEnd
-				),
-				soundManager         = PlatformKit.createSoundManager(),
-				inputManager         = new InputManager( configurationManager ),
-				statisticsManager    = new StatisticsManager(),
-				templateManager      = new TemplateManager( assets ),
-				mainLoop             = createMainLoop( eventManager, statisticsManager )
+		var init = function( loaderConfig ) {
+			var spell             = {},
+				assets            = {},
+				logger            = new Logger(),
+				eventManager      = new EventManager(),
+				soundManager      = PlatformKit.createSoundManager(),
+				statisticsManager = new StatisticsManager(),
+				templateManager   = new TemplateManager( assets ),
+				mainLoop          = createMainLoop( eventManager, statisticsManager )
 
 			statisticsManager.init()
 
@@ -141,13 +143,10 @@ define(
 				spell,
 				{
 					assets               : assets,
-					configurationManager : configurationManager,
 					eventManager         : eventManager,
-					inputEvents          : inputManager.getInputEvents(),
-					inputManager         : inputManager,
+					loaderConfig         : loaderConfig,
 					logger               : logger,
 					mainLoop             : mainLoop,
-					renderingContext     : renderingContext,
 					runtimeModule        : undefined,
 					soundManager         : soundManager,
 					statisticsManager    : statisticsManager,
@@ -158,7 +157,7 @@ define(
 			this.spell = spell
 
 
-			if( config.debug ) {
+			if( loaderConfig.debug ) {
 				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
 				initDebugEnvironment( logger )
 

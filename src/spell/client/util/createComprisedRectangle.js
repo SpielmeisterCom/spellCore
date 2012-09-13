@@ -12,19 +12,26 @@ define(
 		 *   createComprisedRectangle( [ 120, 90 ], 16/9 )
 		 *   => [ 160, 90 ]
 		 */
-		return function( dimensions, requestedAspectRatio ) {
+		return function( dimensions, requestedAspectRatio, round ) {
+			round = !!round
+
 			var width              = dimensions[ 0 ],
 				height             = dimensions[ 1 ],
 				currentAspectRatio = width / height
 
-				if( requestedAspectRatio >= currentAspectRatio ) {
-					// screen has additional space left horizontally
-					width = requestedAspectRatio * height
+			if( requestedAspectRatio >= currentAspectRatio ) {
+				// screen has additional space left horizontally
+				width = requestedAspectRatio * height
 
-				} else {
-					// screen has additional space left vertically
-					height = width / requestedAspectRatio
-				}
+			} else {
+				// screen has additional space left vertically
+				height = width / requestedAspectRatio
+			}
+
+			if( round ) {
+				width  = Math.round( width )
+				height = Math.round( height )
+			}
 
 			return [ width, height ]
 		}

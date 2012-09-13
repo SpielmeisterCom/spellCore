@@ -1,9 +1,11 @@
 define(
 	'spell/shared/util/platform/private/graphics/Viewporter',
 	[
+		'spell/shared/util/Events',
 		'spell/shared/util/platform/private/getAvailableScreenSize'
 	],
 	function(
+		Events,
 		getAvailableScreenSize
 	) {
         'use strict'
@@ -14,10 +16,10 @@ define(
 		 *
 		 * @param id the id of the spell container div
 		 */
-		return function( id ) {
+		return function( eventManager, id ) {
 			var viewporter = {}
 
-			viewporter.renderViewport = function ( onScreenResized ) {
+			viewporter.renderViewport = function() {
 				var createViewportMetaTag = function( initialScale ) {
 					var meta = document.createElement( 'meta' )
 					meta.name    = 'viewport'
@@ -45,9 +47,7 @@ define(
 				}
 
 				var publishScreenResizedEvent = function() {
-					var size = getAvailableScreenSize( id )
-
-					onScreenResized( size[ 0 ], size[ 1 ] )
+					eventManager.publish( Events.AVAILABLE_SCREEN_SIZE_CHANGED, [ getAvailableScreenSize( id ) ] )
 				}
 
 

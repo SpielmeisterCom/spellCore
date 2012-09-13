@@ -264,12 +264,14 @@ define(
 				var cameraDimensions       = [ camera.width, camera.height ],
 					scaledCameraDimensions = vec2.multiply( cameraDimensions, cameraTransform.scale, tmpVec2 ),
 					cameraAspectRatio      = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
-					effectiveTitleSafeDimensions = roundVec2( createIncludedRectangle( screenSize, cameraAspectRatio ) )
+					effectiveTitleSafeDimensions = createIncludedRectangle( screenSize, cameraAspectRatio, true )
 
-				var offset = roundVec2( vec2.scale(
-					vec2.subtract( screenSize, effectiveTitleSafeDimensions, tmpVec2 ),
-					0.5
-				) )
+				var offset = roundVec2(
+					vec2.scale(
+						vec2.subtract( screenSize, effectiveTitleSafeDimensions, tmpVec2 ),
+						0.5
+					)
+				)
 
 				context.save()
 				{
@@ -322,7 +324,7 @@ define(
 			this.configurationManager = spell.configurationManager
 			this.context              = spell.renderingContext
 			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
-			this.screenSize           = spell.configurationManager.screenSize
+			this.screenSize           = spell.configurationManager.currentScreenSize
 
 			// When the override screen aspect ratio is defined the screen is set to the maximum possible size at the specific aspect ratio which fits into the
 			// bound.
@@ -366,7 +368,7 @@ define(
 				_.bind(
 					function( size ) {
 						var aspectRatio = this.overrideScreenAspectRatio || size[ 0 ] / size[ 1 ],
-							screenSize  = roundVec2( createIncludedRectangle( size, aspectRatio ) )
+							screenSize  = createIncludedRectangle( size, aspectRatio, true )
 
 						initColorBuffer( context, screenSize, viewportPosition )
 
@@ -393,7 +395,7 @@ define(
 						var availableScreenSize = PlatformKit.getAvailableScreenSize( this.configurationManager.id )
 
 						var screenSize = aspectRatio ?
-							roundVec2( createIncludedRectangle( availableScreenSize, aspectRatio ) ) :
+							createIncludedRectangle( availableScreenSize, aspectRatio, true ) :
 							availableScreenSize
 
 						initColorBuffer( context, screenSize, viewportPosition )
