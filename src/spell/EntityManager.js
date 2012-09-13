@@ -1,5 +1,5 @@
 /**
- * @class spell..EntityManager
+ * @class spell.EntityManager
  */
 define(
 	'spell/EntityManager',
