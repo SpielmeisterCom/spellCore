@@ -52,10 +52,6 @@ define(
 			return _.contains( validValues, value ) ? value : false
 		}
 
-		var extractBoolean = function( validValues, value ) {
-			return _.contains( validValues, value ) && value
-		}
-
 		var extractVec2 =  function( validValues, value ) {
 			if( _.isArray( value ) &&
 				value.length === 2 ) {
@@ -105,10 +101,8 @@ define(
 			id : {
 				configurable : true
 			},
-			debug : {
-				validValues  : [ true, false ],
-				configurable : true,
-				extractor    : extractBoolean
+			mode : {
+				configurable : true
 			}
 		}
 

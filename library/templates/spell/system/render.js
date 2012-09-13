@@ -226,7 +226,7 @@ define(
 				context                 = this.context,
 				drawVisualObjectPartial = this.drawVisualObjectPartial,
 				screenSize              = this.screenSize,
-				screenAspectRatio       = this.overrideScreenAspectRatio || screenSize[ 0 ] / screenSize[ 1 ]
+				screenAspectRatio       = this.debug.screenAspectRatio || screenSize[ 0 ] / screenSize[ 1 ]
 
 			// set the camera
 			var activeCameraId            = getActiveCameraId( cameras ),
@@ -293,22 +293,30 @@ define(
 				context.restore()
 			}
 
-			if( effectiveCameraDimensions &&
+			if( this.debug &&
+				effectiveCameraDimensions &&
 				cameraTransform ) {
 
-				if( this.coordinateGridEnabled ) {
+				if( this.debug.drawCoordinateGrid ) {
 					drawCoordinateGrid( context, this.debugFontAsset, screenSize, effectiveCameraDimensions, cameraTransform )
 				}
 
-				if( this.titleSafeOutlineEnabled ) {
+				if( this.debug.drawTitleSafeOutline ) {
 					drawTitleSafeOutline( context, screenSize, [ camera.width, camera.height ], cameraTransform )
 				}
 			}
 		}
 
-		var initColorBuffer = function( context, screenDimensions, viewportPosition ) {
+		var createScreenSize = function( availableScreenSize, aspectRatio ) {
+
+			return aspectRatio ?
+				createIncludedRectangle( availableScreenSize, aspectRatio, true ) :
+				availableScreenSize
+		}
+
+		var initColorBuffer = function( context, screenDimensions ) {
 			context.resizeColorBuffer( screenDimensions[ 0 ], screenDimensions[ 1 ] )
-			context.viewport( viewportPosition[ 0 ], viewportPosition[ 1 ], screenDimensions[ 0 ], screenDimensions [ 1 ] )
+			context.viewport( 0, 0, screenDimensions[ 0 ], screenDimensions [ 1 ] )
 		}
 
 		var init = function( spell ) {}
@@ -325,13 +333,7 @@ define(
 			this.context              = spell.renderingContext
 			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
 			this.screenSize           = spell.configurationManager.currentScreenSize
-
-			// When the override screen aspect ratio is defined the screen is set to the maximum possible size at the specific aspect ratio which fits into the
-			// bound.
-			this.overrideScreenAspectRatio = undefined
-
-			this.coordinateGridEnabled     = false
-			this.titleSafeOutlineEnabled   = false
+			this.debug                = !!spell.configurationManager.debug ? spell.configurationManager.debug : false
 
 			this.drawVisualObjectPartial = _.bind(
 				drawVisualObject,
@@ -356,10 +358,19 @@ define(
 
 			context.setViewMatrix( tmpMat3 )
 
-			// setting up the viewport
-			var viewportPosition = [ 0, 0 ]
 
-			initColorBuffer( context, screenSize, viewportPosition )
+			if( this.debug &&
+				this.debug.screenAspectRatio !== undefined ) {
+
+				this.screenSize = createScreenSize(
+					PlatformKit.getAvailableScreenSize(
+						this.configurationManager.id
+					),
+					this.debug.screenAspectRatio
+				)
+			}
+
+			initColorBuffer( context, this.screenSize )
 
 
 			// registering event handlers
@@ -367,22 +378,11 @@ define(
 				Events.SCREEN_RESIZE,
 				_.bind(
 					function( size ) {
-						var aspectRatio = this.overrideScreenAspectRatio || size[ 0 ] / size[ 1 ],
-							screenSize  = createIncludedRectangle( size, aspectRatio, true )
+						var aspectRatio = this.overrideScreenAspectRatio || size[ 0 ] / size[ 1 ]
 
-						initColorBuffer( context, screenSize, viewportPosition )
+						this.screenSize = createIncludedRectangle( size, aspectRatio, true )
 
-						this.screenSize = screenSize
-					},
-					this
-				)
-			)
-
-			eventManager.subscribe(
-				Events.DRAW_COORDINATE_GRID,
-				_.bind(
-					function( value ) {
-						this.coordinateGridEnabled = value
+						initColorBuffer( this.context, this.screenSize )
 					},
 					this
 				)
@@ -392,26 +392,14 @@ define(
 				Events.SCREEN_ASPECT_RATIO,
 				_.bind(
 					function( aspectRatio ) {
-						var availableScreenSize = PlatformKit.getAvailableScreenSize( this.configurationManager.id )
+						this.screenSize = createScreenSize(
+							PlatformKit.getAvailableScreenSize(
+								this.configurationManager.id
+							),
+							aspectRatio
+						)
 
-						var screenSize = aspectRatio ?
-							createIncludedRectangle( availableScreenSize, aspectRatio, true ) :
-							availableScreenSize
-
-						initColorBuffer( context, screenSize, viewportPosition )
-
-						this.screenSize = screenSize
-						this.overrideScreenAspectRatio = aspectRatio
-					},
-					this
-				)
-			)
-
-			eventManager.subscribe(
-				Events.DRAW_TITLE_SAFE_OUTLINE,
-				_.bind(
-					function( value ) {
-						this.titleSafeOutlineEnabled = value
+						initColorBuffer( this.context, this.screenSize )
 					},
 					this
 				)

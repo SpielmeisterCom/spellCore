@@ -71,7 +71,7 @@ define(
 
 			if( !sceneConfig ) throw 'Error: Could not find start scene \'' + spell.runtimeModule.startScene + '\'.'
 
-			var anonymizeModuleIdentifiers = !spell.configurationManager.debug
+			var anonymizeModuleIdentifiers = spell.configurationManager.mode === 'deployed'
 			spell.sceneManager.startScene( sceneConfig, anonymizeModuleIdentifiers )
 
 			spell.mainLoop.run()
@@ -157,7 +157,7 @@ define(
 			this.spell = spell
 
 
-			if( loaderConfig.debug ) {
+			if( loaderConfig.mode !== 'deployed' ) {
 				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
 				initDebugEnvironment( logger )
 

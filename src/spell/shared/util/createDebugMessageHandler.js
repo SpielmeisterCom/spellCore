@@ -15,6 +15,14 @@ define(
 		'use strict'
 
 
+		var addDebugFlag = function( configurationManager, name, value ) {
+			if( !configurationManager.debug ) {
+				configurationManager.debug = {}
+			}
+
+			configurationManager.debug[ name ] = value
+		}
+
 		return function( spell, startEngine ) {
 			var messageTypeToHandler = {
 				'spelled.debug.executeRuntimeModule' : function( payload ) {
@@ -29,12 +37,14 @@ define(
 					}
 				},
 				'spelled.debug.drawCoordinateGrid' : function( payload ) {
-					spell.eventManager.publish( Events.DRAW_COORDINATE_GRID, [ !!payload ] )
+					addDebugFlag( spell.configurationManager, 'drawCoordinateGrid', !!payload )
 				},
 				'spelled.debug.drawTitleSafeOutline' : function( payload ) {
-					spell.eventManager.publish( Events.DRAW_TITLE_SAFE_OUTLINE, [ !!payload ] )
+					addDebugFlag( spell.configurationManager, 'drawTitleSafeOutline', !!payload )
 				},
 				'spelled.debug.simulateScreenAspectRatio' : function( payload ) {
+					addDebugFlag( spell.configurationManager, 'screenAspectRatio', payload.aspectRatio )
+
 					spell.eventManager.publish( Events.SCREEN_ASPECT_RATIO, [ payload.aspectRatio ] )
 				}
 			}

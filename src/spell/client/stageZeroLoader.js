@@ -28,8 +28,8 @@ if ( !window.console ) {
 		DEFAULT_CONTAINER_ID = 'spell',
 		MODE = {
 			DEPLOYED : 'deployed',
-			DEVELOPMENT_EMBEDDED : 'dev_embedded',
-			DEVELOPMENT_STANDALONE : 'dev_standalone'
+			DEVELOPMENT_EMBEDDED : 'development_embedded',
+			DEVELOPMENT_STANDALONE : 'development_standalone'
 		}
 
 	var isFirefox = function() {
@@ -147,10 +147,6 @@ if ( !window.console ) {
 			config.id = 'spell'
 		}
 
-		if( !config.debug ) {
-			config.debug = false
-		}
-
 		if( !config.platform ) {
 			if( isHtml5Capable() ) {
 				config.platform = 'html5'
@@ -214,14 +210,15 @@ if ( !window.console ) {
 	}
 
 	var loadHtml5Executable = function( config, spellObject, onInitialized, debugMessageCallback ) {
-		var isModeDeployed = ( config.mode === MODE.DEPLOYED )
+		var isModeDeployed    = config.mode === MODE.DEPLOYED
+		var isModeDevelopment = !isModeDeployed
 
 		var startHtml5Executable = function() {
 			if( config.verbose ) printLaunching()
 
 			var engineInstance = require( 'spell/client/main', config )
 
-			if( config.debug ) {
+			if( isModeDevelopment ) {
 				addDebugAPI( spellObject, engineInstance, debugMessageCallback )
 			}
 
