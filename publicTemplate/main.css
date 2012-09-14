@@ -1,14 +1,15 @@
 body {
-	text-align:center;
+	text-align: center;
 	margin: 0px;
 	padding: 0px;
     background-color: #444444;
 }
 
 #spell-canvas {
-	text-align:center;
-	overflow:hidden;
-	display:block;
+	text-align: center;
+	overflow: hidden;
+	display: block;
+	margin: auto;
 	-moz-transform: translate3d(0, 0, 0);
 	-webkit-transform: translate3d(0, 0, 0);
 	-o-transform: translate3d(0, 0, 0);

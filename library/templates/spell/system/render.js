@@ -308,7 +308,6 @@ define(
 		}
 
 		var createScreenSize = function( availableScreenSize, aspectRatio ) {
-
 			return aspectRatio ?
 				createIncludedRectangle( availableScreenSize, aspectRatio, true ) :
 				availableScreenSize
@@ -378,7 +377,10 @@ define(
 				Events.SCREEN_RESIZE,
 				_.bind(
 					function( size ) {
-						var aspectRatio = this.overrideScreenAspectRatio || size[ 0 ] / size[ 1 ]
+						var aspectRatio = ( this.debug && this.debug.screenAspectRatio !== undefined ?
+							this.debug.screenAspectRatio :
+							size[ 0 ] / size[ 1 ]
+						)
 
 						this.screenSize = createIncludedRectangle( size, aspectRatio, true )
 
