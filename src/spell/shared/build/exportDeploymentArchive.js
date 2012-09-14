@@ -8,7 +8,7 @@ define(
 		'flob',
 		'mkdirp',
 		'path',
-		'tar-async'
+		'zipstream'
 	],
 	function(
 		executeCreateDeployBuild,
@@ -18,7 +18,7 @@ define(
 		flob,
 		mkdirp,
 		path,
-		tar
+		ZipStream
 	) {
 		'use strict'
 
@@ -27,37 +27,38 @@ define(
 		 * private
 		 */
 
-		/*
-		 * Writes list of files to a tar "tape"
-		 *
-		 * @param tape
-		 * @param rootPath
-		 * @param filePaths
-		 */
-		var writeFiles = function( tape, rootPath, filePaths ) {
+		var addFile = function( zip, rootPath, filePaths ) {
 			var filePath = filePaths.shift()
 
 			if( filePath ) {
 				var absoluteFilePath = path.join( rootPath, filePath )
 
 				if( isFile( absoluteFilePath ) ) {
-					var data = fs.readFileSync( absoluteFilePath )
-
-					tape.append(
-						filePath.replace( /\/build\/deploy/, '' ),
-						data,
+					zip.addFile(
+						fs.createReadStream( absoluteFilePath ),
+						{ name : filePath.replace( /\/build\/deploy/, '' ) },
 						function() {
-							writeFiles( tape, rootPath, filePaths )
+							addFile( zip, rootPath, filePaths )
 						}
 					)
 
 				} else {
-					writeFiles( tape, rootPath, filePaths )
+					addFile( zip, rootPath, filePaths )
 				}
 
 			} else {
-				tape.close()
+				zip.finalize()
 			}
+		}
+
+
+		var createZipFile = function( outputFilePath, rootPath, fileNames ) {
+			var zip = ZipStream.createZip( { level: 1 } ),
+				out = fs.createWriteStream( outputFilePath )
+
+			zip.pipe( out )
+
+			addFile( zip, rootPath, fileNames )
 		}
 
 
@@ -84,11 +85,7 @@ define(
 				next
 			)
 
-			// create tar archive
-			var tape = new tar( {
-				output : fs.createWriteStream( outputFilePath )
-			} )
-
+			// create archive
 			var filePaths = flob.sync(
 				projectName + '/build/deploy/**',
 				{
@@ -96,7 +93,7 @@ define(
 				}
 			)
 
-			writeFiles( tape, projectsPath, filePaths )
+			createZipFile( outputFilePath, projectsPath, filePaths )
 		}
 	}
 )

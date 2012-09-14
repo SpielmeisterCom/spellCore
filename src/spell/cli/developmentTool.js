@@ -157,7 +157,7 @@ define(
 
 				var outputFilePath = _.isString( command.file ) ?
 					path.resolve( command.file ) :
-					path.resolve( projectPath, 'export.tar' )
+					path.resolve( projectPath, 'export.zip' )
 
 				exportDeploymentArchive( spellCorePath, projectPath, outputFilePath, _.bind( onComplete, null, 'export' ) )
 			}
