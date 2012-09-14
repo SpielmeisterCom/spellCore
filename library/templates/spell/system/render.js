@@ -369,7 +369,7 @@ define(
 				)
 			}
 
-			initColorBuffer( context, this.screenSize )
+			initColorBuffer( this.context, this.screenSize )
 
 
 			// registering event handlers
@@ -382,7 +382,7 @@ define(
 							size[ 0 ] / size[ 1 ]
 						)
 
-						this.screenSize = createIncludedRectangle( size, aspectRatio, true )
+						this.screenSize = createScreenSize( size, aspectRatio )
 
 						initColorBuffer( this.context, this.screenSize )
 					},
