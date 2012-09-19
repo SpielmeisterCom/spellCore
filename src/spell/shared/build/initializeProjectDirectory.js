@@ -30,9 +30,7 @@ define(
 		 * private
 		 */
 
-		var LIBRARY_TEMPLATES_PATH = 'library/templates',
-			LIBRARY_SCRIPTS_PATH   = 'library/scripts',
-			LIBRARY_ASSETS_PATH    = 'library/assets'
+		var LIBRARY_PATH = 'library'
 
 		/*
 		 * Copies the contents of source path to target path recursively
@@ -82,11 +80,7 @@ define(
 			var paths = [
 				publicDirName,
 				'build',
-				path.join( LIBRARY_ASSETS_PATH, projectName ),
-				path.join( LIBRARY_TEMPLATES_PATH, projectName, 'component' ),
-				path.join( LIBRARY_TEMPLATES_PATH, projectName, 'entity' ),
-				path.join( LIBRARY_TEMPLATES_PATH, projectName, 'system' ),
-				path.join( LIBRARY_SCRIPTS_PATH, projectName )
+				path.join( LIBRARY_PATH, projectName )
 			]
 
 			_.each(
@@ -115,10 +109,8 @@ define(
 				)
 			}
 
-			// copy spell sdk templates, scripts and assets
-			copyDirectory( path.join( spellCorePath, LIBRARY_TEMPLATES_PATH ), path.join( projectPath, LIBRARY_TEMPLATES_PATH ) )
-			copyDirectory( path.join( spellCorePath, LIBRARY_SCRIPTS_PATH ),   path.join( projectPath, LIBRARY_SCRIPTS_PATH ) )
-			copyDirectory( path.join( spellCorePath, LIBRARY_ASSETS_PATH ),    path.join( projectPath, LIBRARY_ASSETS_PATH ) )
+			// copy spell sdk library
+			copyDirectory( path.join( spellCorePath, LIBRARY_PATH ), path.join( projectPath, LIBRARY_PATH ) )
 
 
 			// populate public directory
