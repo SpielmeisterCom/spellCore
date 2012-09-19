@@ -6,12 +6,16 @@ define(
 	[
 		'spell/defines',
 		'spell/shared/util/create',
+		'spell/shared/util/deepClone',
+		'spell/shared/util/template/applyComponentConfig',
 
 		'spell/functions'
 	],
 	function(
 		defines,
 		create,
+		deepClone,
+		applyComponentConfig,
 
 		_
 	) {
@@ -89,6 +93,40 @@ define(
 			}
 		}
 
+		/**
+		 * Applies the overloaded children config to the children config defined in a template.
+		 *
+		 * @param entityTemplateChildrenConfig
+		 * @param overloadedChildrenConfig
+		 * @return {*}
+		 */
+		var applyOverloadedChildrenConfig = function( entityTemplateChildrenConfig, overloadedChildrenConfig ) {
+			return _.reduce(
+				overloadedChildrenConfig,
+				function( memo, overloadedChildConfig ) {
+					var entityTemplateChildConfig = _.find(
+						memo,
+						function( entityTemplateChildConfig ) {
+							return overloadedChildConfig.name === entityTemplateChildConfig.name
+						}
+					)
+
+					if( entityTemplateChildConfig ) {
+						entityTemplateChildConfig.children = overloadedChildConfig.children
+						entityTemplateChildConfig.id       = overloadedChildConfig.id
+
+						entityTemplateChildConfig.config = applyComponentConfig( entityTemplateChildConfig.config, overloadedChildConfig.config )
+
+					} else {
+						memo.push( overloadedChildConfig )
+					}
+
+					return memo
+				},
+				deepClone( entityTemplateChildrenConfig )
+			)
+		}
+
 		/*
 		 * Normalizes the provided entity config
 		 *
@@ -111,11 +149,7 @@ define(
 					throw 'Error: Unknown template \'' + templateId + '\'. Could not create entity.'
 				}
 
-				if( template.children &&
-					template.children.length > 0 ) {
-
-					children = children.concat( template.children )
-				}
+				children = applyOverloadedChildrenConfig( template.children, children )
 			}
 
 			return {

@@ -2,12 +2,14 @@ define(
 	'spell/shared/util/template/TemplateManager',
 	[
 		'spell/shared/util/deepClone',
+		'spell/shared/util/template/applyComponentConfig',
 		'spell/shared/util/template/TemplateTypes',
 
 		'spell/functions'
 	],
 	function(
 		deepClone,
+		applyComponentConfig,
 		TemplateTypes,
 
 		_
@@ -177,28 +179,6 @@ define(
 			}
 
 			return component
-		}
-
-		/**
-		 * Applies a component config to an entity and returns the configured entity.
-		 *
-		 * @param entity
-		 * @param componentConfig
-		 * @return {*}
-		 */
-		var applyComponentConfig = function( entity, componentConfig ) {
-			return _.reduce(
-				componentConfig,
-				function( entity, attributeConfig, componentId ) {
-					entity[ componentId ] = _.extend(
-						entity[ componentId ] || {},
-						attributeConfig
-					)
-
-					return entity
-				},
-				entity
-			)
 		}
 
 		var createComponents = function( assets, templates, componentConfig, entityPrototype, entityTemplateId, injectAssets ) {
