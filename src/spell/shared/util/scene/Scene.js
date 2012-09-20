@@ -1,6 +1,7 @@
 define(
 	'spell/shared/util/scene/Scene',
 	[
+		'spell/shared/build/createModuleId',
 		'spell/shared/util/create',
 		'spell/shared/util/entityConfig/flatten',
 		'spell/shared/util/hashModuleIdentifier',
@@ -9,6 +10,7 @@ define(
 		'spell/functions'
 	],
 	function(
+		createModuleId,
 		create,
 		flattenEntityConfig,
 		hashModuleIdentifier,
@@ -26,10 +28,16 @@ define(
 		var cameraEntityTemplateId    = 'spell.entity.2d.graphics.camera',
 			cameraComponentTemplateId = 'spell.component.2d.graphics.camera'
 
-		var loadModule = function( moduleId, config ) {
+		var loadModule = function( moduleId, anonymizeModuleIdentifiers ) {
 			if( !moduleId ) throw 'Error: No module id provided.'
 
-			var module = require( moduleId, undefined, config )
+			var module = require(
+				moduleId,
+				undefined,
+				{
+					loadingAllowed : !anonymizeModuleIdentifiers
+				}
+			)
 
 			if( !module ) throw 'Error: Could not resolve module id \'' + moduleId + '\' to module.'
 
@@ -53,19 +61,13 @@ define(
 			return namespace + '.' + name
 		}
 
-		var createModuleIdFromTemplateId = function( id ) {
-			return id.replace( /\./g, '/' )
-		}
-
 		var createSystem = function( spell, templateManager, EntityManager, anonymizeModuleIdentifiers, systemTemplateId ) {
-			var template = templateManager.getTemplate( systemTemplateId ),
-				moduleId = createModuleIdFromTemplateId( createTemplateId( template.namespace, template.name ) )
+			var template    = templateManager.getTemplate( systemTemplateId ),
+				moduleId    = createModuleId( createTemplateId( template.namespace, template.name ) )
 
 			var constructor = loadModule(
 				anonymizeModuleIdentifiers ? hashModuleIdentifier( moduleId ) : moduleId,
-				{
-					baseUrl : 'library/templates'
-				}
+				anonymizeModuleIdentifiers
 			)
 
 			var componentsInput = _.reduce(
@@ -147,7 +149,11 @@ define(
 				}
 
 				if( sceneConfig.scriptId ) {
-					this.script = loadModule( sceneConfig.scriptId )
+					this.script = loadModule(
+						anonymizeModuleIdentifiers ? sceneConfig.scriptId : createModuleId( sceneConfig.scriptId ),
+						anonymizeModuleIdentifiers
+					)
+
 					this.script.init( this.spell, this.EntityManager, sceneConfig )
 				}
 

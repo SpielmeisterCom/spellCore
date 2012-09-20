@@ -5,9 +5,9 @@ define(
 
 
 		return {
-			'ENTITY'    : 'entityTemplate',
-			'COMPONENT' : 'componentTemplate',
-			'SYSTEM'    : 'systemTemplate'
+			'COMPONENT' : 'component',
+			'ENTITY'    : 'entity',
+			'SYSTEM'    : 'system'
 		}
 	}
 )

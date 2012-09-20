@@ -2,8 +2,11 @@ define(
 	'spell/shared/build/executeCreateDeployBuild',
 	[
 		'spell/shared/build/copyFile',
+		'spell/shared/build/createModuleId',
 		'spell/shared/build/processSource',
+		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
+		'spell/shared/util/createId',
 		'spell/shared/util/hashModuleIdentifier',
 		'spell/shared/util/template/TemplateTypes',
 
@@ -15,8 +18,11 @@ define(
 	],
 	function(
 		copyFile,
+		createModuleId,
 		processSource,
+		isDirectory,
 		isFile,
+		createId,
 		hashModuleIdentifier,
 		TemplateTypes,
 
@@ -75,39 +81,11 @@ define(
 			var filePaths = flob.sync(
 				'**/*.json',
 				{
-					nomount : true,
-					cwd : libraryPath
+					root : libraryPath
 				}
 			)
 
 			return loadJsonFromPaths( result, libraryPath, filePaths )
-		}
-
-
-		/**
-		 * Creates a list of raw asset files, that is not the json files containing the asset definition but rather the actual low level resources like images,
-		 * sounds, etc.
-		 *
-		 * @param {String} prefix
-		 * @param {Array} assets
-		 * @return {Array}
-		 */
-		var createResourceFilePaths = function( prefix, assets ) {
-			return _.map(
-				_.compact(
-					_.unique(
-						_.map(
-							assets,
-							function( it ) {
-								return it.content.file
-							}
-						)
-					)
-				),
-				function( it ) {
-					return prefix + '/' + it
-				}
-			)
 		}
 
 		var readProjectConfigFile = function( filePath ) {
@@ -175,115 +153,83 @@ define(
 					return {
 						entities : scene.entities,
 						name     : scene.name,
-						scriptId : anonymizeModuleIdentifiers ? hashModuleIdentifier( scene.scriptId ) : scene.scriptId,
+						scriptId : anonymizeModuleIdentifiers ? hashModuleIdentifier( createModuleId( scene.scriptId ) ) : scene.scriptId,
 						systems  : scene.systems
 					}
 				}
 			)
 		}
 
-		var loadSystemTemplateModules = function( templates, projectTemplatesPath ) {
-			var errors = []
+		var loadLibrary = function( projectLibraryPath, result ) {
+			var library = [],
+				errors  = loadJsonFromLibrary( library, projectLibraryPath )
 
 			_.each(
-				templates,
-				function( template ) {
-					if( template.content.type !== TemplateTypes.SYSTEM ) return
+				library,
+				function( record ) {
+					var type = record.content.type
 
-					var moduleFilePath = path.join(
-						projectTemplatesPath,
-						template.filePath.replace( /json$/, 'js' )
-					)
+					if( !result[ type ] ) {
+						result[ type ] = [ record ]
 
-					var module = amdHelper.loadModule( moduleFilePath )
-
-
-					if( !module ) {
-						var templateId = template.content.namespace + '.' + template.content.name
-
-						errors.push( 'Error: Could not load module for system template \'' + templateId + '\'.' )
-
-						return
+					} else {
+						result[ type ].push( record )
 					}
-
-					template.module = module
 				}
 			)
 
 			return errors
 		}
 
-
-		return function( target, spellCorePath, projectPath, projectFilePath, callback ) {
-			var errors                     = [],
-				minify                     = true,
-				anonymizeModuleIdentifiers = true,
-				spellEnginePath            = path.resolve( spellCorePath + '/../..' ),
-				projectTemplatesPath       = path.join( projectPath, TEMPLATES_PATH ),
-				projectAssetsPath          = path.join( projectPath, ASSETS_PATH ),
-				deployPath                 = path.join( projectPath, DEPLOY_PATH ),
-				deployHtml5Path            = path.join( deployPath, 'html5' )
-
-			var projectConfigData = readProjectConfigFile( projectFilePath )
-			var projectConfigRaw  = parseProjectConfig( projectConfigData, callback )
-			var projectConfig     = createProjectConfig( projectConfigRaw, anonymizeModuleIdentifiers )
-
-
-			// load all scripts
-			var scripts = amdHelper.loadModules( path.join( projectPath, SCRIPTS_PATH ) )
-
-
-			// load all templates
-			var templates = []
-
-			errors = errors.concat(
-				loadJsonFromLibrary( templates, projectTemplatesPath )
-			)
-
-			// load all system templates' implementations
-			errors = loadSystemTemplateModules( templates, projectTemplatesPath )
-
-			if( _.size( errors ) > 0 ) callback( errors )
-
-
-			// add source of the system template modules to scripts
-			scripts = _.extend(
+		var loadScriptModules = function( projectLibraryPath, scripts ) {
+			return _.reduce(
 				scripts,
-				_.reduce(
-					templates,
-					function( memo, template ) {
-						var module = template.module
+				function( memo, script ) {
+					var moduleFilePath = path.join(
+						projectLibraryPath,
+						script.filePath.replace( /json$/, 'js' )
+					)
 
-						if( !module ) return memo
+					var module = amdHelper.loadModule( moduleFilePath )
 
-						memo[ module.name ] = _.pick( module, [ 'dependencies', 'source', 'path' ] )
+					if( module ) {
+						memo[ module.name ] = module
+					}
 
-						return memo
-					},
-					{}
-				)
+					return memo
+				},
+				{}
 			)
+		}
 
-
-			// load all assets
-			var assets = []
-
-			errors = errors.concat(
-				loadJsonFromLibrary( assets, path.join( projectPath, ASSETS_PATH ) )
+		var createDataFileContent = function( dataFileTemplate, scriptSource, cachedResources, projectConfig ) {
+			return _s.sprintf(
+				dataFileTemplate,
+				scriptSource,
+				JSON.stringify( cachedResources ),
+				JSON.stringify( projectConfig )
 			)
+		}
 
-			if( _.size( errors ) > 0 ) callback( errors )
-
-
-			// copy all files in asset directory which are not json files to the directory "build/deploy/library/assets"
-			var resourceFilePaths = createResourceFilePaths( 'library/assets', assets )
-
+		var copyFiles = function( sourceDirectoryPath, targetDirectoryPath, filePaths ) {
 			_.each(
-				resourceFilePaths,
-				function( resourceFilePath ) {
-					var sourceFilePath = path.resolve( projectPath, resourceFilePath ),
-						targetFilePath = path.resolve( deployPath, resourceFilePath ),
-						targetPath     = path.dirname( targetFilePath )
+				filePaths,
+				function( filePathInfo ) {
+					// indicates if the path and or name of the file changes from source to target location
+					var isMoved = _.isArray( filePathInfo ) && filePathInfo.length === 2
+
+					var sourceFilePath = isMoved ?
+						filePathInfo[ 0 ] :
+						path.resolve( sourceDirectoryPath,  filePathInfo )
+
+					if( isDirectory( sourceFilePath ) ) return
+
+
+					var targetFilePath = isMoved ?
+						filePathInfo[ 1 ] :
+						path.resolve( targetDirectoryPath,  filePathInfo )
+
+					var targetPath = path.dirname( targetFilePath )
 
 					if( !fs.existsSync( targetPath ) ) {
 						mkdirp.sync( targetPath )
@@ -292,59 +238,122 @@ define(
 					copyFile( sourceFilePath, targetFilePath )
 				}
 			)
+		}
+
+		var loadSystemScriptModules = function( projectLibraryPath, templates ) {
+			return _.reduce(
+				templates,
+				function( memo, template ) {
+					if( template.content.subtype !== TemplateTypes.SYSTEM ) return memo
+
+					var id             = createId( template.content.namespace, template.content.name ),
+						moduleId       = createModuleId( id ),
+						moduleFilePath = path.join( projectLibraryPath, moduleId + '.js' ),
+						module         = amdHelper.loadModule( moduleFilePath )
+
+					if( module ) {
+						memo[ module.name ] = module
+					}
+
+					return memo
+				},
+				{}
+			)
+		}
 
 
-			// write data file to output directory -> "build/deploy/html5/data.js"
-			var resources = templates.concat( assets )
+		return function( target, spellCorePath, projectPath, projectFilePath, callback ) {
+			var errors                     = [],
+				minify                     = true,
+				anonymizeModuleIdentifiers = true,
+				projectLibraryPath         = path.join( projectPath, LIBRARY_PATH ),
+				deployPath                 = path.join( projectPath, DEPLOY_PATH ),
+				deployLibraryPath          = path.join( deployPath, LIBRARY_PATH ),
+				deployHtml5Path            = path.join( deployPath, 'html5' ),
+				projectConfigData          = readProjectConfigFile( projectFilePath ),
+				projectConfigRaw           = parseProjectConfig( projectConfigData, callback ),
+				projectConfig              = createProjectConfig( projectConfigRaw, anonymizeModuleIdentifiers )
 
-			var scriptSource = processSource(
-				_.pluck( scripts, 'source' ).join( '\n' ),
-				minify,
-				anonymizeModuleIdentifiers
+
+			// loading the library
+			var library = {}
+
+			errors = errors.concat(
+				loadLibrary( projectLibraryPath, library )
 			)
 
-			var dataFileContent = _s.sprintf(
-				dataFileTemplate,
-				scriptSource,
-				JSON.stringify( createCacheContent( resources ) ),
-				JSON.stringify( projectConfig )
+			if( _.size( errors ) > 0 ) callback( errors )
+
+
+			// load all scripts
+			var scriptModules = loadScriptModules( projectLibraryPath, library.script )
+
+			scriptModules = _.extend(
+				scriptModules,
+				loadSystemScriptModules( projectLibraryPath, library.template )
 			)
 
+
+			console.log( library.script )
+
+
+			// write data file to "build/deploy/html5/data.js"
 			if( !fs.existsSync( deployHtml5Path ) ) {
 				mkdirp.sync( deployHtml5Path )
 			}
 
 			var dataFilePath = path.resolve( deployHtml5Path, 'data.js' )
 
-			writeFile( dataFilePath, dataFileContent )
+			var scriptSource = processSource(
+				_.pluck( scriptModules, 'source' ).join( '\n' ),
+				minify,
+				anonymizeModuleIdentifiers
+			)
 
+			var cachedResources = createCacheContent(
+				library.template.concat( library.asset )
+			)
 
-			// copy public template files to output directory -> "build/deploy/*"
-			var publicTemplateFiles = [ 'index.html', 'main.css' ]
-
-			_.each(
-				publicTemplateFiles,
-				function( file ) {
-					var sourceFilePath = path.join( spellCorePath, 'publicTemplate', file ),
-						targetFilePath = path.join( deployPath, file )
-
-					copyFile( sourceFilePath, targetFilePath )
-				}
+			writeFile(
+				dataFilePath,
+				createDataFileContent(
+					dataFileTemplate,
+					scriptSource,
+					cachedResources,
+					projectConfig
+				)
 			)
 
 
-			// copy stage zero loader to output directory -> "build/deploy/spell.js"
-			var sourceFilePath = path.join( spellCorePath, 'src/spell/client/stageZeroLoader.js' ),
-			targetFilePath = path.join( deployPath, 'spell.js' )
+			// copying all files required by the build to the deployment directory "build/deploy"
 
-			copyFile( sourceFilePath, targetFilePath )
+			// the library files
+			var deployFilePaths = flob.sync( '**/*', { cwd : projectLibraryPath } )
 
+			// public template files go to "build/deploy/*"
+			deployFilePaths.push( [
+				path.join( spellCorePath, 'publicTemplate', 'index.html' ),
+				path.join( deployPath, 'index.html' )
+			] )
 
-			// copy minified, anonymized engine include to output directory -> "build/deploy/html5/spell.js"
-			sourceFilePath = path.join( spellCorePath, 'build/spell.deploy.js' ),
-			targetFilePath = path.join( deployHtml5Path, 'spell.js' )
+			deployFilePaths.push( [
+				path.join( spellCorePath, 'publicTemplate', 'main.css' ),
+				path.join( deployPath, 'main.css' )
+			] )
 
-			copyFile( sourceFilePath, targetFilePath )
+			// stage zero loader goes to "build/deploy/spell.js"
+			deployFilePaths.push( [
+				path.join( spellCorePath, 'src/spell/client/stageZeroLoader.js' ),
+				path.join( deployPath, 'spell.js' )
+			] )
+
+			// minified, anonymized engine include goes to "build/deploy/html5/spell.js"
+			deployFilePaths.push( [
+				path.join( spellCorePath, 'build/spell.deploy.js' ),
+				path.join( deployHtml5Path, 'spell.js' )
+			] )
+
+			copyFiles( projectLibraryPath, deployLibraryPath, deployFilePaths )
 		}
 	}
 )

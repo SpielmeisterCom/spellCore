@@ -1,9 +1,13 @@
 define(
 	'spell/shared/util/createAssetId',
 	[
+		'spell/shared/util/createId',
+
 		'spell/functions'
 	],
 	function(
+		createId,
+
 		_
 	) {
 		'use strict'
@@ -12,18 +16,8 @@ define(
 		return function( scheme ) {
 			if( !scheme ) throw 'Error: Missing argument \'scheme\'.'
 
-			var args = _.toArray( arguments ).slice( 1 )
-
-			if( args.length === 0 ) throw 'Error: Missing name and or namespace.'
-
-			return scheme + ':' + _.reduce(
-				args,
-				function( memo, argument ) {
-					if( argument === '' ) return memo
-
-					return memo + ( memo !== '' ? '.' : '' )  + argument
-				},
-				''
+			return scheme + ':' + createId(
+				_.toArray( arguments ).slice( 1 )
 			)
 		}
 	}

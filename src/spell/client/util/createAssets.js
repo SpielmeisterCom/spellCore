@@ -44,7 +44,7 @@ define(
 				createFrameOffsetPartial = _.bind( createFrameOffset, null, frameWidth, frameHeight )
 
 			return {
-				type            : asset.type,
+				type            : asset.subtype,
 				resourceId      : spriteSheetAsset.resourceId,
 				frameDimensions : [ frameWidth, frameHeight ],
 				frameDuration   : asset.config.duration / numFrames,
@@ -86,28 +86,29 @@ define(
 			var assets = _.reduce(
 				assetDefinitions,
 				function( memo, assetDefinition, resourceName ) {
-					var asset
+					var asset,
+						type = assetDefinition.subtype
 
-					if( assetDefinition.type === 'appearance') {
+					if( type === 'appearance') {
 						asset = {
 							resourceId : assetDefinition.file,
-							type       : assetDefinition.type
+							type       : type
 						}
 
-					} else if( assetDefinition.type === 'spriteSheet' ||
-						assetDefinition.type === 'font') {
+					} else if( type === 'spriteSheet' ||
+						type === 'font') {
 
 						asset = {
 							config     : assetDefinition.config,
 							resourceId : assetDefinition.file,
-							type       : assetDefinition.type
+							type       : type
 						}
 
-					} else if( assetDefinition.type === 'keyToActionMap' ) {
+					} else if( type === 'keyToActionMap' ) {
 						asset = createKeyToActionMapAsset( assetDefinition )
 					}
 
-					memo[ createAssetId( assetDefinition.type, resourceName ) ] = asset
+					memo[ createAssetId( type, resourceName ) ] = asset
 
 					return memo
 				},
@@ -118,8 +119,10 @@ define(
 			return _.reduce(
 				assetDefinitions,
 				function( memo, assetDefinition, resourceName ) {
-					if( assetDefinition.type === 'animation' ) {
-						memo[ createAssetId( assetDefinition.type, resourceName ) ] = createAnimationAsset( memo, assetDefinition )
+					var type = assetDefinition.subtype
+
+					if( type === 'animation' ) {
+						memo[ createAssetId( type, resourceName ) ] = createAnimationAsset( memo, assetDefinition )
 					}
 
 					return memo

@@ -4,7 +4,7 @@
 
 ( function( document ) {
 	var modules  = {},
-		BASE_URL = 'library/scripts'
+		BASE_URL = 'library'
 
 	var createScriptNode = function( name, source ) {
 		var script = document.createElement( 'script' )
@@ -101,11 +101,17 @@
 
 
 	var require = function( moduleName, args, config ) {
+		config = config || {}
+
 		if( !moduleName ) throw 'Error: No module name provided.'
 
 		var module = modules[ moduleName ]
 
 		if( !module ) {
+			if( config.loadingAllowed === false ) {
+				throw 'Error: Missing module \'' + moduleName + '\'. External loading is disabled. Please make sure that all required modules are shipped.'
+			}
+
 			module = createModule( moduleName, config )
 		}
 

@@ -15,12 +15,12 @@ define(
 		'use strict'
 
 
-		var startLoadingResources = function( resourceLoader, resourceBundleId, resourceIds, baseUrl, type, afterLoad ) {
+		var startLoadingResources = function( resourceLoader, resourceBundleId, resourceIds, type, afterLoad ) {
 			resourceLoader.addResourceBundle(
 				resourceBundleId,
 				resourceIds,
 				{
-					baseUrl   : baseUrl,
+					baseUrl   : 'library',
 					type      : type,
 					afterLoad : afterLoad
 				}
@@ -87,7 +87,6 @@ define(
 						resourceLoader,
 						templateBundleId,
 						resourceIdsToJsonFilenames( runtimeModule.templateIds ),
-						'library/templates',
 						'text',
 						resourceJsonDecoder
 					)
@@ -97,7 +96,6 @@ define(
 						resourceLoader,
 						resourceBundleId,
 						traceResourceIds( spell.assets ),
-						'library/assets',
 						'image',
 						function( resource ) {
 							return renderingContext.createTexture( resource )
@@ -129,7 +127,6 @@ define(
 				resourceLoader,
 				assetBundleId,
 				resourceIdsToJsonFilenames( runtimeModule.assetIds ),
-				'library/assets',
 				'text',
 				resourceJsonDecoder
 			)

@@ -8,6 +8,7 @@ define(
 		'spell/shared/util/create',
 		'spell/shared/util/deepClone',
 		'spell/shared/util/template/applyComponentConfig',
+		'spell/shared/util/template/TemplateTypes',
 
 		'spell/functions'
 	],
@@ -16,6 +17,7 @@ define(
 		create,
 		deepClone,
 		applyComponentConfig,
+		TemplateTypes,
 
 		_
 	) {
@@ -270,7 +272,7 @@ define(
 		 */
 
 		var EntityManager = function( templateManager ) {
-			this.componentDictionaries = createComponentList( templateManager.getTemplateIds( 'componentTemplate' ) )
+			this.componentDictionaries = createComponentList( templateManager.getTemplateIds( TemplateTypes.COMPONENT ) )
 			this.templateManager       = templateManager
 		}
 

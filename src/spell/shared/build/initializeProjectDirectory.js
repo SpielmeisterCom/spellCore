@@ -97,9 +97,10 @@ define(
 			// create project.json
 			if( !isFile( projectFilePath ) ) {
 				var data = {
-					"name": projectName,
-					"startScene": "",
-					"scenes": []
+					"type"       : "project",
+					"name"       : projectName,
+					"startScene" : "",
+					"scenes"     : []
 				}
 
 				fs.writeFileSync(
