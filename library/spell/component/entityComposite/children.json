@@ -1,5 +1,6 @@
 {
-	"type" : "componentTemplate",
+	"type": "template",
+	"subtype": "component",
 	"readonly" : true,
 	"engineInternal" : true,
 	"namespace" : "spell.component.entityComposite",

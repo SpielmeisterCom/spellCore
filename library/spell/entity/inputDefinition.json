@@ -1,7 +1,8 @@
 {
+	"type": "template",
+	"subtype": "entity",
 	"name": "inputDefinition",
 	"namespace": "spell.entity",
-	"type": "entityTemplate",
 	"config": {
 		"spell.component.inputDefinition": {}
 	},

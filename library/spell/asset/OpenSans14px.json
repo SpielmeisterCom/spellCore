@@ -1,5 +1,6 @@
 {
-	"type": "font",
+	"type": "asset",
+	"subtype": "appearance",
 	"file": "spell/asset/OpenSans14px.png",
 	"namespace": "spell.asset",
 	"name": "OpenSans14px",

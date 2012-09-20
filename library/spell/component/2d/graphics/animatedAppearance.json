@@ -2,7 +2,8 @@
 	"name": "animatedAppearance",
 	"readonly" : true,
 	"namespace": "spell.component.2d.graphics",
-	"type": "componentTemplate",
+	"type": "template",
+	"subtype": "component",
 	"title": "2D Animated Appearance",
 	"doc": "",
 	"attributes": [
