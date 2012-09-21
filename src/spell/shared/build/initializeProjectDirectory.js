@@ -151,13 +151,6 @@ define(
 				outputPath + '/spell.js'
 			)
 
-			// add symlink to library directory
-			var outputLibraryPath = outputPath + '/library'
-
-			if( !fs.existsSync( outputLibraryPath ) ) {
-				fs.symlinkSync( '../library', outputLibraryPath, 'dir' )
-			}
-
 			return errors
 		}
 	}
