@@ -294,9 +294,6 @@ define(
 			)
 
 
-			console.log( library.script )
-
-
 			// write data file to "build/deploy/html5/data.js"
 			if( !fs.existsSync( deployHtml5Path ) ) {
 				mkdirp.sync( deployHtml5Path )
