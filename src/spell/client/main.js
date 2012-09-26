@@ -56,7 +56,7 @@ define(
 
 			spell.logger.debug( 'loading resources completed' )
 
-			PlatformKit.registerOnScreenResize( spell.eventManager, spell.configurationManager.id )
+			PlatformKit.registerOnScreenResize( spell.eventManager, spell.configurationManager.id, spell.configurationManager.screenSize )
 
 			var renderingContextConfig = spell.renderingContext.getConfiguration()
 			spell.logger.debug( 'created rendering context (' + renderingContextConfig.type + ')' )

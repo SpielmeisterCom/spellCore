@@ -55,7 +55,7 @@ define(
 			return new Input( eventManager, Events )
 		}
 
-        var registerOnScreenResize = function( eventManager, id ) {
+        var registerOnScreenResize = function( eventManager, id, initialScreenSize ) {
 			var viewporter = new Viewporter( eventManager, id )
 			viewporter.renderViewport()
         }

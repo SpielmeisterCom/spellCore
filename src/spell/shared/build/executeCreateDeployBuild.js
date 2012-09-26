@@ -117,7 +117,7 @@ define(
 		}
 
 		var createProjectConfig = function( projectConfigRaw, anonymizeModuleIds ) {
-			var result = _.pick( projectConfigRaw, 'name', 'startScene', 'templateIds', 'assetIds' )
+			var result = _.pick( projectConfigRaw, 'name', 'startScene', 'templateIds', 'assetIds', 'config' )
 
 			result.scenes = createSceneList( projectConfigRaw.scenes, anonymizeModuleIds )
 
