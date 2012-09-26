@@ -71,8 +71,8 @@ define(
 
 			if( !sceneConfig ) throw 'Error: Could not find start scene \'' + spell.runtimeModule.startScene + '\'.'
 
-			var anonymizeModuleIdentifiers = spell.configurationManager.mode === 'deployed'
-			spell.sceneManager.startScene( sceneConfig, anonymizeModuleIdentifiers )
+			var anonymizeModuleIds = spell.configurationManager.mode === 'deployed'
+			spell.sceneManager.startScene( sceneConfig, anonymizeModuleIds )
 
 			spell.mainLoop.run()
 		}

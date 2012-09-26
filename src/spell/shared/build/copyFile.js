@@ -6,6 +6,9 @@ define(
 	function(
 		fs
 	) {
+		'use strict'
+
+
 		return function( inputFilePath, outputFilePath ) {
 			fs.writeFileSync(
 				outputFilePath,

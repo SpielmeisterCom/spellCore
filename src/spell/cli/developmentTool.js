@@ -84,16 +84,21 @@ define(
 			var buildTargets = {
 				HTML5 : 'html5',
 				FLASH : 'flash',
-				ALL   : 'all'
+				ALL : 'all'
 			}
 
 			var buildCommand = function( cwd, target, command ) {
-				var projectPath = path.resolve( cwd ),
-					errors      = checkProjectPath( projectPath )
+				var projectPath        = path.resolve( cwd ),
+					errors             = checkProjectPath( projectPath ),
+					debug              = command.debug || false,
+					minify             = !debug,
+					anonymizeModuleIds = true
 
 				if( errors.length > 0 ) printErrors( errors )
 
-				if( !target ) target = buildTargets.HTML5
+				if( !target ) {
+					target = buildTargets.HTML5
+				}
 
 				if( !_.contains( _.values( buildTargets ), target ) ) {
 					errors.push( 'Error: \'' + target + '\' is not a valid target. See \"' + executableName + ' --help\" for usage information.' )
@@ -101,16 +106,46 @@ define(
 
 				if( errors.length > 0 ) printErrors( errors )
 
-				console.log( 'creating deployment build for target \'' + target + '\'...' )
-
 				var projectFilePath = createProjectFilePath( projectPath )
 
-				if( isFile( projectFilePath ) ) {
-					executeCreateDeployBuild( target, spellCorePath, projectPath, projectFilePath, _.bind( onComplete, null, 'build' ) )
-
-				} else {
+				if( !isFile( projectFilePath ) ) {
 					printErrors( 'Error: Missing project file \'' + projectFilePath + '\'.' )
 				}
+
+				// figuring out the requested targets
+				if( target === 'all' ) {
+					targets = [ buildTargets.HTML5, buildTargets.FLASH ]
+
+				} else {
+					targets = [ target ]
+				}
+
+				// begin building
+				console.log( 'creating deployment build...' )
+				if( debug ) console.log( ' -> debug build is enabled' )
+
+				var afterAllBuildsCompleted = _.after(
+					targets.length,
+					_.bind( onComplete, null, 'build' )
+				)
+
+				_.each(
+					targets,
+					function( target ) {
+						console.log( ' -> creating package for target \'' + target + '\''  )
+
+						executeCreateDeployBuild(
+							target,
+							spellCorePath,
+							projectPath,
+							projectFilePath,
+							minify,
+							anonymizeModuleIds,
+							debug,
+							afterAllBuildsCompleted
+						)
+					}
+				)
 			}
 
 			var startServerCommand = function( cwd, command ) {
@@ -178,6 +213,7 @@ define(
 
 			commander
 				.command( 'build-deploy [target]' )
+				.option( '-d, --debug' )
 				.description( 'build for a specific target [html5 (default)]' )
 				.action( _.bind( buildCommand, this, cwd ) )
 

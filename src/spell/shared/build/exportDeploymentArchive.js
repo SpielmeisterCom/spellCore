@@ -67,10 +67,14 @@ define(
 		 */
 
 		return function( spellCorePath, projectPath, outputFilePath, next ) {
-			var outputPath      = path.dirname( outputFilePath ),
-				projectsPath    = path.resolve( projectPath, '..' ),
-				projectName     = path.basename( projectPath ),
-				projectFilePath = path.resolve( projectPath, 'project.json' )
+			var outputPath         = path.dirname( outputFilePath ),
+				projectsPath       = path.resolve( projectPath, '..' ),
+				projectName        = path.basename( projectPath ),
+				projectFilePath    = path.resolve( projectPath, 'project.json' ),
+				target             = 'html5',
+				minify             = true,
+				anonymizeModuleIds = true,
+				debug              = false
 
 			if( !fs.existsSync( outputPath ) ) {
 				mkdirp.sync( outputPath )
@@ -78,10 +82,13 @@ define(
 
 			// create deployment build
 			executeCreateDeployBuild(
-				'html5',
+				target,
 				spellCorePath,
 				projectPath,
 				projectFilePath,
+				minify,
+				anonymizeModuleIds,
+				debug,
 				next
 			)
 

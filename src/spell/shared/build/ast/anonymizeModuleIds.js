@@ -1,13 +1,13 @@
 define(
-	'spell/shared/build/ast/anonymizeModuleIdentifiers',
+	'spell/shared/build/ast/anonymizeModuleIds',
 	[
-		'spell/shared/util/hashModuleIdentifier',
+		'spell/shared/util/hashModuleId',
 		'spell/functions',
 
 		'uglify-js'
 	],
 	function(
-		hashModuleIdentifier,
+		hashModuleId,
 		_,
 
 		uglify
@@ -70,7 +70,7 @@ define(
 						var moduleId = args[ 0 ][ 1 ]
 
 						if( !_.contains( blacklistedModuleIds, moduleId ) ) {
-							args[ 0 ][ 1 ] = hashModuleIdentifier( moduleId )
+							args[ 0 ][ 1 ] = hashModuleId( moduleId )
 						}
 
 						// update module dependencies
@@ -81,7 +81,7 @@ define(
 									var moduleId = dependency[ 1 ]
 
 									if( !_.contains( blacklistedModuleIds, moduleId ) ) {
-										dependency[ 1 ] = hashModuleIdentifier( dependency[ 1 ] )
+										dependency[ 1 ] = hashModuleId( dependency[ 1 ] )
 									}
 
 									return dependency

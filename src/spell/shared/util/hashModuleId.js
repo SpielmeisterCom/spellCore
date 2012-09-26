@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/hashModuleIdentifier',
+	'spell/shared/util/hashModuleId',
 	[
 		'spell/math/hash/SHA256'
 	],

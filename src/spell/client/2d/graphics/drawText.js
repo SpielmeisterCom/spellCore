@@ -44,7 +44,7 @@ define(
 				fontMapSpacing = fontAsset.config.spacing
 
 			for( var i = 0; i < numCharacters; i++ ) {
-				var charData = charset[ text[ i ] ]
+				var charData = charset[ text.charAt( i ) ]
 
 				// in case of unsupported character perform a fallback
 				if( !charData ) {

@@ -4,7 +4,7 @@ define(
 		'spell/shared/build/createModuleId',
 		'spell/shared/util/create',
 		'spell/shared/util/entityConfig/flatten',
-		'spell/shared/util/hashModuleIdentifier',
+		'spell/shared/util/hashModuleId',
 		'spell/shared/util/Events',
 
 		'spell/functions'
@@ -13,7 +13,7 @@ define(
 		createModuleId,
 		create,
 		flattenEntityConfig,
-		hashModuleIdentifier,
+		hashModuleId,
 		Events,
 
 		_
@@ -28,14 +28,14 @@ define(
 		var cameraEntityTemplateId    = 'spell.entity.2d.graphics.camera',
 			cameraComponentTemplateId = 'spell.component.2d.graphics.camera'
 
-		var loadModule = function( moduleId, anonymizeModuleIdentifiers ) {
+		var loadModule = function( moduleId, anonymizeModuleIds ) {
 			if( !moduleId ) throw 'Error: No module id provided.'
 
 			var module = require(
 				moduleId,
 				undefined,
 				{
-					loadingAllowed : !anonymizeModuleIdentifiers
+					loadingAllowed : !anonymizeModuleIds
 				}
 			)
 
@@ -61,13 +61,13 @@ define(
 			return namespace + '.' + name
 		}
 
-		var createSystem = function( spell, templateManager, EntityManager, anonymizeModuleIdentifiers, systemTemplateId ) {
+		var createSystem = function( spell, templateManager, EntityManager, anonymizeModuleIds, systemTemplateId ) {
 			var template    = templateManager.getTemplate( systemTemplateId ),
 				moduleId    = createModuleId( createTemplateId( template.namespace, template.name ) )
 
 			var constructor = loadModule(
-				anonymizeModuleIdentifiers ? hashModuleIdentifier( moduleId ) : moduleId,
-				anonymizeModuleIdentifiers
+				anonymizeModuleIds ? hashModuleId( moduleId ) : moduleId,
+				anonymizeModuleIds
 			)
 
 			var componentsInput = _.reduce(
@@ -90,14 +90,14 @@ define(
 			return create( constructor, [ spell ], componentsInput )
 		}
 
-		var createSystems = function( spell, systemTemplateIds, anonymizeModuleIdentifiers ) {
+		var createSystems = function( spell, systemTemplateIds, anonymizeModuleIds ) {
 			var templateManager = spell.templateManager,
 				EntityManager   = spell.EntityManager
 
 			return _.map(
 				systemTemplateIds,
 				function( systemTemplateId ) {
-					return createSystem( spell, templateManager, EntityManager, anonymizeModuleIdentifiers, systemTemplateId )
+					return createSystem( spell, templateManager, EntityManager, anonymizeModuleIds, systemTemplateId )
 				}
 			)
 		}
@@ -141,7 +141,7 @@ define(
 			update: function( timeInMs, deltaTimeInMs ) {
 				invoke( this.updateSystems, 'process', [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
-			init: function( spell, sceneConfig, anonymizeModuleIdentifiers ) {
+			init: function( spell, sceneConfig, anonymizeModuleIds ) {
 				if( !hasActiveCamera( sceneConfig ) ) {
 					spell.logger.error( 'Could not start scene "' + sceneConfig.name + '" because no camera entity was found. A scene must have at least one active camera entity.' )
 
@@ -150,16 +150,16 @@ define(
 
 				if( sceneConfig.scriptId ) {
 					this.script = loadModule(
-						anonymizeModuleIdentifiers ? sceneConfig.scriptId : createModuleId( sceneConfig.scriptId ),
-						anonymizeModuleIdentifiers
+						anonymizeModuleIds ? sceneConfig.scriptId : createModuleId( sceneConfig.scriptId ),
+						anonymizeModuleIds
 					)
 
 					this.script.init( this.spell, this.EntityManager, sceneConfig )
 				}
 
 				if( sceneConfig.systems ) {
-					this.renderSystems = createSystems( spell, sceneConfig.systems.render, anonymizeModuleIdentifiers )
-					this.updateSystems = createSystems( spell, sceneConfig.systems.update, anonymizeModuleIdentifiers )
+					this.renderSystems = createSystems( spell, sceneConfig.systems.render, anonymizeModuleIds )
+					this.updateSystems = createSystems( spell, sceneConfig.systems.update, anonymizeModuleIds )
 
 					invoke( this.renderSystems, 'init', [ this.spell, sceneConfig ] )
 					invoke( this.updateSystems, 'init', [ this.spell, sceneConfig ] )

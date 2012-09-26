@@ -1,13 +1,13 @@
 define(
 	'spell/shared/build/processSource',
 	[
-		'spell/shared/build/ast/anonymizeModuleIdentifiers',
+		'spell/shared/build/ast/anonymizeModuleIds',
 		'spell/shared/build/ast/createAST',
 		'spell/shared/build/ast/createSource',
 		'spell/shared/build/ast/minifyAST'
 	],
 	function(
-		anonymizeModuleIdentifiers,
+		anonymizeModuleIds,
 		createAST,
 		createSource,
 		minifyAST
@@ -18,7 +18,7 @@ define(
 			var ast = createAST( sourceChunk )
 
 			if( anonymizeModules ) {
-				ast = anonymizeModuleIdentifiers( ast, [ 'spell/client/main', 'spell/client/runtimeModule' ] )
+				ast = anonymizeModuleIds( ast, [ 'spell/client/main' ] )
 			}
 
 			if( minify ) ast = minifyAST( ast )

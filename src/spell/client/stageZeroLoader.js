@@ -181,8 +181,7 @@ if ( !window.console ) {
 		} else if( config.platform === 'flash' &&
 			isFlashCapable() ) {
 
-			// for now the flash back-end is disabled
-			return false
+			return true
 		}
 
 		return false
@@ -244,7 +243,7 @@ if ( !window.console ) {
 		head.js.apply( null, args )
 	}
 
-	var loadFlashExecutable = function( parameters, verbose ) {
+	var loadFlashExecutable = function( config, verbose ) {
 		if( verbose ) printLoading()
 
 		swfobject.embedSWF(
@@ -254,7 +253,7 @@ if ( !window.console ) {
 			'768',
 			MIN_FLASH_PLAYER_VERSION,
 			'playerProductInstall.swf',
-			parameters,
+			config,
 			null,
 			null,
 			function() { if( verbose ) printLaunching() }

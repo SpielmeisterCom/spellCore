@@ -64,6 +64,15 @@ define(
 			asset.resource = resource
 		}
 
+		var addTemplates = function( templateManager, templates ) {
+			_.each(
+				templates,
+				function( template ) {
+					templateManager.add( template )
+				}
+			)
+		}
+
 
 		return function( spell, next ) {
 			var eventManager     = spell.eventManager,
@@ -106,7 +115,27 @@ define(
 			).and(
 				[ Events.RESOURCE_LOADING_COMPLETED, templateBundleId ],
 				function( loadedTemplates ) {
-					_.each( loadedTemplates, function( template ) { templateManager.add( template ) } )
+					// separate templates according to subtype
+					var templates = _.reduce(
+						loadedTemplates,
+						function( memo, value, key ) {
+							var type = value.subtype
+
+							if( memo[ type ] ) {
+								memo[ type ].push( value )
+
+							} else {
+								memo[ type ] = [ value ]
+							}
+
+							return memo
+						},
+						{}
+					)
+
+					addTemplates( templateManager, templates.component )
+					addTemplates( templateManager, templates.entity )
+					addTemplates( templateManager, templates.system )
 				}
 
 			).and(

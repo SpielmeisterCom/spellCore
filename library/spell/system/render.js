@@ -226,12 +226,12 @@ define(
 				context                 = this.context,
 				drawVisualObjectPartial = this.drawVisualObjectPartial,
 				screenSize              = this.screenSize,
-				screenAspectRatio       = this.debug.screenAspectRatio || screenSize[ 0 ] / screenSize[ 1 ]
+				screenAspectRatio       = this.debug && this.debug.screenAspectRatio ? this.debug.screenAspectRatio : screenSize[ 0 ] / screenSize[ 1 ]
 
 			// set the camera
-			var activeCameraId            = getActiveCameraId( cameras ),
-				camera                    = cameras[ activeCameraId ],
-				cameraTransform           = this.transforms[ activeCameraId ]
+			var activeCameraId  = getActiveCameraId( cameras ),
+				camera          = cameras[ activeCameraId ],
+				cameraTransform = this.transforms[ activeCameraId ]
 
 			if( camera && cameraTransform ) {
 				var effectiveCameraDimensions = vec2.multiply(

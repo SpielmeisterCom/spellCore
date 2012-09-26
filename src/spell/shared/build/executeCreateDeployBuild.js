@@ -1,13 +1,15 @@
 define(
 	'spell/shared/build/executeCreateDeployBuild',
 	[
-		'spell/shared/build/copyFile',
+		'spell/shared/build/copyFiles',
 		'spell/shared/build/createModuleId',
 		'spell/shared/build/processSource',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
+		'spell/shared/build/executable/buildHtml5',
+		'spell/shared/build/executable/buildFlash',
 		'spell/shared/util/createId',
-		'spell/shared/util/hashModuleIdentifier',
+		'spell/shared/util/hashModuleId',
 		'spell/shared/util/template/TemplateTypes',
 
 		'amd-helper',
@@ -17,13 +19,15 @@ define(
 		'path'
 	],
 	function(
-		copyFile,
+		copyFiles,
 		createModuleId,
 		processSource,
 		isDirectory,
 		isFile,
+		buildHtml5,
+		buildFlash,
 		createId,
-		hashModuleIdentifier,
+		hashModuleId,
 		TemplateTypes,
 
 		amdHelper,
@@ -35,17 +39,19 @@ define(
 		'use strict'
 
 
-		var LIBRARY_PATH   = 'library'
-		var ASSETS_PATH    = LIBRARY_PATH + '/assets'
-		var SCRIPTS_PATH   = LIBRARY_PATH + '/scripts'
-		var TEMPLATES_PATH = LIBRARY_PATH + '/templates'
-		var DEPLOY_PATH    = 'build/deploy'
+		var LIBRARY_PATH = 'library'
+		var DEPLOY_PATH  = 'build/deploy'
 
 		var dataFileTemplate = [
 			'%1$s;',
 			'spell.setCache(%2$s);',
 			'spell.setRuntimeModule(%3$s);'
 		].join( '\n' )
+
+		var targetToBuilder = {
+			html5 : buildHtml5,
+			flash : buildFlash,
+		}
 
 
 		var loadJsonFromPaths = function( result, libraryPath, filePaths ) {
@@ -110,10 +116,10 @@ define(
 			return projectConfig
 		}
 
-		var createProjectConfig = function( projectConfigRaw, anonymizeModuleIdentifiers ) {
+		var createProjectConfig = function( projectConfigRaw, anonymizeModuleIds ) {
 			var result = _.pick( projectConfigRaw, 'name', 'startScene', 'templateIds', 'assetIds' )
 
-			result.scenes = createSceneList( projectConfigRaw.scenes, anonymizeModuleIdentifiers )
+			result.scenes = createSceneList( projectConfigRaw.scenes, anonymizeModuleIds )
 
 			return result
 		}
@@ -146,14 +152,14 @@ define(
 			)
 		}
 
-		var createSceneList = function( scenes, anonymizeModuleIdentifiers ) {
+		var createSceneList = function( scenes, anonymizeModuleIds ) {
 			return _.map(
 				scenes,
 				function( scene ) {
 					return {
 						entities : scene.entities,
 						name     : scene.name,
-						scriptId : anonymizeModuleIdentifiers ? hashModuleIdentifier( createModuleId( scene.scriptId ) ) : scene.scriptId,
+						scriptId : anonymizeModuleIds ? hashModuleId( createModuleId( scene.scriptId ) ) : scene.scriptId,
 						systems  : scene.systems
 					}
 				}
@@ -211,35 +217,6 @@ define(
 			)
 		}
 
-		var copyFiles = function( sourceDirectoryPath, targetDirectoryPath, filePaths ) {
-			_.each(
-				filePaths,
-				function( filePathInfo ) {
-					// indicates if the path and or name of the file changes from source to target location
-					var isMoved = _.isArray( filePathInfo ) && filePathInfo.length === 2
-
-					var sourceFilePath = isMoved ?
-						filePathInfo[ 0 ] :
-						path.resolve( sourceDirectoryPath,  filePathInfo )
-
-					if( isDirectory( sourceFilePath ) ) return
-
-
-					var targetFilePath = isMoved ?
-						filePathInfo[ 1 ] :
-						path.resolve( targetDirectoryPath,  filePathInfo )
-
-					var targetPath = path.dirname( targetFilePath )
-
-					if( !fs.existsSync( targetPath ) ) {
-						mkdirp.sync( targetPath )
-					}
-
-					copyFile( sourceFilePath, targetFilePath )
-				}
-			)
-		}
-
 		var loadSystemScriptModules = function( projectLibraryPath, templates ) {
 			return _.reduce(
 				templates,
@@ -261,18 +238,35 @@ define(
 			)
 		}
 
+		var createCacheContent = function( resources ) {
+			return _.reduce(
+				resources,
+				function( memo, resource ) {
+					var content  = resource.content,
+						filePath = resource.filePath
 
-		return function( target, spellCorePath, projectPath, projectFilePath, callback ) {
-			var errors                     = [],
-				minify                     = true,
-				anonymizeModuleIdentifiers = true,
-				projectLibraryPath         = path.join( projectPath, LIBRARY_PATH ),
-				deployPath                 = path.join( projectPath, DEPLOY_PATH ),
-				deployLibraryPath          = path.join( deployPath, LIBRARY_PATH ),
-				deployHtml5Path            = path.join( deployPath, 'html5' ),
-				projectConfigData          = readProjectConfigFile( projectFilePath ),
-				projectConfigRaw           = parseProjectConfig( projectConfigData, callback ),
-				projectConfig              = createProjectConfig( projectConfigRaw, anonymizeModuleIdentifiers )
+					if( _.has( memo, filePath ) ) {
+						throw 'Error: Resource path duplication detected. Could not build.'
+					}
+
+					memo[ filePath ] = JSON.stringify( content )
+
+					return memo
+				},
+				{}
+			)
+		}
+
+
+		return function( target, spellCorePath, projectPath, projectFilePath, minify, anonymizeModuleIds, debug, callback ) {
+			var errors             = [],
+				projectLibraryPath = path.join( projectPath, LIBRARY_PATH ),
+				deployPath         = path.join( projectPath, DEPLOY_PATH ),
+				deployLibraryPath  = path.join( deployPath, LIBRARY_PATH ),
+				deployHtml5Path    = path.join( deployPath, 'html5' ),
+				projectConfigData  = readProjectConfigFile( projectFilePath ),
+				projectConfigRaw   = parseProjectConfig( projectConfigData, callback ),
+				projectConfig      = createProjectConfig( projectConfigRaw, anonymizeModuleIds )
 
 
 			// loading the library
@@ -284,7 +278,6 @@ define(
 
 			if( _.size( errors ) > 0 ) callback( errors )
 
-
 			// load all scripts
 			var scriptModules = loadScriptModules( projectLibraryPath, library.script )
 
@@ -293,36 +286,20 @@ define(
 				loadSystemScriptModules( projectLibraryPath, library.template )
 			)
 
-
-			// write data file to "build/deploy/html5/data.js"
-			if( !fs.existsSync( deployHtml5Path ) ) {
-				mkdirp.sync( deployHtml5Path )
-			}
-
-			var dataFilePath = path.resolve( deployHtml5Path, 'data.js' )
-
+			// generate script source
 			var scriptSource = processSource(
 				_.pluck( scriptModules, 'source' ).join( '\n' ),
 				minify,
-				anonymizeModuleIdentifiers
+				anonymizeModuleIds
 			)
 
-			var cachedResources = createCacheContent(
+			// generate cache content
+			var cacheContent = createCacheContent(
 				library.template.concat( library.asset )
 			)
 
-			writeFile(
-				dataFilePath,
-				createDataFileContent(
-					dataFileTemplate,
-					scriptSource,
-					cachedResources,
-					projectConfig
-				)
-			)
 
-
-			// copying all files required by the build to the deployment directory "build/deploy"
+			// copy common files
 
 			// the library files
 			var deployFilePaths = flob.sync( '**/*', { cwd : projectLibraryPath } )
@@ -344,13 +321,30 @@ define(
 				path.join( deployPath, 'spell.js' )
 			] )
 
-			// minified, anonymized engine include goes to "build/deploy/html5/spell.js"
-			deployFilePaths.push( [
-				path.join( spellCorePath, 'build/spell.deploy.js' ),
-				path.join( deployHtml5Path, 'spell.js' )
-			] )
-
 			copyFiles( projectLibraryPath, deployLibraryPath, deployFilePaths )
+
+
+			// create build
+			var build = targetToBuilder[ target ]
+
+			if( !build ) {
+				throw 'The target \'' + target + '\' is not supported.'
+			}
+
+			build(
+				spellCorePath,
+				projectPath,
+				projectLibraryPath,
+				deployPath,
+				projectConfig,
+				library,
+				cacheContent,
+				scriptSource,
+				minify,
+				anonymizeModuleIds,
+				debug,
+				callback
+			)
 		}
 	}
 )

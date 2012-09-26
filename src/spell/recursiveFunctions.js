@@ -15,7 +15,7 @@ define(
 
 		/**
 		 * Performs a recursive walk over all properties of the supplied object. The "object" argument can be either of type object or array. The iterator
-		 * argument is called with the arguments "key" and "value" for every property that is encountered on the walk.
+		 * argument is called with the arguments "value" and "key" for every property that is encountered on the walk.
 		 *
 		 * @param {*} object data structure to work on
 		 * @param {Function} iterator
@@ -28,9 +28,19 @@ define(
 					walk( value, iterator )
 
 				} else {
-					iterator( key, value )
+					iterator( value, key )
 				}
 			}
+		}
+
+		var reduce = function( object, iterator, memo ) {
+			var wrapper = function( value, key ) {
+				memo = iterator( memo, value, key )
+			}
+
+			walk( object, wrapper )
+
+			return memo
 		}
 
 		/**
@@ -57,8 +67,9 @@ define(
 		}
 
 		return {
-			walk : walk,
-			pluck : pluck
+			pluck  : pluck,
+			reduce : reduce,
+			walk   : walk
 		}
 	}
 )
