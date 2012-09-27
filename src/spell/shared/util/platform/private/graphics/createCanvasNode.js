@@ -1,5 +1,5 @@
 define(
-	"spell/shared/util/platform/private/graphics/createCanvasNode",
+	'spell/shared/util/platform/private/graphics/createCanvasNode',
 	function() {
 		return function( id, width, height ) {
 			var container = document.getElementById( id )
@@ -7,10 +7,11 @@ define(
 			if( !container ) throw 'Could not find a container with the id ' + id + ' in the DOM tree.'
 
 
-			var canvas = document.createElement( "canvas" )
-				canvas.id     = 'spell-canvas'
+			var canvas = document.createElement( 'canvas' )
+				canvas.id     = id + '-screen'
 				canvas.width  = width
 				canvas.height = height
+				canvas.classList.add( 'spell-canvas' )
 
 			container.appendChild( canvas )
 

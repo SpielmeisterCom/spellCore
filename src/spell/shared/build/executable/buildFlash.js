@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/executable/buildFlash',
 	[
+		'spell/shared/build/copyFile',
 		'spell/shared/build/isFile',
 		'spell/shared/build/processSource',
 
@@ -14,6 +15,7 @@ define(
 		'spell/functions'
 	],
 	function(
+		copyFile,
 		isFile,
 		processSource,
 
@@ -163,13 +165,27 @@ define(
 		return function( spellCorePath, projectPath, projectLibraryPath, deployPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
 			var errors          = [],
 				spellEnginePath = path.resolve( spellCorePath, '../..' ),
-				spellFlashPath  = path.resolve( spellEnginePath, 'modules/spellFlash' ),
-				tmpPath         = path.resolve( projectPath, 'build' ),
-				tmpSourcePath   = path.resolve( tmpPath, 'src/Spielmeister' )
+				spellFlashPath  = path.join( spellEnginePath, 'modules/spellFlash' ),
+				tmpPath         = path.join( projectPath, 'build' ),
+				tmpSourcePath   = path.join( tmpPath, 'src/Spielmeister' ),
+				deployFlashPath = path.join( deployPath, 'flash' )
+
 
 			if( !fs.existsSync( tmpSourcePath ) ) {
 				mkdirp.sync( tmpSourcePath )
 			}
+
+			if( !fs.existsSync( deployFlashPath ) ) {
+				fs.mkdirSync( deployFlashPath )
+			}
+
+
+			// copy flash dom shim
+			copyFile(
+				path.join( spellCorePath, 'src/spell/client/flashDomShim.js' ),
+				path.join( deployFlashPath, 'domShim.js' )
+			)
+
 
 			// reading engine source file
 			var spellEngineSourceFilePath = path.join( spellCorePath, 'build/spell.common.js' )
@@ -180,7 +196,7 @@ define(
 			}
 
 			// write engine source wrapper class file
-			var engineSourceFilePath = path.resolve( tmpSourcePath, 'SpellEngine.as' ),
+			var engineSourceFilePath = path.join( tmpSourcePath, 'SpellEngine.as' ),
 				engineSource         = fs.readFileSync( spellEngineSourceFilePath ).toString( 'utf-8' )
 
 			writeFile(
@@ -193,7 +209,7 @@ define(
 
 			// write script modules source wrapper class file
 			writeFile(
-				path.resolve( tmpSourcePath, 'ScriptModules.as' ),
+				path.join( tmpSourcePath, 'ScriptModules.as' ),
 				createModuleDefinitionWrapperClass(
 					'ScriptModules',
 					scriptSource
@@ -202,7 +218,7 @@ define(
 
 			// write application data class file
 			writeFile(
-				path.resolve( tmpSourcePath, 'ApplicationData.as' ),
+				path.join( tmpSourcePath, 'ApplicationData.as' ),
 				_s.sprintf(
 					applicationDataFileTemplate,
 					JSON.stringify( cacheContent ),
@@ -211,17 +227,11 @@ define(
 			)
 
 			// create config and compile
-			var flexSdkPath            = path.resolve( spellFlashPath, 'vendor/flex_sdk_4.1.0.16076A_mpl' ),
-				compilerConfigFilePath = path.resolve( tmpPath, 'compile-config.xml' ),
-				deployFlashPath        = path.resolve( deployPath, 'flash' ),
-				outputFilePath         = path.resolve( deployFlashPath, 'spell.swf' )
-
-			if( !fs.existsSync( deployFlashPath ) ) {
-				fs.mkdirSync( deployFlashPath )
-			}
+			var flexSdkPath            = path.join( spellFlashPath, 'vendor/flex_sdk_4.1.0.16076A_mpl' ),
+				compilerConfigFilePath = path.join( tmpPath, 'compile-config.xml' ),
+				outputFilePath         = path.join( deployFlashPath, 'spell.swf' )
 
 			writeCompilerConfigFile( projectPath, spellFlashPath, flexSdkPath, compilerConfigFilePath, outputFilePath, anonymizeModuleIds, debug )
-
 
 			var onCompilingCompleted = function( errors, stderr, stdout ) {
 				// TODO: parse stderr to get to the real compiler errors
