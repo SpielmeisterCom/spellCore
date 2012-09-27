@@ -1,21 +1,21 @@
 {
 	"type": "template",
 	"subtype": "component",
-	"readonly" : true,
-	"namespace" : "spell.component",
-	"name" : "inputDefinition",
-	"title" : "Mapping of keys to actions",
-	"attributes" : [
+	"readonly": true,
+	"namespace": "spell.component",
+	"name": "inputDefinition",
+	"title": "Mapping of keys to actions",
+	"attributes": [
 		{
-			"name" : "actorId",
-			"type" : "string",
-			"doc" : "the id of the actor that is controlled by this mapping"
+			"name": "actorId",
+			"type": "string",
+			"doc": "the id of the actor that is controlled by this mapping"
 		},
 		{
-			"name" : "assetId",
-			"type" : "assetId:keyToActionMap",
-			"doc" : "key to action mapping"
+			"name": "assetId",
+			"type": "assetId:keyToActionMap",
+			"doc": "key to action mapping"
 		}
-	]
+	],
+	"version": 1
 }
-

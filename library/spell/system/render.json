@@ -1,42 +1,42 @@
 {
-	"type" : "template",
-	"subtype" : "system",
-	"readonly" : true,
-	"namespace" : "spell.system",
-	"name" : "render",
-
-	"input" : [
+	"type": "template",
+	"subtype": "system",
+	"readonly": true,
+	"namespace": "spell.system",
+	"name": "render",
+	"input": [
 		{
-			"name" : "transforms",
-			"templateId" : "spell.component.2d.transform"
+			"name": "transforms",
+			"templateId": "spell.component.2d.transform"
 		},
 		{
-			"name" : "roots",
-			"templateId" : "spell.component.entityComposite.root"
+			"name": "roots",
+			"templateId": "spell.component.entityComposite.root"
 		},
 		{
-			"name" : "childrenComponents",
-			"templateId" : "spell.component.entityComposite.children"
+			"name": "childrenComponents",
+			"templateId": "spell.component.entityComposite.children"
 		},
 		{
-			"name" : "appearances",
-			"templateId" : "spell.component.2d.graphics.appearance"
+			"name": "appearances",
+			"templateId": "spell.component.2d.graphics.appearance"
 		},
 		{
-			"name" : "animatedAppearances",
-			"templateId" : "spell.component.2d.graphics.animatedAppearance"
+			"name": "animatedAppearances",
+			"templateId": "spell.component.2d.graphics.animatedAppearance"
 		},
 		{
-			"name" : "textAppearances",
-			"templateId" : "spell.component.2d.graphics.textAppearance"
+			"name": "textAppearances",
+			"templateId": "spell.component.2d.graphics.textAppearance"
 		},
 		{
-			"name" : "visualObjects",
-			"templateId" : "spell.component.visualObject"
+			"name": "visualObjects",
+			"templateId": "spell.component.visualObject"
 		},
 		{
-			"name" : "cameras",
-			"templateId" : "spell.component.2d.graphics.camera"
+			"name": "cameras",
+			"templateId": "spell.component.2d.graphics.camera"
 		}
-	]
+	],
+	"version": 1
 }

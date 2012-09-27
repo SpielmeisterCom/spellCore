@@ -3,5 +3,6 @@
 	"subtype": "appearance",
 	"file": "spell/defaultTexture.png",
 	"namespace": "spell",
-	"name": "defaultAppearance"
+	"name": "defaultAppearance",
+	"version": 1
 }

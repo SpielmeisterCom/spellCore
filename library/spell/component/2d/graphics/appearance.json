@@ -1,16 +1,17 @@
 {
 	"type": "template",
 	"subtype": "component",
-	"readonly" : true,
-	"namespace" : "spell.component.2d.graphics",
-	"name" : "appearance",
-	"title" : "2D Static Appearance",
-	"attributes" : [
+	"readonly": true,
+	"namespace": "spell.component.2d.graphics",
+	"name": "appearance",
+	"title": "2D Static Appearance",
+	"attributes": [
 		{
-			"name" : "assetId",
-			"type" : "assetId:appearance",
-			"default" : "appearance:spell.defaultAppearance",
-			"doc" : "the appearance asset used for rendering"
+			"name": "assetId",
+			"type": "assetId:appearance",
+			"default": "appearance:spell.defaultAppearance",
+			"doc": "the appearance asset used for rendering"
 		}
-	]
+	],
+	"version": 1
 }

@@ -1,5 +1,6 @@
 {
 	"name": "default",
 	"namespace": "spell.scene",
-	"type": "script"
+	"type": "script",
+	"version": 1
 }

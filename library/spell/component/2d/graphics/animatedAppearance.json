@@ -1,6 +1,6 @@
 {
 	"name": "animatedAppearance",
-	"readonly" : true,
+	"readonly": true,
 	"namespace": "spell.component.2d.graphics",
 	"type": "template",
 	"subtype": "component",
@@ -11,19 +11,20 @@
 			"name": "assetId",
 			"type": "assetId:animation",
 			"default": "animation:spell.not_defined",
-			"doc" : "the appearance asset used for rendering"
+			"doc": "the appearance asset used for rendering"
 		},
 		{
 			"name": "replaySpeed",
 			"type": "number",
 			"default": 1,
-			"doc" : "the replay speed used for playing the animation; i.e. a speed factor of 2 means doubled playing speed"
+			"doc": "the replay speed used for playing the animation; i.e. a speed factor of 2 means doubled playing speed"
 		},
 		{
 			"name": "offset",
 			"type": "number",
 			"default": 0,
-			"doc" : "current offset into the played animation in milliseconds"
+			"doc": "current offset into the played animation in milliseconds"
 		}
-	]
+	],
+	"version": 1
 }

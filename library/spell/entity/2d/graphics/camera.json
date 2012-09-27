@@ -7,5 +7,6 @@
 		"spell.component.2d.transform": {},
 		"spell.component.2d.graphics.camera": {}
 	},
-	"children": []
+	"children": [],
+	"version": 1
 }

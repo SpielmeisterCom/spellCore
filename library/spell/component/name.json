@@ -1,18 +1,18 @@
 {
 	"type": "template",
 	"subtype": "component",
-	"readonly" : true,
-	"engineInternal" : true,
-	"namespace" : "spell.component",
-	"name" : "name",
-	"title" : "Name",
-	"attributes" : [
+	"readonly": true,
+	"engineInternal": true,
+	"namespace": "spell.component",
+	"name": "name",
+	"title": "Name",
+	"attributes": [
 		{
-			"name" : "value",
-			"type" : "string",
-			"default" : "",
-			"doc" : "the name of the entity"
+			"name": "value",
+			"type": "string",
+			"default": "",
+			"doc": "the name of the entity"
 		}
-	]
+	],
+	"version": 1
 }
-

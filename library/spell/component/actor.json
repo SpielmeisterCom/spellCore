@@ -1,22 +1,22 @@
 {
 	"type": "template",
 	"subtype": "component",
-	"readonly" : true,
-	"namespace" : "spell.component",
-	"name" : "actor",
-	"title" : "Actor",
-	"attributes" : [
+	"readonly": true,
+	"namespace": "spell.component",
+	"name": "actor",
+	"title": "Actor",
+	"attributes": [
 		{
-			"name" : "id",
-			"type" : "string",
-			"doc" : "the id of the actor"
+			"name": "id",
+			"type": "string",
+			"doc": "the id of the actor"
 		},
 		{
-			"name" : "actions",
-			"type" : "object",
-			"default" : {},
-			"doc" : "the actions which can be performed by the actor"
+			"name": "actions",
+			"type": "object",
+			"default": {},
+			"doc": "the actions which can be performed by the actor"
 		}
-	]
+	],
+	"version": 1
 }
-

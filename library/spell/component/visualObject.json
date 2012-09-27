@@ -1,23 +1,24 @@
 {
 	"type": "template",
 	"subtype": "component",
-	"readonly" : true,
-	"namespace" : "spell.component",
-	"name" : "visualObject",
-	"title" : "Visual Object",
-	"doc" : "the visual representation of an entity",
-	"attributes" : [
+	"readonly": true,
+	"namespace": "spell.component",
+	"name": "visualObject",
+	"title": "Visual Object",
+	"doc": "the visual representation of an entity",
+	"attributes": [
 		{
-			"name" : "layer",
-			"type" : "integer",
-			"default" : 1,
-			"doc" : "the layer that the entity is drawn on"
+			"name": "layer",
+			"type": "integer",
+			"default": 1,
+			"doc": "the layer that the entity is drawn on"
 		},
 		{
-			"name" : "opacity",
-			"type" : "number",
-			"default" : 1.0,
-			"doc" : "the opacity that the entity is drawn with"
+			"name": "opacity",
+			"type": "number",
+			"default": 1,
+			"doc": "the opacity that the entity is drawn with"
 		}
-	]
+	],
+	"version": 1
 }

@@ -1,18 +1,18 @@
 {
-	"type" : "template",
-	"subtype" : "system",
-	"readonly" : true,
-	"namespace" : "spell.system",
-	"name" : "keyInput",
-
-	"input" : [
+	"type": "template",
+	"subtype": "system",
+	"readonly": true,
+	"namespace": "spell.system",
+	"name": "keyInput",
+	"input": [
 		{
-			"name" : "actors",
-			"templateId" : "spell.component.actor"
+			"name": "actors",
+			"templateId": "spell.component.actor"
 		},
 		{
-			"name" : "inputDefinitions",
-			"templateId" : "spell.component.inputDefinition"
+			"name": "inputDefinitions",
+			"templateId": "spell.component.inputDefinition"
 		}
-	]
+	],
+	"version": 1
 }

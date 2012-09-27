@@ -1,22 +1,26 @@
 {
 	"type": "template",
 	"subtype": "component",
-	"readonly" : true,
-	"namespace" : "spell.component.2d.physics",
-	"name" : "inertialObject",
-	"title" : "Inertial Object",
-	"attributes" : [
+	"readonly": true,
+	"namespace": "spell.component.2d.physics",
+	"name": "inertialObject",
+	"title": "Inertial Object",
+	"attributes": [
 		{
-			"name" : "mass",
-			"type" : "number",
-			"default" : 1,
-			"doc" : "the mass of the object"
+			"name": "mass",
+			"type": "number",
+			"default": 1,
+			"doc": "the mass of the object"
 		},
 		{
-			"name" : "velocity",
-			"type" : "vec2",
-			"default" : [ 0, 0 ],
-			"doc" : "the velocity of the object"
+			"name": "velocity",
+			"type": "vec2",
+			"default": [
+				0,
+				0
+			],
+			"doc": "the velocity of the object"
 		}
-	]
+	],
+	"version": 1
 }
