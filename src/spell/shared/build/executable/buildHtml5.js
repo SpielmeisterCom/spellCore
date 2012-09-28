@@ -6,7 +6,6 @@ define(
 		'spell/shared/build/processSource',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
-		'spell/shared/util/createId',
 		'spell/shared/util/hashModuleId',
 		'spell/shared/util/template/TemplateTypes',
 
@@ -22,7 +21,6 @@ define(
 		processSource,
 		isDirectory,
 		isFile,
-		createId,
 		hashModuleId,
 		TemplateTypes,
 

@@ -2,12 +2,14 @@ define(
 	'spell/client/util/loadResources',
 	[
 		'spell/client/util/createAssets',
+		'spell/shared/util/createIdFromLibraryFilePath',
 		'spell/shared/util/Events',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/functions'
 	],
 	function(
 		createAssets,
+		createIdFromLibraryFilePath,
 		Events,
 		PlatformKit,
 		_
@@ -73,6 +75,23 @@ define(
 			)
 		}
 
+		/**
+		 * Adds the namespace and name attribute to library records.
+		 *
+		 * @param records
+		 */
+		var addNamespaceAndName = function( records ) {
+			_.each(
+				records,
+				function( value, key ) {
+					var idParts = createIdFromLibraryFilePath( key, true )
+
+					value.name      = idParts.pop()
+					value.namespace = idParts.join( '.' )
+				}
+			)
+		}
+
 
 		return function( spell, next ) {
 			var eventManager     = spell.eventManager,
@@ -89,6 +108,8 @@ define(
 			eventManager.waitFor(
 				[ Events.RESOURCE_LOADING_COMPLETED, assetBundleId ],
 				function( loadedAssets ) {
+					addNamespaceAndName( loadedAssets )
+
 					_.extend( spell.assets, createAssets( loadedAssets ) )
 
 					// start loading template definition files
@@ -115,6 +136,8 @@ define(
 			).and(
 				[ Events.RESOURCE_LOADING_COMPLETED, templateBundleId ],
 				function( loadedTemplates ) {
+					addNamespaceAndName( loadedTemplates )
+
 					// separate templates according to subtype
 					var templates = _.reduce(
 						loadedTemplates,

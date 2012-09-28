@@ -8,7 +8,7 @@ define(
 		'spell/shared/build/isFile',
 		'spell/shared/build/executable/buildHtml5',
 		'spell/shared/build/executable/buildFlash',
-		'spell/shared/util/createId',
+		'spell/shared/util/createIdFromLibraryFilePath',
 		'spell/shared/util/hashModuleId',
 		'spell/shared/util/template/TemplateTypes',
 
@@ -26,7 +26,7 @@ define(
 		isFile,
 		buildHtml5,
 		buildFlash,
-		createId,
+		createIdFromLibraryFilePath,
 		hashModuleId,
 		TemplateTypes,
 
@@ -223,7 +223,7 @@ define(
 				function( memo, template ) {
 					if( template.content.subtype !== TemplateTypes.SYSTEM ) return memo
 
-					var id             = createId( template.content.namespace, template.content.name ),
+					var id             = createIdFromLibraryFilePath( template.filePath ),
 						moduleId       = createModuleId( id ),
 						moduleFilePath = path.join( projectLibraryPath, moduleId + '.js' ),
 						module         = amdHelper.loadModule( moduleFilePath )
