@@ -1,11 +1,13 @@
 define(
 	'spell/client/util/createAssets',
 	[
+		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/input/keyCodes',
 
 		'spell/functions'
 	],
 	function(
+		createLibraryFilePath,
 		keyCodes,
 
 		_
@@ -76,6 +78,14 @@ define(
 			asset.resource = resource
 		}
 
+		var addResourceId = function( asset, assetDefinition ) {
+			var file = assetDefinition.file
+
+			if( !file ) return
+
+			asset.resourceId = createLibraryFilePath( assetDefinition.namespace, file )
+		}
+
 
 		/*
 		 * public
@@ -91,22 +101,22 @@ define(
 
 					if( type === 'appearance') {
 						asset = {
-							resourceId : assetDefinition.file,
-							type       : type
+							type : type
 						}
 
 					} else if( type === 'spriteSheet' ||
 						type === 'font') {
 
 						asset = {
-							config     : assetDefinition.config,
-							resourceId : assetDefinition.file,
-							type       : type
+							config : assetDefinition.config,
+							type   : type
 						}
 
 					} else if( type === 'keyToActionMap' ) {
 						asset = createKeyToActionMapAsset( assetDefinition )
 					}
+
+					addResourceId( asset, assetDefinition )
 
 					memo[ createAssetId( type, resourceName ) ] = asset
 

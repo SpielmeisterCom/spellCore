@@ -3,6 +3,7 @@ define(
 	[
 		'spell/client/util/createAssets',
 		'spell/shared/util/createIdFromLibraryFilePath',
+		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/Events',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/functions'
@@ -10,6 +11,7 @@ define(
 	function(
 		createAssets,
 		createIdFromLibraryFilePath,
+		createLibraryFilePath,
 		Events,
 		PlatformKit,
 		_
@@ -44,12 +46,14 @@ define(
 			return PlatformKit.jsonCoder.decode( resource )
 		}
 
-		var traceResourceIds = function( assets ) {
+		var createFilesToLoad = function( assets ) {
 			return _.unique(
 				_.reduce(
 					assets,
 					function( memo, asset ) {
-						return asset.resourceId ? memo.concat( asset.resourceId ) : memo
+						return asset.file ?
+							memo.concat( createLibraryFilePath( asset.namespace, asset.file ) ) :
+							memo
 					},
 					[]
 				)
@@ -125,7 +129,7 @@ define(
 					startLoadingResources(
 						resourceLoader,
 						resourceBundleId,
-						traceResourceIds( spell.assets ),
+						createFilesToLoad( loadedAssets ),
 						'image',
 						function( resource ) {
 							return renderingContext.createTexture( resource )

@@ -1,6 +1,6 @@
 {
 	"type": "asset",
 	"subtype": "appearance",
-	"file": "spell/defaultTexture.png",
+	"file": "defaultAppearance.png",
 	"version": 1
 }

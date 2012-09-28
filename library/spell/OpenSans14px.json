@@ -1,7 +1,7 @@
 {
 	"type": "asset",
 	"subtype": "font",
-	"file": "spell/OpenSans14px.png",
+	"file": "OpenSans14px.png",
 	"config": {
 		"fontFamily": "Open Sans",
 		"fontSize": "14",
