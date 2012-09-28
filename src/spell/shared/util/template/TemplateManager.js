@@ -176,7 +176,13 @@ define(
 		 */
 		var injectAsset = function( assets, componentTemplate, component ) {
 			if( hasAssetIdAttribute( componentTemplate.attributes ) ) {
-				component.asset = assets[ component.assetId ]
+				var asset = assets[ component.assetId ]
+
+				if( !asset ) {
+					throw 'Error: Could not resolve asset id \'' + component.assetId + '\' to asset instance. Please make sure that the asset id is valid.'
+				}
+
+				component.asset = asset
 			}
 
 			return component
