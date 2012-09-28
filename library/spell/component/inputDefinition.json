@@ -2,8 +2,6 @@
 	"type": "template",
 	"subtype": "component",
 	"readonly": true,
-	"namespace": "spell.component",
-	"name": "inputDefinition",
 	"title": "Mapping of keys to actions",
 	"attributes": [
 		{

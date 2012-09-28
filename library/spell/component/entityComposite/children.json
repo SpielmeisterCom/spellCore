@@ -3,8 +3,6 @@
 	"subtype": "component",
 	"readonly": true,
 	"engineInternal": true,
-	"namespace": "spell.component.entityComposite",
-	"name": "children",
 	"title": "Children Entities",
 	"doc": "This component holds references to entities that are subordinate to the current entity.",
 	"attributes": [

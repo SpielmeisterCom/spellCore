@@ -2,8 +2,6 @@
 	"type": "template",
 	"subtype": "component",
 	"readonly": true,
-	"namespace": "spell.component.2d.graphics",
-	"name": "appearance",
 	"title": "2D Static Appearance",
 	"attributes": [
 		{

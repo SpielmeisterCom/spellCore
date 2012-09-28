@@ -2,8 +2,6 @@
 	"type": "template",
 	"subtype": "component",
 	"readonly": true,
-	"namespace": "spell.component",
-	"name": "actor",
 	"title": "Actor",
 	"attributes": [
 		{

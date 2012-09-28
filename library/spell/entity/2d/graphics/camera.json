@@ -1,8 +1,6 @@
 {
 	"type": "template",
 	"subtype": "entity",
-	"name": "camera",
-	"namespace": "spell.entity.2d.graphics",
 	"config": {
 		"spell.component.2d.transform": {},
 		"spell.component.2d.graphics.camera": {}

@@ -2,8 +2,6 @@
 	"type": "template",
 	"subtype": "system",
 	"readonly": true,
-	"namespace": "spell.system",
-	"name": "keyInput",
 	"input": [
 		{
 			"name": "actors",

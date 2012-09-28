@@ -2,8 +2,6 @@
 	"type": "asset",
 	"subtype": "font",
 	"file": "spell/OpenSans14px.png",
-	"namespace": "spell",
-	"name": "OpenSans14px",
 	"config": {
 		"fontFamily": "Open Sans",
 		"fontSize": "14",

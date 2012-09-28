@@ -2,8 +2,6 @@
 	"type": "template",
 	"subtype": "component",
 	"readonly": true,
-	"namespace": "spell.component.2d",
-	"name": "transform",
 	"title": "2D Transformation",
 	"doc": "transformation of the local origin of the entity relative to its parent",
 	"attributes": [

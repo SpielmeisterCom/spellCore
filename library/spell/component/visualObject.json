@@ -2,8 +2,6 @@
 	"type": "template",
 	"subtype": "component",
 	"readonly": true,
-	"namespace": "spell.component",
-	"name": "visualObject",
 	"title": "Visual Object",
 	"doc": "the visual representation of an entity",
 	"attributes": [
