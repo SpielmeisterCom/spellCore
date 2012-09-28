@@ -5,7 +5,7 @@
  *
  * usage:
  *
- *   ./setAttribute.js 5 ../library
+ *   ./setAttribute.js ../library 5
  */
 
 var flob = require( 'flob' ),
@@ -46,8 +46,6 @@ var writeFile = function( filePath, content ) {
 		fs.unlinkSync( filePath )
 	}
 
-	console.log( content )
-
 	fs.writeFileSync( filePath, content, 'utf-8' )
 }
 
@@ -62,9 +60,6 @@ _.each(
 		var content = createJson( fullyQualifiedFilePath )
 
 		content[ attributeName ] = attributeValue
-
-//		console.log( content )
-//		process.exit(0)
 
 		writeFile(
 			fullyQualifiedFilePath,
