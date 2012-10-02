@@ -1,0 +1,33 @@
+{
+	"readonly": true,
+	"type": "template",
+	"subtype": "component",
+	"title": "2D Key Frame Animation",
+	"doc": "",
+	"attributes": [
+		{
+			"name": "assetId",
+			"type": "assetId:keyFrameAnimation",
+			"doc": "the used key frame animation asset"
+		},
+		{
+			"name": "replaySpeed",
+			"type": "number",
+			"default": 1,
+			"doc": "the replay speed used for playing the key frame animation; i.e. a speed factor of 2 means doubled playing speed"
+		},
+		{
+			"name": "offset",
+			"type": "number",
+			"default": 0,
+			"doc": "current offset into the key frame animation in milliseconds"
+		},
+		{
+			"name": "looped",
+			"type": "boolean",
+			"default": false,
+			"doc": "if true the animation is looped"
+		}
+	],
+	"version": 1
+}

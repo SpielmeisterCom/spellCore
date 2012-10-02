@@ -1,0 +1,12 @@
+{
+	"type": "template",
+	"subtype": "system",
+	"readonly": true,
+	"input": [
+		{
+			"name": "keyFrameAnimations",
+			"templateId": "spell.component.2d.graphics.keyFrameAnimation"
+		}
+	],
+	"version": 1
+}
