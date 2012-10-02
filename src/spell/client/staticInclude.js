@@ -17,6 +17,7 @@ define(
 		'spell/math/vec3',
 		'spell/math/vec4',
 		'spell/math/random/XorShift32',
+		'spell/shared/Easing',
 		'spell/shared/util/createEntityEach',
 		'spell/client/util/createComprisedRectangle',
 		'spell/client/util/createIncludedRectangle'

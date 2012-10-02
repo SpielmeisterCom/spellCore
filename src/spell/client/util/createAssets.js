@@ -67,6 +67,30 @@ define(
 				{}
 			)
 		}
+		var eachAnimatedAttribute = function( animate, iterator ) {
+			return _.each(
+				animate,
+				function( attributes ) {
+					_.each( attributes, iterator )
+				}
+			)
+		}
+
+		var createKeyFrameAnimationAsset = function( asset ) {
+			// determine and add length of attribute animations
+			eachAnimatedAttribute(
+				asset.animate,
+				function( attribute ) {
+					attribute.length = _.last( attribute.keyFrames ).time
+				}
+			)
+
+			return {
+				animate : asset.animate,
+				type    : asset.subtype,
+				length  : asset.length
+			}
+		}
 
 		var injectResource = function( asset, resources, resourceId ) {
 			if( !asset.resourceId ) return
@@ -114,6 +138,9 @@ define(
 
 					} else if( type === 'keyToActionMap' ) {
 						asset = createKeyToActionMapAsset( assetDefinition )
+
+					} else if( type === "keyFrameAnimation" ) {
+						asset = createKeyFrameAnimationAsset( assetDefinition )
 					}
 
 					addResourceId( asset, assetDefinition )
