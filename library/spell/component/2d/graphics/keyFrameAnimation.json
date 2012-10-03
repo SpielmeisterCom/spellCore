@@ -11,10 +11,10 @@
 			"doc": "the used key frame animation asset"
 		},
 		{
-			"name": "replaySpeed",
-			"type": "number",
-			"default": 1,
-			"doc": "the replay speed used for playing the key frame animation; i.e. a speed factor of 2 means doubled playing speed"
+			"name": "looped",
+			"type": "boolean",
+			"default": true,
+			"doc": "if true the animation is looped"
 		},
 		{
 			"name": "offset",
@@ -23,10 +23,22 @@
 			"doc": "current offset into the key frame animation in milliseconds"
 		},
 		{
-			"name": "looped",
+			"name": "playing",
+			"type": "boolean",
+			"default": true,
+			"doc": "if true the key frame animation is playing; gets set to false if the end of the animation is reached and looping is disabled"
+		},
+		{
+			"name": "replaySpeed",
+			"type": "number",
+			"default": 1,
+			"doc": "the replay speed used for playing the key frame animation; i.e. a speed factor of 2 means doubled playing speed"
+		},
+		{
+			"name": "reversed",
 			"type": "boolean",
 			"default": false,
-			"doc": "if true the animation is looped"
+			"doc": "if true the animation is played in reverse direction"
 		}
 	],
 	"version": 1

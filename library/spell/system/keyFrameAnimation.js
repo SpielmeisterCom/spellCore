@@ -2,18 +2,24 @@ define(
 	'spell/system/keyFrameAnimation',
 	[
 		'spell/shared/Easing',
+		'spell/math/util',
 		'spell/math/vec2',
 
 		'spell/functions'
 	],
 	function(
 		Easing,
+		mathUtil,
 		vec2,
 
 		_
 	) {
 		'use strict'
 
+
+		var clamp        = mathUtil.clamp,
+			isInInterval = mathUtil.isInInterval,
+			modulo       = mathUtil.modulo
 
 		var getKeyFrameIdA = function( keyFrames, offset ) {
 			for( var i = 0, numKeyFrames = keyFrames.length; i < numKeyFrames; i++ ) {
@@ -35,16 +41,20 @@ define(
 			return fn
 		}
 
-		var updateOffset = function( deltaTimeInMs, animationLengthInMs, offsetInMs, replaySpeed, looped ) {
-			var newOffsetInMs = Math.round( offsetInMs + deltaTimeInMs * replaySpeed )
+		var createOffset = function( deltaTimeInMs, animationLengthInMs, offsetInMs, replaySpeed, reversed ) {
+			return Math.round( offsetInMs + deltaTimeInMs * replaySpeed * ( reversed ? -1 : 1 ) )
+		}
 
-			if( !looped &&
-				newOffsetInMs > animationLengthInMs ) {
+		var normalizeOffset = function( animationLengthInMs, offsetInMs, looped ) {
+			return looped ?
+				modulo( offsetInMs, animationLengthInMs ) :
+				clamp( offsetInMs, 0, animationLengthInMs )
+		}
 
-				return animationLengthInMs
-			}
-
-			return newOffsetInMs % animationLengthInMs
+		var updatePlaying = function( animationLengthInMs, offsetInMs, looped ) {
+			return looped ?
+				true :
+				isInInterval( offsetInMs, 0, animationLengthInMs )
 		}
 
 		var lerp = function( a, b, t ) {
@@ -61,16 +71,24 @@ define(
 
 			for( var id in keyFrameAnimations ) {
 				var keyFrameAnimation      = keyFrameAnimations[ id ],
-					offset                 = keyFrameAnimation.offset,
 					keyFrameAnimationAsset = keyFrameAnimation.asset,
 					animate                = keyFrameAnimationAsset.animate,
-					length                 = keyFrameAnimationAsset.length
+					lengthInMs             = keyFrameAnimationAsset.length
 
-				if( !keyFrameAnimation.looped &&
-					offset === length ) {
+				if( !keyFrameAnimation.playing ) continue
 
-					continue
-				}
+				var rawOffset = createOffset(
+					deltaTimeInMs,
+					lengthInMs,
+					keyFrameAnimation.offset,
+					keyFrameAnimation.replaySpeed,
+					keyFrameAnimation.reversed
+				)
+
+				var offset = normalizeOffset( lengthInMs, rawOffset, keyFrameAnimation.looped )
+				keyFrameAnimation.offset  = offset
+				keyFrameAnimation.playing = updatePlaying( lengthInMs, rawOffset, keyFrameAnimation.looped )
+
 
 				for( var componentId in animate ) {
 					var componentAnimation = animate[ componentId ],
@@ -107,14 +125,6 @@ define(
 						}
 					}
 				}
-
-				keyFrameAnimation.offset = updateOffset(
-					deltaTimeInMs,
-					keyFrameAnimationAsset.length,
-					offset,
-					keyFrameAnimation.replaySpeed,
-					keyFrameAnimation.looped
-				)
 			}
 		}
 

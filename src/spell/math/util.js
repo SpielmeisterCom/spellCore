@@ -64,6 +64,21 @@ define(
 			return ( value >= lowerBound && value <= upperBound )
 		}
 
+		/**
+		 * This function returns a positive member of the quotient ring defined by dividend % divisor.
+		 *
+		 * @param dividend
+		 * @param divisor
+		 * @return {*}
+		 */
+		mathUtil.modulo = function( dividend, divisor ) {
+			var tmp = dividend % divisor
+
+			return tmp < 0 ?
+				( tmp + divisor ) % divisor :
+				tmp
+		}
+
 		return mathUtil
 	}
 )
