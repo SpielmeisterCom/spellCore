@@ -5,7 +5,7 @@
 	"input": [
 		{
 			"name": "keyFrameAnimations",
-			"templateId": "spell.component.2d.graphics.keyFrameAnimation"
+			"templateId": "spell.component.animation.keyFrameAnimation"
 		}
 	],
 	"version": 1
