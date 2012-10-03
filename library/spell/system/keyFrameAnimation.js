@@ -117,7 +117,7 @@ define(
 							easingFunction  = getEasingFunction( keyFrameB.interpolation ),
 							t               = easingFunction( attributeOffset / ( keyFrameB.time - keyFrameA.time ) )
 
-						if( attribute.length ) {
+						if( _.isArray( attribute ) ) {
 							vec2.lerp( keyFrameA.value, keyFrameB.value, t, attribute )
 
 						} else {
