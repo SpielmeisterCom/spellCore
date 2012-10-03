@@ -12,16 +12,22 @@
 			"doc": "the appearance asset used for rendering"
 		},
 		{
-			"name": "replaySpeed",
-			"type": "number",
-			"default": 1,
-			"doc": "the replay speed used for playing the animation; i.e. a speed factor of 2 means doubled playing speed"
+			"name": "looped",
+			"type": "boolean",
+			"default": true,
+			"doc": "if true the animation is looped"
 		},
 		{
 			"name": "offset",
 			"type": "number",
 			"default": 0,
 			"doc": "current offset into the played animation in milliseconds"
+		},
+		{
+			"name": "replaySpeed",
+			"type": "number",
+			"default": 1,
+			"doc": "the replay speed used for playing the animation; i.e. a speed factor of 2 means doubled playing speed"
 		}
 	],
 	"version": 1

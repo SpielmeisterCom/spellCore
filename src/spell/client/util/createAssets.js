@@ -51,8 +51,7 @@ define(
 				frameDimensions : [ frameWidth, frameHeight ],
 				frameDuration   : asset.config.duration / numFrames,
 				frameOffsets    : _.map( asset.config.frameIds, function( frameId ) { return createFrameOffsetPartial( numX, numY, frameId ) } ),
-				numFrames       : numFrames,
-				looped          : asset.config.looped
+				numFrames       : numFrames
 			}
 		}
 

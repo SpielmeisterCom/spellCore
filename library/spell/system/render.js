@@ -152,7 +152,7 @@ define(
 								appearance.replaySpeed,
 								assetNumFrames,
 								asset.frameDuration,
-								asset.looped
+								appearance.looped
 							)
 
 							var frameId = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
