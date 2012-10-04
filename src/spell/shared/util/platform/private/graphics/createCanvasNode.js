@@ -11,7 +11,7 @@ define(
 				canvas.id     = id + '-screen'
 				canvas.width  = width
 				canvas.height = height
-				canvas.classList.add( 'spell-canvas' )
+				canvas.className += 'spell-canvas'
 
 			container.appendChild( canvas )
 
