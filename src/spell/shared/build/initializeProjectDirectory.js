@@ -98,7 +98,6 @@ define(
 			if( !isFile( projectFilePath ) ) {
 				var data = {
 					"type"       : "project",
-					"name"       : projectName,
 					"startScene" : "",
 					"scenes"     : []
 				}
