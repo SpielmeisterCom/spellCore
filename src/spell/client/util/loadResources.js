@@ -142,11 +142,11 @@ define(
 				function( loadedTemplates ) {
 					addNamespaceAndName( loadedTemplates )
 
-					// separate templates according to subtype
+					// separate templates according to type
 					var templates = _.reduce(
 						loadedTemplates,
 						function( memo, value, key ) {
-							var type = value.subtype
+							var type = value.type
 
 							if( memo[ type ] ) {
 								memo[ type ].push( value )

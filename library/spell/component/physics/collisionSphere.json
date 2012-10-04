@@ -1,6 +1,5 @@
 {
-	"type": "template",
-	"subtype": "component",
+	"type": "component",
 	"readonly": true,
 	"title": "Collision Sphere",
 	"doc": "provides a collision sphere for 2d, 3d and higher dimensions",

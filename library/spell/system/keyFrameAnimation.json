@@ -1,6 +1,5 @@
 {
-	"type": "template",
-	"subtype": "system",
+	"type": "system",
 	"readonly": true,
 	"input": [
 		{

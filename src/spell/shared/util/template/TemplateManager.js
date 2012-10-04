@@ -86,7 +86,7 @@ define(
 		}
 
 		var isValidDefinition = function( template ) {
-			var templateType = template.subtype
+			var templateType = template.type
 
 			if( !_.contains( TemplateTypes, templateType ) ) return false
 
@@ -134,7 +134,7 @@ define(
 
 		var addTemplate = function( assets, templates, componentTemplatesWithAssets, entityPrototypes, definition ) {
 			var templateId = createName( definition.namespace, definition.name ),
-				type       = definition.subtype
+				type       = definition.type
 
 			if( _.has( templates, templateId ) ) throw 'Error: Template definition \'' + templateId + '\' already exists.'
 
@@ -157,7 +157,7 @@ define(
 				false :
 				( !templateType ?
 					template :
-					( template.subtype !== templateType ?
+					( template.type !== templateType ?
 						false :
 						template
 					)
@@ -291,7 +291,7 @@ define(
 				return _.reduce(
 					this.templates,
 					function( memo, template, templateId ) {
-						return template.subtype === templateType ? memo.concat( templateId ) : memo
+						return template.type === templateType ? memo.concat( templateId ) : memo
 					},
 					[]
 				)

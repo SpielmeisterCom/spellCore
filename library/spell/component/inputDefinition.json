@@ -1,6 +1,5 @@
 {
-	"type": "template",
-	"subtype": "component",
+	"type": "component",
 	"readonly": true,
 	"title": "Mapping of keys to actions",
 	"attributes": [

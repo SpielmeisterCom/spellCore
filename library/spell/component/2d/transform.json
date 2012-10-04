@@ -1,6 +1,5 @@
 {
-	"type": "template",
-	"subtype": "component",
+	"type": "component",
 	"readonly": true,
 	"title": "2D Transformation",
 	"doc": "transformation of the local origin of the entity relative to its parent",

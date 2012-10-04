@@ -217,13 +217,11 @@ define(
 			)
 		}
 
-		var loadSystemScriptModules = function( projectLibraryPath, templates ) {
+		var loadSystemScriptModules = function( projectLibraryPath, systems ) {
 			return _.reduce(
-				templates,
-				function( memo, template ) {
-					if( template.content.subtype !== TemplateTypes.SYSTEM ) return memo
-
-					var id             = createIdFromLibraryFilePath( template.filePath ),
+				systems,
+				function( memo, system ) {
+					var id             = createIdFromLibraryFilePath( system.filePath ),
 						moduleId       = createModuleId( id ),
 						moduleFilePath = path.join( projectLibraryPath, moduleId + '.js' ),
 						module         = amdHelper.loadModule( moduleFilePath )
@@ -238,7 +236,15 @@ define(
 			)
 		}
 
-		var createCacheContent = function( resources ) {
+		var createCacheContent = function( library ) {
+			var resources = _.reduce(
+				library,
+				function( memo, contentByType ) {
+					return memo.concat( contentByType )
+				},
+				[]
+			)
+
 			return _.reduce(
 				resources,
 				function( memo, resource ) {
@@ -283,7 +289,7 @@ define(
 
 			scriptModules = _.extend(
 				scriptModules,
-				loadSystemScriptModules( projectLibraryPath, library.template )
+				loadSystemScriptModules( projectLibraryPath, library.system )
 			)
 
 			// generate script source
@@ -295,7 +301,13 @@ define(
 
 			// generate cache content
 			var cacheContent = createCacheContent(
-				library.template.concat( library.asset )
+				_.pick(
+					library,
+					'asset',
+					'component',
+					'entity',
+					'system'
+				)
 			)
 
 

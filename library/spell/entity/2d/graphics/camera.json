@@ -1,6 +1,5 @@
 {
-	"type": "template",
-	"subtype": "entity",
+	"type": "entity",
 	"config": {
 		"spell.component.2d.transform": {},
 		"spell.component.2d.graphics.camera": {}

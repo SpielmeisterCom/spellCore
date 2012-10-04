@@ -1,7 +1,6 @@
 {
 	"readonly": true,
-	"type": "template",
-	"subtype": "component",
+	"type": "component",
 	"title": "2D Key Frame Animation",
 	"doc": "",
 	"attributes": [

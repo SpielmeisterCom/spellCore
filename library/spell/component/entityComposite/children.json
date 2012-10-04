@@ -1,6 +1,5 @@
 {
-	"type": "template",
-	"subtype": "component",
+	"type": "component",
 	"readonly": true,
 	"engineInternal": true,
 	"title": "Children Entities",
