@@ -106,7 +106,7 @@ define(
 			return _.any(
 				flattenEntityConfig( sceneConfig.entities ),
 				function( entityConfig ) {
-					if( entityConfig.templateId !== cameraEntityTemplateId ||
+					if( entityConfig.entityTemplateId !== cameraEntityTemplateId ||
 						!entityConfig.config ) {
 
 						return false

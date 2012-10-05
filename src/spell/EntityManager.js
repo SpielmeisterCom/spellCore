@@ -133,63 +133,63 @@ define(
 		 * Normalizes the provided entity config
 		 *
 		 * @param templateManager
-		 * @param arg1 can be either a entity template id or a entity config
+		 * @param arg1 can be either an entity template id or a entity config
 		 * @return {*}
 		 */
 		var normalizeEntityConfig = function( templateManager, arg1 ) {
 			if( !arg1 ) return
 
-			var config     = arg1.config || {},
-				children   = arg1.children || [],
-				name       = arg1.name || '',
-				templateId = _.isString( arg1 ) ? arg1 : arg1.templateId
+			var config           = arg1.config || {},
+				children         = arg1.children || [],
+				name             = arg1.name || '',
+				entityTemplateId = _.isString( arg1 ) ? arg1 : arg1.entityTemplateId
 
-			if( templateId ) {
-				var template = templateManager.getTemplate( templateId )
+			if( entityTemplateId ) {
+				var entityTemplate = templateManager.getTemplate( entityTemplateId )
 
-				if( !template ) {
-					throw 'Error: Unknown template \'' + templateId + '\'. Could not create entity.'
+				if( !entityTemplate ) {
+					throw 'Error: Unknown entity template \'' + entityTemplateId + '\'. Could not create entity.'
 				}
 
-				children = applyOverloadedChildrenConfig( template.children, children )
+				children = applyOverloadedChildrenConfig( entityTemplate.children, children )
 			}
 
 			return {
-				children   : children,
-				config     : config,
-				id         : arg1.id ? arg1.id : undefined,
-				name       : name,
-				templateId : templateId
+				children         : children,
+				config           : config,
+				id               : arg1.id ? arg1.id : undefined,
+				name             : name,
+				entityTemplateId : entityTemplateId
 			}
 		}
 
 		/*
 		 * Normalizes the provided component config
 		 *
-		 * @param arg0 can be either a component template id or a component config
+		 * @param arg0 can be either a component id or a component config
 		 * @return {*}
 		 */
 		var normalizeComponentConfig = function( arg0 ) {
-			var templateId,
+			var componentId,
 				config
 
 			if( !arg0 ) return
 
 			if( _.isString( arg0 ) ) {
-				templateId = arg0
+				componentId = arg0
 				config = {}
 
 			} else if( _.isObject( arg0 ) ) {
-				if( !_.has( arg0, 'templateId' ) ) {
+				if( !_.has( arg0, 'componentId' ) ) {
 					throw 'Error: Supplied invalid arguments.'
 				}
 
-				templateId = arg0.templateId
+				componentId = arg0.componentId
 				config = arg0.config || {}
 			}
 
 			var result = {}
-			result[ templateId ] = config
+			result[ componentId ] = config
 
 			return result
 		}
@@ -218,10 +218,10 @@ define(
 
 			if( !entityConfig ) throw 'Error: Supplied invalid arguments.'
 
-			var templateId = entityConfig.templateId,
-				config     = entityConfig.config || {}
+			var entityTemplateId = entityConfig.entityTemplateId,
+				config           = entityConfig.config || {}
 
-			if( !templateId && !config ) {
+			if( !entityTemplateId && !config ) {
 				throw 'Error: Supplied invalid arguments.'
 			}
 
@@ -244,7 +244,7 @@ define(
 			addComponents(
 				componentDictionaries,
 				entityId,
-				templateManager.createComponents( templateId, config || {} )
+				templateManager.createComponents( entityTemplateId, config || {} )
 			)
 
 			return entityId

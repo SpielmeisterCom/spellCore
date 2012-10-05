@@ -1,6 +1,7 @@
 define(
 	'spell/shared/util/template/TemplateManager',
 	[
+		'spell/shared/util/createId',
 		'spell/shared/util/deepClone',
 		'spell/shared/util/template/applyComponentConfig',
 		'spell/shared/util/template/TemplateTypes',
@@ -8,6 +9,7 @@ define(
 		'spell/functions'
 	],
 	function(
+		createId,
 		deepClone,
 		applyComponentConfig,
 		TemplateTypes,
@@ -56,15 +58,15 @@ define(
 			)
 		}
 
-		var isValidEntityTemplate = function( template ) {
+		var isValidEntityTemplate = function( entityTemplate ) {
 			// check for duplicate components
 			var componentNameCounts = _.reduce(
-				template.components,
+				entityTemplate.components,
 				function( memo, componentConfig ) {
-					var templateId = componentConfig.templateId
+					var componentId = componentConfig.componentId
 
-					memo[ templateId ] = ( _.has( memo, templateId ) ?
-						memo[ templateId ] += 1 :
+					memo[ componentId ] = ( _.has( memo, componentId ) ?
+						memo[ componentId ] += 1 :
 						1
 					)
 
@@ -77,7 +79,7 @@ define(
 				componentNameCounts,
 				function( componentNameCount, componentName ) {
 					if( componentNameCount > 1 ) {
-						throw 'Error: Entity template \'' + template.templateId + '\' has duplicate component of type \'' + componentName + '\'.'
+						throw 'Error: Entity template \'' + createId( entityTemplate.namespace, entityTemplate.name ) + '\' has duplicate component of type \'' + componentName + '\'.'
 					}
 				}
 			)
