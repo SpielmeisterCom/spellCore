@@ -99,7 +99,8 @@ define(
 				var data = {
 					"type"       : "project",
 					"startScene" : "",
-					"scenes"     : []
+					"scenes"     : [],
+					"version"    : 1
 				}
 
 				fs.writeFileSync(
