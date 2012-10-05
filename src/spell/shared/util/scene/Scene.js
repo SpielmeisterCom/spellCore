@@ -3,6 +3,7 @@ define(
 	[
 		'spell/shared/build/createModuleId',
 		'spell/shared/util/create',
+		'spell/shared/util/createId',
 		'spell/shared/util/entityConfig/flatten',
 		'spell/shared/util/hashModuleId',
 		'spell/shared/util/Events',
@@ -12,6 +13,7 @@ define(
 	function(
 		createModuleId,
 		create,
+		createId,
 		flattenEntityConfig,
 		hashModuleId,
 		Events,
@@ -57,13 +59,9 @@ define(
 			)
 		}
 
-		var createTemplateId = function( namespace, name ) {
-			return namespace + '.' + name
-		}
-
 		var createSystem = function( spell, templateManager, EntityManager, anonymizeModuleIds, systemTemplateId ) {
 			var system   = templateManager.getTemplate( systemTemplateId ),
-				moduleId = createModuleId( createTemplateId( system.namespace, system.name ) )
+				moduleId = createModuleId( createId( system.namespace, system.name ) )
 
 			var constructor = loadModule(
 				anonymizeModuleIds ? hashModuleId( moduleId ) : moduleId,
