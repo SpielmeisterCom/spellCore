@@ -6,7 +6,7 @@ define(
 
 		return {
 			'COMPONENT' : 'component',
-			'ENTITY'    : 'entity',
+			'ENTITY'    : 'entityTemplate',
 			'SYSTEM'    : 'system'
 		}
 	}

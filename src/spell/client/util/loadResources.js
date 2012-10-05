@@ -161,7 +161,7 @@ define(
 					)
 
 					addTemplates( templateManager, templates.component )
-					addTemplates( templateManager, templates.entity )
+					addTemplates( templateManager, templates.entityTemplate )
 					addTemplates( templateManager, templates.system )
 				}
 

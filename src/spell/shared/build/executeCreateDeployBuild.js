@@ -305,7 +305,7 @@ define(
 					library,
 					'asset',
 					'component',
-					'entity',
+					'entityTemplate',
 					'system'
 				)
 			)
