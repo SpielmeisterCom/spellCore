@@ -76,18 +76,20 @@ define(
 		}
 
 		var createKeyFrameAnimationAsset = function( asset ) {
+			var config = asset.config
+
 			// determine and add length of attribute animations
 			eachAnimatedAttribute(
-				asset.animate,
+				config.animate,
 				function( attribute ) {
 					attribute.length = _.last( attribute.keyFrames ).time
 				}
 			)
 
 			return {
-				animate : asset.animate,
+				animate : config.animate,
 				type    : asset.subtype,
-				length  : asset.length
+				length  : config.length
 			}
 		}
 
