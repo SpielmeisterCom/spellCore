@@ -62,8 +62,8 @@ define(
 		}
 
 		var createSystem = function( spell, templateManager, EntityManager, anonymizeModuleIds, systemTemplateId ) {
-			var template    = templateManager.getTemplate( systemTemplateId ),
-				moduleId    = createModuleId( createTemplateId( template.namespace, template.name ) )
+			var system   = templateManager.getTemplate( systemTemplateId ),
+				moduleId = createModuleId( createTemplateId( system.namespace, system.name ) )
 
 			var constructor = loadModule(
 				anonymizeModuleIds ? hashModuleId( moduleId ) : moduleId,
@@ -71,12 +71,12 @@ define(
 			)
 
 			var componentsInput = _.reduce(
-				template.input,
+				system.input,
 				function( memo, inputDefinition ) {
-					var componentDictionary = EntityManager.getComponentDictionaryById( inputDefinition.templateId )
+					var componentDictionary = EntityManager.getComponentDictionaryById( inputDefinition.componentId )
 
 					if( !componentDictionary ) {
-						throw 'Error: No component list for component template id \'' + inputDefinition.templateId +  '\' available.'
+						throw 'Error: No component list for component id \'' + inputDefinition.componentId +  '\' available.'
 					}
 
 					memo[ inputDefinition.name ] = componentDictionary

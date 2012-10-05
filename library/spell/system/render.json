@@ -4,35 +4,35 @@
 	"input": [
 		{
 			"name": "transforms",
-			"templateId": "spell.component.2d.transform"
+			"componentId": "spell.component.2d.transform"
 		},
 		{
 			"name": "roots",
-			"templateId": "spell.component.entityComposite.root"
+			"componentId": "spell.component.entityComposite.root"
 		},
 		{
 			"name": "childrenComponents",
-			"templateId": "spell.component.entityComposite.children"
+			"componentId": "spell.component.entityComposite.children"
 		},
 		{
 			"name": "appearances",
-			"templateId": "spell.component.2d.graphics.appearance"
+			"componentId": "spell.component.2d.graphics.appearance"
 		},
 		{
 			"name": "animatedAppearances",
-			"templateId": "spell.component.2d.graphics.animatedAppearance"
+			"componentId": "spell.component.2d.graphics.animatedAppearance"
 		},
 		{
 			"name": "textAppearances",
-			"templateId": "spell.component.2d.graphics.textAppearance"
+			"componentId": "spell.component.2d.graphics.textAppearance"
 		},
 		{
 			"name": "visualObjects",
-			"templateId": "spell.component.visualObject"
+			"componentId": "spell.component.visualObject"
 		},
 		{
 			"name": "cameras",
-			"templateId": "spell.component.2d.graphics.camera"
+			"componentId": "spell.component.2d.graphics.camera"
 		}
 	],
 	"version": 1

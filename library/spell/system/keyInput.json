@@ -4,11 +4,11 @@
 	"input": [
 		{
 			"name": "actors",
-			"templateId": "spell.component.actor"
+			"componentId": "spell.component.actor"
 		},
 		{
 			"name": "inputDefinitions",
-			"templateId": "spell.component.inputDefinition"
+			"componentId": "spell.component.inputDefinition"
 		}
 	],
 	"version": 1
