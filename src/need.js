@@ -63,11 +63,11 @@
 
 		if( dependencies ) {
 			for( var i = 0; i < dependencies.length; i++ ) {
-				var dependencyModuleName = dependencies[ i ],
-					dependencyModule = modules[ dependencyModuleName ]
+				var dependencyName = dependencies[ i ],
+					dependencyModule = modules[ dependencyName ]
 
 				if( !dependencyModule ) {
-					dependencyModule = createModule( dependencyModuleName, config )
+					dependencyModule = createModule( dependencyName, config )
 				}
 
 				if( !dependencyModule.instance ) {
@@ -83,9 +83,38 @@
 		return body.apply( null, args )
 	}
 
+	var traceDependentModules = function( names, dependentModules ) {
+		dependentModules = dependentModules || []
+
+		for( var i = 0, numNames = names.length; i < numNames; i++ ) {
+			var name = names[ i ]
+
+			for( var moduleName in modules ) {
+				var module       = modules[ moduleName ],
+					dependencies = module.dependencies
+
+				if( !dependencies ) continue
+
+				for( var i = 0, numDependencies = dependencies.length; i < numDependencies; i++ ) {
+					var dependencyName = dependencies[ i ]
+
+					if( name === dependencyName ) {
+						dependentModules.push( moduleName )
+					}
+				}
+			}
+		}
+
+		return dependentModules
+	}
+
+	var createDependentModules = function( name ) {
+		return traceDependentModules( [ name ] )
+	}
 
 	var define = function( name ) {
-		var numArguments = arguments.length
+		var numArguments = arguments.length,
+			arg1         = arguments[ 1 ]
 
 		if( numArguments < 2 ||
 			numArguments > 3 ) {
@@ -93,26 +122,30 @@
 			throw 'Error: Module definition is invalid.'
 		}
 
-		modules[ name ] = {
-			body         : ( numArguments === 2 ? arguments[ 1 ] : arguments[ 2 ] ),
-			dependencies : ( numArguments === 2 ? undefined : arguments[ 1 ] )
+		if( typeof( arg1 ) === 'string' ) {
+			createScriptNode( name, arg1 )
+
+		} else {
+			modules[ name ] = {
+				body         : ( numArguments === 2 ? arg1 : arguments[ 2 ] ),
+				dependencies : ( numArguments === 2 ? undefined : arg1 )
+			}
 		}
 	}
 
-
-	var require = function( moduleName, args, config ) {
+	var require = function( name, args, config ) {
 		config = config || {}
 
-		if( !moduleName ) throw 'Error: No module name provided.'
+		if( !name ) throw 'Error: No module name provided.'
 
-		var module = modules[ moduleName ]
+		var module = modules[ name ]
 
 		if( !module ) {
 			if( config.loadingAllowed === false ) {
-				throw 'Error: Missing module \'' + moduleName + '\'. External loading is disabled. Please make sure that all required modules are shipped.'
+				throw 'Error: Missing module \'' + name + '\'. External loading is disabled. Please make sure that all required modules are shipped.'
 			}
 
-			module = createModule( moduleName, config )
+			module = createModule( name, config )
 		}
 
 		if( !module.instance ) {
@@ -124,4 +157,5 @@
 
 	window.define  = define
 	window.require = require
+	window.createDependentModules = createDependentModules
 } )( document )

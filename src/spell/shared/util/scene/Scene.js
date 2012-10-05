@@ -1,9 +1,9 @@
 define(
 	'spell/shared/util/scene/Scene',
 	[
-		'spell/shared/build/createModuleId',
 		'spell/shared/util/create',
 		'spell/shared/util/createId',
+		'spell/shared/util/createModuleId',
 		'spell/shared/util/entityConfig/flatten',
 		'spell/shared/util/hashModuleId',
 		'spell/shared/util/Events',
@@ -11,9 +11,9 @@ define(
 		'spell/functions'
 	],
 	function(
-		createModuleId,
 		create,
 		createId,
+		createModuleId,
 		flattenEntityConfig,
 		hashModuleId,
 		Events,
@@ -59,9 +59,12 @@ define(
 			)
 		}
 
-		var createSystem = function( spell, templateManager, EntityManager, anonymizeModuleIds, systemTemplateId ) {
-			var system   = templateManager.getTemplate( systemTemplateId ),
-				moduleId = createModuleId( createId( system.namespace, system.name ) )
+		var createTemplateId = function( namespace, name ) {
+			return namespace + '.' + name
+		}
+
+		var createSystem = function( spell, EntityManager, system, anonymizeModuleIds ) {
+			var moduleId = createModuleId( createId( system.namespace, system.name ) )
 
 			var constructor = loadModule(
 				anonymizeModuleIds ? hashModuleId( moduleId ) : moduleId,
@@ -74,7 +77,7 @@ define(
 					var componentDictionary = EntityManager.getComponentDictionaryById( inputDefinition.componentId )
 
 					if( !componentDictionary ) {
-						throw 'Error: No component list for component id \'' + inputDefinition.componentId +  '\' available.'
+						throw 'Error: No component list for component template id \'' + inputDefinition.componentId +  '\' available.'
 					}
 
 					memo[ inputDefinition.name ] = componentDictionary
@@ -88,15 +91,18 @@ define(
 			return create( constructor, [ spell ], componentsInput )
 		}
 
-		var createSystems = function( spell, systemTemplateIds, anonymizeModuleIds ) {
+		var createSystems = function( spell, systemIds, anonymizeModuleIds ) {
 			var templateManager = spell.templateManager,
 				EntityManager   = spell.EntityManager
 
-			return _.map(
-				systemTemplateIds,
-				function( systemTemplateId ) {
-					return createSystem( spell, templateManager, EntityManager, anonymizeModuleIds, systemTemplateId )
-				}
+			return _.reduce(
+				systemIds,
+				function( memo, systemId ) {
+					memo[ systemId ] = createSystem( spell, EntityManager, templateManager.getTemplate( systemId ), anonymizeModuleIds )
+
+					return memo
+				},
+				{}
 			)
 		}
 
@@ -124,12 +130,14 @@ define(
 		 * public
 		 */
 
-		var Scene = function( spell, EntityManager ) {
-			this.spell         = spell
-			this.EntityManager = EntityManager
-			this.renderSystems = null
-			this.updateSystems = null
-			this.script        = null
+		var Scene = function( spell, EntityManager, templateManager, anonymizeModuleIds ) {
+			this.spell              = spell
+			this.EntityManager      = EntityManager
+			this.templateManager    = templateManager
+			this.anonymizeModuleIds = anonymizeModuleIds
+			this.renderSystems      = null
+			this.updateSystems      = null
+			this.script             = null
 		}
 
 		Scene.prototype = {
@@ -139,12 +147,14 @@ define(
 			update: function( timeInMs, deltaTimeInMs ) {
 				invoke( this.updateSystems, 'process', [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
-			init: function( spell, sceneConfig, anonymizeModuleIds ) {
+			init: function( sceneConfig ) {
 				if( !hasActiveCamera( sceneConfig ) ) {
-					spell.logger.error( 'Could not start scene "' + sceneConfig.name + '" because no camera entity was found. A scene must have at least one active camera entity.' )
+					this.spell.logger.error( 'Could not start scene "' + sceneConfig.name + '" because no camera entity was found. A scene must have at least one active camera entity.' )
 
 					return
 				}
+
+				var anonymizeModuleIds = this.anonymizeModuleIds
 
 				if( sceneConfig.scriptId ) {
 					this.script = loadModule(
@@ -156,18 +166,44 @@ define(
 				}
 
 				if( sceneConfig.systems ) {
-					this.renderSystems = createSystems( spell, sceneConfig.systems.render, anonymizeModuleIds )
-					this.updateSystems = createSystems( spell, sceneConfig.systems.update, anonymizeModuleIds )
+					this.renderSystems = createSystems( this.spell, sceneConfig.systems.render, anonymizeModuleIds )
+					this.updateSystems = createSystems( this.spell, sceneConfig.systems.update, anonymizeModuleIds )
 
 					invoke( this.renderSystems, 'init', [ this.spell, sceneConfig ] )
 					invoke( this.updateSystems, 'init', [ this.spell, sceneConfig ] )
 				}
 			},
-			destroy: function( spell, sceneConfig ) {
+			destroy: function( sceneConfig ) {
 				invoke( this.renderSystems, 'cleanUp', [ this.spell, sceneConfig ] )
 				invoke( this.updateSystems, 'cleanUp', [ this.spell, sceneConfig ] )
 
 				this.script.cleanUp( this.spell )
+			},
+			restartSystem: function( systemId ) {
+				var renderSystems = this.renderSystems,
+					updateSystems = this.updateSystems
+
+				var systemsGroup = ( renderSystems[ systemId ] ?
+					renderSystems :
+					( updateSystems[ systemId ] ?
+						updateSystems :
+						undefined
+					)
+				)
+
+				if( !systemsGroup ) return
+
+				systemsGroup[ systemId ].prototype[ 'cleanUp' ]( this.spell )
+
+				var system = createSystem(
+					this.spell,
+					this.EntityManager,
+					this.templateManager.getTemplate( systemId ),
+					this.anonymizeModuleIds
+				)
+
+				system.init( this.spell )
+				systemsGroup[ systemId ] = system
 			}
 		}
 

@@ -134,11 +134,15 @@ define(
 			)
 		}
 
-		var addTemplate = function( assets, templates, componentTemplatesWithAssets, entityPrototypes, definition ) {
+		var addTemplate = function( assets, templates, componentTemplatesWithAssets, entityPrototypes, definition, overwrite ) {
 			var templateId = createName( definition.namespace, definition.name ),
 				type       = definition.type
 
-			if( _.has( templates, templateId ) ) throw 'Error: Template definition \'' + templateId + '\' already exists.'
+			if( !overwrite &&
+				_.has( templates, templateId ) ) {
+
+				throw 'Error: Template definition \'' + templateId + '\' already exists.'
+			}
 
 			templates[ templateId ] = definition
 
@@ -232,16 +236,16 @@ define(
 		 */
 
 		function TemplateManager( assets ) {
-			this.assets                       = assets
-			this.templates                    = {}
-			this.entityPrototypes             = {}
+			this.assets           = assets
+			this.templates        = {}
+			this.entityPrototypes = {}
 
 			// map of component template ids which have an asset id
 			this.componentTemplatesWithAssets = {}
 		}
 
 		TemplateManager.prototype = {
-			add : function( definition ) {
+			add : function( definition, overwrite ) {
 				if( !isValidDefinition( definition ) ) {
 					throw 'Error: The format of the supplied template definition is invalid.'
 				}
@@ -251,7 +255,8 @@ define(
 					this.templates,
 					this.componentTemplatesWithAssets,
 					this.entityPrototypes,
-					definition
+					definition,
+					overwrite
 				)
 			},
 
@@ -294,6 +299,18 @@ define(
 					this.templates,
 					function( memo, template, templateId ) {
 						return template.type === templateType ? memo.concat( templateId ) : memo
+					},
+					[]
+				)
+			},
+
+			getTemplatesByType : function( templateType ) {
+				return _.reduce(
+					this.templates,
+					function( memo, template ) {
+						return templateType === template.type ?
+							memo.concat( template ) :
+							memo
 					},
 					[]
 				)

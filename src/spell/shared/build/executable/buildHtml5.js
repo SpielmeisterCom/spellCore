@@ -2,7 +2,7 @@ define(
 	'spell/shared/build/executable/buildHtml5',
 	[
 		'spell/shared/build/copyFiles',
-		'spell/shared/build/createModuleId',
+		'spell/shared/util/createModuleId',
 		'spell/shared/build/processSource',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',

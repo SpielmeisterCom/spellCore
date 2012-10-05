@@ -2,7 +2,7 @@ define(
 	'spell/shared/build/executeCreateDeployBuild',
 	[
 		'spell/shared/build/copyFiles',
-		'spell/shared/build/createModuleId',
+		'spell/shared/util/createModuleId',
 		'spell/shared/build/processSource',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',

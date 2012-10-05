@@ -1,5 +1,5 @@
 define(
-	'spell/shared/build/createModuleId',
+	'spell/shared/util/createModuleId',
 	function() {
 		'use strict'
 
