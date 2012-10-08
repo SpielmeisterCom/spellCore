@@ -202,7 +202,7 @@ define(
 					this.anonymizeModuleIds
 				)
 
-				system.init( this.spell )
+				system.prototype[ 'init' ].call( this.spell )
 				systemsGroup[ systemId ] = system
 			}
 		}

@@ -3,6 +3,7 @@ define(
 	[
 		'spell/shared/util/createId',
 		'spell/shared/util/development/updateScript',
+		'spell/shared/util/development/updateSystem',
 		'spell/shared/util/Events',
 		'spell/shared/util/platform/PlatformKit',
 
@@ -11,6 +12,7 @@ define(
 	function(
 		createId,
 		updateScript,
+		updateSystem,
 		Events,
 		PlatformKit,
 
@@ -52,16 +54,6 @@ define(
 			addDebugFlag( spell.configurationManager, 'screenAspectRatio', payload.aspectRatio )
 
 			spell.eventManager.publish( Events.SCREEN_ASPECT_RATIO, [ payload.aspectRatio ] )
-		}
-
-		var updateSystem = function( spell, payload ) {
-			var definition = payload.definition
-
-			// TODO: update system definition
-			spell.templateManager.add( definition, true )
-
-			// TODO: restart the affected system
-			spell.sceneManager.restartSystem( createId( definition.namespace, definition.name ) )
 		}
 
 		return function( spell, startEngine ) {
