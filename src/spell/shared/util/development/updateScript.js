@@ -37,7 +37,7 @@ define(
 		}
 
 		return function( spell, payload ) {
-			var scriptId = payload.scriptId
+			var scriptId = payload.id
 
 			// reload amd module
 			define( scriptId, payload.moduleSource )
