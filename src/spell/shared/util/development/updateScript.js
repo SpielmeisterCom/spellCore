@@ -37,16 +37,16 @@ define(
 		}
 
 		return function( spell, payload ) {
-			var scriptId = payload.id
+			var moduleId = createModuleId( payload.id )
 
 			// reload amd module
-			define( scriptId, payload.moduleSource )
+			define( moduleId, payload.moduleSource )
 
 			// restart the affected systems
 			var sceneManager = spell.sceneManager,
 				systemIds    = createAffectedSystems(
 					spell.templateManager,
-					createDependentModules( scriptId ).concat( scriptId )
+					createDependentModules( moduleId ).concat( moduleId )
 				)
 
 			_.each(
