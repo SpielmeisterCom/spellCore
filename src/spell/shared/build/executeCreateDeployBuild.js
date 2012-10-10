@@ -133,25 +133,6 @@ define(
 			fs.writeFileSync( filePath, content, 'utf-8' )
 		}
 
-		var createCacheContent = function( resources ) {
-			return _.reduce(
-				resources,
-				function( memo, resource ) {
-					var content  = resource.content,
-						filePath = resource.filePath
-
-					if( _.has( memo, filePath ) ) {
-						throw 'Error: Resource path duplication detected. Could not build.'
-					}
-
-					memo[ filePath ] = JSON.stringify( content )
-
-					return memo
-				},
-				{}
-			)
-		}
-
 		var createSceneList = function( scenes, anonymizeModuleIds ) {
 			return _.map(
 				scenes,
@@ -255,7 +236,7 @@ define(
 						throw 'Error: Resource path duplication detected. Could not build.'
 					}
 
-					memo[ filePath ] = JSON.stringify( content )
+					memo[ filePath ] = content
 
 					return memo
 				},
