@@ -6,15 +6,6 @@
 	var modules  = {},
 		BASE_URL = 'library'
 
-	var createScriptNode = function( name, source ) {
-		var script = document.createElement( 'script' )
-		script.type = 'text/javascript'
-		script.text = source
-
-		var head = document.getElementsByTagName( 'head' )[ 0 ]
-		head.appendChild( script )
-	}
-
 	var normalizeConfig = function( config ) {
 		if( !config ) {
 			config = {}
@@ -41,7 +32,9 @@
 
 		if( request.status !== 200 ) throw 'Error: Loading \'' + moduleUrl + '\' failed.'
 
-		createScriptNode( name, request.responseText )
+		var moduleSource = request.responseText
+
+		eval( moduleSource )
 
 		return modules[ name ]
 	}
