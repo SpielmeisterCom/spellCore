@@ -181,15 +181,13 @@ define(
 		 * @return {*}
 		 */
 		var injectAsset = function( assets, componentTemplate, component ) {
-			if( hasAssetIdAttribute( componentTemplate.attributes ) ) {
-				var asset = assets[ component.assetId ]
+			var asset = assets[ component.assetId ]
 
-				if( !asset ) {
-					throw 'Error: Could not resolve asset id \'' + component.assetId + '\' to asset instance. Please make sure that the asset id is valid.'
-				}
-
-				component.asset = asset
+			if( !asset ) {
+				throw 'Error: Could not resolve asset id \'' + component.assetId + '\' to asset instance. Please make sure that the asset id is valid.'
 			}
+
+			component.asset = asset
 
 			return component
 		}
@@ -220,10 +218,9 @@ define(
 						attributeConfig
 					)
 
-					entity[ componentId ] = ( injectAssets ?
+					entity[ componentId ] = hasAssetIdAttribute( componentTemplate.attributes ) && injectAssets ?
 						injectAsset( assets, componentTemplate, updatedComponent ) :
 						updatedComponent
-					)
 				}
 			)
 
