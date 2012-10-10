@@ -28,7 +28,7 @@ define(
 
 
 		var updateResourcesAndAssets = function( spell, assetId, asset ) {
-			spell.logger.log( 'updating resources and assets' )
+			spell.logger.debug( 'Updating asset \'' + assetId + '\'.' )
 
 			injectResource( spell.resources, asset )
 			spell.EntityManager.updateAssetReferences( assetId, asset )
