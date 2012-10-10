@@ -455,6 +455,29 @@ define(
 			 */
 			getComponentDictionaryById : function( componentId ) {
 				return this.componentDictionaries[ componentId ]
+			},
+
+			/**
+			 * Updates all components which reference the asset with the updated asset instance.
+			 *
+			 * @param assetId
+			 * @param asset
+			 */
+			updateAssetReferences : function( assetId, asset ) {
+				var componentIds = this.templateManager.getComponentsWithAssets()
+
+				for( var i = 0, numComponentIds = componentIds.length; i < numComponentIds; i++ ) {
+					var componentId  = componentIds[ i ],
+						componentMap = this.componentDictionaries[ componentId ]
+
+					for( var id in componentMap ) {
+						var component = componentMap[ id ]
+
+						if( component.assetId === assetId ) {
+							component.asset = asset
+						}
+					}
+				}
 			}
 		}
 

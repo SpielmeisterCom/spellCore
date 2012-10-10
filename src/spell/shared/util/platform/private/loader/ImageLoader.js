@@ -22,14 +22,11 @@ define(
 
 			this.loaded = true
 
-			this.onCompleteCallback( image )
+			this.onLoadCallback( image )
 		}
 
 		var onError = function( event ) {
-			this.eventManager.publish(
-				[ Events.RESOURCE_ERROR, this.resourceBundleName ],
-				[ this.resourceBundleName, event ]
-			)
+			this.onErrorCallback( event )
 		}
 
 		var onReadyStateChange = function( image ) {
@@ -43,13 +40,11 @@ define(
 		 * public
 		 */
 
-		var ImageLoader = function( eventManager, resourcePath, resourceBundleName, resourceName, loadingCompletedCallback, timedOutCallback, renderingContext ) {
-			this.eventManager       = eventManager
-			this.renderingContext   = renderingContext
-			this.resourceBundleName = resourceBundleName
+		var ImageLoader = function( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 			this.resourcePath       = resourcePath
 			this.resourceName       = resourceName
-			this.onCompleteCallback = loadingCompletedCallback
+			this.onLoadCallback     = onLoadCallback
+			this.onErrorCallback    = onErrorCallback
 			this.loaded             = false
 		}
 

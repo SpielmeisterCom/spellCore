@@ -2,6 +2,7 @@ define(
 	'spell/shared/util/createDebugMessageHandler',
 	[
 		'spell/shared/util/createId',
+		'spell/shared/util/development/updateAsset',
 		'spell/shared/util/development/updateScript',
 		'spell/shared/util/development/updateSystem',
 		'spell/shared/util/Events',
@@ -11,6 +12,7 @@ define(
 	],
 	function(
 		createId,
+		updateAsset,
 		updateScript,
 		updateSystem,
 		Events,
@@ -63,6 +65,7 @@ define(
 				'spelled.debug.drawTitleSafeOutline'      : drawTitleSafeOutline,
 				'spelled.debug.simulateScreenAspectRatio' : simulateScreenAspectRatio,
 				'spelled.debug.updateComponent'           : updateComponent,
+				'spelled.debug.updateAsset'               : updateAsset,
 				'spelled.debug.updateScript'              : updateScript,
 				'spelled.debug.updateSystem'              : updateSystem
 			}

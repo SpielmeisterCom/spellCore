@@ -1,7 +1,7 @@
 define(
 	'spell/client/main',
 	[
-		'spell/client/util/loadResources',
+		'spell/client/loading/loadResources',
 		'spell/client/staticInclude',
 		'spell/shared/util/createMainLoop',
 		'spell/EntityManager',
@@ -10,7 +10,7 @@ define(
 		'spell/shared/util/ConfigurationManager',
 		'spell/shared/util/EventManager',
 		'spell/shared/util/InputManager',
-		'spell/shared/util/ResourceLoader',
+		'spell/client/loading/ResourceLoader',
 		'spell/shared/util/StatisticsManager',
 		'spell/shared/util/Logger',
 		'spell/shared/util/createDebugMessageHandler',
@@ -99,13 +99,7 @@ define(
 
 			var inputManager = new InputManager( configurationManager )
 
-			var resourceLoader = new ResourceLoader(
-				spell,
-				spell.soundManager,
-				spell.renderingContext,
-				spell.eventManager,
-				configurationManager.resourceServer
-			)
+			var resourceLoader = new ResourceLoader( spell, spell.eventManager, renderingContext, configurationManager.resourceServer )
 
 			if( cachedContent ) resourceLoader.setCache( cachedContent )
 

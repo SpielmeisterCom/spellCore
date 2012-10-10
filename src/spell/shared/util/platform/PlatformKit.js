@@ -15,7 +15,6 @@ define(
 		'spell/shared/util/platform/private/loader/ImageLoader',
 		'spell/shared/util/platform/private/loader/SoundLoader',
 		'spell/shared/util/platform/private/loader/TextLoader',
-		'spell/shared/util/platform/private/createLoader',
 		'spell/shared/util/platform/private/Input',
 		'spell/shared/util/platform/private/configurationOptions',
 		'spell/shared/util/platform/private/system/features',
@@ -33,7 +32,6 @@ define(
 		ImageLoader,
 		SoundLoader,
 		TextLoader,
-		createLoader,
 		Input,
 		configurationOptions,
 		features,
@@ -130,16 +128,16 @@ define(
 			 */
 			registerOnScreenResize : registerOnScreenResize,
 
-			createImageLoader : function( eventManager, host, resourceBundleName, resourceUri, loadingCompletedcallback, timedOutCallback, renderingContext ) {
-				return createLoader( ImageLoader, eventManager, host, resourceBundleName, resourceUri, loadingCompletedcallback, timedOutCallback, renderingContext )
+			createImageLoader : function( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+				return new ImageLoader( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			createSoundLoader : function( eventManager, host, resourceBundleName, resourceUri, loadingCompletedcallback, timedOutCallback, soundManager ) {
-				return createLoader( SoundLoader, eventManager, host, resourceBundleName, resourceUri, loadingCompletedcallback, timedOutCallback, soundManager )
+			createSoundLoader : function( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+				return new SoundLoader( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			createTextLoader : function( eventManager, host, resourceBundleName, resourceUri, loadingCompletedcallback, timedOutCallback ) {
-				return createLoader( TextLoader, eventManager, host, resourceBundleName, resourceUri, loadingCompletedcallback, timedOutCallback )
+			createTextLoader : function( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+				return new TextLoader( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			}
 		}
 	}

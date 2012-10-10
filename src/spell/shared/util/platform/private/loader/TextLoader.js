@@ -30,14 +30,11 @@ define(
 				return
 			}
 
-			this.onCompleteCallback( response )
+			this.onLoadCallback( response )
 		}
 
 		var onError = function( event ) {
-			this.eventManager.publish(
-				[ Events.RESOURCE_ERROR, this.resourceBundleName ],
-				[ this.resourceBundleName, event ]
-			)
+			this.onErrorCallback( event )
 		}
 
 		var onReadyStateChange = function( request ) {
@@ -54,13 +51,12 @@ define(
 		 * public
 		 */
 
-		var TextLoader = function( eventManager, resourcePath, resourceBundleName, resourceName, loadingCompletedCallback, timedOutCallback ) {
-			this.eventManager       = eventManager
-			this.resourcePath       = resourcePath
-			this.resourceBundleName = resourceBundleName
-			this.resourceName       = resourceName
-			this.onCompleteCallback = loadingCompletedCallback
-			this.loaded             = false
+		var TextLoader = function( resourcePath, resourceName, onLoadCallback, onErrorCallback ) {
+			this.resourcePath    = resourcePath
+			this.resourceName    = resourceName
+			this.onLoadCallback  = onLoadCallback
+			this.onErrorCallback = onErrorCallback
+			this.loaded          = false
 		}
 
 		TextLoader.prototype = {

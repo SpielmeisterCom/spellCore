@@ -3,7 +3,7 @@ define(
 	[
 		'spell/shared/util/ConfigurationManager',
 		'spell/shared/util/EventManager',
-		'spell/shared/util/ResourceLoader',
+		'spell/client/loading/ResourceLoader',
 		'spell/shared/util/Events',
 		'spell/shared/util/Logger',
 		'spell/shared/util/platform/PlatformKit',

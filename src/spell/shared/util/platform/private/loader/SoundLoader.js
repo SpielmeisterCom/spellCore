@@ -85,14 +85,11 @@ define(
 		 * public
 		 */
 
-		var SoundLoader = function( eventManager, host, resourceBundleName, resourceUri, loadingCompletedCallback, timedOutCallback, soundManager ) {
-			this.eventManager       = eventManager
-            this.soundManager       = soundManager
-			this.host               = host
-			this.resourceBundleName = resourceBundleName
-			this.resourceUri        = resourceUri
-			this.onCompleteCallback = loadingCompletedCallback
-			this.onTimeOut          = timedOutCallback
+		var SoundLoader = function( host, resourceUri, onLoadCallback, onErrorCallback ) {
+			this.host            = host
+			this.resourceUri     = resourceUri
+			this.onLoadCallback  = onLoadCallback
+			this.onErrorCallback = onErrorCallback
 		}
 
 		SoundLoader.prototype = {

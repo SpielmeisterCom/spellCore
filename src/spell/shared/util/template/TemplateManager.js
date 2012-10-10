@@ -134,7 +134,7 @@ define(
 			)
 		}
 
-		var addTemplate = function( assets, templates, componentTemplatesWithAssets, entityPrototypes, definition, overwrite ) {
+		var addTemplate = function( assets, templates, componentsWithAssets, entityPrototypes, definition, overwrite ) {
 			var templateId = createName( definition.namespace, definition.name ),
 				type       = definition.type
 
@@ -152,7 +152,7 @@ define(
 			} else if( type === TemplateTypes.COMPONENT ) {
 				var hasAssetId = hasAssetIdAttribute( definition.attributes )
 
-				if( hasAssetId ) componentTemplatesWithAssets[ templateId ] = true
+				if( hasAssetId ) componentsWithAssets[ templateId ] = true
 			}
 		}
 
@@ -240,8 +240,8 @@ define(
 			this.templates        = {}
 			this.entityPrototypes = {}
 
-			// map of component template ids which have an asset id
-			this.componentTemplatesWithAssets = {}
+			// map of components which have an asset id
+			this.componentsWithAssets = {}
 		}
 
 		TemplateManager.prototype = {
@@ -253,7 +253,7 @@ define(
 				addTemplate(
 					this.assets,
 					this.templates,
-					this.componentTemplatesWithAssets,
+					this.componentsWithAssets,
 					this.entityPrototypes,
 					definition,
 					overwrite
@@ -275,13 +275,17 @@ define(
 			updateComponent : function( componentId, component, attributeConfig ) {
 				updateComponent( component, attributeConfig )
 
-				if( this.componentTemplatesWithAssets[ componentId ] ) {
+				if( this.componentsWithAssets[ componentId ] ) {
 					var assetIdChanged = !!attributeConfig[ 'assetId' ]
 
 					if( assetIdChanged ) {
 						injectAsset( this.assets, this.templates[ componentId ], component )
 					}
 				}
+			},
+
+			getComponentsWithAssets : function() {
+				return _.keys( this.componentsWithAssets )
 			},
 
 			hasTemplate : function( templateId ) {

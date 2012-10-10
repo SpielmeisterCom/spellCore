@@ -1,12 +1,14 @@
 define(
 	'spell/client/util/createAssets',
 	[
+		'spell/shared/util/createAssetId',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/input/keyCodes',
 
 		'spell/functions'
 	],
 	function(
+		createAssetId,
 		createLibraryFilePath,
 		keyCodes,
 
@@ -18,12 +20,6 @@ define(
 		/*
 		 * private
 		 */
-
-		var createAssetId = function( type, resourceName ) {
-			var baseName = resourceName.match( /(.*)\.[^.]+$/ )[ 1 ]
-
-			return type + ':' + baseName.replace( /\//g, '.' )
-		}
 
 		var createFrameOffset = function( frameWidth, frameHeight, numX, numY, frameId ) {
 			return [
@@ -146,7 +142,7 @@ define(
 
 					addResourceId( asset, assetDefinition )
 
-					memo[ createAssetId( type, resourceName ) ] = asset
+					memo[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = asset
 
 					return memo
 				},
@@ -160,7 +156,7 @@ define(
 					var type = assetDefinition.subtype
 
 					if( type === 'animation' ) {
-						memo[ createAssetId( type, resourceName ) ] = createAnimationAsset( memo, assetDefinition )
+						memo[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = createAnimationAsset( memo, assetDefinition )
 					}
 
 					return memo

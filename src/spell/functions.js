@@ -635,6 +635,16 @@ define(
 		 */
 		_.isNaN = platformImpl.isNaN
 
+		/**
+		 * Returns the same value that is used as the argument. In math: f(x) = x
+		 * This function looks useless, but is used throughout Underscore as a default iterator.
+		 *
+		 *     var moe = {name : 'moe'};
+		 *     moe === _.identity(moe);
+		 *     //=> true
+		 */
+		_.identity = platformImpl.identity
+
 		return _
 	}
 )
