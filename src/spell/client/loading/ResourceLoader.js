@@ -121,16 +121,18 @@ define(
 			updateProgress( eventManager, cache, resourceBundles, resourceBundle )
 		}
 
-		var onErrorCallback = function( eventManager, cache, resourceBundle, resourceName ) {
+		var onErrorCallback = function( eventManager, cache, resourceBundles, resourceBundle, resourceName ) {
 			throw 'Error: Loading resource \'' + resourceName + '\' failed.'
 		}
 
-		var createLoader = function( host, resourceType, baseUrl, resourceName, onLoadCallback, onErrorCallback ) {
-			var loaderFactory = resourceType.factory
+		var onTimedOutCallback = function( eventManager, cache, resourceBundles, resourceBundle, resourceName ) {
+			throw 'Error: Loading resource \'' + resourceName + '\' timed out.'
+		}
 
+		var createLoader = function( host, loaderFactory, baseUrl, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 			var resourcePath = baseUrl
 
-			return loaderFactory( resourcePath, resourceName, onLoadCallback, onErrorCallback )
+			return loaderFactory( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 		}
 
 		var startLoadingResourceBundle = function( cache, eventManager, resourceTypes, host, resourceBundles, resourceBundle ) {
@@ -158,11 +160,12 @@ define(
 
 					var loader = createLoader(
 						host,
-						resourceType,
+						resourceType.factory,
 						resourceBundle.baseUrl,
 						resourceName,
 						_.bind( onLoadCallback, null, eventManager, cache, processOnLoad, resourceBundles, resourceBundle, resourceName ),
-						_.bind( onErrorCallback, null, eventManager, cache, resourceBundles, resourceBundle, resourceName )
+						_.bind( onErrorCallback, null, eventManager, cache, resourceBundles, resourceBundle, resourceName ),
+						_.bind( onTimedOutCallback, null, eventManager, cache, resourceBundles, resourceBundle, resourceName )
 					)
 
 					if( !loader ) {
