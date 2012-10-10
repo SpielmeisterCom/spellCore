@@ -4,6 +4,7 @@ define(
 		'spell/shared/util/createId',
 		'spell/shared/util/createModuleId',
 		'spell/shared/util/template/TemplateTypes',
+		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'
 	],
@@ -11,6 +12,7 @@ define(
 		createId,
 		createModuleId,
 		TemplateTypes,
+		PlatformKit,
 
 		_
 	) {
@@ -46,7 +48,7 @@ define(
 			var sceneManager = spell.sceneManager,
 				systemIds    = createAffectedSystems(
 					spell.templateManager,
-					createDependentModules( moduleId ).concat( moduleId )
+					PlatformKit.ModuleLoader.createDependentModules( moduleId ).concat( moduleId )
 				)
 
 			_.each(

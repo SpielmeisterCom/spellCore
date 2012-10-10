@@ -10,6 +10,7 @@ define(
 		'spell/shared/util/platform/private/jsonCoder',
 		'spell/shared/util/platform/private/createSocket',
 		'spell/shared/util/platform/private/getAvailableScreenSize',
+		'spell/shared/util/platform/private/ModuleLoader',
 		'spell/shared/util/platform/private/graphics/RenderingFactory',
 		'spell/shared/util/platform/private/registerTimer',
 		'spell/shared/util/platform/private/loader/ImageLoader',
@@ -27,6 +28,7 @@ define(
 		jsonCoder,
 		createSocket,
 		getAvailableScreenSize,
+		ModuleLoader,
 		RenderingFactory,
 		registerTimer,
 		ImageLoader,
@@ -92,6 +94,11 @@ define(
 			 *
 			 */
 			getHost : getHost,
+
+			/**
+			 *
+			 */
+			ModuleLoader : ModuleLoader,
 
 			/**
 			 *
