@@ -7,6 +7,7 @@ define(
 		'spell/shared/util/entityConfig/flatten',
 		'spell/shared/util/hashModuleId',
 		'spell/shared/util/Events',
+		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'
 	],
@@ -17,6 +18,7 @@ define(
 		flattenEntityConfig,
 		hashModuleId,
 		Events,
+		PlatformKit,
 
 		_
 	) {
@@ -33,7 +35,7 @@ define(
 		var loadModule = function( moduleId, anonymizeModuleIds ) {
 			if( !moduleId ) throw 'Error: No module id provided.'
 
-			var module = require(
+			var module = PlatformKit.ModuleLoader.require(
 				moduleId,
 				undefined,
 				{
