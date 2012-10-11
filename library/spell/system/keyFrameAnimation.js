@@ -57,6 +57,17 @@ define(
 				isInInterval( offsetInMs, 0, animationLengthInMs )
 		}
 
+		var setValue = function( component, attributeId, value ) {
+			var attribute = component[ attributeId ]
+
+			if( _.isArray( attribute ) ) {
+				vec2.set( value, attribute )
+
+			} else {
+				component[ attributeId ] = value
+			}
+		}
+
 		var lerp = function( a, b, t ) {
 			return a + ( b - a ) * t
 		}
@@ -104,14 +115,25 @@ define(
 							animationLength    = attributeAnimation.length,
 							keyFrameIdA        = getKeyFrameIdA( keyFrames, offset )
 
-						if( keyFrameIdA < 0 ) continue
+						if( keyFrameIdA < 0 ) {
+							// set to first key frame value
+							setValue( component, attributeId, keyFrames[ 0 ].value )
+
+							continue
+						}
+
+						if( !keyFrameIdA ) {
+							// set to last key frame value
+							setValue( component, attributeId, keyFrames[ keyFrames.length - 1 ].value )
+
+							continue
+						}
 
 						var keyFrameIdB = keyFrameIdA + 1,
 							keyFrameA   = keyFrames[ keyFrameIdA ],
 							keyFrameB   = keyFrames[ keyFrameIdB ]
 
-						if( !keyFrameB ) continue
-
+						// interpolate between key frame A and B
 						var attribute       = component[ attributeId ],
 							attributeOffset = offset - keyFrameA.time,
 							easingFunction  = getEasingFunction( keyFrameB.interpolation ),

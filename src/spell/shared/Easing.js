@@ -26,19 +26,25 @@
 
 define(
 	'spell/shared/Easing',
-	function() {
+	[
+		'spell/functions'
+	],
+	function(
+		_
+	) {
 		'use strict'
 
 
-		var identity = function( k ) {
-			return k
+		var none = function( k ) {
+			return k < 1.0 ? 0.0 : 1.0
 		}
 
 		var Easing = {
+			// None
+			None : none,
+
 			// Linear
-			LinearIn : identity,
-			LinearOut : identity,
-			LinearInOut : identity,
+			Linear : _.identity,
 
 			// Quadratic
 			QuadraticIn : function( k ) {
