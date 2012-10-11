@@ -122,7 +122,7 @@ define(
 							continue
 						}
 
-						if( !keyFrameIdA ) {
+						if( keyFrameIdA === undefined ) {
 							// set to last key frame value
 							setValue( component, attributeId, keyFrames[ keyFrames.length - 1 ].value )
 
