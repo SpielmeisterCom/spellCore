@@ -213,7 +213,7 @@ define(
 			]
 		}
 
-		var start = function( cache, eventManager, host, resourceBundles, resourceTypes, resourcesToLoad, name, config ) {
+		var load = function( cache, eventManager, host, resourceBundles, resourceTypes, resourcesToLoad, name, config ) {
 			var id             = createBundleId(),
 				resourceBundle = createResourceBundle( config, id, name, resourcesToLoad )
 
@@ -231,7 +231,7 @@ define(
 				this.cache = content
 			},
 
-			start: function( resourcesToLoad ) {
+			load: function( resourcesToLoad ) {
 				var numArguments = _.size( arguments ),
 					config       = {},
 					name
@@ -262,7 +262,7 @@ define(
 					throw 'Error: A resource bundle with the \'' + name + '\' already exists.'
 				}
 
-				start(
+				load(
 					this.cache,
 					this.eventManager,
 					this.host,

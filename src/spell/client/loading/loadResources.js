@@ -60,13 +60,13 @@ define(
 					_.extend( spell.assets, createAssets( loadedAssets ) )
 
 					// start loading template definition files
-					resourceLoader.start(
+					resourceLoader.load(
 						resourceIdsToJsonFilenames( runtimeModule.templateIds ),
 						templateBundleName
 					)
 
 					// start loading resources
-					resourceLoader.start(
+					resourceLoader.load(
 						createFilesToLoad( loadedAssets ),
 						resourceBundleName
 					)
@@ -114,7 +114,7 @@ define(
 			} )
 
 			// start loading asset definition files
-			resourceLoader.start(
+			resourceLoader.load(
 				resourceIdsToJsonFilenames( runtimeModule.assetIds ),
 				assetBundleName
 			)

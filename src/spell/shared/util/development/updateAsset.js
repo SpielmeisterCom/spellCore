@@ -53,7 +53,7 @@ define(
 				// when an asset references an external resource trigger loading it
 				var resourceBundleId = libraryFilePath
 
-				spell.resourceLoader.start(
+				spell.resourceLoader.load(
 					createFilesToLoad( loadedAssets ),
 					{
 						omitCache          : true,
