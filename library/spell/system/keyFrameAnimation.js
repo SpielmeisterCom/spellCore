@@ -30,7 +30,7 @@ define(
 		}
 
 		var getEasingFunction = function( name ) {
-			if( !name ) name = 'LinearInOut'
+			if( !name ) name = 'Linear'
 
 			var fn = Easing[ name ]
 
