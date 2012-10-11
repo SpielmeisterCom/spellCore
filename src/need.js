@@ -116,7 +116,7 @@
 		}
 
 		if( typeof( arg1 ) === 'string' ) {
-			createScriptNode( name, arg1 )
+			eval( arg1 )
 
 		} else {
 			modules[ name ] = {
