@@ -164,7 +164,7 @@ define(
 						anonymizeModuleIds
 					)
 
-					this.script.init( this.spell, this.EntityManager, sceneConfig )
+					this.script.init( this.spell, sceneConfig )
 				}
 
 				if( sceneConfig.systems ) {
@@ -173,13 +173,19 @@ define(
 
 					invoke( this.renderSystems, 'init', [ this.spell, sceneConfig ] )
 					invoke( this.updateSystems, 'init', [ this.spell, sceneConfig ] )
+
+					invoke( this.renderSystems, 'activate', [ this.spell, sceneConfig ] )
+					invoke( this.updateSystems, 'activate', [ this.spell, sceneConfig ] )
 				}
 			},
 			destroy: function( sceneConfig ) {
-				invoke( this.renderSystems, 'cleanUp', [ this.spell, sceneConfig ] )
-				invoke( this.updateSystems, 'cleanUp', [ this.spell, sceneConfig ] )
+				invoke( this.renderSystems, 'deactivate', [ this.spell, sceneConfig ] )
+				invoke( this.updateSystems, 'deactivate', [ this.spell, sceneConfig ] )
 
-				this.script.cleanUp( this.spell )
+				invoke( this.renderSystems, 'destroy', [ this.spell, sceneConfig ] )
+				invoke( this.updateSystems, 'destroy', [ this.spell, sceneConfig ] )
+
+				this.script.destroy( this.spell, sceneConfig )
 			},
 			restartSystem: function( systemId ) {
 				var renderSystems = this.renderSystems,

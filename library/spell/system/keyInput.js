@@ -17,12 +17,6 @@ define(
 		 * private
 		 */
 
-		var init = function( spell ) {
-			this.inputManager.init()
-		}
-
-		var cleanUp = function( spell ) {}
-
 		var processEvent = function( actors, inputDefinitions ) {
 			var inputEvent = this
 
@@ -55,6 +49,10 @@ define(
 			)
 		}
 
+		var init = function( spell ) {
+			this.inputManager.init()
+		}
+
 		/**
 		 * Update the actor entities action component with the player input
 		 *
@@ -79,8 +77,10 @@ define(
 		}
 
 		KeyInput.prototype = {
-			cleanUp : cleanUp,
 			init : init,
+			destroy : function() {},
+			activate : function() {},
+			deactivate : function() {},
 			process : process
 		}
 

@@ -74,8 +74,6 @@ define(
 
 		var init = function( spell ) {}
 
-		var cleanUp = function( spell ) {}
-
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var entityManager      = this.entityManager,
 				keyFrameAnimations = this.keyFrameAnimations
@@ -155,8 +153,10 @@ define(
 		}
 
 		KeyFrameAnimation.prototype = {
-			cleanUp : cleanUp,
-			init    : init,
+			init : init,
+			destroy : function() {},
+			activate : function() {},
+			deactivate : function() {},
 			process : process
 		}
 

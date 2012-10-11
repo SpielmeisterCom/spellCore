@@ -221,6 +221,19 @@ define(
 			context.setViewMatrix( tmpMat3 )
 		}
 
+		var createScreenSize = function( availableScreenSize, aspectRatio ) {
+			return aspectRatio ?
+				createIncludedRectangle( availableScreenSize, aspectRatio, true ) :
+				availableScreenSize
+		}
+
+		var initColorBuffer = function( context, screenDimensions ) {
+			context.resizeColorBuffer( screenDimensions[ 0 ], screenDimensions[ 1 ] )
+			context.viewport( 0, 0, screenDimensions[ 0 ], screenDimensions [ 1 ] )
+		}
+
+		var init = function( spell ) {}
+
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var cameras                 = this.cameras,
 				context                 = this.context,
@@ -306,21 +319,6 @@ define(
 				}
 			}
 		}
-
-		var createScreenSize = function( availableScreenSize, aspectRatio ) {
-			return aspectRatio ?
-				createIncludedRectangle( availableScreenSize, aspectRatio, true ) :
-				availableScreenSize
-		}
-
-		var initColorBuffer = function( context, screenDimensions ) {
-			context.resizeColorBuffer( screenDimensions[ 0 ], screenDimensions[ 1 ] )
-			context.viewport( 0, 0, screenDimensions[ 0 ], screenDimensions [ 1 ] )
-		}
-
-		var init = function( spell ) {}
-
-		var cleanUp = function( spell ) {}
 
 
 		/**
@@ -409,8 +407,10 @@ define(
 		}
 
 		Renderer.prototype = {
-			cleanup : cleanUp,
 			init : init,
+			destroy : function() {},
+			activate : function() {},
+			deactivate : function() {},
 			process : process
 		}
 
