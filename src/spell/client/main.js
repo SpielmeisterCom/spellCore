@@ -51,7 +51,7 @@ define(
 		var postLoadedResources = function() {
 			var spell = this.spell
 
-			spell.EntityManager = new EntityManager( spell.templateManager )
+			spell.EntityManager = new EntityManager( spell.eventManager, spell.templateManager )
 			spell.sceneManager  = new SceneManager( spell, spell.EntityManager, spell.templateManager, spell.mainLoop )
 
 			spell.logger.debug( 'loading resources completed' )

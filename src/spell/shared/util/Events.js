@@ -17,6 +17,10 @@ define(
 			// clock synchronization
 			'CLOCK_SYNC_ESTABLISHED',
 
+			// Entity
+			'ENTITY_CREATED',
+			'ENTITY_DESTROYED',
+
 			// EventManager
 			'SUBSCRIBE',
 			'UNSUBSCRIBE',

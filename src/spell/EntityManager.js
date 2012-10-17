@@ -7,6 +7,7 @@ define(
 		'spell/defines',
 		'spell/shared/util/create',
 		'spell/shared/util/deepClone',
+		'spell/shared/util/Events',
 		'spell/shared/util/template/applyComponentConfig',
 		'spell/shared/util/template/TemplateTypes',
 
@@ -16,6 +17,7 @@ define(
 		defines,
 		create,
 		deepClone,
+		Events,
 		applyComponentConfig,
 		TemplateTypes,
 
@@ -37,10 +39,12 @@ define(
 		 * Returns an entity id. If no entity id is provided a new one is generated.
 		 *
 		 * @param {Object} id
-		 * @return {Integer}
+		 * @return {*}
 		 */
 		var getEntityId = function( id ) {
-			if( !id ) return nextEntityId++
+			if( !id ) {
+				return '' + nextEntityId++
+			}
 
 			var number = parseInt( id )
 
@@ -48,7 +52,7 @@ define(
 
 			nextEntityId = Math.max( number + 1, nextEntityId )
 
-			return number
+			return '' + number
 		}
 
 		var createComponentList = function( componentTemplateIds ) {
@@ -77,7 +81,7 @@ define(
 			)
 		}
 
-		var removeComponents = function( componentDictionaries, entityId, entityComponentId ) {
+		var removeComponents = function( eventManager, componentDictionaries, entityId, entityComponentId ) {
 			if( entityComponentId ) {
 				// remove a single component from the entity
 				delete componentDictionaries[ entityComponentId ][ entityId ]
@@ -93,6 +97,8 @@ define(
 					}
 				)
 			}
+
+			eventManager.publish( Events.ENTITY_DESTROYED, entityId )
 		}
 
 		/**
@@ -212,7 +218,7 @@ define(
 			return result
 		}
 
-		var createEntity = function( componentDictionaries, templateManager, entityConfig, isRoot ) {
+		var createEntity = function( eventManager, componentDictionaries, templateManager, entityConfig, isRoot ) {
 			isRoot       = ( isRoot === true || isRoot === undefined )
 			entityConfig = normalizeEntityConfig( templateManager, entityConfig )
 
@@ -229,7 +235,7 @@ define(
 			var childEntityIds = _.map(
 				entityConfig.children,
 				function( entityConfig ) {
-					return createEntity( componentDictionaries, templateManager, entityConfig, false )
+					return createEntity( eventManager, componentDictionaries, templateManager, entityConfig, false )
 				}
 			)
 
@@ -239,13 +245,12 @@ define(
 				createAdditionalEntityConfig( isRoot, childEntityIds, entityConfig.name )
 			)
 
-			var entityId = getEntityId( entityConfig.id )
+			var entityId         = getEntityId( entityConfig.id ),
+				entityComponents = templateManager.createComponents( entityTemplateId, config || {} )
 
-			addComponents(
-				componentDictionaries,
-				entityId,
-				templateManager.createComponents( entityTemplateId, config || {} )
-			)
+			addComponents( componentDictionaries, entityId, entityComponents )
+
+			eventManager.publish( Events.ENTITY_CREATED, [ entityId, entityComponents ] )
 
 			return entityId
 		}
@@ -271,8 +276,9 @@ define(
 		 * public
 		 */
 
-		var EntityManager = function( templateManager ) {
+		var EntityManager = function( eventManager, templateManager ) {
 			this.componentDictionaries = createComponentList( templateManager.getTemplateIds( TemplateTypes.COMPONENT ) )
+			this.eventManager          = eventManager
 			this.templateManager       = templateManager
 		}
 
@@ -284,7 +290,7 @@ define(
 			 * @return {*}
 			 */
 			createEntity : function( arg0 ) {
-				return createEntity( this.componentDictionaries, this.templateManager, arg0 )
+				return createEntity( this.eventManager, this.componentDictionaries, this.templateManager, arg0 )
 			},
 
 			/**
@@ -311,7 +317,7 @@ define(
 			removeEntity : function( id ) {
 				if( !id ) throw 'Error: Missing entity id.'
 
-				removeComponents( this.componentDictionaries, id )
+				removeComponents( this.eventManager, this.componentDictionaries, id )
 			},
 
 			/**
@@ -393,7 +399,7 @@ define(
 			removeComponent : function( id, componentId ) {
 				if( !id ) throw 'Error: Missing entity id.'
 
-				removeComponents( this.componentDictionaries, id, componentId )
+				removeComponents( this.eventManager, this.componentDictionaries, id, componentId )
 			},
 
 			/**

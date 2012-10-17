@@ -56,16 +56,16 @@ define(
 
 			context.save()
 			{
-				context.setFillStyleColor( [ 1.0, 0.0, 0.2 ] )
+				context.setColor( [ 1.0, 0.0, 0.2 ] )
 				context.fillRect( x, y + halfHeight, halfWidth, halfHeight )
 
-				context.setFillStyleColor( [ 0.8, 0.0, 0.8 ] )
+				context.setColor( [ 0.8, 0.0, 0.8 ] )
 				context.fillRect( x + halfWidth, y, halfWidth, halfHeight )
 
-				context.setFillStyleColor( [ 0.5, 0.72, 0.61 ] )
+				context.setColor( [ 0.5, 0.72, 0.61 ] )
 				context.fillRect( x + halfWidth * 1.5, y, halfWidth / 2, halfHeight / 2 )
 
-//				context.setFillStyleColor( [ 0.0, 0.0, 0.82 ] )
+//				context.setColor( [ 0.0, 0.0, 0.82 ] )
 //				context.fillRect( x, y, width, height )
 			}
 			context.restore()

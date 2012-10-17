@@ -5,6 +5,7 @@
 define(
 	'spell/shared/util/platform/PlatformKit',
 	[
+		'spell/shared/util/platform/private/Box2D',
 		'spell/shared/util/platform/private/callNextFrame',
 		'spell/shared/util/platform/private/createHost',
 		'spell/shared/util/platform/private/jsonCoder',
@@ -23,6 +24,7 @@ define(
 		'spell/shared/util/platform/private/sound/SoundManager'
 	],
 	function(
+		Box2D,
 		callNextFrame,
 		createHost,
 		jsonCoder,
@@ -65,6 +67,11 @@ define(
 		}
 
 		return {
+			/**
+			 *
+			 */
+			Box2D : Box2D,
+
 			/**
 			 *
 			 */

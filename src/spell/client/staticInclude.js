@@ -6,6 +6,10 @@
 define(
 	'spell/client/staticInclude',
 	[
+		'spell/client/2d/graphics/physics/drawBox',
+		'spell/client/2d/graphics/physics/drawCircle',
+		'spell/client/2d/graphics/physics/drawPoint',
+		'spell/client/2d/graphics/physics/drawOrigin',
 		'spell/client/2d/graphics/drawCoordinateGrid',
 		'spell/client/2d/graphics/drawTitleSafeOutline',
 		'spell/math/mat2',
@@ -19,8 +23,10 @@ define(
 		'spell/math/random/XorShift32',
 		'spell/shared/Easing',
 		'spell/shared/util/createEntityEach',
+		'spell/shared/util/input/keyCodes',
 		'spell/client/util/createComprisedRectangle',
-		'spell/client/util/createIncludedRectangle'
+		'spell/client/util/createIncludedRectangle',
+		'spell/recursiveFunctions'
 	],
 	function() {
 		return undefined

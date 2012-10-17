@@ -123,7 +123,8 @@ define(
 				save              : save,
 				scale             : scale,
 				setClearColor     : setClearColor,
-				setFillStyleColor : setFillStyleColor,
+				setColor          : setColor,
+				setLineColor      : setLineColor,
 				setGlobalAlpha    : setGlobalAlpha,
 				setTransform      : setTransform,
 				setViewMatrix     : setViewMatrix,
@@ -237,11 +238,18 @@ define(
 			currentState = stateStack.getTop()
 		}
 
-		var setFillStyleColor = function( vec ) {
+		var setColor = function( vec ) {
+			// TODO: push color value to shader program, not just state stack
 			currentState.color = color.createRgba( vec )
 		}
 
+		var setLineColor = function( vec ) {
+			// TODO: push color value to shader program, not just state stack
+			currentState.lineColor = color.createRgba( vec )
+		}
+
 		var setGlobalAlpha = function( u ) {
+			// TODO: push color value to shader program, not just state stack
 			currentState.opacity = u
 		}
 

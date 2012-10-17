@@ -60,7 +60,7 @@ define(
 
 				context.setViewMatrix( tmpMat3 )
 
-				context.setFillStyleColor( color )
+				context.setColor( color )
 				drawRect( context, 0, 0, effectiveCameraDimensions[ 0 ], effectiveCameraDimensions[ 1 ], 2 )
 			}
 			context.restore()

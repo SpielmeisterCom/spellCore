@@ -24,6 +24,9 @@ define(
 		var stateStack   = new StateStack( 32 )
 		var currentState = stateStack.getTop()
 
+		// scaling factor which must be applied to draw a one pixel wide line
+		var pixelScale
+
 		// world space to view space transformation matrix
 		var worldToView = mat3.create()
 		mat3.identity( worldToView )
@@ -67,6 +70,8 @@ define(
 		var updateWorldToScreen = function( viewToScreen, worldToView ) {
 			mat3.multiply( viewToScreen, worldToView, worldToScreen )
 
+			pixelScale = Math.abs( 1 / worldToScreen[ 0 ] )
+
 			context.setTransform(
 				worldToScreen[ 0 ],
 				worldToScreen[ 1 ],
@@ -108,6 +113,9 @@ define(
 				createTexture     : createCanvasTexture,
 				drawTexture       : drawTexture,
 				drawSubTexture    : drawSubTexture,
+				drawRect          : drawRect,
+				drawCircle        : drawCircle,
+				drawLine          : drawLine,
 				fillRect          : fillRect,
 				getConfiguration  : getConfiguration,
 				resizeColorBuffer : resizeColorBuffer,
@@ -116,7 +124,8 @@ define(
 				save              : save,
 				scale             : scale,
 				setClearColor     : setClearColor,
-				setFillStyleColor : setFillStyleColor,
+				setColor          : setColor,
+				setLineColor      : setLineColor,
 				setGlobalAlpha    : setGlobalAlpha,
 				setTransform      : setTransform,
 				setViewMatrix     : setViewMatrix,
@@ -150,12 +159,19 @@ define(
 		 * public
 		 */
 
-		var setFillStyleColor = function( vec ) {
+		var setColor = function( vec ) {
 			currentState.color = color.createRgba( vec )
+			context.fillStyle = color.formatCanvas( vec )
+		}
+
+		var setLineColor = function( vec ) {
+			currentState.lineColor = color.createRgba( vec )
+			context.strokeStyle = color.formatCanvas( vec )
 		}
 
 		var setGlobalAlpha = function( u ) {
 			currentState.opacity = u
+			context.globalAlpha = u
 		}
 
 		var setClearColor = function( vec ) {
@@ -260,10 +276,93 @@ define(
 			context.restore()
 		}
 
+		var drawRect = function( dx, dy, dw, dh, lineWidth ) {
+			if( !lineWidth ) lineWidth = 1
+
+			context.save()
+			{
+				context.globalAlpha = currentState.opacity
+
+				var modelToWorld = currentState.matrix
+
+				context.transform(
+					modelToWorld[ 0 ],
+					modelToWorld[ 1 ],
+					modelToWorld[ 3 ],
+					modelToWorld[ 4 ],
+					modelToWorld[ 6 ],
+					modelToWorld[ 7 ]
+				)
+
+				var halfWidth = dw * 0.5
+
+				context.lineWidth = pixelScale * lineWidth
+			    context.strokeRect( dx - halfWidth, dy - dh * 0.5, dw, dh )
+			}
+			context.restore()
+		}
+
+		var drawCircle = function( dx, dy, radius, lineWidth ) {
+			if( !lineWidth ) lineWidth = 1
+
+			context.save()
+			{
+//				context.fillStyle   = color.formatCanvas( currentState.color )
+//				context.strokeStyle = color.formatCanvas( currentState.color )
+				context.globalAlpha = currentState.opacity
+
+				var modelToWorld = currentState.matrix
+
+				context.transform(
+					modelToWorld[ 0 ],
+					modelToWorld[ 1 ],
+					modelToWorld[ 3 ],
+					modelToWorld[ 4 ],
+					modelToWorld[ 6 ],
+					modelToWorld[ 7 ]
+				)
+
+				context.lineWidth = pixelScale * lineWidth
+				context.beginPath()
+				context.arc( dx, dy, radius, 0, Math.PI * 2, true )
+				context.stroke()
+			}
+			context.restore()
+		}
+
+		var drawLine = function( ax, ay, bx, by, lineWidth ) {
+			if( !lineWidth ) lineWidth = 1
+
+			context.save()
+			{
+				context.globalAlpha = currentState.opacity
+
+				var modelToWorld = currentState.matrix
+
+				context.transform(
+					modelToWorld[ 0 ],
+					modelToWorld[ 1 ],
+					modelToWorld[ 3 ],
+					modelToWorld[ 4 ],
+					modelToWorld[ 6 ],
+					modelToWorld[ 7 ]
+				)
+
+				var scaledLineWidth = pixelScale * lineWidth
+
+				context.lineWidth = scaledLineWidth
+
+				context.beginPath()
+				context.moveTo( ax, ay )
+				context.lineTo( bx, by )
+				context.stroke()
+			}
+			context.restore()
+		}
+
 		var fillRect = function( dx, dy, dw, dh ) {
 			context.save()
 			{
-				context.fillStyle   = color.formatCanvas( currentState.color )
 				context.globalAlpha = currentState.opacity
 
 				var modelToWorld = currentState.matrix

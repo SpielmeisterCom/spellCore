@@ -1,0 +1,35 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Box2D Simple Sphere",
+	"doc": "",
+	"icon": "",
+	"attributes": [
+		{
+			"name": "density",
+			"type": "number",
+			"default": 1
+		},
+		{
+			"name": "friction",
+			"type": "number",
+			"default": 0.5
+		},
+		{
+			"name": "restitution",
+			"type": "number",
+			"default": 0.2
+		},
+		{
+			"name": "radius",
+			"type": "number",
+			"default": 1
+		},
+		{
+			"name": "type",
+			"type": "string",
+			"default": "dynamic"
+		}
+	]
+}

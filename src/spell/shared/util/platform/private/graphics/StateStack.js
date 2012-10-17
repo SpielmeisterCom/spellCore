@@ -19,27 +19,34 @@ define(
 		 * private
 		 */
 
-		var createState = function( opacity, fillStyleColor, matrix ) {
+		var createState = function( opacity, color, lineColor, matrix ) {
 			return {
-				opacity : opacity,
-				color   : fillStyleColor,
-				matrix  : matrix
+				opacity   : opacity,
+				color     : color,
+				lineColor : lineColor,
+				matrix    : matrix
 			}
 		}
 
 		var createDefaultState = function() {
-			var opacity        = 1.0,
-				fillStyleColor = createFloatArray( 4 ),
-				matrix         = mat3.create()
+			var opacity   = 1.0,
+				color     = createFloatArray( 4 ),
+				lineColor = createFloatArray( 4 ),
+				matrix    = mat3.create()
 
-			fillStyleColor[ 0 ] = 1.0
-			fillStyleColor[ 1 ] = 1.0
-			fillStyleColor[ 2 ] = 1.0
-			fillStyleColor[ 3 ] = 1.0
+			color[ 0 ] = 1.0
+			color[ 1 ] = 1.0
+			color[ 2 ] = 1.0
+			color[ 3 ] = 1.0
+
+			lineColor[ 0 ] = 1.0
+			lineColor[ 1 ] = 1.0
+			lineColor[ 2 ] = 1.0
+			lineColor[ 3 ] = 1.0
 
 			mat3.identity( matrix )
 
-			return createState( opacity, fillStyleColor, matrix )
+			return createState( opacity, color, lineColor, matrix )
 		}
 
 		var copyState = function( source, target ) {
@@ -49,6 +56,11 @@ define(
 			target.color[ 1 ] = source.color[ 1 ]
 			target.color[ 2 ] = source.color[ 2 ]
 			target.color[ 3 ] = source.color[ 3 ]
+
+			target.lineColor[ 0 ] = source.lineColor[ 0 ]
+			target.lineColor[ 1 ] = source.lineColor[ 1 ]
+			target.lineColor[ 2 ] = source.lineColor[ 2 ]
+			target.lineColor[ 3 ] = source.lineColor[ 3 ]
 
 			mat3.set( source.matrix, target.matrix )
 		}

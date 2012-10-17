@@ -2,6 +2,10 @@ define(
 	'spell/system/render',
 	[
 		'spell/client/2d/graphics/drawCoordinateGrid',
+		'spell/client/2d/graphics/physics/drawBox',
+		'spell/client/2d/graphics/physics/drawCircle',
+		'spell/client/2d/graphics/physics/drawPoint',
+		'spell/client/2d/graphics/physics/drawOrigin',
 		'spell/client/2d/graphics/drawText',
 		'spell/client/2d/graphics/drawTitleSafeOutline',
 		'spell/client/util/createComprisedRectangle',
@@ -17,6 +21,10 @@ define(
 	],
 	function(
 		drawCoordinateGrid,
+		drawPhysicsBox,
+		drawPhysicsCircle,
+		drawPhysicsPoint,
+		drawPhysicsOrigin,
 		drawText,
 		drawTitleSafeOutline,
 		createComprisedRectangle,
@@ -40,7 +48,9 @@ define(
 		var tmpVec2          = vec2.create(),
 			tmpMat3          = mat3.identity(),
 			clearColor       = vec4.create( [ 0, 0, 0, 1 ] ),
+			markerColor      = vec4.create( [ 0.45, 0.45, 0.45, 1 ] ),
 			debugFontAssetId = 'font:spell.OpenSans14px',
+			drawDebugShapes  = true,
 			currentCameraId
 
 		var roundVec2 = function( v ) {
@@ -107,7 +117,7 @@ define(
 			context.save()
 			{
 				if( transform ) {
-					// object to world space transformation go here
+					// object to world space transformations go here
 					context.translate( transform.translation )
 					context.rotate( transform.rotation )
 					context.scale( transform.scale )
@@ -225,6 +235,37 @@ define(
 			context.restore()
 		}
 
+		var drawDebug = function( context, childrenComponents, debugBoxes, debugCircles, transforms, deltaTimeInMs, id, next ) {
+			var debugBox    = debugBoxes[ id ],
+				debugCircle = debugCircles[ id ],
+				transform   = transforms[ id ]
+
+			if( !debugBox && !debugCircle ) return
+
+			context.save()
+			{
+				if( transform ) {
+					// object to world space transformations go here
+					context.translate( transform.translation )
+					context.rotate( transform.rotation )
+				}
+
+				if( debugBox ) {
+					drawPhysicsBox( context, debugBox.width, debugBox.height, debugBox.color, 1 )
+
+				} else {
+					drawPhysicsCircle( context, debugCircle.radius, debugCircle.color, 1 )
+				}
+
+				context.setColor( markerColor )
+				drawPhysicsPoint( context, 0.2 )
+
+				context.setLineColor( markerColor )
+				drawPhysicsOrigin( context, 0.25 )
+			}
+			context.restore()
+		}
+
 		var getActiveCameraId = function( cameras ) {
 			if( _.size( cameras ) === 0 ) return
 
@@ -278,6 +319,7 @@ define(
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var cameras                 = this.cameras,
 				context                 = this.context,
+				debug                   = !!this.debug,
 				drawVisualObjectPartial = this.drawVisualObjectPartial,
 				screenSize              = this.screenSize,
 				screenAspectRatio       = this.debug && this.debug.screenAspectRatio ? this.debug.screenAspectRatio : screenSize[ 0 ] / screenSize[ 1 ]
@@ -306,12 +348,28 @@ define(
 				_.keys( this.transforms )
 			)
 
+			// draw scene
+			var sortedVisualObjects = createSortedByLayer( this.visualObjects, rootTransforms )
+
 			_.each(
-				createSortedByLayer( this.visualObjects, rootTransforms ),
+				sortedVisualObjects,
 				function( id ) {
 					drawVisualObjectPartial( deltaTimeInMs, id, drawVisualObjectPartial )
 				}
 			)
+
+			if( debug &&
+				drawDebugShapes ) {
+
+				var drawDebugPartial = this.drawDebugPartial
+
+				_.each(
+					sortedVisualObjects,
+					function( id ) {
+						drawDebugPartial( deltaTimeInMs, id, drawDebugPartial )
+					}
+				)
+			}
 
 			// clear unsafe area
 			if( camera && camera.clearUnsafeArea && cameraTransform ) {
@@ -347,7 +405,7 @@ define(
 				context.restore()
 			}
 
-			if( this.debug &&
+			if( debug &&
 				effectiveCameraDimensions &&
 				cameraTransform ) {
 
@@ -385,6 +443,18 @@ define(
 				this.childrenComponents,
 				this.visualObjects
 			)
+
+			if( this.debug ) {
+				this.drawDebugPartial = _.bind(
+					drawDebug,
+					null,
+					this.context,
+					this.childrenComponents,
+					this.debugBoxes,
+					this.debugCircles,
+					this.transforms
+				)
+			}
 
 			var eventManager = spell.eventManager,
 				context      = this.context,

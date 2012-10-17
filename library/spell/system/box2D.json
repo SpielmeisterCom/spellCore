@@ -1,0 +1,27 @@
+{
+	"type": "system",
+	"readonly": true,
+	"input": [
+		{
+			"name": "transforms",
+			"componentId": "spell.component.2d.transform"
+		},
+		{
+			"name": "simpleBoxes",
+			"componentId": "spell.component.box2d.simpleBox"
+		},
+		{
+			"name": "simpleSpheres",
+			"componentId": "spell.component.box2d.simpleSphere"
+		},
+		{
+			"name": "debugBoxes",
+			"componentId": "spell.component.2d.graphics.debug.box"
+		},
+		{
+			"name": "debugCircles",
+			"componentId": "spell.component.2d.graphics.debug.circle"
+		}
+	],
+	"version": 1
+}

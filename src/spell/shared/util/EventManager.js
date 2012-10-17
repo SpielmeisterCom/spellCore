@@ -19,7 +19,7 @@ define(
 		 * private
 		 */
 
-		var normalize = function( scope ) {
+		var wrapArray = function( scope ) {
 			return ( _.isArray( scope ) ? scope : [ scope ] )
 		}
 
@@ -63,7 +63,7 @@ define(
 
 		EventManager.prototype = {
 			subscribe: function( scope, subscriber ) {
-				scope = normalize( scope )
+				scope = wrapArray( scope )
 
 				forestMultiMap.add(
 					this.subscribers,
@@ -75,7 +75,7 @@ define(
 			},
 
 			unsubscribe: function( scope, subscriber ) {
-				scope = normalize( scope )
+				scope = wrapArray( scope )
 
 				forestMultiMap.remove(
 					this.subscribers,
@@ -87,22 +87,17 @@ define(
 			},
 
 			publish: function( scope, eventArgs ) {
-				scope = normalize( scope )
-
-				var subscribersInScope = forestMultiMap.get(
-					this.subscribers,
-					scope
-				)
+				var subscribersInScope = forestMultiMap.get( this.subscribers, wrapArray( scope ) )
 
 				_.each( subscribersInScope, function( subscriber ) {
-					subscriber.apply( undefined, eventArgs )
+					subscriber.apply( undefined, wrapArray( eventArgs ) )
 				} )
 
 				return true
 			},
 
 			waitFor: function( scope, subscriber ) {
-				scope = normalize( scope )
+				scope = wrapArray( scope )
 
 				waitForChainConfig = {
 					events : [ {
@@ -118,7 +113,7 @@ define(
 				// check if pending chain call exists
 				if( !waitForChainConfig ) throw 'A call to the method "and" must be chained to a previous call to "waitFor".'
 
-				scope = normalize( scope )
+				scope = wrapArray( scope )
 
 				waitForChainConfig.events.push( {
 					scope      : scope,

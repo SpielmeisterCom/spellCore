@@ -156,17 +156,6 @@ define(
 					return
 				}
 
-				var anonymizeModuleIds = this.anonymizeModuleIds
-
-				if( sceneConfig.scriptId ) {
-					this.script = loadModule(
-						anonymizeModuleIds ? sceneConfig.scriptId : createModuleId( sceneConfig.scriptId ),
-						anonymizeModuleIds
-					)
-
-					this.script.init( this.spell, sceneConfig )
-				}
-
 				if( sceneConfig.systems ) {
 					this.renderSystems = createSystems( this.spell, sceneConfig.systems.render, anonymizeModuleIds )
 					this.updateSystems = createSystems( this.spell, sceneConfig.systems.update, anonymizeModuleIds )
@@ -176,6 +165,17 @@ define(
 
 					invoke( this.renderSystems, 'activate', [ this.spell, sceneConfig ] )
 					invoke( this.updateSystems, 'activate', [ this.spell, sceneConfig ] )
+				}
+
+				var anonymizeModuleIds = this.anonymizeModuleIds
+
+				if( sceneConfig.scriptId ) {
+					this.script = loadModule(
+						anonymizeModuleIds ? sceneConfig.scriptId : createModuleId( sceneConfig.scriptId ),
+						anonymizeModuleIds
+					)
+
+					this.script.init( this.spell, sceneConfig )
 				}
 			},
 			destroy: function( sceneConfig ) {

@@ -59,7 +59,7 @@ define(
 				scaledX = Math.round( ( x + worldToScreenTranslation[ 0 ] ) * invScale )
 
 				// determining the color
-				context.setFillStyleColor(
+				context.setColor(
 					( x === 0 ?
 						YAxisColor :
 						( x % nextStepSize === 0 ?
@@ -88,7 +88,7 @@ define(
 				scaledY = Math.round( ( y + worldToScreenTranslation[ 1 ] ) * invScale )
 
 				// determining the color
-				context.setFillStyleColor(
+				context.setColor(
 					( y === 0 ?
 						XAxisColor :
 						( y % nextStepSize === 0 ?
