@@ -391,7 +391,7 @@ define(
 					mat3.ortho( 0, screenSize[ 0 ], 0, screenSize[ 1 ], tmpMat3 )
 					context.setViewMatrix( tmpMat3 )
 
-					context.setFillStyleColor( clearColor )
+					context.setColor( clearColor )
 
 					if( offset[ 0 ] > 0 ) {
 						context.fillRect( 0, 0, offset[ 0 ], screenSize[ 1 ] )
