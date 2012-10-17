@@ -26,6 +26,10 @@
 			"name": "textAppearances",
 			"componentId": "spell.component.2d.graphics.textAppearance"
 		},
+        {
+            "name": "tilemaps",
+            "componentId": "spell.component.2d.graphics.tilemap"
+        },
 		{
 			"name": "visualObjects",
 			"componentId": "spell.component.visualObject"

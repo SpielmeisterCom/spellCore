@@ -28,6 +28,35 @@ define(
 			]
 		}
 
+		var createTilemapAsset = function( assets, asset ) {
+			var spriteSheetAssetId = asset.assetId,
+				spriteSheetAsset   = assets[ spriteSheetAssetId ]
+
+			if( !spriteSheetAsset ) throw 'Error: Could not find asset with id \'' + spriteSheetAssetId + '\'.'
+
+			var frameWidth  = spriteSheetAsset.config.frameWidth,
+				frameHeight = spriteSheetAsset.config.frameHeight,
+				numX        = Math.floor( spriteSheetAsset.config.textureWidth / frameWidth ),
+				numY        = Math.floor( spriteSheetAsset.config.textureHeight / frameHeight),
+				numFrames   = numX * numY
+
+			//create a lookup table to lookup the subtextures
+			var frameOffsets = [];
+			for (var i=0; i < numFrames; i++) {
+				frameOffsets[i] = createFrameOffset( frameWidth, frameHeight, numX, numY, i )
+			}
+
+			return {
+				type                : asset.subtype,
+				resourceId          : spriteSheetAsset.resourceId,
+				frameDimensions     : [ frameWidth, frameHeight ],
+				tilemapDimensions   : [ asset.config.width, asset.config.height ],
+				tilemapData         : asset.config.tileLayerData,
+				frameOffsets        : frameOffsets
+			}
+		}
+
+
 		var createAnimationAsset = function( assets, asset ) {
 			var spriteSheetAssetId = asset.assetId,
 				spriteSheetAsset   = assets[ spriteSheetAssetId ]
@@ -157,6 +186,9 @@ define(
 
 					if( type === 'animation' ) {
 						memo[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = createAnimationAsset( memo, assetDefinition )
+
+					} else if ( type === '2dTileMap') {
+						memo[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = createTilemapAsset( memo, assetDefinition )
 					}
 
 					return memo
