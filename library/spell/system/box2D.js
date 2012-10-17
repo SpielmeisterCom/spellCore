@@ -86,8 +86,6 @@ define(
 				if( !body ) continue
 
 				world.DestroyBody( body )
-
-				console.originalLog( 'removed body ' + destroyedEntities[ i ] )
 			}
 		}
 
