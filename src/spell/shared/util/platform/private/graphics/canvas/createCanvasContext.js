@@ -271,7 +271,7 @@ define(
 				context.scale( -1, 1 )
 				context.translate( 0, -dh )
 
-				context.drawImage( texture.privateImageResource, sx, sy, sw, sh, 0 , 0, dw, dh )
+				context.drawImage( texture.privateImageResource, sx + 1, sy + 1, sw - 2, sh - 2, 0 , 0, dw , dh )
 			}
 			context.restore()
 		}
@@ -307,8 +307,6 @@ define(
 
 			context.save()
 			{
-//				context.fillStyle   = color.formatCanvas( currentState.color )
-//				context.strokeStyle = color.formatCanvas( currentState.color )
 				context.globalAlpha = currentState.opacity
 
 				var modelToWorld = currentState.matrix
