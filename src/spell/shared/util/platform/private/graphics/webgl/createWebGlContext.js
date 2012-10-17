@@ -319,7 +319,6 @@ define(
 		var drawSubTexture = function( shaderProgram, texture, sx, sy, sw, sh, dx, dy, dw, dh ) {
 			if( texture === undefined ) throw 'Texture is undefined'
 
-
 			if( !dw ) dw = 1.0
 			if( !dh ) dh = 1.0
 
@@ -355,10 +354,10 @@ define(
 
 			updateTextureMatrix(
 				shaderProgram,
-				sw / tw,
-				sh / th,
-				sx / tw,
-				sy / th,
+				( sw - 1 ) / tw,
+				( sh - 1 ) / th,
+				( sx + 0.5 ) / tw,
+				( sy + 0.5 ) / th,
 				textureMatrix
 			)
 
