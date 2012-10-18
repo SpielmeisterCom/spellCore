@@ -85,6 +85,7 @@ define(
 				throw 'Error: No runtime module defined. Please provide a runtime module.'
 			}
 
+			spell.logger.setSendMessageToEditor( this.sendMessageToEditor )
 			spell.logger.debug( 'client started' )
 
 			var configurationManager = new ConfigurationManager( spell.eventManager, spell.loaderConfig, runtimeModule.config )
@@ -117,6 +118,7 @@ define(
 
 			loadResources(
 				spell,
+				this.sendMessageToEditor,
 				_.bind( postLoadedResources, this )
 			)
 		}
@@ -164,8 +166,10 @@ define(
 
 
 		var main = function() {
-			this.spell               = undefined
-			this.debugMessageHandler = undefined
+			this.spell
+			this.debugMessageHandler
+			this.sendMessageToEditor
+
 			init.call( this, stageZeroConfig )
 		}
 
@@ -178,7 +182,7 @@ define(
 			 * @param {Function} fn
 			 */
 			setSendMessageToEditor : function( fn ) {
-				this.spell.logger.setSendMessageToEditor( fn )
+				this.sendMessageToEditor = fn
 			},
 
 			/*

@@ -21,6 +21,17 @@ define(
 		'use strict'
 
 
+		var createSendLoadingProgress = function( sendMessageToEditor ) {
+			if( !sendMessageToEditor ) return function() {}
+
+			var numLoadingSteps = 3,
+				loadingStep     = 0
+
+			return function() {
+				sendMessageToEditor( 'spell.loadingProgress', loadingStep++ / numLoadingSteps )
+			}
+		}
+
 		var resourceIdsToJsonFilenames = function( resourceIds ) {
 			return _.map(
 				resourceIds,
@@ -40,7 +51,7 @@ define(
 		}
 
 
-		return function( spell, next ) {
+		return function( spell, sendMessageToEditor, next ) {
 			var eventManager     = spell.eventManager,
 				renderingContext = spell.renderingContext,
 				resourceLoader   = spell.resourceLoader,
@@ -51,6 +62,8 @@ define(
 			var templateBundleName = 'templates',
 				assetBundleName    = 'assets',
 				resourceBundleName = 'resources'
+
+			var sendLoadingProgress = createSendLoadingProgress( sendMessageToEditor )
 
 			eventManager.waitFor(
 				[ Events.RESOURCE_LOADING_COMPLETED, assetBundleName ],
@@ -70,6 +83,8 @@ define(
 						createFilesToLoad( loadedAssets ),
 						resourceBundleName
 					)
+
+					sendLoadingProgress()
 				}
 
 			).and(
@@ -98,6 +113,8 @@ define(
 					addTemplates( templateManager, templates.component )
 					addTemplates( templateManager, templates.entityTemplate )
 					addTemplates( templateManager, templates.system )
+
+					sendLoadingProgress()
 				}
 
 			).and(
@@ -107,9 +124,13 @@ define(
 						spell.assets,
 						_.bind( injectResource, null, loadedResources )
 					)
+
+					sendLoadingProgress()
 				}
 
 			).resume( function() {
+				sendLoadingProgress()
+
 				next()
 			} )
 
