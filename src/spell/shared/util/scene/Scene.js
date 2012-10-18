@@ -201,8 +201,8 @@ define(
 
 				if( !systemsGroup ) return
 
-				systemsGroup[ systemId ].prototype[ 'deactivate' ]( this.spell )
-				systemsGroup[ systemId ].prototype[ 'destroy' ]( this.spell )
+				systemsGroup[ systemId ].prototype.deactivate( this.spell )
+				systemsGroup[ systemId ].prototype.destroy( this.spell )
 
 				var system = createSystem(
 					this.spell,
@@ -211,8 +211,8 @@ define(
 					this.anonymizeModuleIds
 				)
 
-				system.prototype[ 'init' ].call( this.spell )
-				system.prototype[ 'activate' ].call( this.spell )
+				system.prototype.init( this.spell )
+				system.prototype.activate( this.spell )
 				systemsGroup[ systemId ] = system
 			}
 		}
