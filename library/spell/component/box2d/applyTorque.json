@@ -1,0 +1,15 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Box2D Torque",
+	"doc": "",
+	"icon": "",
+	"attributes": [
+		{
+			"name": "torque",
+			"type": "number",
+			"default": 0
+		}
+	]
+}

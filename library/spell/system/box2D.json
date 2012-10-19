@@ -7,6 +7,18 @@
 			"componentId": "spell.component.2d.transform"
 		},
 		{
+			"name": "applyForces",
+			"componentId": "spell.component.box2d.applyForce"
+		},
+		{
+			"name": "applyTorques",
+			"componentId": "spell.component.box2d.applyTorque"
+		},
+		{
+			"name": "applyImpulses",
+			"componentId": "spell.component.box2d.applyImpulse"
+		},
+		{
 			"name": "simpleBoxes",
 			"componentId": "spell.component.box2d.simpleBox"
 		},

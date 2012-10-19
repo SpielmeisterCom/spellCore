@@ -172,6 +172,67 @@ define(
 			}
 		}
 
+		var applyInfluence = function( entityManager, world, applyForces, applyTorques, applyImpulses ) {
+			for( var body = world.GetBodyList(); body; body = body.m_next ) {
+				var id = body.GetUserData()
+
+				if( !id ) continue
+
+				// spell.component.box2d.applyForce
+				var applyForce = applyForces[ id ]
+
+				if( applyForce ) {
+					var force  = applyForce.force,
+						forceX = force[ 0 ],
+						forceY = force[ 1 ]
+
+					if( forceX || forceY ) {
+						var point = applyForce.point
+
+						body.ApplyForce(
+							new b2Vec2( forceX, forceY ),
+							applyForce.usePoint ?
+								new b2Vec2( point[ 0 ], point[ 1 ] ) :
+								body.GetWorldCenter()
+						)
+					}
+				}
+
+				// spell.component.box2d.applyTorque
+				var applyTorque = applyTorques[ id ]
+
+				if( applyTorque ) {
+					var torque = applyTorque.torque
+
+					if( torque ) {
+						body.ApplyTorque( torque )
+					}
+				}
+
+				// spell.component.box2d.applyImpulse
+				var applyImpulse = applyImpulses[ id ]
+
+				if( applyImpulse ) {
+					var impulse  = applyImpulse.impulse,
+						impulseX = impulse[ 0 ],
+						impulseY = impulse[ 1 ]
+
+					if( impulseX || impulseY ) {
+						var point = applyImpulse.point
+
+						body.ApplyImpulse(
+							new b2Vec2( impulseX, impulseY ),
+							applyImpulse.usePoint ?
+								new b2Vec2( point[ 0 ], point[ 1 ] ) :
+								body.GetWorldCenter()
+						)
+
+						entityManager.removeComponent( id, 'spell.component.box2d.applyImpulse' )
+					}
+				}
+			}
+		}
+
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var world           = this.world,
 				transforms      = this.transforms,
@@ -182,6 +243,7 @@ define(
 				removedEntities.length = 0
 			}
 
+			applyInfluence( spell.EntityManager, world, this.applyForces, this.applyTorques, this.applyImpulses )
 			simulate( world, deltaTimeInMs )
 			transferState( world, transforms )
 

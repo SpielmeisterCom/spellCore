@@ -1,0 +1,25 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Box2D Impulse",
+	"doc": "",
+	"icon": "",
+	"attributes": [
+		{
+			"name": "impulse",
+			"type": "vec2",
+			"default": [ 0, 0 ]
+		},
+		{
+			"name": "point",
+			"type": "vec2",
+			"default": [ 0, 0 ]
+		},
+		{
+			"name": "usePoint",
+			"type": "boolean",
+			"default": false
+		}
+	]
+}
