@@ -89,6 +89,16 @@ define(
 			)
 		}
 
+		var entityExists = function( componentDictionaries, entityId ) {
+			for( var componentId in componentDictionaries ) {
+				var componentDictionary = componentDictionaries[ componentId ]
+
+				if( componentDictionary[ entityId ] ) return true
+			}
+
+			return false
+		}
+
 		var removeComponents = function( eventManager, componentDictionaries, entityId, entityComponentId ) {
 			if( entityComponentId ) {
 				// remove a single component from the entity
@@ -106,7 +116,9 @@ define(
 				)
 			}
 
-			eventManager.publish( Events.ENTITY_DESTROYED, entityId )
+			if( !entityExists( componentDictionaries, entityId ) ) {
+				eventManager.publish( Events.ENTITY_DESTROYED, entityId )
+			}
 		}
 
 		/**
