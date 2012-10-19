@@ -33,9 +33,15 @@ define(
 		 * private
 		 */
 
-		var gl
-		var stateStack   = new StateStack( 32 )
-		var currentState = stateStack.getTop()
+		var gl,
+			stateStack           = new StateStack( 32 ),
+			currentState         = stateStack.getTop(),
+			NUM_CIRCLE_VERTICES  = 32,
+			QUAD_VERTEX_OFFSET   = 0,
+			CIRCLE_VERTEX_OFFSET = QUAD_VERTEX_OFFSET + 4,
+			LINE_VERTEX_OFFSET   = CIRCLE_VERTEX_OFFSET + NUM_CIRCLE_VERTICES,
+			vertices             = createFloatArray( ( LINE_VERTEX_OFFSET + 2 ) * 2 ),
+			positionVertexBuffer
 
 		var screenSpaceShimMatrix = mat3.create()
 
@@ -115,6 +121,9 @@ define(
 				createTexture     : createWebGlTexture,
 				drawTexture       : _.bind( drawTexture, null, shaderProgram ),
 				drawSubTexture    : _.bind( drawSubTexture, null, shaderProgram ),
+				drawRect          : _.bind( drawRect, null, shaderProgram ),
+				drawCircle        : _.bind( drawCircle, null, shaderProgram ),
+				drawLine          : _.bind( drawLine, null, shaderProgram ),
 				fillRect          : _.bind( fillRect, null, shaderProgram ),
 				getConfiguration  : getConfiguration,
 				resizeColorBuffer : resizeColorBuffer,
@@ -170,18 +179,35 @@ define(
 			gl.useProgram( shaderProgram )
 
 			// setting up vertices
-			var vertices = createFloatArray( 8 )
-			vertices[ 0 ] = 0.0
-			vertices[ 1 ] = 0.0
-			vertices[ 2 ] = 1.0
-			vertices[ 3 ] = 0.0
-			vertices[ 4 ] = 0.0
-			vertices[ 5 ] = 1.0
-			vertices[ 6 ] = 1.0
-			vertices[ 7 ] = 1.0
+			var angleStep = Math.PI * 2 / NUM_CIRCLE_VERTICES
 
-			var vertexPositionBuffer = gl.createBuffer()
-			gl.bindBuffer( gl.ARRAY_BUFFER, vertexPositionBuffer )
+			// quad
+			vertices[ QUAD_VERTEX_OFFSET * 2 + 0 ] = 0.0
+			vertices[ QUAD_VERTEX_OFFSET * 2 + 1 ] = 0.0
+			vertices[ QUAD_VERTEX_OFFSET * 2 + 2 ] = 1.0
+			vertices[ QUAD_VERTEX_OFFSET * 2 + 3 ] = 0.0
+			vertices[ QUAD_VERTEX_OFFSET * 2 + 4 ] = 1.0
+			vertices[ QUAD_VERTEX_OFFSET * 2 + 5 ] = 1.0
+			vertices[ QUAD_VERTEX_OFFSET * 2 + 6 ] = 0.0
+			vertices[ QUAD_VERTEX_OFFSET * 2 + 7 ] = 1.0
+
+			// circle
+			for( var i = 0; i < NUM_CIRCLE_VERTICES; i++ ) {
+				var angle = angleStep * i
+
+				vertices[ CIRCLE_VERTEX_OFFSET * 2 + i * 2 ]     = Math.sin( angle )
+				vertices[ CIRCLE_VERTEX_OFFSET * 2 + i * 2 + 1 ] = Math.cos( angle )
+			}
+
+			// line
+			// These vertices are stubs and get overwritten once the drawLine function is called.
+			vertices[ LINE_VERTEX_OFFSET * 2 + 0 ] = 0.0
+			vertices[ LINE_VERTEX_OFFSET * 2 + 1 ] = 0.0
+			vertices[ LINE_VERTEX_OFFSET * 2 + 2 ] = 0.0
+			vertices[ LINE_VERTEX_OFFSET * 2 + 3 ] = 0.0
+
+			positionVertexBuffer = gl.createBuffer()
+			gl.bindBuffer( gl.ARRAY_BUFFER, positionVertexBuffer )
 			gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW )
 
 			var attributeLocation = gl.getAttribLocation( shaderProgram, 'aVertexPosition' )
@@ -239,17 +265,14 @@ define(
 		}
 
 		var setColor = function( vec ) {
-			// TODO: push color value to shader program, not just state stack
 			currentState.color = color.createRgba( vec )
 		}
 
 		var setLineColor = function( vec ) {
-			// TODO: push color value to shader program, not just state stack
 			currentState.lineColor = color.createRgba( vec )
 		}
 
 		var setGlobalAlpha = function( u ) {
-			// TODO: push color value to shader program, not just state stack
 			currentState.opacity = u
 		}
 
@@ -278,7 +301,6 @@ define(
 
 		var drawTexture = function( shaderProgram, texture, dx, dy, dw, dh ) {
 			if( texture === undefined ) throw 'Texture is undefined'
-
 
 			if( !dw ) dw = 1.0
 			if( !dh ) dh = 1.0
@@ -313,7 +335,7 @@ define(
 			resetTextureMatrix( shaderProgram, textureMatrix )
 
 			// drawing
-			gl.drawArrays( gl.TRIANGLE_STRIP, 0, 4 )
+			gl.drawArrays( gl.TRIANGLE_FAN, QUAD_VERTEX_OFFSET, 4 )
 		}
 
 		var drawSubTexture = function( shaderProgram, texture, sx, sy, sw, sh, dx, dy, dw, dh ) {
@@ -362,7 +384,95 @@ define(
 			)
 
 			// drawing
-			gl.drawArrays( gl.TRIANGLE_STRIP, 0, 4 )
+			gl.drawArrays( gl.TRIANGLE_FAN, QUAD_VERTEX_OFFSET, 4 )
+		}
+
+		var drawRect = function( shaderProgram, dx, dy, dw, dh, lineWidth ) {
+			if( !lineWidth ) lineWidth = 1
+
+			gl.lineWidth( lineWidth )
+
+			// setting up fillRect mode
+			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
+			gl.uniform1i( uniformLocation, 1 )
+
+			// setting up global alpha
+			gl.uniform1f( gl.getUniformLocation( shaderProgram, 'uGlobalAlpha' ), currentState.opacity )
+
+			// setting up global color
+			gl.uniform4fv( gl.getUniformLocation( shaderProgram, 'uGlobalColor' ), currentState.lineColor )
+
+			// setting up transformation
+			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
+
+			// correcting position
+			mat3.translate( tmpMatrix, [ dx + dw * -0.5, dy + dh * -0.5 ] )
+			mat3.scale( tmpMatrix, [ dw, dh ] )
+
+			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
+
+			// drawing
+			gl.drawArrays( gl.LINE_LOOP, QUAD_VERTEX_OFFSET, 4 )
+		}
+
+		var drawCircle = function( shaderProgram, dx, dy, radius, lineWidth ) {
+			if( !lineWidth ) lineWidth = 1
+
+			gl.lineWidth( lineWidth )
+
+			// setting up fillRect mode
+			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
+			gl.uniform1i( uniformLocation, 1 )
+
+			// setting up global alpha
+			gl.uniform1f( gl.getUniformLocation( shaderProgram, 'uGlobalAlpha' ), currentState.opacity )
+
+			// setting up global color
+			gl.uniform4fv( gl.getUniformLocation( shaderProgram, 'uGlobalColor' ), currentState.lineColor )
+
+			// setting up transformation
+			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
+
+			// correcting position
+			mat3.translate( tmpMatrix, [ dx, dy ] )
+			mat3.scale( tmpMatrix, [ radius, radius ] )
+
+			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
+
+			// drawing
+			gl.drawArrays( gl.LINE_LOOP, CIRCLE_VERTEX_OFFSET, NUM_CIRCLE_VERTICES )
+		}
+
+		var drawLine = function( shaderProgram, ax, ay, bx, by, lineWidth ) {
+			if( !lineWidth ) lineWidth = 1
+
+			gl.lineWidth( lineWidth )
+
+			// setting up fillRect mode
+			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
+			gl.uniform1i( uniformLocation, 1 )
+
+			// setting up global alpha
+			gl.uniform1f( gl.getUniformLocation( shaderProgram, 'uGlobalAlpha' ), currentState.opacity )
+
+			// setting up global color
+			gl.uniform4fv( gl.getUniformLocation( shaderProgram, 'uGlobalColor' ), currentState.lineColor )
+
+			// setting up transformation
+			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
+
+			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
+
+			// line
+			vertices[ LINE_VERTEX_OFFSET * 2 + 0 ] = ax
+			vertices[ LINE_VERTEX_OFFSET * 2 + 1 ] = ay
+			vertices[ LINE_VERTEX_OFFSET * 2 + 2 ] = bx
+			vertices[ LINE_VERTEX_OFFSET * 2 + 3 ] = by
+
+			gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW )
+
+			// drawing
+			gl.drawArrays( gl.LINES, LINE_VERTEX_OFFSET, 2 )
 		}
 
 		var fillRect = function( shaderProgram, dx, dy, dw, dh ) {
@@ -386,7 +496,7 @@ define(
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
 
 			// drawing
-			gl.drawArrays( gl.TRIANGLE_STRIP, 0, 4 )
+			gl.drawArrays( gl.TRIANGLE_FAN, QUAD_VERTEX_OFFSET, 4 )
 		}
 
 		var resizeColorBuffer = function( width, height ) {
