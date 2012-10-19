@@ -1,4 +1,4 @@
-/**
+/*
  * @class spell.shared.util.platform.PlatformKit
  * @singleton
  */
@@ -67,77 +67,77 @@ define(
 		}
 
 		return {
-			/**
+			/*
 			 *
 			 */
 			Box2D : Box2D,
 
-			/**
+			/*
 			 *
 			 */
 			callNextFrame : callNextFrame,
 
-			/**
+			/*
 			 *
 			 */
 			registerTimer : registerTimer,
 
-			/**
+			/*
 			 *
 			 */
 			createSocket : createSocket,
 
-			/**
+			/*
 			 *
 			 */
 			createSoundManager : createSoundManager,
 
-			/**
+			/*
 			 *
 			 */
 			RenderingFactory : RenderingFactory,
 
-			/**
+			/*
 			 *
 			 */
 			getHost : getHost,
 
-			/**
+			/*
 			 *
 			 */
 			ModuleLoader : ModuleLoader,
 
-			/**
+			/*
 			 *
 			 */
 			configurationOptions : configurationOptions,
 
-			/**
+			/*
 			 *
 			 */
 			getPlatformInfo : getPlatformInfo,
 
-			/**
+			/*
 			 *
 			 */
 			jsonCoder : jsonCoder,
 
-			/**
+			/*
 			 *
 			 */
 			createInput : createInput,
 
-			/**
+			/*
 			 *
 			 */
 			features : features,
 
-			/**
+			/*
 			 *
 			 */
 			getAvailableScreenSize : getAvailableScreenSize,
 
-			/**
+			/*
 			 *
 			 */
 			registerOnScreenResize : registerOnScreenResize,

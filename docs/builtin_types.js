@@ -1,77 +1,77 @@
-/**
+/*
  * TBD
  * @class Object
  */
 Object = {};
 
-/**
+/*
  * TBD
  * @class String
  */
 String = {};
 
-/**
+/*
  * TBD
  * @class Number
  */
 Number = {};
 
-/**
+/*
  * TBD
  * @class Boolean
  */
 Boolean = {};
 
-/**
+/*
  * TBD
  * @class RegExp
  */
 RegExp = {};
 
-/**
+/*
  * TBD
  * @class Function
  */
 Function = {};
 
-/**
+/*
  * TBD
  * @class Array
  */
 Array = {};
 
-/**
+/*
  * TBD
  * @class Arguments
  */
 Arguments = {};
 
-/**
+/*
  * TBD
  * @class Date
  */
 Date = {};
 
-/**
+/*
  * TBD
  * @class Error
  */
 Error = {};
 
-/**
+/*
  * TBD
  * @class Float32Array
  */
 Float32Array = {};
 
-/**
+/*
  * TBD
  * @class Array
  */
 Array = {};
 
 /**
- * TBD
+ * ECMAScript3 compatible Math Object
  * @class Math
  */
 Math = {};
