@@ -1,5 +1,12 @@
 /**
+ * The EntityManager contains functions for creating, updating and destroying entities and for
+ * querying and updating components.
+ *
+ * You can use the EntityManager for example in your system's init, activate, deactivate, destroy and process functions
+ * to create or destroy entities, or to add or remove components from entities and update components.
+ *
  * @class spell.EntityManager
+ * @singleton
  */
 define(
 	'spell/EntityManager',
@@ -38,6 +45,7 @@ define(
 		/**
 		 * Returns an entity id. If no entity id is provided a new one is generated.
 		 *
+		 * @private
 		 * @param {Object} id
 		 * @return {*}
 		 */
@@ -104,6 +112,7 @@ define(
 		/**
 		 * Applies the overloaded children config to the children config defined in a template.
 		 *
+		 * @private
 		 * @param entityTemplateChildrenConfig
 		 * @param overloadedChildrenConfig
 		 * @return {*}
@@ -135,11 +144,12 @@ define(
 			)
 		}
 
-		/*
+		/**
 		 * Normalizes the provided entity config
 		 *
 		 * @param templateManager
 		 * @param arg1 can be either an entity template id or a entity config
+		 * @private
 		 * @return {*}
 		 */
 		var normalizeEntityConfig = function( templateManager, arg1 ) {
@@ -169,10 +179,11 @@ define(
 			}
 		}
 
-		/*
+		/**
 		 * Normalizes the provided component config
 		 *
 		 * @param arg0 can be either a component id or a component config
+		 * @private
 		 * @return {*}
 		 */
 		var normalizeComponentConfig = function( arg0 ) {
@@ -284,19 +295,96 @@ define(
 
 		EntityManager.prototype = {
 			/**
-			 * Creates an entity
+			 * Creates an entity using the given configuration object.
 			 *
-			 * @param {*} arg0 an entity template id or an entity config
-			 * @return {*}
+			 * Available configuration options are:
+			 *
+			 * * **entityTemplateId** [String] - if the entity should be constructed using an entity template you can specify the library path to the entity template here
+			 * * **config** [Object] - component configuration for this entity. It can also be used to partially override an entity template config
+			 * * **children** [Array] - if this entity has children, an array of nested config objects can be specified here
+			 * * **id** [String] - if specified the entity will be created using this id. Please note: you should not use this function unless you know what you're doing. Normally the engine assigns entityIds automatically.
+			 * * **name** [String] - a name for this entity. If specified, you can use the {@link #getEntityIdsByName} function to lookup named entities to their entityIds
+			 *
+			 * Example usage:
+			 *
+			 *     //create a new entity with the given components
+			 *     var entityId = spell.EntityManager.createEntity({
+			 *         config: {
+			 *
+			 *             "spell.component.2d.transform": {
+			 *                 "translation": [ 100, 200 ]
+			 *             },
+			 *             "spell.component.visualObject": {
+			 *               //if no configuration is specified the default values of this component will be used
+			 *             },
+			 *             "spell.component.2d.graphics.appearance": {
+			 *                 "assetId": "appearance:library.identifier.of.my.static.appearance"
+			 *             }
+			 *         }
+			 *
+			 *     })
+			 *
+			 *     //create a new entity with child entities
+			 *     var entityId = spell.EntityManager.createEntity({
+			 *         "config": {
+			 *             "spell.component.2d.transform": {
+			 *                 "translation": [ 100, 200 ]
+			 *             },
+			 *             "spell.component.visualObject": {
+			 *               //if no configuration is specified the default values of this component will be used
+			 *             },
+			 *             "spell.component.2d.graphics.appearance": {
+			 *                 "assetId": "appearance:library.identifier.of.my.static.appearance"
+			 *             }
+			 *         },
+			 *         "children": [
+			 *             {
+			 *                 "config": {
+			 *                         "spell.component.2d.transform": {
+			 *                         "translation": [ -15, 20 ] //translation is relative to the parent
+			 *                     },
+			 *                     "spell.component.visualObject": {
+			 *                       //if no configuration is specified the default values of this component will be used
+			 *                     },
+			 *                     "spell.component.2d.graphics.appearance": {
+			 *                         "assetId": "appearance:library.identifier.of.my.other.static.appearance"
+			 *                     }
+			 *             }
+			 *         ]
+			 *
+			 *     })
+			 *
+			 *     //create a new entity from an entity template
+			 *     var entityId = spell.EntityManager.createEntity({
+			 *         entityTemplateId: 'library.identifier.of.my.template'
+			 *     })
+			 *
+			 *     //create a new entity from an entity template and override values from the template
+			 *     var entityId = spell.EntityManager.createEntity({
+			 *         entityTemplateId: 'library.identifier.of.my.template',
+			 *         config: {
+			 *             "spell.component.box2d.simpleBox": {
+			 *                 "dimensions": [ 100, 100 ]
+			 *              },
+			 *              "spell.component.2d.transform": {
+			 *                  "translation": [ 150, 50 ]
+			 *               }
+			 *         }
+			 *     })
+			 *
+			 * @param {Object} entityConfig an entity configuration object
+			 * @return {String} the entity id of the newly created entity
 			 */
-			createEntity : function( arg0 ) {
-				return createEntity( this.eventManager, this.componentDictionaries, this.templateManager, arg0 )
+			createEntity : function( entityConfig ) {
+				return createEntity( this.eventManager, this.componentDictionaries, this.templateManager, entityConfig )
 			},
 
 			/**
 			 * Creates entities from a list of entity configs.
 			 *
-			 * @param {Object} entityConfigs
+			 * See {@link #createEntity} function for a documentation of the entity config object.
+			 *
+			 * @param {Array} entityConfigs
 			 */
 			createEntities : function( entityConfigs ) {
 				var self = this
@@ -312,12 +400,12 @@ define(
 			/**
 			 * Removes an entity
 			 *
-			 * @param {String} id the id of the entity to remove
+			 * @param {String} entityId the id of the entity to remove
 			 */
-			removeEntity : function( id ) {
-				if( !id ) throw 'Error: Missing entity id.'
+			removeEntity : function( entityId ) {
+				if( !entityId ) throw 'Error: Missing entity id.'
 
-				removeComponents( this.eventManager, this.componentDictionaries, id )
+				removeComponents( this.eventManager, this.componentDictionaries, entityId )
 			},
 
 			/**
@@ -326,11 +414,11 @@ define(
 			 * NOTE: Do not use this function to frequently query large amounts of entities. In order to process entities frequently with better performance
 			 * define a system input that matches your requirements.
 			 *
-			 * @param {String} id the entity id
+			 * @param {String} entityId the entity id
 			 * @return {Object}
 			 */
-			getEntityById : function( id ) {
-				return assembleEntityInstance( this.componentDictionaries, id )
+			getEntityById : function( entityId ) {
+				return assembleEntityInstance( this.componentDictionaries, entityId )
 			},
 
 			/**
@@ -375,16 +463,33 @@ define(
 			/**
 			 * Adds a component to an entity.
 			 *
-			 * @param {String} id the id of the entity that the component belongs to
+			 * Available configuration options are:
+			 *
+			 * * **componentId** [String] - the library path of the component
+			 * * **config** [Object] - attribute configuration for this component. It can also be used to partially override the component's default values
+			 *
+			 * Example usage:
+			 *
+			 *     //add a component with it's default configuration to this entity
+			 *     spell.EntityManager.addComponent( entityId, "spell.component.2d.graphics.debug.box" )
+			 *
+			 *     //add a component to this entity and override a default value
+			 *     spell.EntityManager.addComponent( entityId, {
+			 *         "componentId": "spell.component.2d.graphics.textApperance",
+			 *         "config": {
+			 *             "text": "Hello World"
+			 *         }
+			 *     } )
+			 *
+			 * @param {String} entityId of the entity that the component belongs to
 			 * @param {*} arg1 can be a component template id or a component template config
-			 * @return {*}
 			 */
-			addComponent : function( id, arg1 ) {
-				if( !id ) throw 'Error: Missing entity id.'
+			addComponent : function( entityId, arg1 ) {
+				if( !entityId ) throw 'Error: Missing entity id.'
 
 				addComponents(
 					this.componentDictionaries,
-					id,
+					entityId,
 					this.templateManager.createComponents( null, normalizeComponentConfig( arg1 ) )
 				)
 			},
@@ -392,27 +497,27 @@ define(
 			/**
 			 * Removes a component from an entity.
 			 *
-			 * @param {String} id the id of the entity that the component belongs to
-			 * @param {String} componentId the id (template id) of the component to remove
+			 * @param {String} entityId the id of the entity that the component belongs to
+			 * @param {String} componentId the library path of the component to remove
 			 * @return {*}
 			 */
-			removeComponent : function( id, componentId ) {
-				if( !id ) throw 'Error: Missing entity id.'
+			removeComponent : function( entityId, componentId ) {
+				if( !entityId ) throw 'Error: Missing entity id.'
 
-				removeComponents( this.eventManager, this.componentDictionaries, id, componentId )
+				removeComponents( this.eventManager, this.componentDictionaries, entityId, componentId )
 			},
 
 			/**
 			 * Returns a component from a specific entity.
 			 *
 			 * @param {String} componentId the requested component id
-			 * @param {String} id the id of the requested entity
+			 * @param {String} entityId the id of the requested entity
 			 * @return {Object}
 			 */
-			getComponentById : function( componentId, id ) {
+			getComponentById : function( componentId, entityId ) {
 				var componentDictionary = this.componentDictionaries[ componentId ]
 
-				return componentDictionary ? componentDictionary[ id ] : undefined
+				return componentDictionary ? componentDictionary[ entityId ] : undefined
 			},
 
 			/**
@@ -437,6 +542,17 @@ define(
 
 			/**
 			 * Updates the attributes of a component. Returns true when successful, false otherwise.
+			 *
+			 * Example usage:
+			 *     //update a component of an entity
+			 *     spell.updateComponent(
+			 *         "spell.component.2d.graphics.apperance",
+			 *         entityId,
+			 *         {
+			 *             "assetId": "appearance:library.identifier.of.my.static.appearance"
+			 *         }
+			 *
+			 *     )
 			 *
 			 * @param {String} componentId the component id of the component
 			 * @param {String} entityId the id of the entity which the component belongs to
