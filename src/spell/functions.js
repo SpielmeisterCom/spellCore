@@ -1,4 +1,6 @@
 /*
+ * This class is derived from the library "Underscore" which original license follows:
+ *
  * Licence Notice Underscore.js 1.3.3:
  *
  * Copyright (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
