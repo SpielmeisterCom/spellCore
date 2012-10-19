@@ -2,6 +2,17 @@ This software makes use of third party libraries which come with their own licen
 All files that are not governed by our own licence agreement are explicitly listed in this file
 with their corresponding licenses.
 
+= SWFObject =
+
+Affected files:
+
+    * vendor/swfobject.js
+
+License:
+/*!	SWFObject v2.2 <http://code.google.com/p/swfobject/>
+	is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
+*/
+
 = Box2D =
 
 Affected files:
