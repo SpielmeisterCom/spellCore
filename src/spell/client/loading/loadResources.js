@@ -24,7 +24,7 @@ define(
 		var createSendLoadingProgress = function( sendMessageToEditor ) {
 			if( !sendMessageToEditor ) return function() {}
 
-			var numLoadingSteps    = 3,
+			var numLoadingSteps    = 2,
 				invNumLoadingSteps = 1 / numLoadingSteps,
 				loadingStep        = 0
 
@@ -33,7 +33,7 @@ define(
 			}
 		}
 
-		var resourceIdsToJsonFilenames = function( resourceIds ) {
+		var libraryIdsToJsonFilenames = function( resourceIds ) {
 			return _.map(
 				resourceIds,
 				function( resourceId ) {
@@ -51,6 +51,10 @@ define(
 			)
 		}
 
+		var isAsset = function( libraryRecord ) {
+			return libraryRecord.type === 'asset'
+		}
+
 
 		return function( spell, sendMessageToEditor, next ) {
 			var eventManager     = spell.eventManager,
@@ -60,42 +64,26 @@ define(
 				runtimeModule    = spell.runtimeModule,
 				templateManager  = spell.templateManager
 
-			var templateBundleName = 'templates',
-				assetBundleName    = 'assets',
+			var libraryBundleName  = 'library',
 				resourceBundleName = 'resources'
 
 			var sendLoadingProgress = createSendLoadingProgress( sendMessageToEditor )
 
 			eventManager.waitFor(
-				[ Events.RESOURCE_LOADING_COMPLETED, assetBundleName ],
-				function( loadedAssets ) {
-					addNamespaceAndName( loadedAssets )
+				[ Events.RESOURCE_LOADING_COMPLETED, libraryBundleName ],
+				function( loadedLibrary ) {
+					addNamespaceAndName( loadedLibrary )
+
+					var loadedAssets     = _.filter( loadedLibrary, isAsset ),
+						loadedOtherStuff = _.reject( loadedLibrary, isAsset )
 
 					_.extend( spell.assets, createAssets( loadedAssets ) )
 
-					// start loading template definition files
-					resourceLoader.load(
-						resourceIdsToJsonFilenames( runtimeModule.templateIds ),
-						templateBundleName
-					)
+					resourceLoader.load( createFilesToLoad( loadedAssets ), resourceBundleName )
 
-					// start loading resources
-					resourceLoader.load(
-						createFilesToLoad( loadedAssets ),
-						resourceBundleName
-					)
-
-					sendLoadingProgress()
-				}
-
-			).and(
-				[ Events.RESOURCE_LOADING_COMPLETED, templateBundleName ],
-				function( loadedTemplates ) {
-					addNamespaceAndName( loadedTemplates )
-
-					// separate templates according to type
-					var templates = _.reduce(
-						loadedTemplates,
+					// separate the other stuff according to type
+					var otherStuff = _.reduce(
+						loadedOtherStuff,
 						function( memo, value, key ) {
 							var type = value.type
 
@@ -111,9 +99,9 @@ define(
 						{}
 					)
 
-					addTemplates( templateManager, templates.component )
-					addTemplates( templateManager, templates.entityTemplate )
-					addTemplates( templateManager, templates.system )
+					addTemplates( templateManager, otherStuff.component )
+					addTemplates( templateManager, otherStuff.entityTemplate )
+					addTemplates( templateManager, otherStuff.system )
 
 					sendLoadingProgress()
 				}
@@ -135,10 +123,10 @@ define(
 				next()
 			} )
 
-			// start loading asset definition files
+			// start loading library definition files
 			resourceLoader.load(
-				resourceIdsToJsonFilenames( runtimeModule.assetIds ),
-				assetBundleName
+				libraryIdsToJsonFilenames( runtimeModule.libraryIds ),
+				libraryBundleName
 			)
 		}
 	}
