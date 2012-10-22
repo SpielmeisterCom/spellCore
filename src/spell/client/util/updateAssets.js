@@ -1,5 +1,5 @@
 define(
-	'spell/client/util/createAssets',
+	'spell/client/util/updateAssets',
 	[
 		'spell/shared/util/createAssetId',
 		'spell/shared/util/createLibraryFilePath',
@@ -37,13 +37,14 @@ define(
 			var frameWidth  = spriteSheetAsset.config.frameWidth,
 				frameHeight = spriteSheetAsset.config.frameHeight,
 				numX        = Math.floor( spriteSheetAsset.config.textureWidth / frameWidth ),
-				numY        = Math.floor( spriteSheetAsset.config.textureHeight / frameHeight),
+				numY        = Math.floor( spriteSheetAsset.config.textureHeight / frameHeight ),
 				numFrames   = numX * numY
 
-			//create a lookup table to lookup the subtextures
-			var frameOffsets = [];
-			for (var i=0; i < numFrames; i++) {
-				frameOffsets[i] = createFrameOffset( frameWidth, frameHeight, numX, numY, i )
+			// create a lookup table to lookup the subtextures
+			var frameOffsets = []
+
+			for( var i = 0; i < numFrames; i++ ) {
+				frameOffsets[ i ] = createFrameOffset( frameWidth, frameHeight, numX, numY, i )
 			}
 
 			return {
@@ -55,7 +56,6 @@ define(
 				frameOffsets        : frameOffsets
 			}
 		}
-
 
 		var createAnimationAsset = function( assets, asset ) {
 			var spriteSheetAssetId = asset.assetId,
@@ -141,11 +141,11 @@ define(
 		 * public
 		 */
 
-		return function( assetDefinitions ) {
+		return function( assets, newAssetDefinitions ) {
 			// in a first pass all assets which do not depend on other assets are created
-			var assets = _.reduce(
-				assetDefinitions,
-				function( memo, assetDefinition, resourceName ) {
+			_.each(
+				newAssetDefinitions,
+				function( assetDefinition ) {
 					var asset,
 						type = assetDefinition.subtype
 
@@ -171,29 +171,23 @@ define(
 
 					addResourceId( asset, assetDefinition )
 
-					memo[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = asset
-
-					return memo
-				},
-				{}
+					assets[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = asset
+				}
 			)
 
 			// in a second pass all assets that reference other assets are created
-			return _.reduce(
-				assetDefinitions,
-				function( memo, assetDefinition, resourceName ) {
+			_.each(
+				newAssetDefinitions,
+				function( assetDefinition ) {
 					var type = assetDefinition.subtype
 
 					if( type === 'animation' ) {
-						memo[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = createAnimationAsset( memo, assetDefinition )
+						assets[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = createAnimationAsset( assets, assetDefinition )
 
 					} else if ( type === '2dTileMap') {
-						memo[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = createTilemapAsset( memo, assetDefinition )
+						assets[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = createTilemapAsset( assets, assetDefinition )
 					}
-
-					return memo
-				},
-				assets
+				}
 			)
 		}
 	}

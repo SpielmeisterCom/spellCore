@@ -4,7 +4,7 @@ define(
 		'spell/client/loading/addNamespaceAndName',
 		'spell/client/loading/createFilesToLoad',
 		'spell/client/loading/injectResource',
-		'spell/client/util/createAssets',
+		'spell/client/util/updateAssets',
 		'spell/shared/util/createAssetId',
 		'spell/shared/util/createId',
 		'spell/shared/util/createLibraryFilePath',
@@ -16,7 +16,7 @@ define(
 		addNamespaceAndName,
 		createFilesToLoad,
 		injectResource,
-		createAssets,
+		updateAssets,
 		createAssetId,
 		createId,
 		createLibraryFilePath,
@@ -45,25 +45,28 @@ define(
 			loadedAssets[ libraryFilePath ] = definition
 			addNamespaceAndName( loadedAssets )
 
-			_.extend( spell.assets, createAssets( loadedAssets ) )
+			updateAssets( spell.assets, loadedAssets )
 
 			var asset = spell.assets[ assetId ]
 
 			if( asset.resourceId ) {
-				// when an asset references an external resource trigger loading it
-				var resourceBundleId = libraryFilePath
+				var filesToLoad = createFilesToLoad( loadedAssets )
 
-				spell.resourceLoader.load(
-					createFilesToLoad( loadedAssets ),
-					{
-						omitCache          : true,
-						onLoadingCompleted : _.bind( updateResourcesAndAssets, null, spell, assetId, asset )
-					}
-				)
+				if( filesToLoad.length > 0 ) {
+					// when an asset references an external resource trigger loading it
+					var resourceBundleId = libraryFilePath
 
-			} else {
-				updateResourcesAndAssets( spell, assetId, asset )
+					spell.resourceLoader.load(
+						filesToLoad,
+						{
+							omitCache          : true,
+							onLoadingCompleted : _.bind( updateResourcesAndAssets, null, spell, assetId, asset )
+						}
+					)
+				}
 			}
+
+			updateResourcesAndAssets( spell, assetId, asset )
 		}
 	}
 )

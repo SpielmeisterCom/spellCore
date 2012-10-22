@@ -1,7 +1,7 @@
 define(
 	'spell/client/loading/loadResources',
 	[
-		'spell/client/util/createAssets',
+		'spell/client/util/updateAssets',
 		'spell/client/loading/addNamespaceAndName',
 		'spell/client/loading/createFilesToLoad',
 		'spell/client/loading/injectResource',
@@ -11,7 +11,7 @@ define(
 		'spell/functions'
 	],
 	function(
-		createAssets,
+		updateAssets,
 		addNamespaceAndName,
 		createFilesToLoad,
 		injectResource,
@@ -107,7 +107,7 @@ define(
 
 					_.extend( spell.scenes, addIdAsKey( library.scene ) )
 
-					_.extend( spell.assets, createAssets( library.asset ) )
+					updateAssets( spell.assets, library.asset )
 					resourceLoader.load( createFilesToLoad( library.asset ), resourceBundleName )
 
 					addTemplates( templateManager, library.component )
