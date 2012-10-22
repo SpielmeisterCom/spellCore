@@ -24,11 +24,12 @@ define(
 		var createSendLoadingProgress = function( sendMessageToEditor ) {
 			if( !sendMessageToEditor ) return function() {}
 
-			var numLoadingSteps = 3,
-				loadingStep     = 0
+			var numLoadingSteps    = 3,
+				invNumLoadingSteps = 1 / numLoadingSteps,
+				loadingStep        = 0
 
 			return function() {
-				sendMessageToEditor( 'spell.loadingProgress', loadingStep++ / numLoadingSteps )
+				sendMessageToEditor( 'spell.loadingProgress', ( loadingStep++ * invNumLoadingSteps) )
 			}
 		}
 
