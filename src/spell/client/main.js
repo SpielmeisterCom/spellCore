@@ -62,12 +62,7 @@ define(
 			spell.logger.debug( 'created rendering context (' + renderingContextConfig.type + ')' )
 
 
-			var sceneConfig = _.find(
-				spell.runtimeModule.scenes,
-				function( iter ) {
-					return iter.name === spell.runtimeModule.startScene
-				}
-			)
+			var sceneConfig = spell.scenes[ spell.runtimeModule.startScene ]
 
 			if( !sceneConfig ) throw 'Error: Could not find start scene \'' + spell.runtimeModule.startScene + '\'.'
 
@@ -126,6 +121,7 @@ define(
 		var init = function( loaderConfig ) {
 			var spell             = {},
 				assets            = {},
+				scenes            = {},
 				logger            = new Logger(),
 				eventManager      = new EventManager(),
 				soundManager      = PlatformKit.createSoundManager(),
@@ -145,6 +141,7 @@ define(
 					mainLoop             : mainLoop,
 					runtimeModule        : undefined,
 					soundManager         : soundManager,
+					scenes               : scenes,
 					statisticsManager    : statisticsManager,
 					templateManager      : templateManager
 				}

@@ -117,7 +117,7 @@ define(
 		}
 
 		var createProjectConfig = function( projectConfigRaw, anonymizeModuleIds ) {
-			var result = _.pick( projectConfigRaw, 'name', 'startScene', 'templateIds', 'assetIds', 'config' )
+			var result = _.pick( projectConfigRaw, 'name', 'startScene', 'libraryIds', 'config' )
 
 			result.scenes = createSceneList( projectConfigRaw.scenes, anonymizeModuleIds )
 
@@ -140,7 +140,6 @@ define(
 					return {
 						entities : scene.entities,
 						name     : scene.name,
-						scriptId : anonymizeModuleIds ? hashModuleId( createModuleId( scene.scriptId ) ) : scene.scriptId,
 						systems  : scene.systems
 					}
 				}
@@ -198,11 +197,11 @@ define(
 			)
 		}
 
-		var loadSystemScriptModules = function( projectLibraryPath, systems ) {
+		var loadAssociatedScriptModules = function( projectLibraryPath, libraryRecords ) {
 			return _.reduce(
-				systems,
-				function( memo, system ) {
-					var id             = createIdFromLibraryFilePath( system.filePath ),
+				libraryRecords,
+				function( memo, libraryRecord ) {
+					var id             = createIdFromLibraryFilePath( libraryRecord.filePath ),
 						moduleId       = createModuleId( id ),
 						moduleFilePath = path.join( projectLibraryPath, moduleId + '.js' ),
 						module         = amdHelper.loadModule( moduleFilePath )
@@ -270,7 +269,8 @@ define(
 
 			scriptModules = _.extend(
 				scriptModules,
-				loadSystemScriptModules( projectLibraryPath, library.system )
+				loadAssociatedScriptModules( projectLibraryPath, library.scene ),
+				loadAssociatedScriptModules( projectLibraryPath, library.system )
 			)
 
 			// generate script source
@@ -287,6 +287,7 @@ define(
 					'asset',
 					'component',
 					'entityTemplate',
+					'scene',
 					'system'
 				)
 			)

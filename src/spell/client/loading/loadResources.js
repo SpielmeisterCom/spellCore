@@ -5,6 +5,7 @@ define(
 		'spell/client/loading/addNamespaceAndName',
 		'spell/client/loading/createFilesToLoad',
 		'spell/client/loading/injectResource',
+		'spell/shared/util/createId',
 		'spell/shared/util/Events',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/functions'
@@ -14,6 +15,7 @@ define(
 		addNamespaceAndName,
 		createFilesToLoad,
 		injectResource,
+		createId,
 		Events,
 		PlatformKit,
 		_
@@ -51,8 +53,35 @@ define(
 			)
 		}
 
-		var isAsset = function( libraryRecord ) {
-			return libraryRecord.type === 'asset'
+		var groupByType = function( libraryRecords ) {
+			return _.reduce(
+				libraryRecords,
+				function( memo, value, key ) {
+					var type = value.type
+
+					if( memo[ type ] ) {
+						memo[ type ].push( value )
+
+					} else {
+						memo[ type ] = [ value ]
+					}
+
+					return memo
+				},
+				{}
+			)
+		}
+
+		var addIdAsKey = function( libraryRecords ) {
+			return _.reduce(
+				libraryRecords,
+				function( memo, libraryRecord ) {
+					memo[ createId( libraryRecord.namespace, libraryRecord.name ) ] = libraryRecord
+
+					return memo
+				},
+				{}
+			)
 		}
 
 
@@ -74,34 +103,16 @@ define(
 				function( loadedLibrary ) {
 					addNamespaceAndName( loadedLibrary )
 
-					var loadedAssets     = _.filter( loadedLibrary, isAsset ),
-						loadedOtherStuff = _.reject( loadedLibrary, isAsset )
+					var library = groupByType( loadedLibrary )
 
-					_.extend( spell.assets, createAssets( loadedAssets ) )
+					_.extend( spell.scenes, addIdAsKey( library.scene ) )
 
-					resourceLoader.load( createFilesToLoad( loadedAssets ), resourceBundleName )
+					_.extend( spell.assets, createAssets( library.asset ) )
+					resourceLoader.load( createFilesToLoad( library.asset ), resourceBundleName )
 
-					// separate the other stuff according to type
-					var otherStuff = _.reduce(
-						loadedOtherStuff,
-						function( memo, value, key ) {
-							var type = value.type
-
-							if( memo[ type ] ) {
-								memo[ type ].push( value )
-
-							} else {
-								memo[ type ] = [ value ]
-							}
-
-							return memo
-						},
-						{}
-					)
-
-					addTemplates( templateManager, otherStuff.component )
-					addTemplates( templateManager, otherStuff.entityTemplate )
-					addTemplates( templateManager, otherStuff.system )
+					addTemplates( templateManager, library.component )
+					addTemplates( templateManager, library.entityTemplate )
+					addTemplates( templateManager, library.system )
 
 					sendLoadingProgress()
 				}

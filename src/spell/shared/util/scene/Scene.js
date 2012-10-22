@@ -169,14 +169,14 @@ define(
 					invoke( this.updateSystems, 'activate', [ this.spell, sceneConfig ] )
 				}
 
-				if( sceneConfig.scriptId ) {
-					this.script = loadModule(
-						anonymizeModuleIds ? sceneConfig.scriptId : createModuleId( sceneConfig.scriptId ),
-						anonymizeModuleIds
-					)
+				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
 
-					this.script.init( this.spell, sceneConfig )
-				}
+				this.script = loadModule(
+					anonymizeModuleIds ? hashModuleId( moduleId ) : moduleId,
+					anonymizeModuleIds
+				)
+
+				this.script.init( this.spell, sceneConfig )
 			},
 			destroy: function( sceneConfig ) {
 				invoke( this.renderSystems, 'deactivate', [ this.spell, sceneConfig ] )
