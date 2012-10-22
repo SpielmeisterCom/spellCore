@@ -129,6 +129,10 @@ define(
 			return !!_.find(
 				attributeConfig,
 				function( attribute ) {
+					var type = attribute.type
+
+					if( !_.isString( type ) ) return false
+
 					return attribute.type.indexOf( 'assetId:' ) === 0
 				}
 			)

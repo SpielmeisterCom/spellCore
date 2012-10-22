@@ -28,7 +28,10 @@
 		},
 		{
 			"name": "type",
-			"type": "string",
+			"type": {
+				"name": "enum",
+				"values": [ "dynamic", "static" ]
+			},
 			"default": "dynamic"
 		},
 		{
