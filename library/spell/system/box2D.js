@@ -238,7 +238,7 @@ define(
 				var velocity        = applyVelocities[ id ]
 
 				if ( velocity ) {
-					body.setLinearVelocity( new b2Vec2( velocity.velocity[0], velocity.velocity[1] ) )
+					body.SetLinearVelocity( new b2Vec2( velocity.velocity[0], velocity.velocity[1] ) )
 
 					entityManager.removeComponent( id, 'spell.component.box2d.applyVelocity' )
 				}
