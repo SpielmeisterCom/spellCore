@@ -175,7 +175,7 @@ define(
 			}
 		}
 
-		var applyInfluence = function( entityManager, world, applyForces, applyTorques, applyImpulses ) {
+		var applyInfluence = function( entityManager, world, applyForces, applyTorques, applyImpulses, applyVelocities ) {
 			for( var body = world.GetBodyList(); body; body = body.m_next ) {
 				var id = body.GetUserData()
 
@@ -234,6 +234,15 @@ define(
 					}
 				}
 
+				// spell.component.box2d.applyVelocity
+				var velocity        = applyVelocities[ id ]
+
+				if ( velocity ) {
+					body.setLinearVelocity( new b2Vec2( velocity.velocity[0], velocity.velocity[1] ) )
+
+					entityManager.removeComponent( id, 'spell.component.box2d.applyVelocity' )
+				}
+
 				// check max velocity constraint
 				var velocityVec2 = body.GetLinearVelocity(),
 					velocity = velocityVec2.Length()
@@ -258,7 +267,7 @@ define(
 				removedEntities.length = 0
 			}
 
-			applyInfluence( spell.EntityManager, world, this.applyForces, this.applyTorques, this.applyImpulses )
+			applyInfluence( spell.EntityManager, world, this.applyForces, this.applyTorques, this.applyImpulses, this.applyVelocities )
 			simulate( world, deltaTimeInMs )
 			transferState( world, transforms )
 

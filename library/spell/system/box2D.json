@@ -18,6 +18,10 @@
 			"name": "applyImpulses",
 			"componentId": "spell.component.box2d.applyImpulse"
 		},
+        {
+            "name": "applyVelocities",
+            "componentId": "spell.component.box2d.applyVelocity"
+        },
 		{
 			"name": "simpleBoxes",
 			"componentId": "spell.component.box2d.simpleBox"
