@@ -30,7 +30,7 @@ define(
 
 		var awakeColor      = [ 0.82, 0.76, 0.07 ],
 			notAwakeColor   = [ 0.27, 0.25, 0.02 ],
-			scaleFactor     = 100,
+			scaleFactor     = 1,
 			maxVelocity     = 10
 
 		var isSphereShape = function( bodyDef ) {
