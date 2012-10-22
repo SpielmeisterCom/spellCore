@@ -29,7 +29,8 @@ define(
 			b2CircleShape  = Box2D.Collision.Shapes.b2CircleShape
 
 		var awakeColor      = [ 0.82, 0.76, 0.07 ],
-			notAwakeColor   = [ 0.27, 0.25, 0.02 ]
+			notAwakeColor   = [ 0.27, 0.25, 0.02 ],
+			scaleFactor     = 1
 
 		var isSphereShape = function( bodyDef ) {
 			return !!bodyDef.radius
@@ -125,7 +126,7 @@ define(
 
 			} else {
 				b2fixtureDef.shape = new b2PolygonShape
-				b2fixtureDef.shape.SetAsBox( simpleBoxOrSphere.dimensions[ 0 ] / 2, simpleBoxOrSphere.dimensions[ 1 ] / 2 )
+				b2fixtureDef.shape.SetAsBox( simpleBoxOrSphere.dimensions[ 0 ] / scaleFactor / 2, simpleBoxOrSphere.dimensions[ 1 ] / scaleFactor / 2 )
 			}
 
 			// body
@@ -134,8 +135,8 @@ define(
 
 			b2bodyDef.fixedRotation = simpleBoxOrSphere.fixedRotation
 			b2bodyDef.type          = simpleBoxOrSphere.type === 'dynamic' ? b2Body.b2_dynamicBody : b2Body.b2_staticBody
-			b2bodyDef.position.x    = translation[ 0 ]
-			b2bodyDef.position.y    = translation[ 1 ]
+			b2bodyDef.position.x    = translation[ 0 ] / scaleFactor
+			b2bodyDef.position.y    = translation[ 1 ] / scaleFactor
 			b2bodyDef.userData      = entityId
 
 			world.CreateBody( b2bodyDef ).CreateFixture( b2fixtureDef )
@@ -155,8 +156,8 @@ define(
 				var position  = body.GetPosition(),
 					transform = transforms[ id ]
 
-				transform.translation[ 0 ] = position.x
-				transform.translation[ 1 ] = position.y
+				transform.translation[ 0 ] = position.x * scaleFactor
+				transform.translation[ 1 ] = position.y * scaleFactor
 				transform.rotation = body.GetAngle() * -1
 			}
 		}
