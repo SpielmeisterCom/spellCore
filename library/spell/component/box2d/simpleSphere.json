@@ -30,6 +30,11 @@
 			"name": "type",
 			"type": "string",
 			"default": "dynamic"
+		},
+		{
+			"name": "fixedRotation",
+			"type": "boolean",
+			"default": false
 		}
 	]
 }
