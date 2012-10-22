@@ -104,6 +104,10 @@ define(
 				// remove a single component from the entity
 				delete componentDictionaries[ entityComponentId ][ entityId ]
 
+				if( !entityExists( componentDictionaries, entityId ) ) {
+					eventManager.publish( Events.ENTITY_DESTROYED, entityId )
+				}
+
 			} else {
 				// remove all componentDictionaries, that is "remove the entity"
 				_.each(
@@ -114,9 +118,7 @@ define(
 						delete componentDictionary[ entityId ]
 					}
 				)
-			}
 
-			if( !entityExists( componentDictionaries, entityId ) ) {
 				eventManager.publish( Events.ENTITY_DESTROYED, entityId )
 			}
 		}
