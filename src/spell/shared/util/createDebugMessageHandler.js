@@ -1,6 +1,8 @@
 define(
 	'spell/shared/util/createDebugMessageHandler',
 	[
+		'spell/shared/util/createCacheContent',
+		'spell/shared/util/createLibraryFilePathFromId',
 		'spell/shared/util/createId',
 		'spell/shared/util/development/updateAsset',
 		'spell/shared/util/development/updateScript',
@@ -11,6 +13,8 @@ define(
 		'spell/functions'
 	],
 	function(
+		createCacheContent,
+		createLibraryFilePathFromId,
 		createId,
 		updateAsset,
 		updateScript,
@@ -31,9 +35,21 @@ define(
 			configurationManager.debug[ name ] = value
 		}
 
-		var executeRuntimeModule = function( startEngine, spell, payload ) {
-			spell.runtimeModule = payload
-			startEngine( payload )
+		var startRuntimeModule = function( startEngine, spell, payload ) {
+			spell.runtimeModule = payload.runtimeModule
+
+			/*
+			 * The scene provided by the editor includes synchronization metadata. In order to preserve this data and to force the engine to use this version
+			 * of the scene, it gets injected into the cache to prevent loading of the "vanilla" version from storage.
+			 */
+			var scene = payload.scene
+
+			var cacheContent = createCacheContent( {
+				content : payload.scene,
+				filePath : createLibraryFilePathFromId( createId( scene.namespace, scene.name ) )
+			} )
+
+			startEngine( payload.runtimeModule, cacheContent )
 		}
 
 		var updateComponent = function( spell, payload ) {
@@ -60,7 +76,7 @@ define(
 
 		return function( spell, startEngine ) {
 			var messageTypeToHandler = {
-				'spelled.debug.executeRuntimeModule'      : _.bind( executeRuntimeModule, null, startEngine ),
+				'spelled.debug.startRuntimeModule'        : _.bind( startRuntimeModule, null, startEngine ),
 				'spelled.debug.drawCoordinateGrid'        : drawCoordinateGrid,
 				'spelled.debug.drawTitleSafeOutline'      : drawTitleSafeOutline,
 				'spelled.debug.simulateScreenAspectRatio' : simulateScreenAspectRatio,

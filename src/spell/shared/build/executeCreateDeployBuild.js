@@ -8,6 +8,7 @@ define(
 		'spell/shared/build/isFile',
 		'spell/shared/build/executable/buildHtml5',
 		'spell/shared/build/executable/buildFlash',
+		'spell/shared/util/createCacheContent',
 		'spell/shared/util/createIdFromLibraryFilePath',
 		'spell/shared/util/hashModuleId',
 		'spell/shared/util/template/TemplateTypes',
@@ -26,6 +27,7 @@ define(
 		isFile,
 		buildHtml5,
 		buildFlash,
+		createCacheContent,
 		createIdFromLibraryFilePath,
 		hashModuleId,
 		TemplateTypes,
@@ -216,33 +218,6 @@ define(
 			)
 		}
 
-		var createCacheContent = function( library ) {
-			var resources = _.reduce(
-				library,
-				function( memo, contentByType ) {
-					return memo.concat( contentByType )
-				},
-				[]
-			)
-
-			return _.reduce(
-				resources,
-				function( memo, resource ) {
-					var content  = resource.content,
-						filePath = resource.filePath
-
-					if( _.has( memo, filePath ) ) {
-						throw 'Error: Resource path duplication detected. Could not build.'
-					}
-
-					memo[ filePath ] = content
-
-					return memo
-				},
-				{}
-			)
-		}
-
 
 		return function( target, spellCorePath, projectPath, projectFilePath, minify, anonymizeModuleIds, debug, callback ) {
 			var errors             = [],
@@ -282,13 +257,16 @@ define(
 
 			// generate cache content
 			var cacheContent = createCacheContent(
-				_.pick(
-					library,
-					'asset',
-					'component',
-					'entityTemplate',
-					'scene',
-					'system'
+				_.flatten(
+					_.pick(
+						library,
+						'asset',
+						'component',
+						'entityTemplate',
+						'scene',
+						'system'
+					),
+					true
 				)
 			)
 

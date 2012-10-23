@@ -72,7 +72,7 @@ define(
 			spell.mainLoop.run()
 		}
 
-		var start = function( runtimeModule, cachedContent ) {
+		var start = function( runtimeModule, cacheContent ) {
 			var spell = this.spell
 			spell.runtimeModule = runtimeModule
 
@@ -97,7 +97,7 @@ define(
 
 			var resourceLoader = new ResourceLoader( spell, spell.eventManager, renderingContext, configurationManager.resourceServer )
 
-			if( cachedContent ) resourceLoader.setCache( cachedContent )
+			if( cacheContent ) resourceLoader.setCache( cacheContent )
 
 			_.extend(
 				spell,
