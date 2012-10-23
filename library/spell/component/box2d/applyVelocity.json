@@ -6,10 +6,10 @@
 	"doc": "",
 	"icon": "",
 	"attributes": [
-	{
-		"name": "velocity",
-		"type": "vec2",
-		"default": [ 0, 0 ]
-	}
+		{
+			"name": "velocity",
+			"type": "vec2",
+			"default": [ 0, 0 ]
+		}
 	]
 }

@@ -245,15 +245,13 @@ define(
 
 				// check max velocity constraint
 				var velocityVec2 = body.GetLinearVelocity(),
-					velocity = velocityVec2.Length()
+					velocity     = velocityVec2.Length()
 
-				if ( velocity > 0 && velocity >  maxVelocity ) {
-					velocityVec2.x = (maxVelocity / velocity) * velocityVec2.x
-					velocityVec2.y = (maxVelocity / velocity) * velocityVec2.y
-					body.SetLinearVelocity( velocityVec2 );
+				if( velocity > 0 && velocity >  maxVelocity ) {
+					velocityVec2.x = maxVelocity / velocity * velocityVec2.x
+					velocityVec2.y = maxVelocity / velocity * velocityVec2.y
+					body.SetLinearVelocity( velocityVec2 )
 				}
-
-
 			}
 		}
 
