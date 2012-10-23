@@ -102,8 +102,10 @@
 					'../project.json',
 					function( request ) {
 						sendMessageToEditor(
-							'spelled.debug.executeRuntimeModule',
-							JSON.parse( request.response || request.responseText )
+							'spelled.debug.startRuntimeModule',
+							{
+								runtimeModule : JSON.parse( request.response || request.responseText )
+							}
 						)
 					}
 				)

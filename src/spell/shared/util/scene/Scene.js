@@ -7,6 +7,7 @@ define(
 		'spell/shared/util/entityConfig/flatten',
 		'spell/shared/util/hashModuleId',
 		'spell/shared/util/Events',
+		'spell/shared/util/OrderedMap',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'
@@ -18,6 +19,7 @@ define(
 		flattenEntityConfig,
 		hashModuleId,
 		Events,
+		OrderedMap,
 		PlatformKit,
 
 		_
@@ -52,20 +54,19 @@ define(
 		 * TODO: Remove this custom invoke that knows how to handle the borked instances produced by the "create" constructor wrapper function.
 		 * Instances created by "create" for some unknown reason do not support prototype chain method look-up. See "Fix create"
 		 */
-		var invoke = function( items, functionName, args ) {
-			_.each(
-				items,
-				function( item ) {
-					item.prototype[ functionName ].apply( item, args )
-				}
-			)
+		var invoke = function( orderedMap, functionName, args ) {
+			for( var i = 0, size = orderedMap.size(); i < size; i++ ) {
+				var system = orderedMap.getByIndex( i )
+
+				system.prototype[ functionName ].apply( system, args )
+			}
 		}
 
 		var createTemplateId = function( namespace, name ) {
 			return namespace + '.' + name
 		}
 
-		var createSystem = function( spell, EntityManager, system, anonymizeModuleIds ) {
+		var createSystem = function( spell, entityManager, system, anonymizeModuleIds ) {
 			var moduleId = createModuleId( createId( system.namespace, system.name ) )
 
 			var constructor = loadModule(
@@ -76,7 +77,7 @@ define(
 			var componentsInput = _.reduce(
 				system.input,
 				function( memo, inputDefinition ) {
-					var componentDictionary = EntityManager.getComponentDictionaryById( inputDefinition.componentId )
+					var componentDictionary = entityManager.getComponentDictionaryById( inputDefinition.componentId )
 
 					if( !componentDictionary ) {
 						throw 'Error: No component list for component template id \'' + inputDefinition.componentId +  '\' available.'
@@ -93,18 +94,16 @@ define(
 			return create( constructor, [ spell ], componentsInput )
 		}
 
-		var createSystems = function( spell, systemIds, anonymizeModuleIds ) {
-			var templateManager = spell.templateManager,
-				EntityManager   = spell.EntityManager
-
+		var createSystems = function( spell, entityManager, templateManager, systemIds, anonymizeModuleIds ) {
 			return _.reduce(
 				systemIds,
 				function( memo, systemId ) {
-					memo[ systemId ] = createSystem( spell, EntityManager, templateManager.getTemplate( systemId ), anonymizeModuleIds )
-
-					return memo
+					return memo.add(
+						systemId,
+						createSystem( spell, entityManager, templateManager.getTemplate( systemId ), anonymizeModuleIds )
+					)
 				},
-				{}
+				new OrderedMap()
 			)
 		}
 
@@ -132,9 +131,9 @@ define(
 		 * public
 		 */
 
-		var Scene = function( spell, EntityManager, templateManager, anonymizeModuleIds ) {
+		var Scene = function( spell, entityManager, templateManager, anonymizeModuleIds ) {
 			this.spell              = spell
-			this.EntityManager      = EntityManager
+			this.entityManager      = entityManager
 			this.templateManager    = templateManager
 			this.anonymizeModuleIds = anonymizeModuleIds
 			this.renderSystems      = null
@@ -159,14 +158,18 @@ define(
 				var anonymizeModuleIds = this.anonymizeModuleIds
 
 				if( sceneConfig.systems ) {
-					this.renderSystems = createSystems( this.spell, sceneConfig.systems.render, anonymizeModuleIds )
-					this.updateSystems = createSystems( this.spell, sceneConfig.systems.update, anonymizeModuleIds )
+					var spell           = this.spell,
+						entityManager   = this.entityManager,
+						templateManager = this.templateManager
 
-					invoke( this.renderSystems, 'init', [ this.spell, sceneConfig ] )
-					invoke( this.updateSystems, 'init', [ this.spell, sceneConfig ] )
+					this.renderSystems = createSystems( spell, entityManager, templateManager, sceneConfig.systems.render, anonymizeModuleIds )
+					this.updateSystems = createSystems( spell, entityManager, templateManager, sceneConfig.systems.update, anonymizeModuleIds )
 
-					invoke( this.renderSystems, 'activate', [ this.spell, sceneConfig ] )
-					invoke( this.updateSystems, 'activate', [ this.spell, sceneConfig ] )
+					invoke( this.renderSystems, 'init', [ spell, sceneConfig ] )
+					invoke( this.updateSystems, 'init', [ spell, sceneConfig ] )
+
+					invoke( this.renderSystems, 'activate', [ spell, sceneConfig ] )
+					invoke( this.updateSystems, 'activate', [ spell, sceneConfig ] )
 				}
 
 				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
@@ -191,7 +194,7 @@ define(
 				var renderSystems = this.renderSystems,
 					updateSystems = this.updateSystems
 
-				var systemsGroup = ( renderSystems[ systemId ] ?
+				var systemGroup = ( renderSystems[ systemId ] ?
 					renderSystems :
 					( updateSystems[ systemId ] ?
 						updateSystems :
@@ -199,21 +202,27 @@ define(
 					)
 				)
 
-				if( !systemsGroup ) return
+				if( !systemGroup ) return
 
-				systemsGroup[ systemId ].prototype.deactivate( this.spell )
-				systemsGroup[ systemId ].prototype.destroy( this.spell )
+				// deactivating, destroying ye olde system
+				var spell  = this.spell,
+					system = systemGroup.getByKey( systemId )
 
-				var system = createSystem(
-					this.spell,
-					this.EntityManager,
+				system.prototype.deactivate( spell )
+				system.prototype.destroy( spell )
+
+				// initializing and activating the new system instance
+				var newSystem = createSystem(
+					spell,
+					this.entityManager,
 					this.templateManager.getTemplate( systemId ),
 					this.anonymizeModuleIds
 				)
 
-				system.prototype.init( this.spell )
-				system.prototype.activate( this.spell )
-				systemsGroup[ systemId ] = system
+				newSystem.prototype.init( spell )
+				newSystem.prototype.activate( spell )
+
+				systemGroup.add( systemId, newSystem )
 			}
 		}
 

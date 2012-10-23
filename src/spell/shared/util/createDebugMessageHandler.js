@@ -36,7 +36,9 @@ define(
 		}
 
 		var startRuntimeModule = function( startEngine, spell, payload ) {
-			spell.runtimeModule = payload.runtimeModule
+			var runtimeModule = payload.runtimeModule
+
+			spell.runtimeModule = runtimeModule
 
 			/*
 			 * The scene provided by the editor includes synchronization metadata. In order to preserve this data and to force the engine to use this version
@@ -44,12 +46,16 @@ define(
 			 */
 			var scene = payload.scene
 
-			var cacheContent = createCacheContent( {
-				content : payload.scene,
-				filePath : createLibraryFilePathFromId( createId( scene.namespace, scene.name ) )
-			} )
+			if( scene ) {
+				var cacheContent = createCacheContent( [
+					{
+						content : payload.scene,
+						filePath : createLibraryFilePathFromId( createId( scene.namespace, scene.name ) )
+					}
+				] )
+			}
 
-			startEngine( payload.runtimeModule, cacheContent )
+			startEngine( runtimeModule, cacheContent )
 		}
 
 		var updateComponent = function( spell, payload ) {
