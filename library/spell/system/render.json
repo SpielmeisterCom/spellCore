@@ -26,10 +26,10 @@
 			"name": "textAppearances",
 			"componentId": "spell.component.2d.graphics.textAppearance"
 		},
-        {
-            "name": "tilemaps",
-            "componentId": "spell.component.2d.graphics.tilemap"
-        },
+		{
+			"name": "tilemaps",
+			"componentId": "spell.component.2d.graphics.tilemap"
+		},
 		{
 			"name": "visualObjects",
 			"componentId": "spell.component.visualObject"
@@ -47,5 +47,13 @@
 			"componentId": "spell.component.2d.graphics.debug.circle"
 		}
 	],
-	"version": 1
+	"version": 1,
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": true,
+			"doc": "if active is false the system will be skipped during processing"
+		}
+	]
 }

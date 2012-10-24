@@ -18,10 +18,10 @@
 			"name": "applyImpulses",
 			"componentId": "spell.component.box2d.applyImpulse"
 		},
-        {
-            "name": "applyVelocities",
-            "componentId": "spell.component.box2d.applyVelocity"
-        },
+		{
+			"name": "applyVelocities",
+			"componentId": "spell.component.box2d.applyVelocity"
+		},
 		{
 			"name": "simpleBoxes",
 			"componentId": "spell.component.box2d.simpleBox"
@@ -39,5 +39,13 @@
 			"componentId": "spell.component.2d.graphics.debug.circle"
 		}
 	],
-	"version": 1
+	"version": 1,
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": true,
+			"doc": "if active is false the system will be skipped during processing"
+		}
+	]
 }
