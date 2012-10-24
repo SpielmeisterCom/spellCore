@@ -10,7 +10,7 @@ define(
 
 
 		return function( spell, payload ) {
-			spell.sceneManager.addSystem( payload.systemId, payload.srcExecutionGroupId, payload.dstExecutionGroupId, payload.dstIndex )
+			spell.sceneManager.moveSystem( payload.systemId, payload.srcExecutionGroupId, payload.dstExecutionGroupId, payload.dstIndex )
 		}
 	}
 )

@@ -282,8 +282,8 @@ define(
 				var system = srcExecutionGroup.getByKey( systemId )
 				if( !system ) return
 
-				dstExecutionGroup.insert( systemId, system, dstIndex )
 				srcExecutionGroup.removeByKey( systemId )
+				dstExecutionGroup.insert( systemId, system, dstIndex )
 			}
 		}
 
