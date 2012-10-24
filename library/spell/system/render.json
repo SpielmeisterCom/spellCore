@@ -53,7 +53,13 @@
 			"name": "active",
 			"type": "boolean",
 			"default": true,
-			"doc": "if active is false the system will be skipped during processing"
+			"doc": "if false the system will be skipped during processing"
+		},
+		{
+			"name": "debug",
+			"type": "boolean",
+			"default": false,
+			"doc": "if true the system will draw additional debug information"
 		}
 	]
 }

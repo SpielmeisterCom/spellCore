@@ -64,19 +64,32 @@ define(
 			}
 		}
 
+		var process = function( orderedMap, args ) {
+			var systems = orderedMap.values
+
+			for( var i = 0, numSystems = systems.length; i < numSystems; i++ ) {
+				var system = systems[ i ]
+
+				if( system.config.active ) {
+					system.prototype.process.apply( system, args )
+				}
+			}
+		}
+
 		var createTemplateId = function( namespace, name ) {
 			return namespace + '.' + name
 		}
 
 		var createSystem = function( spell, entityManager, system, anonymizeModuleIds, systemConfig ) {
-			var moduleId = createModuleId( createId( system.namespace, system.name ) )
+			var systemId = createId( system.namespace, system.name),
+				moduleId = createModuleId( systemId )
 
 			var constructor = loadModule(
 				anonymizeModuleIds ? hashModuleId( moduleId ) : moduleId,
 				anonymizeModuleIds
 			)
 
-			var componentsInput = _.reduce(
+			var attributes = _.reduce(
 				system.input,
 				function( memo, inputDefinition ) {
 					var componentDictionary = entityManager.getComponentDictionaryById( inputDefinition.componentId )
@@ -85,15 +98,21 @@ define(
 						throw 'Error: No component list for component template id \'' + inputDefinition.componentId +  '\' available.'
 					}
 
+					if( inputDefinition.name === 'config' ) {
+						throw 'Error: The system \'' + systemId + '\' uses the reserved keyword \'config\' as a local alias for its input.'
+					}
+
 					memo[ inputDefinition.name ] = componentDictionary
 
 					return memo
 				},
-				{}
+				{
+					config : systemConfig
+				}
 			)
 
 			// TODO: Fix create. Returned instances do not support prototype chain method look-up. O_o
-			return create( constructor, [ spell ], componentsInput )
+			return create( constructor, [ spell ], attributes )
 		}
 
 		var createSystems = function( spell, entityManager, templateManager, systems, anonymizeModuleIds ) {
@@ -146,10 +165,10 @@ define(
 
 		Scene.prototype = {
 			render: function( timeInMs, deltaTimeInMs ) {
-				invoke( this.executionGroups.render, 'process', [ this.spell, timeInMs, deltaTimeInMs ] )
+				process( this.executionGroups.render, [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			update: function( timeInMs, deltaTimeInMs ) {
-				invoke( this.executionGroups.update, 'process', [ this.spell, timeInMs, deltaTimeInMs ] )
+				process( this.executionGroups.update, [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			init: function( sceneConfig ) {
 				if( !hasActiveCamera( sceneConfig ) ) {
