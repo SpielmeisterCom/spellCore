@@ -96,13 +96,15 @@ define(
 			return create( constructor, [ spell ], componentsInput )
 		}
 
-		var createSystems = function( spell, entityManager, templateManager, systemIds, anonymizeModuleIds ) {
+		var createSystems = function( spell, entityManager, templateManager, systems, anonymizeModuleIds ) {
 			return _.reduce(
-				systemIds,
-				function( memo, systemId ) {
+				systems,
+				function( memo, system ) {
+					var systemId = system.id
+
 					return memo.add(
 						systemId,
-						createSystem( spell, entityManager, templateManager.getTemplate( systemId ), anonymizeModuleIds )
+						createSystem( spell, entityManager, templateManager.getTemplate( systemId ), anonymizeModuleIds, system.config )
 					)
 				},
 				new OrderedMap()
