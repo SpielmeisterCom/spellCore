@@ -37,8 +37,17 @@ define(
 
 				this.activeScene = scene
 			},
-			restartSystem: function( systemId ) {
-				this.activeScene.restartSystem( systemId )
+			addSystem: function( systemId, executionGroupId, index, systemConfig ) {
+				this.activeScene.addSystem( systemId, executionGroupId, index, systemConfig )
+			},
+			moveSystem: function( systemId, srcExecutionGroupId, dstExecutionGroupId, dstIndex ) {
+				this.activeScene.moveSystem( systemId, srcExecutionGroupId, dstExecutionGroupId, dstIndex )
+			},
+			removeSystem: function( systemId, executionGroupId ) {
+				this.activeScene.removeSystem( systemId, executionGroupId )
+			},
+			restartSystem: function( systemId, executionGroupId, systemConfig ) {
+				this.activeScene.restartSystem( systemId, executionGroupId, systemConfig )
 			}
 		}
 

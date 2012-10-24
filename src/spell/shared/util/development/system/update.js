@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/development/updateSystem',
+	'spell/shared/util/development/system/update',
 	[
 		'spell/shared/util/createId'
 	],
@@ -13,7 +13,11 @@ define(
 			var definition = payload.definition
 
 			spell.templateManager.add( definition, true )
-			spell.sceneManager.restartSystem( createId( definition.namespace, definition.name ) )
+			spell.sceneManager.restartSystem(
+				createId( definition.namespace, definition.name ),
+				payload.executionGroupId,
+				payload.systemConfig
+			)
 		}
 	}
 )

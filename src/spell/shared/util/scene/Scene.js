@@ -55,8 +55,10 @@ define(
 		 * Instances created by "create" for some unknown reason do not support prototype chain method look-up. See "Fix create"
 		 */
 		var invoke = function( orderedMap, functionName, args ) {
-			for( var i = 0, size = orderedMap.size(); i < size; i++ ) {
-				var system = orderedMap.getByIndex( i )
+			var systems = orderedMap.values
+
+			for( var i = 0, numSystems = systems.length; i < numSystems; i++ ) {
+				var system = systems[ i ]
 
 				system.prototype[ functionName ].apply( system, args )
 			}
@@ -66,7 +68,7 @@ define(
 			return namespace + '.' + name
 		}
 
-		var createSystem = function( spell, entityManager, system, anonymizeModuleIds ) {
+		var createSystem = function( spell, entityManager, system, anonymizeModuleIds, systemConfig ) {
 			var moduleId = createModuleId( createId( system.namespace, system.name ) )
 
 			var constructor = loadModule(
@@ -136,17 +138,16 @@ define(
 			this.entityManager      = entityManager
 			this.templateManager    = templateManager
 			this.anonymizeModuleIds = anonymizeModuleIds
-			this.renderSystems      = null
-			this.updateSystems      = null
+			this.executionGroups    = { render : null, update : null }
 			this.script             = null
 		}
 
 		Scene.prototype = {
 			render: function( timeInMs, deltaTimeInMs ) {
-				invoke( this.renderSystems, 'process', [ this.spell, timeInMs, deltaTimeInMs ] )
+				invoke( this.executionGroups.render, 'process', [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			update: function( timeInMs, deltaTimeInMs ) {
-				invoke( this.updateSystems, 'process', [ this.spell, timeInMs, deltaTimeInMs ] )
+				invoke( this.executionGroups.update, 'process', [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			init: function( sceneConfig ) {
 				if( !hasActiveCamera( sceneConfig ) ) {
@@ -160,16 +161,17 @@ define(
 				if( sceneConfig.systems ) {
 					var spell           = this.spell,
 						entityManager   = this.entityManager,
-						templateManager = this.templateManager
+						templateManager = this.templateManager,
+						executionGroups = this.executionGroups
 
-					this.renderSystems = createSystems( spell, entityManager, templateManager, sceneConfig.systems.render, anonymizeModuleIds )
-					this.updateSystems = createSystems( spell, entityManager, templateManager, sceneConfig.systems.update, anonymizeModuleIds )
+					executionGroups.render = createSystems( spell, entityManager, templateManager, sceneConfig.systems.render, anonymizeModuleIds )
+					executionGroups.update = createSystems( spell, entityManager, templateManager, sceneConfig.systems.update, anonymizeModuleIds )
 
-					invoke( this.renderSystems, 'init', [ spell, sceneConfig ] )
-					invoke( this.updateSystems, 'init', [ spell, sceneConfig ] )
+					invoke( executionGroups.render, 'init', [ spell, sceneConfig ] )
+					invoke( executionGroups.update, 'init', [ spell, sceneConfig ] )
 
-					invoke( this.renderSystems, 'activate', [ spell, sceneConfig ] )
-					invoke( this.updateSystems, 'activate', [ spell, sceneConfig ] )
+					invoke( executionGroups.render, 'activate', [ spell, sceneConfig ] )
+					invoke( executionGroups.update, 'activate', [ spell, sceneConfig ] )
 				}
 
 				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
@@ -182,31 +184,25 @@ define(
 				this.script.init( this.spell, sceneConfig )
 			},
 			destroy: function( sceneConfig ) {
-				invoke( this.renderSystems, 'deactivate', [ this.spell, sceneConfig ] )
-				invoke( this.updateSystems, 'deactivate', [ this.spell, sceneConfig ] )
+				var executionGroups = this.executionGroups
 
-				invoke( this.renderSystems, 'destroy', [ this.spell, sceneConfig ] )
-				invoke( this.updateSystems, 'destroy', [ this.spell, sceneConfig ] )
+				invoke( executionGroups.render, 'deactivate', [ this.spell, sceneConfig ] )
+				invoke( executionGroups.update, 'deactivate', [ this.spell, sceneConfig ] )
+
+				invoke( executionGroups.render, 'destroy', [ this.spell, sceneConfig ] )
+				invoke( executionGroups.update, 'destroy', [ this.spell, sceneConfig ] )
 
 				this.script.destroy( this.spell, sceneConfig )
 			},
-			restartSystem: function( systemId ) {
-				var renderSystems = this.renderSystems,
-					updateSystems = this.updateSystems
+			restartSystem: function( systemId, executionGroupId, systemConfig ) {
+				var executionGroup = this.executionGroups[ executionGroupId ]
+				if( !executionGroup ) return
 
-				var systemGroup = ( renderSystems[ systemId ] ?
-					renderSystems :
-					( updateSystems[ systemId ] ?
-						updateSystems :
-						undefined
-					)
-				)
-
-				if( !systemGroup ) return
+				var system = executionGroup.getByKey( systemId )
+				if( !system ) return
 
 				// deactivating, destroying ye olde system
-				var spell  = this.spell,
-					system = systemGroup.getByKey( systemId )
+				var spell  = this.spell
 
 				system.prototype.deactivate( spell )
 				system.prototype.destroy( spell )
@@ -216,13 +212,48 @@ define(
 					spell,
 					this.entityManager,
 					this.templateManager.getTemplate( systemId ),
-					this.anonymizeModuleIds
+					this.anonymizeModuleIds,
+					systemConfig
 				)
 
 				newSystem.prototype.init( spell )
 				newSystem.prototype.activate( spell )
 
-				systemGroup.add( systemId, newSystem )
+				executionGroup.add( systemId, newSystem )
+			},
+			addSystem: function( systemId, executionGroupId, index, systemConfig ) {
+				var executionGroup = this.executionGroups[ executionGroupId ]
+				if( !executionGroup ) return
+
+				executionGroup.insert(
+					systemId,
+					createSystem(
+						spell,
+						this.entityManager,
+						this.templateManager.getTemplate( systemId ),
+						this.anonymizeModuleIds,
+						systemConfig
+					),
+					index
+				)
+			},
+			removeSystem: function( systemId, executionGroupId ) {
+				var executionGroup = this.executionGroups[ executionGroupId ]
+				if( !executionGroup ) return
+
+				executionGroup.removeByKey( systemId )
+			},
+			moveSystem: function( systemId, srcExecutionGroupId, dstExecutionGroupId, dstIndex ) {
+				var srcExecutionGroup = this.executionGroups[ srcExecutionGroupId ],
+					dstExecutionGroup = this.executionGroups[ dstExecutionGroupId ]
+
+				if( !srcExecutionGroup || !dstExecutionGroup ) return
+
+				var system = srcExecutionGroup.getByKey( systemId )
+				if( !system ) return
+
+				dstExecutionGroup.insert( systemId, system, dstIndex )
+				srcExecutionGroup.removeByKey( systemId )
 			}
 		}
 

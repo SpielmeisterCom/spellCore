@@ -42,6 +42,9 @@ define(
 			getByKey : function( key ) {
 				return this.getByIndex( this.keys.indexOf( key ) )
 			},
+			hasKey : function( key ) {
+				return this.keys.indexOf( key ) !== -1
+			},
 		    removeByIndex : function( index ) {
 		        arrayRemove( this.keys, index )
 				arrayRemove( this.values, index )

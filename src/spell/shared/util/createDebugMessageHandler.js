@@ -6,7 +6,10 @@ define(
 		'spell/shared/util/createId',
 		'spell/shared/util/development/updateAsset',
 		'spell/shared/util/development/updateScript',
-		'spell/shared/util/development/updateSystem',
+		'spell/shared/util/development/system/add',
+		'spell/shared/util/development/system/move',
+		'spell/shared/util/development/system/remove',
+		'spell/shared/util/development/system/update',
 		'spell/shared/util/Events',
 		'spell/shared/util/platform/PlatformKit',
 
@@ -18,6 +21,9 @@ define(
 		createId,
 		updateAsset,
 		updateScript,
+		addSystem,
+		moveSystem,
+		removeSystem,
 		updateSystem,
 		Events,
 		PlatformKit,
@@ -85,17 +91,18 @@ define(
 				'spelled.debug.startRuntimeModule'        : _.bind( startRuntimeModule, null, startEngine ),
 				'spelled.debug.drawCoordinateGrid'        : drawCoordinateGrid,
 				'spelled.debug.drawTitleSafeOutline'      : drawTitleSafeOutline,
-				'spelled.debug.simulateScreenAspectRatio' : simulateScreenAspectRatio,
 				'spelled.debug.updateComponent'           : updateComponent,
 				'spelled.debug.updateAsset'               : updateAsset,
 				'spelled.debug.updateScript'              : updateScript,
-				'spelled.debug.updateSystem'              : updateSystem
+				'spelled.debug.simulateScreenAspectRatio' : simulateScreenAspectRatio,
+				'spelled.debug.system.add'                : addSystem,
+				'spelled.debug.system.move'               : moveSystem,
+				'spelled.debug.system.remove'             : removeSystem,
+				'spelled.debug.system.update'             : updateSystem,
 			}
 
 			return function( message ) {
 				var handler = messageTypeToHandler[ message.type ]
-
-				if( !handler ) return
 
 				handler( spell, message.payload )
 			}
