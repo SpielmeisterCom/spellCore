@@ -223,10 +223,10 @@ define(
 				if( !system ) return
 
 				// deactivating, destroying ye olde system
-				var spell  = this.spell
+				var spell = this.spell
 
-				system.prototype.deactivate( spell )
-				system.prototype.destroy( spell )
+				system.prototype.deactivate.call( system, spell )
+				system.prototype.destroy.call( system, spell )
 
 				// initializing and activating the new system instance
 				var newSystem = createSystem(
@@ -237,8 +237,8 @@ define(
 					systemConfig
 				)
 
-				newSystem.prototype.init( spell )
-				newSystem.prototype.activate( spell )
+				newSystem.prototype.init.call( newSystem, spell )
+				newSystem.prototype.activate.call( newSystem, spell )
 
 				executionGroup.add( systemId, newSystem )
 			},
@@ -246,21 +246,30 @@ define(
 				var executionGroup = this.executionGroups[ executionGroupId ]
 				if( !executionGroup ) return
 
-				executionGroup.insert(
-					systemId,
-					createSystem(
-						spell,
-						this.entityManager,
-						this.templateManager.getTemplate( systemId ),
-						this.anonymizeModuleIds,
-						systemConfig
-					),
-					index
+				var spell = this.spell
+
+				var system = createSystem(
+					spell,
+					this.entityManager,
+					this.templateManager.getTemplate( systemId ),
+					this.anonymizeModuleIds,
+					systemConfig
 				)
+
+				system.prototype.init.call( system, spell )
+				system.prototype.activate.call( system, spell )
+
+				executionGroup.insert( systemId, system, index )
 			},
 			removeSystem: function( systemId, executionGroupId ) {
 				var executionGroup = this.executionGroups[ executionGroupId ]
 				if( !executionGroup ) return
+
+				var spell  = this.spell,
+					system = executionGroup.getByKey( systemId )
+
+				system.prototype.deactivate.call( system, spell )
+				system.prototype.destroy.call( system, spell )
 
 				executionGroup.removeByKey( systemId )
 			},
