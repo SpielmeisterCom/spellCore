@@ -307,10 +307,9 @@ define(
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var cameras                 = this.cameras,
 				context                 = this.context,
-				debug                   = this.config.debug,
 				drawVisualObjectPartial = this.drawVisualObjectPartial,
 				screenSize              = this.screenSize,
-				screenAspectRatio       = debug && this.debugSettings.screenAspectRatio ? this.debugSettings.screenAspectRatio : screenSize[ 0 ] / screenSize[ 1 ]
+				screenAspectRatio       = this.debugSettings.screenAspectRatio ? this.debugSettings.screenAspectRatio : screenSize[ 0 ] / screenSize[ 1 ]
 
 			// set the camera
 			var activeCameraId  = getActiveCameraId( cameras ),
@@ -346,7 +345,7 @@ define(
 				}
 			)
 
-			if( debug &&
+			if( this.config.debug &&
 				drawDebugShapes ) {
 
 				var drawDebugPartial = this.drawDebugPartial
@@ -393,7 +392,7 @@ define(
 				context.restore()
 			}
 
-			if( debug &&
+			if( this.debugSettings &&
 				effectiveCameraDimensions &&
 				cameraTransform ) {
 
@@ -417,7 +416,7 @@ define(
 			this.context              = spell.renderingContext
 			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
 			this.screenSize           = spell.configurationManager.currentScreenSize
-			this.debugSettings        = this.config.debug ? spell.configurationManager.debug : false
+			this.debugSettings        = spell.configurationManager.debug ? spell.configurationManager.debug : false
 
 			this.drawVisualObjectPartial = _.bind(
 				drawVisualObject,
@@ -456,9 +455,7 @@ define(
 			context.setViewMatrix( tmpMat3 )
 
 
-			if( this.config.debug &&
-				this.debugSettings.screenAspectRatio !== undefined ) {
-
+			if( this.debugSettings.screenAspectRatio !== undefined ) {
 				this.screenSize = createScreenSize(
 					PlatformKit.getAvailableScreenSize(
 						this.configurationManager.id
