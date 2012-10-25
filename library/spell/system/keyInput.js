@@ -17,40 +17,32 @@ define(
 		 * private
 		 */
 
-		var processEvent = function( actors, inputDefinitions ) {
-			var inputEvent = this
+		var updateActors = function( actors, actorId, actionId, isExecuting ) {
+			for( var id in actors ) {
+				var actor  = actors[ id ],
+					action = actor.actions[ actionId ]
 
-			_.each(
-				inputDefinitions,
-				function( inputDefinition ) {
-					var keyToActionMapAsset = inputDefinition.asset,
-						actionId            = keyToActionMapAsset[ inputEvent.keyCode ]
+				if( action &&
+					actor.id === actorId &&
+					action.executing !== isExecuting ) { // only changes in action state are interesting
 
-					if( !actionId ) return
-
-					var isExecuting = ( inputEvent.type === 'keydown' )
-
-					_.each(
-						actors,
-						function( actor ) {
-							var action = actor.actions[ actionId ]
-
-							if( !action ||
-								action.executing === isExecuting || // only changes in action state are interesting
-								actor.id !== inputDefinition.actorId ) {
-
-								return
-							}
-
-							action.executing = isExecuting
-						}
-					)
+					action.executing = isExecuting
 				}
-			)
+			}
 		}
 
-		var init = function( spell ) {
-			this.inputManager.init()
+		var processEvent = function( inputEvent, actors, inputDefinitions ) {
+			for( var id in inputDefinitions ) {
+				var inputDefinition     = inputDefinitions[ id ],
+					keyToActionMapAsset = inputDefinition.asset,
+					actionId            = keyToActionMapAsset[ inputEvent.keyCode ]
+
+				if( actionId ) {
+					var isExecuting = ( inputEvent.type === 'keydown' )
+
+					updateActors( actors, inputDefinition.actorId, actionId, isExecuting )
+				}
+			}
 		}
 
 		/**
@@ -61,9 +53,15 @@ define(
 		 * @param deltaTimeInMs
 		 */
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
-			_.invoke( this.inputEvents, processEvent, this.actors, this.inputDefinitions )
+			var actors           = this.actors,
+				inputEvents      = this.inputEvents,
+				inputDefinitions = this.inputDefinitions
 
-			this.inputEvents.length = 0
+			for( var i = 0, numInputEvents = this.inputEvents.length; i < numInputEvents; i++ ) {
+				processEvent( inputEvents[ i ], actors, inputDefinitions )
+			}
+
+			inputEvents.length = 0
 		}
 
 
@@ -77,8 +75,12 @@ define(
 		}
 
 		KeyInput.prototype = {
-			init : init,
-			destroy : function() {},
+			init : function( spell ) {
+				this.inputManager.init()
+			},
+			destroy : function( spell ) {
+				this.inputManager.destroy()
+			},
 			activate : function() {},
 			deactivate : function() {},
 			process : process

@@ -85,7 +85,7 @@ define(
 				this.nativeInput.setInputEventListener( 'keydown', keyHandler )
 				this.nativeInput.setInputEventListener( 'keyup', keyHandler )
 			},
-			cleanUp : function() {
+			destroy : function() {
 				if( PlatformKit.features.touch ) {
 					this.nativeInput.removeInputEventListener( 'touchstart' )
 					this.nativeInput.removeInputEventListener( 'touchend' )
