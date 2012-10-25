@@ -4,7 +4,7 @@
 	"readonly": true,
 	"title": "Box2D Simple Sphere",
 	"doc": "",
-	"icon": "",
+    "icon": "/images/icons/component_box2d_sphere.png",
 	"attributes": [
 		{
 			"name": "density",

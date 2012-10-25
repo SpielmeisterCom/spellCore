@@ -4,8 +4,8 @@
 	"readonly": true,
 	"title": "Box2D Simple Box",
 	"doc": "",
-	"icon": "",
-	"attributes": [
+    "icon": "/images/icons/component_box2d_box.png",
+    "attributes": [
 		{
 			"name": "density",
 			"type": "number",

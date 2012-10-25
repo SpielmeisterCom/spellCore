@@ -3,6 +3,7 @@
 	"readonly": true,
 	"title": "Visual Object",
 	"doc": "the visual representation of an entity",
+    "icon": "/images/icons/component_visualobject.png",
 	"attributes": [
 		{
 			"name": "layer",

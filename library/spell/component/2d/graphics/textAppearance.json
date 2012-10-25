@@ -2,6 +2,7 @@
 	"type": "component",
 	"readonly": true,
 	"title": "2D Text Appearance",
+    "icon": "/images/icons/component_2d_graphics_textappearance.png",
 	"attributes": [
 		{
 			"name": "assetId",

@@ -2,9 +2,9 @@
 	"version": 1,
 	"type": "component",
 	"readonly": true,
-	"title": "Box2D Impulse (once)",
+	"title": "Box2D Impulse",
 	"doc": "",
-	"icon": "",
+	"icon": "/images/icons/component_box2d_impulse.png",
 	"attributes": [
 		{
 			"name": "impulse",

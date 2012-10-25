@@ -1,8 +1,9 @@
 {
 	"readonly": true,
 	"type": "component",
-	"title": "2D Key Frame Animation",
+	"title": "Key Frame Animation",
 	"doc": "",
+    "icon": "/images/icons/component_animation_keyframeanimation.png",
 	"attributes": [
 		{
 			"name": "assetId",

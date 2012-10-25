@@ -2,9 +2,9 @@
 	"version": 1,
 	"type": "component",
 	"readonly": true,
-	"title": "Box2D Torque (constant)",
+	"title": "Box2D Torque",
 	"doc": "",
-	"icon": "",
+	"icon": "/images/icons/component_box2d_torque.png",
 	"attributes": [
 		{
 			"name": "torque",

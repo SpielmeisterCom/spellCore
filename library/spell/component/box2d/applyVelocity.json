@@ -2,7 +2,7 @@
 	"version": 1,
 	"type": "component",
 	"readonly": true,
-	"title": "Box2D Set Velocity (once)",
+	"title": "Box2D Set Velocity",
 	"doc": "",
 	"icon": "",
 	"attributes": [
