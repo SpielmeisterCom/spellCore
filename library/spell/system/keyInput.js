@@ -1,11 +1,13 @@
 define(
 	'spell/system/keyInput',
 	[
+		'spell/shared/util/Events',
 		'spell/shared/util/input/keyCodes',
 
 		'spell/functions'
 	],
 	function(
+		Events,
 		keyCodes,
 
 		_
@@ -17,7 +19,7 @@ define(
 		 * private
 		 */
 
-		var updateActors = function( actors, actorId, actionId, isExecuting ) {
+		var updateActors = function( actors, eventManager, actorId, actionId, isExecuting ) {
 			for( var id in actors ) {
 				var actor  = actors[ id ],
 					action = actor.actions[ actionId ]
@@ -27,11 +29,16 @@ define(
 					action.executing !== isExecuting ) { // only changes in action state are interesting
 
 					action.executing = isExecuting
+
+					eventManager.publish(
+						isExecuting ? Events.ACTION_STARTED : Events.ACTION_ENDED,
+						[ actionId, id ]
+					)
 				}
 			}
 		}
 
-		var processEvent = function( inputEvent, actors, inputDefinitions ) {
+		var processEvent = function( eventManager, inputEvent, actors, inputDefinitions ) {
 			for( var id in inputDefinitions ) {
 				var inputDefinition     = inputDefinitions[ id ],
 					keyToActionMapAsset = inputDefinition.asset,
@@ -40,7 +47,7 @@ define(
 				if( actionId ) {
 					var isExecuting = ( inputEvent.type === 'keydown' )
 
-					updateActors( actors, inputDefinition.actorId, actionId, isExecuting )
+					updateActors( actors, eventManager, inputDefinition.actorId, actionId, isExecuting )
 				}
 			}
 		}
@@ -54,11 +61,12 @@ define(
 		 */
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var actors           = this.actors,
-				inputEvents      = this.inputEvents,
+				eventManager     = spell.eventManager,
+				inputEvents      = spell.inputEvents,
 				inputDefinitions = this.inputDefinitions
 
-			for( var i = 0, numInputEvents = this.inputEvents.length; i < numInputEvents; i++ ) {
-				processEvent( inputEvents[ i ], actors, inputDefinitions )
+			for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
+				processEvent( eventManager, inputEvents[ i ], actors, inputDefinitions )
 			}
 
 			inputEvents.length = 0
@@ -69,20 +77,17 @@ define(
 		 * public
 		 */
 
-		var KeyInput = function( spell ) {
-			this.inputEvents  = spell.inputEvents
-			this.inputManager = spell.inputManager
-		}
+		var KeyInput = function( spell ) {}
 
 		KeyInput.prototype = {
 			init : function( spell ) {
-				this.inputManager.init()
+				spell.inputManager.init()
 			},
 			destroy : function( spell ) {
-				this.inputManager.destroy()
+				spell.inputManager.destroy()
 			},
-			activate : function() {},
-			deactivate : function() {},
+			activate : function( spell ) {},
+			deactivate : function( spell ) {},
 			process : process
 		}
 

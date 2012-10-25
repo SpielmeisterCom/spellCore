@@ -21,6 +21,10 @@ define(
 			'ENTITY_CREATED',
 			'ENTITY_DESTROYED',
 
+			// Action
+			'ACTION_STARTED',
+			'ACTION_ENDED',
+
 			// EventManager
 			'SUBSCRIBE',
 			'UNSUBSCRIBE',
