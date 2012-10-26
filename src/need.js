@@ -31,16 +31,16 @@
 	}
 
 	var loadModule = function( name, baseUrl, cache ) {
-		var moduleUrl = baseUrl + '/' + name + '.js'
-
-		var cachedEntry = cache[ moduleUrl ],
+		var scriptName  = name + '.js',
+			cachedEntry = cache[ scriptName ],
 			moduleSource
 
 		if( cachedEntry ) {
 			moduleSource = cachedEntry
 
 		} else {
-			var request = createRequest( moduleUrl )
+			var moduleUrl = baseUrl + '/' + scriptName,
+				request   = createRequest( moduleUrl )
 
 			if( request.status !== 200 ) throw 'Error: Loading \'' + moduleUrl + '\' failed.'
 
