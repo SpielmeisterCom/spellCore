@@ -31,7 +31,7 @@ define(
 					action.executing = isExecuting
 
 					eventManager.publish(
-						[ isExecuting ? Events.ACTION_STARTED : Events.ACTION_ENDED, actionId ],
+						[ isExecuting ? Events.ACTION_STARTED : Events.ACTION_STOPPED, actionId ],
 						[ id ]
 					)
 				}
