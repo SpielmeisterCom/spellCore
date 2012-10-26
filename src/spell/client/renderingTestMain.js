@@ -100,7 +100,7 @@ define(
 			function( event ) {
 				logger.info( "loading completed" )
 
-                resources = resourceLoader.getResources()
+                resources = resourceLoader.getCache()
 				draw()
 			}
 		)

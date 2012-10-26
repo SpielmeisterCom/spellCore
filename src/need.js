@@ -15,6 +15,10 @@
 			config.baseUrl = BASE_URL
 		}
 
+		if( !config.cache ) {
+			config.cache = {}
+		}
+
 		return config
 	}
 
@@ -26,13 +30,22 @@
 		return request
 	}
 
-	var loadModule = function( name, baseUrl ) {
-		var moduleUrl = baseUrl + '/' + name + '.js',
-			request   = createRequest( moduleUrl )
+	var loadModule = function( name, baseUrl, cache ) {
+		var moduleUrl = baseUrl + '/' + name + '.js'
 
-		if( request.status !== 200 ) throw 'Error: Loading \'' + moduleUrl + '\' failed.'
+		var cachedEntry = cache[ moduleUrl ],
+			moduleSource
 
-		var moduleSource = request.responseText
+		if( cachedEntry ) {
+			moduleSource = cachedEntry
+
+		} else {
+			var request = createRequest( moduleUrl )
+
+			if( request.status !== 200 ) throw 'Error: Loading \'' + moduleUrl + '\' failed.'
+
+			moduleSource = request.responseText
+		}
 
 		eval( moduleSource )
 
@@ -42,7 +55,7 @@
 	var createModule = function( name, config ) {
 		config = normalizeConfig( config )
 
-		var module = loadModule( name, config.baseUrl )
+		var module = loadModule( name, config.baseUrl, config.cache )
 
 		if( !module ) throw 'Error: Could not load module \'' + name + '\'.'
 

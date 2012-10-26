@@ -178,7 +178,7 @@ define(
 			function( event ) {
 				logger.info( 'loading completed' )
 
-				texture = context.createTexture( resourceLoader.getResources()[ resourceUris[ 0 ] ] )
+				texture = context.createTexture( resourceLoader.getCache()[ resourceUris[ 0 ] ] )
 
 				logger.info( 'running test' )
 				runTest()

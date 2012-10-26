@@ -34,16 +34,18 @@ define(
 		var cameraEntityTemplateId    = 'spell.entity.2d.graphics.camera',
 			cameraComponentTemplateId = 'spell.component.2d.graphics.camera'
 
-		var loadModule = function( moduleId, anonymizeModuleIds ) {
+		var loadModule = function( resourceLoader, moduleId, anonymizeModuleIds ) {
 			if( !moduleId ) throw 'Error: No module id provided.'
 
-			var module = PlatformKit.ModuleLoader.require(
-				moduleId,
-				undefined,
-				{
-					loadingAllowed : !anonymizeModuleIds
-				}
-			)
+			var config = {
+				loadingAllowed : !anonymizeModuleIds
+			}
+
+			if( config.loadingAllowed ) {
+				config.cache = resourceLoader.getCache()
+			}
+
+			var module = PlatformKit.ModuleLoader.require( moduleId, undefined, config )
 
 			if( !module ) throw 'Error: Could not resolve module id \'' + moduleId + '\' to module.'
 
@@ -85,6 +87,7 @@ define(
 				moduleId = createModuleId( systemId )
 
 			var constructor = loadModule(
+				spell.resourceLoader,
 				anonymizeModuleIds ? hashModuleId( moduleId ) : moduleId,
 				anonymizeModuleIds
 			)
@@ -171,8 +174,10 @@ define(
 				process( this.executionGroups.update, [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			init: function( sceneConfig ) {
+				var spell = this.spell
+
 				if( !hasActiveCamera( sceneConfig ) ) {
-					this.spell.logger.error( 'Could not start scene "' + sceneConfig.name + '" because no camera entity was found. A scene must have at least one active camera entity.' )
+					spell.logger.error( 'Could not start scene "' + sceneConfig.name + '" because no camera entity was found. A scene must have at least one active camera entity.' )
 
 					return
 				}
@@ -180,8 +185,7 @@ define(
 				var anonymizeModuleIds = this.anonymizeModuleIds
 
 				if( sceneConfig.systems ) {
-					var spell           = this.spell,
-						entityManager   = this.entityManager,
+					var entityManager   = this.entityManager,
 						templateManager = this.templateManager,
 						executionGroups = this.executionGroups
 
@@ -198,11 +202,12 @@ define(
 				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
 
 				this.script = loadModule(
+					spell.resourceLoader,
 					anonymizeModuleIds ? hashModuleId( moduleId ) : moduleId,
 					anonymizeModuleIds
 				)
 
-				this.script.init( this.spell, sceneConfig )
+				this.script.init( spell, sceneConfig )
 			},
 			destroy: function( sceneConfig ) {
 				var executionGroups = this.executionGroups

@@ -46,22 +46,7 @@ define(
 
 			spell.runtimeModule = runtimeModule
 
-			/*
-			 * The scene provided by the editor includes synchronization metadata. In order to preserve this data and to force the engine to use this version
-			 * of the scene, it gets injected into the cache to prevent loading of the "vanilla" version from storage.
-			 */
-			var scene = payload.scene
-
-			if( scene ) {
-				var cacheContent = createCacheContent( [
-					{
-						content : payload.scene,
-						filePath : createLibraryFilePathFromId( createId( scene.namespace, scene.name ) )
-					}
-				] )
-			}
-
-			startEngine( runtimeModule, cacheContent )
+			startEngine( runtimeModule, payload.cacheContent )
 		}
 
 		var updateComponent = function( spell, payload ) {

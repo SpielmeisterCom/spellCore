@@ -223,7 +223,7 @@ define(
 		}
 
 		ResourceLoader.prototype = {
-			getResources: function() {
+			getCache: function() {
 				return this.cache
 			},
 

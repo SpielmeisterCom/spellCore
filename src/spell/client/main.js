@@ -107,7 +107,7 @@ define(
 					inputManager         : inputManager,
 					renderingContext     : renderingContext,
 					resourceLoader       : resourceLoader,
-					resources            : resourceLoader.getResources()
+					resources            : resourceLoader.getCache()
 				}
 			)
 
