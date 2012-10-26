@@ -38,6 +38,11 @@
 			"name": "fixedRotation",
 			"type": "boolean",
 			"default": false
+		},
+		{
+			"name": "velocity",
+			"type": "vec2",
+			"default": [ 0, 0 ]
 		}
 	]
 }
