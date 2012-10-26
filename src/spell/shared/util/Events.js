@@ -21,6 +21,9 @@ define(
 			'ENTITY_CREATED',
 			'ENTITY_DESTROYED',
 
+			// Asset
+			'ASSET_UPDATED',
+
 			// Action
 			'ACTION_STARTED',
 			'ACTION_STOPPED',

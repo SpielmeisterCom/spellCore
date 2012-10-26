@@ -9,6 +9,7 @@ define(
 		'spell/shared/util/createId',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/createLibraryFilePathFromId',
+		'spell/shared/util/Events',
 
 		'spell/functions'
 	],
@@ -21,6 +22,7 @@ define(
 		createId,
 		createLibraryFilePath,
 		createLibraryFilePathFromId,
+		Events,
 
 		_
 	) {
@@ -28,8 +30,6 @@ define(
 
 
 		var updateResourcesAndAssets = function( spell, assetId, asset ) {
-			spell.logger.debug( 'Updating asset \'' + assetId + '\'.' )
-
 			injectResource( spell.resources, asset )
 			spell.EntityManager.updateAssetReferences( assetId, asset )
 		}
@@ -67,6 +67,11 @@ define(
 			}
 
 			updateResourcesAndAssets( spell, assetId, asset )
+
+			spell.eventManager.publish(
+				[ Events.ASSET_UPDATED, definition.subtype ],
+				[ assetId ]
+			)
 		}
 	}
 )
