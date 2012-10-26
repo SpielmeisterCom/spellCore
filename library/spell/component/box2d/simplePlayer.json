@@ -1,0 +1,35 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Box2D Simple Player",
+	"doc": "",
+    "icon": "/images/icons/component_box2d_box.png",
+    "attributes": [
+		{
+			"name": "density",
+			"type": "number",
+			"default": 1
+		},
+		{
+			"name": "friction",
+			"type": "number",
+			"default": 0.5
+		},
+		{
+			"name": "restitution",
+			"type": "number",
+			"default": 0.2
+		},
+		{
+			"name": "dimensions",
+			"type": "vec2",
+			"default": [ 2, 2 ]
+		},
+		{
+			"name": "velocity",
+			"type": "vec2",
+			"default": [ 0, 0 ]
+		}
+	]
+}
