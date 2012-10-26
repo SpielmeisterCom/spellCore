@@ -9,7 +9,7 @@ define(
 		'use strict'
 
 
-		return createEnumesqueObject( [
+		var Events = createEnumesqueObject( [
 			// CONNECTION
 			'SERVER_CONNECTION_ESTABLISHED',
 			'MESSAGE_RECEIVED',
@@ -23,7 +23,7 @@ define(
 
 			// Action
 			'ACTION_STARTED',
-			'ACTION_ENDED',
+			'ACTION_STOPPED',
 
 			// EventManager
 			'SUBSCRIBE',
@@ -47,5 +47,15 @@ define(
 			'DRAW_TITLE_SAFE_OUTLINE',
 			'SCREEN_ASPECT_RATIO'
 		] )
+
+		Events.getNameById = function( id ) {
+			for( var key in Events ) {
+				var value = Events[ key ]
+
+				if( id === value ) return key
+			}
+		}
+
+		return Events
 	}
 )
