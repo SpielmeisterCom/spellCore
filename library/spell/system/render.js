@@ -302,7 +302,47 @@ define(
 			context.viewport( 0, 0, screenDimensions[ 0 ], screenDimensions [ 1 ] )
 		}
 
-		var init = function( spell ) {}
+		var init = function( spell ) {
+			var eventManager = spell.eventManager
+
+			this.screenResizeHandler = _.bind(
+				function( size ) {
+					var aspectRatio = ( this.debugSettings && this.debugSettings.screenAspectRatio !== undefined ?
+						this.debugSettings.screenAspectRatio :
+						size[ 0 ] / size[ 1 ]
+					)
+
+					this.screenSize = createScreenSize( size, aspectRatio )
+
+					initColorBuffer( this.context, this.screenSize )
+				},
+				this
+			)
+
+			this.screeAspectRatioHandler =_.bind(
+				function( aspectRatio ) {
+					this.screenSize = createScreenSize(
+						PlatformKit.getAvailableScreenSize(
+							this.configurationManager.id
+						),
+						aspectRatio
+					)
+
+					initColorBuffer( this.context, this.screenSize )
+				},
+				this
+			)
+
+			eventManager.subscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
+			eventManager.subscribe( Events.SCREEN_ASPECT_RATIO, this.screeAspectRatioHandler )
+		}
+
+		var destroy = function( spell ) {
+			var eventManager = spell.eventManager
+
+			eventManager.unsubscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
+			eventManager.unsubscribe( Events.SCREEN_ASPECT_RATIO, this.screeAspectRatioHandler )
+		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var cameras                 = this.cameras,
@@ -465,47 +505,11 @@ define(
 			}
 
 			initColorBuffer( this.context, this.screenSize )
-
-
-			// registering event handlers
-			eventManager.subscribe(
-				Events.SCREEN_RESIZE,
-				_.bind(
-					function( size ) {
-						var aspectRatio = ( this.config.debug && this.debugSettings.screenAspectRatio !== undefined ?
-							this.debugSettings.screenAspectRatio :
-							size[ 0 ] / size[ 1 ]
-						)
-
-						this.screenSize = createScreenSize( size, aspectRatio )
-
-						initColorBuffer( this.context, this.screenSize )
-					},
-					this
-				)
-			)
-
-			eventManager.subscribe(
-				Events.SCREEN_ASPECT_RATIO,
-				_.bind(
-					function( aspectRatio ) {
-						this.screenSize = createScreenSize(
-							PlatformKit.getAvailableScreenSize(
-								this.configurationManager.id
-							),
-							aspectRatio
-						)
-
-						initColorBuffer( this.context, this.screenSize )
-					},
-					this
-				)
-			)
 		}
 
 		Renderer.prototype = {
 			init : init,
-			destroy : function() {},
+			destroy : destroy,
 			activate : function() {},
 			deactivate : function() {},
 			process : process
