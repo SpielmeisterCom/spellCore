@@ -152,6 +152,16 @@ define(
 			)
 		}
 
+		var getExecutionGroupIdBySystemId = function( executionGroups, systemId ) {
+			for( var executionGroupId in executionGroups ) {
+				var executionGroup = executionGroups[ executionGroupId ]
+
+				if( executionGroup.hasKey( systemId ) ) {
+					return executionGroupId
+				}
+			}
+		}
+
 
 		/*
 		 * public
@@ -221,11 +231,23 @@ define(
 				this.script.destroy( this.spell, sceneConfig )
 			},
 			restartSystem: function( systemId, executionGroupId, systemConfig ) {
-				var executionGroup = this.executionGroups[ executionGroupId ]
+				var executionGroups = this.executionGroups
+
+				if( !executionGroupId ) {
+					// figure out in which execution group the system is contained
+					executionGroupId = getExecutionGroupIdBySystemId( executionGroups, systemId )
+				}
+
+				var executionGroup = executionGroups[ executionGroupId ]
 				if( !executionGroup ) return
 
 				var system = executionGroup.getByKey( systemId )
 				if( !system ) return
+
+				if( !systemConfig ) {
+					// reusing the existing system config if none was provided
+					systemConfig = system.config
+				}
 
 				// deactivating, destroying ye olde system
 				var spell = this.spell

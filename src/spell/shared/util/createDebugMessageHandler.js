@@ -89,6 +89,10 @@ define(
 			return function( message ) {
 				var handler = messageTypeToHandler[ message.type ]
 
+				if( !handler ) {
+					throw 'Error: Unknown message type \'' + message.type + '\'.'
+				}
+
 				handler( spell, message.payload )
 			}
 		}
