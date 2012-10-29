@@ -122,11 +122,16 @@ define(
 			return _.reduce(
 				systems,
 				function( memo, system ) {
-					var systemId = system.id
+					var systemId       = system.id,
+						systemTemplate = templateManager.getTemplate( systemId )
+
+					if( !systemTemplate ) {
+						throw 'Error: Could not get template for id \'' + systemId + '\'.'
+					}
 
 					return memo.add(
 						systemId,
-						createSystem( spell, entityManager, templateManager.getTemplate( systemId ), anonymizeModuleIds, system.config )
+						createSystem( spell, entityManager, systemTemplate, anonymizeModuleIds, system.config )
 					)
 				},
 				new OrderedMap()
