@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/OrderedMap',
+	'spell/shared/util/SortedMap',
 	[
 		'spell/shared/util/arrayRemove'
 	],

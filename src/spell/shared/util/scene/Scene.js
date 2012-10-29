@@ -7,7 +7,7 @@ define(
 		'spell/shared/util/entityConfig/flatten',
 		'spell/shared/util/hashModuleId',
 		'spell/shared/util/Events',
-		'spell/shared/util/OrderedMap',
+		'spell/shared/util/SortedMap',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'
