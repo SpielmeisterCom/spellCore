@@ -23,6 +23,10 @@
 			"componentId": "spell.component.box2d.applyVelocity"
 		},
 		{
+			"name": "setPositions",
+			"componentId": "spell.component.box2d.setPosition"
+		},
+		{
 			"name": "simpleBoxes",
 			"componentId": "spell.component.box2d.simpleBox"
 		},
@@ -46,6 +50,18 @@
 			"type": "boolean",
 			"default": true,
 			"doc": "if active is false the system will be skipped during processing"
+		},
+		{
+			"name": "gravity",
+			"type": "vec2",
+			"default": [ 0, -10 ],
+			"doc": "the local gravity of the world"
+		},
+		{
+			"name": "scale",
+			"type": "number",
+			"default": 1,
+			"doc": "the scale that is applied to input before it is passed to the physics engine"
 		}
 	]
 }

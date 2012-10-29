@@ -4,16 +4,14 @@ define(
 		'spell/shared/util/Events',
 		'spell/shared/util/platform/PlatformKit',
 
-		'spell/recursiveFunctions',
 		'spell/functions'
 	],
 	function(
 		Events,
 		PlatformKit,
 
-		_rec,
 		_
-		) {
+	) {
 		'use strict'
 
 
@@ -30,7 +28,6 @@ define(
 
 		var awakeColor      = [ 0.82, 0.76, 0.07 ],
 			notAwakeColor   = [ 0.27, 0.25, 0.02 ],
-			scaleFactor     = 1,
 			maxVelocity     = 10
 
 		var isSphereShape = function( bodyDef ) {
@@ -45,13 +42,13 @@ define(
 			}
 		}
 
-		var createBody = function( spell, debug, world, entityId, entity ) {
+		var createBody = function( spell, worldToPhysicsScale, debug, world, entityId, entity ) {
 			var simpleBoxOrSphere = entity[ 'spell.component.box2d.simpleBox' ] || entity[ 'spell.component.box2d.simpleSphere' ],
 				transform         = entity[ 'spell.component.2d.transform' ]
 
 			if( !simpleBoxOrSphere || !transform ) return
 
-			createBox2DBody( world, entityId, simpleBoxOrSphere, transform )
+			createBox2DBody( world, worldToPhysicsScale, entityId, simpleBoxOrSphere, transform )
 
 			if( debug ) {
 				var componentId,
@@ -95,14 +92,19 @@ define(
 		// public
 
 		var init = function( spell ) {
-			var gravity = new b2Vec2( 0, -10 ),
-				doSleep = true
+			var doSleep = true
 
-			this.world = new b2World( gravity, doSleep )
+			this.world = new b2World(
+				new b2Vec2(
+					this.config.gravity[ 0 ] * this.worldToPhysicsScale,
+					this.config.gravity[ 1 ] * this.worldToPhysicsScale
+				),
+				doSleep
+			)
 		}
 
 		var activate = function( spell ) {
-			this.entityCreatedHandler = _.bind( createBody, null, spell, this.debug, this.world )
+			this.entityCreatedHandler = _.bind( createBody, null, spell, this.worldToPhysicsScale, this.debug, this.world )
 			this.entityDestroyHandler = _.bind( this.removedEntities.push, this.removedEntities )
 
 			spell.eventManager.subscribe( Events.ENTITY_CREATED, this.entityCreatedHandler )
@@ -114,7 +116,7 @@ define(
 			spell.eventManager.unsubscribe( Events.ENTITY_DESTROYED, this.entityDestroyHandler )
 		}
 
-		var createBox2DBody = function( world, entityId, simpleBoxOrSphere, transform ) {
+		var createBox2DBody = function( world, worldToPhysicsScale, entityId, simpleBoxOrSphere, transform ) {
 			// fixture
 			var b2fixtureDef = new b2FixtureDef
 
@@ -123,11 +125,14 @@ define(
 			b2fixtureDef.restitution = simpleBoxOrSphere.restitution
 
 			if( isSphereShape( simpleBoxOrSphere ) ) {
-				b2fixtureDef.shape = new b2CircleShape( simpleBoxOrSphere.radius )
+				b2fixtureDef.shape = new b2CircleShape( simpleBoxOrSphere.radius * worldToPhysicsScale )
 
 			} else {
 				b2fixtureDef.shape = new b2PolygonShape
-				b2fixtureDef.shape.SetAsBox( simpleBoxOrSphere.dimensions[ 0 ] / scaleFactor / 2, simpleBoxOrSphere.dimensions[ 1 ] / scaleFactor / 2 )
+				b2fixtureDef.shape.SetAsBox(
+					simpleBoxOrSphere.dimensions[ 0 ] / 2 * worldToPhysicsScale,
+					simpleBoxOrSphere.dimensions[ 1 ] / 2 * worldToPhysicsScale
+				)
 			}
 
 			// body
@@ -136,8 +141,8 @@ define(
 
 			b2bodyDef.fixedRotation = simpleBoxOrSphere.fixedRotation
 			b2bodyDef.type          = simpleBoxOrSphere.type === 'dynamic' ? b2Body.b2_dynamicBody : b2Body.b2_staticBody
-			b2bodyDef.position.x    = translation[ 0 ] / scaleFactor
-			b2bodyDef.position.y    = translation[ 1 ] / scaleFactor
+			b2bodyDef.position.x    = translation[ 0 ] * worldToPhysicsScale
+			b2bodyDef.position.y    = translation[ 1 ] * worldToPhysicsScale
 			b2bodyDef.userData      = entityId
 
 			world.CreateBody( b2bodyDef ).CreateFixture( b2fixtureDef )
@@ -148,7 +153,7 @@ define(
 			world.ClearForces()
 		}
 
-		var transferState = function( world, transforms ) {
+		var transferState = function( world, worldToPhysicsScale, transforms ) {
 			for( var body = world.GetBodyList(); body; body = body.m_next ) {
 				var id = body.GetUserData()
 
@@ -157,8 +162,8 @@ define(
 				var position  = body.GetPosition(),
 					transform = transforms[ id ]
 
-				transform.translation[ 0 ] = position.x * scaleFactor
-				transform.translation[ 1 ] = position.y * scaleFactor
+				transform.translation[ 0 ] = position.x / worldToPhysicsScale
+				transform.translation[ 1 ] = position.y / worldToPhysicsScale
 				transform.rotation = body.GetAngle() * -1
 			}
 		}
@@ -175,7 +180,7 @@ define(
 			}
 		}
 
-		var applyInfluence = function( entityManager, world, applyForces, applyTorques, applyImpulses, applyVelocities ) {
+		var applyInfluence = function( entityManager, world, worldToPhysicsScale, applyForces, applyTorques, applyImpulses, applyVelocities, setPositions ) {
 			for( var body = world.GetBodyList(); body; body = body.m_next ) {
 				var id = body.GetUserData()
 
@@ -186,8 +191,8 @@ define(
 
 				if( applyForce ) {
 					var force  = applyForce.force,
-						forceX = force[ 0 ],
-						forceY = force[ 1 ]
+						forceX = force[ 0 ] * worldToPhysicsScale,
+						forceY = force[ 1 ] * worldToPhysicsScale
 
 					if( forceX || forceY ) {
 						var point = applyForce.point
@@ -205,7 +210,7 @@ define(
 				var applyTorque = applyTorques[ id ]
 
 				if( applyTorque ) {
-					var torque = applyTorque.torque
+					var torque = applyTorque.torque * worldToPhysicsScale
 
 					if( torque ) {
 						body.ApplyTorque( torque )
@@ -217,8 +222,8 @@ define(
 
 				if( applyImpulse ) {
 					var impulse  = applyImpulse.impulse,
-						impulseX = impulse[ 0 ],
-						impulseY = impulse[ 1 ]
+						impulseX = impulse[ 0 ] * worldToPhysicsScale,
+						impulseY = impulse[ 1 ] * worldToPhysicsScale
 
 					if( impulseX || impulseY ) {
 						var point = applyImpulse.point
@@ -235,13 +240,33 @@ define(
 				}
 
 				// spell.component.box2d.applyVelocity
-				var velocity        = applyVelocities[ id ]
+				var velocity = applyVelocities[ id ]
 
-				if ( velocity ) {
-					body.SetLinearVelocity( new b2Vec2( velocity.velocity[0], velocity.velocity[1] ) )
+				if( velocity ) {
+					body.SetLinearVelocity(
+						new b2Vec2(
+							velocity.velocity[ 0 ] * worldToPhysicsScale,
+							velocity.velocity[ 1 ] * worldToPhysicsScale
+						)
+					)
 
 					entityManager.removeComponent( id, 'spell.component.box2d.applyVelocity' )
 				}
+
+				// spell.component.box2d.setPosition
+				var setPosition = setPositions[ id ]
+
+				if( setPosition ) {
+					body.SetPosition(
+						new b2Vec2(
+							setPosition.value[ 0 ] * worldToPhysicsScale,
+							setPosition.value[ 1 ] * worldToPhysicsScale
+						)
+					)
+
+					entityManager.removeComponent( id, 'spell.component.box2d.setPosition' )
+				}
+
 
 				// check max velocity constraint
 				var velocityVec2 = body.GetLinearVelocity(),
@@ -256,18 +281,19 @@ define(
 		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
-			var world           = this.world,
-				transforms      = this.transforms,
-				removedEntities = this.removedEntities
+			var world               = this.world,
+				transforms          = this.transforms,
+				removedEntities     = this.removedEntities,
+				worldToPhysicsScale = this.worldToPhysicsScale
 
 			if( removedEntities.length ) {
 				destroyBodies( world, removedEntities )
 				removedEntities.length = 0
 			}
 
-			applyInfluence( spell.EntityManager, world, this.applyForces, this.applyTorques, this.applyImpulses, this.applyVelocities )
+			applyInfluence( spell.EntityManager, world, worldToPhysicsScale, this.applyForces, this.applyTorques, this.applyImpulses, this.applyVelocities, this.setPositions )
 			simulate( world, deltaTimeInMs )
-			transferState( world, transforms )
+			transferState( world, worldToPhysicsScale, transforms )
 
 			if( this.debug ) {
 				updateDebug( world, this.debugBoxes, this.debugCircles, transforms )
@@ -280,6 +306,7 @@ define(
 			this.entityDestroyHandler
 			this.removedEntities = []
 			this.world
+			this.worldToPhysicsScale = this.config.scale
 		}
 
 		Box2DSystem.prototype = {

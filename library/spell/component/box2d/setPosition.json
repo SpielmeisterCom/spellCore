@@ -1,0 +1,15 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Box2D Set Position",
+	"doc": "",
+	"icon": "",
+	"attributes": [
+		{
+			"name": "value",
+			"type": "vec2",
+			"default": [ 0, 0 ]
+		}
+	]
+}
