@@ -26,12 +26,12 @@ define(
 		var createSendLoadingProgress = function( sendMessageToEditor ) {
 			if( !sendMessageToEditor ) return function() {}
 
-			var numLoadingSteps    = 2,
+			var numLoadingSteps    = 3,
 				invNumLoadingSteps = 1 / numLoadingSteps,
 				loadingStep        = 0
 
 			return function() {
-				sendMessageToEditor( 'spell.loadingProgress', ( loadingStep++ * invNumLoadingSteps) )
+				sendMessageToEditor( 'spell.loadingProgress', ( loadingStep++ * invNumLoadingSteps ) )
 			}
 		}
 
@@ -139,6 +139,8 @@ define(
 				libraryIdsToJsonFilenames( runtimeModule.libraryIds ),
 				libraryBundleName
 			)
+
+			sendLoadingProgress()
 		}
 	}
 )
