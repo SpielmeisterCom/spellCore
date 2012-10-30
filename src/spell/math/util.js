@@ -79,6 +79,21 @@ define(
 				tmp
 		}
 
+		/**
+		 * This function rounds to the specified resolution.
+		 *
+		 * @param value
+		 * @param resolution
+		 * @return {*}
+		 */
+		mathUtil.roundToResolution = function( value, resolution ) {
+			if( !resolution ) resolution = 0.5
+
+			var rest = value % resolution
+
+   			return value - rest + ( rest > ( resolution / 2 ) ? resolution : 0 )
+		}
+
 		return mathUtil
 	}
 )

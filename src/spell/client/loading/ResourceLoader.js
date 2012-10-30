@@ -51,16 +51,16 @@ define(
 
 		var createResourceBundle = function( config, id, name, resources ) {
 			return {
-				processOnLoad         : config.processOnLoad,
-				baseUrl               : config.baseUrl,
-				id                    : id,
-				name                  : name,
-				omitCache             : config.omitCache,
-				onLoadingCompleted    : config.onLoadingCompleted,
-				resources             : resources,
-				resourcesTotal        : resources.length,
-				resourcesNotCompleted : resources.length,
-				type                  : config.type
+				processOnLoad      : config.processOnLoad,
+				baseUrl            : config.baseUrl,
+				id                 : id,
+				name               : name,
+				omitCache          : config.omitCache,
+				onLoadingCompleted : config.onLoadingCompleted,
+				resources          : resources,
+				resourcesTotal     : resources.length,
+				resourcesCompleted : 0,
+				type               : config.type
 			}
 		}
 
@@ -82,20 +82,20 @@ define(
 		}
 
 		var updateProgress = function( eventManager, cache, resourceBundles, resourceBundle ) {
-			resourceBundle.resourcesNotCompleted -= 1
+			resourceBundle.resourcesCompleted++
 
 			var name = resourceBundle.name
 
 			if( name ) {
-				var progress = 1.0 - resourceBundle.resourcesNotCompleted / resourceBundle.resourcesTotal
+				var progress = resourceBundle.resourcesCompleted / resourceBundle.resourcesTotal
 
 				eventManager.publish(
 					[ Events.RESOURCE_PROGRESS, resourceBundle.name ],
-					[ progress ]
+					[ progress, resourceBundle.resourcesCompleted, resourceBundle.resourcesTotal ]
 				)
 			}
 
-			if( resourceBundle.resourcesNotCompleted === 0 ) {
+			if( resourceBundle.resourcesCompleted === resourceBundle.resourcesTotal ) {
 				if( name ) {
 					eventManager.publish(
 						[ Events.RESOURCE_LOADING_COMPLETED, name ],
