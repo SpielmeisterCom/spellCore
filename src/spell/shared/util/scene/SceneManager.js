@@ -42,11 +42,15 @@ define(
 
 		SceneManager.prototype = {
 			startScene: function( sceneId, anonymizeModuleIds ) {
+				var onProgress = this.sendMessageToEditor ?
+					_.bind( this.sendMessageToEditor, null, 'spell.loadingProgress' ) :
+					undefined
+
 				loadSceneResources(
 					this.spell,
 					sceneId,
 					_.bind( postLoadedResources, this, this.spell, this.entityManager, this.templateManager, anonymizeModuleIds, sceneId ),
-					_.bind( this.sendMessageToEditor, null, 'spell.loadingProgress' )
+					onProgress
 				)
 			},
 			addSystem: function( systemId, executionGroupId, index, systemConfig ) {
