@@ -304,7 +304,7 @@ define(
 			 *
 			 *     //create a new entity with child entities
 			 *     var entityId = spell.entityManager.createEntity({
-			 *         "config": {
+			 *         config: {
 			 *             "spell.component.2d.transform": {
 			 *                 "translation": [ 100, 200 ]
 			 *             },
@@ -315,18 +315,19 @@ define(
 			 *                 "assetId": "appearance:library.identifier.of.my.static.appearance"
 			 *             }
 			 *         },
-			 *         "children": [
+			 *         children: [
 			 *             {
-			 *                 "config": {
-			 *                         "spell.component.2d.transform": {
-			 *                         "translation": [ -15, 20 ] //translation is relative to the parent
-			 *                     },
-			 *                     "spell.component.visualObject": {
-			 *                       //if no configuration is specified the default values of this component will be used
-			 *                     },
-			 *                     "spell.component.2d.graphics.appearance": {
-			 *                         "assetId": "appearance:library.identifier.of.my.other.static.appearance"
-			 *                     }
+			 *                 config: {
+			 *                             "spell.component.2d.transform": {
+			 *                                 "translation": [ -15, 20 ] //translation is relative to the parent
+			 *                             },
+			 *                             "spell.component.visualObject": {
+			 *                               //if no configuration is specified the default values of this component will be used
+			 *                             },
+			 *                             "spell.component.2d.graphics.appearance": {
+			 *                                 "assetId": "appearance:library.identifier.of.my.other.static.appearance"
+			 *                             }
+			 *                 }
 			 *             }
 			 *         ]
 			 *
@@ -523,7 +524,7 @@ define(
 			 *
 			 * Example usage:
 			 *     //update a component of an entity
-			 *     spell.updateComponent(
+			 *     spell.entityManager.updateComponent(
 			 *         entityId
 			 *         "spell.component.2d.graphics.apperance",
 			 *         {
@@ -562,6 +563,7 @@ define(
 			 *
 			 * @param assetId
 			 * @param asset
+			 * @private
 			 */
 			updateAssetReferences : function( assetId, asset ) {
 				var componentIds = this.templateManager.getComponentsWithAssets()
