@@ -23,15 +23,15 @@ define(
 		'use strict'
 
 
-		var createSendLoadingProgress = function( sendMessageToEditor ) {
-			if( !sendMessageToEditor ) return function() {}
+		var createSendLoadingProgress = function( progressCallback ) {
+			if( !progressCallback ) return function() {}
 
 			var numLoadingSteps    = 3,
 				invNumLoadingSteps = 1 / numLoadingSteps,
 				loadingStep        = 0
 
 			return function() {
-				sendMessageToEditor( 'spell.loadingProgress', ( loadingStep++ * invNumLoadingSteps ) )
+				progressCallback( loadingStep++ * invNumLoadingSteps )
 			}
 		}
 
@@ -85,7 +85,7 @@ define(
 		}
 
 
-		return function( spell, sceneId, next, sendMessageToEditor ) {
+		return function( spell, sceneId, next, progressCallback ) {
 			var eventManager     = spell.eventManager,
 				renderingContext = spell.renderingContext,
 				resourceLoader   = spell.resourceLoader,
@@ -96,7 +96,7 @@ define(
 			var libraryBundleName  = 'library',
 				resourceBundleName = 'resources'
 
-			var sendLoadingProgress = createSendLoadingProgress( sendMessageToEditor )
+			var sendLoadingProgress = createSendLoadingProgress( progressCallback )
 
 
 			eventManager.waitFor(

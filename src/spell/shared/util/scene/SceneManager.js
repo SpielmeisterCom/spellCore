@@ -46,7 +46,7 @@ define(
 					this.spell,
 					sceneId,
 					_.bind( postLoadedResources, this, this.spell, this.entityManager, this.templateManager, anonymizeModuleIds, sceneId ),
-					this.sendMessageToEditor
+					_.bind( this.sendMessageToEditor, null, 'spell.loadingProgress' )
 				)
 			},
 			addSystem: function( systemId, executionGroupId, index, systemConfig ) {
