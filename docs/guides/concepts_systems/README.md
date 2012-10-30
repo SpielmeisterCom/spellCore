@@ -29,8 +29,13 @@ Since a systems' implementation is done in a script all standard rules related t
 ### A basic system skeleton
 
 <pre><code>
+/**
+ * @class Foo
+ * @singleton
+ */
+
 define(
-	'script/system/foo',
+	'Foo',
 	[
 		'spell/functions'
 	],
@@ -40,17 +45,63 @@ define(
 		'use strict'
 
 
-		var Foo = function( globals ) {}
+
+		/**
+		 * Creates an instance of the system.
+		 *
+		 * @constructor
+		 * @param {Object} [spell] The spell object.
+		 */
+		var Foo = function( spell ) {
+
+		}
 
 		Foo.prototype = {
-			cleanUp : function() {
-				// do some cleaning up
+			/**
+		 	 * Gets called when the system is created.
+		 	 *
+		 	 * @param {Object} [spell] The spell object.
+			 */
+			init: function( spell ) {
+
 			},
-			init    : function() {
-				// do some initializing
+
+			/**
+		 	 * Gets called when the system is destroyed.
+		 	 *
+		 	 * @param {Object} [spell] The spell object.
+			 */
+			destroy: function( spell ) {
+
 			},
-			process : function( globals, timeInMs, deltaTimeInMs ) {
-				// do some processing on entities
+
+			/**
+		 	 * Gets called when the system is activated.
+		 	 *
+		 	 * @param {Object} [spell] The spell object.
+			 */
+			activate: function( spell ) {
+
+			},
+
+			/**
+		 	 * Gets called when the system is deactivated.
+		 	 *
+		 	 * @param {Object} [spell] The spell object.
+			 */
+			deactivate: function( spell ) {
+
+			},
+
+			/**
+		 	 * Gets called to trigger the processing of game state.
+		 	 *
+			 * @param {Object} [spell] The spell object.
+			 * @param {Object} [timeInMs] The current time in ms.
+			 * @param {Object} [deltaTimeInMs] The elapsed time in ms.
+			 */
+			process: function( spell, timeInMs, deltaTimeInMs ) {
+
 			}
 		}
 
@@ -70,21 +121,66 @@ required input the *component dictionary* of all transform components can be acc
 <pre><code>
 ...
 
-var Foo = function( globals ) {
-	var aComponent = this.myTransformComponents[ _.size( this.myTransformComponents ) - 1 ]
-	examine( aComponent )
-	...
+var Foo = function( spell ) {
+
+    for (var entityId in this.myTransformComponents) {
+
+        doSomethingWithEntityId( entityId )
+    }
+
+	//...
 }
 
 Foo.prototype = {
-	cleanUp : function() {
-		// do some cleaning up
-	},
-	init    : function() {
-		// do some initializing
-	},
-	process : function( globals, timeInMs, deltaTimeInMs ) {
-		_.each( this.myTransformComponents, function( component, entityId ) { // do stuff } )
+        /**
+         * Gets called when the system is created.
+         *
+         * @param {Object} [spell] The spell object.
+         */
+        init: function( spell ) {
+
+        },
+
+        /**
+         * Gets called when the system is destroyed.
+         *
+         * @param {Object} [spell] The spell object.
+         */
+        destroy: function( spell ) {
+
+        },
+
+        /**
+         * Gets called when the system is activated.
+         *
+         * @param {Object} [spell] The spell object.
+         */
+        activate: function( spell ) {
+
+        },
+
+        /**
+         * Gets called when the system is deactivated.
+         *
+         * @param {Object} [spell] The spell object.
+         */
+        deactivate: function( spell ) {
+
+        },
+
+        /**
+         * Gets called to trigger the processing of game state.
+         *
+         * @param {Object} [spell] The spell object.
+         * @param {Object} [timeInMs] The current time in ms.
+         * @param {Object} [deltaTimeInMs] The elapsed time in ms.
+         */
+        process: function( spell, timeInMs, deltaTimeInMs ) {
+		    _.each( this.myTransformComponents, function( component, entityId ) {
+		        // do stuff
+		     } )
+
+        }
 	}
 }
 
