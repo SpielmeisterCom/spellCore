@@ -138,7 +138,7 @@ define(
 			)
 		}
 
-		var addTemplate = function( assets, templates, componentsWithAssets, entityPrototypes, definition, overwrite ) {
+		var addTemplate = function( assets, onComponentTypeAdded, templates, componentsWithAssets, entityPrototypes, definition, overwrite ) {
 			var templateId = createName( definition.namespace, definition.name ),
 				type       = definition.type
 
@@ -157,6 +157,8 @@ define(
 				var hasAssetId = hasAssetIdAttribute( definition.attributes )
 
 				if( hasAssetId ) componentsWithAssets[ templateId ] = true
+
+				onComponentTypeAdded( templateId )
 			}
 		}
 
@@ -253,6 +255,7 @@ define(
 
 				addTemplate(
 					this.assets,
+					this.onComponentTypeAdded,
 					this.templates,
 					this.componentsWithAssets,
 					this.entityPrototypes,
@@ -319,6 +322,15 @@ define(
 					},
 					[]
 				)
+			},
+
+			/**
+			 * HACK: EntityManager and TemplateManager need major surgery.
+			 *
+			 * @param fn
+			 */
+			registerComponentTypeAddedCallback : function( fn ) {
+				this.onComponentTypeAdded = fn
 			}
 		}
 

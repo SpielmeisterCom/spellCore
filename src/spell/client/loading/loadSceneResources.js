@@ -1,5 +1,5 @@
 define(
-	'spell/client/loading/loadResources',
+	'spell/client/loading/loadSceneResources',
 	[
 		'spell/client/util/updateAssets',
 		'spell/client/loading/addNamespaceAndName',
@@ -85,7 +85,7 @@ define(
 		}
 
 
-		return function( spell, sendMessageToEditor, next ) {
+		return function( spell, sceneId, next, sendMessageToEditor ) {
 			var eventManager     = spell.eventManager,
 				renderingContext = spell.renderingContext,
 				resourceLoader   = spell.resourceLoader,
@@ -98,46 +98,65 @@ define(
 
 			var sendLoadingProgress = createSendLoadingProgress( sendMessageToEditor )
 
+
 			eventManager.waitFor(
-				[ Events.RESOURCE_LOADING_COMPLETED, libraryBundleName ],
-				function( loadedLibrary ) {
-					addNamespaceAndName( loadedLibrary )
+				[ Events.RESOURCE_LOADING_COMPLETED, sceneId ],
+				function( loadedRecords ) {
+					addNamespaceAndName( loadedRecords )
 
-					var library = groupByType( loadedLibrary )
-
-					_.extend( spell.scenes, addIdAsKey( library.scene ) )
-
-					updateAssets( spell.assets, library.asset )
-					resourceLoader.load( createFilesToLoad( library.asset ), resourceBundleName )
-
-					addTemplates( templateManager, library.component )
-					addTemplates( templateManager, library.entityTemplate )
-					addTemplates( templateManager, library.system )
-
-					sendLoadingProgress()
-				}
-
-			).and(
-				[ Events.RESOURCE_LOADING_COMPLETED, resourceBundleName ],
-				function( loadedResources ) {
-					_.each(
-						spell.assets,
-						_.bind( injectResource, null, loadedResources )
-					)
+					_.extend( spell.scenes, addIdAsKey( loadedRecords ) )
 
 					sendLoadingProgress()
 				}
 
 			).resume( function() {
-				sendLoadingProgress()
+				eventManager.waitFor(
+					[ Events.RESOURCE_LOADING_COMPLETED, libraryBundleName ],
+					function( loadedRecords ) {
+						addNamespaceAndName( loadedRecords )
 
-				next()
+						var library = groupByType( loadedRecords )
+
+						updateAssets( spell.assets, library.asset )
+						resourceLoader.load( createFilesToLoad( library.asset ), resourceBundleName )
+
+						addTemplates( templateManager, library.component )
+						addTemplates( templateManager, library.entityTemplate )
+						addTemplates( templateManager, library.system )
+
+						sendLoadingProgress()
+					}
+
+				).and(
+					[ Events.RESOURCE_LOADING_COMPLETED, resourceBundleName ],
+					function( loadedResources ) {
+						_.each(
+							spell.assets,
+							_.bind( injectResource, null, loadedResources )
+						)
+
+						sendLoadingProgress()
+					}
+
+				).resume( function() {
+					sendLoadingProgress()
+
+					next()
+				} )
+
+				// start loading the required library records
+				var scene = spell.scenes[ sceneId ]
+
+				resourceLoader.load(
+					libraryIdsToJsonFilenames( scene.libraryIds ),
+					libraryBundleName
+				)
 			} )
 
-			// start loading library definition files
+			// load scene library record
 			resourceLoader.load(
-				libraryIdsToJsonFilenames( runtimeModule.libraryIds ),
-				libraryBundleName
+				libraryIdsToJsonFilenames( [ sceneId ] ),
+				sceneId
 			)
 
 			sendLoadingProgress()

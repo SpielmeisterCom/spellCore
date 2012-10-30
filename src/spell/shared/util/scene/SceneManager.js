@@ -1,13 +1,13 @@
 define(
 	'spell/shared/util/scene/SceneManager',
 	[
-		'spell/shared/util/Events',
+		'spell/client/loading/loadSceneResources',
 		'spell/shared/util/scene/Scene',
 
 		'spell/functions'
 	],
 	function(
-		Events,
+		loadSceneResources,
 		Scene,
 
 		_
@@ -15,27 +15,39 @@ define(
 		'use strict'
 
 
-		/*
-		 * public
-		 */
+		var postLoadedResources = function( spell, entityManager, templateManager, anonymizeModuleIds, sceneId ) {
+			var scene       = new Scene( spell, entityManager, templateManager, anonymizeModuleIds ),
+				sceneConfig = spell.scenes[ sceneId ]
 
-		var SceneManager = function( spell, EntityManager, templateManager, mainLoop ) {
-			this.EntityManager   = EntityManager
-			this.templateManager = templateManager
-			this.mainLoop        = mainLoop
-			this.spell           = spell
-			this.activeScene     = null
+			if( !sceneConfig ) {
+				throw 'Error: Could not find scene configuration for scene \'' + sceneId + '\'.'
+			}
+
+			scene.init( sceneConfig )
+
+			this.mainLoop.setRenderCallback( _.bind( scene.render, scene ) )
+			this.mainLoop.setUpdateCallback( _.bind( scene.update, scene ) )
+
+			this.activeScene = scene
+		}
+
+		var SceneManager = function( spell, EntityManager, templateManager, mainLoop, sendMessageToEditor ) {
+			this.activeScene
+			this.entityManager       = EntityManager
+			this.mainLoop            = mainLoop
+			this.sendMessageToEditor = sendMessageToEditor
+			this.spell               = spell
+			this.templateManager     = templateManager
 		}
 
 		SceneManager.prototype = {
-			startScene: function( sceneConfig, anonymizeModuleIds ) {
-				var scene = new Scene( this.spell, this.EntityManager, this.templateManager, anonymizeModuleIds )
-				scene.init( sceneConfig )
-
-				this.mainLoop.setRenderCallback( _.bind( scene.render, scene ) )
-				this.mainLoop.setUpdateCallback( _.bind( scene.update, scene ) )
-
-				this.activeScene = scene
+			startScene: function( sceneId, anonymizeModuleIds ) {
+				loadSceneResources(
+					this.spell,
+					sceneId,
+					_.bind( postLoadedResources, this, this.spell, this.entityManager, this.templateManager, anonymizeModuleIds, sceneId ),
+					this.sendMessageToEditor
+				)
 			},
 			addSystem: function( systemId, executionGroupId, index, systemConfig ) {
 				this.activeScene.addSystem( systemId, executionGroupId, index, systemConfig )

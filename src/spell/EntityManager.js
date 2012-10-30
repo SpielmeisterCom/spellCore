@@ -63,16 +63,8 @@ define(
 			return '' + number
 		}
 
-		var createComponentList = function( componentTemplateIds ) {
-			return _.reduce(
-				componentTemplateIds,
-				function( memo, componentTemplateId ) {
-					memo[ componentTemplateId ] = {}
-
-					return memo
-				},
-				{}
-			)
+		var addComponentType = function( componentMaps, componentId ) {
+			componentMaps[ componentId ] = {}
 		}
 
 		var addComponents = function( componentDictionaries, entityId, entityComponents ) {
@@ -302,9 +294,13 @@ define(
 		 */
 
 		var EntityManager = function( eventManager, templateManager ) {
-			this.componentDictionaries = createComponentList( templateManager.getTemplateIds( TemplateTypes.COMPONENT ) )
+			this.componentDictionaries = {}
 			this.eventManager          = eventManager
 			this.templateManager       = templateManager
+
+			this.templateManager.registerComponentTypeAddedCallback(
+				_.bind( addComponentType, null, this.componentDictionaries )
+			)
 		}
 
 		EntityManager.prototype = {

@@ -1,7 +1,6 @@
 define(
 	'spell/client/main',
 	[
-		'spell/client/loading/loadResources',
 		'spell/client/staticInclude',
 		'spell/shared/util/createMainLoop',
 		'spell/EntityManager',
@@ -20,7 +19,6 @@ define(
 		'spell/functions'
 	],
 	function(
-		loadResources,
 		staticInclude,
 		createMainLoop,
 		EntityManager,
@@ -44,34 +42,6 @@ define(
 		'use strict'
 
 
-		/**
-		 * This function is called as soon as all external resources are loaded. From this moment on it is safe to assume that all static content has been
-		 * loaded and is ready to use.
-		 */
-		var postLoadedResources = function() {
-			var spell = this.spell
-
-			spell.EntityManager = new EntityManager( spell.eventManager, spell.templateManager )
-			spell.sceneManager  = new SceneManager( spell, spell.EntityManager, spell.templateManager, spell.mainLoop )
-
-			spell.logger.debug( 'loading resources completed' )
-
-			PlatformKit.registerOnScreenResize( spell.eventManager, spell.configurationManager.id, spell.configurationManager.screenSize )
-
-			var renderingContextConfig = spell.renderingContext.getConfiguration()
-			spell.logger.debug( 'created rendering context (' + renderingContextConfig.type + ')' )
-
-
-			var sceneConfig = spell.scenes[ spell.runtimeModule.startScene ]
-
-			if( !sceneConfig ) throw 'Error: Could not find start scene \'' + spell.runtimeModule.startScene + '\'.'
-
-			var anonymizeModuleIds = spell.configurationManager.mode === 'deployed'
-			spell.sceneManager.startScene( sceneConfig, anonymizeModuleIds )
-
-			spell.mainLoop.run()
-		}
-
 		var start = function( runtimeModule, cacheContent ) {
 			var spell = this.spell
 			spell.runtimeModule = runtimeModule
@@ -93,11 +63,17 @@ define(
 				configurationManager.renderingBackEnd
 			)
 
+			PlatformKit.registerOnScreenResize( spell.eventManager, configurationManager.id, configurationManager.screenSize )
+
+			spell.logger.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
+
 			var inputManager = new InputManager( configurationManager )
 
 			var resourceLoader = new ResourceLoader( spell, spell.eventManager, renderingContext, configurationManager.resourceServer )
 
 			if( cacheContent ) resourceLoader.setCache( cacheContent )
+
+			var sceneManager  = new SceneManager( spell, spell.EntityManager, spell.templateManager, spell.mainLoop, this.sendMessageToEditor )
 
 			_.extend(
 				spell,
@@ -107,15 +83,15 @@ define(
 					inputManager         : inputManager,
 					renderingContext     : renderingContext,
 					resourceLoader       : resourceLoader,
-					resources            : resourceLoader.getCache()
+					resources            : resourceLoader.getCache(),
+					sceneManager         : sceneManager
 				}
 			)
 
-			loadResources(
-				spell,
-				this.sendMessageToEditor,
-				_.bind( postLoadedResources, this )
-			)
+			var anonymizeModuleIds = spell.configurationManager.mode === 'deployed'
+			spell.sceneManager.startScene( spell.runtimeModule.startScene, anonymizeModuleIds )
+
+			spell.mainLoop.run()
 		}
 
 		var init = function( loaderConfig ) {
@@ -127,6 +103,7 @@ define(
 				soundManager      = PlatformKit.createSoundManager(),
 				statisticsManager = new StatisticsManager(),
 				templateManager   = new TemplateManager( assets ),
+				entityManager     = new EntityManager( eventManager, templateManager ),
 				mainLoop          = createMainLoop( eventManager, statisticsManager )
 
 			statisticsManager.init()
@@ -135,6 +112,7 @@ define(
 				spell,
 				{
 					assets               : assets,
+					EntityManager        : entityManager,
 					eventManager         : eventManager,
 					loaderConfig         : loaderConfig,
 					logger               : logger,
