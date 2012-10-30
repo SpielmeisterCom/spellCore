@@ -50,7 +50,7 @@ define(
 		}
 
 		var updateComponent = function( spell, payload ) {
-			var success = spell.entityManager.updateComponent( payload.componentId, payload.entityId, payload.config )
+			var success = spell.entityManager.updateComponent( payload.entityId, payload.componentId, payload.config )
 
 			if( !success ) {
 				spell.logger.error( 'Could not update component \'' + payload.componentId + '\' in entity ' + payload.entityId + '.' )

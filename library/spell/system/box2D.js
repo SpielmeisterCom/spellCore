@@ -70,10 +70,8 @@ define(
 
 				spell.entityManager.addComponent(
 					entityId,
-					{
-						componentId : componentId,
-						config : config
-					}
+					componentId,
+					config
 				)
 			}
 		}

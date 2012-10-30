@@ -185,38 +185,6 @@ define(
 			}
 		}
 
-		/**
-		 * Normalizes the provided component config
-		 *
-		 * @param arg0 can be either a component id or a component config
-		 * @private
-		 * @return {*}
-		 */
-		var normalizeComponentConfig = function( arg0 ) {
-			var componentId,
-				config
-
-			if( !arg0 ) return
-
-			if( _.isString( arg0 ) ) {
-				componentId = arg0
-				config = {}
-
-			} else if( _.isObject( arg0 ) ) {
-				if( !_.has( arg0, 'componentId' ) ) {
-					throw 'Error: Supplied invalid arguments.'
-				}
-
-				componentId = arg0.componentId
-				config = arg0.config || {}
-			}
-
-			var result = {}
-			result[ componentId ] = config
-
-			return result
-		}
-
 		var createAdditionalEntityConfig = function( isRoot, childEntityIds, name ) {
 			var result = {}
 
@@ -473,34 +441,35 @@ define(
 			/**
 			 * Adds a component to an entity.
 			 *
-			 * Available configuration options are:
-			 *
-			 * * **componentId** [String] - the library path of the component
-			 * * **config** [Object] - attribute configuration for this component. It can also be used to partially override the component's default values
-			 *
 			 * Example usage:
 			 *
 			 *     //add a component with it's default configuration to this entity
 			 *     spell.entityManager.addComponent( entityId, "spell.component.2d.graphics.debug.box" )
 			 *
 			 *     //add a component to this entity and override a default value
-			 *     spell.entityManager.addComponent( entityId, {
-			 *         "componentId": "spell.component.2d.graphics.textApperance",
-			 *         "config": {
+			 *     spell.entityManager.addComponent(
+			 *         entityId,
+			 *         "spell.component.2d.graphics.textApperance",
+			 *         {
 			 *             "text": "Hello World"
 			 *         }
-			 *     } )
+			 *     )
 			 *
 			 * @param {String} entityId of the entity that the component belongs to
-			 * @param {*} arg1 can be a component template id or a component template config
+			 * @param {String} componentId the library path of the component to add
+			 * @param {Object} attributeConfig the attribute configuration of the component
 			 */
-			addComponent : function( entityId, arg1 ) {
+			addComponent : function( entityId, componentId, attributeConfig ) {
 				if( !entityId ) throw 'Error: Missing entity id.'
+				if( !componentId ) throw 'Error: Missing component id.'
+
+				var componentConfigs = {}
+				componentConfigs[ componentId ] = attributeConfig || {}
 
 				addComponents(
 					this.componentDictionaries,
 					entityId,
-					this.templateManager.createComponents( null, normalizeComponentConfig( arg1 ) )
+					this.templateManager.createComponents( null, componentConfigs )
 				)
 			},
 
@@ -509,7 +478,6 @@ define(
 			 *
 			 * @param {String} entityId the id of the entity that the component belongs to
 			 * @param {String} componentId the library path of the component to remove
-			 * @return {*}
 			 */
 			removeComponent : function( entityId, componentId ) {
 				if( !entityId ) throw 'Error: Missing entity id.'
@@ -556,20 +524,20 @@ define(
 			 * Example usage:
 			 *     //update a component of an entity
 			 *     spell.updateComponent(
+			 *         entityId
 			 *         "spell.component.2d.graphics.apperance",
-			 *         entityId,
 			 *         {
 			 *             "assetId": "appearance:library.identifier.of.my.static.appearance"
 			 *         }
 			 *
 			 *     )
 			 *
-			 * @param {String} componentId the component id of the component
 			 * @param {String} entityId the id of the entity which the component belongs to
+			 * @param {String} componentId the library path of the component
 			 * @param {Object} attributeConfig the attribute configuration change of the component
-			 * @return {Boolean}
+			 * @return {Boolean} true if the component could be found, false otherwise
 			 */
-			updateComponent : function( componentId, entityId, attributeConfig ) {
+			updateComponent : function( entityId, componentId, attributeConfig ) {
 				var component = this.getComponentById( componentId, entityId )
 
 				if( !component ) return false
