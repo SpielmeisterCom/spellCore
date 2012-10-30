@@ -5,9 +5,11 @@ define(
 		'spell/client/loading/addNamespaceAndName',
 		'spell/client/loading/createFilesToLoad',
 		'spell/client/loading/injectResource',
+		'spell/math/util',
 		'spell/shared/util/createId',
 		'spell/shared/util/Events',
 		'spell/shared/util/platform/PlatformKit',
+
 		'spell/functions'
 	],
 	function(
@@ -15,25 +17,15 @@ define(
 		addNamespaceAndName,
 		createFilesToLoad,
 		injectResource,
+		mathUtil,
 		createId,
 		Events,
 		PlatformKit,
+
 		_
 	) {
 		'use strict'
 
-
-		var createSendLoadingProgress = function( progressCallback ) {
-			if( !progressCallback ) return function() {}
-
-			var numLoadingSteps    = 3,
-				invNumLoadingSteps = 1 / numLoadingSteps,
-				loadingStep        = 0
-
-			return function() {
-				progressCallback( loadingStep++ * invNumLoadingSteps )
-			}
-		}
 
 		var libraryIdsToJsonFilenames = function( resourceIds ) {
 			return _.map(
@@ -84,6 +76,54 @@ define(
 			)
 		}
 
+		var createLoadingProgress = function( eventManager, progressCallback ) {
+			if( !progressCallback ) progressCallback = function() {}
+
+			var LoadingProgress = function( eventManager, progressCallback ) {
+				this.bundles          = {}
+				this.eventManager     = eventManager
+				this.progressCallback = progressCallback
+				this.progress         = 0
+				this.lastSendProgress = 0
+				this.progressHandler  = function( portion, progress, numCompleted, numTotal ) {
+					this.progress += portion / numTotal
+
+					var currentProgress = mathUtil.roundToResolution( this.progress, 0.05 )
+
+					if( currentProgress <= this.lastSendProgress ) return
+
+					this.lastSendProgress = currentProgress
+					this.progressCallback( currentProgress )
+				}
+			}
+
+			LoadingProgress.prototype = {
+				addBundle : function( name, portion ) {
+					// the loading interval is [ 0, 0.99 ], call "complete" to signal progress of 1
+					var handler = _.bind( this.progressHandler, this, portion * 0.99 )
+
+					this.bundles[ name ] = handler
+
+					this.eventManager.subscribe( [ Events.RESOURCE_PROGRESS, name ], handler )
+				},
+				complete : function() {
+					this.progressCallback( 1 )
+				},
+				destroy : function() {
+					var eventManager = this.eventManager
+
+					_.each(
+						this.bundles,
+						function( handler, name ) {
+							eventManager.unsubscribe( [ Events.RESOURCE_PROGRESS, name ], handler )
+						}
+					)
+				}
+			}
+
+			return new LoadingProgress( eventManager, progressCallback )
+		}
+
 
 		return function( spell, sceneId, next, progressCallback ) {
 			var eventManager     = spell.eventManager,
@@ -96,7 +136,11 @@ define(
 			var libraryBundleName  = 'library',
 				resourceBundleName = 'resources'
 
-			var sendLoadingProgress = createSendLoadingProgress( progressCallback )
+			var loadingProgress = createLoadingProgress( eventManager, progressCallback )
+
+			loadingProgress.addBundle( sceneId, 0.1 )
+			loadingProgress.addBundle( libraryBundleName, 0.45 )
+			loadingProgress.addBundle( resourceBundleName, 0.45 )
 
 
 			eventManager.waitFor(
@@ -105,8 +149,6 @@ define(
 					addNamespaceAndName( loadedRecords )
 
 					_.extend( spell.scenes, addIdAsKey( loadedRecords ) )
-
-					sendLoadingProgress()
 				}
 
 			).resume( function() {
@@ -118,13 +160,15 @@ define(
 						var library = groupByType( loadedRecords )
 
 						updateAssets( spell.assets, library.asset )
-						resourceLoader.load( createFilesToLoad( library.asset ), resourceBundleName )
+
+						resourceLoader.load(
+							createFilesToLoad( library.asset ),
+							resourceBundleName
+						)
 
 						addTemplates( templateManager, library.component )
 						addTemplates( templateManager, library.entityTemplate )
 						addTemplates( templateManager, library.system )
-
-						sendLoadingProgress()
 					}
 
 				).and(
@@ -134,13 +178,11 @@ define(
 							spell.assets,
 							_.bind( injectResource, null, loadedResources )
 						)
-
-						sendLoadingProgress()
 					}
 
 				).resume( function() {
-					sendLoadingProgress()
-
+					loadingProgress.complete()
+					loadingProgress.destroy()
 					next()
 				} )
 
@@ -158,8 +200,6 @@ define(
 				libraryIdsToJsonFilenames( [ sceneId ] ),
 				sceneId
 			)
-
-			sendLoadingProgress()
 		}
 	}
 )
