@@ -3,7 +3,7 @@ define(
 	[
 		'spell/client/staticInclude',
 		'spell/shared/util/createMainLoop',
-		'spell/EntityManager',
+		'spell/entityManager',
 		'spell/shared/util/scene/SceneManager',
 		'spell/shared/util/template/TemplateManager',
 		'spell/shared/util/ConfigurationManager',
@@ -73,7 +73,7 @@ define(
 
 			if( cacheContent ) resourceLoader.setCache( cacheContent )
 
-			var sceneManager  = new SceneManager( spell, spell.EntityManager, spell.templateManager, spell.mainLoop, this.sendMessageToEditor )
+			var sceneManager  = new SceneManager( spell, spell.entityManager, spell.templateManager, spell.mainLoop, this.sendMessageToEditor )
 
 			_.extend(
 				spell,
@@ -112,7 +112,7 @@ define(
 				spell,
 				{
 					assets               : assets,
-					EntityManager        : entityManager,
+					entityManager        : entityManager,
 					eventManager         : eventManager,
 					loaderConfig         : loaderConfig,
 					logger               : logger,

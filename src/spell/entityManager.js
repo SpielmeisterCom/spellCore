@@ -5,11 +5,11 @@
  * You can use the EntityManager for example in your system's init, activate, deactivate, destroy and process functions
  * to create or destroy entities, or to add or remove components from entities and update components.
  *
- * @class spell.EntityManager
+ * @class spell.entityManager
  * @singleton
  */
 define(
-	'spell/EntityManager',
+	'spell/entityManager',
 	[
 		'spell/defines',
 		'spell/shared/util/create',
@@ -293,7 +293,7 @@ define(
 		 * public
 		 */
 
-		var EntityManager = function( eventManager, templateManager ) {
+		var entityManager = function( eventManager, templateManager ) {
 			this.componentDictionaries = {}
 			this.eventManager          = eventManager
 			this.templateManager       = templateManager
@@ -303,7 +303,7 @@ define(
 			)
 		}
 
-		EntityManager.prototype = {
+		entityManager.prototype = {
 			/**
 			 * Creates an entity using the given configuration object.
 			 *
@@ -318,7 +318,7 @@ define(
 			 * Example usage:
 			 *
 			 *     //create a new entity with the given components
-			 *     var entityId = spell.EntityManager.createEntity({
+			 *     var entityId = spell.entityManager.createEntity({
 			 *         config: {
 			 *
 			 *             "spell.component.2d.transform": {
@@ -335,7 +335,7 @@ define(
 			 *     })
 			 *
 			 *     //create a new entity with child entities
-			 *     var entityId = spell.EntityManager.createEntity({
+			 *     var entityId = spell.entityManager.createEntity({
 			 *         "config": {
 			 *             "spell.component.2d.transform": {
 			 *                 "translation": [ 100, 200 ]
@@ -365,12 +365,12 @@ define(
 			 *     })
 			 *
 			 *     //create a new entity from an entity template
-			 *     var entityId = spell.EntityManager.createEntity({
+			 *     var entityId = spell.entityManager.createEntity({
 			 *         entityTemplateId: 'library.identifier.of.my.template'
 			 *     })
 			 *
 			 *     //create a new entity from an entity template and override values from the template
-			 *     var entityId = spell.EntityManager.createEntity({
+			 *     var entityId = spell.entityManager.createEntity({
 			 *         entityTemplateId: 'library.identifier.of.my.template',
 			 *         config: {
 			 *             "spell.component.box2d.simpleBox": {
@@ -481,10 +481,10 @@ define(
 			 * Example usage:
 			 *
 			 *     //add a component with it's default configuration to this entity
-			 *     spell.EntityManager.addComponent( entityId, "spell.component.2d.graphics.debug.box" )
+			 *     spell.entityManager.addComponent( entityId, "spell.component.2d.graphics.debug.box" )
 			 *
 			 *     //add a component to this entity and override a default value
-			 *     spell.EntityManager.addComponent( entityId, {
+			 *     spell.entityManager.addComponent( entityId, {
 			 *         "componentId": "spell.component.2d.graphics.textApperance",
 			 *         "config": {
 			 *             "text": "Hello World"
@@ -613,6 +613,6 @@ define(
 			}
 		}
 
-		return EntityManager
+		return entityManager
 	}
 )

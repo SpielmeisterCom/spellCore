@@ -31,7 +31,7 @@ define(
 
 		var updateResourcesAndAssets = function( spell, assetId, asset ) {
 			injectResource( spell.resources, asset )
-			spell.EntityManager.updateAssetReferences( assetId, asset )
+			spell.entityManager.updateAssetReferences( assetId, asset )
 		}
 
 		return function( spell, payload ) {

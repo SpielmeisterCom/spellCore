@@ -149,7 +149,7 @@ define(
 		}
 
 		var KeyFrameAnimation = function( spell ) {
-			this.entityManager = spell.EntityManager
+			this.entityManager = spell.entityManager
 		}
 
 		KeyFrameAnimation.prototype = {

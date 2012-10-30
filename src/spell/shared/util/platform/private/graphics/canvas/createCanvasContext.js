@@ -268,7 +268,7 @@ define(
 				// rotating the image so that it is not upside down
 				context.translate( dx, dy )
 				context.rotate( Math.PI )
-				context.scale( -1, 1 )
+				context.scale( -1.015, 1.015 )
 				context.translate( 0, -dh )
 
 				context.drawImage( texture.privateImageResource, sx + 1, sy + 1, sw - 2, sh - 2, 0 , 0, dw , dh )

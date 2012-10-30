@@ -31,9 +31,9 @@ define(
 			this.activeScene = scene
 		}
 
-		var SceneManager = function( spell, EntityManager, templateManager, mainLoop, sendMessageToEditor ) {
+		var SceneManager = function( spell, entityManager, templateManager, mainLoop, sendMessageToEditor ) {
 			this.activeScene
-			this.entityManager       = EntityManager
+			this.entityManager       = entityManager
 			this.mainLoop            = mainLoop
 			this.sendMessageToEditor = sendMessageToEditor
 			this.spell               = spell

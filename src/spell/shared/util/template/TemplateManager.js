@@ -325,7 +325,7 @@ define(
 			},
 
 			/**
-			 * HACK: EntityManager and TemplateManager need major surgery.
+			 * HACK: entityManager and TemplateManager need major surgery.
 			 *
 			 * @param fn
 			 */
