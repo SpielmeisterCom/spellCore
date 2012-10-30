@@ -103,20 +103,12 @@
 				"title": "2D Camera"
 			},
 			{
-				"name": "component_template_spell_component_2d_physics_inertialObject",
-				"title": "2D Inertial Object"
-			},
-			{
 				"name": "component_template_spell_component_2d_transform",
 				"title": "2D Transformation"
 			},
 			{
 				"name": "component_template_spell_component_actor",
 				"title": "Actor"
-			},
-			{
-				"name": "component_template_spell_component_physics_collisionSphere",
-				"title": "Collision Sphere"
 			},
 			{
 				"name": "component_template_spell_component_inputDefinition",
