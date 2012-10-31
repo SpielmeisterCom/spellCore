@@ -64,29 +64,33 @@
 		return module
 	}
 
-	var createModuleInstance = function( dependencies, body, config ) {
-		var args = []
+	var createModuleInstance = function( dependencies, body, args, config ) {
+		var moduleInstanceArgs = []
 
 		if( dependencies ) {
 			for( var i = 0; i < dependencies.length; i++ ) {
-				var dependencyName = dependencies[ i ],
+				var dependencyName   = dependencies[ i ],
 					dependencyModule = modules[ dependencyName ]
 
+				if( !dependencyModule && config.hashModuleId ) {
+					dependencyModule = modules[ config.hashModuleId( dependencyName ) ]
+				}
+
 				if( !dependencyModule ) {
-					dependencyModule = createModule( dependencyName, config )
+					dependencyModule = createModule( dependencyName, args )
 				}
 
 				if( !dependencyModule.instance ) {
-					dependencyModule.instance = createModuleInstance( dependencyModule.dependencies, dependencyModule.body )
+					dependencyModule.instance = createModuleInstance( dependencyModule.dependencies, dependencyModule.body, undefined, config )
 				}
 
-				args.push( dependencyModule.instance )
+				moduleInstanceArgs.push( dependencyModule.instance )
 			}
 		}
 
-		if( config ) args.push( config )
+		if( args ) moduleInstanceArgs.push( args )
 
-		return body.apply( null, args )
+		return body.apply( null, moduleInstanceArgs )
 	}
 
 	var traceDependentModules = function( names, dependentModules ) {
@@ -146,6 +150,10 @@
 
 		var module = modules[ name ]
 
+		if( !module && config.hashModuleId ) {
+			module = modules[ config.hashModuleId( name ) ]
+		}
+
 		if( !module ) {
 			if( config.loadingAllowed === false ) {
 				throw 'Error: Missing module \'' + name + '\'. External loading is disabled. Please make sure that all required modules are shipped.'
@@ -155,7 +163,7 @@
 		}
 
 		if( !module.instance ) {
-			module.instance = createModuleInstance( module.dependencies, module.body, args )
+			module.instance = createModuleInstance( module.dependencies, module.body, args, config )
 		}
 
 		return module.instance
