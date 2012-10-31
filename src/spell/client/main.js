@@ -3,7 +3,7 @@ define(
 	[
 		'spell/client/staticInclude',
 		'spell/shared/util/createMainLoop',
-		'spell/entityManager',
+		'spell/EntityManager',
 		'spell/shared/util/scene/SceneManager',
 		'spell/shared/util/template/TemplateManager',
 		'spell/shared/util/ConfigurationManager',

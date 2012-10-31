@@ -5,11 +5,11 @@
  * You can use the EntityManager for example in your system's init, activate, deactivate, destroy and process functions
  * to create or destroy entities, or to add or remove components from entities and update components.
  *
- * @class spell.entityManager
+ * @class spell.EntityManager
  * @singleton
  */
 define(
-	'spell/entityManager',
+	'spell/EntityManager',
 	[
 		'spell/defines',
 		'spell/shared/util/create',
@@ -261,7 +261,7 @@ define(
 		 * public
 		 */
 
-		var entityManager = function( eventManager, templateManager ) {
+		var EntityManager = function( eventManager, templateManager ) {
 			this.componentDictionaries = {}
 			this.eventManager          = eventManager
 			this.templateManager       = templateManager
@@ -271,7 +271,7 @@ define(
 			)
 		}
 
-		entityManager.prototype = {
+		EntityManager.prototype = {
 			/**
 			 * Creates an entity using the given configuration object.
 			 *
@@ -583,6 +583,6 @@ define(
 			}
 		}
 
-		return entityManager
+		return EntityManager
 	}
 )
