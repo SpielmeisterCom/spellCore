@@ -15,8 +15,8 @@ define(
 		'use strict'
 
 
-		var postLoadedResources = function( spell, entityManager, templateManager, anonymizeModuleIds, sceneId ) {
-			var scene       = new Scene( spell, entityManager, templateManager, anonymizeModuleIds ),
+		var postLoadedResources = function( spell, entityManager, templateManager, isModeDevelopment, sceneId ) {
+			var scene       = new Scene( spell, entityManager, templateManager, isModeDevelopment ),
 				sceneConfig = spell.scenes[ sceneId ]
 
 			if( !sceneConfig ) {
@@ -31,17 +31,18 @@ define(
 			this.activeScene = scene
 		}
 
-		var SceneManager = function( spell, entityManager, templateManager, mainLoop, sendMessageToEditor ) {
+		var SceneManager = function( spell, entityManager, templateManager, mainLoop, sendMessageToEditor, isModeDevelopment ) {
 			this.activeScene
 			this.entityManager       = entityManager
 			this.mainLoop            = mainLoop
 			this.sendMessageToEditor = sendMessageToEditor
 			this.spell               = spell
 			this.templateManager     = templateManager
+			this.isModeDevelopment   = isModeDevelopment
 		}
 
 		SceneManager.prototype = {
-			startScene: function( sceneId, anonymizeModuleIds ) {
+			startScene: function( sceneId ) {
 				var onProgress = this.sendMessageToEditor ?
 					_.bind( this.sendMessageToEditor, null, 'spell.loadingProgress' ) :
 					undefined
@@ -49,7 +50,15 @@ define(
 				loadSceneResources(
 					this.spell,
 					sceneId,
-					_.bind( postLoadedResources, this, this.spell, this.entityManager, this.templateManager, anonymizeModuleIds, sceneId ),
+					_.bind(
+						postLoadedResources,
+						this,
+						this.spell,
+						this.entityManager,
+						this.templateManager,
+						this.isModeDevelopment,
+						sceneId
+					),
 					onProgress
 				)
 			},

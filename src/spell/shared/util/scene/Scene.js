@@ -19,7 +19,7 @@ define(
 		flattenEntityConfig,
 		hashModuleId,
 		Events,
-		OrderedMap,
+		SortedMap,
 		PlatformKit,
 
 		_
@@ -31,21 +31,23 @@ define(
 		 * private
 		 */
 
-		var cameraEntityTemplateId    = 'spell.entity.2d.graphics.camera',
-			cameraComponentTemplateId = 'spell.component.2d.graphics.camera'
+		var cameraEntityTemplateId = 'spell.entity.2d.graphics.camera',
+			cameraComponentId      = 'spell.component.2d.graphics.camera'
 
-		var loadModule = function( resourceLoader, moduleId, anonymizeModuleIds ) {
+		var loadModule = function( resourceLoader, moduleId, isModeDevelopment ) {
 			if( !moduleId ) throw 'Error: No module id provided.'
 
 			var config = {
-				loadingAllowed : !anonymizeModuleIds
+				cache          : isModeDevelopment ? resourceLoader.getCache() : undefined,
+				hashModuleId   : isModeDevelopment ? hashModuleId : undefined,
+				loadingAllowed : isModeDevelopment
 			}
 
-			if( config.loadingAllowed ) {
-				config.cache = resourceLoader.getCache()
-			}
-
-			var module = PlatformKit.ModuleLoader.require( moduleId, undefined, config )
+			var module = PlatformKit.ModuleLoader.require(
+				isModeDevelopment ? moduleId : hashModuleId( moduleId ),
+				undefined,
+				config
+			)
 
 			if( !module ) throw 'Error: Could not resolve module id \'' + moduleId + '\' to module.'
 
@@ -56,8 +58,8 @@ define(
 		 * TODO: Remove this custom invoke that knows how to handle the borked instances produced by the "create" constructor wrapper function.
 		 * Instances created by "create" for some unknown reason do not support prototype chain method look-up. See "Fix create"
 		 */
-		var invoke = function( orderedMap, functionName, args ) {
-			var systems = orderedMap.values
+		var invoke = function( sortedMap, functionName, args ) {
+			var systems = sortedMap.values
 
 			for( var i = 0, numSystems = systems.length; i < numSystems; i++ ) {
 				var system = systems[ i ]
@@ -66,8 +68,8 @@ define(
 			}
 		}
 
-		var process = function( orderedMap, args ) {
-			var systems = orderedMap.values
+		var process = function( sortedMap, args ) {
+			var systems = sortedMap.values
 
 			for( var i = 0, numSystems = systems.length; i < numSystems; i++ ) {
 				var system = systems[ i ]
@@ -82,15 +84,9 @@ define(
 			return namespace + '.' + name
 		}
 
-		var createSystem = function( spell, entityManager, system, anonymizeModuleIds, systemConfig ) {
-			var systemId = createId( system.namespace, system.name),
+		var createSystem = function( spell, entityManager, system, isModeDevelopment, systemConfig ) {
+			var systemId = createId( system.namespace, system.name ),
 				moduleId = createModuleId( systemId )
-
-			var constructor = loadModule(
-				spell.resourceLoader,
-				anonymizeModuleIds ? hashModuleId( moduleId ) : moduleId,
-				anonymizeModuleIds
-			)
 
 			var attributes = _.reduce(
 				system.input,
@@ -114,11 +110,13 @@ define(
 				}
 			)
 
+			var constructor = loadModule( spell.resourceLoader, moduleId, isModeDevelopment )
+
 			// TODO: Fix create. Returned instances do not support prototype chain method look-up. O_o
 			return create( constructor, [ spell ], attributes )
 		}
 
-		var createSystems = function( spell, entityManager, templateManager, systems, anonymizeModuleIds ) {
+		var createSystems = function( spell, entityManager, templateManager, systems, isModeDevelopment ) {
 			return _.reduce(
 				systems,
 				function( memo, system ) {
@@ -131,10 +129,10 @@ define(
 
 					return memo.add(
 						systemId,
-						createSystem( spell, entityManager, systemTemplate, anonymizeModuleIds, system.config )
+						createSystem( spell, entityManager, systemTemplate, isModeDevelopment, system.config )
 					)
 				},
-				new OrderedMap()
+				new SortedMap()
 			)
 		}
 
@@ -148,7 +146,7 @@ define(
 						return false
 					}
 
-					var cameraComponent = entityConfig.config[ cameraComponentTemplateId ]
+					var cameraComponent = entityConfig.config[ cameraComponentId ]
 
 					if( !cameraComponent ) return false
 
@@ -172,11 +170,11 @@ define(
 		 * public
 		 */
 
-		var Scene = function( spell, entityManager, templateManager, anonymizeModuleIds ) {
+		var Scene = function( spell, entityManager, templateManager, isModeDevelopment ) {
 			this.spell              = spell
 			this.entityManager      = entityManager
 			this.templateManager    = templateManager
-			this.anonymizeModuleIds = anonymizeModuleIds
+			this.isModeDevelopment  = isModeDevelopment
 			this.executionGroups    = { render : null, update : null }
 			this.script             = null
 		}
@@ -197,15 +195,26 @@ define(
 					return
 				}
 
-				var anonymizeModuleIds = this.anonymizeModuleIds
-
 				if( sceneConfig.systems ) {
 					var entityManager   = this.entityManager,
 						templateManager = this.templateManager,
 						executionGroups = this.executionGroups
 
-					executionGroups.render = createSystems( spell, entityManager, templateManager, sceneConfig.systems.render, anonymizeModuleIds )
-					executionGroups.update = createSystems( spell, entityManager, templateManager, sceneConfig.systems.update, anonymizeModuleIds )
+					executionGroups.render = createSystems(
+						spell,
+						entityManager,
+						templateManager,
+						sceneConfig.systems.render,
+						this.isModeDevelopment
+					)
+
+					executionGroups.update = createSystems(
+						spell,
+						entityManager,
+						templateManager,
+						sceneConfig.systems.update,
+						this.isModeDevelopment
+					)
 
 					invoke( executionGroups.render, 'init', [ spell, sceneConfig ] )
 					invoke( executionGroups.update, 'init', [ spell, sceneConfig ] )
@@ -216,11 +225,7 @@ define(
 
 				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
 
-				this.script = loadModule(
-					spell.resourceLoader,
-					anonymizeModuleIds ? hashModuleId( moduleId ) : moduleId,
-					anonymizeModuleIds
-				)
+				this.script = loadModule( spell.resourceLoader, moduleId, this.isModeDevelopment )
 
 				this.script.init( spell, sceneConfig )
 			},
@@ -265,7 +270,7 @@ define(
 					spell,
 					this.entityManager,
 					this.templateManager.getTemplate( systemId ),
-					this.anonymizeModuleIds,
+					this.isModeDevelopment,
 					systemConfig
 				)
 
@@ -284,7 +289,7 @@ define(
 					spell,
 					this.entityManager,
 					this.templateManager.getTemplate( systemId ),
-					this.anonymizeModuleIds,
+					this.isModeDevelopment,
 					systemConfig
 				)
 

@@ -73,7 +73,16 @@ define(
 
 			if( cacheContent ) resourceLoader.setCache( cacheContent )
 
-			var sceneManager  = new SceneManager( spell, spell.entityManager, spell.templateManager, spell.mainLoop, this.sendMessageToEditor )
+			var isModeDevelopment = configurationManager.mode !== 'deployed'
+
+			var sceneManager = new SceneManager(
+				spell,
+				spell.entityManager,
+				spell.templateManager,
+				spell.mainLoop,
+				this.sendMessageToEditor,
+				isModeDevelopment
+			)
 
 			_.extend(
 				spell,
@@ -88,9 +97,7 @@ define(
 				}
 			)
 
-			var anonymizeModuleIds = spell.configurationManager.mode === 'deployed'
-			spell.sceneManager.startScene( spell.runtimeModule.startScene, anonymizeModuleIds )
-
+			spell.sceneManager.startScene( spell.runtimeModule.startScene )
 			spell.mainLoop.run()
 		}
 

@@ -164,7 +164,7 @@ define(
 					}
 
 
-					if( configValue !== false ) {
+					if( configValue !== undefined ) {
 						memo[ optionName ] = configValue
 
 					} else {
