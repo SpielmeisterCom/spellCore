@@ -9,12 +9,12 @@ define(
 		'use strict'
 
 
-		var OrderedMap = function() {
+		var SortedMap = function() {
 		    this.keys = []
 		    this.values = []
 		}
 
-		OrderedMap.prototype = {
+		SortedMap.prototype = {
 		    add : function( key, value ) {
 				var keys   = this.keys,
 					values = this.values,
@@ -80,6 +80,6 @@ define(
 		    }
 		}
 
-		return OrderedMap
+		return SortedMap
 	}
 )
