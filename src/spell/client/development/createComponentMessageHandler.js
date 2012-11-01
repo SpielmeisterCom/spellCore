@@ -13,7 +13,7 @@ define(
 			return createMessageDispatcher(
 				{
 					'add' : function( payload ) {
-						spell.entityManager.addComponent( payload.entityId, payload.componentId, payload.attributeConfig )
+						spell.entityManager.addComponent( payload.entityId, payload.componentId )
 					},
 					'remove' : function( payload ) {
 						spell.entityManager.removeComponent( payload.entityId, payload.componentId )
