@@ -12,6 +12,7 @@ define(
 	'spell/EntityManager',
 	[
 		'spell/defines',
+		'spell/shared/util/arrayRemove',
 		'spell/shared/util/create',
 		'spell/shared/util/deepClone',
 		'spell/shared/util/Events',
@@ -22,6 +23,7 @@ define(
 	],
 	function(
 		defines,
+		arrayRemove,
 		create,
 		deepClone,
 		Events,
@@ -150,6 +152,57 @@ define(
 			)
 		}
 
+		var attachEntityToParent = function( childrenComponents, entityId, parentEntityId ) {
+			var children = childrenComponents[ parentEntityId ]
+
+			if( !children ) {
+				childrenComponents[ parentEntityId ] = { ids : [ entityId ] }
+
+			} else {
+				childrenComponents[ parentEntityId ].ids.push( entityId )
+			}
+		}
+
+		var detachEntityFromParent = function( childrenComponents, entityId, parentEntityId ) {
+			for( var id in childrenComponents ) {
+				var children = childrenComponents[ id ],
+					index    = _.indexOf( children.ids, entityId )
+
+				if( index !== -1 ) {
+					arrayRemove( children.ids, index )
+
+					break
+				}
+			}
+		}
+
+		var reassignEntity = function( componentDictionaries, entityId, parentEntityId ) {
+			if( entityId === parentEntityId ) return
+
+			var rootComponents     = componentDictionaries[ ROOT_COMPONENT_ID ],
+				childrenComponents = componentDictionaries[ CHILDREN_COMPONENT_ID ],
+				isRoot             = !!rootComponents[ entityId ]
+
+			if( isRoot && !parentEntityId ) return
+
+			if( parentEntityId ) {
+				detachEntityFromParent( childrenComponents, entityId, parentEntityId )
+				attachEntityToParent( childrenComponents, entityId, parentEntityId )
+
+				if( isRoot ) {
+					// remove root component from entity
+					delete rootComponents[ entityId ]
+				}
+			}
+
+			if( !isRoot && !parentEntityId ) {
+				// just got promoted to root
+				rootComponents[ entityId ] = {}
+
+				detachEntityFromParent( childrenComponents, entityId, parentEntityId )
+			}
+		}
+
 		/**
 		 * Normalizes the provided entity config
 		 *
@@ -164,6 +217,7 @@ define(
 			var config           = arg1.config || {},
 				children         = arg1.children || [],
 				name             = arg1.name || '',
+				parentId         = arg1.parentId,
 				entityTemplateId = _.isString( arg1 ) ? arg1 : arg1.entityTemplateId
 
 			if( entityTemplateId ) {
@@ -180,15 +234,18 @@ define(
 				children         : children,
 				config           : config,
 				id               : arg1.id ? arg1.id : undefined,
+				parentId         : parentId,
 				name             : name,
 				entityTemplateId : entityTemplateId
 			}
 		}
 
-		var createAdditionalEntityConfig = function( isRoot, childEntityIds, name ) {
+		var createAdditionalEntityConfig = function( isRoot, parentId, childEntityIds, name ) {
 			var result = {}
 
-			if( isRoot ) result[ ROOT_COMPONENT_ID ] = {}
+			if( isRoot && !parentId ) {
+				result[ ROOT_COMPONENT_ID ] = {}
+			}
 
 			if( _.size( childEntityIds ) > 0 ) {
 				result[ CHILDREN_COMPONENT_ID ] = {
@@ -210,7 +267,8 @@ define(
 			if( !entityConfig ) throw 'Error: Supplied invalid arguments.'
 
 			var entityTemplateId = entityConfig.entityTemplateId,
-				config           = entityConfig.config || {}
+				config           = entityConfig.config || {},
+				parentId         = entityConfig.parentId
 
 			if( !entityTemplateId && !config ) {
 				throw 'Error: Supplied invalid arguments.'
@@ -227,13 +285,18 @@ define(
 			// add additional components which the engine requires
 			_.extend(
 				config,
-				createAdditionalEntityConfig( isRoot, childEntityIds, entityConfig.name )
+				createAdditionalEntityConfig( isRoot, parentId, childEntityIds, entityConfig.name )
 			)
 
+			// creating the entity
 			var entityId         = getEntityId( entityConfig.id ),
 				entityComponents = templateManager.createComponents( entityTemplateId, config || {} )
 
 			addComponents( componentDictionaries, entityId, entityComponents )
+
+			if( parentId ) {
+				attachEntityToParent( componentDictionaries[ CHILDREN_COMPONENT_ID ], entityId, parentId )
+			}
 
 			eventManager.publish( Events.ENTITY_CREATED, [ entityId, entityComponents ] )
 
@@ -288,7 +351,6 @@ define(
 			 *     //create a new entity with the given components
 			 *     var entityId = spell.entityManager.createEntity({
 			 *         config: {
-			 *
 			 *             "spell.component.2d.transform": {
 			 *                 "translation": [ 100, 200 ]
 			 *             },
@@ -299,7 +361,6 @@ define(
 			 *                 "assetId": "appearance:library.identifier.of.my.static.appearance"
 			 *             }
 			 *         }
-			 *
 			 *     })
 			 *
 			 *     //create a new entity with child entities
@@ -318,19 +379,18 @@ define(
 			 *         children: [
 			 *             {
 			 *                 config: {
-			 *                             "spell.component.2d.transform": {
-			 *                                 "translation": [ -15, 20 ] //translation is relative to the parent
-			 *                             },
-			 *                             "spell.component.visualObject": {
-			 *                               //if no configuration is specified the default values of this component will be used
-			 *                             },
-			 *                             "spell.component.2d.graphics.appearance": {
-			 *                                 "assetId": "appearance:library.identifier.of.my.other.static.appearance"
-			 *                             }
+			 *                     "spell.component.2d.transform": {
+			 *                         "translation": [ -15, 20 ] //translation is relative to the parent
+			 *                     },
+			 *                     "spell.component.visualObject": {
+			 *                       //if no configuration is specified the default values of this component will be used
+			 *                     },
+			 *                     "spell.component.2d.graphics.appearance": {
+			 *                         "assetId": "appearance:library.identifier.of.my.other.static.appearance"
+			 *                     }
 			 *                 }
 			 *             }
 			 *         ]
-			 *
 			 *     })
 			 *
 			 *     //create a new entity from an entity template
@@ -437,6 +497,26 @@ define(
 				}
 
 				return entities
+			},
+
+			/**
+			 * Reassigns an entity to become the child of a parent entity.
+			 *
+			 * Example usage:
+			 *
+			 *     //make entity A the child of entity B
+			 *     spell.entityManager.reassign( aId, bId )
+			 *
+			 *     //make entity A a root entity, that is it has no parent
+			 *     spell.entityManager.reassign( aId )
+			 *
+			 * @param entityId the id of the entity which gets reassigned
+			 * @param parentEntityId the id of the entity which will be the parent entity
+			 */
+			reassignEntity : function( entityId, parentEntityId ) {
+				if( !entityId ) throw 'Error: Missing entity id.'
+
+				reassignEntity( this.componentDictionaries, entityId, parentEntityId )
 			},
 
 			/**

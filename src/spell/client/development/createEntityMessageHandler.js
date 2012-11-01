@@ -12,8 +12,8 @@ define(
 		return function( spell ) {
 			return createMessageDispatcher(
 				{
-					'changeParent' : function( payload ) {
-						spell.logger.error( 'The spelled.debug.entity.changeParent message handler is not yet implemented.' )
+					'reassign' : function( payload ) {
+						spell.entityManager.reassignEntity( payload.entityId, payload.parentEntityId )
 					},
 					'create' : function( payload ) {
 						spell.entityManager.createEntity( payload.entityConfig )
