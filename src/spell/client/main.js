@@ -1,6 +1,7 @@
 define(
 	'spell/client/main',
 	[
+		'spell/client/development/createDebugMessageHandler',
 		'spell/client/staticInclude',
 		'spell/shared/util/createMainLoop',
 		'spell/EntityManager',
@@ -12,13 +13,13 @@ define(
 		'spell/client/loading/ResourceLoader',
 		'spell/shared/util/StatisticsManager',
 		'spell/shared/util/Logger',
-		'spell/shared/util/createDebugMessageHandler',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
 
 		'spell/functions'
 	],
 	function(
+		createDebugMessageHandler,
 		staticInclude,
 		createMainLoop,
 		EntityManager,
@@ -30,7 +31,6 @@ define(
 		ResourceLoader,
 		StatisticsManager,
 		Logger,
-		createDebugMessageHandler,
 		PlatformKit,
 		initDebugEnvironment,
 
@@ -173,7 +173,7 @@ define(
 			 * @param {Object} message
 			 */
 			sendDebugMessage : function( message ) {
-				this.debugMessageHandler( message )
+				this.debugMessageHandler( message.payload, message.type )
 			}
 		}
 

@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/development/updateAsset',
+	'spell/client/development/library/updateAsset',
 	[
 		'spell/client/loading/addNamespaceAndName',
 		'spell/client/loading/createFilesToLoad',

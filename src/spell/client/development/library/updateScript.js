@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/development/updateScript',
+	'spell/client/development/library/updateScript',
 	[
 		'spell/shared/util/createId',
 		'spell/shared/util/createModuleId',
