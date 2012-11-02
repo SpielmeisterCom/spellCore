@@ -4,7 +4,7 @@
 	"readonly": true,
 	"title": "Physics Body",
 	"doc": "",
-    "icon": "/images/icons/component_physics_box.png",
+    "icon": "/images/icons/component.png",
     "attributes": [
 		{
 			"name": "type",
