@@ -2,12 +2,12 @@
 	"version": 1,
 	"type": "component",
 	"readonly": true,
-	"title": "Box2D Impulse",
+	"title": "Physics Force",
 	"doc": "",
-	"icon": "/images/icons/component_box2d_impulse.png",
+    "icon": "/images/icons/component_physics_force.png",
 	"attributes": [
 		{
-			"name": "impulse",
+			"name": "force",
 			"type": "vec2",
 			"default": [ 0, 0 ]
 		},

@@ -2,9 +2,9 @@
 	"version": 1,
 	"type": "component",
 	"readonly": true,
-	"title": "Box2D Simple Player",
+	"title": "Physics Fixture",
 	"doc": "",
-    "icon": "/images/icons/component_box2d_box.png",
+    "icon": "/images/icons/component_physics_box.png",
     "attributes": [
 		{
 			"name": "density",
@@ -20,16 +20,6 @@
 			"name": "restitution",
 			"type": "number",
 			"default": 0.2
-		},
-		{
-			"name": "dimensions",
-			"type": "vec2",
-			"default": [ 2, 2 ]
-		},
-		{
-			"name": "velocity",
-			"type": "vec2",
-			"default": [ 0, 0 ]
 		}
 	]
 }

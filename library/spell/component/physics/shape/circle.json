@@ -1,0 +1,15 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Physics Shape - Circle",
+	"doc": "",
+    "icon": "/images/icons/component_physics_sphere.png",
+	"attributes": [
+		{
+			"name": "radius",
+			"type": "number",
+			"default": 0.5
+		}
+	]
+}

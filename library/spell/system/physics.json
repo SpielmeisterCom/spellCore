@@ -8,31 +8,43 @@
 		},
 		{
 			"name": "applyForces",
-			"componentId": "spell.component.box2d.applyForce"
+			"componentId": "spell.component.physics.applyForce"
 		},
 		{
 			"name": "applyTorques",
-			"componentId": "spell.component.box2d.applyTorque"
+			"componentId": "spell.component.physics.applyTorque"
 		},
 		{
 			"name": "applyImpulses",
-			"componentId": "spell.component.box2d.applyImpulse"
+			"componentId": "spell.component.physics.applyImpulse"
 		},
 		{
 			"name": "applyVelocities",
-			"componentId": "spell.component.box2d.applyVelocity"
+			"componentId": "spell.component.physics.applyVelocity"
 		},
 		{
 			"name": "setPositions",
-			"componentId": "spell.component.box2d.setPosition"
+			"componentId": "spell.component.physics.setPosition"
 		},
 		{
-			"name": "simpleBoxes",
-			"componentId": "spell.component.box2d.simpleBox"
+			"name": "bodies",
+			"componentId": "spell.component.physics.body"
 		},
 		{
-			"name": "simpleSpheres",
-			"componentId": "spell.component.box2d.simpleSphere"
+			"name": "fixtures",
+			"componentId": "spell.component.physics.fixture"
+		},
+		{
+			"name": "boxShapes",
+			"componentId": "spell.component.physics.shape.box"
+		},
+		{
+			"name": "circleShapes",
+			"componentId": "spell.component.physics.shape.circle"
+		},
+		{
+			"name": "jumpAndRunPlayerShapes",
+			"componentId": "spell.component.physics.shape.jumpAndRunPlayer"
 		},
 		{
 			"name": "debugBoxes",

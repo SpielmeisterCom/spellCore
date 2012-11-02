@@ -2,12 +2,12 @@
 	"version": 1,
 	"type": "component",
 	"readonly": true,
-	"title": "Box2D Set Position",
+	"title": "Physics Set Velocity",
 	"doc": "",
 	"icon": "",
 	"attributes": [
 		{
-			"name": "value",
+			"name": "velocity",
 			"type": "vec2",
 			"default": [ 0, 0 ]
 		}

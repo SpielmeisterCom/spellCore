@@ -11,7 +11,7 @@
 define(
 	'spell/EntityManager',
 	[
-		'spell/defines',
+		'spell/Defines',
 		'spell/shared/util/arrayRemove',
 		'spell/shared/util/create',
 		'spell/shared/util/deepClone',

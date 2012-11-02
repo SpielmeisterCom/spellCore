@@ -2,9 +2,9 @@
 	"version": 1,
 	"type": "component",
 	"readonly": true,
-	"title": "Box2D Torque",
+	"title": "Physics Torque",
 	"doc": "",
-	"icon": "/images/icons/component_box2d_torque.png",
+	"icon": "/images/icons/component_physics_torque.png",
 	"attributes": [
 		{
 			"name": "torque",

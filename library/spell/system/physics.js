@@ -1,12 +1,14 @@
 define(
-	'spell/system/box2D',
+	'spell/system/physics',
 	[
+		'spell/Defines',
 		'spell/shared/util/Events',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'
 	],
 	function(
+		Defines,
 		Events,
 		PlatformKit,
 
@@ -15,24 +17,18 @@ define(
 		'use strict'
 
 
-		// private
-
-		var Box2D          = PlatformKit.Box2D,
-			b2Vec2         = Box2D.Common.Math.b2Vec2,
-			b2World        = Box2D.Dynamics.b2World,
-			b2FixtureDef   = Box2D.Dynamics.b2FixtureDef,
-			b2Body         = Box2D.Dynamics.b2Body,
-			b2BodyDef      = Box2D.Dynamics.b2BodyDef,
-			b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape,
-			b2CircleShape  = Box2D.Collision.Shapes.b2CircleShape
+		var physics        = PlatformKit.Box2D,
+			b2Vec2         = physics.Common.Math.b2Vec2,
+			b2World        = physics.Dynamics.b2World,
+			b2FixtureDef   = physics.Dynamics.b2FixtureDef,
+			b2Body         = physics.Dynamics.b2Body,
+			b2BodyDef      = physics.Dynamics.b2BodyDef,
+			b2PolygonShape = physics.Collision.Shapes.b2PolygonShape,
+			b2CircleShape  = physics.Collision.Shapes.b2CircleShape
 
 		var awakeColor      = [ 0.82, 0.76, 0.07 ],
 			notAwakeColor   = [ 0.27, 0.25, 0.02 ],
 			maxVelocity     = 10
-
-		var isSphereShape = function( bodyDef ) {
-			return !!bodyDef.radius
-		}
 
 		var getBodyById = function( world, entityId ) {
 			for( var body = world.GetBodyList(); body; body = body.m_next ) {
@@ -43,28 +39,38 @@ define(
 		}
 
 		var createBody = function( spell, worldToPhysicsScale, debug, world, entityId, entity ) {
-			var simpleBoxOrSphere = entity[ 'spell.component.box2d.simpleBox' ] || entity[ 'spell.component.box2d.simpleSphere' ],
-				transform         = entity[ 'spell.component.2d.transform' ]
+			var body        = entity[ Defines.PHYSICS_BODY_COMPONENT_ID ],
+				fixture     = entity[ Defines.PHYSICS_FIXTURE_COMPONENT_ID ],
+				boxShape    = entity[ Defines.PHYSICS_BOX_SHAPE_COMPONENT_ID ],
+				circleShape = entity[ Defines.PHYSICS_CIRCLE_SHAPE_COMPONENT_ID ],
+				playerShape = entity[ Defines.PHYSICS_JNRPLAYER_SHAPE_COMPONENT_ID ],
+				transform   = entity[ Defines.TRANSFORM_COMPONENT_ID ]
 
-			if( !simpleBoxOrSphere || !transform ) return
+			if( !body || !fixture || !transform ||
+				( !boxShape && !circleShape && !playerShape ) ) {
 
-			createBox2DBody( world, worldToPhysicsScale, entityId, simpleBoxOrSphere, transform )
+				return
+			}
+
+			createPhysicsObject( world, worldToPhysicsScale, entityId, body, fixture, boxShape, circleShape, playerShape, transform )
 
 			if( debug ) {
 				var componentId,
 					config
 
-				if( isSphereShape( simpleBoxOrSphere ) ) {
+				if( circleShape ) {
 					componentId = 'spell.component.2d.graphics.debug.circle'
 					config = {
-						radius : simpleBoxOrSphere.radius
+						radius : circleShape.radius
 					}
 
 				} else {
+					var boxesqueShape = boxShape || playerShape
+
 					componentId = 'spell.component.2d.graphics.debug.box'
 					config = {
-						width : simpleBoxOrSphere.dimensions[ 0 ],
-						height : simpleBoxOrSphere.dimensions[ 1 ]
+						width : boxesqueShape.dimensions[ 0 ],
+						height : boxesqueShape.dimensions[ 1 ]
 					}
 				}
 
@@ -114,36 +120,71 @@ define(
 			spell.eventManager.unsubscribe( Events.ENTITY_DESTROYED, this.entityDestroyHandler )
 		}
 
-		var createBox2DBody = function( world, worldToPhysicsScale, entityId, simpleBoxOrSphere, transform ) {
-			// fixture
-			var b2fixtureDef = new b2FixtureDef
-
-			b2fixtureDef.density     = simpleBoxOrSphere.density
-			b2fixtureDef.friction    = simpleBoxOrSphere.friction
-			b2fixtureDef.restitution = simpleBoxOrSphere.restitution
-
-			if( isSphereShape( simpleBoxOrSphere ) ) {
-				b2fixtureDef.shape = new b2CircleShape( simpleBoxOrSphere.radius * worldToPhysicsScale )
-
-			} else {
-				b2fixtureDef.shape = new b2PolygonShape
-				b2fixtureDef.shape.SetAsBox(
-					simpleBoxOrSphere.dimensions[ 0 ] / 2 * worldToPhysicsScale,
-					simpleBoxOrSphere.dimensions[ 1 ] / 2 * worldToPhysicsScale
-				)
-			}
-
-			// body
+		var createB2BodyDef = function( world, worldToPhysicsScale, entityId, body, transform ) {
 			var translation = transform.translation,
 				b2bodyDef   = new b2BodyDef
 
-			b2bodyDef.fixedRotation = simpleBoxOrSphere.fixedRotation
-			b2bodyDef.type          = simpleBoxOrSphere.type === 'dynamic' ? b2Body.b2_dynamicBody : b2Body.b2_staticBody
+			b2bodyDef.fixedRotation = body.fixedRotation
+			b2bodyDef.type          = body.type === 'dynamic' ? b2Body.b2_dynamicBody : b2Body.b2_staticBody
 			b2bodyDef.position.x    = translation[ 0 ] * worldToPhysicsScale
 			b2bodyDef.position.y    = translation[ 1 ] * worldToPhysicsScale
 			b2bodyDef.userData      = entityId
 
-			world.CreateBody( b2bodyDef ).CreateFixture( b2fixtureDef )
+			return world.CreateBody( b2bodyDef )
+		}
+
+		var addShape = function( world, worldToPhysicsScale, entityId, b2BodyDef, fixture, boxShape, circleShape, playerShape ) {
+			var fixtureDef = new b2FixtureDef()
+
+			fixtureDef.density     = fixture.density
+			fixtureDef.friction    = fixture.friction
+			fixtureDef.restitution = fixture.restitution
+
+			if( boxShape ) {
+				fixtureDef.shape = new b2PolygonShape()
+				fixtureDef.shape.SetAsBox(
+					boxShape.dimensions[ 0 ] / 2 * worldToPhysicsScale,
+					boxShape.dimensions[ 1 ] / 2 * worldToPhysicsScale
+				)
+
+				b2BodyDef.CreateFixture( fixtureDef )
+
+			} else if( circleShape ) {
+				fixtureDef.shape = new b2CircleShape( circleShape.radius * worldToPhysicsScale )
+
+				b2BodyDef.CreateFixture( fixtureDef )
+
+			} else if( playerShape ) {
+				var halfWidth  = playerShape.dimensions[ 0 ] / 2 * worldToPhysicsScale,
+					halfHeight = playerShape.dimensions[ 1 ] / 2 * worldToPhysicsScale
+
+				// main shape
+				fixtureDef.shape = new b2PolygonShape()
+				fixtureDef.shape.SetAsBox( halfWidth, halfHeight )
+
+				b2BodyDef.CreateFixture( fixtureDef )
+
+				// foot sensor shape
+				var radius         = halfWidth,
+					footFixtureDef = new b2FixtureDef()
+
+//				footFixtureDef.density     = fixture.density
+//				footFixtureDef.friction    = fixture.friction
+//				footFixtureDef.restitution = fixture.restitution
+
+				footFixtureDef.isSensor = true
+				footFixtureDef.userData = { type : 'footSensor', id : entityId }
+				footFixtureDef.shape = new b2CircleShape( radius )
+				footFixtureDef.shape.SetLocalPosition( new b2Vec2( 0, -1 * halfHeight ) )
+
+				b2BodyDef.CreateFixture( footFixtureDef )
+			}
+		}
+
+		var createPhysicsObject = function( world, worldToPhysicsScale, entityId, body, fixture, boxShape, circleShape, playerShape, transform ) {
+			var b2BodyDef = createB2BodyDef( world, worldToPhysicsScale, entityId, body, transform )
+
+			addShape( world, worldToPhysicsScale, entityId, b2BodyDef, fixture, boxShape, circleShape, playerShape )
 		}
 
 		var simulate = function( world, deltaTimeInMs ) {
@@ -184,7 +225,7 @@ define(
 
 				if( !id ) continue
 
-				// spell.component.box2d.applyForce
+				// spell.component.physics.applyForce
 				var applyForce = applyForces[ id ]
 
 				if( applyForce ) {
@@ -204,7 +245,7 @@ define(
 					}
 				}
 
-				// spell.component.box2d.applyTorque
+				// spell.component.physics.applyTorque
 				var applyTorque = applyTorques[ id ]
 
 				if( applyTorque ) {
@@ -215,7 +256,7 @@ define(
 					}
 				}
 
-				// spell.component.box2d.applyImpulse
+				// spell.component.physics.applyImpulse
 				var applyImpulse = applyImpulses[ id ]
 
 				if( applyImpulse ) {
@@ -233,11 +274,11 @@ define(
 								body.GetWorldCenter()
 						)
 
-						entityManager.removeComponent( id, 'spell.component.box2d.applyImpulse' )
+						entityManager.removeComponent( id, 'spell.component.physics.applyImpulse' )
 					}
 				}
 
-				// spell.component.box2d.applyVelocity
+				// spell.component.physics.applyVelocity
 				var velocity = applyVelocities[ id ]
 
 				if( velocity ) {
@@ -248,10 +289,10 @@ define(
 						)
 					)
 
-					entityManager.removeComponent( id, 'spell.component.box2d.applyVelocity' )
+					entityManager.removeComponent( id, 'spell.component.physics.applyVelocity' )
 				}
 
-				// spell.component.box2d.setPosition
+				// spell.component.physics.setPosition
 				var setPosition = setPositions[ id ]
 
 				if( setPosition ) {
@@ -262,7 +303,7 @@ define(
 						)
 					)
 
-					entityManager.removeComponent( id, 'spell.component.box2d.setPosition' )
+					entityManager.removeComponent( id, 'spell.component.physics.setPosition' )
 				}
 
 
@@ -298,7 +339,7 @@ define(
 			}
 		}
 
-		var Box2DSystem = function( spell ) {
+		var physicsSystem = function( spell ) {
 			this.debug = !!spell.configurationManager.debug
 			this.entityCreatedHandler
 			this.entityDestroyHandler
@@ -307,7 +348,7 @@ define(
 			this.worldToPhysicsScale = this.config.scale
 		}
 
-		Box2DSystem.prototype = {
+		physicsSystem.prototype = {
 			init : init,
 			destroy : function() {},
 			activate : activate,
@@ -315,6 +356,6 @@ define(
 			process : process
 		}
 
-		return Box2DSystem
+		return physicsSystem
 	}
 )
