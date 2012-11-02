@@ -17,18 +17,18 @@ define(
 		'use strict'
 
 
-		var physics        = PlatformKit.Box2D,
-			b2Vec2         = physics.Common.Math.b2Vec2,
-			b2World        = physics.Dynamics.b2World,
-			b2FixtureDef   = physics.Dynamics.b2FixtureDef,
-			b2Body         = physics.Dynamics.b2Body,
-			b2BodyDef      = physics.Dynamics.b2BodyDef,
-			b2PolygonShape = physics.Collision.Shapes.b2PolygonShape,
-			b2CircleShape  = physics.Collision.Shapes.b2CircleShape
+		var Box2D          = PlatformKit.Box2D,
+			b2Vec2         = Box2D.Common.Math.b2Vec2,
+			b2World        = Box2D.Dynamics.b2World,
+			b2FixtureDef   = Box2D.Dynamics.b2FixtureDef,
+			b2Body         = Box2D.Dynamics.b2Body,
+			b2BodyDef      = Box2D.Dynamics.b2BodyDef,
+			b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape,
+			b2CircleShape  = Box2D.Collision.Shapes.b2CircleShape
 
 		var awakeColor      = [ 0.82, 0.76, 0.07 ],
 			notAwakeColor   = [ 0.27, 0.25, 0.02 ],
-			maxVelocity     = 10
+			maxVelocity     = 20
 
 		var getBodyById = function( world, entityId ) {
 			for( var body = world.GetBodyList(); body; body = body.m_next ) {
@@ -90,34 +90,6 @@ define(
 
 				world.DestroyBody( body )
 			}
-		}
-
-
-		// public
-
-		var init = function( spell ) {
-			var doSleep = true
-
-			this.world = new b2World(
-				new b2Vec2(
-					this.config.gravity[ 0 ] * this.worldToPhysicsScale,
-					this.config.gravity[ 1 ] * this.worldToPhysicsScale
-				),
-				doSleep
-			)
-		}
-
-		var activate = function( spell ) {
-			this.entityCreatedHandler = _.bind( createBody, null, spell, this.worldToPhysicsScale, this.debug, this.world )
-			this.entityDestroyHandler = _.bind( this.removedEntities.push, this.removedEntities )
-
-			spell.eventManager.subscribe( Events.ENTITY_CREATED, this.entityCreatedHandler )
-			spell.eventManager.subscribe( Events.ENTITY_DESTROYED, this.entityDestroyHandler )
-		}
-
-		var deactivate = function( spell ) {
-			spell.eventManager.unsubscribe( Events.ENTITY_CREATED, this.entityCreatedHandler )
-			spell.eventManager.unsubscribe( Events.ENTITY_DESTROYED, this.entityDestroyHandler )
 		}
 
 		var createB2BodyDef = function( world, worldToPhysicsScale, entityId, body, transform ) {
@@ -192,18 +164,24 @@ define(
 			world.ClearForces()
 		}
 
-		var transferState = function( world, worldToPhysicsScale, transforms ) {
-			for( var body = world.GetBodyList(); body; body = body.m_next ) {
-				var id = body.GetUserData()
+		var transferState = function( world, worldToPhysicsScale, bodies, transforms ) {
+			for( var b2Body = world.GetBodyList(); b2Body; b2Body = b2Body.m_next ) {
+				var id = b2Body.GetUserData()
 
 				if( !id ) continue
 
-				var position  = body.GetPosition(),
+				var position  = b2Body.GetPosition(),
 					transform = transforms[ id ]
 
 				transform.translation[ 0 ] = position.x / worldToPhysicsScale
 				transform.translation[ 1 ] = position.y / worldToPhysicsScale
-				transform.rotation = body.GetAngle() * -1
+				transform.rotation = b2Body.GetAngle() * -1
+
+				var velocityVec2 = b2Body.GetLinearVelocity(),
+					body         = bodies[ id ]
+
+				body.velocity[ 0 ] = velocityVec2.x / worldToPhysicsScale
+				body.velocity[ 1 ] = velocityVec2.y / worldToPhysicsScale
 			}
 		}
 
@@ -239,7 +217,7 @@ define(
 						body.ApplyForce(
 							new b2Vec2( forceX, forceY ),
 							applyForce.usePoint ?
-								new b2Vec2( point[ 0 ], point[ 1 ] ) :
+								new b2Vec2( point[ 0 ] * worldToPhysicsScale, point[ 1 ] * worldToPhysicsScale ) :
 								body.GetWorldCenter()
 						)
 					}
@@ -270,7 +248,7 @@ define(
 						body.ApplyImpulse(
 							new b2Vec2( impulseX, impulseY ),
 							applyImpulse.usePoint ?
-								new b2Vec2( point[ 0 ], point[ 1 ] ) :
+								new b2Vec2( point[ 0 ] * worldToPhysicsScale, point[ 1 ] * worldToPhysicsScale ) :
 								body.GetWorldCenter()
 						)
 
@@ -319,36 +297,58 @@ define(
 			}
 		}
 
-		var process = function( spell, timeInMs, deltaTimeInMs ) {
-			var world               = this.world,
-				transforms          = this.transforms,
-				removedEntities     = this.removedEntities,
-				worldToPhysicsScale = this.worldToPhysicsScale
+		var init = function( spell ) {
+			var doSleep = true
 
-			if( removedEntities.length ) {
-				destroyBodies( world, removedEntities )
-				removedEntities.length = 0
+			this.world = new b2World(
+				new b2Vec2( this.config.gravity[ 0 ], this.config.gravity[ 1 ] ),
+				doSleep
+			)
+		}
+
+		var activate = function( spell ) {
+			this.entityCreatedHandler = _.bind( createBody, null, spell, this.worldToPhysicsScale, this.debug, this.world )
+			this.entityDestroyHandler = _.bind( this.removedEntitiesQueue.push, this.removedEntitiesQueue )
+
+			spell.eventManager.subscribe( Events.ENTITY_CREATED, this.entityCreatedHandler )
+			spell.eventManager.subscribe( Events.ENTITY_DESTROYED, this.entityDestroyHandler )
+		}
+
+		var deactivate = function( spell ) {
+			spell.eventManager.unsubscribe( Events.ENTITY_CREATED, this.entityCreatedHandler )
+			spell.eventManager.unsubscribe( Events.ENTITY_DESTROYED, this.entityDestroyHandler )
+		}
+
+		var process = function( spell, timeInMs, deltaTimeInMs ) {
+			var world                = this.world,
+				transforms           = this.transforms,
+				removedEntitiesQueue = this.removedEntitiesQueue,
+				worldToPhysicsScale  = this.worldToPhysicsScale
+
+			if( removedEntitiesQueue.length ) {
+				destroyBodies( world, removedEntitiesQueue )
+				removedEntitiesQueue.length = 0
 			}
 
 			applyInfluence( spell.entityManager, world, worldToPhysicsScale, this.applyForces, this.applyTorques, this.applyImpulses, this.applyVelocities, this.setPositions )
 			simulate( world, deltaTimeInMs )
-			transferState( world, worldToPhysicsScale, transforms )
+			transferState( world, worldToPhysicsScale, this.bodies, transforms )
 
 			if( this.debug ) {
 				updateDebug( world, this.debugBoxes, this.debugCircles, transforms )
 			}
 		}
 
-		var physicsSystem = function( spell ) {
+		var Physics = function( spell ) {
 			this.debug = !!spell.configurationManager.debug
 			this.entityCreatedHandler
 			this.entityDestroyHandler
-			this.removedEntities = []
 			this.world
 			this.worldToPhysicsScale = this.config.scale
+			this.removedEntitiesQueue = []
 		}
 
-		physicsSystem.prototype = {
+		Physics.prototype = {
 			init : init,
 			destroy : function() {},
 			activate : activate,
@@ -356,6 +356,6 @@ define(
 			process : process
 		}
 
-		return physicsSystem
+		return Physics
 	}
 )
