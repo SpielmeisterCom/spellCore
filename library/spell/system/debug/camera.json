@@ -1,0 +1,16 @@
+{
+	"type": "system",
+	"readonly": true,
+	"engineInternal": true,
+	"input": [
+	],
+	"version": 1,
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": false,
+			"doc": "if false the system will be skipped during processing"
+		}
+	]
+}
