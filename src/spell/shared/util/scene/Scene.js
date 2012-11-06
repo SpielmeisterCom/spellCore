@@ -58,24 +58,14 @@ define(
 		 * TODO: Remove this custom invoke that knows how to handle the borked instances produced by the "create" constructor wrapper function.
 		 * Instances created by "create" for some unknown reason do not support prototype chain method look-up. See "Fix create"
 		 */
-		var invoke = function( sortedMap, functionName, args ) {
+		var invoke = function( sortedMap, functionName, activeSystemsOnly, args ) {
 			var systems = sortedMap.values
 
 			for( var i = 0, numSystems = systems.length; i < numSystems; i++ ) {
 				var system = systems[ i ]
 
-				system.prototype[ functionName ].apply( system, args )
-			}
-		}
-
-		var process = function( sortedMap, args ) {
-			var systems = sortedMap.values
-
-			for( var i = 0, numSystems = systems.length; i < numSystems; i++ ) {
-				var system = systems[ i ]
-
-				if( system.config.active ) {
-					system.prototype.process.apply( system, args )
+				if ( !activeSystemsOnly || system.config.active ) {
+					system.prototype[ functionName ].apply( system, args )
 				}
 			}
 		}
@@ -181,10 +171,10 @@ define(
 
 		Scene.prototype = {
 			render: function( timeInMs, deltaTimeInMs ) {
-				process( this.executionGroups.render, [ this.spell, timeInMs, deltaTimeInMs ] )
+				invoke( this.executionGroups.render, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			update: function( timeInMs, deltaTimeInMs ) {
-				process( this.executionGroups.update, [ this.spell, timeInMs, deltaTimeInMs ] )
+				invoke( this.executionGroups.update, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			init: function( sceneConfig ) {
 				var spell = this.spell
@@ -216,11 +206,11 @@ define(
 						this.isModeDevelopment
 					)
 
-					invoke( executionGroups.render, 'init', [ spell, sceneConfig ] )
-					invoke( executionGroups.update, 'init', [ spell, sceneConfig ] )
+					invoke( executionGroups.render, 'init', false, [ spell, sceneConfig ] )
+					invoke( executionGroups.update, 'init', false, [ spell, sceneConfig ] )
 
-					invoke( executionGroups.render, 'activate', [ spell, sceneConfig ] )
-					invoke( executionGroups.update, 'activate', [ spell, sceneConfig ] )
+					invoke( executionGroups.render, 'activate', true, [ spell, sceneConfig ] )
+					invoke( executionGroups.update, 'activate', true, [ spell, sceneConfig ] )
 				}
 
 				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
@@ -232,11 +222,11 @@ define(
 			destroy: function( sceneConfig ) {
 				var executionGroups = this.executionGroups
 
-				invoke( executionGroups.render, 'deactivate', [ this.spell, sceneConfig ] )
-				invoke( executionGroups.update, 'deactivate', [ this.spell, sceneConfig ] )
+				invoke( executionGroups.render, 'deactivate', true, [ this.spell, sceneConfig ] )
+				invoke( executionGroups.update, 'deactivate', true, [ this.spell, sceneConfig ] )
 
-				invoke( executionGroups.render, 'destroy', [ this.spell, sceneConfig ] )
-				invoke( executionGroups.update, 'destroy', [ this.spell, sceneConfig ] )
+				invoke( executionGroups.render, 'destroy', false, [ this.spell, sceneConfig ] )
+				invoke( executionGroups.update, 'destroy', false, [ this.spell, sceneConfig ] )
 
 				this.script.destroy( this.spell, sceneConfig )
 			},
@@ -262,7 +252,9 @@ define(
 				// deactivating, destroying ye olde system
 				var spell = this.spell
 
-				system.prototype.deactivate.call( system, spell )
+				if ( system.config.active ) {
+					system.prototype.deactivate.call( system, spell )
+				}
 				system.prototype.destroy.call( system, spell )
 
 				// initializing and activating the new system instance
@@ -275,7 +267,10 @@ define(
 				)
 
 				newSystem.prototype.init.call( newSystem, spell )
-				newSystem.prototype.activate.call( newSystem, spell )
+
+				if ( newSystem.config.active ) {
+					newSystem.prototype.activate.call( newSystem, spell )
+				}
 
 				executionGroup.add( systemId, newSystem )
 			},
@@ -294,7 +289,10 @@ define(
 				)
 
 				system.prototype.init.call( system, spell )
-				system.prototype.activate.call( system, spell )
+
+				if ( system.config.active ) {
+					system.prototype.activate.call( system, spell )
+				}
 
 				executionGroup.insert( systemId, system, index )
 			},
@@ -305,7 +303,9 @@ define(
 				var spell  = this.spell,
 					system = executionGroup.getByKey( systemId )
 
-				system.prototype.deactivate.call( system, spell )
+				if ( system.config.active ) {
+					system.prototype.deactivate.call( system, spell )
+				}
 				system.prototype.destroy.call( system, spell )
 
 				executionGroup.removeByKey( systemId )
