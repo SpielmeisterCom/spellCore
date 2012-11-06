@@ -29,6 +29,9 @@ define(
 			this.mainLoop.setUpdateCallback( _.bind( scene.update, scene ) )
 
 			this.activeScene = scene
+
+			this.loadingPending = false
+			this.processCmdQueue()
 		}
 
 		var SceneManager = function( spell, entityManager, templateManager, mainLoop, sendMessageToEditor, isModeDevelopment ) {
@@ -39,6 +42,8 @@ define(
 			this.spell               = spell
 			this.templateManager     = templateManager
 			this.isModeDevelopment   = isModeDevelopment
+			this.cmdQueue            = []
+			this.loadingPending      = false
 		}
 
 		SceneManager.prototype = {
@@ -46,6 +51,8 @@ define(
 				var onProgress = this.sendMessageToEditor ?
 					_.bind( this.sendMessageToEditor, null, 'spell.loadingProgress' ) :
 					undefined
+
+				this.loadingPending = true
 
 				loadSceneResources(
 					this.spell,
@@ -62,17 +69,56 @@ define(
 					onProgress
 				)
 			},
+
+			processCmdQueue: function() {
+
+				if ( this.loadingPending ) {
+					return
+				}
+
+				for (var i=0; i < this.cmdQueue.length; i++) {
+					var cmd = this.cmdQueue[ i ]
+
+					this.activeScene[ cmd[ 'fn' ] ].apply( this.activeScene, cmd[ 'arguments' ])
+				}
+
+				this.cmdQueue.length = 0
+			},
+
 			addSystem: function( systemId, executionGroupId, index, systemConfig ) {
-				this.activeScene.addSystem( systemId, executionGroupId, index, systemConfig )
+				this.cmdQueue.push({
+					'fn'        : 'addSystem',
+					'arguments' : [ systemId, executionGroupId, index, systemConfig ]
+				})
+
+				this.processCmdQueue()
 			},
+
 			moveSystem: function( systemId, srcExecutionGroupId, dstExecutionGroupId, dstIndex ) {
-				this.activeScene.moveSystem( systemId, srcExecutionGroupId, dstExecutionGroupId, dstIndex )
+				this.cmdQueue.push({
+					'fn'        : 'moveSystem',
+					'arguments' : [ systemId, srcExecutionGroupId, dstExecutionGroupId, dstIndex ]
+				})
+
+				this.processCmdQueue()
 			},
+
 			removeSystem: function( systemId, executionGroupId ) {
-				this.activeScene.removeSystem( systemId, executionGroupId )
+				this.cmdQueue.push({
+					'fn'        : 'removeSystem',
+					'arguments' : [ systemId, executionGroupId ]
+				})
+
+				this.processCmdQueue()
 			},
+
 			restartSystem: function( systemId, executionGroupId, systemConfig ) {
-				this.activeScene.restartSystem( systemId, executionGroupId, systemConfig )
+				this.cmdQueue.push({
+					'fn'        : 'restartSystem',
+					'arguments' : [ systemId, executionGroupId, systemConfig ]
+				})
+
+				this.processCmdQueue()
 			}
 		}
 
