@@ -72,7 +72,13 @@ define(
 			 */
 			activate: function( spell ) {
 				//find current active camera
-				var activeCameraId = getActiveCameraId( this.cameras )
+				this.lastActiveCameraId = getActiveCameraId( this.cameras )
+
+				spell.entityManager.updateComponent(
+					this.lastActiveCameraId,
+					'spell.component.2d.graphics.camera', {
+					'active': false
+				})
 
 				//create editor camera
 				this.editorCameraEntityId = spell.entityManager.createEntity({
@@ -84,8 +90,6 @@ define(
 						}
 					}
 				})
-
-
 			},
 
 			/**
@@ -95,6 +99,12 @@ define(
 			 */
 			deactivate: function( spell ) {
 
+				spell.entityManager.updateComponent( this.lastActiveCameraId, 'spell.component.2d.graphics.camera', {
+					'active': true
+				})
+
+				spell.entityManager.removeEntity( this.editorCameraEntityId )
+				this.editorCameraEntityId = undefined
 			},
 
 			/**
