@@ -6,10 +6,22 @@ define(
 
 		return function( logger ) {
 			// rewiring console.log
-			console.originalLog = console.log
 
+			console.originalLog = console.log
 			console.log = function() {
-				logger.error( 'Usage of console.log is prohibited within the SpellJS framework. You can use the built-in <a href="http://docs.spelljs.com/index.html#!/guide/tutorials_using_console_logging" target="_blank">logging functionality</a> instead.' )
+
+				if ( console.originalLog ) {
+
+					//trigger a warning for using console.log once and then allow console.log usage
+					console.log = console.originalLog
+					delete console.originalLog
+
+					var warning = 'console.log can be only used during development because it is not cross-platform save. Be sure to remove this call when you finished your debugging. Use the spell.logger function to enable cross-platform logging.'
+					logger.warn( warning )
+					console.warn ( warning )
+
+					console.log( arguments )
+				}
 			}
 
 			// putting global error handler in place
