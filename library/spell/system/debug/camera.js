@@ -13,6 +13,27 @@ define(
 		) {
 		'use strict'
 
+		var getActiveCameraId = function( cameras ) {
+			if( !cameras || _.size( cameras ) === 0 ) return
+
+			// Gets the first active camera. More than one camera being active is an undefined state and the first found active is used.
+			var activeCameraId = undefined
+
+			_.any(
+				cameras,
+				function( camera, id ) {
+					if( camera.active ) {
+						activeCameraId = id
+
+						return true
+					}
+
+					return false
+				}
+			)
+
+			return activeCameraId
+		}
 
 
 		/**
@@ -50,6 +71,20 @@ define(
 			 * @param {Object} [spell] The spell object.
 			 */
 			activate: function( spell ) {
+				//find current active camera
+				var activeCameraId = getActiveCameraId( this.cameras )
+
+				//create editor camera
+				this.editorCameraEntityId = spell.entityManager.createEntity({
+					templateId: 'spell.entity.2d.graphics.camera',
+					config: {
+						"spell.component.2d.transform": {},
+						"spell.component.2d.graphics.camera": {
+							"active": true
+						}
+					}
+				})
+
 
 			},
 

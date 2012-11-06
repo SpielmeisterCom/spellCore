@@ -3,6 +3,14 @@
 	"readonly": true,
 	"engineInternal": true,
 	"input": [
+        {
+            "name": "transforms",
+            "componentId": "spell.component.2d.transform"
+        },
+        {
+            "name": "cameras",
+            "componentId": "spell.component.2d.graphics.camera"
+        }
 	],
 	"version": 1,
 	"config": [
