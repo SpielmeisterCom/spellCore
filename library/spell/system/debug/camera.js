@@ -36,6 +36,25 @@ define(
 		}
 
 
+		var processEvent = function ( event ) {
+
+			if ( event.type == 'mousewheel' ) {
+				//zoom camera in and out on mousewheel event
+				var currentScale = this.transforms[ this.editorCameraEntityId ].scale
+
+				currentScale[0] = currentScale[0] + ( 0.5 * event.direction * -1 )
+				currentScale[1] = currentScale[1] + ( 0.5 * event.direction * -1 )
+
+				if (currentScale[0] < 0.5) {
+					currentScale[0] = 0.5
+				}
+
+				if (currentScale[1] < 0.5) {
+					currentScale[1] = 0.5
+				}
+			}
+		}
+
 		/**
 		 * Creates an instance of the system.
 		 *
@@ -80,13 +99,22 @@ define(
 					'active': false
 				})
 
+				var lastActiveCameraTransform = this.transforms[ this.lastActiveCameraId ]
+				var lastActiveCamera          = this.cameras[ this.lastActiveCameraId ]
+
 				//create editor camera
 				this.editorCameraEntityId = spell.entityManager.createEntity({
 					templateId: 'spell.entity.2d.graphics.camera',
 					config: {
-						"spell.component.2d.transform": {},
+						"spell.component.2d.transform": {
+							translation: [ lastActiveCameraTransform.translation[0], lastActiveCameraTransform.translation[1] ],
+							scale: [ lastActiveCameraTransform.scale[0], lastActiveCameraTransform.scale[1] ]
+						},
 						"spell.component.2d.graphics.camera": {
-							"active": true
+							active: true,
+							clearUnsafeArea: false,
+							height: lastActiveCamera.height,
+							width: lastActiveCamera.width
 						}
 					}
 				})
@@ -115,7 +143,13 @@ define(
 			 * @param {Object} [deltaTimeInMs] The elapsed time in ms.
 			 */
 			process: function( spell, timeInMs, deltaTimeInMs ) {
+				var inputEvents      = spell.inputManager.getInputEvents()
 
+				for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
+
+					processEvent.call( this, inputEvents[ i ] )
+
+				}
 			}
 		}
 
