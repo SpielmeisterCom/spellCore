@@ -62,14 +62,12 @@ define(
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var actors           = this.actors,
 				eventManager     = spell.eventManager,
-				inputEvents      = spell.inputEvents,
+				inputEvents      = spell.inputManager.getInputEvents(),
 				inputDefinitions = this.inputDefinitions
 
 			for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
 				processEvent( eventManager, inputEvents[ i ], actors, inputDefinitions )
 			}
-
-			inputEvents.length = 0
 		}
 
 
@@ -80,12 +78,8 @@ define(
 		var KeyInput = function( spell ) {}
 
 		KeyInput.prototype = {
-			init : function( spell ) {
-				spell.inputManager.init()
-			},
-			destroy : function( spell ) {
-				spell.inputManager.destroy()
-			},
+			init : function( spell ) {},
+			destroy : function( spell ) {},
 			activate : function( spell ) {},
 			deactivate : function( spell ) {},
 			process : process
