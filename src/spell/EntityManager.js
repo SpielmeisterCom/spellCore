@@ -5,7 +5,7 @@
  * You can use the EntityManager for example in your system's init, activate, deactivate, destroy and process functions
  * to create or destroy entities, or to add or remove components from entities and update components.
  *
- * @class spell.EntityManager
+ * @class spell.entityManager
  * @singleton
  */
 define(
