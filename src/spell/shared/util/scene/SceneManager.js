@@ -52,6 +52,7 @@ define(
 					_.bind( this.sendMessageToEditor, null, 'spell.loadingProgress' ) :
 					undefined
 
+				this.cmdQueue = []
 				this.loadingPending = true
 
 				loadSceneResources(
