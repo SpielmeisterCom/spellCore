@@ -113,7 +113,7 @@ define(
 					.up()
 					.ele( 'external-library-path' )
 						.ele( 'path-element' )
-							.txt( flexSdkPath + '/frameworks/libs/player/10.1/playerglobal.swc' )
+                            .txt( flexSdkPath + '/frameworks/libs/player/11.1/playerglobal.swc' )
 						.up()
 					.up()
 					.ele( 'debug' )
@@ -147,14 +147,14 @@ define(
 		}
 
 		var compile = function( flexSdkPath, configFilePath, next ) {
-			var command = _s.sprintf( '%1$s/bin/mxmlc -load-config %2$s', flexSdkPath, configFilePath ),
-				options = {
-					env : {
-						LC_ALL : 'en_US'
-					}
-				}
+			var executablePath = path.join( flexSdkPath, 'bin/mxmlc.bat' )
 
-			child_process.exec( command, options, next )
+			child_process.execFile(
+				executablePath,
+				[ '-load-config', configFilePath ],
+				{},
+				next
+			)
 		}
 
 
@@ -227,7 +227,7 @@ define(
 			)
 
 			// create config and compile
-			var flexSdkPath            = path.join( spellFlashPath, 'vendor/flex_sdk_4.1.0.16076A_mpl' ),
+			var flexSdkPath            = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
 				compilerConfigFilePath = path.join( tmpPath, 'compile-config.xml' ),
 				outputFilePath         = path.join( deployFlashPath, 'spell.swf' )
 
