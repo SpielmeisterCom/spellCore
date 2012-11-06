@@ -1,3 +1,9 @@
+/**
+ * The InputManager contains functions for processing user input
+ *
+ * @class spell.inputManager
+ * @singleton
+ */
 define(
 	"spell/InputManager",
 	[
@@ -20,11 +26,9 @@ define(
 
 		var nextSequenceNumber = 0
 
-
 		/*
 		 * public
 		 */
-
 		var inputEvents = []
 
 		var mouseClickHandler = function( event ) {
@@ -41,8 +45,19 @@ define(
 			inputEvents.push( internalEvent )
 		}
 
+		var mouseMoveHandler = function( event ) {
+
+		}
+
 		var mouseWheelHandler = function( event ) {
-			
+
+			var internalEvent = {
+				type           : event.type,
+				sequenceNumber : nextSequenceNumber++,
+				direction      : event.direction
+			}
+
+			inputEvents.push( internalEvent )
 		}
 
         var touchHandler = function( event ) {
@@ -77,6 +92,10 @@ define(
 		}
 
 		InputManager.prototype = {
+			/**
+			 * Initialize the InputManager. This function is being called by spellCore, don't call it yourself!
+			 * @private
+			 */
 			init : function() {
 				if( PlatformKit.features.touch ) {
 					this.nativeInput.setInputEventListener( 'touchstart', touchHandler )
@@ -90,6 +109,10 @@ define(
 				this.nativeInput.setInputEventListener( 'keydown', keyHandler )
 				this.nativeInput.setInputEventListener( 'keyup', keyHandler )
 			},
+			/**
+			 * Destroys the InputManager. This function is being called by spellCore, don't call it yourself!
+			 * @private
+			 */
 			destroy : function() {
 				if( PlatformKit.features.touch ) {
 					this.nativeInput.removeInputEventListener( 'touchstart' )
@@ -105,6 +128,13 @@ define(
 			},
 			getInputEvents : function() {
 				return inputEvents
+			},
+			/**
+			 * Clear the current input event queue.
+			 */
+			clearInputEvents : function() {
+				inputEvents.length = 0
+
 			},
 			injectKeyEvent : function( type, keyCode ) {
 				inputEvents.push( createKeyEvent( type, keyCode ) )
