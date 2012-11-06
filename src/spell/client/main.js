@@ -68,6 +68,7 @@ define(
 			spell.logger.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
 
 			var inputManager = new InputManager( configurationManager )
+			inputManager.init()
 
 			var resourceLoader = new ResourceLoader( spell, spell.eventManager, renderingContext, configurationManager.resourceServer )
 
@@ -88,7 +89,6 @@ define(
 				spell,
 				{
 					configurationManager : configurationManager,
-					inputEvents          : inputManager.getInputEvents(),
 					inputManager         : inputManager,
 					renderingContext     : renderingContext,
 					resourceLoader       : resourceLoader,
