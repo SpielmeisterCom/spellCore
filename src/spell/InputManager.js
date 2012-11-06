@@ -1,5 +1,5 @@
 define(
-	"spell/shared/util/InputManager",
+	"spell/InputManager",
 	[
 		"spell/shared/util/platform/PlatformKit"
 	],
@@ -27,7 +27,7 @@ define(
 
 		var inputEvents = []
 
-		var mouseHandler = function( event ) {
+		var mouseClickHandler = function( event ) {
 			// scale screen space position to "world" position
 			event.position[ 0 ] *= constants.xSize
 			event.position[ 1 ] *= constants.ySize
@@ -39,6 +39,10 @@ define(
 			}
 
 			inputEvents.push( internalEvent )
+		}
+
+		var mouseWheelHandler = function( event ) {
+			
 		}
 
         var touchHandler = function( event ) {
@@ -79,8 +83,9 @@ define(
 					this.nativeInput.setInputEventListener( 'touchend', touchHandler )
 				}
 
-                this.nativeInput.setInputEventListener( 'mousedown', mouseHandler )
-                this.nativeInput.setInputEventListener( 'mouseup', mouseHandler )
+                this.nativeInput.setInputEventListener( 'mousedown', mouseClickHandler )
+                this.nativeInput.setInputEventListener( 'mouseup', mouseClickHandler )
+				this.nativeInput.setInputEventListener( 'mousewheel', mouseWheelHandler );
 
 				this.nativeInput.setInputEventListener( 'keydown', keyHandler )
 				this.nativeInput.setInputEventListener( 'keyup', keyHandler )
@@ -93,6 +98,7 @@ define(
 
                 this.nativeInput.removeInputEventListener( 'mousedown' )
                 this.nativeInput.removeInputEventListener( 'mouseup' )
+				this.nativeInput.removeInputEventListener( 'mousewheel' )
 
 				this.nativeInput.removeInputEventListener( 'keydown' )
 				this.nativeInput.removeInputEventListener( 'keyup' )

@@ -9,7 +9,7 @@ define(
 		'spell/shared/util/template/TemplateManager',
 		'spell/shared/util/ConfigurationManager',
 		'spell/shared/util/EventManager',
-		'spell/shared/util/InputManager',
+		'spell/InputManager',
 		'spell/client/loading/ResourceLoader',
 		'spell/shared/util/StatisticsManager',
 		'spell/shared/util/Logger',
