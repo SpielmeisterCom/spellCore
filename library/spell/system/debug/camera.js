@@ -106,15 +106,15 @@ define(
 				this.editorCameraEntityId = spell.entityManager.createEntity({
 					templateId: 'spell.entity.2d.graphics.camera',
 					config: {
-						"spell.component.2d.transform": {
-							translation: [ lastActiveCameraTransform.translation[0], lastActiveCameraTransform.translation[1] ],
-							scale: [ lastActiveCameraTransform.scale[0], lastActiveCameraTransform.scale[1] ]
+						'spell.component.2d.transform': {
+							'translation': [ lastActiveCameraTransform[ 'translation' ][0], lastActiveCameraTransform[ 'translation' ][1] ],
+							'scale': [ lastActiveCameraTransform[ 'scale' ][0], lastActiveCameraTransform[ 'scale' ][1] ]
 						},
-						"spell.component.2d.graphics.camera": {
-							active: true,
-							clearUnsafeArea: false,
-							height: lastActiveCamera.height,
-							width: lastActiveCamera.width
+						'spell.component.2d.graphics.camera': {
+							'active': true,
+							'clearUnsafeArea': false,
+							'height': lastActiveCamera[ 'height' ],
+							'width': lastActiveCamera[ 'width' ]
 						}
 					}
 				})
@@ -144,7 +144,6 @@ define(
 			 */
 			process: function( spell, timeInMs, deltaTimeInMs ) {
 				var inputEvents      = spell.inputManager.getInputEvents()
-
 				for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
 
 					processEvent.call( this, inputEvents[ i ] )
