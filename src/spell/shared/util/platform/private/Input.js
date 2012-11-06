@@ -109,6 +109,20 @@ define(
 			callback( event )
 		}
 
+		var nativeMouseWheelHandler = function( callback, event ) {
+			var delta = event.wheelDelta ? event.wheelDelta : (event.detail * -1)
+
+			var direction = delta > 0 ? 1 : -1
+
+			event.stopPropagation()
+			event.preventDefault()
+
+			callback( {
+				type:       'mousewheel',
+				direction:  direction
+			})
+		}
+
         var nativeMouseHandler = function( callback, event ) {
 			var offset = getOffset( this.container )
 			var screenSize = this.configurationManager.currentScreenSize
@@ -136,27 +150,31 @@ define(
 		 */
 		var nativeEventMap = {
             touchstart : {
-                eventName : 'touchstart',
+                eventNames : [ 'touchstart' ],
                 handler   : nativeTouchHandler
             },
             touchend : {
-                eventName : 'touchend',
+                eventNames : [ 'touchend' ],
                 handler   : nativeTouchHandler
             },
 			mousedown : {
-				eventName : 'mousedown',
+				eventNames : [ 'mousedown' ],
 				handler   : nativeMouseHandler
 			},
 			mouseup : {
-				eventName : 'mouseup',
+				eventNames : [ 'mouseup' ],
 				handler   : nativeMouseHandler
 			},
+			mousewheel : {
+				eventNames : [ 'mousewheel', 'DOMMouseScroll' ],
+				handler   : nativeMouseWheelHandler
+			},
 			keydown : {
-				eventName : 'keydown',
+				eventNames : [ 'keydown' ],
 				handler   : nativeKeyHandler
 			},
 			keyup : {
-				eventName : 'keyup',
+				eventNames : [ 'keyup' ],
 				handler   : nativeKeyHandler
 			}
 		}
@@ -176,7 +194,10 @@ define(
 
 			var nativeEvent = nativeEventMap[ eventName ]
 
-			addEvent( document.body, nativeEvent.eventName, _.bind( nativeEvent.handler, this, callback ) )
+
+			for (var i = 0; i < nativeEvent.eventNames.length; i++ ) {
+				addEvent( document.body, nativeEvent.eventNames[ i ], _.bind( nativeEvent.handler, this, callback ) )
+			}
 		}
 
 		var removeListener = function( eventName ) {
@@ -184,7 +205,9 @@ define(
 
 			var nativeEvent = nativeEventMap[ eventName ]
 
-			this.container[ 'on' + nativeEvent.eventName ] = null
+			for (var i = 0; i < nativeEvent.eventNames; i++ ) {
+				this.container[ 'on' + nativeEvent.eventNames[ i ] ] = null
+			}
 		}
 
 		Input.prototype = {
