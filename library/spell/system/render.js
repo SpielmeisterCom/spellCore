@@ -307,7 +307,7 @@ define(
 
 			this.screenResizeHandler = _.bind(
 				function( size ) {
-					var aspectRatio = ( this.debugSettings && this.debugSettings.screenAspectRatio !== undefined ?
+					var aspectRatio = ( this.debugSettings && !this.debugSettings.screenAspectRatio ?
 						this.debugSettings.screenAspectRatio :
 						size[ 0 ] / size[ 1 ]
 					)
@@ -349,7 +349,9 @@ define(
 				context                 = this.context,
 				drawVisualObjectPartial = this.drawVisualObjectPartial,
 				screenSize              = this.screenSize,
-				screenAspectRatio       = this.debugSettings.screenAspectRatio ? this.debugSettings.screenAspectRatio : screenSize[ 0 ] / screenSize[ 1 ]
+				screenAspectRatio       = this.debugSettings && this.debugSettings.screenAspectRatio ?
+					this.debugSettings.screenAspectRatio :
+					screenSize[ 0 ] / screenSize[ 1 ]
 
 			// set the camera
 			var activeCameraId  = getActiveCameraId( cameras ),
@@ -499,7 +501,9 @@ define(
 			context.setViewMatrix( tmpMat3 )
 
 
-			if( this.debugSettings.screenAspectRatio !== undefined ) {
+			if( this.debugSettings &&
+				!this.debugSettings.screenAspectRatio ) {
+
 				this.screenSize = createScreenSize(
 					PlatformKit.getAvailableScreenSize(
 						this.configurationManager.id
