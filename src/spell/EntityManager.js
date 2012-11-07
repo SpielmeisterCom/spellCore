@@ -74,8 +74,7 @@ define(
 				entityComponents,
 				function( component, componentId ) {
 					if( !!componentDictionaries[ componentId ][ entityId ] ) {
-						throw 'Error: Adding a component to the entity with id \'' + entityId + '\' failed because the requested id is already in use. ' +
-							'Please make sure that no duplicate entity ids are used.'
+						throw 'Error: Adding a component to the entity with id \'' + entityId + '\' failed because the entity already has a component named \'' + componentId + '\'. Check with hasComponent first if this entity already has this component.'
 					}
 
 					componentDictionaries[ componentId ][ entityId ] = component
