@@ -544,7 +544,6 @@ define(
 		}
 
 		var viewport = function( shaderProgram, x, y, width, height ) {
-			console.log( [ x, y, width, height ] )
 			gl.viewport( x, y , width, height )
 
 			// reinitialize screen space shim matrix
