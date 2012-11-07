@@ -144,9 +144,9 @@
 	}
 
 	var require = function( name, args, config ) {
-		config = config || {}
-
 		if( !name ) throw 'Error: No module name provided.'
+
+		config = config || {}
 
 		var module = modules[ name ]
 
