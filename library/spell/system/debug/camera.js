@@ -72,11 +72,11 @@ define(
 
 				this.lastMousePosition = [ event.position[ 0 ], event.position[ 1 ] ]
 
-			} else if ( event.type == 'keydown' && ( event.keyCode == 17 || event.keyCode == 91 ) ) { //strg or cmd
+			} else if ( event.type == 'mousedown' ) {
 				this.lastMousePosition  = null
 				this.draggingEnabled    = true
 
-			} else if ( event.type == 'keyup' && ( event.keyCode == 17 || event.keyCode == 91 ) ) { //strg or cmd
+			} else if ( event.type == 'mouseup' ) {
 				this.lastMousePosition  = null
 				this.draggingEnabled    = false
 			}
