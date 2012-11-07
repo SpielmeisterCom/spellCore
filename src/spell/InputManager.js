@@ -99,7 +99,8 @@ define(
 
 		InputManager.prototype = {
 			/**
-			 * Initialize the InputManager. This function is being called by spellCore, don't call it yourself!
+			 * Initialize the InputManager and register all input binding.
+			 * This function is being called by spellCore, don't call it yourself!
 			 * @private
 			 */
 			init : function() {
@@ -116,8 +117,10 @@ define(
 				this.nativeInput.setInputEventListener( 'keydown',  _.bind( keyHandler, this ) )
 				this.nativeInput.setInputEventListener( 'keyup',  _.bind( keyHandler, this ) )
 			},
+
 			/**
-			 * Destroys the InputManager. This function is being called by spellCore, don't call it yourself!
+			 * Destroys the InputManager and unregister all input bindings.
+			 * This function is being called by spellCore, don't call it yourself!
 			 * @private
 			 */
 			destroy : function() {
@@ -134,9 +137,15 @@ define(
 				this.nativeInput.removeInputEventListener( 'keydown' )
 				this.nativeInput.removeInputEventListener( 'keyup' )
 			},
+
+			/**
+			 * Get the InputEvents Queue
+			 * @return {Array}
+			 */
 			getInputEvents : function() {
 				return inputEvents
 			},
+
 			/**
 			 * Clear the current input event queue.
 			 */
@@ -144,6 +153,8 @@ define(
 				inputEvents.length = 0
 
 			},
+
+
 			injectKeyEvent : function( type, keyCode ) {
 				inputEvents.push( createKeyEvent( type, keyCode ) )
 			}
