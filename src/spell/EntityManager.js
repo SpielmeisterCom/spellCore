@@ -519,6 +519,17 @@ define(
 			},
 
 			/**
+			 * Check if an entity already has a specific component
+			 *
+			 * @param {String} entityId of the entity that the component belongs to
+			 * @param {String} componentId the library path of the component
+			 * @return {Boolean}
+			 */
+			hasComponent : function( entityId, componentId ) {
+				return !!this.componentDictionaries[ componentId ][ entityId ]
+			},
+
+			/**
 			 * Adds a component to an entity.
 			 *
 			 * Example usage:
