@@ -17,21 +17,22 @@ define(
 		'use strict'
 
 
-		var Box2D          = PlatformKit.Box2D,
-			b2Vec2         = Box2D.Common.Math.b2Vec2,
-			b2World        = Box2D.Dynamics.b2World,
-			b2FixtureDef   = Box2D.Dynamics.b2FixtureDef,
-			b2Body         = Box2D.Dynamics.b2Body,
-			b2BodyDef      = Box2D.Dynamics.b2BodyDef,
-			b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape,
-			b2CircleShape  = Box2D.Collision.Shapes.b2CircleShape
+		var Box2D                 = PlatformKit.Box2D,
+			createB2Vec2          = Box2D.Common.Math.createB2Vec2,
+			createB2World         = Box2D.Dynamics.createB2World,
+			createB2FixtureDef    = Box2D.Dynamics.createB2FixtureDef,
+			createB2Body          = Box2D.Dynamics.createB2Body,
+			b2Body                = Box2D.Dynamics.b2Body,
+			createB2BodyDef       = Box2D.Dynamics.createB2BodyDef,
+			createB2PolygonShape  = Box2D.Collision.Shapes.createB2PolygonShape,
+			createB2CircleShape   = Box2D.Collision.Shapes.createB2CircleShape
 
 		var awakeColor      = [ 0.82, 0.76, 0.07 ],
 			notAwakeColor   = [ 0.27, 0.25, 0.02 ],
 			maxVelocity     = 20
 
 		var getBodyById = function( world, entityId ) {
-			for( var body = world.GetBodyList(); body; body = body.m_next ) {
+			for( var body = world.GetBodyList(); body; body = body.GetNext() ) {
 				if( entityId === body.GetUserData() ) {
 					return body
 				}
@@ -92,53 +93,53 @@ define(
 			}
 		}
 
-		var createB2BodyDef = function( world, worldToPhysicsScale, entityId, body, transform ) {
+		var createBodyDef = function( world, worldToPhysicsScale, entityId, body, transform ) {
 			var translation = transform.translation,
-				b2bodyDef   = new b2BodyDef
+				bodyDef     = createB2BodyDef()
 
-			b2bodyDef.fixedRotation = body.fixedRotation
-			b2bodyDef.type          = body.type === 'dynamic' ? b2Body.b2_dynamicBody : b2Body.b2_staticBody
-			b2bodyDef.position.x    = translation[ 0 ] * worldToPhysicsScale
-			b2bodyDef.position.y    = translation[ 1 ] * worldToPhysicsScale
-			b2bodyDef.userData      = entityId
+			bodyDef.fixedRotation = body.fixedRotation
+			bodyDef.type          = body.type === 'dynamic' ? b2Body.b2_dynamicBody : b2Body.b2_staticBody
+			bodyDef.position.x    = translation[ 0 ] * worldToPhysicsScale
+			bodyDef.position.y    = translation[ 1 ] * worldToPhysicsScale
+			bodyDef.userData      = entityId
 
-			return world.CreateBody( b2bodyDef )
+			return world.CreateBody( bodyDef )
 		}
 
-		var addShape = function( world, worldToPhysicsScale, entityId, b2BodyDef, fixture, boxShape, circleShape, playerShape ) {
-			var fixtureDef = new b2FixtureDef()
+		var addShape = function( world, worldToPhysicsScale, entityId, bodyDef, fixture, boxShape, circleShape, playerShape ) {
+			var fixtureDef = createB2FixtureDef()
 
 			fixtureDef.density     = fixture.density
 			fixtureDef.friction    = fixture.friction
 			fixtureDef.restitution = fixture.restitution
 
 			if( boxShape ) {
-				fixtureDef.shape = new b2PolygonShape()
+				fixtureDef.shape = createB2PolygonShape()
 				fixtureDef.shape.SetAsBox(
 					boxShape.dimensions[ 0 ] / 2 * worldToPhysicsScale,
 					boxShape.dimensions[ 1 ] / 2 * worldToPhysicsScale
 				)
 
-				b2BodyDef.CreateFixture( fixtureDef )
+				bodyDef.CreateFixture( fixtureDef )
 
 			} else if( circleShape ) {
-				fixtureDef.shape = new b2CircleShape( circleShape.radius * worldToPhysicsScale )
+				fixtureDef.shape = createB2CircleShape( circleShape.radius * worldToPhysicsScale )
 
-				b2BodyDef.CreateFixture( fixtureDef )
+				bodyDef.CreateFixture( fixtureDef )
 
 			} else if( playerShape ) {
 				var halfWidth  = playerShape.dimensions[ 0 ] / 2 * worldToPhysicsScale,
 					halfHeight = playerShape.dimensions[ 1 ] / 2 * worldToPhysicsScale
 
 				// main shape
-				fixtureDef.shape = new b2PolygonShape()
+				fixtureDef.shape = createB2PolygonShape()
 				fixtureDef.shape.SetAsBox( halfWidth, halfHeight )
 
-				b2BodyDef.CreateFixture( fixtureDef )
+				bodyDef.CreateFixture( fixtureDef )
 
 				// foot sensor shape
 				var radius         = halfWidth,
-					footFixtureDef = new b2FixtureDef()
+					footFixtureDef = createB2FixtureDef()
 
 //				footFixtureDef.density     = fixture.density
 //				footFixtureDef.friction    = fixture.friction
@@ -146,17 +147,17 @@ define(
 
 				footFixtureDef.isSensor = true
 				footFixtureDef.userData = { type : 'footSensor', id : entityId }
-				footFixtureDef.shape = new b2CircleShape( radius )
-				footFixtureDef.shape.SetLocalPosition( new b2Vec2( 0, -1 * halfHeight ) )
+				footFixtureDef.shape = createB2CircleShape( radius )
+				footFixtureDef.shape.SetLocalPosition( createB2Vec2( 0, -1 * halfHeight ) )
 
-				b2BodyDef.CreateFixture( footFixtureDef )
+				bodyDef.CreateFixture( footFixtureDef )
 			}
 		}
 
 		var createPhysicsObject = function( world, worldToPhysicsScale, entityId, body, fixture, boxShape, circleShape, playerShape, transform ) {
-			var b2BodyDef = createB2BodyDef( world, worldToPhysicsScale, entityId, body, transform )
+			var bodyDef = createBodyDef( world, worldToPhysicsScale, entityId, body, transform )
 
-			addShape( world, worldToPhysicsScale, entityId, b2BodyDef, fixture, boxShape, circleShape, playerShape )
+			addShape( world, worldToPhysicsScale, entityId, bodyDef, fixture, boxShape, circleShape, playerShape )
 		}
 
 		var simulate = function( world, deltaTimeInMs ) {
@@ -165,28 +166,28 @@ define(
 		}
 
 		var transferState = function( world, worldToPhysicsScale, bodies, transforms ) {
-			for( var b2Body = world.GetBodyList(); b2Body; b2Body = b2Body.m_next ) {
-				var id = b2Body.GetUserData()
+			for( var body = world.GetBodyList(); body; body = body.GetNext() ) {
+				var id = body.GetUserData()
 
 				if( !id ) continue
 
-				var position  = b2Body.GetPosition(),
+				var position  = body.GetPosition(),
 					transform = transforms[ id ]
 
 				transform.translation[ 0 ] = position.x / worldToPhysicsScale
 				transform.translation[ 1 ] = position.y / worldToPhysicsScale
-				transform.rotation = b2Body.GetAngle() * -1
+				transform.rotation = body.GetAngle() * -1
 
-				var velocityVec2 = b2Body.GetLinearVelocity(),
-					body         = bodies[ id ]
+				var velocityVec2  = body.GetLinearVelocity(),
+					bodyComponent = bodies[ id ]
 
-				body.velocity[ 0 ] = velocityVec2.x / worldToPhysicsScale
-				body.velocity[ 1 ] = velocityVec2.y / worldToPhysicsScale
+				bodyComponent.velocity[ 0 ] = velocityVec2.x / worldToPhysicsScale
+				bodyComponent.velocity[ 1 ] = velocityVec2.y / worldToPhysicsScale
 			}
 		}
 
 		var updateDebug = function( world, debugBoxes, debugCircles, transforms ) {
-			for( var body = world.GetBodyList(); body; body = body.m_next ) {
+			for( var body = world.GetBodyList(); body; body = body.GetNext() ) {
 				var id = body.GetUserData()
 
 				if( !id ) continue
@@ -198,7 +199,7 @@ define(
 		}
 
 		var applyInfluence = function( entityManager, world, worldToPhysicsScale, applyForces, applyTorques, applyImpulses, applyVelocities, setPositions ) {
-			for( var body = world.GetBodyList(); body; body = body.m_next ) {
+			for( var body = world.GetBodyList(); body; body = body.GetNext() ) {
 				var id = body.GetUserData()
 
 				if( !id ) continue
@@ -215,9 +216,9 @@ define(
 						var point = applyForce.point
 
 						body.ApplyForce(
-							new b2Vec2( forceX, forceY ),
+							createB2Vec2( forceX, forceY ),
 							applyForce.usePoint ?
-								new b2Vec2( point[ 0 ] * worldToPhysicsScale, point[ 1 ] * worldToPhysicsScale ) :
+								createB2Vec2( point[ 0 ] * worldToPhysicsScale, point[ 1 ] * worldToPhysicsScale ) :
 								body.GetWorldCenter()
 						)
 					}
@@ -246,9 +247,9 @@ define(
 						var point = applyImpulse.point
 
 						body.ApplyImpulse(
-							new b2Vec2( impulseX, impulseY ),
+							createB2Vec2( impulseX, impulseY ),
 							applyImpulse.usePoint ?
-								new b2Vec2( point[ 0 ] * worldToPhysicsScale, point[ 1 ] * worldToPhysicsScale ) :
+								createB2Vec2( point[ 0 ] * worldToPhysicsScale, point[ 1 ] * worldToPhysicsScale ) :
 								body.GetWorldCenter()
 						)
 
@@ -261,7 +262,7 @@ define(
 
 				if( velocity ) {
 					body.SetLinearVelocity(
-						new b2Vec2(
+						createB2Vec2(
 							velocity.velocity[ 0 ] * worldToPhysicsScale,
 							velocity.velocity[ 1 ] * worldToPhysicsScale
 						)
@@ -275,7 +276,7 @@ define(
 
 				if( setPosition ) {
 					body.SetPosition(
-						new b2Vec2(
+						createB2Vec2(
 							setPosition.value[ 0 ] * worldToPhysicsScale,
 							setPosition.value[ 1 ] * worldToPhysicsScale
 						)
@@ -300,8 +301,8 @@ define(
 		var init = function( spell ) {
 			var doSleep = true
 
-			this.world = new b2World(
-				new b2Vec2( this.config.gravity[ 0 ], this.config.gravity[ 1 ] ),
+			this.world = createB2World(
+				createB2Vec2( this.config.gravity[ 0 ], this.config.gravity[ 1 ] ),
 				doSleep
 			)
 		}
