@@ -7,7 +7,7 @@ define(
 		'spell/EntityManager',
 		'spell/shared/util/scene/SceneManager',
 		'spell/shared/util/template/TemplateManager',
-		'spell/shared/util/ConfigurationManager',
+		'spell/ConfigurationManager',
 		'spell/shared/util/EventManager',
 		'spell/InputManager',
 		'spell/client/loading/ResourceLoader',

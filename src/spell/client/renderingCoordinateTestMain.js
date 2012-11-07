@@ -1,7 +1,7 @@
 define(
 	'spell/client/renderingCoordinateTestMain',
 	[
-		'spell/shared/util/ConfigurationManager',
+		'spell/ConfigurationManager',
 		'spell/shared/util/EventManager',
 		'spell/client/loading/ResourceLoader',
 		'spell/shared/util/Events',

@@ -1,5 +1,9 @@
+/**
+ * @class spell.configurationManager
+ * @singleton
+ */
 define(
-	'spell/shared/util/ConfigurationManager',
+	'spell/ConfigurationManager',
 	[
 		'spell/client/util/createIncludedRectangle',
 		'spell/math/util',
