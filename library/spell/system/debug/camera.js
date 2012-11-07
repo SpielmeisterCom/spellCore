@@ -6,9 +6,13 @@
 define(
 	'spell/system/debug/camera',
 	[
+		'spell/math/vec2',
+		'spell/math/mat3',
 		'spell/functions'
 	],
 	function(
+		vec2,
+		mat3,
 		_
 		) {
 		'use strict'
@@ -36,7 +40,7 @@ define(
 		}
 
 
-		var processEvent = function ( event ) {
+		var processEvent = function ( spell, event ) {
 
 			if ( event.type == 'mousewheel' ) {
 				//zoom camera in and out on mousewheel event
@@ -57,6 +61,16 @@ define(
 
 				if ( window !== undefined )
 					window.focus()
+
+				//inverse the current worldToScreen matrix
+				var worldToScreen  = spell.renderingContext.getWorldToScreenMatrix(),
+					screenToWorld  = mat3.create(),
+					worldPosition  = vec2.create()
+
+				mat3.inverse( worldToScreen, screenToWorld )
+				mat3.multiplyVec2( screenToWorld, event.position, worldPosition )
+
+				//console.log( worldPosition )
 
 				var currentTranslation = this.transforms[ this.editorCameraEntityId ].translation,
 					currentScale = this.transforms[ this.editorCameraEntityId ].scale
@@ -174,7 +188,7 @@ define(
 				var inputEvents      = spell.inputManager.getInputEvents()
 				for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
 
-					processEvent.call( this, inputEvents[ i ] )
+					processEvent.call( this, spell, inputEvents[ i ] )
 
 				}
 			}
