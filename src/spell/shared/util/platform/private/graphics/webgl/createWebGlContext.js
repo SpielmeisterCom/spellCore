@@ -260,9 +260,13 @@ define(
 		 * public
 		 */
 		var transformScreenToWorld = function( vec ) {
-			var worldPosition = vec2.create()
 
-			mat3.multiplyVec2( screenToWorld, vec, worldPosition )
+			//transform vec to a gl-like origin (bottom left)
+			//use worldPosition as temp because we need to allocate it anyway
+			var worldPosition = vec2.create( vec )
+			worldPosition[ 1 ] = gl.canvas.height - worldPosition[ 1 ]
+
+			mat3.multiplyVec2( screenToWorld, worldPosition, worldPosition )
 
 			return worldPosition
 		}
