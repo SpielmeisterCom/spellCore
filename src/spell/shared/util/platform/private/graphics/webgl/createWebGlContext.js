@@ -117,29 +117,30 @@ define(
 			initWrapperContext( shaderProgram )
 
 			return {
-				clear             : clear,
-				createTexture     : createWebGlTexture,
-				drawTexture       : _.bind( drawTexture, null, shaderProgram ),
-				drawSubTexture    : _.bind( drawSubTexture, null, shaderProgram ),
-				drawRect          : _.bind( drawRect, null, shaderProgram ),
-				drawCircle        : _.bind( drawCircle, null, shaderProgram ),
-				drawLine          : _.bind( drawLine, null, shaderProgram ),
-				fillRect          : _.bind( fillRect, null, shaderProgram ),
-				getConfiguration  : getConfiguration,
-				resizeColorBuffer : resizeColorBuffer,
-				restore           : restore,
-				rotate            : rotate,
-				save              : save,
-				scale             : scale,
-				setClearColor     : setClearColor,
-				setColor          : setColor,
-				setLineColor      : setLineColor,
-				setGlobalAlpha    : setGlobalAlpha,
-				setTransform      : setTransform,
-				setViewMatrix     : setViewMatrix,
-				transform         : transform,
-				translate         : translate,
-				viewport          : _.bind( viewport, null, shaderProgram )
+				clear                   : clear,
+				createTexture           : createWebGlTexture,
+				drawTexture             : _.bind( drawTexture, null, shaderProgram ),
+				drawSubTexture          : _.bind( drawSubTexture, null, shaderProgram ),
+				drawRect                : _.bind( drawRect, null, shaderProgram ),
+				drawCircle              : _.bind( drawCircle, null, shaderProgram ),
+				drawLine                : _.bind( drawLine, null, shaderProgram ),
+				fillRect                : _.bind( fillRect, null, shaderProgram ),
+				getConfiguration        : getConfiguration,
+				resizeColorBuffer       : resizeColorBuffer,
+				restore                 : restore,
+				rotate                  : rotate,
+				save                    : save,
+				scale                   : scale,
+				setClearColor           : setClearColor,
+				setColor                : setColor,
+				setLineColor            : setLineColor,
+				setGlobalAlpha          : setGlobalAlpha,
+				setTransform            : setTransform,
+				setViewMatrix           : setViewMatrix,
+				transform               : transform,
+				translate               : translate,
+				viewport                : _.bind( viewport, null, shaderProgram ),
+				getWorldToScreenMatrix  : function() { return worldToScreen }
 			}
 		}
 
@@ -516,9 +517,13 @@ define(
 		}
 
 		var setViewMatrix = function( matrix ) {
+			mat3.set( matrix, currentState.viewMatrix )
+
 			mat3.set( matrix, worldToView )
 			createViewToScreenMatrix( gl.canvas.width, gl.canvas.height, viewToScreen )
 			mat3.multiply( viewToScreen, worldToView, worldToScreen )
+
+			setViewMatrix( currentState.viewMatrix )
 		}
 
 		var viewport = function( shaderProgram, x, y, width, height ) {

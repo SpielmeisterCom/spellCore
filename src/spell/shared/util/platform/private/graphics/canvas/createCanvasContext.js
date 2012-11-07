@@ -109,29 +109,30 @@ define(
 			initWrapperContext()
 
 			return {
-				clear             : clear,
-				createTexture     : createCanvasTexture,
-				drawTexture       : drawTexture,
-				drawSubTexture    : drawSubTexture,
-				drawRect          : drawRect,
-				drawCircle        : drawCircle,
-				drawLine          : drawLine,
-				fillRect          : fillRect,
-				getConfiguration  : getConfiguration,
-				resizeColorBuffer : resizeColorBuffer,
-				restore           : restore,
-				rotate            : rotate,
-				save              : save,
-				scale             : scale,
-				setClearColor     : setClearColor,
-				setColor          : setColor,
-				setLineColor      : setLineColor,
-				setGlobalAlpha    : setGlobalAlpha,
-				setTransform      : setTransform,
-				setViewMatrix     : setViewMatrix,
-				transform         : transform,
-				translate         : translate,
-				viewport          : viewport
+				clear                   : clear,
+				createTexture           : createCanvasTexture,
+				drawTexture             : drawTexture,
+				drawSubTexture          : drawSubTexture,
+				drawRect                : drawRect,
+				drawCircle              : drawCircle,
+				drawLine                : drawLine,
+				fillRect                : fillRect,
+				getConfiguration        : getConfiguration,
+				resizeColorBuffer       : resizeColorBuffer,
+				restore                 : restore,
+				rotate                  : rotate,
+				save                    : save,
+				scale                   : scale,
+				setClearColor           : setClearColor,
+				setColor                : setColor,
+				setLineColor            : setLineColor,
+				setGlobalAlpha          : setGlobalAlpha,
+				setTransform            : setTransform,
+				setViewMatrix           : setViewMatrix,
+				transform               : transform,
+				translate               : translate,
+				viewport                : viewport,
+				getWorldToScreenMatrix  : function() { return worldToScreen }
 			}
 		}
 
@@ -186,6 +187,8 @@ define(
 		var restore = function() {
 			stateStack.popState()
 			currentState = stateStack.getTop()
+
+			setViewMatrix( currentState.viewMatrix )
 		}
 
 		var scale = function( vec ) {
@@ -399,6 +402,7 @@ define(
 		}
 
 		var setViewMatrix = function( matrix ) {
+			mat3.set( matrix, currentState.viewMatrix )
 			mat3.set( matrix, worldToView )
 
 			updateWorldToScreen( viewToScreen, worldToView )

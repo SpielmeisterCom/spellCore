@@ -436,13 +436,17 @@ define(
 				effectiveCameraDimensions &&
 				cameraTransform ) {
 
-				if( this.debugSettings.drawCoordinateGrid ) {
-					drawCoordinateGrid( context, this.debugFontAsset, screenSize, effectiveCameraDimensions, cameraTransform )
-				}
+				context.save()
+				{
+					if( this.debugSettings.drawCoordinateGrid ) {
+						drawCoordinateGrid( context, this.debugFontAsset, screenSize, effectiveCameraDimensions, cameraTransform )
+					}
 
-				if( this.debugSettings.drawTitleSafeOutline ) {
-					drawTitleSafeOutline( context, screenSize, [ camera.width, camera.height ], cameraTransform )
+					if( this.debugSettings.drawTitleSafeOutline ) {
+						drawTitleSafeOutline( context, screenSize, [ camera.width, camera.height ], cameraTransform )
+					}
 				}
+				context.restore()
 			}
 		}
 
