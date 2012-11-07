@@ -5,25 +5,20 @@
  * @singleton
  */
 define(
-	"spell/InputManager",
+	'spell/InputManager',
 	[
-		"spell/shared/util/platform/PlatformKit"
+		'spell/shared/util/platform/PlatformKit',
+		'spell/functions'
 	],
 	function(
-		PlatformKit
+		PlatformKit,
+	    _
 	) {
 		"use strict"
-
-		//TODO: get constants from a global configuration
-		var constants = {
-			"xSize" : 1024,
-			"ySize" : 768
-		}
 
 		/*
 		 * private
 		 */
-
 		var nextSequenceNumber = 0
 
 		/*
@@ -33,11 +28,11 @@ define(
 
 		var mouseClickHandler = function( event ) {
 			// scale screen space position to "world" position
-			event.position[ 0 ] *= constants.xSize
-			event.position[ 1 ] *= constants.ySize
+			event.position[ 0 ] *= this.configurationManager.currentScreenSize[ 0 ]
+			event.position[ 1 ] *= this.configurationManager.currentScreenSize[ 1 ]
 
 			var internalEvent = {
-				type           : event.type,
+				type           : event.type, //mousedown, mouseup
 				sequenceNumber : nextSequenceNumber++,
                 position       : event.position
 			}
@@ -46,13 +41,23 @@ define(
 		}
 
 		var mouseMoveHandler = function( event ) {
+			// scale screen space position to "world" position
+			event.position[ 0 ] *= this.configurationManager.currentScreenSize[ 0 ]
+			event.position[ 1 ] *= this.configurationManager.currentScreenSize[ 1 ]
 
+			var internalEvent = {
+				type           : event.type, //mousemove
+				sequenceNumber : nextSequenceNumber++,
+				position       : event.position
+			}
+
+			inputEvents.push( internalEvent )
 		}
 
 		var mouseWheelHandler = function( event ) {
 
 			var internalEvent = {
-				type           : event.type,
+				type           : event.type, // mousewheel
 				sequenceNumber : nextSequenceNumber++,
 				direction      : event.direction
 			}
@@ -61,9 +66,9 @@ define(
 		}
 
         var touchHandler = function( event ) {
-            // scale screen space position to "world" position
-            event.position[ 0 ] *= constants.xSize
-            event.position[ 1 ] *= constants.ySize
+	        // scale screen space position to "world" position
+	        event.position[ 0 ] *= this.configurationManager.currentScreenSize[ 0 ]
+	        event.position[ 1 ] *= this.configurationManager.currentScreenSize[ 1 ]
 
             var internalEvent = {
                 type           : ( event.type === 'touchstart' ? 'mousedown' : 'mouseup' ),
@@ -89,6 +94,7 @@ define(
 
 		var InputManager = function( configurationManager ) {
 			this.nativeInput = PlatformKit.createInput( configurationManager )
+			this.configurationManager = configurationManager
 		}
 
 		InputManager.prototype = {
@@ -98,16 +104,17 @@ define(
 			 */
 			init : function() {
 				if( PlatformKit.features.touch ) {
-					this.nativeInput.setInputEventListener( 'touchstart', touchHandler )
-					this.nativeInput.setInputEventListener( 'touchend', touchHandler )
+					this.nativeInput.setInputEventListener( 'touchstart', _.bind( touchHandler, this ) )
+					this.nativeInput.setInputEventListener( 'touchend',  _.bind( touchHandler, this ) )
 				}
 
-                this.nativeInput.setInputEventListener( 'mousedown', mouseClickHandler )
-                this.nativeInput.setInputEventListener( 'mouseup', mouseClickHandler )
-				this.nativeInput.setInputEventListener( 'mousewheel', mouseWheelHandler );
+                this.nativeInput.setInputEventListener( 'mousedown',  _.bind( mouseClickHandler, this ) )
+                this.nativeInput.setInputEventListener( 'mouseup',  _.bind( mouseClickHandler, this ) )
+				this.nativeInput.setInputEventListener( 'mousemove',  _.bind( mouseMoveHandler, this ) )
+				this.nativeInput.setInputEventListener( 'mousewheel',  _.bind( mouseWheelHandler, this ) )
 
-				this.nativeInput.setInputEventListener( 'keydown', keyHandler )
-				this.nativeInput.setInputEventListener( 'keyup', keyHandler )
+				this.nativeInput.setInputEventListener( 'keydown',  _.bind( keyHandler, this ) )
+				this.nativeInput.setInputEventListener( 'keyup',  _.bind( keyHandler, this ) )
 			},
 			/**
 			 * Destroys the InputManager. This function is being called by spellCore, don't call it yourself!
@@ -121,6 +128,7 @@ define(
 
                 this.nativeInput.removeInputEventListener( 'mousedown' )
                 this.nativeInput.removeInputEventListener( 'mouseup' )
+				this.nativeInput.removeInputEventListener( 'mousemove' )
 				this.nativeInput.removeInputEventListener( 'mousewheel' )
 
 				this.nativeInput.removeInputEventListener( 'keydown' )

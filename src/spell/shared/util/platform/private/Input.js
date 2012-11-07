@@ -123,7 +123,7 @@ define(
 			})
 		}
 
-        var nativeMouseHandler = function( callback, event ) {
+        var nativeMouseClickHandler = function( callback, event ) {
 			var offset = getOffset( this.container )
 			var screenSize = this.configurationManager.currentScreenSize
 
@@ -140,10 +140,32 @@ define(
             }
 
             callback( {
-                type     : event.type,
+                type     : event.type, //mousedown, mouseup
                 position : position
             } )
         }
+
+		var nativeMouseMoveHandler = function( callback, event ) {
+			var offset = getOffset( this.container )
+			var screenSize = this.configurationManager.currentScreenSize
+
+			var position = [
+				( event.pageX - offset[ 0 ] ) / screenSize[ 0 ],
+				( event.pageY - offset[ 1 ] ) / screenSize[ 1 ]
+			]
+
+			// if the event missed the display it gets ignored
+			if( !mathUtil.isInInterval( position[ 0 ], 0.0, 1.0 ) ||
+				!mathUtil.isInInterval( position[ 1 ], 0.0, 1.0 ) ) {
+
+				return
+			}
+
+			callback( {
+				type     : event.type, //mousemove
+				position : position
+			} )
+		}
 
 		/*
 		 * maps the internal event name to to native event name and callback
@@ -159,11 +181,15 @@ define(
             },
 			mousedown : {
 				eventNames : [ 'mousedown' ],
-				handler   : nativeMouseHandler
+				handler   : nativeMouseClickHandler
 			},
 			mouseup : {
 				eventNames : [ 'mouseup' ],
-				handler   : nativeMouseHandler
+				handler   : nativeMouseClickHandler
+			},
+			mousemove : {
+				eventNames : [ 'mousemove' ],
+				handler   : nativeMouseMoveHandler
 			},
 			mousewheel : {
 				eventNames : [ 'mousewheel', 'DOMMouseScroll' ],

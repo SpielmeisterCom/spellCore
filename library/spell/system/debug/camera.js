@@ -52,6 +52,12 @@ define(
 				if (currentScale[1] < 0.5) {
 					currentScale[1] = 0.5
 				}
+
+			} else if ( event.type == 'mousemove' ) {
+				var currentTranslation = this.transforms[ this.editorCameraEntityId ].translation
+
+				currentTranslation[ 0 ] = event.position[ 0 ]
+				currentTranslation[ 1 ] = event.position[ 1 ]
 			}
 		}
 
