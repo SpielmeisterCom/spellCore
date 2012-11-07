@@ -2,7 +2,7 @@ define(
 	"spell/client/renderingTestMain",
 	[
         "spell/ConfigurationManager",
-		"spell/shared/util/EventManager",
+		"spell/EventManager",
 		"spell/client/loading/ResourceLoader",
         'spell/InputManager',
 		"spell/shared/util/Logger",

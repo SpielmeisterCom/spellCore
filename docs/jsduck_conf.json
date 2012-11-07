@@ -9,6 +9,7 @@
         "../src/spell/InputManager.js",
         "../src/spell/ConfigurationManager.js",
         "../src/spell/RenderingContext.js",
+        "../src/spell/EventManager.js",
         "../src/spell/math",
         "../src/spell/shared/util/Logger",
 		"../src/spell/shared/util/platform/PlatformKit.js",

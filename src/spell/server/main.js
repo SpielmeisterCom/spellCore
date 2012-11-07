@@ -7,7 +7,7 @@ define(
 		'spell/shared/util/template/TemplateManager',
 		'spell/shared/util/networkProtocol',
 		'spell/shared/util/network/Messages',
-		'spell/shared/util/EventManager',
+		'spell/EventManager',
 		'spell/EntityManager',
 		'spell/shared/util/scene/SceneManager',
 		'spell/shared/util/Logger',

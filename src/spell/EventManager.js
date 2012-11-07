@@ -1,5 +1,9 @@
+/**
+ * @class spell.eventManager
+ * @singleton
+ */
 define(
-	'spell/shared/util/EventManager',
+	'spell/EventManager',
 	[
 		'spell/shared/util/forestMultiMap',
 		'spell/shared/util/Events',

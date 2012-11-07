@@ -8,7 +8,7 @@ define(
 		'spell/shared/util/scene/SceneManager',
 		'spell/shared/util/template/TemplateManager',
 		'spell/ConfigurationManager',
-		'spell/shared/util/EventManager',
+		'spell/EventManager',
 		'spell/InputManager',
 		'spell/client/loading/ResourceLoader',
 		'spell/shared/util/StatisticsManager',
