@@ -57,13 +57,12 @@ define(
 					currentScale[1] = 0.5
 				}
 
-			} else if ( event.type == 'mousemove' /* && this.draggingEnabled */ ) {
+			} else if ( event.type == 'mousemove' && this.draggingEnabled ) {
 
 				if ( window !== undefined )
 					window.focus()
 
 				var worldPosition = spell.renderingContext.transformScreenToWorld( event.position )
-				console.log( worldPosition )
 
 				var currentTranslation = this.transforms[ this.editorCameraEntityId ].translation,
 					currentScale = this.transforms[ this.editorCameraEntityId ].scale
@@ -74,8 +73,8 @@ define(
 					return
 				}
 
-				//currentTranslation[ 0 ] -= ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ]
-				//currentTranslation[ 1 ] += ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
+				currentTranslation[ 0 ] -= ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ]
+				currentTranslation[ 1 ] += ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
 
 				this.lastMousePosition = [ event.position[ 0 ], event.position[ 1 ] ]
 
