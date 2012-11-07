@@ -39,6 +39,57 @@ define(
 			return activeCameraId
 		}
 
+		var isPointInRect = function( point, rectOrigin, rectWidth, rectHeight, rectRotation ) {
+			var tmp     = -rectRotation, /** Math.PI / 180,*/
+				c       = Math.cos( tmp ),
+				s       = Math.sin( tmp),
+				leftX   = rectOrigin[ 0 ] - rectWidth / 2,
+				rightX  = rectOrigin[ 0 ] + rectWidth / 2,
+				topY    = rectOrigin[ 1 ] - rectHeight / 2,
+				bottomY = rectOrigin[ 1 ] + rectHeight / 2
+
+			// Unrotate the point depending on the rotation of the rectangle
+			var rotatedX = rectOrigin[ 0 ] + c * ( point[ 0 ] - rectOrigin[ 0 ] ) - s * ( point[ 1 ] - rectOrigin[1] ),
+				rotatedY = rectOrigin[ 1 ] + s * ( point[ 0 ] - rectOrigin[ 0 ] ) + c * ( point[ 1 ] - rectOrigin[1] )
+
+			return leftX <= rotatedX && rotatedX <= rightX && topY <= rotatedY && rotatedY <= bottomY
+		}
+
+		var findEntitiesAtPosition = function( worldPosition ) {
+			var spell = this.spell
+
+			//TODO: corect handling of sub entities
+			_.each(
+
+				this.transforms,
+				function( transform, id ) {
+					var translation = transform.translation,
+						rotation    = transform.rotation
+
+					if ( isPointInRect( worldPosition, translation, 100, 100, rotation ) ) {
+
+						if ( !spell.entityManager.hasComponent( id, "spell.component.2d.graphics.debug.box" ) ) {
+							console.log ( id )
+							spell.entityManager.addComponent(
+								id,
+								"spell.component.2d.graphics.debug.box",
+								{
+									'color': [1,0,0],
+									'height': 100,
+									'width': 100
+								}
+
+							)
+						}
+
+					} else {
+
+						spell.entityManager.removeComponent( id, "spell.component.2d.graphics.debug.box" )
+
+					}
+				}
+			)
+		}
 
 		var processEvent = function ( spell, event ) {
 
@@ -57,24 +108,28 @@ define(
 					currentScale[1] = 0.5
 				}
 
-			} else if ( event.type == 'mousemove' && this.draggingEnabled ) {
+			} else if ( event.type == 'mousemove' ) {
 
 				if ( window !== undefined )
 					window.focus()
 
 				var worldPosition = spell.renderingContext.transformScreenToWorld( event.position )
 
-				var currentTranslation = this.transforms[ this.editorCameraEntityId ].translation,
-					currentScale = this.transforms[ this.editorCameraEntityId ].scale
+				findEntitiesAtPosition.call( this, worldPosition )
 
-				if ( this.lastMousePosition === null ) {
-					//first sample of mouse movement
-					this.lastMousePosition = [ event.position[ 0 ], event.position[ 1 ] ]
-					return
+				if ( this.draggingEnabled ) {
+					var currentTranslation = this.transforms[ this.editorCameraEntityId ].translation,
+						currentScale = this.transforms[ this.editorCameraEntityId ].scale
+
+					if ( this.lastMousePosition === null ) {
+						//first sample of mouse movement
+						this.lastMousePosition = [ event.position[ 0 ], event.position[ 1 ] ]
+						return
+					}
+
+					currentTranslation[ 0 ] -= ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ]
+					currentTranslation[ 1 ] += ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
 				}
-
-				currentTranslation[ 0 ] -= ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ]
-				currentTranslation[ 1 ] += ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
 
 				this.lastMousePosition = [ event.position[ 0 ], event.position[ 1 ] ]
 
@@ -95,8 +150,9 @@ define(
 		 * @param {Object} [spell] The spell object.
 		 */
 		var camera = function( spell ) {
-			this.lastMousePosition = null
-			this.draggingEnabled = false
+			this.spell                  = spell
+			this.lastMousePosition      = null
+			this.draggingEnabled        = false
 		}
 
 		camera.prototype = {
