@@ -20,7 +20,7 @@ define(
 					logger.warn( warning )
 					console.warn ( warning )
 
-					console.log( arguments )
+					console.log.apply( this, arguments )
 				}
 			}
 
