@@ -4,12 +4,14 @@ define(
 		'spell/shared/util/platform/private/graphics/StateStack',
 		'spell/shared/util/color',
 
+		'spell/math/vec2',
 		'spell/math/mat3'
 	],
 	function(
 		StateStack,
 		color,
 
+		vec2,
 		mat3
 	) {
 		'use strict'
@@ -39,6 +41,8 @@ define(
 		var worldToScreen = mat3.create()
 		mat3.identity( worldToScreen )
 
+		var screenToWorld = mat3.create()
+		mat3.identity( screenToWorld )
 
 		/*
 		 * Returns true if the supplied quad covers the full screen, false otherwise.
@@ -69,6 +73,7 @@ define(
 
 		var updateWorldToScreen = function( viewToScreen, worldToView ) {
 			mat3.multiply( viewToScreen, worldToView, worldToScreen )
+			mat3.inverse( worldToScreen, screenToWorld )
 
 			pixelScale = Math.abs( 1 / worldToScreen[ 0 ] )
 
@@ -132,7 +137,7 @@ define(
 				transform               : transform,
 				translate               : translate,
 				viewport                : viewport,
-				getWorldToScreenMatrix  : function() { return worldToScreen }
+				transformScreenToWorld  : transformScreenToWorld
 			}
 		}
 
@@ -159,6 +164,12 @@ define(
 		/*
 		 * public
 		 */
+		var transformScreenToWorld = function( vec ) {
+			var worldPosition = vec2.create()
+			mat3.multiplyVec2( screenToWorld, vec, worldPosition )
+
+			return worldPosition
+		}
 
 		var setColor = function( vec ) {
 			currentState.color = color.createRgba( vec )

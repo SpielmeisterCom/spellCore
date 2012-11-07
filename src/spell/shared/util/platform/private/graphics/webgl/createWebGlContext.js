@@ -8,6 +8,7 @@ define(
 		'spell/shared/util/color',
 		'spell/shared/util/platform/private/nativeType/createFloatArray',
 
+		'spell/math/vec2',
 		'spell/math/vec3',
 		'spell/math/mat3',
 
@@ -21,6 +22,7 @@ define(
 		color,
 		createFloatArray,
 
+		vec2,
 		vec3,
 		mat3,
 
@@ -56,6 +58,9 @@ define(
 		// accumulated transformation world space to screen space transformation matrix
 		var worldToScreen = mat3.create()
 		mat3.identity( worldToScreen )
+
+		var screenToWorld = mat3.create()
+		mat3.identity( screenToWorld )
 
 		var tmpMatrix     = mat3.create(),
 			textureMatrix = mat3.create()
@@ -140,7 +145,7 @@ define(
 				transform               : transform,
 				translate               : translate,
 				viewport                : _.bind( viewport, null, shaderProgram ),
-				getWorldToScreenMatrix  : function() { return worldToScreen }
+				transformScreenToWorld  : transformScreenToWorld
 			}
 		}
 
@@ -254,6 +259,13 @@ define(
 		/*
 		 * public
 		 */
+		var transformScreenToWorld = function( vec ) {
+			var worldPosition = vec2.create()
+
+			mat3.multiplyVec2( screenToWorld, vec, worldPosition )
+
+			return worldPosition
+		}
 
 		var save = function() {
 			stateStack.pushState()
@@ -263,6 +275,8 @@ define(
 		var restore = function() {
 			stateStack.popState()
 			currentState = stateStack.getTop()
+
+			setViewMatrix( currentState.viewMatrix )
 		}
 
 		var setColor = function( vec ) {
@@ -522,11 +536,11 @@ define(
 			mat3.set( matrix, worldToView )
 			createViewToScreenMatrix( gl.canvas.width, gl.canvas.height, viewToScreen )
 			mat3.multiply( viewToScreen, worldToView, worldToScreen )
-
-			setViewMatrix( currentState.viewMatrix )
+			mat3.inverse( worldToScreen, screenToWorld )
 		}
 
 		var viewport = function( shaderProgram, x, y, width, height ) {
+			console.log( [ x, y, width, height ] )
 			gl.viewport( x, y , width, height )
 
 			// reinitialize screen space shim matrix

@@ -57,20 +57,13 @@ define(
 					currentScale[1] = 0.5
 				}
 
-			} else if ( event.type == 'mousemove' && this.draggingEnabled ) {
+			} else if ( event.type == 'mousemove' /* && this.draggingEnabled */ ) {
 
 				if ( window !== undefined )
 					window.focus()
 
-				//inverse the current worldToScreen matrix
-				var worldToScreen  = spell.renderingContext.getWorldToScreenMatrix(),
-					screenToWorld  = mat3.create(),
-					worldPosition  = vec2.create()
-
-				mat3.inverse( worldToScreen, screenToWorld )
-				mat3.multiplyVec2( screenToWorld, event.position, worldPosition )
-
-				//console.log( worldPosition )
+				var worldPosition = spell.renderingContext.transformScreenToWorld( event.position )
+				console.log( worldPosition )
 
 				var currentTranslation = this.transforms[ this.editorCameraEntityId ].translation,
 					currentScale = this.transforms[ this.editorCameraEntityId ].scale
@@ -81,8 +74,8 @@ define(
 					return
 				}
 
-				currentTranslation[ 0 ] -= ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ]
-				currentTranslation[ 1 ] += ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
+				//currentTranslation[ 0 ] -= ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ]
+				//currentTranslation[ 1 ] += ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
 
 				this.lastMousePosition = [ event.position[ 0 ], event.position[ 1 ] ]
 
