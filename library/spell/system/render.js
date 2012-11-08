@@ -307,7 +307,7 @@ define(
 
 			this.screenResizeHandler = _.bind(
 				function( size ) {
-					var aspectRatio = ( this.debugSettings && !this.debugSettings.screenAspectRatio ?
+					var aspectRatio = ( this.debugSettings && this.debugSettings.screenAspectRatio ?
 						this.debugSettings.screenAspectRatio :
 						size[ 0 ] / size[ 1 ]
 					)
@@ -489,9 +489,8 @@ define(
 				)
 			}
 
-			var eventManager = spell.eventManager,
-				context      = this.context,
-				screenSize   = this.screenSize
+			var context    = this.context,
+				screenSize = this.screenSize
 
 			context.setClearColor( clearColor )
 
@@ -502,7 +501,7 @@ define(
 
 
 			if( this.debugSettings &&
-				!this.debugSettings.screenAspectRatio ) {
+				this.debugSettings.screenAspectRatio ) {
 
 				this.screenSize = createScreenSize(
 					PlatformKit.getAvailableScreenSize(
