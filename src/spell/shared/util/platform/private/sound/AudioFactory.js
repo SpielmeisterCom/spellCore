@@ -33,7 +33,9 @@ define(
 
 			// native html5 audio
 			if( requestedBackEnd === undefined ? true : ( requestedBackEnd === BACK_END_HTML5 ) ) {
-				context = createHtml5AudioContext()
+				try {
+					context = createHtml5AudioContext()
+				} catch ( e ) { context = null }
 
 				if( context ) return context
 			}

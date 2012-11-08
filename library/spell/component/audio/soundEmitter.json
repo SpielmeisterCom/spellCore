@@ -1,0 +1,34 @@
+{
+	"version": 1,
+	"type": "component",
+	"title": "",
+	"doc": "",
+	"icon": "",
+	"attributes": [
+		{
+			"name": "assetId",
+			"default": "sound:defaultSound",
+			"type": "assetId:sound"
+		},
+		{
+			"name": "loop",
+			"default": false,
+			"type": "boolean"
+		},
+		{
+			"name": "play",
+			"default": false,
+			"type": "boolean"
+		},
+		{
+			"name": "mute",
+			"default": false,
+			"type": "boolean"
+		},
+		{
+			"name": "volume",
+			"default": 1,
+			"type": "number"
+		}
+	]
+}

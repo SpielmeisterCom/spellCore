@@ -89,21 +89,19 @@ define(
 			var html5Audio = new Audio()
 
 			if( !!config.onloadeddata ) {
+				var html5callback = function() {
+					html5Audio.removeEventListener( "canplaythrough", html5callback, false )
+					config.onloadeddata( html5Audio )
+				}
 
-				html5Audio.addEventListener(
-					"canplaythrough", config.onloadeddata,
-					false
-				)
+				html5Audio.addEventListener( "canplaythrough", html5callback, false )
 			}
 
 			html5Audio.addEventListener( "error", function() {
 				throw "Error: Could not load sound resource '" + html5Audio.src + "'"
 			}, false )
 
-			html5Audio.id       = config.id
-			html5Audio.resource = config.resource
 			html5Audio.playing  = false
-			html5Audio.selected = false
 			html5Audio.src      = config.resource
 
 			// old WebKit
@@ -114,16 +112,6 @@ define(
 			html5Audio.load()
 
 			return html5Audio
-		}
-
-		var cloneHTML5Audio = function( ObjectToClone ) {
-			var html5Audioclone = ObjectToClone.cloneNode(true)
-
-			html5Audioclone.resource = ObjectToClone.resource
-			html5Audioclone.playing  = false
-			html5Audioclone.selected = false
-
-			return html5Audioclone
 		}
 
         var createWebkitHTML5Audio = function ( config ) {
@@ -172,17 +160,14 @@ define(
 
             if( !hasWebAudioSupport() ) {
                 this.createAudio = createHTML5Audio
-                this.cloneAudio  = cloneHTML5Audio
 
             }else {
                 this.createAudio = createWebkitHTML5Audio
-                this.context     = context
             }
 
         }
 
         SoundManager.prototype = {
-            soundSpriteConfig         : undefined,
             audioFormats              : audioFormats,
             getFreeChannel            : getFreeChannel,
             checkMaxAvailableChannels : checkMaxAvailableChannels,
