@@ -67,10 +67,18 @@ define(
 
 			spell.logger.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
 
+			var audioContext = PlatformKit.AudioFactory.createAudioContext(
+//				spell.eventManager,
+//				configurationManager.id,
+//				1,
+//				1,
+//				configurationManager.audioBackEnd
+			)
+
 			var inputManager = new InputManager( configurationManager )
 			inputManager.init()
 
-			var resourceLoader = new ResourceLoader( spell, spell.eventManager, renderingContext, configurationManager.resourceServer )
+			var resourceLoader = new ResourceLoader( spell, spell.eventManager, renderingContext, audioContext, configurationManager.resourceServer )
 
 			if( cacheContent ) resourceLoader.setCache( cacheContent )
 
@@ -91,6 +99,7 @@ define(
 					configurationManager : configurationManager,
 					inputManager         : inputManager,
 					renderingContext     : renderingContext,
+					audioContext         : audioContext,
 					resourceLoader       : resourceLoader,
 					resources            : resourceLoader.getCache(),
 					sceneManager         : sceneManager
@@ -107,7 +116,6 @@ define(
 				scenes            = {},
 				logger            = new Logger(),
 				eventManager      = new EventManager(),
-				soundManager      = PlatformKit.createSoundManager(),
 				statisticsManager = new StatisticsManager(),
 				templateManager   = new TemplateManager( assets ),
 				entityManager     = new EntityManager( eventManager, templateManager ),
@@ -125,7 +133,6 @@ define(
 					logger               : logger,
 					mainLoop             : mainLoop,
 					runtimeModule        : undefined,
-					soundManager         : soundManager,
 					scenes               : scenes,
 					statisticsManager    : statisticsManager,
 					templateManager      : templateManager

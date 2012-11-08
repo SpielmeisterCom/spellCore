@@ -13,6 +13,7 @@ define(
 		'spell/shared/util/platform/private/getAvailableScreenSize',
 		'spell/shared/util/platform/private/ModuleLoader',
 		'spell/shared/util/platform/private/graphics/RenderingFactory',
+		'spell/shared/util/platform/private/sound/AudioFactory',
 		'spell/shared/util/platform/private/registerTimer',
 		'spell/shared/util/platform/private/loader/ImageLoader',
 		'spell/shared/util/platform/private/loader/SoundLoader',
@@ -20,8 +21,7 @@ define(
 		'spell/shared/util/platform/private/Input',
 		'spell/shared/util/platform/private/configurationOptions',
 		'spell/shared/util/platform/private/system/features',
-        'spell/shared/util/platform/private/graphics/Viewporter',
-		'spell/shared/util/platform/private/sound/SoundManager'
+        'spell/shared/util/platform/private/graphics/Viewporter'
 	],
 	function(
 		Box2D,
@@ -32,6 +32,7 @@ define(
 		getAvailableScreenSize,
 		ModuleLoader,
 		RenderingFactory,
+		AudioFactory,
 		registerTimer,
 		ImageLoader,
 		SoundLoader,
@@ -39,8 +40,7 @@ define(
 		Input,
 		configurationOptions,
 		features,
-        Viewporter,
-		SoundManager
+        Viewporter
 	) {
 		'use strict'
 
@@ -61,10 +61,6 @@ define(
 			var viewporter = new Viewporter( eventManager, id )
 			viewporter.renderViewport()
         }
-
-		var createSoundManager = function() {
-			return new SoundManager()
-		}
 
 		return {
 			/*
@@ -90,7 +86,7 @@ define(
 			/*
 			 *
 			 */
-			createSoundManager : createSoundManager,
+			AudioFactory : AudioFactory,
 
 			/*
 			 *

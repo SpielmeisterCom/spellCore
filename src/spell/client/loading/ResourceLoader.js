@@ -35,6 +35,10 @@ define(
 			return renderingContext.createTexture( resource )
 		}
 
+		var resourceSoundDecoder = function( audioContext, resource ) {
+			return audioContext.createSound( resource )
+		}
+
 		var getResourceType = function( resourceTypes, resourceName, type ) {
 			var type = type === 'auto' ?
 				_.last( resourceName.split( '.' ) ) :
@@ -193,7 +197,7 @@ define(
 		 * public
 		 */
 
-		var ResourceLoader = function( spell, eventManager, renderingContext, hostConfig ) {
+		var ResourceLoader = function( spell, eventManager, renderingContext, soundContext, hostConfig ) {
 			this.eventManager    = eventManager
 			this.resourceBundles = {}
 			this.cache           = {}
@@ -209,6 +213,11 @@ define(
 					factory       : PlatformKit.createTextLoader,
 					processOnLoad : resourceJsonDecoder,
 					types         : [ 'json' ]
+				},
+				{
+					factory       : PlatformKit.createSoundLoader,
+					processOnLoad :  _.bind( resourceSoundDecoder, null, soundContext ),
+					types         : [ 'mp3', 'wav', 'ogg' ]
 				}
 			]
 		}

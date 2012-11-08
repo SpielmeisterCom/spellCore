@@ -1,20 +1,15 @@
 define(
 	"spell/shared/util/platform/private/sound/SoundManager",
 	[
-		"spell/shared/components/sound/soundEmitter",
-
 		'spell/functions'
 	],
 	function(
-		soundEmitterConstructor,
-
 		_
 		) {
 		"use strict"
 
 		var maxAvailableChannels = 8
         var context              = undefined
-        var muted                = false
 
 		var checkMaxAvailableChannels = function() {
 			if( (/iPhone|iPod|iPad/i).test( navigator.userAgent ) ) {
@@ -26,8 +21,6 @@ define(
 
 			return maxAvailableChannels
 		}
-
-		var basePath = "sounds"
 
 		var channels = {}
 
@@ -58,13 +51,6 @@ define(
 			return channel
 		}
 
-		var remove = function( soundObject ) {
-			soundObject.stop     = -1
-			soundObject.start    = -1
-			soundObject.selected = false
-            soundObject.playing  = false
-		}
-
 		var audioFormats = {
 			ogg: {
 				mimeTypes: ['audio/ogg; codecs=vorbis']
@@ -79,7 +65,7 @@ define(
 
 		var detectExtension = function() {
 
-			var probe = new Audio();
+			var probe = new Audio()
 
 			return _.reduce(
 				audioFormats,
@@ -111,14 +97,14 @@ define(
 			}
 
 			html5Audio.addEventListener( "error", function() {
-				throw "Error: Could not load sound resource '"+html5Audio.src+"'"
+				throw "Error: Could not load sound resource '" + html5Audio.src + "'"
 			}, false )
 
 			html5Audio.id       = config.id
 			html5Audio.resource = config.resource
 			html5Audio.playing  = false
 			html5Audio.selected = false
-			html5Audio.src      = basePath + "/" + config.resource + "."+ detectExtension()
+			html5Audio.src      = config.resource
 
 			// old WebKit
 			html5Audio.autobuffer = "auto"
@@ -141,9 +127,9 @@ define(
 		}
 
         var createWebkitHTML5Audio = function ( config ) {
-            var request = new XMLHttpRequest();
-            request.open('GET', basePath + "/" + config.resource + "."+ detectExtension(), true);
-            request.responseType = 'arraybuffer';
+            var request = new XMLHttpRequest()
+            request.open('GET', config.resource, true)
+            request.responseType = 'arraybuffer'
 
             if( !!config.onloadeddata ) {
 
@@ -151,21 +137,15 @@ define(
                 request.onload = function() {
                   context.decodeAudioData( request.response,
                       function( buffer ) {
-
-                          buffer.id       = config.id
-                          buffer.resource = config.resource
-                          buffer.playing  = false
-                          buffer.selected = false
-
                           config.onloadeddata( buffer )
                       }
 
-                  );
+                  )
                 }
             }
 
             request.onError = function() {
-                throw "Error: Could not load sound resource '"+ config.resource +"'"
+                throw "Error: Could not load sound resource '" + config.resource + "'"
             }
 
             request.send()
@@ -179,44 +159,13 @@ define(
 
 				if( !hasWebkitAudio ) return false
 
-                var context = new webkitAudioContext()
+                context = new webkitAudioContext()
 
                 return true
 
             } catch ( e ) {
                 return false
             }
-        }
-
-        var toggleMuteSounds = function( muted ) {
-            _.each(
-                _.keys( channels ),
-                function( key) {
-
-                    if( hasWebAudioSupport() ) {
-                        channels[key].gain  = ( muted === true ) ? 0 : 1
-
-                    } else {
-                        channels[key].muted = muted
-
-                        if( maxAvailableChannels === 1 ) {
-                            if( muted === true)
-                                channels[ key ].pause()
-                            else
-                                channels[ key ].play()
-                        }
-                    }
-                }
-            )
-        }
-
-        var setMuted = function( value ) {
-            muted = !!value
-            toggleMuteSounds( muted )
-        }
-
-        var isMuted = function() {
-            return muted
         }
 
         var SoundManager = function() {
@@ -227,7 +176,7 @@ define(
 
             }else {
                 this.createAudio = createWebkitHTML5Audio
-                this.context          = context
+                this.context     = context
             }
 
         }
@@ -235,13 +184,9 @@ define(
         SoundManager.prototype = {
             soundSpriteConfig         : undefined,
             audioFormats              : audioFormats,
-            channels                  : channels,
             getFreeChannel            : getFreeChannel,
             checkMaxAvailableChannels : checkMaxAvailableChannels,
-            maxAvailableChannels      : maxAvailableChannels,
-            remove                    : remove,
-            setMuted                  : setMuted,
-            isMuted                   : isMuted
+            maxAvailableChannels      : maxAvailableChannels
         }
 
         return SoundManager

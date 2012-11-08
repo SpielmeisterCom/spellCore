@@ -149,7 +149,7 @@ define(
 					var asset,
 						type = assetDefinition.subtype
 
-					if( type === 'appearance') {
+					if( type === 'appearance' || type === 'sound' ) {
 						asset = {
 							type : type
 						}
