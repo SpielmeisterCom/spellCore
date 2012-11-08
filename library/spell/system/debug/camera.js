@@ -56,58 +56,55 @@ define(
 		}
 
 		var findEntitiesAtPosition = function( worldPosition ) {
-			var spell = this.spell,
-				ctx   = this.spell.renderingContext
+			var context = this.spell.renderingContext
 
-			//TODO: corect handling of sub entities
+			// TODO: corect handling of sub entities
 			_.each(
-
 				this.transforms,
-				function( transform, id ) {
+				function( transform ) {
 
-					if ( isPointInRect( worldPosition, transform.translation, 100, 100, transform.rotation ) ) {
-						ctx.save()
-						ctx.translate( transform.translation )
-						ctx.rotate( transform.rotation )
+					if( isPointInRect( worldPosition, transform.translation, 100, 100, transform.rotation ) ) {
+						context.save()
+						context.translate( transform.translation )
+						context.rotate( transform.rotation )
 
-						ctx.setLineColor( [1,0,0,1] )
-						ctx.drawRect( 0, 0, 100, 100, 1)
-						ctx.restore()
+						context.setLineColor( [ 1, 0, 0, 1 ] )
+						context.drawRect( 0, 0, 100, 100, 1 )
+						context.restore()
 					}
 				}
 			)
 		}
 
-		var processEvent = function ( spell, event ) {
-
-			if ( event.type == 'mousewheel' ) {
-				//zoom camera in and out on mousewheel event
+		var processEvent = function( spell, event ) {
+			if( event.type === 'mousewheel' ) {
+				// zoom camera in and out on mousewheel event
 				var currentScale = this.transforms[ this.editorCameraEntityId ].scale
 
-				currentScale[0] = currentScale[0] + ( 0.75 * event.direction * -1 )
-				currentScale[1] = currentScale[1] + ( 0.75 * event.direction * -1 )
+				currentScale[ 0 ] = currentScale[ 0 ] + ( 0.75 * event.direction * -1 )
+				currentScale[ 1 ] = currentScale[ 1 ] + ( 0.75 * event.direction * -1 )
 
-				if (currentScale[0] < 0.5) {
-					currentScale[0] = 0.5
+				if( currentScale[ 0 ] < 0.5 ) {
+					currentScale[ 0 ] = 0.5
 				}
 
-				if (currentScale[1] < 0.5) {
-					currentScale[1] = 0.5
+				if( currentScale[ 1 ] < 0.5 ) {
+					currentScale[ 1 ] = 0.5
 				}
 
-			} else if ( event.type == 'mousemove' ) {
-
-				if ( window !== undefined )
+			} else if( event.type === 'mousemove' ) {
+				if( window !== undefined ) {
 					window.focus()
+				}
 
 				this.currentWorldPosition = spell.renderingContext.transformScreenToWorld( event.position )
 
-				if ( this.draggingEnabled ) {
+				if( this.draggingEnabled ) {
 					var currentTranslation = this.transforms[ this.editorCameraEntityId ].translation,
-						currentScale = this.transforms[ this.editorCameraEntityId ].scale
+						currentScale       = this.transforms[ this.editorCameraEntityId ].scale
 
-					if ( this.lastMousePosition === null ) {
-						//first sample of mouse movement
+					if( this.lastMousePosition === null ) {
+						// first sample of mouse movement
 						this.lastMousePosition = [ event.position[ 0 ], event.position[ 1 ] ]
 						return
 					}
@@ -118,13 +115,13 @@ define(
 
 				this.lastMousePosition = [ event.position[ 0 ], event.position[ 1 ] ]
 
-			} else if ( event.type == 'mousedown' ) {
-				this.lastMousePosition  = null
-				this.draggingEnabled    = true
+			} else if( event.type === 'mousedown' ) {
+				this.lastMousePosition = null
+				this.draggingEnabled   = true
 
-			} else if ( event.type == 'mouseup' ) {
-				this.lastMousePosition  = null
-				this.draggingEnabled    = false
+			} else if( event.type === 'mouseup' ) {
+				this.lastMousePosition = null
+				this.draggingEnabled   = false
 			}
 		}
 
@@ -135,10 +132,10 @@ define(
 		 * @param {Object} [spell] The spell object.
 		 */
 		var camera = function( spell ) {
-			this.spell                  = spell
-			this.lastMousePosition      = null
-			this.currentWorldPosition   = null
-			this.draggingEnabled        = false
+			this.spell                = spell
+			this.lastMousePosition    = null
+			this.currentWorldPosition = null
+			this.draggingEnabled      = false
 		}
 
 		camera.prototype = {
@@ -226,8 +223,9 @@ define(
 
 				}
 
-				if ( this.currentWorldPosition )
+				if( this.currentWorldPosition ) {
 					findEntitiesAtPosition.call( this, this.currentWorldPosition )
+				}
 			}
 		}
 
