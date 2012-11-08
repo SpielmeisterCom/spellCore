@@ -56,36 +56,23 @@ define(
 		}
 
 		var findEntitiesAtPosition = function( worldPosition ) {
-			var spell = this.spell
+			var spell = this.spell,
+				ctx   = this.spell.renderingContext
 
 			//TODO: corect handling of sub entities
 			_.each(
 
 				this.transforms,
 				function( transform, id ) {
-					var translation = transform.translation,
-						rotation    = transform.rotation
 
-					if ( isPointInRect( worldPosition, translation, 100, 100, rotation ) ) {
+					if ( isPointInRect( worldPosition, transform.translation, 100, 100, transform.rotation ) ) {
+						ctx.save()
+						ctx.translate( transform.translation )
+						ctx.rotate( transform.rotation )
 
-						if ( !spell.entityManager.hasComponent( id, "spell.component.2d.graphics.debug.box" ) ) {
-							console.log ( id )
-							spell.entityManager.addComponent(
-								id,
-								"spell.component.2d.graphics.debug.box",
-								{
-									'color': [1,0,0],
-									'height': 100,
-									'width': 100
-								}
-
-							)
-						}
-
-					} else {
-
-						spell.entityManager.removeComponent( id, "spell.component.2d.graphics.debug.box" )
-
+						ctx.setLineColor( [1,0,0,1] )
+						ctx.drawRect( 0, 0, 100, 100, 1)
+						ctx.restore()
 					}
 				}
 			)
@@ -113,9 +100,7 @@ define(
 				if ( window !== undefined )
 					window.focus()
 
-				var worldPosition = spell.renderingContext.transformScreenToWorld( event.position )
-
-				findEntitiesAtPosition.call( this, worldPosition )
+				this.currentWorldPosition = spell.renderingContext.transformScreenToWorld( event.position )
 
 				if ( this.draggingEnabled ) {
 					var currentTranslation = this.transforms[ this.editorCameraEntityId ].translation,
@@ -152,6 +137,7 @@ define(
 		var camera = function( spell ) {
 			this.spell                  = spell
 			this.lastMousePosition      = null
+			this.currentWorldPosition   = null
 			this.draggingEnabled        = false
 		}
 
@@ -239,6 +225,9 @@ define(
 					processEvent.call( this, spell, inputEvents[ i ] )
 
 				}
+
+				if ( this.currentWorldPosition )
+					findEntitiesAtPosition.call( this, this.currentWorldPosition )
 			}
 		}
 

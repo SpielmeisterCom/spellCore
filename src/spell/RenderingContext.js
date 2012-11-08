@@ -41,17 +41,17 @@ define(
 			/**
 			 *
 			 */
-			drawSubTexture          : function() {},
+			drawSubTexture          : function(texture, sx, sy, sw, sh, dx, dy, dw, dh) {},
 
 			/**
 			 *
 			 */
-			drawRect                : function() {},
+			drawRect                : function(dx, dy, dw, dh, lineWidth) {},
 
 			/**
 			 *
 			 */
-			drawCircle              : function() {},
+			drawCircle              : function(dx, dy, radius, lineWidth) {},
 
 			/**
 			 *
@@ -101,7 +101,7 @@ define(
 			/**
 			 *
 			 */
-			setColor                : function() {},
+			setColor                : function(vec) {},
 
 			/**
 			 *
@@ -134,14 +134,18 @@ define(
 			translate               : function() {},
 
 			/**
-			 *
+			 * @return void
 			 */
-			viewport                : function() {},
+			viewport                : function( x, y, width, height ) {
+
+			},
 
 			/**
-			 *
+			 * @return vec2
 			 */
-			getWorldToScreenMatrix  : function() {}
+			transformScreenToWorld  : function( vec ) {
+
+			}
 		}
 
 		return RenderingContext
