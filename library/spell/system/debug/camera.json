@@ -10,6 +10,14 @@
         {
             "name": "cameras",
             "componentId": "spell.component.2d.graphics.camera"
+        },
+        {
+            "name": "appearances",
+            "componentId": "spell.component.2d.graphics.appearance"
+        },
+        {
+            "name": "animatedAppearances",
+            "componentId": "spell.component.2d.graphics.animatedAppearance"
         }
 	],
 	"version": 1,
