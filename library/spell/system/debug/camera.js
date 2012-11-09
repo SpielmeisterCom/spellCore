@@ -55,44 +55,9 @@ define(
 			return leftX <= rotatedX && rotatedX <= rightX && topY <= rotatedY && rotatedY <= bottomY
 		}
 
-		var calculateOutlineBoxDimensions = function( entityId ) {
-			var width = 100,
-				height = 100
-
-			if ( this.appearances[ entityId ] &&
-				this.appearances[ entityId ].asset &&
-				this.appearances[ entityId ].asset.resource &&
-			    this.appearances[ entityId ].asset.resource.dimensions ) {
-
-			    //entity has a static appearance
-				width = this.appearances[ entityId ].asset.resource.dimensions[ 0 ]
-				height = this.appearances[ entityId ].asset.resource.dimensions[ 1 ]
-
-
-
-			} else if ( this.animatedAppearances[ entityId ] &&
-				this.animatedAppearances[ entityId ].asset &&
-				this.animatedAppearances[ entityId ].asset.frameDimensions ) {
-
-				//entity has an animated appearance
-				width = this.animatedAppearances[ entityId ].asset.frameDimensions[ 0 ],
-				height = this.animatedAppearances[ entityId ].asset.frameDimensions[ 1 ]
-			}
-
-
-			//apply scale factor
-			if ( this.transforms[ entityId ] ) {
-				width *= this.transforms[ entityId ].scale[ 0 ]
-				height *= this.transforms[ entityId ].scale[ 1 ]
-			}
-
-			return [ width, height ]
-		}
-
 		var findEntitiesAtPosition = function( worldPosition ) {
 			var spell = this.spell,
-				ctx   = this.spell.renderingContext,
-				me    = this
+				ctx   = this.spell.renderingContext
 
 			//TODO: corect handling of sub entities
 			_.each(
@@ -100,15 +65,13 @@ define(
 				this.transforms,
 				function( transform, id ) {
 
-					var entityDimensions = calculateOutlineBoxDimensions.call( me, id )
-
-					if ( isPointInRect( worldPosition, transform.translation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.rotation ) ) {
+					if ( isPointInRect( worldPosition, transform.translation, 100, 100, transform.rotation ) ) {
 						ctx.save()
 						ctx.translate( transform.translation )
 						ctx.rotate( transform.rotation )
 
-						ctx.setLineColor( [ 1,0,0,1 ] )
-						ctx.drawRect( 0, 0, entityDimensions[ 0 ], entityDimensions[ 1 ], 1)
+						ctx.setLineColor( [1,0,0,1] )
+						ctx.drawRect( 0, 0, 100, 100, 1)
 						ctx.restore()
 					}
 				}
@@ -263,8 +226,9 @@ define(
 
 				}
 
-				if ( this.currentWorldPosition )
+				if( this.currentWorldPosition ) {
 					findEntitiesAtPosition.call( this, this.currentWorldPosition )
+				}
 			}
 		}
 

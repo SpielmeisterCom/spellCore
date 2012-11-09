@@ -49,7 +49,7 @@ define(
 		SceneManager.prototype = {
 			startScene: function( sceneId ) {
 				var onProgress = this.sendMessageToEditor ?
-					_.bind( this.sendMessageToEditor, null, 'spell.loadingProgress' ) :
+					_.bind( this.sendMessageToEditor, null, 'spelled.loadingProgress' ) :
 					undefined
 
 				this.cmdQueue = []

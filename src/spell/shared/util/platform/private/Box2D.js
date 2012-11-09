@@ -500,6 +500,10 @@ define(
 
 					return contactListener
 				},
+				b2DebugDraw : Box2D.Dynamics.b2DebugDraw,
+				createB2DebugDraw : function() {
+					return new Box2D.Dynamics.b2DebugDraw()
+				},
 				b2FixtureDef : Box2D.Dynamics.b2FixtureDef,
 				createB2FixtureDef : function() {
 					return new Box2D.Dynamics.b2FixtureDef()
