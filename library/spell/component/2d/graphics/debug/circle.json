@@ -7,13 +7,13 @@
 		{
 			"name": "color",
 			"type": "vec3",
-			"default": "[1, 0, 1]",
+			"default": [ 1, 0, 1 ],
 			"doc": "the color used for drawing"
 		},
 		{
 			"name": "radius",
 			"type": "number",
-			"default": "1",
+			"default": 1,
 			"doc": "the radius of the circle"
 		}
 	],
