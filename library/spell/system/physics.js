@@ -129,28 +129,39 @@ define(
 
 			} else if( playerShape ) {
 				var halfWidth  = playerShape.dimensions[ 0 ] / 2 * worldToPhysicsScale,
-					halfHeight = playerShape.dimensions[ 1 ] / 2 * worldToPhysicsScale
+					footRadius = halfWidth,
+					halfHeight = playerShape.dimensions[ 1 ] / 2 * worldToPhysicsScale - footRadius
 
 				// main shape
 				fixtureDef.shape = createB2PolygonShape()
-				fixtureDef.shape.SetAsBox( halfWidth, halfHeight )
+				fixtureDef.shape.SetAsBox( halfWidth, halfHeight - footRadius, createB2Vec2( 0, footRadius ) )
 
 				bodyDef.CreateFixture( fixtureDef )
 
-				// foot sensor shape
-				var radius         = halfWidth,
-					footFixtureDef = createB2FixtureDef()
+				// foot shape
+				var footFixtureDef = createB2FixtureDef()
 
-//				footFixtureDef.density     = fixture.density
-//				footFixtureDef.friction    = fixture.friction
-//				footFixtureDef.restitution = fixture.restitution
-
-				footFixtureDef.isSensor = true
-				footFixtureDef.userData = { type : 'footSensor', id : entityId }
-				footFixtureDef.shape = createB2CircleShape( radius )
-				footFixtureDef.shape.SetLocalPosition( createB2Vec2( 0, -1 * halfHeight ) )
+				footFixtureDef.density     = fixture.density / 2
+				footFixtureDef.friction    = fixture.friction
+				footFixtureDef.restitution = fixture.restitution
+				footFixtureDef.shape       = createB2CircleShape( footRadius )
+				footFixtureDef.shape.SetLocalPosition( createB2Vec2( 0, halfHeight * -1 ) )
 
 				bodyDef.CreateFixture( footFixtureDef )
+
+				// foot sensor shape
+				var footSensorFixtureDef = createB2FixtureDef()
+
+//				footSensorFixtureDef.density     = fixture.density
+//				footSensorFixtureDef.friction    = fixture.friction
+//				footSensorFixtureDef.restitution = fixture.restitution
+
+				footSensorFixtureDef.isSensor = true
+				footSensorFixtureDef.userData = { type : 'footSensor', id : entityId }
+				footSensorFixtureDef.shape    = createB2CircleShape( footRadius * 1.1 )
+				footSensorFixtureDef.shape.SetLocalPosition( createB2Vec2( 0, halfHeight * -1 ) )
+
+				bodyDef.CreateFixture( footSensorFixtureDef )
 			}
 		}
 
@@ -186,7 +197,7 @@ define(
 			}
 		}
 
-		var updateDebug = function( world, debugBoxes, debugCircles, transforms ) {
+		var updateDebug = function( world, debugBoxes, debugCircles ) {
 			for( var body = world.GetBodyList(); body; body = body.GetNext() ) {
 				var id = body.GetUserData()
 
@@ -336,7 +347,7 @@ define(
 			transferState( world, worldToPhysicsScale, this.bodies, transforms )
 
 			if( this.debug ) {
-				updateDebug( world, this.debugBoxes, this.debugCircles, transforms )
+				updateDebug( world, this.debugBoxes, this.debugCircles )
 			}
 		}
 
