@@ -94,7 +94,7 @@
 		var onInitialized = function() {
 			if( isEmbedded ) {
 				// embedded mode, wait for messages from the editor
-				sendMessageToEditor( 'spell.initialized' )
+				sendMessageToEditor( 'spelled.initialized' )
 
 			} else {
 				// stand-alone mode, load project.json and pass it to the engine
@@ -102,7 +102,7 @@
 					'../project.json',
 					function( request ) {
 						sendMessageToEditor(
-							'spelled.debug.runtimeModule.start',
+							'spell.debug.runtimeModule.start',
 							{
 								runtimeModule : JSON.parse( request.response || request.responseText )
 							}
