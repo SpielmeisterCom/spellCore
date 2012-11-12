@@ -1,0 +1,27 @@
+{
+	"version": 1,
+	"type": "system",
+	"readonly": true,
+	"input": [
+		{
+			"name": "children",
+			"componentId": "spell.component.entityComposite.children"
+		},
+        {
+            "name": "roots",
+            "componentId": "spell.component.entityComposite.root"
+        },
+        {
+            "name": "transforms",
+            "componentId": "spell.component.2d.transform"
+        }
+	],
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": true,
+			"doc": "if active is false the system will be skipped during processing"
+		}
+	]
+}

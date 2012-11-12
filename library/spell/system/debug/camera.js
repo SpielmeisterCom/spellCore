@@ -166,17 +166,36 @@ define(
 			 * @param {Object} [spell] The spell object.
 			 */
 			activate: function( spell ) {
+				var lastActiveCameraTransform,
+					lastActiveCamera
+
 				//find current active camera
 				this.lastActiveCameraId = getActiveCameraId( this.cameras )
 
-				spell.entityManager.updateComponent(
-					this.lastActiveCameraId,
-					'spell.component.2d.graphics.camera', {
-					'active': false
-				})
+				if ( this.lastActiveCameraId ) {
+					spell.entityManager.updateComponent(
+						this.lastActiveCameraId,
+						'spell.component.2d.graphics.camera', {
+							'active': false
+						})
 
-				var lastActiveCameraTransform = this.transforms[ this.lastActiveCameraId ]
-				var lastActiveCamera          = this.cameras[ this.lastActiveCameraId ]
+
+					lastActiveCameraTransform = this.transforms[ this.lastActiveCameraId ]
+					lastActiveCamera          = this.cameras[ this.lastActiveCameraId ]
+
+				} else {
+					//no active camera found, so initalize a new one
+					lastActiveCamera = {
+						'width':        768,
+						'height':       1024
+					}
+
+					lastActiveCameraTransform = {
+						'translation':  [ 0, 0 ],
+						'scale':        [ 1, 1 ],
+						'rotation':     0
+					}
+				}
 
 				//create editor camera
 				this.editorCameraEntityId = spell.entityManager.createEntity({
