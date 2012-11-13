@@ -54,8 +54,6 @@ define(
 			transform.scale         = [ scaleX, scaleY ]
 			transform.rotation      = Math.acos( matrix3x3[ 0 ] / scaleX )
 
-			debugger
-
 			//http://math.stackexchange.com/questions/13150/extracting-rotation-scale-values-from-2d-transformation-matrix
 			//sign = Math.atan(-c / a);
 
@@ -69,7 +67,6 @@ define(
 			for ( var entityId in this.roots ) {
 				updateGlobalTransform.call( this, defaultMatrix, entityId )
 			}
-
 		}
 
 		var updateGlobalTransform = function ( parentMatrix3x3, entityId ) {
