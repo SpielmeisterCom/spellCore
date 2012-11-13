@@ -14,8 +14,9 @@ define(
 		vec2,
 		mat3,
 		_
-		) {
+	) {
 		'use strict'
+
 
 		var getActiveCameraId = function( cameras ) {
 			if( !cameras || _.size( cameras ) === 0 ) return
@@ -134,10 +135,6 @@ define(
 				}
 
 			} else if ( event.type == 'mousemove' ) {
-
-				if ( window !== undefined )
-					window.focus()
-
 				this.currentWorldPosition = spell.renderingContext.transformScreenToWorld( event.position )
 
 				if ( this.draggingEnabled ) {
