@@ -18,6 +18,10 @@
         {
             "name": "animatedAppearances",
             "componentId": "spell.component.2d.graphics.animatedAppearance"
+        },
+        {
+            "name": "names",
+            "componentId": "spell.component.name"
         }
 	],
 	"version": 1,

@@ -77,13 +77,15 @@ define(
 				//entity has an animated appearance
 				width = this.animatedAppearances[ entityId ].asset.frameDimensions[ 0 ],
 				height = this.animatedAppearances[ entityId ].asset.frameDimensions[ 1 ]
+
 			}
 
+			//camera, physics only entites?
 
 			//apply scale factor
 			if ( this.transforms[ entityId ] ) {
-				width *= this.transforms[ entityId ].scale[ 0 ]
-				height *= this.transforms[ entityId ].scale[ 1 ]
+				width *= this.transforms[ entityId ].globalScale[ 0 ]
+				height *= this.transforms[ entityId ].globalScale[ 1 ]
 			}
 
 			return [ width, height ]
@@ -94,7 +96,6 @@ define(
 				ctx   = this.spell.renderingContext,
 				me    = this
 
-			//TODO: corect handling of sub entities
 			_.each(
 
 				this.transforms,
@@ -102,10 +103,10 @@ define(
 
 					var entityDimensions = calculateOutlineBoxDimensions.call( me, id )
 
-					if ( isPointInRect( worldPosition, transform.translation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.rotation ) ) {
+					if ( isPointInRect( worldPosition, transform.globalTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.globalRotation ) ) {
 						ctx.save()
-						ctx.translate( transform.translation )
-						ctx.rotate( transform.rotation )
+						ctx.translate( transform.globalTranslation )
+						ctx.rotate( transform.globalRotation )
 
 						ctx.setLineColor( [ 1,0,0,1 ] )
 						ctx.drawRect( 0, 0, entityDimensions[ 0 ], entityDimensions[ 1 ], 1)

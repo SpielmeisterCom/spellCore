@@ -79,6 +79,10 @@ define(
 				tmp
 		}
 
+		mathUtil.sign = function( value ) {
+			return ( value > 0 ) ? 1 : -1
+		}
+
 		/**
 		 * This function rounds to the specified resolution.
 		 *
