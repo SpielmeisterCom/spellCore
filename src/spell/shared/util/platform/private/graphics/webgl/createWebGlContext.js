@@ -385,6 +385,8 @@ define(
 			mat3.translate( tmpMatrix, [ dx, dy ] )
 			mat3.rotate( tmpMatrix, Math.PI )
 			mat3.scale( tmpMatrix, [ -dw, dh ] )
+			mat3.scale( tmpMatrix, [ 1.015, 1.015 ] )
+
 			mat3.translate( tmpMatrix, [ 0, -1 ] )
 
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
