@@ -56,8 +56,8 @@ define(
 		}
 
 		var calculateOutlineBoxDimensions = function( entityId ) {
-			var width = 100,
-				height = 100
+			var width = 0,
+				height = 0
 
 			if ( this.appearances[ entityId ] &&
 				this.appearances[ entityId ].asset &&

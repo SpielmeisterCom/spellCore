@@ -25,9 +25,21 @@ define(
 				rotationInDegrees = transformComponent.rotation * 180 / Math.PI,
 
 				resultMatrix = mat3.create( [
-					scale[ 0 ] * Math.cos( rotationInDegrees ), scale[ 0 ] * -1 * Math.sin( rotationInDegrees ), translation[ 0 ],
-					scale[ 1 ] * Math.sin( rotationInDegrees ),  scale[ 1 ] * Math.cos( rotationInDegrees ),      translation[ 1 ],
-					0,      0,      1
+
+					//1. column
+					scale[ 0 ] * Math.cos( rotationInDegrees ),
+					scale[ 1 ] * Math.sin( rotationInDegrees ),
+					0,
+
+					//2. column
+					scale[ 0 ] * -1 * Math.sin( rotationInDegrees ),
+					scale[ 1 ] * Math.cos( rotationInDegrees ),
+					0,
+
+					//3.column
+					translation[ 0 ],
+					translation[ 1 ],
+					1
 				])
 
 			return resultMatrix
@@ -35,12 +47,14 @@ define(
 
 		var matrixToTransform = function( matrix3x3 ) {
 			var transform = {},
-				scaleX = mathUtil.sign( matrix3x3[ 0 ] ) * Math.sqrt((matrix3x3[ 0 ] * matrix3x3[ 0 ]) + (matrix3x3[ 1 ] * matrix3x3[ 1 ])),
-				scaleY = mathUtil.sign( matrix3x3[ 4 ] ) * Math.sqrt((matrix3x3[ 3 ] * matrix3x3[ 3 ]) + (matrix3x3[ 4 ] * matrix3x3[ 4 ]))
+				scaleX = mathUtil.sign( matrix3x3[ 0 ] ) * Math.sqrt((matrix3x3[ 0 ] * matrix3x3[ 0 ]) + (matrix3x3[ 3 ] * matrix3x3[ 3 ])),
+				scaleY = mathUtil.sign( matrix3x3[ 4 ] ) * Math.sqrt((matrix3x3[ 1 ] * matrix3x3[ 1 ]) + (matrix3x3[ 4 ] * matrix3x3[ 4 ]))
 
-			transform.translation   = [ matrix3x3[ 2 ], matrix3x3[ 5 ] ]
+			transform.translation   = [ matrix3x3[ 6 ], matrix3x3[ 7 ] ]
 			transform.scale         = [ scaleX, scaleY ]
 			transform.rotation      = Math.acos( matrix3x3[ 0 ] / scaleX )
+
+			debugger
 
 			//http://math.stackexchange.com/questions/13150/extracting-rotation-scale-values-from-2d-transformation-matrix
 			//sign = Math.atan(-c / a);
@@ -67,7 +81,7 @@ define(
 
 			if ( transform ) {
 				matrix              = transformToMatrix( transform )
-				mat3.multiply( matrix, parentMatrix3x3, matrix )
+				mat3.multiply( parentMatrix3x3, matrix, matrix )
 
 				globalTransform             = matrixToTransform( matrix )
 				transform.globalTranslation = globalTransform.translation
