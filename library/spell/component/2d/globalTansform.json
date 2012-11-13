@@ -1,0 +1,37 @@
+{
+    "type": "component",
+    "readonly": true,
+    "title": "2D Global Transformation",
+    "doc": "transformation of the origin of the scene",
+    "icon": "/images/icons/component_2d_transform.png",
+    "attributes": [
+        {
+            "name": "globalTranslation",
+            "type": "vec2",
+            "default": [
+                0,
+                0
+            ],
+            "doc": "translation part of the global origin"
+        },
+        {
+            "name": "globalRotation",
+            "type": "vec2",
+            "default": [
+                0,
+                0
+            ],
+            "doc": "rotation part of the global origin"
+        },
+        {
+            "name": "globalScale",
+            "type": "vec2",
+            "default": [
+                0,
+                0
+            ],
+            "doc": "scale part of the global origin"
+        }
+    ],
+    "version": 1
+}
