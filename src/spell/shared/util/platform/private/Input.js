@@ -167,41 +167,41 @@ define(
 			} )
 		}
 
+		var nativeContextMenuHandler = function( callback, event ) {
+			//prevent the default context menu in the browser
+			event.stopPropagation();
+			event.preventDefault();
+		}
+
 		/*
 		 * maps the internal event name to to native event name and callback
 		 */
 		var nativeEventMap = {
             touchstart : {
-                eventNames : [ 'touchstart' ],
-                handler   : nativeTouchHandler
+	            'touchstart'      : nativeTouchHandler
             },
             touchend : {
-                eventNames : [ 'touchend' ],
-                handler   : nativeTouchHandler
+	            'touchend'        : nativeTouchHandler
             },
 			mousedown : {
-				eventNames : [ 'mousedown' ],
-				handler   : nativeMouseClickHandler
+				'mousedown'       : nativeMouseClickHandler,
+				'contextmenu'     : nativeContextMenuHandler
 			},
 			mouseup : {
-				eventNames : [ 'mouseup' ],
-				handler   : nativeMouseClickHandler
+				'mouseup'         : nativeMouseClickHandler
 			},
 			mousemove : {
-				eventNames : [ 'mousemove' ],
-				handler   : nativeMouseMoveHandler
+				'mousemove'       : nativeMouseMoveHandler
 			},
 			mousewheel : {
-				eventNames : [ 'mousewheel', 'DOMMouseScroll' ],
-				handler   : nativeMouseWheelHandler
+				'mousewheel'      : nativeMouseWheelHandler,
+				'DOMMouseScroll'  : nativeMouseWheelHandler
 			},
 			keydown : {
-				eventNames : [ 'keydown' ],
-				handler   : nativeKeyHandler
+				'keydown'         : nativeKeyHandler
 			},
 			keyup : {
-				eventNames : [ 'keyup' ],
-				handler   : nativeKeyHandler
+				'keyup'           : nativeKeyHandler
 			}
 		}
 
@@ -218,12 +218,12 @@ define(
 		var setListener = function( eventName, callback ) {
 			if( !isEventSupported( eventName ) ) return
 
-			var nativeEvent = nativeEventMap[ eventName ]
+			var me              = this,
+				nativeEvents    = nativeEventMap[ eventName ]
 
-
-			for (var i = 0; i < nativeEvent.eventNames.length; i++ ) {
-				addEvent( document.body, nativeEvent.eventNames[ i ], _.bind( nativeEvent.handler, this, callback ) )
-			}
+			_.each( nativeEvents, function( nativeEventHandler, nativeEventName ) {
+				addEvent( document.body, nativeEventName,  _.bind( nativeEventHandler, me, callback ) )
+			})
 		}
 
 		var removeListener = function( eventName ) {
