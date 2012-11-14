@@ -17,20 +17,27 @@
         {
             "name": "globalRotation",
             "type": "vec2",
-            "default": [
-                0,
-                0
-            ],
+            "default": 0,
             "doc": "rotation part of the global origin"
         },
         {
             "name": "globalScale",
             "type": "vec2",
             "default": [
-                0,
-                0
+                1,
+                1
             ],
             "doc": "scale part of the global origin"
+        },
+        {
+            "name": "globalMatrix",
+            "type": "mat3",
+            "default": [
+                1,  0,  0,
+                0,  1,  0,
+                0,  0,  1
+            ],
+            "doc": "A 3x3 matrix which describes the complete transformation"
         }
     ],
     "version": 1
