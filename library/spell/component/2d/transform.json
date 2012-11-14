@@ -12,13 +12,13 @@
 				0,
 				0
 			],
-			"doc": "translation part of the local origin"
+			"doc": "position relative to the parent's origin"
 		},
 		{
 			"name": "rotation",
 			"type": "number",
 			"default": 0,
-			"doc": "rotation part of the local origin"
+			"doc": "rotation relative to the parent's origin"
 		},
 		{
 			"name": "scale",
@@ -27,41 +27,51 @@
 				1,
 				1
 			],
-			"doc": "scale part of the local origin"
+			"doc": "scale relative to the parent's origin"
 		},
         {
-            "name": "globalTranslation",
+            "name": "worldTranslation",
             "type": "vec2",
             "default": [
                 0,
                 0
             ],
-            "doc": "translation part of the global origin"
+            "doc": "position relative to the world's origin"
         },
         {
-            "name": "globalRotation",
+            "name": "worldRotation",
             "type": "vec2",
             "default": 0,
-            "doc": "rotation part of the global origin"
+            "doc": "rotation relative to the world's origin"
         },
         {
-            "name": "globalScale",
+            "name": "worldScale",
             "type": "vec2",
             "default": [
                 1,
                 1
             ],
-            "doc": "scale part of the global origin"
+            "doc": "scale relative to the world's origin"
         },
         {
-            "name": "globalMatrix",
+            "name": "worldToLocalMatrix",
             "type": "mat3",
             "default": [
                 1,  0,  0,
                 0,  1,  0,
                 0,  0,  1
             ],
-            "doc": "A 3x3 matrix which describes the complete transformation"
+            "doc": "3x3 matrix that transforms a point from world into local coordinates"
+        },
+        {
+            "name": "localToWorldMatrix",
+            "type": "mat3",
+            "default": [
+                1,  0,  0,
+                0,  1,  0,
+                0,  0,  1
+            ],
+            "doc": "3x3 matrix that transforms a point from local into world coordinates"
         }
 	],
 	"version": 1

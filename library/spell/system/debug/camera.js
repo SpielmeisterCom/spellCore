@@ -85,8 +85,8 @@ define(
 
 			//apply scale factor
 			if ( this.transforms[ entityId ] ) {
-				width *= this.transforms[ entityId ].globalScale[ 0 ]
-				height *= this.transforms[ entityId ].globalScale[ 1 ]
+				width *= this.transforms[ entityId ].worldScale[ 0 ]
+				height *= this.transforms[ entityId ].worldScale[ 1 ]
 			}
 
 			return [ width, height ]
@@ -106,7 +106,7 @@ define(
 
 					var entityDimensions = calculateOutlineBoxDimensions.call( me, id )
 
-					if( isPointInRect( worldPosition, transform.globalTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.globalRotation ) ) {
+					if( isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.worldRotation ) ) {
 
 						me.matchedEntities.push( id )
 
@@ -119,7 +119,7 @@ define(
 							//update transform?
 
 							spell.entityManager.updateComponent( me.overlayEntityMap[ id ], 'spell.component.2d.transform', {
-								'translation': transform.globalTranslation
+								'translation': transform.worldTranslation
 							})
 
 							spell.entityManager.updateComponent( me.overlayEntityMap[ id ], 'spell.component.2d.graphics.debug.box', {
@@ -133,7 +133,7 @@ define(
 							var overlayEntityId = spell.entityManager.createEntity({
 								'config': {
 									'spell.component.2d.transform': {
-										'translation': transform.globalTranslation
+										'translation': transform.worldTranslation
 									},
 									'spell.component.2d.graphics.textAppearance': {
 										'text': (me.names[ id ]) ? me.names[ id ].value : id
