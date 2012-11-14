@@ -28,7 +28,41 @@
 				1
 			],
 			"doc": "scale part of the local origin"
-		}
+		},
+        {
+            "name": "globalTranslation",
+            "type": "vec2",
+            "default": [
+                0,
+                0
+            ],
+            "doc": "translation part of the global origin"
+        },
+        {
+            "name": "globalRotation",
+            "type": "vec2",
+            "default": 0,
+            "doc": "rotation part of the global origin"
+        },
+        {
+            "name": "globalScale",
+            "type": "vec2",
+            "default": [
+                1,
+                1
+            ],
+            "doc": "scale part of the global origin"
+        },
+        {
+            "name": "globalMatrix",
+            "type": "mat3",
+            "default": [
+                1,  0,  0,
+                0,  1,  0,
+                0,  0,  1
+            ],
+            "doc": "A 3x3 matrix which describes the complete transformation"
+        }
 	],
 	"version": 1
 }
