@@ -34,7 +34,8 @@ define(
 			var internalEvent = {
 				type           : event.type, //mousedown, mouseup
 				sequenceNumber : nextSequenceNumber++,
-                position       : event.position
+                position       : event.position,
+				button         : event.button
 			}
 
 			inputEvents.push( internalEvent )

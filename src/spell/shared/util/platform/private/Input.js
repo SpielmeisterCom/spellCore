@@ -140,7 +140,8 @@ define(
             }
 
             callback( {
-                type     : event.type, //mousedown, mouseup
+                type     : event.type,      //mousedown, mouseup
+	            button   : event.button,    //0=left button, 1=middle button if present, 2=right button
                 position : position
             } )
         }
