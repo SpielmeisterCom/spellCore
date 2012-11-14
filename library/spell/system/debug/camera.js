@@ -172,15 +172,15 @@ define(
 				//zoom camera in and out on mousewheel event
 				var currentScale = this.transforms[ this.editorCameraEntityId ].scale
 
-				currentScale[0] = currentScale[0] + ( 0.75 * event.direction * -1 )
-				currentScale[1] = currentScale[1] + ( 0.75 * event.direction * -1 )
+				currentScale[0] = currentScale[0] + ( 0.5 * event.direction * -1 )
+				currentScale[1] = currentScale[1] + ( 0.5 * event.direction * -1 )
 
-				if (currentScale[0] < 0.5) {
-					currentScale[0] = 0.5
+				if (currentScale[0] < 0.25) {
+					currentScale[0] = 0.25
 				}
 
-				if (currentScale[1] < 0.5) {
-					currentScale[1] = 0.5
+				if (currentScale[1] < 0.25) {
+					currentScale[1] = 0.25
 				}
 
 			} else if ( event.type == 'mousemove' ) {
