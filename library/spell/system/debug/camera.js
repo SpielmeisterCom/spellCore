@@ -109,7 +109,11 @@ define(
 					if( isPointInRect( worldPosition, transform.globalTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.globalRotation ) ) {
 
 						me.matchedEntities.push( id )
-						me.selectedEntity = id
+
+						if ( me.dragMode === me.DRAG_MODE_NONE ) {
+							//only set new selectedEntity if no drag is going on
+							me.selectedEntity = id
+						}
 
 						if( me.overlayEntityMap[ id ] ) {
 							//update transform?
@@ -194,6 +198,21 @@ define(
 
 					currentTranslation[ 0 ] -= ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ]
 					currentTranslation[ 1 ] += ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
+
+				} else if ( this.dragMode === this.DRAG_MODE_ENTITY_MOVE && this.selectedEntity ) {
+
+					var currentTranslation = this.transforms[ this.selectedEntity ].translation,
+						currentScale = this.transforms[ this.editorCameraEntityId ].scale
+
+					if ( this.lastMousePosition === null ) {
+						//first sample of mouse movement
+						this.lastMousePosition = [ event.position[ 0 ], event.position[ 1 ] ]
+						return
+					}
+
+					currentTranslation[ 0 ] += ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ]
+					currentTranslation[ 1 ] -= ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
+
 				}
 
 				this.lastMousePosition = [ event.position[ 0 ], event.position[ 1 ] ]
@@ -201,7 +220,6 @@ define(
 			} else if ( event.type == 'mousedown' ) {
 				this.lastMousePosition  = null
 
-				console.log( event )
 				if ( event.button == 0 ) {
 					this.dragMode       = this.DRAG_MODE_ENTITY_MOVE
 
@@ -213,6 +231,7 @@ define(
 			} else if ( event.type == 'mouseup' ) {
 				this.lastMousePosition  = null
 				this.dragMode           = this.DRAG_MODE_NONE
+				this.selectedEntity     = null
 			}
 		}
 
