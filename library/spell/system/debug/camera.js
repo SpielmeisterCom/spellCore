@@ -93,10 +93,12 @@ define(
 		}
 
 		var findEntitiesAtPosition = function( worldPosition ) {
-			var spell = this.spell,
-				ctx   = this.spell.renderingContext,
+			var spell           = this.spell,
+				ctx             = this.spell.renderingContext,
+				entityManager   = this.spell.entityManager,
 				me    = this
 
+			this.matchedEntities.length = 0
 			_.each(
 
 				this.transforms,
@@ -104,17 +106,60 @@ define(
 
 					var entityDimensions = calculateOutlineBoxDimensions.call( me, id )
 
-					if ( isPointInRect( worldPosition, transform.globalTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.globalRotation ) ) {
-						ctx.save()
-						ctx.translate( transform.globalTranslation )
-						ctx.rotate( transform.globalRotation )
+					if( isPointInRect( worldPosition, transform.globalTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.globalRotation ) ) {
 
-						ctx.setLineColor( [ 1,0,0,1 ] )
-						ctx.drawRect( 0, 0, entityDimensions[ 0 ], entityDimensions[ 1 ], 1)
-						ctx.restore()
+						me.matchedEntities.push( id )
+						me.selectedEntity = id
+
+						if( me.overlayEntityMap[ id ] ) {
+							//update transform?
+
+							spell.entityManager.updateComponent( me.overlayEntityMap[ id ], 'spell.component.2d.transform', {
+								'translation': transform.globalTranslation
+							})
+
+							spell.entityManager.updateComponent( me.overlayEntityMap[ id ], 'spell.component.2d.graphics.debug.box', {
+								'color': [1, 0, 1],
+								'height': entityDimensions[ 1 ],
+								'width': entityDimensions[ 0 ]
+							})
+
+
+						} else {
+							var overlayEntityId = spell.entityManager.createEntity({
+								'config': {
+									'spell.component.2d.transform': {
+										'translation': transform.globalTranslation
+									},
+									'spell.component.2d.graphics.textAppearance': {
+										'text': (me.names[ id ]) ? me.names[ id ].value : id
+									},
+									'spell.component.visualObject': {
+										'layer': 99999999
+									},
+									'spell.component.2d.graphics.debug.box': {}
+								}
+							})
+
+							me.overlayEntityMap[ id ] = overlayEntityId
+						}
+
+					} else {
+						//entity is not hit, so remove any overlay entities
+
+						if( me.overlayEntityMap[ id ] ) {
+							spell.entityManager.removeEntity( me.overlayEntityMap[ id ] )
+							delete me.overlayEntityMap[ id ]
+						}
 					}
 				}
 			)
+
+
+			//highlight current active entity
+			spell.entityManager.updateComponent( this.overlayEntityMap[ this.selectedEntity ], 'spell.component.2d.graphics.debug.box', {
+				'color': [ 1, 0, 0 ]
+			})
 		}
 
 		var processEvent = function ( spell, event ) {
@@ -137,7 +182,7 @@ define(
 			} else if ( event.type == 'mousemove' ) {
 				this.currentWorldPosition = spell.renderingContext.transformScreenToWorld( event.position )
 
-				if ( this.draggingEnabled ) {
+				if ( this.dragMode === this.DRAG_MODE_CAMERA_MOVE  ) {
 					var currentTranslation = this.transforms[ this.editorCameraEntityId ].translation,
 						currentScale = this.transforms[ this.editorCameraEntityId ].scale
 
@@ -155,11 +200,19 @@ define(
 
 			} else if ( event.type == 'mousedown' ) {
 				this.lastMousePosition  = null
-				this.draggingEnabled    = true
+
+				console.log( event )
+				if ( event.button == 0 ) {
+					this.dragMode       = this.DRAG_MODE_ENTITY_MOVE
+
+				} else if ( event.button == 2 ) {
+					this.dragMode       = this.DRAG_MODE_CAMERA_MOVE
+				}
+
 
 			} else if ( event.type == 'mouseup' ) {
 				this.lastMousePosition  = null
-				this.draggingEnabled    = false
+				this.dragMode           = this.DRAG_MODE_NONE
 			}
 		}
 
@@ -170,10 +223,38 @@ define(
 		 * @param {Object} [spell] The spell object.
 		 */
 		var camera = function( spell ) {
+			this.DRAG_MODE_CAMERA_MOVE      =   'DRAG_MODE_CAMERA_MOVE'
+			this.DRAG_MODE_ENTITY_MOVE      =   'DRAG_MODE_ENTITY_MOVE'
+			this.DRAG_MODE_NONE             =   'DRAG_MODE_NONE'
+
 			this.spell                  = spell
 			this.lastMousePosition      = null
 			this.currentWorldPosition   = null
-			this.draggingEnabled        = false
+
+
+			/**
+			 * Current state of the drag mode (one of the DRAG_MODE_* constants)
+			 * @type {string}
+			 */
+			this.dragMode                 = this.DRAG_MODE_NONE
+
+			/**
+			 * Map entity => corresponding overlay entity
+			 * @type {Object}
+			 */
+			this.overlayEntityMap         = {}
+
+			/**
+			 * id of the currently selected entity
+			 * @type {string}
+			 */
+			this.selectedEntity           = null
+
+			/**
+			 * List of entities which match for the current cursor (through all layers)
+			 * @type {Array}
+			 */
+			this.matchedEntities          = []
 		}
 
 		camera.prototype = {
@@ -257,12 +338,19 @@ define(
 			 */
 			deactivate: function( spell ) {
 
+				//restore last active camera
 				spell.entityManager.updateComponent( this.lastActiveCameraId, 'spell.component.2d.graphics.camera', {
 					'active': true
 				})
 
 				spell.entityManager.removeEntity( this.editorCameraEntityId )
 				this.editorCameraEntityId = undefined
+
+				//remove all overlay entities
+				for ( var entityId in this.overlayEntityMap ) {
+					spell.entityManager.removeEntity( this.overlayEntityMap[ entityId ] )
+					delete this.overlayEntityMap[ entityId ]
+				}
 			},
 
 			/**
