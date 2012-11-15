@@ -145,6 +145,8 @@ define(
 						}
 					}
 				}
+
+				entityManager.updateWorldTransform( id )
 			}
 		}
 

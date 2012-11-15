@@ -730,6 +730,10 @@ define(
 				return this.componentDictionaries[ componentId ]
 			},
 
+			updateWorldTransform : function( entityId ) {
+				updateWorldTransform( this.componentDictionaries, entityId, null )
+			},
+
 			/**
 			 * Updates all components which reference the asset with the updated asset instance.
 			 *
