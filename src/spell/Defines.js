@@ -6,6 +6,7 @@ define(
 
 		return {
 			ROOT_COMPONENT_ID                    : 'spell.component.entityComposite.root',
+			PARENT_COMPONENT_ID                  : 'spell.component.entityComposite.parent',
 			CHILDREN_COMPONENT_ID                : 'spell.component.entityComposite.children',
 			NAME_COMPONENT_ID                    : 'spell.component.name',
 			TRANSFORM_COMPONENT_ID               : 'spell.component.2d.transform',
