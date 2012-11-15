@@ -1,0 +1,14 @@
+{
+	"type": "component",
+	"readonly": true,
+	"title": "Behaviour",
+	"attributes": [
+		{
+			"name": "assetId",
+			"type": "assetId:script",
+			"default": "",
+			"doc": "the script assigned to this component"
+		}
+	],
+	"version": 1
+}

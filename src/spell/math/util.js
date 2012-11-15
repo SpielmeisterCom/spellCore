@@ -80,7 +80,7 @@ define(
 		}
 
 		mathUtil.sign = function( value ) {
-			return ( value > 0 ) ? 1 : -1
+			return value >= 0 ? 1 : -1
 		}
 
 		/**
@@ -96,12 +96,6 @@ define(
 			var rest = value % resolution
 
    			return value - rest + ( rest > ( resolution / 2 ) ? resolution : 0 )
-		}
-
-		mathUtil.sign = function( x ) {
-			if( x === 0 ) return 1
-
-			return x / Math.abs( x )
 		}
 
 		return mathUtil
