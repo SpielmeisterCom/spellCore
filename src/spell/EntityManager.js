@@ -25,7 +25,7 @@ define(
 		'spell/functions'
 	],
 	function(
-		defines,
+		Defines,
 		arrayRemove,
 		create,
 		deepClone,
@@ -45,12 +45,13 @@ define(
 		 * private
 		 */
 
-		var nextEntityId            = 1,
-			ROOT_COMPONENT_ID       = defines.ROOT_COMPONENT_ID,
-			CHILDREN_COMPONENT_ID   = defines.CHILDREN_COMPONENT_ID,
-			PARENT_COMPONENT_ID     = defines.PARENT_COMPONENT_ID,
-			NAME_COMPONENT_ID       = defines.NAME_COMPONENT_ID,
-			TRANSFORM_COMPONENT_ID  = defines.TRANSFORM_COMPONENT_ID
+		var nextEntityId           = 1,
+			ROOT_COMPONENT_ID      = Defines.ROOT_COMPONENT_ID,
+			CHILDREN_COMPONENT_ID  = Defines.CHILDREN_COMPONENT_ID,
+			PARENT_COMPONENT_ID    = Defines.PARENT_COMPONENT_ID,
+			NAME_COMPONENT_ID      = Defines.NAME_COMPONENT_ID,
+			TRANSFORM_COMPONENT_ID = Defines.TRANSFORM_COMPONENT_ID,
+			EVENTS_COMPONENT_ID    = Defines.EVENTS_COMPONENT_ID
 
 		/**
 		 * Returns an entity id. If no entity id is provided a new one is generated.
@@ -123,8 +124,6 @@ define(
 					}
 				}
 			}
-
-			debugger
 		}
 
 		var addComponentType = function( componentMaps, componentId ) {
@@ -406,10 +405,11 @@ define(
 		 * public
 		 */
 
-		var EntityManager = function( eventManager, templateManager ) {
+		var EntityManager = function( spell, eventManager, templateManager ) {
 			this.componentDictionaries = {}
 			this.eventManager          = eventManager
 			this.templateManager       = templateManager
+			this.spell                 = spell
 
 			this.templateManager.registerComponentTypeAddedCallback(
 				_.bind( addComponentType, null, this.componentDictionaries )
@@ -771,6 +771,18 @@ define(
 						}
 					}
 				}
+			},
+
+			triggerEvent : function( entityId, eventId, eventArguments ) {
+				var component = this.componentDictionaries[ EVENTS_COMPONENT_ID ][ entityId ]
+
+				if( !component ) return
+
+				var eventHandler = component.asset[ eventId ]
+
+				if( !eventHandler ) return
+
+				eventHandler.apply( null, [ this.spell, entityId ].concat( eventArguments ) )
 			}
 		}
 

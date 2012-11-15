@@ -119,7 +119,7 @@ define(
 				eventManager      = new EventManager(),
 				statisticsManager = new StatisticsManager(),
 				templateManager   = new TemplateManager( assets ),
-				entityManager     = new EntityManager( eventManager, templateManager ),
+				entityManager     = new EntityManager( spell, eventManager, templateManager ),
 				mainLoop          = createMainLoop( eventManager, statisticsManager )
 
 			statisticsManager.init()

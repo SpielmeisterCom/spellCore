@@ -2,17 +2,23 @@ define(
 	'spell/shared/util/template/TemplateManager',
 	[
 		'spell/shared/util/createId',
+		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
+		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/template/applyComponentConfig',
 		'spell/shared/util/template/TemplateTypes',
+		'spell/stringUtil',
 
 		'spell/functions'
 	],
 	function(
 		createId,
+		createModuleId,
 		deepClone,
+		PlatformKit,
 		applyComponentConfig,
 		TemplateTypes,
+		stringUtil,
 
 		_
 	) {
@@ -187,10 +193,21 @@ define(
 		 * @return {*}
 		 */
 		var injectAsset = function( assets, componentTemplate, component ) {
-			var asset = assets[ component.assetId ]
+			var assetId = component.assetId
+			if( !assetId ) return
+
+			var asset = assets[ assetId ]
+
+			if( !asset &&
+				stringUtil.startsWith( assetId, 'script:' ) ) {
+
+				var libraryId = assetId.substr( 7 )
+
+				asset = PlatformKit.ModuleLoader.require( createModuleId( libraryId ) )
+			}
 
 			if( !asset ) {
-				throw 'Error: Could not resolve asset id \'' + component.assetId + '\' to asset instance. Please make sure that the asset id is valid.'
+				throw 'Error: Could not resolve asset id \'' + assetId + '\' to asset instance. Please make sure that the asset id is valid.'
 			}
 
 			component.asset = asset

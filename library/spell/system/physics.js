@@ -263,9 +263,9 @@ define(
 								createB2Vec2( point[ 0 ] * worldToPhysicsScale, point[ 1 ] * worldToPhysicsScale ) :
 								body.GetWorldCenter()
 						)
-
-						entityManager.removeComponent( id, 'spell.component.physics.applyImpulse' )
 					}
+
+					entityManager.removeComponent( id, 'spell.component.physics.applyImpulse' )
 				}
 
 				// spell.component.physics.applyVelocity
