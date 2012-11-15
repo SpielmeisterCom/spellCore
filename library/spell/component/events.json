@@ -1,13 +1,13 @@
 {
 	"type": "component",
 	"readonly": true,
-	"title": "Behaviour",
+	"title": "Events",
 	"attributes": [
 		{
 			"name": "assetId",
 			"type": "assetId:script",
 			"default": "",
-			"doc": "the script assigned to this component"
+			"doc": "the events handled by this entity"
 		}
 	],
 	"version": 1
