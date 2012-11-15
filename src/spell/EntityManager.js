@@ -48,6 +48,7 @@ define(
 		var nextEntityId            = 1,
 			ROOT_COMPONENT_ID       = defines.ROOT_COMPONENT_ID,
 			CHILDREN_COMPONENT_ID   = defines.CHILDREN_COMPONENT_ID,
+			PARENT_COMPONENT_ID     = defines.PARENT_COMPONENT_ID,
 			NAME_COMPONENT_ID       = defines.NAME_COMPONENT_ID,
 			TRANSFORM_COMPONENT_ID  = defines.TRANSFORM_COMPONENT_ID
 
@@ -80,57 +81,50 @@ define(
 		 * @param parentEntityId
 		 * @return {Function}
 		 */
-		var updateWorldTransform = function( componentDictionaries, entityId, parentEntityId ) {
-			var children           = componentDictionaries[ CHILDREN_COMPONENT_ID ],
-				transforms         = componentDictionaries[ TRANSFORM_COMPONENT_ID ],
-				transform          = transforms[ entityId ]
+		var updateWorldTransform = function( componentDictionaries, entityId ) {
+			var parentComponents    = componentDictionaries[ PARENT_COMPONENT_ID ],
+				childrenComponents  = componentDictionaries[ CHILDREN_COMPONENT_ID ],
+				transformComponents = componentDictionaries[ TRANSFORM_COMPONENT_ID ],
+				transform           = transformComponents[ entityId ],
+				children            = childrenComponents[ entityId ],
+				parent              = parentComponents[ entityId ]
 
 			if( transform ) {
-				var localToWorldMatrix = transform.localToWorldMatrix,
-					worldToLocalMatrix = transform.worldToLocalMatrix,
-					translation        = transform.translation,
-					scale              = transform.scale,
-					worldTranslation   = transform.worldTranslation,
-					worldScale         = transform.worldScale,
-					worldRotation      = transform.worldRotation,
-					rotationInDegrees  = transform.rotation * 180 / Math.PI
 
+
+				var localToWorldMatrix = transform.localToWorldMatrix
 
 				//set new localToWorldMatrix
-				mat3.set( [
-					scale[ 0 ] * Math.cos( rotationInDegrees ), transform.scale[ 1 ] * Math.sin( rotationInDegrees ), 0,
-					scale[ 0 ] * -1 * Math.sin( rotationInDegrees ), transform.scale[ 1 ] * Math.cos( rotationInDegrees ), 0,
-					translation[ 0 ], translation[ 1 ], 1
-					],
+				mat3.identity(  localToWorldMatrix )
+				mat3.translate( localToWorldMatrix, transform.translation )
+				mat3.rotate(    localToWorldMatrix, transform.rotation )
+				mat3.scale(     localToWorldMatrix, transform.scale )
 
-					localToWorldMatrix
-				)
+				if( parent && transformComponents[ parent.id ] ) {
 
-				if( parentEntityId && transforms[ parentEntityId ] ) {
 					//multiply parent's localToWorldMatrix with ours
-					mat3.multiply( transforms[ parentEntityId ].localToWorldMatrix, localToWorldMatrix, localToWorldMatrix )
+					mat3.multiply( transformComponents[ parent.id ].localToWorldMatrix, localToWorldMatrix, localToWorldMatrix )
 				}
 
-				//update WorldToLocalMatrix
-				mat3.inverse( localToWorldMatrix, worldToLocalMatrix )
+				//update worldToLocalMatrix
+				mat3.inverse(   localToWorldMatrix, transform.worldToLocalMatrix )
 
-				//update worldTranslation, worldScale, worldRotation
-				worldTranslation[0]         = localToWorldMatrix[ 6 ]
-				worldTranslation[1]         = localToWorldMatrix[ 7 ]
-				worldScale[0]               = mathUtil.sign( localToWorldMatrix[ 0 ] ) * Math.sqrt((localToWorldMatrix[ 0 ] * localToWorldMatrix[ 0 ]) + (localToWorldMatrix[ 3 ] * localToWorldMatrix[ 3 ]))
-				worldScale[1]               = mathUtil.sign( localToWorldMatrix[ 4 ] ) * Math.sqrt((localToWorldMatrix[ 1 ] * localToWorldMatrix[ 1 ]) + (localToWorldMatrix[ 4 ] * localToWorldMatrix[ 4 ]))
-				worldRotation               = Math.acos( localToWorldMatrix[ 0 ] / worldScale[0] )
+				//extract translation, scale and rotation from localToWorldMatrix
+				mat3.getTranslation(    localToWorldMatrix, transform.worldTranslation )
+				mat3.getScale(          localToWorldMatrix, transform.worldScale )
+				transform.worldRotation = mat3.getRotation( localToWorldMatrix )
 
-				//http://math.stackexchange.com/questions/13150/extracting-rotation-scale-values-from-2d-transformation-matrix
 
 				//update all childs recursively
-				if( children[ entityId ] ) {
-					for(var i = 0, length = children[ entityId ].ids.length; i < length; i++) {
-						var childrenEntityId = children[ entityId ].ids[ i ]
-						updateWorldTransform( componentDictionaries, childrenEntityId, entityId )
+				if( children ) {
+					for(var i = 0, length = children.ids.length; i < length; i++) {
+						var childrenEntityId = children.ids[ i ]
+						updateWorldTransform( componentDictionaries, childrenEntityId )
 					}
 				}
 			}
+
+			debugger
 		}
 
 		var addComponentType = function( componentMaps, componentId ) {
@@ -219,15 +213,25 @@ define(
 			)
 		}
 
-		var attachEntityToParent = function( childrenComponents, entityId, parentEntityId ) {
-			var children = childrenComponents[ parentEntityId ]
+		var attachEntityToParent = function( componentDictionaries, entityId, parentEntityId ) {
+			var parentComponents    = componentDictionaries[ PARENT_COMPONENT_ID ],
+				childrenComponents  = componentDictionaries[ CHILDREN_COMPONENT_ID ],
+				children            = childrenComponents[ parentEntityId ]
 
+//TODO: Check if this code is needed
+/*
 			if( !children ) {
 				childrenComponents[ parentEntityId ] = { ids : [ entityId ] }
 
 			} else {
 				childrenComponents[ parentEntityId ].ids.push( entityId )
 			}
+			*/
+			if( children ) {
+				children.ids.push( entityId )
+			}
+
+			parentComponents[ entityId ] = { id : parentEntityId }
 		}
 
 		var detachEntityFromParent = function( childrenComponents, entityId, parentEntityId ) {
@@ -248,13 +252,14 @@ define(
 
 			var rootComponents     = componentDictionaries[ ROOT_COMPONENT_ID ],
 				childrenComponents = componentDictionaries[ CHILDREN_COMPONENT_ID ],
+				parentComponents   = componentDictionaries[ PARENT_COMPONENT_ID ],
 				isRoot             = !!rootComponents[ entityId ]
 
 			if( isRoot && !parentEntityId ) return
 
 			if( parentEntityId ) {
 				detachEntityFromParent( childrenComponents, entityId, parentEntityId )
-				attachEntityToParent( childrenComponents, entityId, parentEntityId )
+				attachEntityToParent( parentComponents, childrenComponents, entityId, parentEntityId )
 
 				if( isRoot ) {
 					// remove root component from entity
@@ -314,6 +319,12 @@ define(
 				result[ ROOT_COMPONENT_ID ] = {}
 			}
 
+			if ( parentId ) {
+				result[ PARENT_COMPONENT_ID ] = {
+					id : parentId
+				}
+			}
+
 			if( _.size( childEntityIds ) > 0 ) {
 				result[ CHILDREN_COMPONENT_ID ] = {
 					ids : childEntityIds
@@ -341,10 +352,13 @@ define(
 				throw 'Error: Supplied invalid arguments.'
 			}
 
+			var entityId = getEntityId( entityConfig.id )
+
 			// creating child entities
 			var childEntityIds = _.map(
 				entityConfig.children,
 				function( entityConfig ) {
+					entityConfig.parentId = entityId
 					return createEntity( eventManager, componentDictionaries, templateManager, entityConfig, false )
 				}
 			)
@@ -356,16 +370,15 @@ define(
 			)
 
 			// creating the entity
-			var entityId         = getEntityId( entityConfig.id ),
-				entityComponents = templateManager.createComponents( entityTemplateId, config || {} )
+			var entityComponents = templateManager.createComponents( entityTemplateId, config || {} )
 
 			addComponents( componentDictionaries, entityId, entityComponents )
 
 			if( parentId ) {
-				attachEntityToParent( componentDictionaries[ CHILDREN_COMPONENT_ID ], entityId, parentId )
+				attachEntityToParent( componentDictionaries, entityId, parentId )
 			}
 
-			updateWorldTransform( componentDictionaries, entityId, null )
+			updateWorldTransform( componentDictionaries, entityId )
 
 			eventManager.publish( Events.ENTITY_CREATED, [ entityId, entityComponents ] )
 
@@ -706,10 +719,12 @@ define(
 				this.templateManager.updateComponent( componentId, component, attributeConfig )
 
 				if ( componentId === TRANSFORM_COMPONENT_ID ) {
-					if ( attributeConfig.translation || attributeConfig.scale || attributeConfig.rotation ) {
+					if ( attributeConfig.translation !== undefined ||
+						attributeConfig.scale !== undefined ||
+						attributeConfig.rotation !== undefined ) {
 						//changed local attributes, compute the new global position
 
-						updateWorldTransform( this.componentDictionaries, entityId, null )
+						updateWorldTransform( this.componentDictionaries, entityId )
 
 					} else if ( attributeConfig.worldTranslation || attributeConfig.worldScale || attributeConfig.worldRotation ) {
 						//changed world attributes, compute new local position
@@ -731,7 +746,7 @@ define(
 			},
 
 			updateWorldTransform : function( entityId ) {
-				updateWorldTransform( this.componentDictionaries, entityId, null )
+				updateWorldTransform( this.componentDictionaries, entityId )
 			},
 
 			/**
