@@ -102,7 +102,8 @@ define(
 					audioContext         : audioContext,
 					resourceLoader       : resourceLoader,
 					resources            : resourceLoader.getCache(),
-					sceneManager         : sceneManager
+					sceneManager         : sceneManager,
+					sendMessageToEditor  : this.sendMessageToEditor
 				}
 			)
 

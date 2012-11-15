@@ -210,16 +210,28 @@ define(
 						return
 					}
 
+					var newTransformConfig = {
+						translation: [
+							currentTranslation[ 0 ] + ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ],
+							currentTranslation[ 1 ] - ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
+						]
+					}
+
 					spell.entityManager.updateComponent(
 						this.selectedEntity,
 						'spell.component.2d.transform',
+						newTransformConfig
+					)
+
+					spell.sendMessageToEditor(
+						'spelled.entity.update',
 						{
-							translation: [
-								currentTranslation[ 0 ] + ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ],
-								currentTranslation[ 1 ] - ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
-							]
+							id: this.selectedEntity,
+							componentId: 'spell.component.2d.transform',
+							config: newTransformConfig
 						}
 					)
+
 
 
 				}
