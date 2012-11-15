@@ -8,6 +8,7 @@ define(
 			ROOT_COMPONENT_ID                    : 'spell.component.entityComposite.root',
 			CHILDREN_COMPONENT_ID                : 'spell.component.entityComposite.children',
 			NAME_COMPONENT_ID                    : 'spell.component.name',
+			EVENTS_COMPONENT_ID                  : 'spell.component.events',
 			TRANSFORM_COMPONENT_ID               : 'spell.component.2d.transform',
 			PHYSICS_BODY_COMPONENT_ID            : 'spell.component.physics.body',
 			PHYSICS_FIXTURE_COMPONENT_ID         : 'spell.component.physics.fixture',
