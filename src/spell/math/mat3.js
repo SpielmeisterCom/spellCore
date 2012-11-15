@@ -60,10 +60,12 @@
 define(
 	"spell/math/mat3",
 	[
-		"spell/shared/util/platform/Types"
+		"spell/shared/util/platform/Types",
+		"spell/math/vec2"
 	],
 	function(
-		Types
+		Types,
+	    vec2
 	) {
 
 		"use strict";
@@ -554,6 +556,55 @@ define(
 			dest[8] = 1;
 			return dest;
 		};
+
+
+		/**
+		 * Extracts the scale part from a 3x3 matrix
+		 * @param {Float32Array} 3x3-matrix
+		 * @param {Float32Array} [dest] 2d-Vector if specified, the result will be written in dest. Otherwise a new 2d-Vector will be created and returned
+		 * @return {Float32Array} 2d-Vector with the result
+		 */
+		mat3.getScale = function( mat, dest ) {
+			var a00    = mat[ 0 ],
+				a01    = mat[ 1 ],
+				a10    = mat[ 3 ],
+				a11    = mat[ 4 ]
+
+			if( !dest ) {
+				dest = vec2.create()
+			}
+
+			dest[0] = (( a00 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a00 * a00) + (a10 * a10) )
+			dest[1] = (( a11 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a01 * a01) + (a11 * a11) )
+
+			return dest
+		}
+
+		/**
+		 * Extracts the translation part from a 3x3-matrix
+		 * @param {Float32Array} 3x3-matrix
+		 * @param {Float32Array} [dest] 2d-Vector if specified, the result will be written in dest. Otherwise a new 2d-Vector will be created and returned
+		 * @return {Float32Array} 2d-Vector with the result
+		 */
+		mat3.getTranslation = function( mat, dest ) {
+			if( !dest ) {
+				dest = vec2.create()
+			}
+
+			dest[ 0 ]   = mat[ 6 ]
+			dest[ 1 ]   = mat[ 7 ]
+
+			return dest
+		}
+
+		/**
+		 * Extracts and returns the rotation in radians from a 3x3-matrix
+		 * @param {Float32Array} 3x3-matrix
+		 * @return {Number}
+		 */
+		mat3.getRotation = function( mat ) {
+			return Math.atan2( mat[3], mat[0] )
+		}
 
 		return mat3;
 	}
