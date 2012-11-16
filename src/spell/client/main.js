@@ -11,6 +11,7 @@ define(
 		'spell/EventManager',
 		'spell/InputManager',
 		'spell/client/loading/ResourceLoader',
+		'spell/shared/util/createModuleLoader',
 		'spell/shared/util/StatisticsManager',
 		'spell/shared/util/Logger',
 		'spell/shared/util/platform/PlatformKit',
@@ -29,6 +30,7 @@ define(
 		EventManager,
 		InputManager,
 		ResourceLoader,
+		createModuleLoader,
 		StatisticsManager,
 		Logger,
 		PlatformKit,
@@ -67,13 +69,7 @@ define(
 
 			spell.logger.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
 
-			var audioContext = PlatformKit.AudioFactory.createAudioContext(
-//				spell.eventManager,
-//				configurationManager.id,
-//				1,
-//				1,
-//				configurationManager.audioBackEnd
-			)
+			var audioContext = PlatformKit.AudioFactory.createAudioContext()
 
 			var inputManager = new InputManager( configurationManager )
 			inputManager.init()
@@ -82,12 +78,19 @@ define(
 
 			if( cacheContent ) resourceLoader.setCache( cacheContent )
 
+
 			var isModeDevelopment = configurationManager.mode !== 'deployed'
+
+			var moduleLoader = createModuleLoader( resourceLoader, isModeDevelopment )
+
+			var templateManager = new TemplateManager( spell.assets, moduleLoader )
+
+			var entityManager = new EntityManager( spell, spell.eventManager, templateManager )
 
 			var sceneManager = new SceneManager(
 				spell,
-				spell.entityManager,
-				spell.templateManager,
+				entityManager,
+				templateManager,
 				spell.mainLoop,
 				this.sendMessageToEditor,
 				isModeDevelopment
@@ -102,6 +105,9 @@ define(
 					audioContext         : audioContext,
 					resourceLoader       : resourceLoader,
 					resources            : resourceLoader.getCache(),
+					moduleLoader         : moduleLoader,
+					templateManager      : templateManager,
+					entityManager        : entityManager,
 					sceneManager         : sceneManager,
 					sendMessageToEditor  : this.sendMessageToEditor
 				}
@@ -118,8 +124,6 @@ define(
 				logger            = new Logger(),
 				eventManager      = new EventManager(),
 				statisticsManager = new StatisticsManager(),
-				templateManager   = new TemplateManager( assets ),
-				entityManager     = new EntityManager( spell, eventManager, templateManager ),
 				mainLoop          = createMainLoop( eventManager, statisticsManager )
 
 			statisticsManager.init()
@@ -127,16 +131,14 @@ define(
 			_.extend(
 				spell,
 				{
-					assets               : assets,
-					entityManager        : entityManager,
-					eventManager         : eventManager,
-					loaderConfig         : loaderConfig,
-					logger               : logger,
-					mainLoop             : mainLoop,
-					runtimeModule        : undefined,
-					scenes               : scenes,
-					statisticsManager    : statisticsManager,
-					templateManager      : templateManager
+					assets            : assets,
+					eventManager      : eventManager,
+					loaderConfig      : loaderConfig,
+					logger            : logger,
+					mainLoop          : mainLoop,
+					runtimeModule     : undefined,
+					scenes            : scenes,
+					statisticsManager : statisticsManager
 				}
 			)
 

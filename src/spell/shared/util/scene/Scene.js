@@ -34,26 +34,6 @@ define(
 		var cameraEntityTemplateId = 'spell.entity.2d.graphics.camera',
 			cameraComponentId      = 'spell.component.2d.graphics.camera'
 
-		var loadModule = function( resourceLoader, moduleId, isModeDevelopment ) {
-			if( !moduleId ) throw 'Error: No module id provided.'
-
-			var config = {
-				cache          : isModeDevelopment ? resourceLoader.getCache() : undefined,
-				hashModuleId   : isModeDevelopment ? hashModuleId : undefined,
-				loadingAllowed : isModeDevelopment
-			}
-
-			var module = PlatformKit.ModuleLoader.require(
-				isModeDevelopment ? moduleId : hashModuleId( moduleId ),
-				undefined,
-				config
-			)
-
-			if( !module ) throw 'Error: Could not resolve module id \'' + moduleId + '\' to module.'
-
-			return module
-		}
-
 		/*
 		 * TODO: Remove this custom invoke that knows how to handle the borked instances produced by the "create" constructor wrapper function.
 		 * Instances created by "create" for some unknown reason do not support prototype chain method look-up. See "Fix create"
@@ -68,10 +48,6 @@ define(
 					system.prototype[ functionName ].apply( system, args )
 				}
 			}
-		}
-
-		var createTemplateId = function( namespace, name ) {
-			return namespace + '.' + name
 		}
 
 		var createSystem = function( spell, entityManager, system, isModeDevelopment, systemConfig ) {
@@ -100,7 +76,7 @@ define(
 				}
 			)
 
-			var constructor = loadModule( spell.resourceLoader, moduleId, isModeDevelopment )
+			var constructor = spell.moduleLoader.require( moduleId )
 
 			// TODO: Fix create. Returned instances do not support prototype chain method look-up. O_o
 			return create( constructor, [ spell ], attributes )
@@ -178,7 +154,7 @@ define(
 				//after this whole render tick is processed. This means that all new events will be
 				//injected before the next tick is run. All system processed in a render tick will always see all
 				//events that occured since that last tick
-				this.spell.inputManager.clearInputEvents();
+				this.spell.inputManager.clearInputEvents()
 			},
 			update: function( timeInMs, deltaTimeInMs ) {
 				invoke( this.executionGroups.update, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
@@ -222,7 +198,7 @@ define(
 
 				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
 
-				this.script = loadModule( spell.resourceLoader, moduleId, this.isModeDevelopment )
+				this.script = spell.moduleLoader.require( moduleId )
 
 				this.script.init( spell, sceneConfig )
 			},

@@ -144,7 +144,7 @@ define(
 			)
 		}
 
-		var addTemplate = function( assets, onComponentTypeAdded, templates, componentsWithAssets, entityPrototypes, definition, overwrite ) {
+		var addTemplate = function( assets, moduleLoader, onComponentTypeAdded, templates, componentsWithAssets, entityPrototypes, definition, overwrite ) {
 			var templateId = createName( definition.namespace, definition.name ),
 				type       = definition.type
 
@@ -157,7 +157,7 @@ define(
 			templates[ templateId ] = definition
 
 			if( type === TemplateTypes.ENTITY ) {
-				entityPrototypes[ templateId ] = createComponents( assets, templates, definition.config, null, templateId, false )
+				entityPrototypes[ templateId ] = createComponents( assets, moduleLoader, templates, definition.config, null, templateId, false )
 
 			} else if( type === TemplateTypes.COMPONENT ) {
 				var hasAssetId = hasAssetIdAttribute( definition.attributes )
@@ -192,7 +192,7 @@ define(
 		 * @param component
 		 * @return {*}
 		 */
-		var injectAsset = function( assets, componentTemplate, component ) {
+		var injectAsset = function( assets, moduleLoader, componentTemplate, component ) {
 			var assetId = component.assetId
 			if( !assetId ) return
 
@@ -203,7 +203,7 @@ define(
 
 				var libraryId = assetId.substr( 7 )
 
-				asset = PlatformKit.ModuleLoader.require( createModuleId( libraryId ) )
+				asset = moduleLoader.require( createModuleId( libraryId ) )
 			}
 
 			if( !asset ) {
@@ -215,7 +215,7 @@ define(
 			return component
 		}
 
-		var createComponents = function( assets, templates, componentConfig, entityPrototype, entityTemplateId, injectAssets ) {
+		var createComponents = function( assets, moduleLoader, templates, componentConfig, entityPrototype, entityTemplateId, injectAssets ) {
 			if( injectAssets === undefined ) injectAssets = true
 
 			var entity = applyComponentConfig(
@@ -242,7 +242,7 @@ define(
 					)
 
 					entity[ componentId ] = hasAssetIdAttribute( componentTemplate.attributes ) && injectAssets ?
-						injectAsset( assets, componentTemplate, updatedComponent ) :
+						injectAsset( assets, moduleLoader, componentTemplate, updatedComponent ) :
 						updatedComponent
 				}
 			)
@@ -255,8 +255,9 @@ define(
 		 * public
 		 */
 
-		function TemplateManager( assets ) {
+		var TemplateManager = function( assets, moduleLoader ) {
 			this.assets           = assets
+			this.moduleLoader     = moduleLoader
 			this.templates        = {}
 			this.entityPrototypes = {}
 
@@ -272,6 +273,7 @@ define(
 
 				addTemplate(
 					this.assets,
+					this.moduleLoader,
 					this.onComponentTypeAdded,
 					this.templates,
 					this.componentsWithAssets,
@@ -290,7 +292,7 @@ define(
 					if( !entityPrototype ) throw 'Error: Could not find entity prototype for template id \'' + entityTemplateId + '\'.'
 				}
 
-				return createComponents( this.assets, this.templates, config, entityPrototype, entityTemplateId )
+				return createComponents( this.assets, this.moduleLoader, this.templates, config, entityPrototype, entityTemplateId )
 			},
 
 			updateComponent : function( componentId, component, attributeConfig ) {
@@ -300,7 +302,7 @@ define(
 					var assetIdChanged = !!attributeConfig[ 'assetId' ]
 
 					if( assetIdChanged ) {
-						injectAsset( this.assets, this.templates[ componentId ], component )
+						injectAsset( this.assets, this.moduleLoader, this.templates[ componentId ], component )
 					}
 				}
 			},
