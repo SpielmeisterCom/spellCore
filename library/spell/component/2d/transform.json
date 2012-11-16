@@ -30,6 +30,17 @@
 			"doc": "scale relative to the parent's origin"
 		},
         {
+            "name": "localMatrix",
+            "engineInternal": true,
+            "type": "mat3",
+            "default": [
+                1,  0,  0,
+                0,  1,  0,
+                0,  0,  1
+            ],
+            "doc": "3x3 matrix that describes the transform in local coordinates"
+        },
+        {
             "name": "worldTranslation",
 			"engineInternal": true,
             "type": "vec2",
@@ -57,6 +68,17 @@
             "doc": "scale relative to the world's origin"
         },
         {
+            "name": "worldMatrix",
+            "engineInternal": true,
+            "type": "mat3",
+            "default": [
+                1,  0,  0,
+                0,  1,  0,
+                0,  0,  1
+            ],
+            "doc": "3x3 matrix that describes the complete transform in world coordinates"
+        },
+        {
             "name": "worldToLocalMatrix",
 			"engineInternal": true,
             "type": "mat3",
@@ -66,17 +88,6 @@
                 0,  0,  1
             ],
             "doc": "3x3 matrix that transforms a point from world into local coordinates"
-        },
-        {
-            "name": "localToWorldMatrix",
-			"engineInternal": true,
-            "type": "mat3",
-            "default": [
-                1,  0,  0,
-                0,  1,  0,
-                0,  0,  1
-            ],
-            "doc": "3x3 matrix that transforms a point from local into world coordinates"
         }
 	],
 	"version": 1

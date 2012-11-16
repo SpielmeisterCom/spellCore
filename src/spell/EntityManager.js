@@ -75,6 +75,18 @@ define(
 		}
 
 		/**
+		 * Updates the local transformation from a world transformation
+		 *
+		 * @param componentDictionaries
+		 * @param entityId
+		 * @param parentEntityId
+		 * @return {Function}
+		 */
+		var updateLocalTransform = function( componentDictionaries, entityId ) {
+
+		}
+
+		/**
 		 * Updates the world transformation from a local transformation
 		 *
 		 * @param componentDictionaries
@@ -91,29 +103,34 @@ define(
 				parent              = parentComponents[ entityId ]
 
 			if( transform ) {
-
-
-				var localToWorldMatrix = transform.localToWorldMatrix
+				var localToWorldMatrix = transform.localToWorldMatrix,
+					localMatrix        = transform.localMatrix,
+					worldMatrix        = transform.worldMatrix
 
 				//set new localToWorldMatrix
-				mat3.identity(  localToWorldMatrix )
-				mat3.translate( localToWorldMatrix, transform.translation )
-				mat3.rotate(    localToWorldMatrix, transform.rotation )
-				mat3.scale(     localToWorldMatrix, transform.scale )
+				mat3.identity(  localMatrix )
+				mat3.translate( localMatrix, transform.translation )
+				mat3.rotate(    localMatrix, transform.rotation )
+				mat3.scale(     localMatrix, transform.scale )
 
 				if( parent && transformComponents[ parent.id ] ) {
 
 					//multiply parent's localToWorldMatrix with ours
-					mat3.multiply( transformComponents[ parent.id ].localToWorldMatrix, localToWorldMatrix, localToWorldMatrix )
+					mat3.multiply( transformComponents[ parent.id ].worldMatrix, localMatrix, worldMatrix )
+
+				} else {
+
+					//if this entity has no parent, the localToWorld Matrix equals the localMatrix
+					mat3.set( localMatrix, worldMatrix )
 				}
 
 				//update worldToLocalMatrix
-				mat3.inverse(   localToWorldMatrix, transform.worldToLocalMatrix )
+				mat3.inverse( worldMatrix, transform.worldToLocalMatrix )
 
-				//extract translation, scale and rotation from localToWorldMatrix
-				mat3.getTranslation(    localToWorldMatrix, transform.worldTranslation )
-				mat3.getScale(          localToWorldMatrix, transform.worldScale )
-				transform.worldRotation = mat3.getRotation( localToWorldMatrix )
+				//extract worldTranslation, worldScale and worldRotation from worldMatrix
+				mat3.getTranslation(    worldMatrix, transform.worldTranslation )
+				mat3.getScale(          worldMatrix, transform.worldScale )
+				transform.worldRotation = mat3.getRotation( worldMatrix )
 
 
 				//update all childs recursively
@@ -258,7 +275,7 @@ define(
 
 			if( parentEntityId ) {
 				detachEntityFromParent( childrenComponents, entityId, parentEntityId )
-				attachEntityToParent( parentComponents, childrenComponents, entityId, parentEntityId )
+				attachEntityToParent( componentDictionaries, entityId, parentEntityId )
 
 				if( isRoot ) {
 					// remove root component from entity
