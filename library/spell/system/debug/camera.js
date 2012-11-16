@@ -92,73 +92,102 @@ define(
 			return [ width, height ]
 		}
 
-		var findEntitiesAtPosition = function( worldPosition ) {
-			var spell           = this.spell,
-				ctx             = this.spell.renderingContext,
-				entityManager   = this.spell.entityManager,
-				me    = this
+		var isEntityNotOverlayEntity = function ( worldPosition, entityId ) {
+			return ( !_.contains( _.values( this.overlayEntityMap ), entityId ) )
+		}
 
-			this.matchedEntities.length = 0
-			_.each(
+		var isPointWithinEntity = function ( worldPosition, entityId ) {
 
-				this.transforms,
-				function( transform, id ) {
+			return true
+			var transform = this.transforms[ entityId ]
 
-					var entityDimensions = calculateOutlineBoxDimensions.call( me, id )
+			var entityDimensions = calculateOutlineBoxDimensions.call( this, entityId )
 
-					if( isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.worldRotation ) ) {
+			return isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.worldRotation )
 
-						me.matchedEntities.push( id )
+		}
 
-						if ( me.dragMode === me.DRAG_MODE_NONE ) {
-							//only set new selectedEntity if no drag is going on
-							me.selectedEntity = id
-						}
+		var syncOverlayEntitesWithMatchedEntites = function ( overlayEntityMap, matchedEntites ) {
+			var entityManager = this.spell.entityManager
 
-						if( me.overlayEntityMap[ id ] ) {
-							//update transform?
+			for ( var i= 0,length=matchedEntites.length; i<length; i++) {
 
-							spell.entityManager.updateComponent( me.overlayEntityMap[ id ], 'spell.component.2d.transform', {
+				var entityId            = matchedEntites[ i ],
+					transform           = this.transforms[ entityId ],
+					name                = this.names[ entityId ],
+					entityDimensions    = calculateOutlineBoxDimensions.call( this, entityId),
+					overlayEntityId     = overlayEntityMap[ entityId ]
+
+
+				if ( overlayEntityId  ) {
+					//overlay for entity already exists, so update it
+
+					//bypass updateComponent mechanic for updating the transform component on purpose
+					//don't to this within normal systems
+					var transformOverlay = this.transforms[ overlayEntityId ]
+					vec2.set( transform.worldTranslation, transformOverlay.translation )
+					transformOverlay.rotation = transform.worldRotation
+
+					entityManager.updateComponent( overlayEntityMap[ entityId ], 'spell.component.2d.graphics.debug.box', {
+						'color': [1, 0, 1],
+						'height': entityDimensions[ 1 ],
+						'width': entityDimensions[ 0 ]
+					})
+				}
+				else {
+
+					var overlayEntityId = entityManager.createEntity({
+						'config': {
+							'spell.component.2d.transform': {
 								'translation': transform.worldTranslation
-							})
-
-							spell.entityManager.updateComponent( me.overlayEntityMap[ id ], 'spell.component.2d.graphics.debug.box', {
+							},
+							'spell.component.2d.graphics.textAppearance': {
+								'text': (name) ? name.value : entityId
+							},
+							'spell.component.visualObject': {
+								'layer': 99999999
+							},
+							'spell.component.2d.graphics.debug.box': {
 								'color': [1, 0, 1],
 								'height': entityDimensions[ 1 ],
 								'width': entityDimensions[ 0 ]
-							})
-
-
-						} else {
-							var overlayEntityId = spell.entityManager.createEntity({
-								'config': {
-									'spell.component.2d.transform': {
-										'translation': transform.worldTranslation
-									},
-									'spell.component.2d.graphics.textAppearance': {
-										'text': (me.names[ id ]) ? me.names[ id ].value : id
-									},
-									'spell.component.visualObject': {
-										'layer': 99999999
-									},
-									'spell.component.2d.graphics.debug.box': {}
-								}
-							})
-
-							me.overlayEntityMap[ id ] = overlayEntityId
+							}
 						}
+					})
 
-					} else {
-						//entity is not hit, so remove any overlay entities
-
-						if( me.overlayEntityMap[ id ] ) {
-							spell.entityManager.removeEntity( me.overlayEntityMap[ id ] )
-							delete me.overlayEntityMap[ id ]
-						}
-					}
+					overlayEntityMap[ entityId ] = overlayEntityId
 				}
-			)
 
+			}
+
+			//now remove all overlay entites that are not needed anymore
+			var currentlyOverlayedEntites   = _.keys( overlayEntityMap),
+				overlaysThatNeedRemovalList = _.difference( currentlyOverlayedEntites, matchedEntites )
+
+			for ( var i= 0,length=overlaysThatNeedRemovalList.length; i<length; i++) {
+				var entityId = overlaysThatNeedRemovalList[ i ]
+
+				entityManager.removeEntity( overlayEntityMap[ entityId ] )
+				delete overlayEntityMap[ entityId ]
+			}
+
+			return overlayEntityMap
+		}
+
+
+		var findEntitiesAtPosition = function( worldPosition ) {
+			var spell           = this.spell,
+				ctx             = this.spell.renderingContext,
+				entityManager   = this.spell.entityManager
+
+
+			this.matchedEntities = _.filter( _.keys( this.transforms ), _.bind ( isEntityNotOverlayEntity, this, worldPosition ) )
+			syncOverlayEntitesWithMatchedEntites.call( this, this.overlayEntityMap, this.matchedEntities )
+
+			if ( this.dragMode === this.DRAG_MODE_NONE && this.matchedEntities.length > 0 ) {
+				//only set new selectedEntity if no drag is going on
+				this.selectedEntity = this.matchedEntities[ 0 ]
+			}
 
 			//highlight current active entity
 			spell.entityManager.updateComponent( this.overlayEntityMap[ this.selectedEntity ], 'spell.component.2d.graphics.debug.box', {
