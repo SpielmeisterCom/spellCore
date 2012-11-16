@@ -574,8 +574,8 @@ define(
 				dest = vec2.create()
 			}
 
-			dest[0] = (( a00 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a00 * a00) + (a10 * a10) )
-			dest[1] = (( a11 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a01 * a01) + (a11 * a11) )
+			dest[0] = (( a11 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a01 * a01) + (a11 * a11) )
+			dest[1] = (( a00 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a00 * a00) + (a10 * a10) )
 
 			return dest
 		}
