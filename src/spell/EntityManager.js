@@ -100,11 +100,13 @@ define(
 				transformComponents = componentDictionaries[ TRANSFORM_COMPONENT_ID ],
 				transform           = transformComponents[ entityId ],
 				children            = childrenComponents[ entityId ],
-				parent              = parentComponents[ entityId ]
+				parent,
+				parentEntityId      = entityId, //we will search for the real parent later
+				parentMatrix
+
 
 			if( transform ) {
-				var localToWorldMatrix = transform.localToWorldMatrix,
-					localMatrix        = transform.localMatrix,
+				var localMatrix        = transform.localMatrix,
 					worldMatrix        = transform.worldMatrix
 
 				//set new localToWorldMatrix
@@ -113,10 +115,19 @@ define(
 				mat3.rotate(    localMatrix, transform.rotation )
 				mat3.scale(     localMatrix, transform.scale )
 
-				if( parent && transformComponents[ parent.id ] ) {
+				//search for next parent with an transform component
+				while ( parent = parentComponents[ parentEntityId ] ) {
+					parentEntityId = parent.id
 
+					if ( transformComponents[ parentEntityId ] ) {
+						parentMatrix = transformComponents[ parentEntityId ].worldMatrix
+						break
+					}
+				}
+
+				if( parentMatrix ) {
 					//multiply parent's localToWorldMatrix with ours
-					mat3.multiply( transformComponents[ parent.id ].worldMatrix, localMatrix, worldMatrix )
+					mat3.multiply( parentMatrix, localMatrix, worldMatrix )
 
 				} else {
 
@@ -130,8 +141,15 @@ define(
 				//extract worldTranslation, worldScale and worldRotation from worldMatrix
 				mat3.getTranslation(    worldMatrix, transform.worldTranslation )
 				mat3.getScale(          worldMatrix, transform.worldScale )
+
 				transform.worldRotation = mat3.getRotation( worldMatrix )
 
+				if (transform.worldScale[0] < 0) {
+					transform.worldRotation *= -1
+				}
+				if (transform.worldScale[1] < 0) {
+					transform.worldRotation *= -1
+				}
 
 				//update all childs recursively
 				if( children ) {
