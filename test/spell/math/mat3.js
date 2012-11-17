@@ -177,14 +177,56 @@ define(
 			})
 
 			it("should be able to extract the scale from a matrix that is only scaled", function() {
-				var matrix = mat3.create([0,1,2,3,4,5,6,7,8,9]),
+				var matrix = mat3.create(),
 					scale  = vec2.create([2.5, -6.4])
 
+				mat3.identity( matrix )
 				mat3.scale( matrix, scale )
 				var decomposedScale = mat3.getScale( matrix )
 
 				if (!vec2.equal( decomposedScale, scale )) {
 					throw 'decomposed scale ' + vec2.str( decomposedScale ) + ' does not match the scale ' + vec2.str( scale ) + ' matrix was ' + mat3.str( matrix )
+				}
+			})
+
+			it("should rotate a identity 3x3-matrix correctly", function() {
+				var matrix              = mat3.create(),
+					testValues          = [ Math.PI, -Math.PI, Math.PI/2, -Math.PI/2, Math.PI/4, -Math.PI/4, Math.PI+Math.PI/2, -Math.PI-Math.PI/2 ]
+
+				for (var i=0; i<testValues.length; i++) {
+					var phi = testValues[ i ]
+
+					//rotate left
+					var rotationMatrix = mat3.create([ Math.cos(-phi), Math.sin(-phi), 0, -Math.sin(-phi), Math.cos(-phi), 0, 0, 0, 1])
+					var testMatrix = mat3.create()
+					mat3.identity( testMatrix )
+					mat3.multiply( testMatrix, rotationMatrix, testMatrix )
+
+					mat3.identity( matrix )
+					mat3.rotate( matrix, phi )
+
+					if (!mat3.equal(matrix, testMatrix)) {
+						throw 'did not rotate matrix correctly by ' + phi + ' expected ' + mat3.str( testMatrix ) + ' got ' + mat3.str( matrix )
+					}
+				}
+			})
+
+			it("should be able to extract the rotation from a 3x3-matrix correctly", function() {
+				var matrix              = mat3.create(),
+					testValues          = [ Math.PI, -Math.PI, Math.PI/2, -Math.PI/2, Math.PI/4, -Math.PI/4, Math.PI+Math.PI/2, -Math.PI-Math.PI/2 ]
+
+				for (var i=0; i<testValues.length; i++) {
+					var phi = testValues[ i ]
+
+					//rotate left
+					mat3.identity( matrix )
+					mat3.rotate( matrix, phi )
+
+					var decomposedRotation = mat3.getRotation( matrix )
+
+					if (phi !== decomposedRotation) {
+						throw 'could not extract rotation from 3x3 matrix expected ' + phi + ' got ' + decomposedRotation
+					}
 				}
 			})
 
