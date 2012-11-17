@@ -410,7 +410,6 @@ define(
 
 		/**
 		 * Returns a string representation of a 3x3-matrix
-		 *
 		 * @param {Float32Array} mat 3x3-matrix to represent as a string
 		 *
 		 * @returns {string} String representation of mat
@@ -420,6 +419,212 @@ define(
 				', ' + mat[3] + ', ' + mat[4] + ', ' + mat[5] +
 				', ' + mat[6] + ', ' + mat[7] + ', ' + mat[8] + ']';
 		};
+
+		/**
+		 * Creates a new rotation matrix with the given rotation angle about the x axis
+		 * @param {number} angle The rotation angle in radians.
+		 * @returns {Float32Array} New 3x3-matrix
+		 */
+		mat3.createRotateX = function(angle) {
+			var sinus   = Math.sin(angle),
+				cosine  = Math.cos(angle)
+
+			return mat3.createFrom(
+				1,
+				0,
+				0,
+
+				0,
+				cosine,
+				sinus,
+
+				0,
+				-sinus,
+				cosine
+			)
+		}
+
+		/**
+		 * Rotate the given matrix by angle about the x axis.
+		 * The rotation is clock-wise
+		 * @param mat
+		 * @param angle
+		 * @param dest
+		 * @return {*}
+		 */
+		mat3.rotateX = function(mat, angle, dest) {
+			if (!dest) {
+				dest = mat
+			}
+
+			var a01 = mat[3], a11 = mat[4], a21 = mat[5],
+				a02 = mat[6], a12 = mat[7], a22 = mat[8],
+				sinus   = Math.sin(angle),
+				cosine  = Math.cos(angle);
+
+			dest[0] = mat[0]
+			dest[1] = mat[1]
+			dest[2] = mat[2]
+			dest[3] = a01 * cosine + a02 * sinus;
+			dest[4] = a11 * cosine + a12 * sinus;
+			dest[5] = a21 * cosine + a22 * sinus;
+			dest[6] = a01 * -sinus + a02 * cosine;
+			dest[7] = a11 * -sinus + a12 * cosine;
+			dest[8] = a21 * -sinus + a22 * cosine;
+
+			return dest;
+		}
+
+		/**
+		 * Decomposes the euler angle from a given rotation matrix for the x axis
+		 *
+		 * Please note: the euler angle returned will be in the
+		 * range of -PI to PI
+		 *
+		 * @param mat - 3x3-matrix
+		 * @return {Number}
+		 */
+		mat3.getRotateX = function(mat) {
+			return Math.atan2(mat[5], mat[8])
+		}
+
+		/**
+		 * Creates a new rotation matrix with the given rotation angle about the y axis
+		 * @param {number} angle The rotation angle in radians.
+		 * @returns {Float32Array} New 3x3-matrix
+		 */
+		mat3.createRotateY = function(angle) {
+			var sinus   = Math.sin(angle),
+				cosine  = Math.cos(angle)
+
+			return mat3.createFrom(
+				cosine,
+				0,
+				-sinus,
+
+				0,
+				1,
+				0,
+
+				sinus,
+				0,
+				cosine
+			)
+		}
+
+		/**
+		 * Rotate the given matrix by angle about the y axis.
+		 * @param mat
+		 * @param angle
+		 * @param dest
+		 * @return {*}
+		 */
+		mat3.rotateY = function(mat, angle, dest) {
+			if (!dest) {
+				dest = mat
+			}
+
+			var a00 = mat[0], a10 = mat[1], a20 = mat[2],
+				a02 = mat[6], a12 = mat[7], a22 = mat[8],
+				sinus   = Math.sin(angle),
+				cosine  = Math.cos(angle);
+
+			dest[0] = a00 * cosine + a02 * -sinus;
+			dest[1] = a10 * cosine + a12 * -sinus;
+			dest[2] = a20 * cosine + a22 * -sinus;
+			dest[3] = mat[3]
+			dest[4] = mat[4]
+			dest[5] = mat[5]
+			dest[6] = a00 * sinus + a02 * cosine;
+			dest[7] = a10 * sinus + a12 * cosine;
+			dest[8] = a20 * sinus + a22 * cosine;
+
+			return dest;
+		}
+
+		/**
+		 * Decomposes the euler angle from a given rotation matrix for the y axis
+		 *
+		 * Please note: the euler angle returned will be in the
+		 * range of -PI/2 to PI/2
+		 *
+		 * @param mat - 3x3-matrix
+		 * @return {Number}
+		 */
+		mat3.getRotateY = function(mat) {
+			var a02 = mat[2],
+				a12 = mat[5],
+				a22 = mat[8]
+
+			return Math.atan2(-a02 , Math.sqrt(a12*a12 + a22*a22) )
+		}
+
+
+		/**
+		 * Creates a new rotation matrix with the given rotation angle about the z axis
+		 * The rotation is clock-wise
+		 * @param {number} angle The rotation angle in radians.
+		 * @returns {Float32Array} New 3x3-matrix
+		 */
+		mat3.createRotateZ = function(angle) {
+			var sinus   = Math.sin(angle),
+				cosine  = Math.cos(angle)
+
+			return mat3.createFrom(
+				cosine,
+				sinus,
+				0,
+
+				-sinus,
+				cosine,
+				0,
+
+				0,
+				0,
+				1
+			)
+		}
+
+		/**
+		 * Rotate the given matrix by angle about the z axis.
+		 * The rotation is clock-wise
+		 * @param mat
+		 * @param angle
+		 * @param dest
+		 * @return {*}
+		 */
+		mat3.rotateZ = function(mat, angle, dest) {
+			if (!dest) {
+				dest = mat
+			}
+
+			var a00 = mat[0], a10 = mat[1], a20 = mat[2],
+				a01 = mat[3], a11 = mat[4], a21 = mat[5],
+				sinus   = Math.sin(angle),
+				cosine  = Math.cos(angle);
+
+			dest[0] = a00 * cosine + a01 * sinus;
+			dest[1] = a10 * cosine + a11 * sinus;
+			dest[2] = a20 * cosine + a21 * sinus;
+			dest[3] = a00 * -sinus + a01 * cosine;
+			dest[4] = a10 * -sinus + a11 * cosine;
+			dest[5] = a20 * -sinus + a21 * cosine;
+
+			return dest;
+		}
+
+		/**
+		 * Decomposes the euler angle from a given rotation matrix for the z axis
+		 *
+		 * Please note: the euler angle returned will be in the
+		 * range of -PI to PI
+		 *
+		 * @param mat - 3x3-matrix
+		 * @return {Number}
+		 */
+		mat3.getRotateZ = function(mat) {
+			return Math.atan2( mat[1], mat[0] )
+		}
 
 		/**
 		 * Translates a matrix by the given vector
@@ -483,39 +688,6 @@ define(
 			return dest
 		};
 
-		/**
-		 * Rotates a 3x3-matrix by the given angle
-		 *
-		 * @param {Float32Array} mat 3x3-matrix to rotate
-		 * @param {Number} angle Angle (in radians) to rotate
-		 * @param {Float32Array} [dest] 3x3-matrix receiving operation result. If not specified result is written to mat
-		 *
-		 * @returns {Float32Array} dest if specified, mat otherwise
-		 */
-		mat3.rotate = function (mat, angle, dest) {
-			if (!dest) {
-				dest = mat;
-			}
-
-			var sine   = Math.sin( angle ),
-				cosine = Math.cos( angle )
-
-			mat3.multiply(dest, [
-				cosine,
-				-sine,
-				0,
-
-				sine,
-				cosine,
-				0,
-
-				0,
-				0,
-				1
-			])
-
-			return dest
-		};
 
 		/**
 		 * Generates a orthogonal projection matrix with the given bounds
@@ -602,18 +774,6 @@ define(
 			dest[ 1 ] = Math.atan( a10 /*m.b*/ / a00 /* m.a */)
 
 			return dest
-		}
-
-		/**
-		 * Extracts and returns the rotation in radians from a 3x3-matrix
-		 * @param {Float32Array} 3x3-matrix
-		 * @return {Number}
-		 */
-		mat3.getRotation = function( mat ) {
-			return Math.atan2(
-				mat[ 3 ], //a
-				-mat[ 0 ] //b
-			)
 		}
 
 		return mat3;
