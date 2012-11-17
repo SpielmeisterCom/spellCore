@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+
+var path          = require( 'path' ),
+	requirejs     = require( 'requirejs' ),
+	spellCorePath = path.resolve( process.mainModule.filename , '..' )
+
+requirejs.config( {
+	baseUrl: spellCorePath + '/src',
+	paths: {
+	    'test' : spellCorePath + '/test'
+	},
+	nodeRequire: require
+} )
+
+requirejs(
+	[
+		'test/spellCoreTestSuite'
+	],
+	function(
+		spellCoreTestSuite
+	) {
+
+	    console.log( spellCoreTestSuite )
+
+	}
+)
