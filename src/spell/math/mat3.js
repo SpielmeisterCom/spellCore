@@ -431,36 +431,26 @@ define(
 		 * @returns {Float32Array} dest if specified, mat otherwise
 		 */
 		mat3.translate = function (mat, vec, dest) {
-			var x = vec[0], y = vec[1],
-				a00, a01, a02,
-				a10, a11, a12;
+			var x = vec[0], y = vec[1]
 
-			if (!dest || mat === dest) {
-				mat[6] = mat[0] * x + mat[3] * y + mat[6];
-				mat[7] = mat[1] * x + mat[4] * y + mat[7];
-				mat[8] = mat[2] * x + mat[5] * y + mat[8];
-				return mat;
+			if( !dest ) {
+				dest = mat
 			}
 
-			a00 = mat[0];
-			a01 = mat[3];
-			a02 = mat[6];
-			a10 = mat[1];
-			a11 = mat[4];
-			a12 = mat[7];
+			dest[0] = mat[0]
+			dest[1] = mat[1]
+			dest[2] = mat[2]
 
-			dest[0] = a00;
-			dest[3] = a01;
-			dest[6] = a02;
-			dest[1] = a10;
-			dest[4] = a11;
-			dest[7] = a12;
+			dest[3] = mat[3]
+			dest[4] = mat[4]
+			dest[5] = mat[5]
 
-			dest[6] = a00 * x + a10 * y + mat[6];
-			dest[7] = a01 * x + a11 * y + mat[7];
-			dest[8] = a02 * x + a12 * y + mat[8];
-			return dest;
-		};
+			dest[6] += x
+			dest[7] += y
+			dest[8] = mat[8]
+
+			return dest
+		}
 
 		/**
 		 * Scales a 3x3-matrix by the given 3d-vector
@@ -472,28 +462,25 @@ define(
 		 * @returns {Float32Array} dest if specified, mat otherwise
 		 */
 		mat3.scale = function (mat, vec, dest) {
-			var x = vec[0], y = vec[1];
+			var x = vec[0], y = vec[1]
 
-			if (!dest || mat === dest) {
-				mat[0] *= x;
-				mat[3] *= x;
-				mat[1] *= y;
-				mat[4] *= y;
-				return mat;
+			if ( !dest ) {
+				dest = mat
 			}
 
-			dest[0] = mat[0] * x;
-			dest[3] = mat[3] * x;
-			dest[6] = mat[6];
+			dest[0] = mat[0] * x
+			dest[3] = mat[3] * x
+			dest[6] = mat[6] * x
 
-			dest[1] = mat[1] * y;
-			dest[4] = mat[4] * y;
-			dest[7] = mat[7];
+			dest[1] = mat[1] * y
+			dest[4] = mat[4] * y
+			dest[7] = mat[7] * y
 
-			dest[2] = mat[2];
-			dest[5] = mat[5];
-			dest[8] = mat[8];
-			return dest;
+			dest[2] = mat[2]
+			dest[5] = mat[5]
+			dest[8] = mat[8]
+
+			return dest
 		};
 
 		/**
@@ -510,18 +497,24 @@ define(
 				dest = mat;
 			}
 
-			var sine   = Math.sin( -angle ),
-				cosine = Math.cos( -angle ),
-				a00    = mat[ 0 ],
-				a01    = mat[ 1 ],
-				a10    = mat[ 3 ],
-				a11    = mat[ 4 ]
+			var sine   = Math.sin( angle ),
+				cosine = Math.cos( angle )
 
-			dest[ 0 ] = a00 * cosine + a10 * sine
-			dest[ 1 ] = a01 * cosine + a11 * sine
-			dest[ 3 ] = a00 * -sine  + a10 * cosine
-			dest[ 4 ] = a01 * -sine  + a11 * cosine
-			return dest;
+			mat3.multiply(dest, [
+				cosine,
+				-sine,
+				0,
+
+				sine,
+				cosine,
+				0,
+
+				0,
+				0,
+				1
+			])
+
+			return dest
 		};
 
 		/**
@@ -600,13 +593,13 @@ define(
 
 			var scale = mat3.getScale( mat )
 
-			var a00    = mat[ 0 ] / scale[ 0 ],
-				a01    = mat[ 1 ] / scale[ 1 ],
-				a10    = mat[ 3 ] / scale[ 0 ],
-				a11    = mat[ 4 ] / scale[ 1 ]
+			var a00    = mat[ 0 ],
+				a01    = mat[ 1 ],
+				a10    = mat[ 3 ],
+				a11    = mat[ 4 ]
 
-			dest[ 0 ] = Math.atan( a01 /*-m.c*/ / a11 /*m.d*/) * -1
-			dest[ 1 ] = Math.atan( -a10 /*m.b*/ / a00 /* m.a */) * -1
+			dest[ 0 ] = Math.atan( -a01 /*-m.c*/ / a11 /*m.d*/)
+			dest[ 1 ] = Math.atan( a10 /*m.b*/ / a00 /* m.a */)
 
 			return dest
 		}
@@ -617,14 +610,9 @@ define(
 		 * @return {Number}
 		 */
 		mat3.getRotation = function( mat ) {
-			var a00    = mat[ 0 ],
-				a01    = mat[ 1 ],
-				a10    = mat[ 3 ],
-				a11    = mat[ 4 ]
-
 			return Math.atan2(
-				a10,
-				a00
+				mat[ 3 ], //a
+				-mat[ 0 ] //b
 			)
 		}
 
