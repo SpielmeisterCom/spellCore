@@ -20,7 +20,6 @@ requirejs(
 		spellCoreTestSuite
 	) {
 
-	    console.log( spellCoreTestSuite )
 
 	}
 )
