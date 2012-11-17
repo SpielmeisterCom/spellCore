@@ -476,22 +476,22 @@ define(
 
 			if (!dest || mat === dest) {
 				mat[0] *= x;
-				mat[1] *= x;
-				mat[2] *= x;
-				mat[3] *= y;
+				mat[3] *= x;
+				mat[1] *= y;
 				mat[4] *= y;
-				mat[5] *= y;
 				return mat;
 			}
 
 			dest[0] = mat[0] * x;
-			dest[1] = mat[1] * x;
-			dest[2] = mat[2] * x;
-			dest[3] = mat[3] * y;
-			dest[4] = mat[4] * y;
-			dest[5] = mat[5] * y;
+			dest[3] = mat[3] * x;
 			dest[6] = mat[6];
+
+			dest[1] = mat[1] * y;
+			dest[4] = mat[4] * y;
 			dest[7] = mat[7];
+
+			dest[2] = mat[2];
+			dest[5] = mat[5];
 			dest[8] = mat[8];
 			return dest;
 		};
@@ -514,17 +514,13 @@ define(
 				cosine = Math.cos( -angle ),
 				a00    = mat[ 0 ],
 				a01    = mat[ 1 ],
-				a02    = mat[ 2 ],
 				a10    = mat[ 3 ],
-				a11    = mat[ 4 ],
-				a12    = mat[ 5 ]
+				a11    = mat[ 4 ]
 
 			dest[ 0 ] = a00 * cosine + a10 * sine
 			dest[ 1 ] = a01 * cosine + a11 * sine
-			dest[ 2 ] = a02 * cosine + a12 * sine
 			dest[ 3 ] = a00 * -sine  + a10 * cosine
 			dest[ 4 ] = a01 * -sine  + a11 * cosine
-			dest[ 5 ] = a02 * -sine  + a12 * cosine
 			return dest;
 		};
 
@@ -574,8 +570,8 @@ define(
 				dest = vec2.create()
 			}
 
-			dest[0] = (( a11 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a01 * a01) + (a11 * a11) )
-			dest[1] = (( a00 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a00 * a00) + (a10 * a10) )
+			dest[0] = (( a00 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a00 * a00) + (a10 * a10) )
+			dest[1] = (( a11 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a01 * a01) + (a11 * a11) )
 
 			return dest
 		}
@@ -597,13 +593,39 @@ define(
 			return dest
 		}
 
+		mat3.getSkew = function( mat, dest ) {
+			if( !dest ) {
+				dest = vec2.create()
+			}
+
+			var scale = mat3.getScale( mat )
+
+			var a00    = mat[ 0 ] / scale[ 0 ],
+				a01    = mat[ 1 ] / scale[ 1 ],
+				a10    = mat[ 3 ] / scale[ 0 ],
+				a11    = mat[ 4 ] / scale[ 1 ]
+
+			dest[ 0 ] = Math.atan( a01 /*-m.c*/ / a11 /*m.d*/) * -1
+			dest[ 1 ] = Math.atan( -a10 /*m.b*/ / a00 /* m.a */) * -1
+
+			return dest
+		}
+
 		/**
 		 * Extracts and returns the rotation in radians from a 3x3-matrix
 		 * @param {Float32Array} 3x3-matrix
 		 * @return {Number}
 		 */
 		mat3.getRotation = function( mat ) {
-			return Math.atan2( mat[3], mat[0] )
+			var a00    = mat[ 0 ],
+				a01    = mat[ 1 ],
+				a10    = mat[ 3 ],
+				a11    = mat[ 4 ]
+
+			return Math.atan2(
+				a10,
+				a00
+			)
 		}
 
 		return mat3;
