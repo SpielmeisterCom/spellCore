@@ -8,6 +8,7 @@ define(
 
 		var testSuites          = [ ],
 			tests               = [ ],
+			failedTests         = [ ],
 			currentTestSuite    = "",
 			numberOfTotalTests  = 0,
 			numberOfFailedTests = 0
@@ -54,15 +55,27 @@ define(
 			} catch( e ) {
 				logLine += "FAILED"
 				numberOfFailedTests++
+
+				test.exceptionMessage = e
+				failedTests.push( test )
 			}
 
 			console.log( logLine )
 		}
 
 
-		console.log ( " ")
-
+		console.log ()
 		console.log ( numberOfFailedTests + " tests failed!" )
+		console.log()
 
+		if (numberOfFailedTests > 0 ) {
+			for(var i=0; i<numberOfFailedTests; i++) {
+				var test = failedTests[ i ]
+
+				console.log("<" + test.testSuite + "> " + test.testDescription)
+			    console.log( test.exceptionMessage )
+				console.log("==================================================")
+			}
+		}
 	}
 )
