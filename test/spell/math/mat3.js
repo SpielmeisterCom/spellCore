@@ -115,6 +115,25 @@ define(
 						}
 					})
 
+				it("should implement setDiagonalValues and setDiagonalVec3 correctly", function() {
+					var matrixA     = mat3.create(),
+						matrixB     = mat3.create(),
+						checkMatrix = [ 1, 0, 0, 0, 2, 0, 0, 0, 3 ]
+
+
+					mat3.setDiagonalValues( matrixA, 1, 2, 3 )
+					mat3.setDiagonalVec3( matrixB, [ 1, 2, 3 ])
+
+					if (!mat3.equal(checkMatrix, matrixA)) {
+						throw 'expected ' + mat3.str(checkMatrix ) + ' got ' + mat3.str(matrixA)
+					}
+
+					if (!mat3.equal(checkMatrix, matrixB)) {
+						throw 'expected ' + mat3.str(checkMatrix ) + ' got ' + mat3.str(matrixB)
+					}
+
+				})
+
 				it("should set 3x3-identity matrix correctly", function() {
 						var matrix = mat3.create()
 						mat3.identity( matrix )
@@ -124,59 +143,39 @@ define(
 						}
 					})
 
-				it("should set the scale correctly on the identity matrix for a positive vec2", function() {
-						var matrix = mat3.create(),
-							matrixB = mat3.create(),
-							vector = vec2.create([2.5, 4.5]),
-							checkMatrix = [2.5, 0, 0, 0, 4.5, 0, 0, 0, 1]
+				it("should return the correct scale matrix", function() {
 
-						mat3.identity( matrix )
-						mat3.scale( matrix, vector, matrix )
+					var matrix = mat3.createScaleMatrix( 1, 2, 3 ),
+						checkMatrix = [1, 0, 0, 0, 2, 0, 0, 0, 3]
 
-						if(!mat3.equal( matrix, checkMatrix )) {
-							throw 'mat3.scale( matrix, vector, matrix ) syntax produced wrong result ' + mat3.str( matrix )
-						}
 
-						mat3.identity( matrix )
-						var anotherMatrix = mat3.scale( matrix, vector )
-						if(!mat3.equal( anotherMatrix, checkMatrix )) {
-							throw 'anotherMatrix = mat3.scale( matrix, vector ) produced a wrong result ' + mat3.str( anotherMatrix )
-						}
+					if (!mat3.equal(checkMatrix, matrix)) {
+						throw 'expected ' + mat3.str(checkMatrix ) + ' got ' + mat3.str(matrix)
 
-						mat3.identity( matrix )
-						var anotherMatrix = mat3.scale( matrix, vector, matrixB )
-						if(!mat3.equal( anotherMatrix, checkMatrix )) {
-							throw 'anotherMatrix = mat3.scale( matrix, vector, matrixB ) produced a wrong result ' + mat3.str( matrixB )
-						}
+					}
 				})
 
-				it("should set the scale correctly for any matrix for any vec2", function() {
+				it("should set the scale correctly for any matrix for a vec2", function() {
 					var matrix = mat3.create(),
 						matrixB = mat3.create(),
 						testMatrix = mat3.create([1,2,3,4,5,6,7,8,9]),
 						vector = vec2.create([2.5, -4.5]),
-						x = vector[0],
-						y = vector[1],
-						checkMatrix = [
-							testMatrix[0] * x,
-							testMatrix[1] * y,
-							testMatrix[2],
-							testMatrix[3] * x,
-							testMatrix[4] * y,
-							testMatrix[5],
-							testMatrix[6] * x,
-							testMatrix[7] * y,
-							testMatrix[8] ]
+						scaleMatrix = mat3.createScaleMatrix(vector[0], vector[1], 0),
+						checkMatrix = mat3.create()
+
+					mat3.multiply( testMatrix, scaleMatrix, checkMatrix )
+
 
 					mat3.set( testMatrix, matrix)
-					mat3.scale( matrix, vector, matrix )
+					mat3.scale( matrix, vector )
 
 					if(!mat3.equal( matrix, checkMatrix )) {
-						throw 'mat3.scale( matrix, vector, matrix ) syntax produced wrong result ' + mat3.str( matrix )
+						throw 'mat3.scale( matrix, vector ) syntax produced wrong result expected ' + mat3.str(checkMatrix) + ' got ' + mat3.str( matrix )
 					}
 
 					mat3.set( testMatrix, matrix)
 					var anotherMatrix = mat3.scale( matrix, vector )
+
 					if(!mat3.equal( anotherMatrix, checkMatrix )) {
 						throw 'anotherMatrix = mat3.scale( matrix, vector ) produced a wrong result ' + mat3.str( anotherMatrix )
 					}
@@ -188,6 +187,40 @@ define(
 					}
 
 				})
+
+				it("should set the scale correctly for any matrix for a vec3", function() {
+					var matrix = mat3.create(),
+						matrixB = mat3.create(),
+						testMatrix = mat3.create([1,2,3,4,5,6,7,8,9]),
+						vector = vec3.create([2.5, -4.5, 5]),
+						scaleMatrix = mat3.createScaleMatrix(vector[0], vector[1], vector[2]),
+						checkMatrix = mat3.create()
+
+					mat3.multiply( testMatrix, scaleMatrix, checkMatrix )
+
+
+					mat3.set( testMatrix, matrix)
+					mat3.scale( matrix, vector )
+
+					if(!mat3.equal( matrix, checkMatrix )) {
+						throw 'mat3.scale( matrix, vector ) syntax produced wrong result expected ' + mat3.str(checkMatrix) + ' got ' + mat3.str( matrix )
+					}
+
+					mat3.set( testMatrix, matrix)
+					var anotherMatrix = mat3.scale( matrix, vector )
+
+					if(!mat3.equal( anotherMatrix, checkMatrix )) {
+						throw 'anotherMatrix = mat3.scale( matrix, vector ) produced a wrong result ' + mat3.str( anotherMatrix )
+					}
+
+					mat3.set( testMatrix, matrix)
+					var anotherMatrix = mat3.scale( matrix, vector, matrixB )
+					if(!mat3.equal( anotherMatrix, checkMatrix )) {
+						throw 'anotherMatrix = mat3.scale( matrix, vector, matrixB ) produced a wrong result ' + mat3.str( matrixB )
+					}
+
+				})
+
 
 				it("should be able to extract the scale from a matrix that is only scaled", function() {
 					var matrix = mat3.create(),

@@ -292,6 +292,36 @@ define(
 		};
 
 		/**
+		 * Sets the diagonal values of the matrix from the given values
+		 *
+		 * @param {Float32Array} mat The 3x3-matrix to receive the values
+		 * @param {number} a00 The value for (0, 0)
+		 * @param {number} a11 The value for (1, 1)
+		 * @param {number} a22 The value for (2, 2)
+		 * @return {Float32Array} return mat with new diagonal values set
+		 */
+		mat3.setDiagonalValues = function(mat, a00, a11, a22) {
+			mat[0] = a00;
+			mat[4] = a11;
+			mat[8] = a22;
+			return mat;
+		};
+
+		/**
+		 * Sets the diagonal values of the matrix from the given 2d-vector
+		 * @param {Float32Array} mat The 3x3-matrix to receive the values
+		 * @param {Float32Array} vec a 3d-vector containing the values
+		 * @return {Float32Array}
+		 */
+		mat3.setDiagonalVec3 = function(mat, vec) {
+			mat[0] = vec[0];
+			mat[4] = vec[1];
+			mat[8] = vec[2];
+			return mat;
+		};
+
+
+		/**
 		 * Compares two matrices for equality within a certain margin of error
 		 *
 		 * @param {Float32Array} a First 3x3-matrix
@@ -421,12 +451,65 @@ define(
 		};
 
 		/**
+		 * Creates a 3x3 scale matrix with x, y, and z scale factors.
+		 * @param {number} x The scale along the x axis
+		 * @param {number} y The scale along the y axis
+		 * @param {number} z The scale along the z axis
+		 * @return {Float32Array} A new 3x3-matrix
+		 */
+		mat3.createScaleMatrix = function(x, y, z) {
+			var mat = mat3.create()
+			mat3.setDiagonalValues(mat, x, y, z)
+
+			return mat
+		}
+
+
+		/**
+		 * Scales a 3x3-matrix by the given 3d-vector
+		 *
+		 * @param {Float32Array} mat 3x3-matrix to scale
+		 * @param {Float32Array} vec 2d-vector or 3d-vector specifying the scale for each axis
+		 * @param {Float32Array} [dest] 3x3-matrix receiving operation result. If not specified result is written to mat
+		 *
+		 * @returns {Float32Array} dest if specified, mat otherwise
+		 */
+		mat3.scale = function (mat, vec, dest) {
+			var x = vec[0], y = vec[1], z = vec[2] || 0;
+
+			if (!dest || mat === dest) {
+				mat[0] *= x;
+				mat[1] *= x;
+				mat[2] *= x;
+				mat[3] *= y;
+				mat[4] *= y;
+				mat[5] *= y;
+				mat[6] *= z;
+				mat[7] *= z;
+				mat[8] *= z;
+				return mat;
+			}
+
+			dest[0] = mat[0] * x;
+			dest[1] = mat[1] * x;
+			dest[2] = mat[2] * x;
+			dest[3] = mat[3] * y;
+			dest[4] = mat[4] * y;
+			dest[5] = mat[5] * y;
+			dest[6] = mat[6] * z;
+			dest[7] = mat[7] * z;
+			dest[8] = mat[8] * z;
+			return dest;
+		};
+
+
+		/**
 		 * Creates a new rotation matrix with the given rotation angle about the x axis
 		 * @param {number} angle The rotation angle in radians.
 		 * @returns {Float32Array} New 3x3-matrix
 		 */
 		mat3.createRotateX = function(angle) {
-			var sinus   = Math.sin(angle),
+			var sine   = Math.sin(angle),
 				cosine  = Math.cos(angle)
 
 			return mat3.createFrom(
@@ -436,10 +519,10 @@ define(
 
 				0,
 				cosine,
-				sinus,
+				sine,
 
 				0,
-				-sinus,
+				-sine,
 				cosine
 			)
 		}
@@ -600,15 +683,18 @@ define(
 
 			var a00 = mat[0], a10 = mat[1], a20 = mat[2],
 				a01 = mat[3], a11 = mat[4], a21 = mat[5],
-				sinus   = Math.sin(angle),
+				sine   = Math.sin(angle),
 				cosine  = Math.cos(angle);
 
-			dest[0] = a00 * cosine + a01 * sinus;
-			dest[1] = a10 * cosine + a11 * sinus;
-			dest[2] = a20 * cosine + a21 * sinus;
-			dest[3] = a00 * -sinus + a01 * cosine;
-			dest[4] = a10 * -sinus + a11 * cosine;
-			dest[5] = a20 * -sinus + a21 * cosine;
+			dest[0] = a00 * cosine + a01 * sine;
+			dest[1] = a10 * cosine + a11 * sine;
+			dest[2] = a20 * cosine + a21 * sine;
+			dest[3] = a00 * -sine + a01 * cosine;
+			dest[4] = a10 * -sine + a11 * cosine;
+			dest[5] = a20 * -sine + a21 * cosine;
+			dest[6] = mat[6]
+			dest[7] = mat[7]
+			dest[8] = mat[8]
 
 			return dest;
 		}
@@ -625,6 +711,56 @@ define(
 		mat3.getRotateZ = function(mat) {
 			return Math.atan2( mat[1], mat[0] )
 		}
+
+		/**
+		 * Rotate the given matrix by angle about the x,y,z axis.
+		 * @param mat
+		 * @param angle
+		 * @param x
+		 * @param y
+		 * @param z
+		 * @return {*}
+		 */
+		mat3.rotate = function(mat, angle, x, y, z) {
+			var m00 = mat[0], m10 = mat[1], m20 = mat[2],
+				m01 = mat[3], m11 = mat[4], m21 = mat[5],
+				m02 = mat[6], m12 = mat[7], m22 = mat[8];
+
+			var cosAngle = Math.cos(angle);
+			var sinAngle = Math.sin(angle);
+			var diffCosAngle = 1 - cosAngle;
+
+			var r00 = x * x * diffCosAngle + cosAngle;
+			var r10 = x * y * diffCosAngle + z * sinAngle;
+			var r20 = x * z * diffCosAngle - y * sinAngle;
+
+			var r01 = x * y * diffCosAngle - z * sinAngle;
+			var r11 = y * y * diffCosAngle + cosAngle;
+			var r21 = y * z * diffCosAngle + x * sinAngle;
+
+			var r02 = x * z * diffCosAngle + y * sinAngle;
+			var r12 = y * z * diffCosAngle - x * sinAngle;
+			var r22 = z * z * diffCosAngle + cosAngle;
+
+			mat3.set(
+			mat,
+			[
+				m00 * r00 + m01 * r10 + m02 * r20,
+				m10 * r00 + m11 * r10 + m12 * r20,
+				m20 * r00 + m21 * r10 + m22 * r20,
+
+				m00 * r01 + m01 * r11 + m02 * r21,
+				m10 * r01 + m11 * r11 + m12 * r21,
+				m20 * r01 + m21 * r11 + m22 * r21,
+
+				m00 * r02 + m01 * r12 + m02 * r22,
+				m10 * r02 + m11 * r12 + m12 * r22,
+				m20 * r02 + m21 * r12 + m22 * r22
+			]);
+
+			return mat
+		};
+
 
 		/**
 		 * Translates a matrix by the given vector
@@ -657,37 +793,37 @@ define(
 			return dest
 		}
 
-		/**
-		 * Scales a 3x3-matrix by the given 3d-vector
-		 *
-		 * @param {Float32Array} mat 3x3-matrix to scale
-		 * @param {Float32Array} vec 2d-vector specifying the scale for each axis
-		 * @param {Float32Array} [dest] 3x3-matrix receiving operation result. If not specified result is written to mat
-		 *
-		 * @returns {Float32Array} dest if specified, mat otherwise
-		 */
-		mat3.scale = function (mat, vec, dest) {
-			var x = vec[0], y = vec[1]
+		mat3.translate = function (mat, vec, dest) {
+			var x = vec[0], y = vec[1],
+				a00, a01, a02,
+				a10, a11, a12;
 
-			if ( !dest ) {
-				dest = mat
+			if (!dest || mat === dest) {
+				mat[6] = mat[0] * x + mat[3] * y + mat[6];
+				mat[7] = mat[1] * x + mat[4] * y + mat[7];
+				mat[8] = mat[2] * x + mat[5] * y + mat[8];
+				return mat;
 			}
 
-			dest[0] = mat[0] * x
-			dest[3] = mat[3] * x
-			dest[6] = mat[6] * x
+			a00 = mat[0];
+			a01 = mat[3];
+			a02 = mat[6];
+			a10 = mat[1];
+			a11 = mat[4];
+			a12 = mat[7];
 
-			dest[1] = mat[1] * y
-			dest[4] = mat[4] * y
-			dest[7] = mat[7] * y
+			dest[0] = a00;
+			dest[3] = a01;
+			dest[6] = a02;
+			dest[1] = a10;
+			dest[4] = a11;
+			dest[7] = a12;
 
-			dest[2] = mat[2]
-			dest[5] = mat[5]
-			dest[8] = mat[8]
-
-			return dest
+			dest[6] = a00 * x + a10 * y + mat[6];
+			dest[7] = a01 * x + a11 * y + mat[7];
+			dest[8] = a02 * x + a12 * y + mat[8];
+			return dest;
 		};
-
 
 		/**
 		 * Generates a orthogonal projection matrix with the given bounds
