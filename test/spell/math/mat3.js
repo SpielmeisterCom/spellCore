@@ -188,39 +188,6 @@ define(
 
 				})
 
-				it("should set the scale correctly for any matrix for a vec3", function() {
-					var matrix = mat3.create(),
-						matrixB = mat3.create(),
-						testMatrix = mat3.create([1,2,3,4,5,6,7,8,9]),
-						vector = vec3.create([2.5, -4.5, 5]),
-						scaleMatrix = mat3.createScaleMatrix(vector[0], vector[1], vector[2]),
-						checkMatrix = mat3.create()
-
-					mat3.multiply( testMatrix, scaleMatrix, checkMatrix )
-
-
-					mat3.set( testMatrix, matrix)
-					mat3.scale( matrix, vector )
-
-					if(!mat3.equal( matrix, checkMatrix )) {
-						throw 'mat3.scale( matrix, vector ) syntax produced wrong result expected ' + mat3.str(checkMatrix) + ' got ' + mat3.str( matrix )
-					}
-
-					mat3.set( testMatrix, matrix)
-					var anotherMatrix = mat3.scale( matrix, vector )
-
-					if(!mat3.equal( anotherMatrix, checkMatrix )) {
-						throw 'anotherMatrix = mat3.scale( matrix, vector ) produced a wrong result ' + mat3.str( anotherMatrix )
-					}
-
-					mat3.set( testMatrix, matrix)
-					var anotherMatrix = mat3.scale( matrix, vector, matrixB )
-					if(!mat3.equal( anotherMatrix, checkMatrix )) {
-						throw 'anotherMatrix = mat3.scale( matrix, vector, matrixB ) produced a wrong result ' + mat3.str( matrixB )
-					}
-
-				})
-
 				it("should be able to extract the scale from a matrix that is only scaled", function() {
 					var matrix = mat3.create(),
 						scaleA = vec2.create([2.5, -6.4]),

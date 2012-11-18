@@ -474,13 +474,13 @@ define(
 		 * Scales a 3x3-matrix by the given 3d-vector
 		 *
 		 * @param {Float32Array} mat 3x3-matrix to scale
-		 * @param {Float32Array} vec 2d-vector or 3d-vector specifying the scale for each axis
+		 * @param {Float32Array} vec 2d-vector specifying the scale for each axis
 		 * @param {Float32Array} [dest] 3x3-matrix receiving operation result. If not specified result is written to mat
 		 *
 		 * @returns {Float32Array} dest if specified, mat otherwise
 		 */
 		mat3.scale = function (mat, vec, dest) {
-			var x = vec[0], y = vec[1], z = vec[2] || 1;
+			var x = vec[0], y = vec[1];
 
 			if (!dest || mat === dest) {
 				mat[0] *= x;
@@ -489,9 +489,6 @@ define(
 				mat[3] *= y;
 				mat[4] *= y;
 				mat[5] *= y;
-				mat[6] *= z;
-				mat[7] *= z;
-				mat[8] *= z;
 				return mat;
 			}
 
@@ -501,9 +498,9 @@ define(
 			dest[3] = mat[3] * y;
 			dest[4] = mat[4] * y;
 			dest[5] = mat[5] * y;
-			dest[6] = mat[6] * z;
-			dest[7] = mat[7] * z;
-			dest[8] = mat[8] * z;
+			dest[6] = mat[6];
+			dest[7] = mat[7];
+			dest[8] = mat[8];
 			return dest;
 		};
 
@@ -839,37 +836,6 @@ define(
 
 			return dest;
 		};
-,
-		mat3.ortho( mat, dest ) {
-
-
-			var x = [],
-				y
-			vec3<T> x(r1.x, r2.x, r3.x);
-			vec3<T> y(r1.y, r2.y, r3.y);
-			vec3<T> z(r1.z, r2.z, r3.z);
-			T xl = x.length();
-			if (xl<=vec3<T>::epsilon)
-			throw EZeroDivisionError("mat3.ortho(): divide by zero");
-
-			xl *= xl;
-			y -= ((x*y)/xl)*x;
-			z -= ((x*z)/xl)*x;
-
-			T yl = y.length();
-			if (yl<=vec3<T>::epsilon)
-			throw EZeroDivisionError("mat3.ortho(): divide by zero");
-
-			yl *= yl;
-			z -= ((y*z)/yl)*y;
-
-			dest.r1.set(x.x, y.x, z.x);
-			dest.r2.set(x.y, y.y, z.y);
-			dest.r3.set(x.z, y.z, z.z);
-			return dest;
-
-		}
-
 
 		/**
 		 * Generates a orthogonal projection matrix with the given bounds
@@ -913,14 +879,25 @@ define(
 				a20 = mat[6], a21 = mat[7], a22 = mat[8]
 
 
-			if( !dest ) {
-				dest = [0, 0, 0 ] //vec2.create()
+			if( dest === undefined ) {
+				dest = vec2.create()
 			}
 
-			dest[0] = Math.sqrt( (a00 * a00) + (a01 * a01) + (a02 * a02) )
-			dest[1] = Math.sqrt( (a10 * a10) + (a11 * a11) + (a12 * a12) )
-			dest[2] = Math.sqrt( (a20 * a20) + (a21 * a21) + (a22 * a22) )
+			console.log(mat3.str(mat))
+			dest[0] = Math.sqrt( (a00 * a00) + (a10 * a10) )
+			dest[1] = Math.sqrt( (a01 * a01) + (a11 * a11) )
+			if (a00 * a10 * a20 < 0) {
+				dest[0] *= -1
+			}
 
+			console.log( a01 > 0 )
+			console.log( a11 > 0 )
+			console.log( a01 > 0 && a11 > 0 )
+
+			if (a01 > 0 && a11 > 0) {
+				dest[1] = 33
+			}
+/*
 
 			mat[0] /= dest[0]
 			mat[1] /= dest[0]
@@ -935,7 +912,6 @@ define(
 			mat[8] /= dest[2]
 
 			var determinant = mat3.determinant(mat)
-console.log(determinant)
 
 
 			if (determinant < 0) {
@@ -949,7 +925,7 @@ console.log(determinant)
 
 				//dest[0] *= -1
 			}
-
+*/
 			return dest
 		}
 
