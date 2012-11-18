@@ -188,26 +188,75 @@ define(
 
 				})
 
-				it("should be able to extract the scale from a matrix that is only scaled", function() {
+				it("should be able to extract positive scales from a matrix that is only scaled", function() {
 					var matrix = mat3.create(),
-						scaleA = vec2.create([2.5, -6.4]),
-						scaleB = vec2.create([-4.2, 5]),
-						decomposedScale
+						scales = [
+							[2.5, 6.4],
+							[1,1],
+							[0,0]
+						],
+						decomposedScale = vec2.create()
 
-					mat3.identity( matrix )
-					mat3.scale( matrix, scaleA )
-					decomposedScale = mat3.getScale( matrix )
+					for (var i=0; i<scales.length; i++) {
+						var scale = scales[i]
 
-					if (!vec2.equal( decomposedScale, scaleA )) {
-						throw 'decomposed scale ' + vec2.str( decomposedScale ) + ' does not match the scale ' + vec2.str( scaleA ) + ' matrix was ' + mat3.str( matrix )
+						mat3.identity( matrix )
+						mat3.scale( matrix, scale )
+						mat3.rotateZ( matrix, 0 )
+						mat3.translate( matrix, [0,0] )
+
+						var rotation = mat3.decompose( matrix, decomposedScale )
+						if (!vec2.equal( decomposedScale, scale )) {
+							throw 'decomposed scale ' + vec2.str( decomposedScale ) + ' does not match the scale ' + vec2.str( scale ) + ' rotation: ' + rotation + ' matrix was ' + mat3.str( matrix )
+						}
 					}
+				})
 
-					mat3.identity( matrix )
-					mat3.scale( matrix, scaleB )
-					decomposedScale = mat3.getScale( matrix )
+				it("should be able to extract negative scales from a matrix that is only scaled", function() {
+					var matrix = mat3.create(),
+						scales = [
+							[-2.5, -6.4],
+							[-1,-1],
+							[0,0]
+						],
+						decomposedScale = vec2.create()
 
-					if (!vec2.equal( decomposedScale, scaleB  )) {
-						throw 'decomposed scale ' + vec2.str( decomposedScale ) + ' does not match the scale ' + vec2.str( scaleB ) + ' matrix was ' + mat3.str( matrix )
+					for (var i=0; i<scales.length; i++) {
+						var scale = scales[i]
+
+						mat3.identity( matrix )
+						mat3.scale( matrix, scale )
+						mat3.rotateZ( matrix, 0 )
+						mat3.translate( matrix, [0,0] )
+
+						var rotation = mat3.decompose( matrix, decomposedScale )
+						if (!vec2.equal( decomposedScale, scale )) {
+							throw 'decomposed scale ' + vec2.str( decomposedScale ) + ' does not match the scale ' + vec2.str( scale ) + ' rotation: ' + rotation + ' matrix was ' + mat3.str( matrix )
+						}
+					}
+				})
+
+				it("should be able to extract mixed scales from a matrix that is only scaled", function() {
+					var matrix = mat3.create(),
+						scales = [
+							[-2.5, 6.4],
+							[1,-1],
+							[0,0]
+						],
+						decomposedScale = vec2.create()
+
+					for (var i=0; i<scales.length; i++) {
+						var scale = scales[i]
+
+						mat3.identity( matrix )
+						mat3.scale( matrix, scale )
+						mat3.rotateZ( matrix, 0 )
+						mat3.translate( matrix, [0,0] )
+
+						var rotation = mat3.decompose( matrix, decomposedScale )
+						if (!vec2.equal( decomposedScale, scale )) {
+							throw 'decomposed scale ' + vec2.str( decomposedScale ) + ' does not match the scale ' + vec2.str( scale ) + ' rotation: ' + rotation + ' matrix was ' + mat3.str( matrix )
+						}
 					}
 				})
 
@@ -502,16 +551,29 @@ define(
 
 
 			it("should compose and decompose for a combined translate, scale, rotation correctly", function() {
-				var matrix      = mat3.create(),
+				var matrixA      = mat3.create(),
+					matrixB      = mat3.create(),
 					scales      = [
 						[ 1, 1 ],
+						[ -1, -1 ],
 						[ -1, 1 ],
-						[ 1, -1 ]
+						[ 1, -1 ],
+						[ 0, 1 ],
+						[ 1, 0 ]
 					],
 					translations   = [
 						[ 0,0 ],
-						[ 1,1 ]
-					]
+						[ 1,-1 ],
+						[ -1,1 ],
+						[ 0,1 ],
+						[ 1,0 ],
+						[ 1,1 ],
+						[ 15.3, -14 ]
+					],
+					checkScale = vec2.create(),
+					checkAngle = new Number(),
+					checkTranslation = vec2.create()
+
 
 				for (var j=0; j<scales.length; j++) {
 					var scale = scales[j]
@@ -519,34 +581,31 @@ define(
 					for (var i=0; i<translations.length; i++) {
 						var translation = translations[i]
 
-						for (var angle = -2 * Math.PI; angle <= 2*Math.PI; angle += Math.PI/8 ) {
+						for (var angle = -2 * Math.PI; angle <= 2*Math.PI; angle += Math.PI/4 ) {
 
-							mat3.identity( matrix )
-
-							//console.log(" === ")
-							mat3.scale( matrix, scale )
-						//	console.log(mat3.str(matrix))
-							mat3.rotateZ( matrix, angle )
-						//	console.log(mat3.str(matrix))
-							mat3.translate( matrix, translation )
-						//	console.log(mat3.str(matrix))
-
-							var checkScale          = mat3.getScale( matrix ),
-								checkAngle          = mat3.getEulerZ( matrix ),
-								checkTranslation    = mat3.getTranslation( matrix)
+							mat3.identity( matrixA )
+							mat3.scale( matrixA, scale )
+							mat3.rotateZ( matrixA, angle )
+							mat3.translate( matrixA, translation )
 
 
-							/*if(!vec2.equal( checkScale, scale )) {
-								throw 'expected scale: ' + vec2.str( scale ) +  ' got ' + vec2.str( checkScale ) + ' matrix is ' + mat3.str( matrix ) + ' rotation is ' + angle
+							checkAngle = mat3.decompose( matrixA, checkScale, checkTranslation )
 
-							}
-							else if (!vec2.equal( checkTranslation, translation )) {
-								throw 'expected translation: ' + vec2.str( translation ) +  ' got ' + vec2.str( checkTranslation )
+							mat3.identity( matrixB )
+							mat3.scale( matrixB, checkScale )
+							mat3.rotateZ( matrixB, checkAngle )
+							mat3.translate( matrixB, checkTranslation )
 
-							} */ if ( Math.abs(checkAngle-angle) > FLOAT_EPSILON &&
-								Math.abs(Math.abs(checkAngle-angle)-2*Math.PI) > FLOAT_EPSILON
-								) {
-								throw 'expected rotation: ' + angle + ' got ' + checkAngle
+							if ( !mat3.equal( matrixA, matrixB ) ) {
+								var error = 'checked ' + vec2.str(scale) + ' rotation ' + angle + ' translation ' + vec2.str(translation) + ' matrix ' + mat3.str( matrixA ) + "\n" +
+											'got ' + vec2.str(checkScale) + ' rotation ' + checkAngle + ' translation ' + vec2.str(checkTranslation) +  ' matrix ' + mat3.str( matrixB )
+
+								throw error
+
+							} else {
+								var success = 'worked ' + vec2.str(scale) + ' rotation ' + angle + ' translation ' + vec2.str(translation) + ' matrix ' + mat3.str( matrixA ) + "\n"
+
+								//console.log( success )
 							}
 						}
 					}

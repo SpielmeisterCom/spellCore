@@ -868,65 +868,46 @@ define(
 
 
 		/**
-		 * Extracts the scale part from a 3x3 matrix
+		 * Decomposes a Scale * Rotate * Translate Matrix into it's components
 		 * @param {Float32Array} 3x3-matrix
 		 * @param {Float32Array} [dest] 2d-Vector if specified, the result will be written in dest. Otherwise a new 2d-Vector will be created and returned
 		 * @return {Float32Array} 2d-Vector with the result
 		 */
-		mat3.getScale = function( mat, dest ) {
-			var a00 = mat[0], a01 = mat[1], a02 = mat[2],
-				a10 = mat[3], a11 = mat[4], a12 = mat[5],
-				a20 = mat[6], a21 = mat[7], a22 = mat[8]
+		mat3.decompose = function( mat, scale, translation ) {
+
+			var a = mat[0],
+				b = mat[1],
+
+				c = mat[3],
+				d = mat[4],
+				rotation = 0
 
 
-			if( dest === undefined ) {
-				dest = vec2.create()
+			if( scale === undefined ) {
+				scale = vec2.create()
 			}
 
-			console.log(mat3.str(mat))
-			dest[0] = Math.sqrt( (a00 * a00) + (a10 * a10) )
-			dest[1] = Math.sqrt( (a01 * a01) + (a11 * a11) )
-			if (a00 * a10 * a20 < 0) {
-				dest[0] *= -1
+			if ( translation === undefined ) {
+				translation = vec2.create()
 			}
 
-			console.log( a01 > 0 )
-			console.log( a11 > 0 )
-			console.log( a01 > 0 && a11 > 0 )
+			scale[0] = Math.sqrt( (a * a) + (b * b) )
+			scale[1] = Math.sqrt( (c * c) + (d * d) )
 
-			if (a01 > 0 && a11 > 0) {
-				dest[1] = 33
+			var skew = vec2.create()
+
+			skew[0] = Math.atan2(-c, d)
+			skew[1] = Math.atan2(b, a)
+
+			if (Math.abs(skew[1]-skew[0]) > FLOAT_EPSILON) {
+				throw 'non linear skews currently not supported'
 			}
-/*
 
-			mat[0] /= dest[0]
-			mat[1] /= dest[0]
-			mat[2] /= dest[0]
+			rotation = skew[1]
 
-			mat[3] /= dest[1]
-			mat[4] /= dest[1]
-			mat[5] /= dest[1]
-
-			mat[6] /= dest[2]
-			mat[7] /= dest[2]
-			mat[8] /= dest[2]
-
-			var determinant = mat3.determinant(mat)
-
-
-			if (determinant < 0) {
-	//			mat[0] *= -1
-		//		mat[1] *= -1
-//				mat[2] *= -1
-
-				dest[0] = (( a00 >= 0 ) ? 1 : -1 ) * dest[0] //-dest[0]
-				dest[1] = (( a11 >= 0 ) ? 1 : -1 ) * dest[1]
-
-
-				//dest[0] *= -1
-			}
-*/
-			return dest
+			translation[ 0 ]   = mat[ 6 ] * scale[ 0 ] * Math.cos ( -rotation ) - mat[ 7 ] * scale[ 1 ] * Math.sin ( -rotation )
+			translation[ 1 ]   = mat[ 6 ] * scale[ 1 ] * Math.sin ( -rotation ) + mat[ 7 ] * scale[ 1 ] * Math.cos( -rotation )
+			return rotation
 		}
 
 		/**
@@ -942,24 +923,6 @@ define(
 
 			dest[ 0 ]   = mat[ 6 ]
 			dest[ 1 ]   = mat[ 7 ]
-
-			return dest
-		}
-
-		mat3.getSkew = function( mat, dest ) {
-			if( !dest ) {
-				dest = vec2.create()
-			}
-
-			var scale = mat3.getScale( mat )
-
-			var a00    = mat[ 0 ],
-				a01    = mat[ 1 ],
-				a10    = mat[ 3 ],
-				a11    = mat[ 4 ]
-
-			dest[ 0 ] = Math.atan( -a01 /*-m.c*/ / a11 /*m.d*/)
-			dest[ 1 ] = Math.atan( a10 /*m.b*/ / a00 /* m.a */)
 
 			return dest
 		}
