@@ -455,13 +455,18 @@ define(
 		 * @param {number} x The scale along the x axis
 		 * @param {number} y The scale along the y axis
 		 * @param {number} z The scale along the z axis
-		 * @return {Float32Array} A new 3x3-matrix
+		 * @param {Float32Array} [dest] optional 3x3-matrix receiving operation result, if not specified a new mat3 will be created
+		 * @return {Float32Array} A 3x3-matrix
 		 */
-		mat3.createScaleMatrix = function(x, y, z) {
-			var mat = mat3.create()
-			mat3.setDiagonalValues(mat, x, y, z)
+		mat3.createScaleMatrix = function(x, y, z, dest) {
 
-			return mat
+			if (dest === undefined) {
+				dest = mat3.create()
+			}
+
+			mat3.setDiagonalValues(dest, x, y, z)
+
+			return dest
 		}
 
 
@@ -475,7 +480,7 @@ define(
 		 * @returns {Float32Array} dest if specified, mat otherwise
 		 */
 		mat3.scale = function (mat, vec, dest) {
-			var x = vec[0], y = vec[1], z = vec[2] || 0;
+			var x = vec[0], y = vec[1], z = vec[2] || 1;
 
 			if (!dest || mat === dest) {
 				mat[0] *= x;
@@ -506,25 +511,28 @@ define(
 		/**
 		 * Creates a new rotation matrix with the given rotation angle about the x axis
 		 * @param {number} angle The rotation angle in radians.
+		 * @param {Float32Array} [dest] optional 3x3-matrix receiving operation result, if not specified a new mat3 will be created
 		 * @returns {Float32Array} New 3x3-matrix
 		 */
-		mat3.createRotateX = function(angle) {
+		mat3.createRotateXMatrix = function(angle, dest) {
 			var sine   = Math.sin(angle),
-				cosine  = Math.cos(angle)
+				cosine  = Math.cos(angle);
 
-			return mat3.createFrom(
-				1,
-				0,
-				0,
+			if ( dest === undefined ) {
+				dest = mat3.create();
+			}
 
-				0,
-				cosine,
-				sine,
+			dest[0] = 1;
+			dest[1] = 0;
+			dest[2] = 0;
+			dest[3] = 0;
+			dest[4] = cosine;
+			dest[5] = sine;
+			dest[6] = 0;
+			dest[7] = -sine;
+			dest[8] = cosine;
 
-				0,
-				-sine,
-				cosine
-			)
+			return dest;
 		}
 
 		/**
@@ -540,20 +548,20 @@ define(
 				dest = mat
 			}
 
-			var a01 = mat[3], a11 = mat[4], a21 = mat[5],
-				a02 = mat[6], a12 = mat[7], a22 = mat[8],
+			var m01 = mat[3], m11 = mat[4], m21 = mat[5],
+				m02 = mat[6], m12 = mat[7], m22 = mat[8],
 				sinus   = Math.sin(angle),
 				cosine  = Math.cos(angle);
 
 			dest[0] = mat[0]
 			dest[1] = mat[1]
 			dest[2] = mat[2]
-			dest[3] = a01 * cosine + a02 * sinus;
-			dest[4] = a11 * cosine + a12 * sinus;
-			dest[5] = a21 * cosine + a22 * sinus;
-			dest[6] = a01 * -sinus + a02 * cosine;
-			dest[7] = a11 * -sinus + a12 * cosine;
-			dest[8] = a21 * -sinus + a22 * cosine;
+			dest[3] = m01 * cosine + m02 * sinus;
+			dest[4] = m11 * cosine + m12 * sinus;
+			dest[5] = m21 * cosine + m22 * sinus;
+			dest[6] = m01 * -sinus + m02 * cosine;
+			dest[7] = m11 * -sinus + m12 * cosine;
+			dest[8] = m21 * -sinus + m22 * cosine;
 
 			return dest;
 		}
@@ -567,32 +575,35 @@ define(
 		 * @param mat - 3x3-matrix
 		 * @return {Number}
 		 */
-		mat3.getRotateX = function(mat) {
+		mat3.getEulerX = function(mat) {
 			return Math.atan2(mat[5], mat[8])
 		}
 
 		/**
 		 * Creates a new rotation matrix with the given rotation angle about the y axis
 		 * @param {number} angle The rotation angle in radians.
+		 * @param {Float32Array} [dest] optional 3x3-matrix receiving operation result, if not specified a new mat3 will be created
 		 * @returns {Float32Array} New 3x3-matrix
 		 */
-		mat3.createRotateY = function(angle) {
-			var sinus   = Math.sin(angle),
-				cosine  = Math.cos(angle)
+		mat3.createRotateYMatrix = function(angle, dest) {
+			var sine   = Math.sin(angle),
+				cosine  = Math.cos(angle);
 
-			return mat3.createFrom(
-				cosine,
-				0,
-				-sinus,
+			if ( dest === undefined ) {
+				dest = mat3.create();
+			}
 
-				0,
-				1,
-				0,
+			dest[0] = cosine;
+			dest[1] = 0;
+			dest[2] = -sine;
+			dest[3] = 0;
+			dest[4] = 1;
+			dest[5] = 0;
+			dest[6] = sine;
+			dest[7] = 0;
+			dest[8] = cosine;
 
-				sinus,
-				0,
-				cosine
-			)
+			return dest;
 		}
 
 		/**
@@ -607,20 +618,20 @@ define(
 				dest = mat
 			}
 
-			var a00 = mat[0], a10 = mat[1], a20 = mat[2],
-				a02 = mat[6], a12 = mat[7], a22 = mat[8],
-				sinus   = Math.sin(angle),
+			var m00 = mat[0], m10 = mat[1], m20 = mat[2],
+				m02 = mat[6], m12 = mat[7], m22 = mat[8],
+				sine   = Math.sin(angle),
 				cosine  = Math.cos(angle);
 
-			dest[0] = a00 * cosine + a02 * -sinus;
-			dest[1] = a10 * cosine + a12 * -sinus;
-			dest[2] = a20 * cosine + a22 * -sinus;
+			dest[0] = m00 * cosine + m02 * -sine;
+			dest[1] = m10 * cosine + m12 * -sine;
+			dest[2] = m20 * cosine + m22 * -sine;
 			dest[3] = mat[3]
 			dest[4] = mat[4]
 			dest[5] = mat[5]
-			dest[6] = a00 * sinus + a02 * cosine;
-			dest[7] = a10 * sinus + a12 * cosine;
-			dest[8] = a20 * sinus + a22 * cosine;
+			dest[6] = m00 * sine + m02 * cosine;
+			dest[7] = m10 * sine + m12 * cosine;
+			dest[8] = m20 * sine + m22 * cosine;
 
 			return dest;
 		}
@@ -634,7 +645,7 @@ define(
 		 * @param mat - 3x3-matrix
 		 * @return {Number}
 		 */
-		mat3.getRotateY = function(mat) {
+		mat3.getEulerY = function(mat) {
 			var a02 = mat[2],
 				a12 = mat[5],
 				a22 = mat[8]
@@ -647,25 +658,29 @@ define(
 		 * Creates a new rotation matrix with the given rotation angle about the z axis
 		 * The rotation is clock-wise
 		 * @param {number} angle The rotation angle in radians.
+		 * @param {Float32Array} [dest] optional 3x3-matrix receiving operation result, if not specified a new mat3 will be created
 		 * @returns {Float32Array} New 3x3-matrix
 		 */
-		mat3.createRotateZ = function(angle) {
-			var sinus   = Math.sin(angle),
-				cosine  = Math.cos(angle)
+		mat3.createRotateZMatrix = function(angle, dest) {
+			var sine   = Math.sin(angle),
+				cosine  = Math.cos(angle);
 
-			return mat3.createFrom(
-				cosine,
-				sinus,
-				0,
+			if ( dest === undefined ) {
+				dest = mat3.create();
+			}
 
-				-sinus,
-				cosine,
-				0,
+			dest[0] = cosine
+			dest[1] = sine
+			dest[2] = 0
+			dest[3] = -sine
+			dest[4] = cosine
+			dest[5] = 0
+			dest[6] = 0
+			dest[7] = 0
+			dest[8] = 1
 
-				0,
-				0,
-				1
-			)
+
+			return dest
 		}
 
 		/**
@@ -681,17 +696,17 @@ define(
 				dest = mat
 			}
 
-			var a00 = mat[0], a10 = mat[1], a20 = mat[2],
-				a01 = mat[3], a11 = mat[4], a21 = mat[5],
+			var m00 = mat[0], m10 = mat[1], m20 = mat[2],
+				m01 = mat[3], m11 = mat[4], m21 = mat[5],
 				sine   = Math.sin(angle),
 				cosine  = Math.cos(angle);
 
-			dest[0] = a00 * cosine + a01 * sine;
-			dest[1] = a10 * cosine + a11 * sine;
-			dest[2] = a20 * cosine + a21 * sine;
-			dest[3] = a00 * -sine + a01 * cosine;
-			dest[4] = a10 * -sine + a11 * cosine;
-			dest[5] = a20 * -sine + a21 * cosine;
+			dest[0] = m00 * cosine + m01 * sine;
+			dest[1] = m10 * cosine + m11 * sine;
+			dest[2] = m20 * cosine + m21 * sine;
+			dest[3] = m00 * -sine + m01 * cosine;
+			dest[4] = m10 * -sine + m11 * cosine;
+			dest[5] = m20 * -sine + m21 * cosine;
 			dest[6] = mat[6]
 			dest[7] = mat[7]
 			dest[8] = mat[8]
@@ -708,20 +723,27 @@ define(
 		 * @param mat - 3x3-matrix
 		 * @return {Number}
 		 */
-		mat3.getRotateZ = function(mat) {
+		mat3.getEulerZ = function(mat) {
 			return Math.atan2( mat[1], mat[0] )
 		}
 
 		/**
-		 * Rotate the given matrix by angle about the x,y,z axis.
-		 * @param mat
-		 * @param angle
-		 * @param x
-		 * @param y
-		 * @param z
-		 * @return {*}
+		 * Rotate the given matrix by angle about the x,y,z axis
+		 *
+		 * @param {Float32Array} mat 3x3-matrix to rotate
+		 * @param {number} angle The angle in radians.
+		 * @param {number} x The x component of the rotation axis
+		 * @param {number} y The y component of the rotation axis
+		 * @param {number} z The z component of the rotation axis
+		 * @param {Float32Array} [dest] optional receiving 3x3-matrix
+		 * @return {Float32Array}
 		 */
-		mat3.rotate = function(mat, angle, x, y, z) {
+		mat3.rotate = function(mat, angle, x, y, z, dest) {
+
+			if ( dest === undefined )  {
+				dest = mat
+			}
+
 			var m00 = mat[0], m10 = mat[1], m20 = mat[2],
 				m01 = mat[3], m11 = mat[4], m21 = mat[5],
 				m02 = mat[6], m12 = mat[7], m22 = mat[8];
@@ -742,24 +764,46 @@ define(
 			var r12 = y * z * diffCosAngle - x * sinAngle;
 			var r22 = z * z * diffCosAngle + cosAngle;
 
-			mat3.set(
-			mat,
-			[
-				m00 * r00 + m01 * r10 + m02 * r20,
-				m10 * r00 + m11 * r10 + m12 * r20,
-				m20 * r00 + m21 * r10 + m22 * r20,
-
-				m00 * r01 + m01 * r11 + m02 * r21,
-				m10 * r01 + m11 * r11 + m12 * r21,
-				m20 * r01 + m21 * r11 + m22 * r21,
-
-				m00 * r02 + m01 * r12 + m02 * r22,
-				m10 * r02 + m11 * r12 + m12 * r22,
-				m20 * r02 + m21 * r12 + m22 * r22
-			]);
+			dest[0] = m00 * r00 + m01 * r10 + m02 * r20;
+			dest[1] = m10 * r00 + m11 * r10 + m12 * r20;
+			dest[2] = m20 * r00 + m21 * r10 + m22 * r20;
+			dest[3] = m00 * r01 + m01 * r11 + m02 * r21;
+			dest[4] = m10 * r01 + m11 * r11 + m12 * r21;
+			dest[5] = m20 * r01 + m21 * r11 + m22 * r21;
+			dest[6] = m00 * r02 + m01 * r12 + m02 * r22;
+			dest[7] = m10 * r02 + m11 * r12 + m12 * r22;
+			dest[8] = m20 * r02 + m21 * r12 + m22 * r22;
 
 			return mat
 		};
+
+		/**
+		 * Creates a new Translation Matrix ith x and y
+		 * translation values.
+		 * @param {number} x The translation along the x axis
+		 * @param {number} y The translation along the y axis
+		 * @param {Float32Array} [dest] optional 3x3-matrix receiving operation result, if not specified a new mat3 will be created
+		 */
+		mat3.createTranslateMatrix = function(x, y, dest) {
+
+			if (dest === undefined) {
+				dest = mat3.create()
+			}
+
+			dest[0] = 1
+			dest[1] = 0
+			dest[2] = 0
+
+			dest[3] = 0
+			dest[4] = 1
+			dest[5] = 0
+
+			dest[6] = x
+			dest[7] = y
+			dest[8] = 1
+
+			return dest
+		}
 
 
 		/**
@@ -772,58 +816,60 @@ define(
 		 * @returns {Float32Array} dest if specified, mat otherwise
 		 */
 		mat3.translate = function (mat, vec, dest) {
-			var x = vec[0], y = vec[1]
+			var x = vec[0], y = vec[1],
+				a00 = mat[0], a01 = mat[1], a02 = mat[2],
+				a10 = mat[3], a11 = mat[4], a12 = mat[5],
+				a20 = mat[6], a21 = mat[7], a22 = mat[8]
 
-			if( !dest ) {
+			if( dest === undefined ) {
 				dest = mat
 			}
 
-			dest[0] = mat[0]
-			dest[1] = mat[1]
-			dest[2] = mat[2]
-
-			dest[3] = mat[3]
-			dest[4] = mat[4]
-			dest[5] = mat[5]
-
-			dest[6] += x
-			dest[7] += y
-			dest[8] = mat[8]
-
-			return dest
-		}
-
-		mat3.translate = function (mat, vec, dest) {
-			var x = vec[0], y = vec[1],
-				a00, a01, a02,
-				a10, a11, a12;
-
-			if (!dest || mat === dest) {
-				mat[6] = mat[0] * x + mat[3] * y + mat[6];
-				mat[7] = mat[1] * x + mat[4] * y + mat[7];
-				mat[8] = mat[2] * x + mat[5] * y + mat[8];
-				return mat;
-			}
-
-			a00 = mat[0];
-			a01 = mat[3];
-			a02 = mat[6];
-			a10 = mat[1];
-			a11 = mat[4];
-			a12 = mat[7];
-
 			dest[0] = a00;
-			dest[3] = a01;
-			dest[6] = a02;
-			dest[1] = a10;
-			dest[4] = a11;
-			dest[7] = a12;
+			dest[1] = a01;
+			dest[2] = a02;
 
-			dest[6] = a00 * x + a10 * y + mat[6];
-			dest[7] = a01 * x + a11 * y + mat[7];
-			dest[8] = a02 * x + a12 * y + mat[8];
+			dest[3] = a10;
+			dest[4] = a11;
+			dest[5] = a12;
+
+			dest[6] = x * a00 + y * a10 + a20;
+			dest[7] = x * a01 + y * a11 + a21;
+			dest[8] = x * a02 + y * a12 + a22;
+
 			return dest;
 		};
+,
+		mat3.ortho( mat, dest ) {
+
+
+			var x = [],
+				y
+			vec3<T> x(r1.x, r2.x, r3.x);
+			vec3<T> y(r1.y, r2.y, r3.y);
+			vec3<T> z(r1.z, r2.z, r3.z);
+			T xl = x.length();
+			if (xl<=vec3<T>::epsilon)
+			throw EZeroDivisionError("mat3.ortho(): divide by zero");
+
+			xl *= xl;
+			y -= ((x*y)/xl)*x;
+			z -= ((x*z)/xl)*x;
+
+			T yl = y.length();
+			if (yl<=vec3<T>::epsilon)
+			throw EZeroDivisionError("mat3.ortho(): divide by zero");
+
+			yl *= yl;
+			z -= ((y*z)/yl)*y;
+
+			dest.r1.set(x.x, y.x, z.x);
+			dest.r2.set(x.y, y.y, z.y);
+			dest.r3.set(x.z, y.z, z.z);
+			return dest;
+
+		}
+
 
 		/**
 		 * Generates a orthogonal projection matrix with the given bounds
@@ -862,17 +908,47 @@ define(
 		 * @return {Float32Array} 2d-Vector with the result
 		 */
 		mat3.getScale = function( mat, dest ) {
-			var a00    = mat[ 0 ],
-				a01    = mat[ 1 ],
-				a10    = mat[ 3 ],
-				a11    = mat[ 4 ]
+			var a00 = mat[0], a01 = mat[1], a02 = mat[2],
+				a10 = mat[3], a11 = mat[4], a12 = mat[5],
+				a20 = mat[6], a21 = mat[7], a22 = mat[8]
+
 
 			if( !dest ) {
-				dest = vec2.create()
+				dest = [0, 0, 0 ] //vec2.create()
 			}
 
-			dest[0] = (( a00 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a00 * a00) + (a10 * a10) )
-			dest[1] = (( a11 >= 0 ) ? 1 : -1 ) * Math.sqrt( (a01 * a01) + (a11 * a11) )
+			dest[0] = Math.sqrt( (a00 * a00) + (a01 * a01) + (a02 * a02) )
+			dest[1] = Math.sqrt( (a10 * a10) + (a11 * a11) + (a12 * a12) )
+			dest[2] = Math.sqrt( (a20 * a20) + (a21 * a21) + (a22 * a22) )
+
+
+			mat[0] /= dest[0]
+			mat[1] /= dest[0]
+			mat[2] /= dest[0]
+
+			mat[3] /= dest[1]
+			mat[4] /= dest[1]
+			mat[5] /= dest[1]
+
+			mat[6] /= dest[2]
+			mat[7] /= dest[2]
+			mat[8] /= dest[2]
+
+			var determinant = mat3.determinant(mat)
+console.log(determinant)
+
+
+			if (determinant < 0) {
+	//			mat[0] *= -1
+		//		mat[1] *= -1
+//				mat[2] *= -1
+
+				dest[0] = (( a00 >= 0 ) ? 1 : -1 ) * dest[0] //-dest[0]
+				dest[1] = (( a11 >= 0 ) ? 1 : -1 ) * dest[1]
+
+
+				//dest[0] *= -1
+			}
 
 			return dest
 		}

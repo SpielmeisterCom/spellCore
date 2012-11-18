@@ -160,7 +160,7 @@ define(
 						matrixB = mat3.create(),
 						testMatrix = mat3.create([1,2,3,4,5,6,7,8,9]),
 						vector = vec2.create([2.5, -4.5]),
-						scaleMatrix = mat3.createScaleMatrix(vector[0], vector[1], 0),
+						scaleMatrix = mat3.createScaleMatrix(vector[0], vector[1], 1),
 						checkMatrix = mat3.create()
 
 					mat3.multiply( testMatrix, scaleMatrix, checkMatrix )
@@ -221,7 +221,6 @@ define(
 
 				})
 
-
 				it("should be able to extract the scale from a matrix that is only scaled", function() {
 					var matrix = mat3.create(),
 						scaleA = vec2.create([2.5, -6.4]),
@@ -233,7 +232,7 @@ define(
 					decomposedScale = mat3.getScale( matrix )
 
 					if (!vec2.equal( decomposedScale, scaleA )) {
-						throw 'decomposed scale ' + vec2.str( decomposedScale ) + ' does not match the scale ' + vec2.str( scale ) + ' matrix was ' + mat3.str( matrix )
+						throw 'decomposed scale ' + vec2.str( decomposedScale ) + ' does not match the scale ' + vec2.str( scaleA ) + ' matrix was ' + mat3.str( matrix )
 					}
 
 					mat3.identity( matrix )
@@ -289,7 +288,7 @@ define(
 							Math.cos(angle)
 						]
 
-						var matrix = mat3.createRotateX(angle)
+						var matrix = mat3.createRotateXMatrix(angle)
 
 						if (!mat3.equal(matrix, checkMatrix)) {
 							throw 'expected ' + mat3.str(checkMatrix) + ' got ' + mat3.str(matrix)
@@ -317,7 +316,7 @@ define(
 							Math.cos( angle )
 						]
 
-						var matrix = mat3.createRotateY(angle)
+						var matrix = mat3.createRotateYMatrix(angle)
 
 						if (!mat3.equal(matrix, checkMatrix)) {
 							throw 'expected ' + mat3.str(checkMatrix) + ' got ' + mat3.str(matrix)
@@ -344,7 +343,7 @@ define(
 							1
 						]
 
-						var matrix = mat3.createRotateZ(angle)
+						var matrix = mat3.createRotateZMatrix(angle)
 
 						if (!mat3.equal(matrix, checkMatrix)) {
 							throw 'expected ' + mat3.str(checkMatrix) + ' got ' + mat3.str(matrix)
@@ -360,7 +359,7 @@ define(
 						//rotate left
 
 						mat3.identity( checkMatrix )
-						mat3.multiply( checkMatrix, mat3.createRotateX(angle) )
+						mat3.multiply( checkMatrix, mat3.createRotateXMatrix(angle) )
 
 						mat3.identity( matrix )
 						mat3.rotateX( matrix, angle )
@@ -379,7 +378,7 @@ define(
 						//rotate left
 
 						mat3.identity( checkMatrix )
-						mat3.multiply( checkMatrix, mat3.createRotateY(angle) )
+						mat3.multiply( checkMatrix, mat3.createRotateYMatrix(angle) )
 
 						mat3.identity( matrix )
 						mat3.rotateY( matrix, angle )
@@ -398,10 +397,31 @@ define(
 						//rotate left
 
 						mat3.identity( checkMatrix )
-						mat3.multiply( checkMatrix, mat3.createRotateZ(angle) )
+						mat3.multiply( checkMatrix, mat3.createRotateZMatrix(angle) )
 
 						mat3.identity( matrix )
 						mat3.rotateZ( matrix, angle )
+
+						if (!mat3.equal(matrix, checkMatrix)) {
+							throw 'did not rotate matrix correctly by ' + angle + ' expected ' + mat3.str( checkMatrix ) + ' got ' + mat3.str( matrix )
+						}
+					}
+				})
+
+				it("rotate should produce same results like calling rotateZ, rotateY, rotateX ", function() {
+					var matrix              = mat3.create(),
+						checkMatrix         = mat3.create()
+
+					for ( var angle=-2*Math.PI; angle<= 2*Math.PI; angle+=Math.PI/8 ) {
+						mat3.identity( checkMatrix )
+						mat3.rotateZ( checkMatrix, angle )
+						mat3.rotateY( checkMatrix, angle )
+						mat3.rotateX( checkMatrix, angle )
+
+						mat3.identity( matrix )
+						mat3.rotate( matrix, angle, 0, 0, 1)
+						mat3.rotate( matrix, angle, 0, 1, 0)
+						mat3.rotate( matrix, angle, 1, 0, 0)
 
 						if (!mat3.equal(matrix, checkMatrix)) {
 							throw 'did not rotate matrix correctly by ' + angle + ' expected ' + mat3.str( checkMatrix ) + ' got ' + mat3.str( matrix )
@@ -416,7 +436,7 @@ define(
 						mat3.identity( matrix )
 						mat3.rotateX( matrix, angle )
 
-						var decomposedRotation = mat3.getRotateX( matrix )
+						var decomposedRotation = mat3.getEulerX( matrix )
 
 						if(Math.abs(angle-decomposedRotation) > FLOAT_EPSILON &&
 							(Math.abs(angle-decomposedRotation)-2*Math.PI) > FLOAT_EPSILON) {
@@ -432,7 +452,7 @@ define(
 						mat3.identity( matrix )
 						mat3.rotateY( matrix, angle )
 
-						var decomposedRotation = mat3.getRotateY( matrix )
+						var decomposedRotation = mat3.getEulerY( matrix )
 
 						if(Math.abs(angle-decomposedRotation) > FLOAT_EPSILON &&
 							(Math.abs(angle-decomposedRotation)-2*Math.PI) > FLOAT_EPSILON) {
@@ -448,7 +468,7 @@ define(
 						mat3.identity( matrix )
 						mat3.rotateZ( matrix, angle )
 
-						var decomposedRotation = mat3.getRotateZ( matrix )
+						var decomposedRotation = mat3.getEulerZ( matrix )
 
 						if(Math.abs(angle-decomposedRotation) > FLOAT_EPSILON &&
 							(Math.abs(angle-decomposedRotation)-2*Math.PI) > FLOAT_EPSILON) {
@@ -471,9 +491,9 @@ define(
 								mat3.rotateY( matrix, angleY )
 								mat3.rotateX( matrix, angleX )
 
-								var eulerX      = mat3.getRotateX( matrix ),
-									eulerY      = mat3.getRotateY( matrix ),
-									eulerZ      = mat3.getRotateZ( matrix )
+								var eulerX      = mat3.getEulerX( matrix ),
+									eulerY      = mat3.getEulerY( matrix ),
+									eulerZ      = mat3.getEulerZ( matrix )
 
 								var angles = vec3.create([ angleX, angleY, angleZ ]),
 									eulers = vec3.create([ eulerX, eulerY, eulerZ])
@@ -492,62 +512,77 @@ define(
 					}
 				})
 
+				it("should create a correct translate matrix", function() {
+					var matrix = mat3.createTranslateMatrix(12, -4),
+						checkMatrix = [ 1, 0, 0, 0, 1, 0, 12, -4, 1 ]
 
-			it("should be able to scale, rotate and transform a matrix", function() {
-				var matrix      = mat3.create(),
-					scale       = vec2.create( [ -3, 5 ] ),
-					transform   = vec2.create( [ 10, -100 ] ),
-					phi         = 2,
-					checkMatrix = mat3.create([
-						Math.cos(phi) * scale[ 0 ],
-						-1*Math.sin(phi) * scale[ 1 ],
-						0,
+					if (!mat3.equal(matrix, checkMatrix)) {
+						throw 'expected ' + mat3.str(checkMatrix) + ' got ' + mat3.str(matrix)
+					}
+				})
 
-						Math.sin(phi) * scale[ 0 ],
-						Math.cos(phi) * scale[ 1 ],
-						0,
+				it("translating the identity 3x3-matrix should be the same as the translate matrix", function() {
+					var matrix  = mat3.create(),
+						translateMatrix = mat3.createTranslateMatrix(12, -4)
 
-						transform[ 0 ],
-						transform[ 1 ],
-						1])
+					mat3.identity(matrix)
+					mat3.translate(matrix, [12, -4])
 
+ 					if (!mat3.equal(matrix, translateMatrix)) {
+						throw 'expected ' + mat3.str(translateMatrix) + ' got ' + mat3.str(matrix)
+					}
+				})
 
-				mat3.identity( matrix )
-				mat3.scale( matrix, scale )
-				mat3.rotate( matrix, phi )
-				mat3.translate( matrix, transform )
-
-				if(!mat3.equal( matrix, checkMatrix )) {
-					throw 'expected ' + mat3.str( checkMatrix ) + ' got ' + mat3.str( matrix )
-				}
-
-			})
 
 			it("should compose and decompose for a combined translate, scale, rotation correctly", function() {
 				var matrix      = mat3.create(),
-					scale       = vec2.create( [ -3, 5 ] ),
-					translation   = vec2.create( [ 10, -100 ] ),
-					rotation    = -2
+					scales      = [
+						[ 1, 1 ],
+						[ -1, 1 ],
+						[ 1, -1 ]
+					],
+					translations   = [
+						[ 0,0 ],
+						[ 1,1 ]
+					]
 
-				mat3.identity( matrix )
-				//mat3.translate( matrix, translation )
-				mat3.rotateZ( matrix, rotation )
-				mat3.scale( matrix, scale )
+				for (var j=0; j<scales.length; j++) {
+					var scale = scales[j]
 
-				var checkScale          = mat3.getScale( matrix ),
-					checkRotation       = mat3.getRotation( matrix ),
-					checkTranslation    = mat3.getTranslation( matrix),
-					checkSkew           = mat3.getSkew( matrix )
+					for (var i=0; i<translations.length; i++) {
+						var translation = translations[i]
+
+						for (var angle = -2 * Math.PI; angle <= 2*Math.PI; angle += Math.PI/8 ) {
+
+							mat3.identity( matrix )
+
+							//console.log(" === ")
+							mat3.scale( matrix, scale )
+						//	console.log(mat3.str(matrix))
+							mat3.rotateZ( matrix, angle )
+						//	console.log(mat3.str(matrix))
+							mat3.translate( matrix, translation )
+						//	console.log(mat3.str(matrix))
+
+							var checkScale          = mat3.getScale( matrix ),
+								checkAngle          = mat3.getEulerZ( matrix ),
+								checkTranslation    = mat3.getTranslation( matrix)
 
 
-				if(!vec2.equal( checkScale, scale )) {
-					throw 'expected scale: ' + vec2.str( scale ) +  ' got ' + vec2.str( checkScale ) + ' matrix is ' + mat3.str( matrix ) + ' skew is ' + vec2.str( checkSkew )
+							/*if(!vec2.equal( checkScale, scale )) {
+								throw 'expected scale: ' + vec2.str( scale ) +  ' got ' + vec2.str( checkScale ) + ' matrix is ' + mat3.str( matrix ) + ' rotation is ' + angle
 
-				} /*else if (!vec2.equal( checkTranslation, translation )) {
-					throw 'expected translation: ' + vec2.str( translation ) +  ' got ' + vec2.str( checkTranslation )
+							}
+							else if (!vec2.equal( checkTranslation, translation )) {
+								throw 'expected translation: ' + vec2.str( translation ) +  ' got ' + vec2.str( checkTranslation )
 
-				} */else if ( rotation != checkRotation || Math.abs( checkRotation - rotation ) !== 2*Math.PI ) {
-					throw 'expected rotation: ' + rotation + ' got ' + checkRotation
+							} */ if ( Math.abs(checkAngle-angle) > FLOAT_EPSILON &&
+								Math.abs(Math.abs(checkAngle-angle)-2*Math.PI) > FLOAT_EPSILON
+								) {
+								throw 'expected rotation: ' + angle + ' got ' + checkAngle
+							}
+						}
+					}
 				}
 			})
 		})

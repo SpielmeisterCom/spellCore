@@ -112,7 +112,7 @@ define(
 				//set new localToWorldMatrix
 				mat3.identity(  localMatrix )
 				mat3.translate( localMatrix, transform.translation )
-				mat3.rotate(    localMatrix, transform.rotation )
+				mat3.rotateZ(    localMatrix, transform.rotation )
 				mat3.scale(     localMatrix, transform.scale )
 
 				//search for next parent with an transform component
@@ -142,14 +142,7 @@ define(
 				mat3.getTranslation(    worldMatrix, transform.worldTranslation )
 				mat3.getScale(          worldMatrix, transform.worldScale )
 
-				transform.worldRotation = mat3.getRotation( worldMatrix )
-
-				if (transform.worldScale[0] < 0) {
-					transform.worldRotation *= -1
-				}
-				if (transform.worldScale[1] < 0) {
-					transform.worldRotation *= -1
-				}
+				transform.worldRotation = mat3.getEulerZ( worldMatrix )
 
 				//update all childs recursively
 				if( children ) {
