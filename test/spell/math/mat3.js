@@ -188,62 +188,20 @@ define(
 
 				})
 
-				it("should be able to extract positive scales from a matrix that is only scaled", function() {
+				it("should be able to extract scales from a matrix that is only scaled", function() {
 					var matrix = mat3.create(),
 						scales = [
 							[2.5, 6.4],
 							[1,1],
-							[0,0]
-						],
-						decomposedScale = vec2.create()
-
-					for (var i=0; i<scales.length; i++) {
-						var scale = scales[i]
-
-						mat3.identity( matrix )
-						mat3.scale( matrix, scale )
-						mat3.rotateZ( matrix, 0 )
-						mat3.translate( matrix, [0,0] )
-
-						var rotation = mat3.decompose( matrix, decomposedScale )
-						if (!vec2.equal( decomposedScale, scale )) {
-							throw 'decomposed scale ' + vec2.str( decomposedScale ) + ' does not match the scale ' + vec2.str( scale ) + ' rotation: ' + rotation + ' matrix was ' + mat3.str( matrix )
-						}
-					}
-				})
-
-				it("should be able to extract negative scales from a matrix that is only scaled", function() {
-					var matrix = mat3.create(),
-						scales = [
+							[0,0],
 							[-2.5, -6.4],
 							[-1,-1],
-							[0,0]
-						],
-						decomposedScale = vec2.create()
-
-					for (var i=0; i<scales.length; i++) {
-						var scale = scales[i]
-
-						mat3.identity( matrix )
-						mat3.scale( matrix, scale )
-						mat3.rotateZ( matrix, 0 )
-						mat3.translate( matrix, [0,0] )
-
-						var rotation = mat3.decompose( matrix, decomposedScale )
-						if (!vec2.equal( decomposedScale, scale )) {
-							throw 'decomposed scale ' + vec2.str( decomposedScale ) + ' does not match the scale ' + vec2.str( scale ) + ' rotation: ' + rotation + ' matrix was ' + mat3.str( matrix )
-						}
-					}
-				})
-
-				it("should be able to extract mixed scales from a matrix that is only scaled", function() {
-					var matrix = mat3.create(),
-						scales = [
 							[-2.5, 6.4],
-							[1,-1],
-							[0,0]
+							[1,-1]
 						],
-						decomposedScale = vec2.create()
+						checkScale = vec2.create(),
+						checkSkews = vec2.create(),
+						checkTranslation = vec2.create()
 
 					for (var i=0; i<scales.length; i++) {
 						var scale = scales[i]
@@ -253,9 +211,11 @@ define(
 						mat3.rotateZ( matrix, 0 )
 						mat3.translate( matrix, [0,0] )
 
-						var rotation = mat3.decompose( matrix, decomposedScale )
-						if (!vec2.equal( decomposedScale, scale )) {
-							throw 'decomposed scale ' + vec2.str( decomposedScale ) + ' does not match the scale ' + vec2.str( scale ) + ' rotation: ' + rotation + ' matrix was ' + mat3.str( matrix )
+						mat3.decompose( matrix, checkScale, checkSkews, checkTranslation)
+
+						if (!vec2.equal( checkScale, scale )) {
+							var error = 'checked scale ' + vec2.str(scale) + ' matrix ' + mat3.str( matrix ) + "\n" +
+								'got scale ' + vec2.str(checkScale) + ' skews ' + vec2.str( checkSkews ) + ' translation ' + vec2.str(checkTranslation)
 						}
 					}
 				})
@@ -572,7 +532,8 @@ define(
 					],
 					checkScale = vec2.create(),
 					checkAngle = new Number(),
-					checkTranslation = vec2.create()
+					checkTranslation = vec2.create(),
+					checkSkews = vec2.create()
 
 
 				for (var j=0; j<scales.length; j++) {
@@ -589,16 +550,16 @@ define(
 							mat3.translate( matrixA, translation )
 
 
-							checkAngle = mat3.decompose( matrixA, checkScale, checkTranslation )
+							mat3.decompose( matrixA, checkScale, checkSkews, checkTranslation )
 
 							mat3.identity( matrixB )
 							mat3.scale( matrixB, checkScale )
-							mat3.rotateZ( matrixB, checkAngle )
+							mat3.rotateZ( matrixB, checkSkews[1] )
 							mat3.translate( matrixB, checkTranslation )
 
 							if ( !mat3.equal( matrixA, matrixB ) ) {
-								var error = 'checked ' + vec2.str(scale) + ' rotation ' + angle + ' translation ' + vec2.str(translation) + ' matrix ' + mat3.str( matrixA ) + "\n" +
-											'got ' + vec2.str(checkScale) + ' rotation ' + checkAngle + ' translation ' + vec2.str(checkTranslation) +  ' matrix ' + mat3.str( matrixB )
+								var error = 'checked scale ' + vec2.str(scale) + ' angle ' + angle + ' translation ' + vec2.str(translation) + ' matrix ' + mat3.str( matrixA ) + "\n" +
+											'got scale ' + vec2.str(checkScale) + ' skews ' + vec2.str( checkSkews ) + ' translation ' + vec2.str(checkTranslation) +  ' matrix ' + mat3.str( matrixB )
 
 								throw error
 

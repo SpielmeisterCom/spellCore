@@ -139,10 +139,12 @@ define(
 				mat3.inverse( worldMatrix, transform.worldToLocalMatrix )
 
 				//extract worldTranslation, worldScale and worldRotation from worldMatrix
-				mat3.getTranslation(    worldMatrix, transform.worldTranslation )
-				mat3.getScale(          worldMatrix, transform.worldScale )
 
-				transform.worldRotation = mat3.getEulerZ( worldMatrix )
+				//TODO: reenable worldtransform update
+
+				//mat3.getTranslation(    worldMatrix, transform.worldTranslation )
+				//mat3.getScale(          worldMatrix, transform.worldScale )
+				//transform.worldRotation = mat3.getEulerZ( worldMatrix )
 
 				//update all childs recursively
 				if( children ) {

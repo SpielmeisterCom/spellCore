@@ -873,7 +873,7 @@ define(
 		 * @param {Float32Array} [dest] 2d-Vector if specified, the result will be written in dest. Otherwise a new 2d-Vector will be created and returned
 		 * @return {Float32Array} 2d-Vector with the result
 		 */
-		mat3.decompose = function( mat, scale, translation ) {
+		mat3.decompose = function( mat, scale, skew, translation ) {
 
 			var a = mat[0],
 				b = mat[1],
@@ -891,23 +891,27 @@ define(
 				translation = vec2.create()
 			}
 
+			if ( skew === undefined ) {
+				skew = vec2.create()
+			}
+
 			scale[0] = Math.sqrt( (a * a) + (b * b) )
 			scale[1] = Math.sqrt( (c * c) + (d * d) )
-
-			var skew = vec2.create()
 
 			skew[0] = Math.atan2(-c, d)
 			skew[1] = Math.atan2(b, a)
 
 			if (Math.abs(skew[1]-skew[0]) > FLOAT_EPSILON) {
-				throw 'non linear skews currently not supported'
+				if (skew[0] < 0) {
+					scale[0] *= -1
+				}
+			//	throw 'non linear skews currently not supported'
 			}
 
 			rotation = skew[1]
 
 			translation[ 0 ]   = mat[ 6 ] * scale[ 0 ] * Math.cos ( -rotation ) - mat[ 7 ] * scale[ 1 ] * Math.sin ( -rotation )
 			translation[ 1 ]   = mat[ 6 ] * scale[ 1 ] * Math.sin ( -rotation ) + mat[ 7 ] * scale[ 1 ] * Math.cos( -rotation )
-			return rotation
 		}
 
 		/**
