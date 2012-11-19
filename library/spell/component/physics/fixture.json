@@ -30,6 +30,11 @@
 			"name": "maskBits",
 			"type": "integer",
 			"default": 65535
+		},
+		{
+			"name": "isSensor",
+			"type": "boolean",
+			"default": false
 		}
 	]
 }
