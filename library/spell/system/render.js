@@ -119,7 +119,7 @@ define(
 				if( transform ) {
 					// object to world space transformations go here
 					context.translate( transform.translation )
-					context.rotate( transform.rotation )
+					context.rotate( -transform.rotation )
 					context.scale( transform.scale )
 				}
 
@@ -235,7 +235,7 @@ define(
 				if( transform ) {
 					// object to world space transformations go here
 					context.translate( transform.translation )
-					context.rotate( transform.rotation )
+					context.rotate( -transform.rotation )
 				}
 
 				if( debugBox ) {
