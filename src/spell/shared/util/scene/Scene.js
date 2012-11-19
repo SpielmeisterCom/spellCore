@@ -34,7 +34,7 @@ define(
 		 * private
 		 */
 
-		var CAMERA_COMPONENT_ID      = Defines.CAMERA_COMPONENT_ID
+		var CAMERA_COMPONENT_ID = Defines.CAMERA_COMPONENT_ID
 
 		/*
 		 * TODO: Remove this custom invoke that knows how to handle the borked instances produced by the "create" constructor wrapper function.
@@ -46,7 +46,7 @@ define(
 			for( var i = 0, numSystems = systems.length; i < numSystems; i++ ) {
 				var system = systems[ i ]
 
-				if ( !activeSystemsOnly || system.config.active ) {
+				if( !activeSystemsOnly || system.config.active ) {
 					system.prototype[ functionName ].apply( system, args )
 				}
 			}
@@ -238,7 +238,7 @@ define(
 				// deactivating, destroying ye olde system
 				var spell = this.spell
 
-				if ( system.config.active ) {
+				if( system.config.active ) {
 					system.prototype.deactivate.call( system, spell )
 				}
 				system.prototype.destroy.call( system, spell )
@@ -254,7 +254,7 @@ define(
 
 				newSystem.prototype.init.call( newSystem, spell )
 
-				if ( newSystem.config.active ) {
+				if( newSystem.config.active ) {
 					newSystem.prototype.activate.call( newSystem, spell )
 				}
 
@@ -276,7 +276,7 @@ define(
 
 				system.prototype.init.call( system, spell )
 
-				if ( system.config.active ) {
+				if( system.config.active ) {
 					system.prototype.activate.call( system, spell )
 				}
 
@@ -289,7 +289,7 @@ define(
 				var spell  = this.spell,
 					system = executionGroup.getByKey( systemId )
 
-				if ( system.config.active ) {
+				if( system.config.active ) {
 					system.prototype.deactivate.call( system, spell )
 				}
 				system.prototype.destroy.call( system, spell )
