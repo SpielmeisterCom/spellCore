@@ -105,6 +105,8 @@ define(
 		}
 
 		var hasActiveCamera = function( sceneConfig ) {
+			return true
+
 			return _.any(
 				flattenEntityConfig( sceneConfig.entities ),
 				function( entityConfig ) {
