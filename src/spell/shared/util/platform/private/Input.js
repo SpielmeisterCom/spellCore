@@ -19,19 +19,12 @@ define(
 		 * private
 		 */
 
-		// for these key codes default handling is suppressed
-		var preventDefaultKeyCodes = [
-			keyCodes[ 'SPACE' ],
-			keyCodes[ 'LEFT_ARROW' ],
-			keyCodes[ 'UP_ARROW' ],
-			keyCodes[ 'RIGHT_ARROW' ],
-			keyCodes[ 'DOWN_ARROW' ]
-		]
-
 		var preventDefault = function( event ) {
 			if( event.preventDefault ) {
 				event.preventDefault()
 
+			} else if ( event.stopPropagation ) {
+				e.stopPropagation()
 			} else {
 				event.returnValue = false
 			}
@@ -76,7 +69,6 @@ define(
 		}
 
 		var nativeTouchHandler = function( callback, event ) {
-			event.stopPropagation()
 			preventDefault( event )
 
 			var touch = event.changedTouches[ 0 ]
@@ -102,10 +94,7 @@ define(
 		}
 
 		var nativeKeyHandler = function( callback, event ) {
-			if( _.contains( preventDefaultKeyCodes, event.keyCode ) ) {
-				preventDefault( event )
-			}
-
+			preventDefault( event )
 			callback( event )
 		}
 
@@ -113,9 +102,7 @@ define(
 			var delta = event.wheelDelta ? event.wheelDelta : (event.detail * -1)
 
 			var direction = delta > 0 ? 1 : -1
-
-			event.stopPropagation()
-			event.preventDefault()
+			preventDefault( event )
 
 			callback( {
 				type:       'mousewheel',
@@ -170,8 +157,7 @@ define(
 
 		var nativeContextMenuHandler = function( callback, event ) {
 			//prevent the default context menu in the browser
-			event.stopPropagation();
-			event.preventDefault();
+			preventDefault( event )
 		}
 
 		/*
