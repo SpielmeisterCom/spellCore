@@ -308,7 +308,7 @@ define(
 		}
 
 		var rotate = function( u ) {
-			mat3.rotateZ( currentState.matrix, u )
+			mat3.rotate( currentState.matrix, u )
 		}
 
 		/*
@@ -344,7 +344,7 @@ define(
 
 			// rotating the image so that it is not upside down
 			mat3.translate( tmpMatrix, [ dx, dy ] )
-			mat3.rotateZ( tmpMatrix, Math.PI )
+			mat3.rotate( tmpMatrix, Math.PI )
 			mat3.scale( tmpMatrix, [ -dw, dh ] )
 			mat3.translate( tmpMatrix, [ 0, -1 ] )
 
@@ -383,7 +383,7 @@ define(
 
 			// rotating the image so that it is not upside down
 			mat3.translate( tmpMatrix, [ dx, dy ] )
-			mat3.rotateZ( tmpMatrix, Math.PI )
+			mat3.rotate( tmpMatrix, Math.PI )
 			mat3.scale( tmpMatrix, [ -dw, dh ] )
 			mat3.scale( tmpMatrix, [ 1.015, 1.015 ] )
 

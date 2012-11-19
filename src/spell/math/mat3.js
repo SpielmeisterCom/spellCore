@@ -504,161 +504,14 @@ define(
 			return dest;
 		};
 
-
 		/**
-		 * Creates a new rotation matrix with the given rotation angle about the x axis
+		 * Creates a new rotation matrix with the given rotation angle
+		 *
 		 * @param {number} angle The rotation angle in radians.
 		 * @param {Float32Array} [dest] optional 3x3-matrix receiving operation result, if not specified a new mat3 will be created
 		 * @returns {Float32Array} New 3x3-matrix
 		 */
-		mat3.createRotateXMatrix = function(angle, dest) {
-			var sine   = Math.sin(angle),
-				cosine  = Math.cos(angle);
-
-			if ( dest === undefined ) {
-				dest = mat3.create();
-			}
-
-			dest[0] = 1;
-			dest[1] = 0;
-			dest[2] = 0;
-			dest[3] = 0;
-			dest[4] = cosine;
-			dest[5] = sine;
-			dest[6] = 0;
-			dest[7] = -sine;
-			dest[8] = cosine;
-
-			return dest;
-		}
-
-		/**
-		 * Rotate the given matrix by angle about the x axis.
-		 * The rotation is clock-wise
-		 * @param mat
-		 * @param angle
-		 * @param dest
-		 * @return {*}
-		 */
-		mat3.rotateX = function(mat, angle, dest) {
-			if (!dest) {
-				dest = mat
-			}
-
-			var m01 = mat[3], m11 = mat[4], m21 = mat[5],
-				m02 = mat[6], m12 = mat[7], m22 = mat[8],
-				sinus   = Math.sin(angle),
-				cosine  = Math.cos(angle);
-
-			dest[0] = mat[0]
-			dest[1] = mat[1]
-			dest[2] = mat[2]
-			dest[3] = m01 * cosine + m02 * sinus;
-			dest[4] = m11 * cosine + m12 * sinus;
-			dest[5] = m21 * cosine + m22 * sinus;
-			dest[6] = m01 * -sinus + m02 * cosine;
-			dest[7] = m11 * -sinus + m12 * cosine;
-			dest[8] = m21 * -sinus + m22 * cosine;
-
-			return dest;
-		}
-
-		/**
-		 * Decomposes the euler angle from a given rotation matrix for the x axis
-		 *
-		 * Please note: the euler angle returned will be in the
-		 * range of -PI to PI
-		 *
-		 * @param mat - 3x3-matrix
-		 * @return {Number}
-		 */
-		mat3.getEulerX = function(mat) {
-			return Math.atan2(mat[5], mat[8])
-		}
-
-		/**
-		 * Creates a new rotation matrix with the given rotation angle about the y axis
-		 * @param {number} angle The rotation angle in radians.
-		 * @param {Float32Array} [dest] optional 3x3-matrix receiving operation result, if not specified a new mat3 will be created
-		 * @returns {Float32Array} New 3x3-matrix
-		 */
-		mat3.createRotateYMatrix = function(angle, dest) {
-			var sine   = Math.sin(angle),
-				cosine  = Math.cos(angle);
-
-			if ( dest === undefined ) {
-				dest = mat3.create();
-			}
-
-			dest[0] = cosine;
-			dest[1] = 0;
-			dest[2] = -sine;
-			dest[3] = 0;
-			dest[4] = 1;
-			dest[5] = 0;
-			dest[6] = sine;
-			dest[7] = 0;
-			dest[8] = cosine;
-
-			return dest;
-		}
-
-		/**
-		 * Rotate the given matrix by angle about the y axis.
-		 * @param mat
-		 * @param angle
-		 * @param dest
-		 * @return {*}
-		 */
-		mat3.rotateY = function(mat, angle, dest) {
-			if (!dest) {
-				dest = mat
-			}
-
-			var m00 = mat[0], m10 = mat[1], m20 = mat[2],
-				m02 = mat[6], m12 = mat[7], m22 = mat[8],
-				sine   = Math.sin(angle),
-				cosine  = Math.cos(angle);
-
-			dest[0] = m00 * cosine + m02 * -sine;
-			dest[1] = m10 * cosine + m12 * -sine;
-			dest[2] = m20 * cosine + m22 * -sine;
-			dest[3] = mat[3]
-			dest[4] = mat[4]
-			dest[5] = mat[5]
-			dest[6] = m00 * sine + m02 * cosine;
-			dest[7] = m10 * sine + m12 * cosine;
-			dest[8] = m20 * sine + m22 * cosine;
-
-			return dest;
-		}
-
-		/**
-		 * Decomposes the euler angle from a given rotation matrix for the y axis
-		 *
-		 * Please note: the euler angle returned will be in the
-		 * range of -PI/2 to PI/2
-		 *
-		 * @param mat - 3x3-matrix
-		 * @return {Number}
-		 */
-		mat3.getEulerY = function(mat) {
-			var a02 = mat[2],
-				a12 = mat[5],
-				a22 = mat[8]
-
-			return Math.atan2(-a02 , Math.sqrt(a12*a12 + a22*a22) )
-		}
-
-
-		/**
-		 * Creates a new rotation matrix with the given rotation angle about the z axis
-		 * The rotation is clock-wise
-		 * @param {number} angle The rotation angle in radians.
-		 * @param {Float32Array} [dest] optional 3x3-matrix receiving operation result, if not specified a new mat3 will be created
-		 * @returns {Float32Array} New 3x3-matrix
-		 */
-		mat3.createRotateZMatrix = function(angle, dest) {
+		mat3.createRotateMatrix = function(angle, dest) {
 			var sine   = Math.sin(angle),
 				cosine  = Math.cos(angle);
 
@@ -679,100 +532,6 @@ define(
 
 			return dest
 		}
-
-		/**
-		 * Rotate the given matrix by angle about the z axis.
-		 * The rotation is clock-wise
-		 * @param mat
-		 * @param angle
-		 * @param dest
-		 * @return {*}
-		 */
-		mat3.rotateZ = function(mat, angle, dest) {
-			if (!dest) {
-				dest = mat
-			}
-
-			var m00 = mat[0], m10 = mat[1], m20 = mat[2],
-				m01 = mat[3], m11 = mat[4], m21 = mat[5],
-				sine   = Math.sin(angle),
-				cosine  = Math.cos(angle);
-
-			dest[0] = m00 * cosine + m01 * sine;
-			dest[1] = m10 * cosine + m11 * sine;
-			dest[2] = m20 * cosine + m21 * sine;
-			dest[3] = m00 * -sine + m01 * cosine;
-			dest[4] = m10 * -sine + m11 * cosine;
-			dest[5] = m20 * -sine + m21 * cosine;
-			dest[6] = mat[6]
-			dest[7] = mat[7]
-			dest[8] = mat[8]
-
-			return dest;
-		}
-
-		/**
-		 * Decomposes the euler angle from a given rotation matrix for the z axis
-		 *
-		 * Please note: the euler angle returned will be in the
-		 * range of -PI to PI
-		 *
-		 * @param mat - 3x3-matrix
-		 * @return {Number}
-		 */
-		mat3.getEulerZ = function(mat) {
-			return Math.atan2( mat[1], mat[0] )
-		}
-
-		/**
-		 * Rotate the given matrix by angle about the x,y,z axis
-		 *
-		 * @param {Float32Array} mat 3x3-matrix to rotate
-		 * @param {number} angle The angle in radians.
-		 * @param {number} x The x component of the rotation axis
-		 * @param {number} y The y component of the rotation axis
-		 * @param {number} z The z component of the rotation axis
-		 * @param {Float32Array} [dest] optional receiving 3x3-matrix
-		 * @return {Float32Array}
-		 */
-		mat3.rotate = function(mat, angle, x, y, z, dest) {
-
-			if ( dest === undefined )  {
-				dest = mat
-			}
-
-			var m00 = mat[0], m10 = mat[1], m20 = mat[2],
-				m01 = mat[3], m11 = mat[4], m21 = mat[5],
-				m02 = mat[6], m12 = mat[7], m22 = mat[8];
-
-			var cosAngle = Math.cos(angle);
-			var sinAngle = Math.sin(angle);
-			var diffCosAngle = 1 - cosAngle;
-
-			var r00 = x * x * diffCosAngle + cosAngle;
-			var r10 = x * y * diffCosAngle + z * sinAngle;
-			var r20 = x * z * diffCosAngle - y * sinAngle;
-
-			var r01 = x * y * diffCosAngle - z * sinAngle;
-			var r11 = y * y * diffCosAngle + cosAngle;
-			var r21 = y * z * diffCosAngle + x * sinAngle;
-
-			var r02 = x * z * diffCosAngle + y * sinAngle;
-			var r12 = y * z * diffCosAngle - x * sinAngle;
-			var r22 = z * z * diffCosAngle + cosAngle;
-
-			dest[0] = m00 * r00 + m01 * r10 + m02 * r20;
-			dest[1] = m10 * r00 + m11 * r10 + m12 * r20;
-			dest[2] = m20 * r00 + m21 * r10 + m22 * r20;
-			dest[3] = m00 * r01 + m01 * r11 + m02 * r21;
-			dest[4] = m10 * r01 + m11 * r11 + m12 * r21;
-			dest[5] = m20 * r01 + m21 * r11 + m22 * r21;
-			dest[6] = m00 * r02 + m01 * r12 + m02 * r22;
-			dest[7] = m10 * r02 + m11 * r12 + m12 * r22;
-			dest[8] = m20 * r02 + m21 * r12 + m22 * r22;
-
-			return mat
-		};
 
 		/**
 		 * Creates a new Translation Matrix ith x and y
@@ -866,6 +625,72 @@ define(
 			return dest;
 		};
 
+		/**
+		 * Rotate the given matrix by angle
+		 * @param mat
+		 * @param angle
+		 * @param dest
+		 * @return {*}
+		 */
+		mat3.rotate = function(mat, angle, dest) {
+			if (!dest) {
+				dest = mat
+			}
+
+			var m00 = mat[0], m10 = mat[1], m20 = mat[2],
+				m01 = mat[3], m11 = mat[4], m21 = mat[5],
+				sine   = Math.sin(angle),
+				cosine  = Math.cos(angle);
+
+			dest[0] = m00 * cosine + m01 * sine;
+			dest[1] = m10 * cosine + m11 * sine;
+			dest[2] = m20 * cosine + m21 * sine;
+			dest[3] = m00 * -sine + m01 * cosine;
+			dest[4] = m10 * -sine + m11 * cosine;
+			dest[5] = m20 * -sine + m21 * cosine;
+			dest[6] = mat[6]
+			dest[7] = mat[7]
+			dest[8] = mat[8]
+
+			return dest;
+		}
+
+		/**
+		 * Applies a skew transformation to the matrix.
+		 */
+		mat3.skew = function(mat, skew, dest) {
+			if (!dest) {
+				dest = mat
+			}
+
+			var m00 = mat[0], m10 = mat[1], m20 = mat[2],
+				m01 = mat[3], m11 = mat[4], m21 = mat[5],
+				sineX      = Math.sin( skew[0] ),
+				cosineX    = Math.cos( skew[0] ),
+				sineY      = Math.sin( skew[1] ),
+				cosineY    = Math.cos( skew[1] )
+
+			dest[0] *= cosineY
+			dest[1] *= sineY
+
+			dest[3] *= -1 * sineX;
+			dest[4] *= cosineX;
+
+
+/*
+			dest[0] = m00 * cosineY + m01 * sineY;
+			dest[1] = m10 * cosineY + m11 * sineY;
+			dest[2] = m20 * cosineY + m21 * sineY;
+			dest[3] = m00 * -sineX + m01 * cosineX;
+			dest[4] = m10 * -sineX + m11 * cosineX;
+			dest[5] = m20 * -sineX + m21 * cosineX;
+			dest[6] = mat[6]
+			dest[7] = mat[7]
+			dest[8] = 1;
+*/
+			return dest;
+		}
+
 
 		/**
 		 * Decomposes a Scale * Rotate * Translate Matrix into it's components
@@ -875,7 +700,13 @@ define(
 		 */
 		mat3.decompose = function( mat, scale, skew, translation ) {
 
-			var a = mat[0],
+			var tmp = mat3.create(mat)
+
+			var a00    = mat[ 0 ],
+				a01    = mat[ 1 ],
+				a10    = mat[ 3 ],
+				a11    = mat[ 4 ],
+				a = mat[0],
 				b = mat[1],
 
 				c = mat[3],
@@ -895,40 +726,29 @@ define(
 				skew = vec2.create()
 			}
 
-			scale[0] = Math.sqrt( (a * a) + (b * b) )
-			scale[1] = Math.sqrt( (c * c) + (d * d) )
+			//scale[0] = Math.sqrt( (a * a) + (b * b) )
+			//scale[1] = Math.sqrt( (c * c) + (d * d) )
+
+			scale[1] = Math.sqrt( (a01 * a01) + (a11 * a11) )
+			scale[0] = Math.sqrt( (a00 * a00) + (a10 * a10) )
+
+
+			tmp[0] /= scale[0]
+			tmp[1] /= scale[0]
+			tmp[2] /= scale[0]
+
+			tmp[3] /= scale[1]
+			tmp[4] /= scale[1]
+			tmp[5] /= scale[1]
 
 			skew[0] = Math.atan2(-c, d)
 			skew[1] = Math.atan2(b, a)
 
-			if (Math.abs(skew[1]-skew[0]) > FLOAT_EPSILON) {
-				if (skew[0] < 0) {
-					scale[0] *= -1
-				}
-			//	throw 'non linear skews currently not supported'
-			}
+			mat3.inverse( tmp, tmp )
+			mat3.multiplyVec2( tmp, [0, 0], translation )
 
-			rotation = skew[1]
-
-			translation[ 0 ]   = mat[ 6 ] * scale[ 0 ] * Math.cos ( -rotation ) - mat[ 7 ] * scale[ 1 ] * Math.sin ( -rotation )
-			translation[ 1 ]   = mat[ 6 ] * scale[ 1 ] * Math.sin ( -rotation ) + mat[ 7 ] * scale[ 1 ] * Math.cos( -rotation )
-		}
-
-		/**
-		 * Extracts the translation part from a 3x3-matrix
-		 * @param {Float32Array} 3x3-matrix
-		 * @param {Float32Array} [dest] 2d-Vector if specified, the result will be written in dest. Otherwise a new 2d-Vector will be created and returned
-		 * @return {Float32Array} 2d-Vector with the result
-		 */
-		mat3.getTranslation = function( mat, dest ) {
-			if( !dest ) {
-				dest = vec2.create()
-			}
-
-			dest[ 0 ]   = mat[ 6 ]
-			dest[ 1 ]   = mat[ 7 ]
-
-			return dest
+			//translation[0]  = mat[6]
+			//translation[1]  = mat[7]
 		}
 
 		return mat3;

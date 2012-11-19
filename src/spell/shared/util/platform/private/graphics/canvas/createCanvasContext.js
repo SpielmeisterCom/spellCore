@@ -211,7 +211,7 @@ define(
 		}
 
 		var rotate = function( u ) {
-			mat3.rotateZ( currentState.matrix, u )
+			mat3.rotate( currentState.matrix, u )
 		}
 
 		/*
