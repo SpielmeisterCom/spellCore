@@ -18,7 +18,7 @@
 			"name": "rotation",
 			"type": "number",
 			"default": 0,
-			"doc": "rotation relative to the parent's origin"
+			"doc": "rotation in degrees relative to the parent's origin"
 		},
 		{
 			"name": "scale",
@@ -30,6 +30,15 @@
 			"doc": "scale relative to the parent's origin"
 		},
         {
+            "name": "skew",
+            "type": "vec2",
+            "default": [
+                0,
+                0
+            ],
+            "doc": "2D skew transformation along the X- and the Y-axis"
+        },
+        {
             "name": "localMatrix",
             "engineInternal": true,
             "type": "mat3",
@@ -38,7 +47,7 @@
                 0,  1,  0,
                 0,  0,  1
             ],
-            "doc": "3x3 matrix that describes the transform in local coordinates"
+            "doc": "3x3 matrix that describes the comlete transform in local coordinates"
         },
         {
             "name": "worldTranslation",
@@ -66,6 +75,16 @@
                 1
             ],
             "doc": "scale relative to the world's origin"
+        },
+        {
+            "name": "worldSkew",
+            "engineInternal": true,
+            "type": "vec2",
+            "default": [
+                0,
+                0
+            ],
+            "doc": "2D skew transformation along the X- and the Y-axis"
         },
         {
             "name": "worldMatrix",
