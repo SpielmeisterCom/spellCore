@@ -1,10 +1,12 @@
 define("spell/script/editor/entityMover",
 	[
 		'spell/math/vec2',
+		'spell/math/mat3',
 		'spell/functions'
 	],
 	function(
 		vec2,
+		mat3,
 		_
 		) {
 		"use strict";
@@ -158,8 +160,8 @@ define("spell/script/editor/entityMover",
 				entityManager.removeEntity( overlayEntityMap[ entityId ] )
 				delete overlayEntityMap[ entityId ]
 
-				if ( entityId == this.selectedEntity ) {
-					//if we removed the selectedEntity, deselect it
+				if ( entityId == this.selectedEntity && !this.isDragging ) {
+					//if we removed the selectedEntity and we're not dragging it, deselect it
 					this.selectedEntity = null
 				}
 			}
@@ -167,18 +169,22 @@ define("spell/script/editor/entityMover",
 			return overlayEntityMap
 		}
 
-
 		var highlightEntitiesAtPosition = function( worldPosition ) {
 
-			//find all entities that match with the current cursor position
-			this.matchedEntities = _.filter(
-				_.keys( this.transforms ),
-				_.bind (
-					isPointWithinEntity,
-					this,
-					worldPosition
+			if ( this.isDragging ) {
+				//Don't highlight entites while dragging
+				this.matchedEntities.length = 0
+			} else {
+				//find all entities that match with the current cursor position
+				this.matchedEntities = _.filter(
+					_.keys( this.transforms ),
+					_.bind (
+						isPointWithinEntity,
+						this,
+						worldPosition
+					)
 				)
-			)
+			}
 
 			//highlight the found entities with overlays
 			syncOverlayEntitesWithMatchedEntites.call(
@@ -186,15 +192,90 @@ define("spell/script/editor/entityMover",
 				this.overlayEntityMap,
 				this.matchedEntities
 			)
-
-			debugger
 		}
 
-		var placeEntityByWorldPosition = function( entityId, worldPosition ) {
+		var sendTransformToSpellEd = function( entityId ) {
+			this.spell.entityManager.updateWorldTransform( entityId )
+			this.isDirty = false
 
+			this.spell.sendMessageToEditor(
+				'spelled.entity.update', {
+				id: entityId,
+				componentId: 'spell.component.2d.transform',
+				config: {
+					translation: this.transforms[ entityId ].translation
+				}
+			})
 		}
 
-		var placeEntityByRelativeOffset = function( entityId, vec ) {
+		var startDragging = function( entityId, cursorPosition ) {
+			this.isDragging = true
+
+			var transform = this.transforms[ entityId ]
+
+			if (!this.dragCursorOffset) {
+				this.dragCursorOffset = vec2.create()
+				vec2.set(this.currentWorldPosition, this.dragCursorOffset)
+			}
+
+			if (!this.dragEntityOffset && transform) {
+				this.dragEntityOffset = vec2.create()
+				vec2.set(transform.translation, this.dragEntityOffset)
+			}
+		}
+
+		var stopDragging = function( entityId, cursorPosition ) {
+			this.isDragging = false
+			this.dragCursorOffset = null
+			this.dragEntityOffset = null
+
+			if(this.isDirty) {
+				sendTransformToSpellEd.call( this, this.selectedEntity )
+				this.selectedEntity = null
+			}
+		}
+
+		var cancelSelection = function() {
+			this.selectedEntity = null
+			this.matchedEntities.length = 0
+
+			syncOverlayEntitesWithMatchedEntites.call( this, this.overlayEntityMap, this.matchedEntities)
+		}
+
+		var updateEntityByWorldPosition = function( entityId, cursorPosition ) {
+
+			var transform        = this.transforms[ entityId ],
+				distance         = vec2.create( ),
+				worldPosition    = transform.translation
+
+			vec2.subtract(this.dragCursorOffset, cursorPosition, distance )
+			vec2.subtract(this.dragEntityOffset, distance, worldPosition)
+
+			updateEntity.call( this, entityId, worldPosition )
+		}
+
+		var updateEntityByRelativeOffset = function( entityId, offset ) {
+			var transform           = this.transforms[ entityId ],
+				currentTranslation  = transform.translation
+
+			vec2.add(currentTranslation, offset, currentTranslation)
+
+			updateEntity.call(this, entityId, currentTranslation)
+			sendTransformToSpellEd.call( this, entityId )
+		}
+
+		var updateEntity = function( entityId, newTranslation ) {
+			this.isDirty = true
+
+			var transform           = this.transforms[ entityId ],
+				currentTranslation  = transform.translation,
+				overlayEntityId     = this.overlayEntityMap[ entityId ]
+
+			vec2.set(currentTranslation, newTranslation)
+
+			if( overlayEntityId && this.transforms[ overlayEntityId ]) {
+				vec2.set(currentTranslation, this.transforms[ overlayEntityId ].translation)
+			}
 
 		}
 
@@ -228,10 +309,35 @@ define("spell/script/editor/entityMover",
 			this.selectedEntity           = null
 
 			/**
+			 * Is corrently a drag going on?
+			 * @type {null}
+			 */
+			this.isDragging               = false
+
+			/**
+			 * Do we have unsaved data?
+			 * @type {Boolean}
+			 */
+			this.isDirty                  = false
+
+			/**
 			 * List of entities which match for the current cursor (through all layers)
 			 * @type {Array}
 			 */
 			this.matchedEntities          = []
+
+			/**
+			 * While an entity is dragged, we remember the offset from the dragstart
+			 * @type {null}
+			 */
+			this.dragCursorOffset         = null
+
+			/**
+			 * Remember the origin of the entity
+			 * @type {null}
+			 */
+			this.dragEntityOffset         = null
+
 
 		}
 
@@ -264,82 +370,58 @@ define("spell/script/editor/entityMover",
 			},
 
 			onMouseDown: function( spell, editorSystem, event ) {
-				if ( event.button != 0 ) {
+				if( event.button != 0 ) {
 					return
 				}
 
-				if ( !this.selectedEntity && this.matchedEntities.length > 0 ) {
+				if(!this.selectedEntity && this.matchedEntities.length > 0 ) {
 					//if no entity is selected and a drag is going on
 					this.selectedEntity = this.matchedEntities[ this.matchedEntities.length - 1 ]
+				}
+
+				if( this.selectedEntity ) {
+					startDragging.call( this, this.selectedEntity, event.position )
 				}
 			},
 
 			onMouseUp: function( spell, editorSystem, event ) {
+				if( event.button == 0 && this.isDragging ) {
+					stopDragging.call( this, this.selectedEntity, event.position )
+				}
 			},
 
 			onMouseMove: function( spell, editorSystem, event ) {
 				this.currentWorldPosition = spell.renderingContext.transformScreenToWorld( event.position )
 
-				if (! this.selectedEntity ) {
-					return
+				if( this.selectedEntity && this.isDragging ) {
+					updateEntityByWorldPosition.call( this, this.selectedEntity, this.currentWorldPosition )
 				}
-
-/*
-				var spell = this.spell
-
-
-
-				var currentTranslation = this.transforms[ this.selectedEntity ].translation,
-					currentScale = this.transforms[ this.editorCameraEntityId ].scale
-
-				var newTransformConfig = {
-					translation: [
-						currentTranslation[ 0 ] + ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ],
-						currentTranslation[ 1 ] - ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
-					]
-				}
-
-				spell.entityManager.updateComponent(
-					this.selectedEntity,
-					'spell.component.2d.transform',
-					newTransformConfig
-				)
-
-				spell.sendMessageToEditor(
-					'spelled.entity.update',
-					{
-						id: this.selectedEntity,
-						componentId: 'spell.component.2d.transform',
-						config: newTransformConfig
-					}
-				)*/
 			},
 
 			onKeyDown: function( spell, editorSystem, event ) {
-
-				if (event.keyCode == 27 && this.selectedEntity ) {
+				if(event.keyCode == 27 && this.selectedEntity ) {
 					//ESC cancels selection
-					this.selectedEntity = null
+					cancelSelection.call( this )
 
-				} else if ( event.keyCode == 9 && this.matchedEntities.length > 0) {
+				} else if( event.keyCode == 9 && this.matchedEntities.length > 0) {
 					//TAB toggles through selected entity
 					toggleThroughMatchedEntites.call(this, this.matchedEntities, this.selectedEntity )
 
-				} else if ( event.keyCode == 37 && this.selectedEntity ) {
+				} else if( event.keyCode == 37 && this.selectedEntity ) {
 					//Left arrow moves the selected entity one pixel to the left
-					placeEntityByRelativeOffset.call( this, this.selectedEntity, [-1, 0])
+					updateEntityByRelativeOffset.call( this, this.selectedEntity, [-1, 0])
 
-				} else if ( event.keyCode == 39 && this.selectedEntity ) {
+				} else if( event.keyCode == 38 && this.selectedEntity ) {
 					//top arrow moves the selected entity one pixel up
-					placeEntityByRelativeOffset.call( this, this.selectedEntity, [0, 1])
+					updateEntityByRelativeOffset.call( this, this.selectedEntity, [0, 1])
 
-				} else if ( event.keyCode == 39 && this.selectedEntity ) {
+				} else if( event.keyCode == 39 && this.selectedEntity ) {
 					//right arrow moves the selected entity one pixel to the right
-					placeEntityByRelativeOffset.call( this, this.selectedEntity, [1, 0])
+					updateEntityByRelativeOffset.call( this, this.selectedEntity, [1, 0])
 
-				} else if ( event.keyCode == 40 && this.selectedEntity ) {
+				} else if( event.keyCode == 40 && this.selectedEntity ) {
 					//down arrow moves the selected entity one pixel down
-					placeEntityByRelativeOffset.call( this, this.selectedEntity, [0, -1])
+					updateEntityByRelativeOffset.call( this, this.selectedEntity, [0, -1])
 
 				}
 			},
