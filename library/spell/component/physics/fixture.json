@@ -20,6 +20,16 @@
 			"name": "restitution",
 			"type": "number",
 			"default": 0.2
+		},
+		{
+			"name": "categoryBits",
+			"type": "integer",
+			"default": 1
+		},
+		{
+			"name": "maskBits",
+			"type": "integer",
+			"default": 65535
 		}
 	]
 }
