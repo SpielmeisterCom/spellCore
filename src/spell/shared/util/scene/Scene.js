@@ -1,6 +1,8 @@
 define(
 	'spell/shared/util/scene/Scene',
 	[
+		'spell/Defines',
+
 		'spell/shared/util/create',
 		'spell/shared/util/createId',
 		'spell/shared/util/createModuleId',
@@ -13,6 +15,7 @@ define(
 		'spell/functions'
 	],
 	function(
+		Defines,
 		create,
 		createId,
 		createModuleId,
@@ -31,8 +34,7 @@ define(
 		 * private
 		 */
 
-		var cameraEntityTemplateId = 'spell.entity.2d.graphics.camera',
-			cameraComponentId      = 'spell.component.2d.graphics.camera'
+		var CAMERA_COMPONENT_ID      = Defines.CAMERA_COMPONENT_ID
 
 		/*
 		 * TODO: Remove this custom invoke that knows how to handle the borked instances produced by the "create" constructor wrapper function.
@@ -106,13 +108,12 @@ define(
 			return _.any(
 				flattenEntityConfig( sceneConfig.entities ),
 				function( entityConfig ) {
-					if( entityConfig.entityTemplateId !== cameraEntityTemplateId ||
-						!entityConfig.config ) {
+					if( !entityConfig.config ) {
 
 						return false
 					}
 
-					var cameraComponent = entityConfig.config[ cameraComponentId ]
+					var cameraComponent     = entityConfig.config[ CAMERA_COMPONENT_ID ]
 
 					if( !cameraComponent ) return false
 
