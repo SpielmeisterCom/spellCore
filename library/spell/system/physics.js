@@ -40,12 +40,13 @@ define(
 		}
 
 		var createBody = function( spell, worldToPhysicsScale, debug, world, entityId, entity ) {
-			var body        = entity[ Defines.PHYSICS_BODY_COMPONENT_ID ],
-				fixture     = entity[ Defines.PHYSICS_FIXTURE_COMPONENT_ID ],
-				boxShape    = entity[ Defines.PHYSICS_BOX_SHAPE_COMPONENT_ID ],
-				circleShape = entity[ Defines.PHYSICS_CIRCLE_SHAPE_COMPONENT_ID ],
-				playerShape = entity[ Defines.PHYSICS_JNRPLAYER_SHAPE_COMPONENT_ID ],
-				transform   = entity[ Defines.TRANSFORM_COMPONENT_ID ]
+			var body               = entity[ Defines.PHYSICS_BODY_COMPONENT_ID ],
+				fixture            = entity[ Defines.PHYSICS_FIXTURE_COMPONENT_ID ],
+				boxShape           = entity[ Defines.PHYSICS_BOX_SHAPE_COMPONENT_ID ],
+				circleShape        = entity[ Defines.PHYSICS_CIRCLE_SHAPE_COMPONENT_ID ],
+				convexPolygonShape = entity[ Defines.PHYSICS_CONVEX_POLYGON_SHAPE_COMPONENT_ID ],
+				playerShape        = entity[ Defines.PHYSICS_JNRPLAYER_SHAPE_COMPONENT_ID ],
+				transform          = entity[ Defines.TRANSFORM_COMPONENT_ID ]
 
 			if( !body || !fixture || !transform ||
 				( !boxShape && !circleShape && !playerShape ) ) {
@@ -53,7 +54,7 @@ define(
 				return
 			}
 
-			createPhysicsObject( world, worldToPhysicsScale, entityId, body, fixture, boxShape, circleShape, playerShape, transform )
+			createPhysicsObject( world, worldToPhysicsScale, entityId, body, fixture, boxShape, circleShape, playerShape, convexPolygonShape, transform )
 
 			if( debug ) {
 				var componentId,
@@ -106,7 +107,7 @@ define(
 			return world.CreateBody( bodyDef )
 		}
 
-		var addShape = function( world, worldToPhysicsScale, entityId, bodyDef, fixture, boxShape, circleShape, playerShape ) {
+		var addShape = function( world, worldToPhysicsScale, entityId, bodyDef, fixture, boxShape, circleShape, convexPolygonShape, playerShape ) {
 			var fixtureDef = createB2FixtureDef()
 
 			fixtureDef.density     = fixture.density
@@ -124,6 +125,20 @@ define(
 
 			} else if( circleShape ) {
 				fixtureDef.shape = createB2CircleShape( circleShape.radius * worldToPhysicsScale )
+
+				bodyDef.CreateFixture( fixtureDef )
+
+			} else if( convexPolygonShape ) {
+				var vertices = convexPolygonShape.vertices
+
+				fixtureDef.shape = createB2PolygonShape()
+				fixtureDef.shape.SetAsArray(
+					_.map(
+						vertices,
+						function( x ) { return createB2Vec2( x[ 0 ], x[ 1 ] ) }
+					),
+					vertices.length
+				)
 
 				bodyDef.CreateFixture( fixtureDef )
 
@@ -165,10 +180,10 @@ define(
 			}
 		}
 
-		var createPhysicsObject = function( world, worldToPhysicsScale, entityId, body, fixture, boxShape, circleShape, playerShape, transform ) {
+		var createPhysicsObject = function( world, worldToPhysicsScale, entityId, body, fixture, boxShape, circleShape, playerShape, convexPolygonShape, transform ) {
 			var bodyDef = createBodyDef( world, worldToPhysicsScale, entityId, body, transform )
 
-			addShape( world, worldToPhysicsScale, entityId, bodyDef, fixture, boxShape, circleShape, playerShape )
+			addShape( world, worldToPhysicsScale, entityId, bodyDef, fixture, boxShape, circleShape, convexPolygonShape, playerShape )
 		}
 
 		var simulate = function( world, deltaTimeInMs ) {
