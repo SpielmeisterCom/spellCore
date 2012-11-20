@@ -1,0 +1,14 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Physics Contact Trigger",
+	"doc": "Triggers an event of the specified type on the entity which came in to contact with the trigger.",
+	"icon": "",
+	"attributes": [
+		{
+			"name": "eventId",
+			"type": "string"
+		}
+	]
+}
