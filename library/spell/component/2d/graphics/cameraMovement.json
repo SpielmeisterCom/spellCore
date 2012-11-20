@@ -1,0 +1,45 @@
+{
+    "version": 1,
+    "type": "component",
+    "title": "Camera Movement",
+    "doc": "",
+    "icon": "",
+    "attributes": [
+        {
+            "name": "obeyMinMax",
+            "default": false,
+            "engineInternal": false,
+            "type": "boolean"
+        },
+        {
+            "name": "minX",
+            "default": 0,
+            "engineInternal": false,
+            "type": "integer"
+        },
+        {
+            "name": "maxX",
+            "default": 1000,
+            "engineInternal": false,
+            "type": "integer"
+        },
+        {
+            "name": "minY",
+            "default": 0,
+            "engineInternal": false,
+            "type": "integer"
+        },
+        {
+            "name": "maxY",
+            "default": 1000,
+            "engineInternal": false,
+            "type": "integer"
+        },
+        {
+            "name": "followEntityName",
+            "default": "player",
+            "engineInternal": false,
+            "type": "string"
+        }
+    ]
+}
