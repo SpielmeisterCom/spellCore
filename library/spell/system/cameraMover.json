@@ -1,7 +1,8 @@
 {
 	"version": 1,
 	"type": "system",
-	"input": [
+    "readonly": true,
+    "input": [
 		{
 			"name": "transforms",
 			"componentId": "spell.component.2d.transform"
