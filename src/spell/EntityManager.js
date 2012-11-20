@@ -728,7 +728,7 @@ define(
 			 * Example usage:
 			 *     //update a component of an entity
 			 *     spell.entityManager.updateComponent(
-			 *         entityId
+			 *         entityId,
 			 *         "spell.component.2d.graphics.apperance",
 			 *         {
 			 *             "assetId": "appearance:library.identifier.of.my.static.appearance"
