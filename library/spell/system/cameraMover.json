@@ -1,0 +1,22 @@
+{
+	"version": 1,
+	"type": "system",
+	"input": [
+		{
+			"name": "transforms",
+			"componentId": "spell.component.2d.transform"
+		},
+		{
+			"name": "cameraMovements",
+			"componentId": "spell.component.2d.graphics.cameraMovement"
+		}
+	],
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": true,
+			"doc": "if active is false the system will be skipped during processing"
+		}
+	]
+}
