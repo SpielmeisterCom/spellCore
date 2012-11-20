@@ -91,7 +91,6 @@ define(
 		 *
 		 * @param componentDictionaries
 		 * @param entityId
-		 * @param parentEntityId
 		 * @return {Function}
 		 */
 		var updateWorldTransform = function( componentDictionaries, entityId ) {
@@ -101,44 +100,43 @@ define(
 				transform           = transformComponents[ entityId ],
 				children            = childrenComponents[ entityId ],
 				parent,
-				parentEntityId      = entityId, //we will search for the real parent later
+				parentEntityId      = entityId, // we will search for the real parent later
 				parentMatrix
 
-
 			if( transform ) {
-				var localMatrix        = transform.localMatrix,
-					worldMatrix        = transform.worldMatrix
+				var localMatrix = transform.localMatrix,
+					worldMatrix = transform.worldMatrix
 
-				//set new localToWorldMatrix
+				// set new localToWorldMatrix
 				mat3.identity(  localMatrix )
 				mat3.translate( localMatrix, transform.translation )
 				mat3.rotate(    localMatrix, transform.rotation )
 				mat3.scale(     localMatrix, transform.scale )
 
-				//search for next parent with an transform component
-				while ( parent = parentComponents[ parentEntityId ] ) {
+				// search for next parent with an transform component
+				while( parent = parentComponents[ parentEntityId ] ) {
 					parentEntityId = parent.id
 
-					if ( transformComponents[ parentEntityId ] ) {
+					if( transformComponents[ parentEntityId ] ) {
 						parentMatrix = transformComponents[ parentEntityId ].worldMatrix
 						break
 					}
 				}
 
 				if( parentMatrix ) {
-					//multiply parent's localToWorldMatrix with ours
+					// multiply parent's localToWorldMatrix with ours
 					mat3.multiply( parentMatrix, localMatrix, worldMatrix )
 
 				} else {
 
-					//if this entity has no parent, the localToWorld Matrix equals the localMatrix
+					// if this entity has no parent, the localToWorld Matrix equals the localMatrix
 					mat3.set( localMatrix, worldMatrix )
 				}
 
-				//update worldToLocalMatrix
+				// update worldToLocalMatrix
 				mat3.inverse( worldMatrix, transform.worldToLocalMatrix )
 
-				//extract worldTranslation, worldScale and worldRotation from worldMatrix
+				// extract worldTranslation, worldScale and worldRotation from worldMatrix
 
 				mat3.decompose( worldMatrix, transform.worldScale, transform.worldSkew, transform.worldTranslation )
 				transform.worldRotation = transform.worldSkew[1]
@@ -146,7 +144,7 @@ define(
 				transform.worldTranslation[0] = worldMatrix[6]
 				transform.worldTranslation[1] = worldMatrix[7]
 
-				//update all childs recursively
+				// update all childs recursively
 				if( children ) {
 					for(var i = 0, length = children.ids.length; i < length; i++) {
 						var childrenEntityId = children.ids[ i ]
@@ -348,7 +346,7 @@ define(
 				result[ ROOT_COMPONENT_ID ] = {}
 			}
 
-			if ( parentId ) {
+			if( parentId ) {
 				result[ PARENT_COMPONENT_ID ] = {
 					id : parentId
 				}
@@ -748,18 +746,22 @@ define(
 
 				this.templateManager.updateComponent( componentId, component, attributeConfig )
 
-				if ( componentId === TRANSFORM_COMPONENT_ID ) {
-					if ( attributeConfig.translation !== undefined ||
-						attributeConfig.scale !== undefined ||
-						attributeConfig.rotation !== undefined ) {
-						//changed local attributes, compute the new global position
+				if( componentId === TRANSFORM_COMPONENT_ID ) {
+					if( attributeConfig.translation ||
+						attributeConfig.scale ||
+						attributeConfig.rotation ) {
+
+						// changed local attributes, compute the new global position
 
 						updateWorldTransform( this.componentDictionaries, entityId )
 
-					} else if ( attributeConfig.worldTranslation || attributeConfig.worldScale || attributeConfig.worldRotation ) {
-						//changed world attributes, compute new local position
+					} else if( attributeConfig.worldTranslation ||
+						attributeConfig.worldScale ||
+						attributeConfig.worldRotation ) {
 
-						//todo update localTransform from a changed world transform
+						// changed world attributes, compute new local position
+
+						// TODO: update localTransform from a changed world transform
 					}
 				}
 				return true
