@@ -13,11 +13,12 @@ define(
 		'use strict'
 
 
-		var Box2D           = PlatformKit.Box2D,
-			createB2Vec2    = Box2D.Common.Math.createB2Vec2,
-			createB2World   = Box2D.Dynamics.createB2World,
-			b2Body          = Box2D.Dynamics.b2Body,
-			createB2BodyDef = Box2D.Dynamics.createB2BodyDef
+		var Box2D              = PlatformKit.Box2D,
+			createB2Vec2       = Box2D.Common.Math.createB2Vec2,
+			createB2World      = Box2D.Dynamics.createB2World,
+			b2Body             = Box2D.Dynamics.b2Body,
+			createB2BodyDef    = Box2D.Dynamics.createB2BodyDef,
+			createB2FilterData = Box2D.Dynamics.createB2FilterData
 
 		var getBodyById = function( entityId ) {
 			for( var body = this.rawWorld.GetBodyList(); body; body = body.GetNext() ) {
@@ -83,6 +84,27 @@ define(
 			)
 		}
 
+		var setFilterData = function( entityId, categoryBits, maskBits ) {
+			var body = this.getBodyById( entityId )
+			if( !body ) return
+
+			for( var fixture = body.GetFixtureList(); fixture; fixture = fixture.GetNext() ) {
+				var filterData = createB2FilterData()
+
+				filterData.categoryBits = categoryBits
+				filterData.maskBits     = maskBits
+
+				fixture.SetFilterData( filterData )
+			}
+		}
+
+		var setAwake = function( entityId, state ) {
+			var body = this.getBodyById( entityId )
+			if( !body ) return
+
+			body.SetAwake( state )
+		}
+
 		var setPosition = function( entityId, position ) {
 			var body = this.getBodyById( entityId )
 			if( !body ) return
@@ -143,15 +165,17 @@ define(
 		}
 
 		Box2dWorld.prototype = {
-			applyForce : applyForce,
-			applyTorque : applyTorque,
-			applyImpulse : applyImpulse,
+			applyForce    : applyForce,
+			applyImpulse  : applyImpulse,
+			applyTorque   : applyTorque,
 			applyVelocity : applyVelocity,
-			setPosition : setPosition,
 			createBodyDef : createBodyDef,
-			destroyBody : destroyBody,
-			getBodyById : getBodyById,
-			getRawWorld : getRawWorld
+			destroyBody   : destroyBody,
+			getBodyById   : getBodyById,
+			getRawWorld   : getRawWorld,
+			setAwake      : setAwake,
+			setFilterData : setFilterData,
+			setPosition   : setPosition
 		}
 
 		return function( doSleep, gravity, scale ) {

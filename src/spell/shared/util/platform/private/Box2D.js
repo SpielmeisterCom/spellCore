@@ -489,6 +489,10 @@ define(
 				createB2BodyDef : function() {
 					return new Box2D.Dynamics.b2BodyDef()
 				},
+				b2FilterData : Box2D.Dynamics.b2FilterData,
+				createB2FilterData : function() {
+					return new Box2D.Dynamics.b2FilterData()
+				},
 				b2ContactListener : Box2D.Dynamics.b2ContactListener,
 				createB2ContactListener : function( beginContact, endContact, preSolve, postSolve ) {
 					var contactListener = new Box2D.Dynamics.b2ContactListener()

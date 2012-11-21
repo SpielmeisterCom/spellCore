@@ -7,26 +7,6 @@
 			"componentId": "spell.component.2d.transform"
 		},
 		{
-			"name": "applyForces",
-			"componentId": "spell.component.physics.applyForce"
-		},
-		{
-			"name": "applyTorques",
-			"componentId": "spell.component.physics.applyTorque"
-		},
-		{
-			"name": "applyImpulses",
-			"componentId": "spell.component.physics.applyImpulse"
-		},
-		{
-			"name": "applyVelocities",
-			"componentId": "spell.component.physics.applyVelocity"
-		},
-		{
-			"name": "setPositions",
-			"componentId": "spell.component.physics.setPosition"
-		},
-		{
 			"name": "bodies",
 			"componentId": "spell.component.physics.body"
 		},
