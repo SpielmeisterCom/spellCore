@@ -9,6 +9,10 @@
 		{
 			"name": "eventId",
 			"type": "string"
+		},
+		{
+			"name": "parameters",
+			"type": "list"
 		}
 	]
 }
