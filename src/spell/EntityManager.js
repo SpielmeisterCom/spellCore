@@ -428,6 +428,19 @@ define(
 			)
 		}
 
+		var getEntityCompositeIds = function( childrenComponents, entityId, resultIds ) {
+			var children    = childrenComponents[ entityId ],
+				childrenIds = children ? children.ids : []
+
+			for( var i = 0, numChildrenIds = childrenIds.length; i < numChildrenIds; i++ ) {
+				getEntityCompositeIds( childrenComponents, childrenIds[ i ], resultIds )
+			}
+
+			resultIds.push( entityId )
+
+			return resultIds
+		}
+
 
 		/*
 		 * public
@@ -574,19 +587,26 @@ define(
 			 * Returns an array of ids of entities which have the requested name.
 			 *
 			 * @param {String} name the name of the entity
+			 * @param {String} entityId the scope of the search is limited to this entity and its descendants
 			 * @return {Array}
 			 */
-			getEntityIdsByName : function( name ) {
+			getEntityIdsByName : function( name, entityId ) {
 				var nameComponents = this.componentDictionaries[ NAME_COMPONENT_ID ],
-					ids            = []
+					resultIds      = []
 
-				for( var id in nameComponents ) {
-					if( nameComponents[ id ].value === name ) {
-						ids.push( id )
+				var ids = entityId ?
+					getEntityCompositeIds( this.componentDictionaries[ CHILDREN_COMPONENT_ID ], entityId, [] ) :
+					_.keys( nameComponents )
+
+				for( var i = 0, numIds = ids.length; i < numIds; i++ ) {
+					var nameComponentId = ids[ i ]
+
+					if( nameComponents[ nameComponentId ].value === name ) {
+						resultIds.push( nameComponentId )
 					}
 				}
 
-				return ids
+				return resultIds
 			},
 
 			/**
@@ -705,11 +725,12 @@ define(
 			 *
 			 * @param {String} componentId the requested component id
 			 * @param {String} name the requested entity name
+			 * @param {String} entityId the scope of the search is limited to this entity and its descendants
 			 * @return {Object}
 			 */
-			getComponentsByName : function( componentId, name ) {
+			getComponentsByName : function( componentId, name, entityId ) {
 				var componentDictionary = this.getComponentDictionaryById( componentId ),
-					ids                 = this.getEntityIdsByName( name )
+					ids                 = this.getEntityIdsByName( name, entityId )
 
 				if( ids.length === 0 ||
 					!componentDictionary ) {
