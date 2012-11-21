@@ -13,10 +13,8 @@ define(
 		"use strict"
 
 
-		var BACK_END_WEBGL  = 0
-		var BACK_END_CANVAS = 1
-
-        var context = null
+		var BACK_END_WEBGL  = 0,
+			BACK_END_CANVAS = 1
 
 		/*
 		 * Creates a rendering context
@@ -28,10 +26,10 @@ define(
 		 * @param requestedBackEnd - when supplied, overrides the automagic rendering back-end detection
 		 */
 		var createContext2d = function( eventManager, id, width, height, requestedBackEnd ) {
-			var canvas = createCanvasNode( id, width, height )
+			var canvas = createCanvasNode( id, width, height ),
+				context
 
 			if( canvas === null || canvas === undefined ) throw "Could not create canvas node."
-
 
 			// webgl
 			if( requestedBackEnd === undefined ? true : ( requestedBackEnd === BACK_END_WEBGL ) ) {
