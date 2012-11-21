@@ -9,7 +9,7 @@ define(
 			PARENT_COMPONENT_ID                       : 'spell.component.entityComposite.parent',
 			CHILDREN_COMPONENT_ID                     : 'spell.component.entityComposite.children',
 			NAME_COMPONENT_ID                         : 'spell.component.name',
-			EVENTS_COMPONENT_ID                       : 'spell.component.events',
+			EVENT_HANDLERS_COMPONENT_ID               : 'spell.component.eventHandlers',
 			TRANSFORM_COMPONENT_ID                    : 'spell.component.2d.transform',
 			CAMERA_COMPONENT_ID                       : 'spell.component.2d.graphics.camera',
 			PHYSICS_BODY_COMPONENT_ID                 : 'spell.component.physics.body',

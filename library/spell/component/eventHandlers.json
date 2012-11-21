@@ -1,7 +1,7 @@
 {
 	"type": "component",
 	"readonly": true,
-	"title": "Events",
+	"title": "Event Handlers",
 	"attributes": [
 		{
 			"name": "assetId",
