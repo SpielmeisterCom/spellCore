@@ -14,6 +14,7 @@ define(
 		'spell/shared/util/createModuleLoader',
 		'spell/shared/util/StatisticsManager',
 		'spell/shared/util/Logger',
+		'spell/shared/util/physics/createBox2dContext',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
 
@@ -33,6 +34,7 @@ define(
 		createModuleLoader,
 		StatisticsManager,
 		Logger,
+		createBox2dContext,
 		PlatformKit,
 		initDebugEnvironment,
 
@@ -108,6 +110,8 @@ define(
 					moduleLoader         : moduleLoader,
 					templateManager      : templateManager,
 					entityManager        : entityManager,
+					box2dContext         : createBox2dContext(),
+					box2dWorlds          : {},
 					sceneManager         : sceneManager,
 					sendMessageToEditor  : this.sendMessageToEditor
 				}
