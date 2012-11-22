@@ -73,7 +73,7 @@ define(
 			}
 		}
 
-		var applyVelocity = function( entityId, velocity ) {
+		var setVelocity = function( entityId, velocity ) {
 			var body = this.getBodyById( entityId )
 			if( !body ) return
 
@@ -168,14 +168,14 @@ define(
 			applyForce    : applyForce,
 			applyImpulse  : applyImpulse,
 			applyTorque   : applyTorque,
-			applyVelocity : applyVelocity,
 			createBodyDef : createBodyDef,
 			destroyBody   : destroyBody,
 			getBodyById   : getBodyById,
 			getRawWorld   : getRawWorld,
 			setAwake      : setAwake,
 			setFilterData : setFilterData,
-			setPosition   : setPosition
+			setPosition   : setPosition,
+			setVelocity   : setVelocity
 		}
 
 		return function( doSleep, gravity, scale ) {
