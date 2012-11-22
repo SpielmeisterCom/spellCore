@@ -1,7 +1,7 @@
 define(
-	"spell/shared/util/platform/private/registerTimer",
+	'spell/shared/util/platform/private/registerTimer',
 	function() {
-		"use strict";
+		'use strict'
 
 
 		/*
