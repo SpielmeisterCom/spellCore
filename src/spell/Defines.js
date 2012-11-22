@@ -12,6 +12,8 @@ define(
 			EVENT_HANDLERS_COMPONENT_ID               : 'spell.component.eventHandlers',
 			TRANSFORM_COMPONENT_ID                    : 'spell.component.2d.transform',
 			CAMERA_COMPONENT_ID                       : 'spell.component.2d.graphics.camera',
+			STATIC_APPEARANCE_COMPONENT_ID            : 'spell.component.2d.graphics.appearance',
+			ANIMATED_APPEARANCE_COMPONENT_ID          : 'spell.component.2d.graphics.animatedAppearance',
 			PHYSICS_BODY_COMPONENT_ID                 : 'spell.component.physics.body',
 			PHYSICS_FIXTURE_COMPONENT_ID              : 'spell.component.physics.fixture',
 			PHYSICS_BOX_SHAPE_COMPONENT_ID            : 'spell.component.physics.shape.box',

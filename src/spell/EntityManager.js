@@ -45,13 +45,15 @@ define(
 		 * private
 		 */
 
-		var nextEntityId                = 1,
-			ROOT_COMPONENT_ID           = Defines.ROOT_COMPONENT_ID,
-			CHILDREN_COMPONENT_ID       = Defines.CHILDREN_COMPONENT_ID,
-			PARENT_COMPONENT_ID         = Defines.PARENT_COMPONENT_ID,
-			NAME_COMPONENT_ID           = Defines.NAME_COMPONENT_ID,
-			TRANSFORM_COMPONENT_ID      = Defines.TRANSFORM_COMPONENT_ID,
-			EVENT_HANDLERS_COMPONENT_ID = Defines.EVENT_HANDLERS_COMPONENT_ID
+		var nextEntityId                        = 1,
+			ROOT_COMPONENT_ID                   = Defines.ROOT_COMPONENT_ID,
+			CHILDREN_COMPONENT_ID               = Defines.CHILDREN_COMPONENT_ID,
+			PARENT_COMPONENT_ID                 = Defines.PARENT_COMPONENT_ID,
+			NAME_COMPONENT_ID                   = Defines.NAME_COMPONENT_ID,
+			TRANSFORM_COMPONENT_ID              = Defines.TRANSFORM_COMPONENT_ID,
+			EVENT_HANDLERS_COMPONENT_ID         = Defines.EVENT_HANDLERS_COMPONENT_ID,
+			STATIC_APPEARANCE_COMPONENT_ID      = Defines.STATIC_APPEARANCE_COMPONENT_ID,
+			ANIMATED_APPEARANCE_COMPONENT_ID    = Defines.ANIMATED_APPEARANCE_COMPONENT_ID
 
 		/**
 		 * Returns an entity id. If no entity id is provided a new one is generated.
@@ -441,6 +443,40 @@ define(
 			return resultIds
 		}
 
+		var getEntityDimensions = function( componentDictionaries, entityId ) {
+
+			var staticAppearances   = componentDictionaries[ STATIC_APPEARANCE_COMPONENT_ID ],
+				animatedAppearances = componentDictionaries[ ANIMATED_APPEARANCE_COMPONENT_ID ],
+				transforms          = componentDictionaries[ TRANSFORM_COMPONENT_ID ],
+				width = 0,
+				height = 0
+
+			if ( staticAppearances && staticAppearances[ entityId ] &&
+				staticAppearances[ entityId ].asset &&
+				staticAppearances[ entityId ].asset.resource &&
+				staticAppearances[ entityId ].asset.resource.dimensions ) {
+
+				//entity has a static appearance
+				width   = staticAppearances[ entityId ].asset.resource.dimensions[ 0 ]
+				height  = staticAppearances[ entityId ].asset.resource.dimensions[ 1 ]
+
+			} else if ( animatedAppearances && animatedAppearances[ entityId ] &&
+				animatedAppearances[ entityId ].asset &&
+				animatedAppearances[ entityId ].asset.frameDimensions ) {
+
+				//entity has an animated appearance
+				width = animatedAppearances[ entityId ].asset.frameDimensions[ 0 ],
+				height = animatedAppearances[ entityId ].asset.frameDimensions[ 1 ]
+			}
+
+			//apply scale factor
+			if ( transforms && transforms[ entityId ] ) {
+				width   *= Math.abs( transforms[ entityId ].worldScale[ 0 ] )
+				height  *= Math.abs( transforms[ entityId ].worldScale[ 1 ] )
+			}
+
+			return [ width, height ]
+		}
 
 		/*
 		 * public
@@ -582,6 +618,29 @@ define(
 			getEntityById : function( entityId ) {
 				return assembleEntityInstance( this.componentDictionaries, entityId )
 			},
+
+			/**
+			 * Creates an exact copy of the given entityId
+			 * @param entityId
+			 */
+			cloneEntity: function( entityId ) {
+				var entityConfig = {
+					config: assembleEntityInstance( this.componentDictionaries, entityId )
+				}
+
+				return createEntity( this.eventManager, this.componentDictionaries, this.templateManager, entityConfig )
+			},
+
+
+			/**
+			 * Returns the width and height for a given entity
+			 * @param entityId
+			 * @return vec2 2d-vector containing the dimension
+			 */
+			getEntityDimensions: function( entityId ) {
+				return getEntityDimensions( this.componentDictionaries, entityId )
+			},
+
 
 			/**
 			 * Returns an array of ids of entities which have the requested name.

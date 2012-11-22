@@ -26,44 +26,6 @@ define("spell/script/editor/entityMover",
 			return leftX <= rotatedX && rotatedX <= rightX && topY <= rotatedY && rotatedY <= bottomY
 		}
 
-
-
-		var calculateOutlineBoxDimensions = function( entityId ) {
-			var width = 0,
-				height = 0
-
-			if ( this.appearances[ entityId ] &&
-				this.appearances[ entityId ].asset &&
-				this.appearances[ entityId ].asset.resource &&
-				this.appearances[ entityId ].asset.resource.dimensions ) {
-
-				//entity has a static appearance
-				width = this.appearances[ entityId ].asset.resource.dimensions[ 0 ]
-				height = this.appearances[ entityId ].asset.resource.dimensions[ 1 ]
-
-
-
-			} else if ( this.animatedAppearances[ entityId ] &&
-				this.animatedAppearances[ entityId ].asset &&
-				this.animatedAppearances[ entityId ].asset.frameDimensions ) {
-
-				//entity has an animated appearance
-				width = this.animatedAppearances[ entityId ].asset.frameDimensions[ 0 ],
-					height = this.animatedAppearances[ entityId ].asset.frameDimensions[ 1 ]
-
-			}
-
-			//camera, physics only entites?
-
-			//apply scale factor
-			if ( this.transforms[ entityId ] ) {
-				width *= Math.abs( this.transforms[ entityId ].worldScale[ 0 ] )
-				height *= Math.abs( this.transforms[ entityId ].worldScale[ 1 ] )
-			}
-
-			return [ width, height ]
-		}
-
 		var isPointWithinEntity = function ( worldPosition, entityId ) {
 			var isOverlayEntity = _.contains(
 				_.values( this.overlayEntityMap ),
@@ -76,7 +38,7 @@ define("spell/script/editor/entityMover",
 			}
 
 			var transform = this.transforms[ entityId ],
-			    entityDimensions = calculateOutlineBoxDimensions.call( this, entityId )
+			    entityDimensions = this.spell.entityManager.getEntityDimensions( entityId )
 
 			return isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.worldRotation )
 
@@ -90,7 +52,7 @@ define("spell/script/editor/entityMover",
 				var entityId            = matchedEntites[ i ],
 					transform           = this.transforms[ entityId ],
 					name                = this.names[ entityId ],
-					entityDimensions    = calculateOutlineBoxDimensions.call( this, entityId),
+					entityDimensions    = entityManager.getEntityDimensions( entityId ),
 					overlayEntityId     = overlayEntityMap[ entityId ]
 
 				if ( overlayEntityId  ) {
