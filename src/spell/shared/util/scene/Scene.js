@@ -140,24 +140,17 @@ define(
 		 */
 
 		var Scene = function( spell, entityManager, templateManager, isModeDevelopment ) {
-			this.spell              = spell
-			this.entityManager      = entityManager
-			this.templateManager    = templateManager
-			this.isModeDevelopment  = isModeDevelopment
-			this.executionGroups    = { render : null, update : null }
-			this.script             = null
+			this.spell             = spell
+			this.entityManager     = entityManager
+			this.templateManager   = templateManager
+			this.isModeDevelopment = isModeDevelopment
+			this.executionGroups   = { render : null, update : null }
+			this.script            = null
 		}
 
 		Scene.prototype = {
 			render: function( timeInMs, deltaTimeInMs ) {
 				invoke( this.executionGroups.render, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
-
-				//clear input events after the render loop finished processing
-				//because JavaScript is single-threaded, new events will be processed
-				//after this whole render tick is processed. This means that all new events will be
-				//injected before the next tick is run. All system processed in a render tick will always see all
-				//events that occured since that last tick
-				this.spell.inputManager.clearInputEvents()
 			},
 			update: function( timeInMs, deltaTimeInMs ) {
 				invoke( this.executionGroups.update, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )

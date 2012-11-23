@@ -19,7 +19,7 @@ define(
 		'use strict'
 
 
-		var UPDATE_INTERVAL_IN_MS  = 33,
+		var UPDATE_INTERVAL_IN_MS  = 16,
 			MAX_ELAPSED_TIME_IN_MS = 100
 
 		var MainLoop = function( eventManager, statisticsManager, updateIntervalInMs ) {
