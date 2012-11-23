@@ -1,0 +1,23 @@
+{
+	"type": "system",
+	"readonly": true,
+	"input": [
+		{
+			"name": "actors",
+			"componentId": "spell.component.actor"
+		},
+		{
+			"name": "inputDefinitions",
+			"componentId": "spell.component.inputDefinition"
+		}
+	],
+	"version": 1,
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": true,
+			"doc": "if active is false the system will be skipped during processing"
+		}
+	]
+}
