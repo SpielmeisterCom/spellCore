@@ -1,8 +1,8 @@
 define(
-	"spell/shared/util/Timer",
+	'spell/shared/util/Timer',
 	[
-		"spell/shared/util/Events",
-		"spell/shared/util/platform/Types",
+		'spell/shared/util/Events',
+		'spell/shared/util/platform/Types',
 
 		'spell/functions'
 	],
@@ -12,7 +12,7 @@ define(
 
 		_
 	) {
-		"use strict"
+		'use strict'
 
 
 		/*
@@ -31,7 +31,7 @@ define(
 		 * public
 		 */
 
-		function Timer( eventManager, statisticsManager, initialTime ) {
+		var Timer = function( eventManager, statisticsManager, initialTime ) {
 			this.newRemoteTime        = initialTime
 			this.remoteTime           = initialTime
 			this.newRemoteTimPending  = false
@@ -42,7 +42,7 @@ define(
 			this.statisticsManager    = statisticsManager
 
 			eventManager.subscribe(
-				[ "clockSyncUpdate" ],
+				[ 'clockSyncUpdate' ],
 				_.bind(
 					function( updatedRemoteTime ) {
 //						checkTimeWarp( newRemoteTime, updatedRemoteTime )
@@ -75,7 +75,7 @@ define(
 
 		Timer.prototype = {
 			update : function() {
-				// TODO: think about incorporating the new value "softly" instead of directly replacing the old one
+				// TODO: think about incorporating the new value 'softly' instead of directly replacing the old one
 				if( this.newRemoteTimPending ) {
 					this.remoteTime          = this.newRemoteTime
 					this.newRemoteTimPending = false

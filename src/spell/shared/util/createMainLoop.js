@@ -19,19 +19,14 @@ define(
 		'use strict'
 
 
-		/*
-		 * private
-		 */
-
-		var allowedDeltaInMs = 20,
-			DEFAULT_UPDATE_INTERVAL_IN_MS = 20
-
+		var UPDATE_INTERVAL_IN_MS  = 33,
+			MAX_ELAPSED_TIME_IN_MS = 100
 
 		var MainLoop = function( eventManager, statisticsManager, updateIntervalInMs ) {
-			this.updateIntervalInMs  = updateIntervalInMs || DEFAULT_UPDATE_INTERVAL_IN_MS
+			this.updateIntervalInMs  = updateIntervalInMs || UPDATE_INTERVAL_IN_MS
 			this.renderCallback      = null
 			this.updateCallback      = null
-			this.accumulatedTimeInMs = 0
+			this.accumulatedTimeInMs = this.updateIntervalInMs
 
 			// Until the proper remote game time is computed local time will have to do.
 			var initialLocalGameTimeInMs = Types.Time.getCurrentInMs()
@@ -47,46 +42,28 @@ define(
 			},
 			callEveryFrame : function( currentTimeInMs ) {
 				var timer = this.timer
+
 				timer.update()
 
-				var clockSpeedFactor    = 1.0,
+				var updateIntervalInMs  = this.updateIntervalInMs,
 					localTimeInMs       = timer.getLocalTime(),
-					elapsedTimeInMs     = timer.getElapsedTime(),
-					accumulatedTimeInMs = this.accumulatedTimeInMs + elapsedTimeInMs * clockSpeedFactor,
-					updateIntervalInMs  = this.updateIntervalInMs
+					elapsedTimeInMs     = Math.min( timer.getElapsedTime(), MAX_ELAPSED_TIME_IN_MS )
 
 				if( this.updateCallback ) {
-					/*
-					 * Only simulate, if not too much time has accumulated to prevent CPU overload. This can happen when the browser tab has been in the
-					 * background for a while and requestAnimationFrame is used.
-					 */
-					while( accumulatedTimeInMs > updateIntervalInMs ) {
-						if( accumulatedTimeInMs <= 5 * updateIntervalInMs ) {
-							this.updateCallback( localTimeInMs, updateIntervalInMs )
-						}
+					var accumulatedTimeInMs = this.accumulatedTimeInMs + elapsedTimeInMs
+
+					while( accumulatedTimeInMs >= updateIntervalInMs ) {
+						this.updateCallback( localTimeInMs, updateIntervalInMs )
 
 						accumulatedTimeInMs -= updateIntervalInMs
-						localTimeInMs += updateIntervalInMs
 					}
+
+					this.accumulatedTimeInMs = accumulatedTimeInMs
 				}
 
 				if( this.renderCallback ) {
 					this.renderCallback( localTimeInMs, elapsedTimeInMs )
 				}
-
-//				var localGameTimeDeltaInMs = timer.getRemoteTime() - localTimeInMs
-//
-//				if( Math.abs( localGameTimeDeltaInMs ) > allowedDeltaInMs ) {
-//					if( localGameTimeDeltaInMs > 0 ) {
-//						clockSpeedFactor = 1.25
-//
-//					} else {
-//						clockSpeedFactor = 0.25
-//					}
-//
-//				} else {
-//					clockSpeedFactor = 1.0
-//				}
 
 				PlatformKit.callNextFrame( this.callEveryFramePartial )
 			},
