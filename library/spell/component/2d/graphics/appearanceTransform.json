@@ -1,0 +1,54 @@
+{
+    "type": "component",
+    "readonly": true,
+    "title": "2D Appearance Transformation",
+    "doc": "describes a texture transformation which should be applied to any appearances this entity has",
+    "icon": "/images/icons/component_2d_transform.png",
+    "attributes": [
+        {
+            "name": "translation",
+            "type": "vec2",
+            "default": [
+                0,
+                0
+            ],
+            "doc": "position relative to the parent's origin"
+        },
+        {
+            "name": "rotation",
+            "type": "number",
+            "default": 0,
+            "doc": "rotation in degrees relative to the parent's origin"
+        },
+        {
+            "name": "scale",
+            "type": "vec2",
+            "default": [
+                1,
+                1
+            ],
+            "doc": "scale relative to the parent's origin"
+        },
+        {
+            "name": "skew",
+            "type": "vec2",
+            "default": [
+                0,
+                0
+            ],
+            "doc": "2D skew transformation along the X- and the Y-axis"
+        },
+        {
+            "name": "localMatrix",
+            "engineInternal": true,
+            "type": "mat3",
+            "default": [
+                1,  0,  0,
+                0,  1,  0,
+                0,  0,  1
+            ],
+            "doc": "3x3 matrix that describes the comlete transform in local coordinates"
+        }
+    ],
+    "version": 1
+}
