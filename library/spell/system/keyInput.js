@@ -2,14 +2,10 @@ define(
 	'spell/system/keyInput',
 	[
 		'spell/shared/util/Events',
-		'spell/shared/util/input/keyCodes',
-
 		'spell/functions'
 	],
 	function(
 		Events,
-		keyCodes,
-
 		_
 	) {
 		'use strict'
