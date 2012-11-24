@@ -8,10 +8,12 @@ define(
 	'spell/InputManager',
 	[
 		'spell/shared/util/platform/PlatformKit',
+		'spell/shared/util/input/keyCodes',
 		'spell/functions'
 	],
 	function(
 		PlatformKit,
+		keyCodes,
 	    _
 	) {
 		"use strict"
@@ -153,6 +155,18 @@ define(
 			clearInputEvents : function() {
 				inputEvents.length = 0
 
+			},
+
+			/**
+			 * Returns a key value list of keyCodes
+			 *
+			 * The key is a human readable version of the keyCode and the value
+			 * the corresponding keyCode
+			 *
+			 * @return {*}
+			 */
+			getKeyCodes: function() {
+				return keyCodes
 			},
 
 
