@@ -38,6 +38,8 @@ define(
 
 		var processEvent = function ( spell, event ) {
 
+			var keyCodes = spell.inputManager.getKeyCodes()
+
 			if ( event.type == 'mousewheel' ) {
 				invoke( this.plugins, 'onMouseWheel', spell, this, event)
 
@@ -51,10 +53,22 @@ define(
 				invoke( this.plugins, 'onMouseUp', spell, this, event)
 
 			} else if ( event.type == 'keydown' ) {
-				invoke( this.plugins, 'onKeyDown', spell, this, event)
+				if( this.commandMode ) {
+					invoke( this.plugins, 'onKeyDown', spell, this, event)
+				}
+
+				if( event.keyCode == keyCodes.CRTL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
+					this.commandMode = true
+				}
 
 			} else if ( event.type == 'keyup' ) {
-				invoke( this.plugins, 'onKeyUp', spell, this, event)
+				if( this.commandMode ) {
+					invoke( this.plugins, 'onKeyUp', spell, this, event)
+				}
+
+				if( event.keyCode == keyCodes.CRTL || event.keyCode == keyCodes.LEFT_WINDOW_KEY ) {
+					this.commandMode = false
+				}
 			}
 
 		}
@@ -71,6 +85,7 @@ define(
 
 			//initialize activePlugins
 			this.plugins = [ ]
+			this.commandMode = false
 
 			for (var i= 0; i< this.activePlugins.length; i++) {
 				var pluginConstructor = this.activePlugins[ i ],
@@ -135,6 +150,10 @@ define(
 				}
 				invoke( this.plugins, 'process', spell, this, timeInMs, deltaTimeInMs)
 
+				//consume all input events if we're in commandMode
+				if( this.commandMode == true ) {
+					spell.inputManager.clearInputEvents()
+				}
 			}
 		}
 
