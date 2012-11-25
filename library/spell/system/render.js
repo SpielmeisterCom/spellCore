@@ -174,7 +174,16 @@ define(
 										var frameId = asset.tilemapData[ y ][ x ],
 											frameOffset = asset.frameOffsets[ frameId ]
 
-										context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameDimensions[ 0 ], assetFrameDimensions[ 1 ], x, maxY - y, 1, 1 )
+										context.drawSubTexture(
+											texture,
+											frameOffset[ 0 ],
+											frameOffset[ 1 ],
+											assetFrameDimensions[ 0 ],
+											assetFrameDimensions[ 1 ],
+											x,
+											maxY - y,
+											1,
+											1 )
 									}
 								}
 							}
