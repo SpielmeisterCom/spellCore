@@ -21,10 +21,16 @@ define(
 		 * private
 		 */
 
-		var createFrameOffset = function( frameWidth, frameHeight, numX, numY, frameId ) {
+		var createFrameOffset = function( frameWidth, frameHeight, numX, numY, frameId, innerPadding ) {
+			if( !innerPadding )
+				innerPadding = 0
+
+			frameWidth  += innerPadding * 2
+			frameHeight += innerPadding * 2
+
 			return [
-				( frameId % numX ) * frameWidth,
-				Math.floor( frameId / numX ) * frameHeight
+				( frameId % numX ) * frameWidth + innerPadding,
+				Math.floor( frameId / numX ) * frameHeight + innerPadding
 			]
 		}
 
@@ -34,22 +40,24 @@ define(
 
 			if( !spriteSheetAsset ) throw 'Error: Could not find asset with id \'' + spriteSheetAssetId + '\'.'
 
-			var frameWidth  = spriteSheetAsset.config.frameWidth,
-				frameHeight = spriteSheetAsset.config.frameHeight,
-				numX        = Math.floor( spriteSheetAsset.config.textureWidth / frameWidth ),
-				numY        = Math.floor( spriteSheetAsset.config.textureHeight / frameHeight ),
-				numFrames   = numX * numY
+			var frameWidth      = spriteSheetAsset.config.frameWidth,
+				frameHeight     = spriteSheetAsset.config.frameHeight,
+				innerPadding    = spriteSheetAsset.config.innerPadding || 0,
+				numX            = Math.floor( spriteSheetAsset.config.textureWidth / (frameWidth + innerPadding*2) ),
+				numY            = Math.floor( spriteSheetAsset.config.textureHeight / (frameHeight + innerPadding*2) ),
+				numFrames       = numX * numY
 
 			// create a lookup table to lookup the subtextures
 			var frameOffsets = []
 
 			for( var i = 0; i < numFrames; i++ ) {
-				frameOffsets[ i ] = createFrameOffset( frameWidth, frameHeight, numX, numY, i )
+				frameOffsets[ i ] = createFrameOffset( frameWidth, frameHeight, numX, numY, i, innerPadding )
 			}
 
 			return {
 				type                : asset.subtype,
 				resourceId          : spriteSheetAsset.resourceId,
+				innerPadding        : innerPadding,
 				frameDimensions     : [ frameWidth, frameHeight ],
 				tilemapDimensions   : [ asset.config.width, asset.config.height ],
 				tilemapData         : asset.config.tileLayerData,
@@ -63,11 +71,12 @@ define(
 
 			if( !spriteSheetAsset ) throw 'Error: Could not find asset with id \'' + spriteSheetAssetId + '\'.'
 
-			var frameWidth  = spriteSheetAsset.config.frameWidth,
-				frameHeight = spriteSheetAsset.config.frameHeight,
-				numX        = Math.floor( spriteSheetAsset.config.textureWidth / frameWidth ),
-				numY        = Math.floor( spriteSheetAsset.config.textureHeight / frameHeight ),
-				numFrames   = _.size( asset.config.frameIds),
+			var frameWidth      = spriteSheetAsset.config.frameWidth,
+				frameHeight     = spriteSheetAsset.config.frameHeight,
+				innerPadding    = spriteSheetAsset.config.innerPadding || 0,
+				numX            = Math.floor( spriteSheetAsset.config.textureWidth / (frameWidth + innerPadding*2) ),
+				numY            = Math.floor( spriteSheetAsset.config.textureHeight / (frameHeight + innerPadding*2) ),
+				numFrames       = _.size( asset.config.frameIds),
 				createFrameOffsetPartial = _.bind( createFrameOffset, null, frameWidth, frameHeight )
 
 			return {
@@ -75,7 +84,7 @@ define(
 				resourceId      : spriteSheetAsset.resourceId,
 				frameDimensions : [ frameWidth, frameHeight ],
 				frameDuration   : asset.config.duration / numFrames,
-				frameOffsets    : _.map( asset.config.frameIds, function( frameId ) { return createFrameOffsetPartial( numX, numY, frameId ) } ),
+				frameOffsets    : _.map( asset.config.frameIds, function( frameId ) { return createFrameOffsetPartial( numX, numY, frameId, innerPadding ) } ),
 				numFrames       : numFrames
 			}
 		}
