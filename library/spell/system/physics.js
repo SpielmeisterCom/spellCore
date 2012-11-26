@@ -17,43 +17,82 @@ define(
 		'use strict'
 
 
-		var Box2D                 = PlatformKit.Box2D,
-			createB2Vec2          = Box2D.Common.Math.createB2Vec2,
-			createB2World         = Box2D.Dynamics.createB2World,
-			createB2FixtureDef    = Box2D.Dynamics.createB2FixtureDef,
-			createB2Body          = Box2D.Dynamics.createB2Body,
-			b2Body                = Box2D.Dynamics.b2Body,
-			createB2BodyDef       = Box2D.Dynamics.createB2BodyDef,
-			createB2PolygonShape  = Box2D.Collision.Shapes.createB2PolygonShape,
-			createB2CircleShape   = Box2D.Collision.Shapes.createB2CircleShape
+		var Box2D                   = PlatformKit.Box2D,
+			createB2Vec2            = Box2D.Common.Math.createB2Vec2,
+			createB2FixtureDef      = Box2D.Dynamics.createB2FixtureDef,
+			createB2ContactListener = Box2D.Dynamics.createB2ContactListener,
+			createB2PolygonShape    = Box2D.Collision.Shapes.createB2PolygonShape,
+			createB2CircleShape     = Box2D.Collision.Shapes.createB2CircleShape
 
-		var awakeColor      = [ 0.82, 0.76, 0.07 ],
-			notAwakeColor   = [ 0.27, 0.25, 0.02 ]
+		var awakeColor    = [ 0.82, 0.76, 0.07 ],
+			notAwakeColor = [ 0.27, 0.25, 0.02 ]
 
-		var getBodyById = function( world, entityId ) {
-			for( var body = world.GetBodyList(); body; body = body.GetNext() ) {
-				if( entityId === body.GetUserData() ) {
-					return body
+		var entityEventBeginContact = function( entityManager, contactTriggers, eventId, contact, manifold ) {
+			var entityIdA = contact.GetFixtureA().GetUserData(),
+				entityIdB = contact.GetFixtureB().GetUserData(),
+				contactTrigger
+
+			if( entityIdA ) {
+				entityManager.triggerEvent( entityIdA, eventId, [ entityIdB, contact, manifold ] )
+
+				contactTrigger = contactTriggers[ entityIdA ]
+
+				if( contactTrigger && entityIdB ) {
+					entityManager.triggerEvent( entityIdB, contactTrigger.eventId, [ entityIdA ].concat( contactTrigger.parameters ) )
+				}
+			}
+
+			if( entityIdB ) {
+				entityManager.triggerEvent( entityIdB, eventId, [ entityIdA, contact, manifold ] )
+
+				contactTrigger = contactTriggers[ entityIdB ]
+
+				if( contactTrigger && entityIdA ) {
+					entityManager.triggerEvent( entityIdA, contactTrigger.eventId, [ entityIdB ].concat( contactTrigger.parameters ) )
 				}
 			}
 		}
 
-		var createBody = function( spell, worldToPhysicsScale, debug, world, entityId, entity ) {
+		var entityEventEndContact = function( entityManager, eventId, contact, manifold ) {
+			var entityIdA = contact.GetFixtureA().GetUserData(),
+				entityIdB = contact.GetFixtureB().GetUserData()
+			if( entityIdA ) {
+				entityManager.triggerEvent( entityIdA, eventId, [ entityIdB, contact, manifold ] )
+			}
+
+			if( entityIdB ) {
+				entityManager.triggerEvent( entityIdB, eventId, [ entityIdA, contact, manifold ] )
+			}
+		}
+
+		var createContactListener = function( entityManager, contactTriggers ) {
+			return createB2ContactListener(
+				function( contact, manifold ) {
+					entityEventBeginContact( entityManager, contactTriggers, 'beginContact', contact, manifold )
+				},
+				function( contact, manifold ) {
+					entityEventEndContact( entityManager, 'endContact', contact, manifold )
+				},
+				null,
+				null
+			)
+		}
+
+		var createBody = function( spell, debug, world, entityId, entity ) {
 			var body               = entity[ Defines.PHYSICS_BODY_COMPONENT_ID ],
 				fixture            = entity[ Defines.PHYSICS_FIXTURE_COMPONENT_ID ],
 				boxShape           = entity[ Defines.PHYSICS_BOX_SHAPE_COMPONENT_ID ],
 				circleShape        = entity[ Defines.PHYSICS_CIRCLE_SHAPE_COMPONENT_ID ],
 				convexPolygonShape = entity[ Defines.PHYSICS_CONVEX_POLYGON_SHAPE_COMPONENT_ID ],
-				playerShape        = entity[ Defines.PHYSICS_JNRPLAYER_SHAPE_COMPONENT_ID ],
 				transform          = entity[ Defines.TRANSFORM_COMPONENT_ID ]
 
 			if( !body || !fixture || !transform ||
-				( !boxShape && !circleShape && !playerShape ) ) {
+				( !boxShape && !circleShape && !convexPolygonShape ) ) {
 
 				return
 			}
 
-			createPhysicsObject( world, worldToPhysicsScale, entityId, body, fixture, boxShape, circleShape, playerShape, convexPolygonShape, transform )
+			createPhysicsObject( world, entityId, body, fixture, boxShape, circleShape, convexPolygonShape, transform )
 
 			if( debug ) {
 				var componentId,
@@ -65,8 +104,20 @@ define(
 						radius : circleShape.radius
 					}
 
+				} else if( convexPolygonShape ) {
+					var minX = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var x = v[ 0 ]; return memo < x ? memo : x }, 0 ),
+						maxX = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var x = v[ 0 ]; return memo > x ? memo : x }, 0 ),
+						minY = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var y = v[ 1 ]; return memo < y ? memo : y }, 0 ),
+						maxY = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var y = v[ 1 ]; return memo > y ? memo : y }, 0 )
+
+					componentId = 'spell.component.2d.graphics.debug.box'
+					config = {
+						width : maxX - minX,
+						height : maxY - minY
+					}
+
 				} else {
-					var boxesqueShape = boxShape || playerShape
+					var boxesqueShape = boxShape
 
 					componentId = 'spell.component.2d.graphics.debug.box'
 					config = {
@@ -85,7 +136,7 @@ define(
 
 		var destroyBodies = function( world, destroyedEntities ) {
 			for( var i = 0, numDestroyedEntities = destroyedEntities.length; i < numDestroyedEntities; i++ ) {
-				var body = getBodyById( world, destroyedEntities[ i ] )
+				var body = world.getBodyById( destroyedEntities[ i ] )
 
 				if( !body ) continue
 
@@ -93,25 +144,17 @@ define(
 			}
 		}
 
-		var createBodyDef = function( world, worldToPhysicsScale, entityId, body, transform ) {
-			var translation = transform.translation,
-				bodyDef     = createB2BodyDef()
-
-			bodyDef.fixedRotation = body.fixedRotation
-			bodyDef.type          = body.type === 'dynamic' ? b2Body.b2_dynamicBody : b2Body.b2_staticBody
-			bodyDef.position.x    = translation[ 0 ] * worldToPhysicsScale
-			bodyDef.position.y    = translation[ 1 ] * worldToPhysicsScale
-			bodyDef.userData      = entityId
-
-			return world.CreateBody( bodyDef )
-		}
-
-		var addShape = function( world, worldToPhysicsScale, entityId, bodyDef, fixture, boxShape, circleShape, convexPolygonShape, playerShape ) {
+		var addShape = function( world, worldToPhysicsScale, entityId, bodyDef, fixture, boxShape, circleShape, convexPolygonShape ) {
 			var fixtureDef = createB2FixtureDef()
 
 			fixtureDef.density     = fixture.density
 			fixtureDef.friction    = fixture.friction
 			fixtureDef.restitution = fixture.restitution
+			fixtureDef.isSensor    = fixture.isSensor
+			fixtureDef.userData    = entityId
+
+			fixtureDef.filter.categoryBits = fixture.categoryBits
+			fixtureDef.filter.maskBits     = fixture.maskBits
 
 			if( boxShape ) {
 				fixtureDef.shape = createB2PolygonShape()
@@ -134,60 +177,26 @@ define(
 				fixtureDef.shape.SetAsArray(
 					_.map(
 						vertices,
-						function( x ) { return createB2Vec2( x[ 0 ], x[ 1 ] ) }
+						function( x ) { return createB2Vec2( x[ 0 ] * worldToPhysicsScale, x[ 1 ] * worldToPhysicsScale ) }
 					),
 					vertices.length
 				)
 
 				bodyDef.CreateFixture( fixtureDef )
-
-			} else if( playerShape ) {
-				var halfWidth  = playerShape.dimensions[ 0 ] / 2 * worldToPhysicsScale,
-					footRadius = halfWidth,
-					halfHeight = playerShape.dimensions[ 1 ] / 2 * worldToPhysicsScale - footRadius
-
-				// main shape
-				fixtureDef.shape = createB2PolygonShape()
-				fixtureDef.shape.SetAsBox( halfWidth, halfHeight - footRadius, createB2Vec2( 0, footRadius ) )
-
-				bodyDef.CreateFixture( fixtureDef )
-
-				// foot shape
-				var footFixtureDef = createB2FixtureDef()
-
-				footFixtureDef.density     = fixture.density / 2
-				footFixtureDef.friction    = fixture.friction
-				footFixtureDef.restitution = fixture.restitution
-				footFixtureDef.shape       = createB2CircleShape( footRadius )
-				footFixtureDef.shape.SetLocalPosition( createB2Vec2( 0, halfHeight * -1 ) )
-
-				bodyDef.CreateFixture( footFixtureDef )
-
-				// foot sensor shape
-				var footSensorFixtureDef = createB2FixtureDef()
-
-//				footSensorFixtureDef.density     = fixture.density
-//				footSensorFixtureDef.friction    = fixture.friction
-//				footSensorFixtureDef.restitution = fixture.restitution
-
-				footSensorFixtureDef.isSensor = true
-				footSensorFixtureDef.userData = { type : 'footSensor', id : entityId }
-				footSensorFixtureDef.shape    = createB2CircleShape( footRadius * 1.1 )
-				footSensorFixtureDef.shape.SetLocalPosition( createB2Vec2( 0, halfHeight * -1 ) )
-
-				bodyDef.CreateFixture( footSensorFixtureDef )
 			}
 		}
 
-		var createPhysicsObject = function( world, worldToPhysicsScale, entityId, body, fixture, boxShape, circleShape, playerShape, convexPolygonShape, transform ) {
-			var bodyDef = createBodyDef( world, worldToPhysicsScale, entityId, body, transform )
+		var createPhysicsObject = function( world, entityId, body, fixture, boxShape, circleShape, convexPolygonShape, transform ) {
+			var bodyDef = world.createBodyDef( entityId, body, transform )
 
-			addShape( world, worldToPhysicsScale, entityId, bodyDef, fixture, boxShape, circleShape, convexPolygonShape, playerShape )
+			if( !bodyDef ) return
+
+			addShape( world, world.scale, entityId, bodyDef, fixture, boxShape, circleShape, convexPolygonShape )
 		}
 
-		var simulate = function( world, deltaTimeInMs ) {
-			world.Step( deltaTimeInMs / 1000, 10, 8 )
-			world.ClearForces()
+		var step = function( rawWorld, deltaTimeInMs ) {
+			rawWorld.Step( deltaTimeInMs / 1000, 10, 8 )
+			rawWorld.ClearForces()
 		}
 
 		var transferState = function( world, worldToPhysicsScale, bodies, transforms ) {
@@ -224,16 +233,23 @@ define(
 		}
 
 		var init = function( spell ) {
-			var doSleep = true
+			this.world = spell.box2dWorlds.main
 
-			this.world = createB2World(
-				createB2Vec2( this.config.gravity[ 0 ], this.config.gravity[ 1 ] ),
-				doSleep
-			)
+			if( !this.world ) {
+				var doSleep = true,
+					world   = spell.box2dContext.createWorld( doSleep, this.config.gravity, this.config.scale )
+
+				world.getRawWorld().SetContactListener(
+					createContactListener( spell.entityManager, this.contactTriggers )
+				)
+
+				this.world = world
+				spell.box2dWorlds.main = world
+			}
 		}
 
 		var activate = function( spell ) {
-			this.entityCreatedHandler = _.bind( createBody, null, spell, this.worldToPhysicsScale, this.debug, this.world )
+			this.entityCreatedHandler = _.bind( createBody, null, spell, this.debug, this.world )
 			this.entityDestroyHandler = _.bind( this.removedEntitiesQueue.push, this.removedEntitiesQueue )
 
 			spell.eventManager.subscribe( Events.ENTITY_CREATED, this.entityCreatedHandler )
@@ -247,20 +263,21 @@ define(
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var world                = this.world,
+				rawWorld             = this.world.getRawWorld(),
 				transforms           = this.transforms,
-				removedEntitiesQueue = this.removedEntitiesQueue,
-				worldToPhysicsScale  = this.worldToPhysicsScale
+				removedEntitiesQueue = this.removedEntitiesQueue
 
 			if( removedEntitiesQueue.length ) {
 				destroyBodies( world, removedEntitiesQueue )
 				removedEntitiesQueue.length = 0
 			}
 
-			simulate( world, deltaTimeInMs )
-			transferState( world, worldToPhysicsScale, this.bodies, transforms )
+			step( rawWorld, deltaTimeInMs )
+
+			transferState( rawWorld, world.scale, this.bodies, transforms )
 
 			if( this.debug ) {
-				updateDebug( world, this.debugBoxes, this.debugCircles )
+				updateDebug( rawWorld, this.debugBoxes, this.debugCircles )
 			}
 		}
 
@@ -269,7 +286,6 @@ define(
 			this.entityCreatedHandler
 			this.entityDestroyHandler
 			this.world
-			this.worldToPhysicsScale = this.config.scale
 			this.removedEntitiesQueue = []
 		}
 

@@ -15,16 +15,16 @@
 			"componentId": "spell.component.physics.fixture"
 		},
 		{
+			"name": "contactTriggers",
+			"componentId": "spell.component.physics.contactTrigger"
+		},
+		{
 			"name": "boxShapes",
 			"componentId": "spell.component.physics.shape.box"
 		},
 		{
 			"name": "circleShapes",
 			"componentId": "spell.component.physics.shape.circle"
-		},
-		{
-			"name": "jumpAndRunPlayerShapes",
-			"componentId": "spell.component.physics.shape.jumpAndRunPlayer"
 		},
 		{
 			"name": "debugBoxes",
