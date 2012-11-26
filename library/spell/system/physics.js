@@ -28,8 +28,7 @@ define(
 			createB2CircleShape   = Box2D.Collision.Shapes.createB2CircleShape
 
 		var awakeColor      = [ 0.82, 0.76, 0.07 ],
-			notAwakeColor   = [ 0.27, 0.25, 0.02 ],
-			maxVelocity     = 20
+			notAwakeColor   = [ 0.27, 0.25, 0.02 ]
 
 		var getBodyById = function( world, entityId ) {
 			for( var body = world.GetBodyList(); body; body = body.GetNext() ) {
@@ -224,106 +223,6 @@ define(
 			}
 		}
 
-		var applyInfluence = function( entityManager, world, worldToPhysicsScale, applyForces, applyTorques, applyImpulses, applyVelocities, setPositions ) {
-			for( var body = world.GetBodyList(); body; body = body.GetNext() ) {
-				var id = body.GetUserData()
-
-				if( !id ) continue
-
-				// spell.component.physics.applyForce
-				var applyForce = applyForces[ id ]
-
-				if( applyForce ) {
-					var force  = applyForce.force,
-						forceX = force[ 0 ] * worldToPhysicsScale,
-						forceY = force[ 1 ] * worldToPhysicsScale
-
-					if( forceX || forceY ) {
-						var point = applyForce.point
-
-						body.ApplyForce(
-							createB2Vec2( forceX, forceY ),
-							applyForce.usePoint ?
-								createB2Vec2( point[ 0 ] * worldToPhysicsScale, point[ 1 ] * worldToPhysicsScale ) :
-								body.GetWorldCenter()
-						)
-					}
-				}
-
-				// spell.component.physics.applyTorque
-				var applyTorque = applyTorques[ id ]
-
-				if( applyTorque ) {
-					var torque = applyTorque.torque * worldToPhysicsScale
-
-					if( torque ) {
-						body.ApplyTorque( torque )
-					}
-				}
-
-				// spell.component.physics.applyImpulse
-				var applyImpulse = applyImpulses[ id ]
-
-				if( applyImpulse ) {
-					var impulse  = applyImpulse.impulse,
-						impulseX = impulse[ 0 ] * worldToPhysicsScale,
-						impulseY = impulse[ 1 ] * worldToPhysicsScale
-
-					if( impulseX || impulseY ) {
-						var point = applyImpulse.point
-
-						body.ApplyImpulse(
-							createB2Vec2( impulseX, impulseY ),
-							applyImpulse.usePoint ?
-								createB2Vec2( point[ 0 ] * worldToPhysicsScale, point[ 1 ] * worldToPhysicsScale ) :
-								body.GetWorldCenter()
-						)
-					}
-
-					entityManager.removeComponent( id, 'spell.component.physics.applyImpulse' )
-				}
-
-				// spell.component.physics.applyVelocity
-				var velocity = applyVelocities[ id ]
-
-				if( velocity ) {
-					body.SetLinearVelocity(
-						createB2Vec2(
-							velocity.velocity[ 0 ] * worldToPhysicsScale,
-							velocity.velocity[ 1 ] * worldToPhysicsScale
-						)
-					)
-
-					entityManager.removeComponent( id, 'spell.component.physics.applyVelocity' )
-				}
-
-				// spell.component.physics.setPosition
-				var setPosition = setPositions[ id ]
-
-				if( setPosition ) {
-					body.SetPosition(
-						createB2Vec2(
-							setPosition.value[ 0 ] * worldToPhysicsScale,
-							setPosition.value[ 1 ] * worldToPhysicsScale
-						)
-					)
-
-					entityManager.removeComponent( id, 'spell.component.physics.setPosition' )
-				}
-
-
-				// check max velocity constraint
-				var velocityVec2 = body.GetLinearVelocity(),
-					velocity     = velocityVec2.Length()
-
-				if( velocity > 0 && velocity >  maxVelocity ) {
-					velocityVec2.x = maxVelocity / velocity * velocityVec2.x
-					velocityVec2.y = maxVelocity / velocity * velocityVec2.y
-					body.SetLinearVelocity( velocityVec2 )
-				}
-			}
-		}
-
 		var init = function( spell ) {
 			var doSleep = true
 
@@ -357,7 +256,6 @@ define(
 				removedEntitiesQueue.length = 0
 			}
 
-			applyInfluence( spell.entityManager, world, worldToPhysicsScale, this.applyForces, this.applyTorques, this.applyImpulses, this.applyVelocities, this.setPositions )
 			simulate( world, deltaTimeInMs )
 			transferState( world, worldToPhysicsScale, this.bodies, transforms )
 
