@@ -92,7 +92,7 @@ define(
 			if( offsetInMs > animationLengthInMs ) {
 				if( !loop ) return 1.0
 
-				offsetInMs = offsetInMs % animationLengthInMs
+				offsetInMs %= animationLengthInMs
 			}
 
 			return animationLengthInMs === 0 ?
@@ -157,13 +157,12 @@ define(
 
 						} else if( asset.type === '2dTileMap' ) {
 							// 2d tilemap
-							var assetSpriteSheet    = asset.spriteSheet,
-								tilemapDimensions   = asset.tilemapDimensions,
-								tilemapData         = asset.tilemapData,
-								frameDimensions     = assetSpriteSheet.frameDimensions,
-								frameOffsets        = assetSpriteSheet.frameOffsets,
-								maxX                = tilemapDimensions[ 0 ] - 1,
-								maxY                = tilemapDimensions[ 1 ] - 1
+							var assetSpriteSheet  = asset.spriteSheet,
+								tilemapDimensions = asset.tilemapDimensions,
+								tilemapData       = asset.tilemapData,
+								frameDimensions   = assetSpriteSheet.frameDimensions,
+								maxX              = tilemapDimensions[ 0 ] - 1,
+								maxY              = tilemapDimensions[ 1 ] - 1
 
 							context.save()
 							{
@@ -189,7 +188,8 @@ define(
 											x,
 											maxY - y,
 											1,
-											1 )
+											1
+										)
 									}
 								}
 							}
@@ -209,7 +209,7 @@ define(
 								appearance.looped
 							)
 
-							var frameId = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
+							var frameId     = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
 								frameOffset = asset.frameOffsets[ frameId ]
 
 							context.save()
@@ -224,14 +224,13 @@ define(
 							var frameDimensions     = asset.frameDimensions,
 								frameOffsets        = asset.frameOffsets,
 								numFrames           = asset.numFrames,
-								frameId             = 0,
 								frameOffset         = null
 
 							context.save()
 							{
 								context.scale( frameDimensions )
 
-								for( frameId = 0; frameId < numFrames; frameId++ ) {
+								for( var frameId = 0; frameId < numFrames; frameId++ ) {
 									frameOffset = frameOffsets[ frameId ]
 
 									context.drawSubTexture(
@@ -240,14 +239,14 @@ define(
 										frameOffset[ 1 ],
 										frameDimensions[ 0 ],
 										frameDimensions[ 1 ],
-										frameId, //x
-										0, //y
+										frameId,
+										0,
 										1,
-										1 )
+										1
+									)
 								}
 							}
 							context.restore()
-
 						}
 					}
 				}
