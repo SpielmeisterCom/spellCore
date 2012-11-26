@@ -22,8 +22,7 @@ define(
 		 */
 
 		var createFrameOffset = function( frameWidth, frameHeight, numX, numY, frameId, innerPadding ) {
-			if( !innerPadding )
-				innerPadding = 0
+			if( !innerPadding ) innerPadding = 0
 
 			frameWidth  += innerPadding * 2
 			frameHeight += innerPadding * 2
@@ -58,9 +57,9 @@ define(
 			var frameWidth      = spriteSheetAsset.config.frameWidth,
 				frameHeight     = spriteSheetAsset.config.frameHeight,
 				innerPadding    = spriteSheetAsset.config.innerPadding || 0,
-				numX            = Math.floor( spriteSheetAsset.config.textureWidth / (frameWidth + innerPadding*2) ),
-				numY            = Math.floor( spriteSheetAsset.config.textureHeight / (frameHeight + innerPadding*2) ),
-				numFrames       = _.size( asset.config.frameIds),
+				numX            = Math.floor( spriteSheetAsset.config.textureWidth / ( frameWidth + innerPadding * 2 ) ),
+				numY            = Math.floor( spriteSheetAsset.config.textureHeight / ( frameHeight + innerPadding * 2 ) ),
+				numFrames       = _.size( asset.config.frameIds ),
 				createFrameOffsetPartial = _.bind( createFrameOffset, null, frameWidth, frameHeight )
 
 			return {
