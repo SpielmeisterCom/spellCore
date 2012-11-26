@@ -95,7 +95,9 @@ define(
 				offsetInMs = offsetInMs % animationLengthInMs
 			}
 
-			return offsetInMs / animationLengthInMs
+			return animationLengthInMs === 0 ?
+				0 :
+				offsetInMs / animationLengthInMs
 		}
 
 		var drawVisualObject = function(
