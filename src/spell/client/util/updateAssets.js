@@ -119,14 +119,17 @@ define(
 				numFrames       = numX * numY
 
 			// create a lookup table to lookup the subtextures
-			var frameOffsets = []
+			var frameOffsets = [],
+				frames       = []
 
 			for( var i = 0; i < numFrames; i++ ) {
 				frameOffsets[ i ] = createFrameOffset( frameWidth, frameHeight, numX, numY, i, innerPadding )
+				frames[ i ] = i
 			}
 
 			return {
 				frameDimensions : [ frameWidth, frameHeight ],
+				frames          : frames,
 				frameOffsets    : frameOffsets,
 				frameMaxX       : numX,
 				frameMaxY       : numY,

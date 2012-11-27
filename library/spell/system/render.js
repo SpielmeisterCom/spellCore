@@ -136,7 +136,8 @@ define(
 						context.setGlobalAlpha( visualObjectOpacity )
 					}
 
-					var appearance = appearances[ id ] || animatedAppearances[ id ] || tilemaps[ id ] || textAppearances[ id ] ||  spriteSheetAppearances[ id ]
+					var appearance      = appearances[ id ] || animatedAppearances[ id ] || tilemaps[ id ] || textAppearances[ id ] ||  spriteSheetAppearances[ id ],
+						quadGeometry    = quadGeometries[ id ]
 
 					if( appearance ) {
 						var asset   = appearance.asset,
@@ -146,11 +147,9 @@ define(
 
 						if( asset.type === 'appearance' ) {
 							var appearanceTransform = appearanceTransforms[ id ],
-								quadGeometry = quadGeometries[ id ]
-
-							var quadDimensions = quadGeometry ?
+								quadDimensions = quadGeometry ?
 								quadGeometry.dimensions :
-								texture.dimensions
+									texture.dimensions
 
 							// static appearance
 							context.save()
@@ -215,8 +214,7 @@ define(
 						} else if( asset.type === 'animation' ) {
 							// animated appearance
 							var assetFrameDimensions = asset.frameDimensions,
-								assetNumFrames       = asset.numFrames,
-								quadGeometry         = quadGeometries[ id ]
+								assetNumFrames       = asset.numFrames
 
 							var quadDimensions = quadGeometry ?
 								quadGeometry.dimensions :
@@ -247,31 +245,54 @@ define(
 							context.restore()
 
 						} else if( asset.type === 'spriteSheet' ) {
-							var frameDimensions = asset.frameDimensions,
-								frameOffsets    = asset.frameOffsets,
-								numFrames       = asset.numFrames,
-								frameOffset     = null
+							var frames            = appearance.drawAllFrames ? asset.frames : appearance.frames,
+								frameDimensions   = asset.frameDimensions,
+								frameOffsets      = asset.frameOffsets,
+								numFrames         = asset.numFrames,
+								frameOffset       = null,
+								quadDimensions    = quadGeometry ? quadGeometry.dimensions :  [ (frames.length-0) * frameDimensions[0], frameDimensions[1] ],
+								numFramesInQuad   = [
+									Math.floor( quadDimensions[ 0 ] / frameDimensions[0] ),
+									Math.floor( quadDimensions[ 1 ] / frameDimensions[1] )
+								],
+								totalFramesInQuad = numFramesInQuad[ 0 ] * numFramesInQuad[ 1 ]
 
-							context.save()
-							{
-								context.scale( frameDimensions )
 
-								for( var frameId = 0; frameId < numFrames; frameId++ ) {
-									frameOffset = frameOffsets[ frameId ]
+							if( totalFramesInQuad > 0 ) {
+								//only draw spriteSheet if we have at least space to draw one tile
 
-									tmpVec2[ 0 ] = frameId
-									tmpVec2[ 1 ] = 0
+								context.save()
+								{
+									context.scale( frameDimensions )
 
-									context.drawSubTexture(
-										texture,
-										frameOffset,
-										frameDimensions,
-										tmpVec2,
-										defaultDimensions
-									)
+									for(
+										var x=0, length = frames.length;
+									     x < length &&
+										 x < totalFramesInQuad;
+									     x++
+										) {
+
+										frameId     = frames[ x ]
+										frameOffset = frameOffsets[ frameId ]
+
+
+										tmpVec2[ 0 ] = -(quadDimensions[ 0 ] / frameDimensions[ 0 ]) / 2 + x % numFramesInQuad[ 0 ]
+										tmpVec2[ 1 ] = -(quadDimensions[ 1 ] / frameDimensions[ 1 ]) / 2 + Math.floor( x / numFramesInQuad[ 0 ] )
+
+										context.drawSubTexture(
+											texture,
+											frameOffset,
+											frameDimensions,
+
+											tmpVec2,
+											defaultDimensions
+										)
+									}
 								}
+								context.restore()
+
 							}
-							context.restore()
+
 						}
 					}
 				}
