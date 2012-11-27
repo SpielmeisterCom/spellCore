@@ -13,7 +13,7 @@
         {
             "name": "drawAllFrames",
             "type": "boolean",
-            "default": false,
+            "default": true,
             "doc": "specifies whether all frames should be drawn or only those in the frame list"
         },
         {
