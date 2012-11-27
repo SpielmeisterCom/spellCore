@@ -40,28 +40,12 @@ define(
 
 			if( !spriteSheetAsset ) throw 'Error: Could not find asset with id \'' + spriteSheetAssetId + '\'.'
 
-			var frameWidth      = spriteSheetAsset.config.frameWidth,
-				frameHeight     = spriteSheetAsset.config.frameHeight,
-				innerPadding    = spriteSheetAsset.config.innerPadding || 0,
-				numX            = Math.floor( spriteSheetAsset.config.textureWidth / (frameWidth + innerPadding*2) ),
-				numY            = Math.floor( spriteSheetAsset.config.textureHeight / (frameHeight + innerPadding*2) ),
-				numFrames       = numX * numY
-
-			// create a lookup table to lookup the subtextures
-			var frameOffsets = []
-
-			for( var i = 0; i < numFrames; i++ ) {
-				frameOffsets[ i ] = createFrameOffset( frameWidth, frameHeight, numX, numY, i, innerPadding )
-			}
-
 			return {
 				type                : asset.subtype,
 				resourceId          : spriteSheetAsset.resourceId,
-				innerPadding        : innerPadding,
-				frameDimensions     : [ frameWidth, frameHeight ],
+				spriteSheet         : spriteSheetAsset,
 				tilemapDimensions   : [ asset.config.width, asset.config.height ],
-				tilemapData         : asset.config.tileLayerData,
-				frameOffsets        : frameOffsets
+				tilemapData         : asset.config.tileLayerData
 			}
 		}
 
@@ -127,6 +111,32 @@ define(
 			}
 		}
 
+		var createSpriteSheetAsset = function( asset ) {
+			var frameWidth      = asset.config.frameWidth,
+				frameHeight     = asset.config.frameHeight,
+				innerPadding    = asset.config.innerPadding || 0,
+				numX            = Math.floor( asset.config.textureWidth / (frameWidth + innerPadding*2) ),
+				numY            = Math.floor( asset.config.textureHeight / (frameHeight + innerPadding*2) ),
+				numFrames       = numX * numY
+
+			// create a lookup table to lookup the subtextures
+			var frameOffsets = []
+
+			for( var i = 0; i < numFrames; i++ ) {
+				frameOffsets[ i ] = createFrameOffset( frameWidth, frameHeight, numX, numY, i, innerPadding )
+			}
+
+			return {
+				frameDimensions : [ frameWidth, frameHeight ],
+				frameOffsets    : frameOffsets,
+				frameMaxX       : numX,
+				frameMaxY       : numY,
+				numFrames       : numFrames,
+				config          : asset.config,
+				type            : asset.subtype
+			}
+		}
+
 		var injectResource = function( asset, resources, resourceId ) {
 			if( !asset.resourceId ) return
 
@@ -163,8 +173,10 @@ define(
 							type : type
 						}
 
-					} else if( type === 'spriteSheet' ||
-						type === 'font') {
+					} else if( type === 'spriteSheet' ) {
+						asset = createSpriteSheetAsset( assetDefinition )
+
+					} else if( type === 'font') {
 
 						asset = {
 							config : assetDefinition.config,

@@ -105,6 +105,7 @@ define(
 			animatedAppearances,
 			textAppearances,
 			tilemaps,
+			spriteSheetAppearances,
 			childrenComponents,
 			visualObjects,
 			deltaTimeInMs,
@@ -130,7 +131,7 @@ define(
 						context.setGlobalAlpha( visualObjectOpacity )
 					}
 
-					var appearance = appearances[ id ] || animatedAppearances[ id ] || tilemaps[ id ] || textAppearances[ id ]
+					var appearance = appearances[ id ] || animatedAppearances[ id ] || tilemaps[ id ] || textAppearances[ id ] ||  spriteSheetAppearances[ id ]
 
 					if( appearance ) {
 						var asset   = appearance.asset,
@@ -154,32 +155,35 @@ define(
 
 						} else if( asset.type === '2dTileMap' ) {
 							// 2d tilemap
-							var assetFrameDimensions = asset.frameDimensions,
-								assetNumFrames       = asset.numFrames
+							var assetSpriteSheet    = asset.spriteSheet,
+								tilemapDimensions   = asset.tilemapDimensions,
+								tilemapData         = asset.tilemapData,
+								frameDimensions     = assetSpriteSheet.frameDimensions,
+								frameOffsets        = assetSpriteSheet.frameOffsets,
+								maxX                = tilemapDimensions[ 0 ] - 1,
+								maxY                = tilemapDimensions[ 1 ] - 1
 
 							context.save()
 							{
-								context.scale( assetFrameDimensions )
-								var maxX = asset.tilemapDimensions[ 0 ] - 1,
-									maxY = asset.tilemapDimensions[ 1 ] - 1
+								context.scale( frameDimensions )
 
 								for( var y = 0; y <= maxY ; y++ ) {
 									for( var x = 0; x <= maxX; x++ ) {
 
-										if( !asset.tilemapData[ y ] ||
-											asset.tilemapData[ y ][ x ] === null ) {
+										if( !tilemapData[ y ] ||
+											tilemapData[ y ][ x ] === null ) {
 											continue
 										}
 
-										var frameId = asset.tilemapData[ y ][ x ],
-											frameOffset = asset.frameOffsets[ frameId ]
+										var frameId = tilemapData[ y ][ x ],
+											frameOffset = frameOffsets[ frameId ]
 
 										context.drawSubTexture(
 											texture,
 											frameOffset[ 0 ],
 											frameOffset[ 1 ],
-											assetFrameDimensions[ 0 ],
-											assetFrameDimensions[ 1 ],
+											frameDimensions[ 0 ],
+											frameDimensions[ 1 ],
 											x,
 											maxY - y,
 											1,
@@ -213,6 +217,35 @@ define(
 								context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameDimensions[ 0 ], assetFrameDimensions[ 1 ], -0.5, -0.5, 1, 1 )
 							}
 							context.restore()
+
+						} else if( asset.type === 'spriteSheet' ) {
+							var frameDimensions     = asset.frameDimensions,
+								frameOffsets        = asset.frameOffsets,
+								numFrames           = asset.numFrames,
+								frameId             = 0,
+								frameOffset         = null
+
+							context.save()
+							{
+								context.scale( frameDimensions )
+
+								for( frameId = 0; frameId < numFrames; frameId++ ) {
+									frameOffset = frameOffsets[ frameId ]
+
+									context.drawSubTexture(
+										texture,
+										frameOffset[ 0 ],
+										frameOffset[ 1 ],
+										frameDimensions[ 0 ],
+										frameDimensions[ 1 ],
+										frameId, //x
+										0, //y
+										1,
+										1 )
+								}
+							}
+							context.restore()
+
 						}
 					}
 				}
@@ -482,6 +515,7 @@ define(
 				this.animatedAppearances,
 				this.textAppearances,
 				this.tilemaps,
+				this.spriteSheetAppearances,
 				this.childrenComponents,
 				this.visualObjects
 			)

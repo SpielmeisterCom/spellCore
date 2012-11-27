@@ -18,6 +18,10 @@
 			"name": "appearances",
 			"componentId": "spell.component.2d.graphics.appearance"
 		},
+        {
+            "name": "spriteSheetAppearances",
+            "componentId": "spell.component.2d.graphics.spriteSheetAppearance"
+        },
 		{
 			"name": "animatedAppearances",
 			"componentId": "spell.component.2d.graphics.animatedAppearance"
