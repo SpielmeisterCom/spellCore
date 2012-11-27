@@ -97,9 +97,9 @@ define("spell/script/editor/entityMover",
 								'text': ''
 							},
 							'spell.component.visualObject': {
-								'layer': 99999999
+								'layer': 99999990
 							},
-							'spell.component.2d.graphics.debug.box': {
+							'spell.component.2d.graphics.shape.rectangle': {
 								'color': [1, 0, 1],
 								'height': entityDimensions[ 1 ],
 								'width': entityDimensions[ 0 ]
@@ -337,7 +337,7 @@ define("spell/script/editor/entityMover",
 				}
 			},
 
-			onMouseDown: function( spell, editorSystem, event ) {
+			mousedown: function( spell, editorSystem, event ) {
 				if( event.button != 0 ) {
 					return
 				}
@@ -352,20 +352,20 @@ define("spell/script/editor/entityMover",
 				}
 			},
 
-			onMouseUp: function( spell, editorSystem, event ) {
+			mouseup: function( spell, editorSystem, event ) {
 				if( event.button == 0 && this.isDragging ) {
 					stopDragging.call( this, this.selectedEntity, event.position )
 				}
 			},
 
-			onMouseMove: function( spell, editorSystem, event ) {
+			mousemove: function( spell, editorSystem, event ) {
 
 				if( this.selectedEntity && this.isDragging ) {
 					updateEntityByWorldPosition.call( this, this.selectedEntity, this.editorSystem.cursorWorldPosition )
 				}
 			},
 
-			onKeyDown: function( spell, editorSystem, event ) {
+			keydown: function( spell, editorSystem, event ) {
 				if(event.keyCode == 27 && this.selectedEntity ) {
 					//ESC cancels selection
 					cancelSelection.call( this )
@@ -393,7 +393,7 @@ define("spell/script/editor/entityMover",
 				}
 			},
 
-			onKeyUp: function( spell, editorSystem, event ) {
+			keyup: function( spell, editorSystem, event ) {
 
 			}
 		}

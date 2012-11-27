@@ -117,7 +117,7 @@ define(
 
 			},
 
-			onMouseDown: function( spell, editorSystem, event ) {
+			mousedown: function( spell, editorSystem, event ) {
 				//clear last mouse position
 				this.lastMousePosition  = null
 
@@ -126,7 +126,7 @@ define(
 				}
 			},
 
-			onMouseUp: function( spell, editorSystem, event ) {
+			mouseup: function( spell, editorSystem, event ) {
 				this.lastMousePosition  = null
 
 				if ( event.button == 2 ) {
@@ -134,7 +134,7 @@ define(
 				}
 			},
 
-			onMouseWheel: function( spell, editorSystem, event ) {
+			mousewheel: function( spell, editorSystem, event ) {
 				//zoom camera in and out on mousewheel event
 				var currentScale = editorSystem.transforms[ this.editorCameraEntityId ].scale
 
@@ -142,7 +142,7 @@ define(
 				currentScale[ 1 ] = Math.max( currentScale[ 1 ] + event.direction * -0.5, MIN_SCALE )
 			},
 
-			onMouseMove: function( spell, editorSystem, event ) {
+			mousemove: function( spell, editorSystem, event ) {
 				if ( !this.dragEnabled ) {
 					return
 				}

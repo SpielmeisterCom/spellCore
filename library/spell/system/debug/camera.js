@@ -42,39 +42,20 @@ define(
 
 			var keyCodes = spell.inputManager.getKeyCodes()
 
-			if ( event.type == 'mousewheel' ) {
-				invoke( this.plugins, 'onMouseWheel', spell, this, event)
-
-			} else if ( event.type == 'mousemove' ) {
-
+			if(event.position) {
 				this.cursorWorldPosition = spell.renderingContext.transformScreenToWorld( event.position )
+			}
 
-				invoke( this.plugins, 'onMouseMove', spell, this, event)
+			if(event.type == 'keydown' &&  event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
+				this.commandMode = true
+			} else if(event.type == 'keyup' &&  event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
+				this.commandMode = false
+			}
 
-			} else if ( event.type == 'mousedown' ) {
-				invoke( this.plugins, 'onMouseDown', spell, this, event)
-
-			} else if ( event.type == 'mouseup' ) {
-				invoke( this.plugins, 'onMouseUp', spell, this, event)
-
-			} else if ( event.type == 'keydown' ) {
-
-				if( this.commandMode ) {
-					invoke( this.plugins, 'onKeyDown', spell, this, event)
-				}
-
-				if( event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
-					this.commandMode = true
-				}
-
-			} else if ( event.type == 'keyup' ) {
-				if( this.commandMode ) {
-					invoke( this.plugins, 'onKeyUp', spell, this, event)
-				}
-
-				if( event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY ) {
-					this.commandMode = false
-				}
+			if( this.eventLockPluginInstance && _.indexOf(this.eventLockNames, event.type) !== -1 ) {
+				invoke( [ this.eventLockPluginInstance ], event.type, spell, this, event)
+			} else {
+				invoke( this.plugins, event.type, spell, this, event )
 			}
 
 		}
@@ -92,9 +73,14 @@ define(
 			//initialize activePlugins
 			this.plugins = [ ]
 
-			this.commandMode            = false
-			this.selectedEntity         = null
-			this.cursorWorldPosition    = null
+			this.commandMode                = false
+			this.selectedEntity             = null
+			this.cursorWorldPosition        = null
+
+			this.eventLockPluginInstance    = null
+			this.eventLockNames             = []
+
+			this.processLockPluginInstance  = null
 
 			for (var i= 0; i< this.activePlugins.length; i++) {
 				var pluginConstructor = this.activePlugins[ i ],
@@ -105,12 +91,43 @@ define(
 		}
 
 		interactiveEditingSystem.prototype = {
-			setSelectedEntity: function ( entityId ) {
+			setSelectedEntity: function( entityId ) {
 				this.selectedEntity = entityId
 			},
 
-			getSelectedEntity: function ( entityId ) {
+			getSelectedEntity: function( entityId ) {
 				return this.selectedEntity
+			},
+
+			/**
+			 * This function can be used by a plugin to acquire an exclusive process lock.
+			 * Only the process function for this function will be called after the lock has been set.
+			 * @param pluginInstance
+			 */
+			acquireProcessLock: function( pluginInstance ) {
+				this.processLockPluginInstance = pluginInstance
+			},
+
+			releaseProcessLock: function () {
+				this.processLockPluginInstance = null
+			},
+
+			/**
+			 * This function can be used by a plugin to acquire exlusive access to input events
+			 * @param pluginInstance
+			 */
+			acquireEventLock: function( pluginInstance, eventNames ) {
+				this.eventLockNames          = eventNames
+				this.eventLockPluginInstance = pluginInstance
+			},
+
+			/**
+			 * If the mouse lock can be released this function must be called
+			 * @param pluginInstance
+			 */
+			releaseEventLock: function( pluginInstance ) {
+				this.eventLockNames             = []
+				this.eventLockPluginInstance    = null
 			},
 
 			/**
@@ -165,7 +182,12 @@ define(
 					processEvent.call( this, spell, inputEvents[ i ] )
 
 				}
-				invoke( this.plugins, 'process', spell, this, timeInMs, deltaTimeInMs)
+
+				if( this.processLockPluginInstance !== null) {
+					invoke( [ this.processLockPluginInstance ], 'process', spell, this, timeInMs, deltaTimeInMs)
+				} else {
+					invoke( this.plugins, 'process', spell, this, timeInMs, deltaTimeInMs)
+				}
 
 				//consume all input events if we're in commandMode
 				if( this.commandMode == true ) {
