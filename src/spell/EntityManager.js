@@ -247,15 +247,14 @@ define(
 				childrenComponents  = componentDictionaries[ CHILDREN_COMPONENT_ID ],
 				children            = childrenComponents[ parentEntityId ]
 
-//TODO: Check if this code is needed
-/*
-			if( !children ) {
-				childrenComponents[ parentEntityId ] = { ids : [ entityId ] }
+			// TODO: Check if this code is needed
+//			if( !children ) {
+//				childrenComponents[ parentEntityId ] = { ids : [ entityId ] }
+//
+//			} else {
+//				childrenComponents[ parentEntityId ].ids.push( entityId )
+//			}
 
-			} else {
-				childrenComponents[ parentEntityId ].ids.push( entityId )
-			}
-			*/
 			if( children ) {
 				children.ids.push( entityId )
 			}
@@ -444,35 +443,34 @@ define(
 		}
 
 		var getEntityDimensions = function( componentDictionaries, entityId ) {
-
 			var staticAppearances   = componentDictionaries[ STATIC_APPEARANCE_COMPONENT_ID ],
 				animatedAppearances = componentDictionaries[ ANIMATED_APPEARANCE_COMPONENT_ID ],
 				transforms          = componentDictionaries[ TRANSFORM_COMPONENT_ID ],
-				width = 0,
-				height = 0
+				width               = 0,
+				height              = 0
 
-			if ( staticAppearances && staticAppearances[ entityId ] &&
+			if( staticAppearances && staticAppearances[ entityId ] &&
 				staticAppearances[ entityId ].asset &&
 				staticAppearances[ entityId ].asset.resource &&
 				staticAppearances[ entityId ].asset.resource.dimensions ) {
 
-				//entity has a static appearance
-				width   = staticAppearances[ entityId ].asset.resource.dimensions[ 0 ]
-				height  = staticAppearances[ entityId ].asset.resource.dimensions[ 1 ]
+				// entity has a static appearance
+				width  = staticAppearances[ entityId ].asset.resource.dimensions[ 0 ]
+				height = staticAppearances[ entityId ].asset.resource.dimensions[ 1 ]
 
-			} else if ( animatedAppearances && animatedAppearances[ entityId ] &&
+			} else if( animatedAppearances && animatedAppearances[ entityId ] &&
 				animatedAppearances[ entityId ].asset &&
 				animatedAppearances[ entityId ].asset.frameDimensions ) {
 
-				//entity has an animated appearance
-				width = animatedAppearances[ entityId ].asset.frameDimensions[ 0 ],
+				// entity has an animated appearance
+				width  = animatedAppearances[ entityId ].asset.frameDimensions[ 0 ],
 				height = animatedAppearances[ entityId ].asset.frameDimensions[ 1 ]
 			}
 
-			//apply scale factor
-			if ( transforms && transforms[ entityId ] ) {
-				width   *= Math.abs( transforms[ entityId ].worldScale[ 0 ] )
-				height  *= Math.abs( transforms[ entityId ].worldScale[ 1 ] )
+			// apply scale factor
+			if( transforms && transforms[ entityId ] ) {
+				width  *= Math.abs( transforms[ entityId ].worldScale[ 0 ] )
+				height *= Math.abs( transforms[ entityId ].worldScale[ 1 ] )
 			}
 
 			return [ width, height ]
