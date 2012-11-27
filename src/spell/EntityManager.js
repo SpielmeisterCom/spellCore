@@ -446,8 +446,8 @@ define(
 			var staticAppearances   = componentDictionaries[ STATIC_APPEARANCE_COMPONENT_ID ],
 				animatedAppearances = componentDictionaries[ ANIMATED_APPEARANCE_COMPONENT_ID ],
 				transforms          = componentDictionaries[ TRANSFORM_COMPONENT_ID ],
-				width               = 0,
-				height              = 0
+				width               = 100,
+				height              = 100
 
 			if( staticAppearances && staticAppearances[ entityId ] &&
 				staticAppearances[ entityId ].asset &&
