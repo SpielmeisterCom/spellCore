@@ -8,7 +8,6 @@
         {
             "name": "assetId",
             "type": "assetId:spriteSheet",
-            "default": "",
             "doc": "the spritesheet asset used for rendering"
         }
     ],
