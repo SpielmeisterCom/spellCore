@@ -7,7 +7,6 @@
 		{
 			"name": "assetId",
 			"type": "assetId:2dTileMap",
-			"default": "tilemap:spell.not_defined",
 			"doc": "the appearance asset used for rendering"
 		}
 	],
