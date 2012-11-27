@@ -45,15 +45,16 @@ define(
 		 * private
 		 */
 
-		var nextEntityId                        = 1,
-			ROOT_COMPONENT_ID                   = Defines.ROOT_COMPONENT_ID,
-			CHILDREN_COMPONENT_ID               = Defines.CHILDREN_COMPONENT_ID,
-			PARENT_COMPONENT_ID                 = Defines.PARENT_COMPONENT_ID,
-			NAME_COMPONENT_ID                   = Defines.NAME_COMPONENT_ID,
-			TRANSFORM_COMPONENT_ID              = Defines.TRANSFORM_COMPONENT_ID,
-			EVENT_HANDLERS_COMPONENT_ID         = Defines.EVENT_HANDLERS_COMPONENT_ID,
-			STATIC_APPEARANCE_COMPONENT_ID      = Defines.STATIC_APPEARANCE_COMPONENT_ID,
-			ANIMATED_APPEARANCE_COMPONENT_ID    = Defines.ANIMATED_APPEARANCE_COMPONENT_ID
+		var nextEntityId                      = 1,
+			ROOT_COMPONENT_ID                 = Defines.ROOT_COMPONENT_ID,
+			CHILDREN_COMPONENT_ID             = Defines.CHILDREN_COMPONENT_ID,
+			PARENT_COMPONENT_ID               = Defines.PARENT_COMPONENT_ID,
+			NAME_COMPONENT_ID                 = Defines.NAME_COMPONENT_ID,
+			TRANSFORM_COMPONENT_ID            = Defines.TRANSFORM_COMPONENT_ID,
+			APPEARANCE_TRANSFORM_COMPONENT_ID = Defines.APPEARANCE_TRANSFORM_COMPONENT_ID,
+			EVENT_HANDLERS_COMPONENT_ID       = Defines.EVENT_HANDLERS_COMPONENT_ID,
+			STATIC_APPEARANCE_COMPONENT_ID    = Defines.STATIC_APPEARANCE_COMPONENT_ID,
+			ANIMATED_APPEARANCE_COMPONENT_ID  = Defines.ANIMATED_APPEARANCE_COMPONENT_ID
 
 		/**
 		 * Returns an entity id. If no entity id is provided a new one is generated.
@@ -153,6 +154,15 @@ define(
 					updateWorldTransform( componentDictionaries, childrenEntityId )
 				}
 			}
+		}
+
+		var updateAppearanceTransform = function( appearanceTransform ) {
+			var matrix = appearanceTransform.matrix
+
+			mat3.identity( matrix )
+			mat3.translate( matrix, appearanceTransform.translation )
+			mat3.rotate( matrix, appearanceTransform.rotation )
+			mat3.scale( matrix, appearanceTransform.scale )
 		}
 
 		var addComponentType = function( componentMaps, componentId ) {
@@ -406,6 +416,12 @@ define(
 			}
 
 			updateWorldTransform( componentDictionaries, entityId )
+
+			var appearanceTransform = componentDictionaries[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ]
+
+			if( appearanceTransform ) {
+				updateAppearanceTransform( appearanceTransform )
+			}
 
 			eventManager.publish( Events.ENTITY_CREATED, [ entityId, entityComponents ] )
 
@@ -835,6 +851,14 @@ define(
 						attributeConfig.worldRotation ) {
 
 						// TODO: update localTransform from a changed world transform
+					}
+
+				} else if( componentId === APPEARANCE_TRANSFORM_COMPONENT_ID ) {
+					if( attributeConfig.translation ||
+						attributeConfig.scale ||
+						attributeConfig.rotation ) {
+
+						updateAppearanceTransform( this.componentDictionaries[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
 					}
 				}
 

@@ -11,6 +11,7 @@ define(
 			NAME_COMPONENT_ID                         : 'spell.component.name',
 			EVENT_HANDLERS_COMPONENT_ID               : 'spell.component.eventHandlers',
 			TRANSFORM_COMPONENT_ID                    : 'spell.component.2d.transform',
+			APPEARANCE_TRANSFORM_COMPONENT_ID         : 'spell.component.2d.graphics.appearanceTransform',
 			CAMERA_COMPONENT_ID                       : 'spell.component.2d.graphics.camera',
 			STATIC_APPEARANCE_COMPONENT_ID            : 'spell.component.2d.graphics.appearance',
 			ANIMATED_APPEARANCE_COMPONENT_ID          : 'spell.component.2d.graphics.animatedAppearance',
