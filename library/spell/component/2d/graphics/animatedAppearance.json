@@ -8,7 +8,6 @@
 		{
 			"name": "assetId",
 			"type": "assetId:animation",
-			"default": "animation:spell.not_defined",
 			"doc": "the appearance asset used for rendering"
 		},
 		{
