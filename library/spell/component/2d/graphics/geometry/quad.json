@@ -5,16 +5,10 @@
     "icon": "",
     "attributes": [
         {
-            "name": "width",
-            "type": "number",
-            "default": 1,
-            "doc": "the width of the quad"
-        },
-        {
-            "name": "height",
-            "type": "number",
-            "default": 1,
-            "doc": "the height of the quad"
+            "name": "dimensions",
+            "type": "vec2",
+            "default": [ 1, 1 ],
+            "doc": "the dimensions of the quad"
         }
     ],
     "version": 1
