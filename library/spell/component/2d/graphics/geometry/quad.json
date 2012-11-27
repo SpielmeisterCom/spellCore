@@ -7,13 +7,13 @@
         {
             "name": "width",
             "type": "number",
-            "default": 100,
+            "default": 1,
             "doc": "the width of the quad"
         },
         {
             "name": "height",
             "type": "number",
-            "default": 100,
+            "default": 1,
             "doc": "the height of the quad"
         }
     ],
