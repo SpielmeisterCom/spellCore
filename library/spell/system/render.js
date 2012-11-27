@@ -6,6 +6,7 @@ define(
 		'spell/client/2d/graphics/physics/drawCircle',
 		'spell/client/2d/graphics/physics/drawPoint',
 		'spell/client/2d/graphics/physics/drawOrigin',
+		'spell/client/2d/graphics/drawShape',
 		'spell/client/2d/graphics/drawText',
 		'spell/client/2d/graphics/drawTitleSafeOutline',
 		'spell/client/util/createComprisedRectangle',
@@ -25,6 +26,7 @@ define(
 		drawPhysicsCircle,
 		drawPhysicsPoint,
 		drawPhysicsOrigin,
+		drawShape,
 		drawText,
 		drawTitleSafeOutline,
 		createComprisedRectangle,
@@ -113,6 +115,7 @@ define(
 			childrenComponents,
 			quadGeometries,
 			visualObjects,
+			rectangles,
 			deltaTimeInMs,
 			id,
 			next
@@ -137,6 +140,7 @@ define(
 					}
 
 					var appearance      = appearances[ id ] || animatedAppearances[ id ] || tilemaps[ id ] || textAppearances[ id ] ||  spriteSheetAppearances[ id ],
+						shape           = rectangles[ id ],
 						quadGeometry    = quadGeometries[ id ]
 
 					if( appearance ) {
@@ -294,6 +298,10 @@ define(
 							}
 
 						}
+					}
+
+					if( shape ) {
+						drawShape.rectangle( context, shape )
 					}
 				}
 
@@ -566,7 +574,8 @@ define(
 				this.spriteSheetAppearances,
 				this.childrenComponents,
 				this.quadGeometries,
-				this.visualObjects
+				this.visualObjects,
+				this.rectangles
 			)
 
 			if( this.config.debug ) {

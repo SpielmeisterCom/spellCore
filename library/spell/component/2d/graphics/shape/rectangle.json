@@ -1,0 +1,33 @@
+{
+    "type": "component",
+    "readonly": true,
+    "title": "2D Rectangle",
+    "icon": "",
+    "attributes": [
+        {
+            "name": "color",
+            "type": "vec3",
+            "default": [ 1, 0, 1 ],
+            "doc": "the color used for drawing"
+        },
+        {
+            "name": "width",
+            "type": "number",
+            "default": 2,
+            "doc": "the width of the box"
+        },
+        {
+            "name": "height",
+            "type": "number",
+            "default": 2,
+            "doc": "the height of the box"
+        },
+        {
+            "name": "linewidth",
+            "type": "number",
+            "default": 1,
+            "doc": "the width of the box"
+        }
+    ],
+    "version": 1
+}

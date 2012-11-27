@@ -6,6 +6,7 @@
 define(
 	'spell/client/staticInclude',
 	[
+		'spell/client/2d/graphics/drawShape',
 		'spell/client/2d/graphics/physics/drawBox',
 		'spell/client/2d/graphics/physics/drawCircle',
 		'spell/client/2d/graphics/physics/drawPoint',

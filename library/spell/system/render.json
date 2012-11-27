@@ -50,6 +50,10 @@
 			"name": "cameras",
 			"componentId": "spell.component.2d.graphics.camera"
 		},
+        {
+            "name": "rectangles",
+            "componentId": "spell.component.2d.graphics.shape.rectangle"
+        },
 		{
 			"name": "debugBoxes",
 			"componentId": "spell.component.2d.graphics.debug.box"
