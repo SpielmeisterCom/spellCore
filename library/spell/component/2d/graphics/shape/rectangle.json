@@ -5,12 +5,6 @@
     "icon": "",
     "attributes": [
         {
-            "name": "color",
-            "type": "vec3",
-            "default": [ 1, 0, 1 ],
-            "doc": "the color used for drawing"
-        },
-        {
             "name": "width",
             "type": "number",
             "default": 2,
@@ -23,10 +17,28 @@
             "doc": "the height of the box"
         },
         {
-            "name": "linewidth",
+            "name": "lineColor",
+            "type": "vec3",
+            "default": [ 1, 0, 1 ],
+            "doc": "the line color used for outlining the rectangle"
+        },
+        {
+            "name": "lineWidth",
             "type": "number",
             "default": 1,
             "doc": "the width of the box"
+        },
+        {
+            "name": "fill",
+            "type": "boolean",
+            "default": false,
+            "docs": "specifies if this rectangle should be filled"
+        },
+        {
+            "name": "fillColor",
+            "type": "vec3",
+            "default": [ 1, 0, 1 ],
+            "doc": "the line color used for filling the rectangle"
         }
     ],
     "version": 1
