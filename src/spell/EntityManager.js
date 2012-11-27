@@ -45,15 +45,16 @@ define(
 		 * private
 		 */
 
-		var nextEntityId                        = 1,
-			ROOT_COMPONENT_ID                   = Defines.ROOT_COMPONENT_ID,
-			CHILDREN_COMPONENT_ID               = Defines.CHILDREN_COMPONENT_ID,
-			PARENT_COMPONENT_ID                 = Defines.PARENT_COMPONENT_ID,
-			NAME_COMPONENT_ID                   = Defines.NAME_COMPONENT_ID,
-			TRANSFORM_COMPONENT_ID              = Defines.TRANSFORM_COMPONENT_ID,
-			EVENT_HANDLERS_COMPONENT_ID         = Defines.EVENT_HANDLERS_COMPONENT_ID,
-			STATIC_APPEARANCE_COMPONENT_ID      = Defines.STATIC_APPEARANCE_COMPONENT_ID,
-			ANIMATED_APPEARANCE_COMPONENT_ID    = Defines.ANIMATED_APPEARANCE_COMPONENT_ID
+		var nextEntityId                      = 1,
+			ROOT_COMPONENT_ID                 = Defines.ROOT_COMPONENT_ID,
+			CHILDREN_COMPONENT_ID             = Defines.CHILDREN_COMPONENT_ID,
+			PARENT_COMPONENT_ID               = Defines.PARENT_COMPONENT_ID,
+			NAME_COMPONENT_ID                 = Defines.NAME_COMPONENT_ID,
+			TRANSFORM_COMPONENT_ID            = Defines.TRANSFORM_COMPONENT_ID,
+			APPEARANCE_TRANSFORM_COMPONENT_ID = Defines.APPEARANCE_TRANSFORM_COMPONENT_ID,
+			EVENT_HANDLERS_COMPONENT_ID       = Defines.EVENT_HANDLERS_COMPONENT_ID,
+			STATIC_APPEARANCE_COMPONENT_ID    = Defines.STATIC_APPEARANCE_COMPONENT_ID,
+			ANIMATED_APPEARANCE_COMPONENT_ID  = Defines.ANIMATED_APPEARANCE_COMPONENT_ID
 
 		/**
 		 * Returns an entity id. If no entity id is provided a new one is generated.
@@ -81,8 +82,7 @@ define(
 		 *
 		 * @param componentDictionaries
 		 * @param entityId
-		 * @param parentEntityId
-		 * @return {Function}
+		 * @return {*}
 		 */
 		var updateLocalTransform = function( componentDictionaries, entityId ) {
 
@@ -93,67 +93,76 @@ define(
 		 *
 		 * @param componentDictionaries
 		 * @param entityId
-		 * @return {Function}
+		 * @return {*}
 		 */
 		var updateWorldTransform = function( componentDictionaries, entityId ) {
+			var transformComponents = componentDictionaries[ TRANSFORM_COMPONENT_ID ],
+				transform           = transformComponents[ entityId ]
+
+			if( !transform ) return
+
 			var parentComponents    = componentDictionaries[ PARENT_COMPONENT_ID ],
 				childrenComponents  = componentDictionaries[ CHILDREN_COMPONENT_ID ],
-				transformComponents = componentDictionaries[ TRANSFORM_COMPONENT_ID ],
-				transform           = transformComponents[ entityId ],
 				children            = childrenComponents[ entityId ],
-				parent,
 				parentEntityId      = entityId, // we will search for the real parent later
+				localMatrix         = transform.localMatrix,
+				worldMatrix         = transform.worldMatrix,
+				parent,
 				parentMatrix
 
-			if( transform ) {
-				var localMatrix = transform.localMatrix,
-					worldMatrix = transform.worldMatrix
+			// set new localToWorldMatrix
+			mat3.identity(  localMatrix )
+			mat3.translate( localMatrix, transform.translation )
+			mat3.rotate(    localMatrix, transform.rotation )
+			mat3.scale(     localMatrix, transform.scale )
 
-				// set new localToWorldMatrix
-				mat3.identity(  localMatrix )
-				mat3.translate( localMatrix, transform.translation )
-				mat3.rotate(    localMatrix, transform.rotation )
-				mat3.scale(     localMatrix, transform.scale )
+			// search for next parent with an transform component
+			while( parent = parentComponents[ parentEntityId ] ) {
+				parentEntityId = parent.id
 
-				// search for next parent with an transform component
-				while( parent = parentComponents[ parentEntityId ] ) {
-					parentEntityId = parent.id
-
-					if( transformComponents[ parentEntityId ] ) {
-						parentMatrix = transformComponents[ parentEntityId ].worldMatrix
-						break
-					}
-				}
-
-				if( parentMatrix ) {
-					// multiply parent's localToWorldMatrix with ours
-					mat3.multiply( parentMatrix, localMatrix, worldMatrix )
-
-				} else {
-
-					// if this entity has no parent, the localToWorld Matrix equals the localMatrix
-					mat3.set( localMatrix, worldMatrix )
-				}
-
-				// update worldToLocalMatrix
-				mat3.inverse( worldMatrix, transform.worldToLocalMatrix )
-
-				// extract worldTranslation, worldScale and worldRotation from worldMatrix
-
-				mat3.decompose( worldMatrix, transform.worldScale, transform.worldSkew, transform.worldTranslation )
-				transform.worldRotation = transform.worldSkew[1]
-
-				transform.worldTranslation[0] = worldMatrix[6]
-				transform.worldTranslation[1] = worldMatrix[7]
-
-				// update all childs recursively
-				if( children ) {
-					for(var i = 0, length = children.ids.length; i < length; i++) {
-						var childrenEntityId = children.ids[ i ]
-						updateWorldTransform( componentDictionaries, childrenEntityId )
-					}
+				if( transformComponents[ parentEntityId ] ) {
+					parentMatrix = transformComponents[ parentEntityId ].worldMatrix
+					break
 				}
 			}
+
+			if( parentMatrix ) {
+				// multiply parent's localToWorldMatrix with ours
+				mat3.multiply( parentMatrix, localMatrix, worldMatrix )
+
+			} else {
+				// if this entity has no parent, the localToWorld Matrix equals the localMatrix
+				mat3.set( localMatrix, worldMatrix )
+			}
+
+			// update worldToLocalMatrix
+			mat3.inverse( worldMatrix, transform.worldToLocalMatrix )
+
+			// extract worldTranslation, worldScale and worldRotation from worldMatrix
+
+			mat3.decompose( worldMatrix, transform.worldScale, transform.worldSkew, transform.worldTranslation )
+			transform.worldRotation = transform.worldSkew[ 1 ]
+
+			transform.worldTranslation[ 0 ] = worldMatrix[ 6 ]
+			transform.worldTranslation[ 1 ] = worldMatrix[ 7 ]
+
+			// update all childs recursively
+			if( children ) {
+				for( var i = 0, length = children.ids.length; i < length; i++ ) {
+					var childrenEntityId = children.ids[ i ]
+
+					updateWorldTransform( componentDictionaries, childrenEntityId )
+				}
+			}
+		}
+
+		var updateAppearanceTransform = function( appearanceTransform ) {
+			var matrix = appearanceTransform.matrix
+
+			mat3.identity( matrix )
+			mat3.translate( matrix, appearanceTransform.translation )
+			mat3.rotate( matrix, appearanceTransform.rotation )
+			mat3.scale( matrix, appearanceTransform.scale )
 		}
 
 		var addComponentType = function( componentMaps, componentId ) {
@@ -407,6 +416,12 @@ define(
 			}
 
 			updateWorldTransform( componentDictionaries, entityId )
+
+			var appearanceTransform = componentDictionaries[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ]
+
+			if( appearanceTransform ) {
+				updateAppearanceTransform( appearanceTransform )
+			}
 
 			eventManager.publish( Events.ENTITY_CREATED, [ entityId, entityComponents ] )
 
@@ -829,19 +844,24 @@ define(
 						attributeConfig.scale ||
 						attributeConfig.rotation ) {
 
-						// changed local attributes, compute the new global position
-
 						updateWorldTransform( this.componentDictionaries, entityId )
 
 					} else if( attributeConfig.worldTranslation ||
 						attributeConfig.worldScale ||
 						attributeConfig.worldRotation ) {
 
-						// changed world attributes, compute new local position
-
 						// TODO: update localTransform from a changed world transform
 					}
+
+				} else if( componentId === APPEARANCE_TRANSFORM_COMPONENT_ID ) {
+					if( attributeConfig.translation ||
+						attributeConfig.scale ||
+						attributeConfig.rotation ) {
+
+						updateAppearanceTransform( this.componentDictionaries[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
+					}
 				}
+
 				return true
 			},
 

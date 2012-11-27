@@ -62,9 +62,10 @@ define(
 		var screenToWorld = mat3.create()
 		mat3.identity( screenToWorld )
 
-		var tmpMatrix     = mat3.create(),
-			textureMatrix = mat3.create()
+		var tmpMatrix            = mat3.create(),
+			defaultTextureMatrix = mat3.create()
 
+		mat3.identity( defaultTextureMatrix )
 
 		/*
 		 * Creates a projection matrix that normalizes the transformation behaviour to that of the normalized canvas-2d (that is origin is in bottom left,
@@ -225,27 +226,13 @@ define(
 			gl.uniformMatrix3fv( uniformLocation, false, screenSpaceShimMatrix )
 
 			// setting up texture matrix
-			resetTextureMatrix( shaderProgram, textureMatrix )
+			setTextureMatrix( shaderProgram, defaultTextureMatrix )
 
 			return shaderProgram
 		}
 
-
-		var isTextureMatrixIdentity = false
-
-		var resetTextureMatrix = function( shaderProgram, matrix ) {
-			if( isTextureMatrixIdentity ) return
-
-			matrix[ 0 ] = 1.0
-			matrix[ 4 ] = 1.0
-			matrix[ 6 ] = 0.0
-			matrix[ 7 ] = 0.0
-
-			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uTextureMatrix' ), false, matrix )
-		}
-
 		var updateTextureMatrix = function( shaderProgram, ss, st, tt, ts, matrix ) {
-			isTextureMatrixIdentity = false
+			mat3.identity( matrix )
 
 			matrix[ 0 ] = ss
 			matrix[ 4 ] = st
@@ -255,15 +242,19 @@ define(
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uTextureMatrix' ), false, matrix )
 		}
 
+		var setTextureMatrix = function( shaderProgram, textureMatrix ) {
+			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uTextureMatrix' ), false, textureMatrix )
+		}
+
 
 		/*
 		 * public
 		 */
 		var transformScreenToWorld = function( vec ) {
-
-			//transform vec to a gl-like origin (bottom left)
-			//use worldPosition as temp because we need to allocate it anyway
+			// transform vec to a gl-like origin (bottom left)
+			// use worldPosition as temp because we need to allocate it anyway
 			var worldPosition = vec2.create( vec )
+
 			worldPosition[ 1 ] = gl.canvas.height - worldPosition[ 1 ]
 
 			mat3.multiplyVec2( screenToWorld, worldPosition, worldPosition )
@@ -318,11 +309,8 @@ define(
 			gl.clear( gl.COLOR_BUFFER_BIT )
 		}
 
-		var drawTexture = function( shaderProgram, texture, dx, dy, dw, dh ) {
+		var drawTexture = function( shaderProgram, texture, destinationPosition, destinationDimensions, textureMatrix ) {
 			if( texture === undefined ) throw 'Texture is undefined'
-
-			if( !dw ) dw = 1.0
-			if( !dh ) dh = 1.0
 
 			// setting up fillRect mode
 			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
@@ -343,25 +331,26 @@ define(
 			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
 
 			// rotating the image so that it is not upside down
-			mat3.translate( tmpMatrix, [ dx, dy ] )
+			mat3.translate( tmpMatrix, destinationPosition )
 			mat3.rotate( tmpMatrix, Math.PI )
-			mat3.scale( tmpMatrix, [ -dw, dh ] )
+			mat3.scale( tmpMatrix, [ -1, 1 ] )
+			mat3.scale( tmpMatrix, destinationDimensions )
 			mat3.translate( tmpMatrix, [ 0, -1 ] )
 
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
 
-			// setting up the texture matrix
-			resetTextureMatrix( shaderProgram, textureMatrix )
+			setTextureMatrix(
+				shaderProgram,
+				textureMatrix ?
+					textureMatrix :
+					defaultTextureMatrix
+			)
 
-			// drawing
 			gl.drawArrays( gl.TRIANGLE_FAN, QUAD_VERTEX_OFFSET, 4 )
 		}
 
-		var drawSubTexture = function( shaderProgram, texture, sx, sy, sw, sh, dx, dy, dw, dh ) {
+		var drawSubTexture = function( shaderProgram, texture, sourcePosition, sourceDimensions, destinationPosition, destinationDimensions ) {
 			if( texture === undefined ) throw 'Texture is undefined'
-
-			if( !dw ) dw = 1.0
-			if( !dh ) dh = 1.0
 
 			// setting up fillRect mode
 			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
@@ -382,10 +371,10 @@ define(
 			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
 
 			// rotating the image so that it is not upside down
-			mat3.translate( tmpMatrix, [ dx, dy ] )
+			mat3.translate( tmpMatrix, destinationPosition )
 			mat3.rotate( tmpMatrix, Math.PI )
-			mat3.scale( tmpMatrix, [ -dw, dh ] )
-
+			mat3.scale( tmpMatrix, [ -1, 1 ] )
+			mat3.scale( tmpMatrix, destinationDimensions )
 			mat3.translate( tmpMatrix, [ 0, -1 ] )
 
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
@@ -396,14 +385,13 @@ define(
 
 			updateTextureMatrix(
 				shaderProgram,
-				( sw - 1 ) / tw,
-				( sh - 1 ) / th,
-				( sx + 0.5 ) / tw,
-				( sy + 0.5 ) / th,
-				textureMatrix
+				( sourceDimensions[ 0 ] - 1 ) / tw,
+				( sourceDimensions[ 1 ] - 1 ) / th,
+				( sourcePosition[ 0 ] + 0.5 ) / tw,
+				( sourcePosition[ 1 ] + 0.5 ) / th,
+				tmpMatrix
 			)
 
-			// drawing
 			gl.drawArrays( gl.TRIANGLE_FAN, QUAD_VERTEX_OFFSET, 4 )
 		}
 
@@ -431,7 +419,6 @@ define(
 
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
 
-			// drawing
 			gl.drawArrays( gl.LINE_LOOP, QUAD_VERTEX_OFFSET, 4 )
 		}
 
@@ -459,7 +446,6 @@ define(
 
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
 
-			// drawing
 			gl.drawArrays( gl.LINE_LOOP, CIRCLE_VERTEX_OFFSET, NUM_CIRCLE_VERTICES )
 		}
 
@@ -491,7 +477,6 @@ define(
 
 			gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW )
 
-			// drawing
 			gl.drawArrays( gl.LINES, LINE_VERTEX_OFFSET, 2 )
 		}
 
@@ -515,7 +500,6 @@ define(
 
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
 
-			// drawing
 			gl.drawArrays( gl.TRIANGLE_FAN, QUAD_VERTEX_OFFSET, 4 )
 		}
 
@@ -586,11 +570,15 @@ define(
 			gl.bindTexture( gl.TEXTURE_2D, texture )
 			gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image )
 			gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR )
-			gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE )
-			gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE )
 
 			if( isPowerOfTwoTexture ) {
+				gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT )
+				gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT )
 				gl.generateMipmap( gl.TEXTURE_2D )
+
+			} else {
+				gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE )
+				gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE )
 			}
 
 			gl.bindTexture( gl.TEXTURE_2D, null )

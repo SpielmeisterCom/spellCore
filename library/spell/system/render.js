@@ -45,12 +45,13 @@ define(
 		 * private
 		 */
 
-		var tmpVec2          = vec2.create(),
-			tmpMat3          = mat3.identity(),
-			clearColor       = vec4.create( [ 0, 0, 0, 1 ] ),
-			markerColor      = vec4.create( [ 0.45, 0.45, 0.45, 1 ] ),
-			debugFontAssetId = 'font:spell.OpenSans14px',
-			drawDebugShapes  = true,
+		var tmpVec2           = vec2.create(),
+			tmpMat3           = mat3.identity(),
+			clearColor        = vec4.create( [ 0, 0, 0, 1 ] ),
+			markerColor       = vec4.create( [ 0.45, 0.45, 0.45, 1 ] ),
+			debugFontAssetId  = 'font:spell.OpenSans14px',
+			drawDebugShapes   = true,
+			defaultDimensions = vec2.create( [ 1, 1 ] ),
 			currentCameraId
 
 		var roundVec2 = function( v ) {
@@ -104,11 +105,13 @@ define(
 			context,
 			transforms,
 			appearances,
+			appearanceTransforms,
 			animatedAppearances,
 			textAppearances,
 			tilemaps,
 			spriteSheetAppearances,
 			childrenComponents,
+			quadGeometries,
 			visualObjects,
 			deltaTimeInMs,
 			id,
@@ -142,12 +145,26 @@ define(
 						if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
 
 						if( asset.type === 'appearance' ) {
+							var appearanceTransform = appearanceTransforms[ id ],
+								quadGeometry = quadGeometries[ id ]
+
+							var quadDimensions = quadGeometry ?
+								quadGeometry.dimensions :
+								texture.dimensions
+
 							// static appearance
 							context.save()
 							{
-								context.scale( texture.dimensions )
+								var textureMatrix = appearanceTransform ?
+									appearanceTransform.matrix :
+									undefined
 
-								context.drawTexture( texture, -0.5, -0.5, 1, 1 )
+								context.drawTexture(
+									texture,
+									vec2.scale( quadDimensions, -0.5, tmpVec2 ),
+									quadDimensions,
+									textureMatrix
+								)
 							}
 							context.restore()
 
@@ -171,25 +188,24 @@ define(
 
 								for( var y = 0; y <= maxY ; y++ ) {
 									for( var x = 0; x <= maxX; x++ ) {
-
 										if( !tilemapData[ y ] ||
 											tilemapData[ y ][ x ] === null ) {
+
 											continue
 										}
 
 										var frameId = tilemapData[ y ][ x ],
 											frameOffset = frameOffsets[ frameId ]
 
+										tmpVec2[ 0 ] = x
+										tmpVec2[ 1 ] = maxY - y
+
 										context.drawSubTexture(
 											texture,
-											frameOffset[ 0 ],
-											frameOffset[ 1 ],
-											frameDimensions[ 0 ],
-											frameDimensions[ 1 ],
-											x,
-											maxY - y,
-											1,
-											1
+											frameOffset,
+											frameDimensions,
+											tmpVec2,
+											defaultDimensions
 										)
 									}
 								}
@@ -199,7 +215,12 @@ define(
 						} else if( asset.type === 'animation' ) {
 							// animated appearance
 							var assetFrameDimensions = asset.frameDimensions,
-								assetNumFrames       = asset.numFrames
+								assetNumFrames       = asset.numFrames,
+								quadGeometry         = quadGeometries[ id ]
+
+							var quadDimensions = quadGeometry ?
+								quadGeometry.dimensions :
+								assetFrameDimensions
 
 							appearance.offset = createOffset(
 								deltaTimeInMs,
@@ -215,17 +236,21 @@ define(
 
 							context.save()
 							{
-								context.scale( assetFrameDimensions )
-
-								context.drawSubTexture( texture, frameOffset[ 0 ], frameOffset[ 1 ], assetFrameDimensions[ 0 ], assetFrameDimensions[ 1 ], -0.5, -0.5, 1, 1 )
+								context.drawSubTexture(
+									texture,
+									frameOffset,
+									assetFrameDimensions,
+									vec2.scale( quadDimensions, -0.5, tmpVec2 ),
+									quadDimensions
+								)
 							}
 							context.restore()
 
 						} else if( asset.type === 'spriteSheet' ) {
-							var frameDimensions     = asset.frameDimensions,
-								frameOffsets        = asset.frameOffsets,
-								numFrames           = asset.numFrames,
-								frameOffset         = null
+							var frameDimensions = asset.frameDimensions,
+								frameOffsets    = asset.frameOffsets,
+								numFrames       = asset.numFrames,
+								frameOffset     = null
 
 							context.save()
 							{
@@ -234,16 +259,15 @@ define(
 								for( var frameId = 0; frameId < numFrames; frameId++ ) {
 									frameOffset = frameOffsets[ frameId ]
 
+									tmpVec2[ 0 ] = frameId
+									tmpVec2[ 1 ] = 0
+
 									context.drawSubTexture(
 										texture,
-										frameOffset[ 0 ],
-										frameOffset[ 1 ],
-										frameDimensions[ 0 ],
-										frameDimensions[ 1 ],
-										frameId,
-										0,
-										1,
-										1
+										frameOffset,
+										frameDimensions,
+										tmpVec2,
+										defaultDimensions
 									)
 								}
 							}
@@ -514,11 +538,13 @@ define(
 				this.context,
 				this.transforms,
 				this.appearances,
+				this.appearanceTransforms,
 				this.animatedAppearances,
 				this.textAppearances,
 				this.tilemaps,
 				this.spriteSheetAppearances,
 				this.childrenComponents,
+				this.quadGeometries,
 				this.visualObjects
 			)
 

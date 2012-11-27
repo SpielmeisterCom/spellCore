@@ -3,8 +3,13 @@ define(
 	[
 		'spell/functions'
 	],
-	function(_) {
-		"use strict";
+	function(
+		_
+	) {
+		'use strict'
+
+
+		var MIN_SCALE = 0.01
 
 		var getActiveCameraId = function( cameras ) {
 			if( !cameras || _.size( cameras ) === 0 ) return
@@ -133,16 +138,8 @@ define(
 				//zoom camera in and out on mousewheel event
 				var currentScale = editorSystem.transforms[ this.editorCameraEntityId ].scale
 
-				currentScale[0] = currentScale[0] + ( 0.5 * event.direction * -1 )
-				currentScale[1] = currentScale[1] + ( 0.5 * event.direction * -1 )
-
-				if (currentScale[0] < 0.25) {
-					currentScale[0] = 0.25
-				}
-
-				if (currentScale[1] < 0.25) {
-					currentScale[1] = 0.25
-				}
+				currentScale[ 0 ] = Math.max( currentScale[ 0 ] + event.direction * -0.5, MIN_SCALE )
+				currentScale[ 1 ] = Math.max( currentScale[ 1 ] + event.direction * -0.5, MIN_SCALE )
 			},
 
 			onMouseMove: function( spell, editorSystem, event ) {
