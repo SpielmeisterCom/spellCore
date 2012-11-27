@@ -31,6 +31,7 @@
         },
         {
             "name": "skew",
+			"engineInternal": true,
             "type": "vec2",
             "default": [
                 0,
@@ -39,7 +40,7 @@
             "doc": "2D skew transformation along the X- and the Y-axis"
         },
         {
-            "name": "localMatrix",
+            "name": "matrix",
             "engineInternal": true,
             "type": "mat3",
             "default": [
@@ -47,7 +48,7 @@
                 0,  1,  0,
                 0,  0,  1
             ],
-            "doc": "3x3 matrix that describes the comlete transform in local coordinates"
+            "doc": "3x3 matrix that describes the accumulated texture coordinate transformation"
         }
     ],
     "version": 1
