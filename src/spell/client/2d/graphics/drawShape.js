@@ -6,7 +6,6 @@ define(
 
 		return {
 			rectangle: function( context, shape ) {
-				debugger
 				var halfWidth    = shape.width * 0.5,
 					quarterWidth = shape.width * 0.25
 
