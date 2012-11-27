@@ -1,8 +1,17 @@
 define(
 	'spell/client/2d/graphics/drawText',
-	function() {
+	[
+		'spell/math/vec2'
+	],
+	function(
+		vec2
+	) {
 		'use strict'
 
+
+		var sourcePosition      = vec2.create(),
+			destinationPosition = vec2.create(),
+			dimensions          = vec2.create()
 
 		/**
 		 * Draws a character on a context.
@@ -16,20 +25,21 @@ define(
 		 * @param fontMapSpacing the fake spacing introduced by the font map
 		 */
 		var drawCharacter = function( context, texture, charData, dx, dy, spacing, fontMapSpacing ) {
-			var doubledFontMapSpacing = fontMapSpacing * 2,
-				width                 = charData.width,
-				height                = charData.height
+			sourcePosition[ 0 ] = charData.x - fontMapSpacing
+			sourcePosition[ 1 ] = charData.y
+
+			destinationPosition[ 0 ] = dx - fontMapSpacing
+			destinationPosition[ 1 ] = dy
+
+			dimensions[ 0 ] = charData.width + fontMapSpacing * 2
+			dimensions[ 1 ] = charData.height
 
 			context.drawSubTexture(
 				texture,
-				charData.x - fontMapSpacing,
-				charData.y,
-				width + doubledFontMapSpacing,
-				height,
-				dx - fontMapSpacing,
-				dy,
-				width + doubledFontMapSpacing,
-				height
+				sourcePosition,
+				dimensions,
+				destinationPosition,
+				dimensions
 			)
 
 			return charData.width + spacing + fontMapSpacing

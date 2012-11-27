@@ -3,6 +3,10 @@
 	"readonly": true,
 	"input": [
 		{
+			"name": "appearanceTransforms",
+			"componentId": "spell.component.2d.graphics.appearanceTransform"
+		},
+		{
 			"name": "transforms",
 			"componentId": "spell.component.2d.transform"
 		},
@@ -33,6 +37,10 @@
 		{
 			"name": "tilemaps",
 			"componentId": "spell.component.2d.graphics.tilemap"
+		},
+		{
+			"name": "quadGeometries",
+			"componentId": "spell.component.2d.graphics.geometry.quad"
 		},
 		{
 			"name": "visualObjects",
