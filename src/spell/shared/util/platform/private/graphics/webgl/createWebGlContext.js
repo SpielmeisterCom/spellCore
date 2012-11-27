@@ -495,7 +495,7 @@ define(
 			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
 
 			// correcting position
-			mat3.translate( tmpMatrix, [ dx, dy ] )
+			mat3.translate( tmpMatrix, [ dx + dw * -0.5, dy + dh * -0.5 ] )
 			mat3.scale( tmpMatrix, [ dw, dh ] )
 
 			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
