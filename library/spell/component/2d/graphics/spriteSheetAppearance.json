@@ -1,0 +1,16 @@
+{
+    "readonly": true,
+    "type": "component",
+    "title": "2D SpriteSheet Appearance",
+    "doc": "",
+    "icon": "",
+    "attributes": [
+        {
+            "name": "assetId",
+            "type": "assetId:spriteSheet",
+            "default": "",
+            "doc": "the spritesheet asset used for rendering"
+        }
+    ],
+    "version": 1
+}
