@@ -7,7 +7,6 @@
 	"attributes": [
 		{
 			"name": "assetId",
-			"default": "sound:spell.defaultSound",
 			"type": "assetId:sound"
 		},
 		{
