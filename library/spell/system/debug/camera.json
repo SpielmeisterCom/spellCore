@@ -20,6 +20,10 @@
             "componentId": "spell.component.2d.graphics.animatedAppearance"
         },
         {
+            "name": "tilemaps",
+            "componentId": "spell.component.2d.graphics.tilemap"
+        },
+        {
             "name": "names",
             "componentId": "spell.component.name"
         }

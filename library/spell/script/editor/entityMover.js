@@ -124,7 +124,7 @@ define("spell/script/editor/entityMover",
 
 				if ( entityId == this.selectedEntity && !this.isDragging ) {
 					//if we removed the selectedEntity and we're not dragging it, deselect it
-					this.selectedEntity = null
+					selectEntity.call( this, null )
 				}
 			}
 
@@ -177,7 +177,7 @@ define("spell/script/editor/entityMover",
 
 			if (!this.dragCursorOffset) {
 				this.dragCursorOffset = vec2.create()
-				vec2.set(this.currentWorldPosition, this.dragCursorOffset)
+				vec2.set(this.editorSystem.cursorWorldPosition, this.dragCursorOffset)
 			}
 
 			if (!this.dragEntityOffset && transform) {
@@ -193,12 +193,12 @@ define("spell/script/editor/entityMover",
 
 			if(this.isDirty) {
 				sendTransformToSpellEd.call( this, this.selectedEntity )
-				this.selectedEntity = null
+				selectEntity.call( this, null )
 			}
 		}
 
 		var cancelSelection = function() {
-			this.selectedEntity = null
+			selectEntity.call( this, null )
 			this.matchedEntities.length = 0
 
 			syncOverlayEntitesWithMatchedEntites.call( this, this.overlayEntityMap, this.matchedEntities)
@@ -250,13 +250,19 @@ define("spell/script/editor/entityMover",
 				index = (index + 1) % matchedEntites.length
 			}
 
-			this.selectedEntity = matchedEntites[ index ]
+			selectEntity.call( this, matchedEntites[ index ] )
+		}
+
+		var interactiveEditorSystem = null
+
+		var selectEntity = function( entityId ) {
+			this.selectedEntity = entityId
+			this.editorSystem.prototype.setSelectedEntity.call( this.editorSystem, entityId )
 		}
 
 
 		var entityMover = function(spell, editorSystem) {
-
-			this.currentWorldPosition   = null
+			this.editorSystem       = editorSystem
 
 			/**
 			 * Map entity => corresponding overlay entity
@@ -326,8 +332,8 @@ define("spell/script/editor/entityMover",
 			},
 
 			process: function( spell, editorSystem, timeInMs, deltaTimeInMs) {
-				if( this.currentWorldPosition ) {
-					highlightEntitiesAtPosition.call( this, this.currentWorldPosition )
+				if( this.editorSystem.cursorWorldPosition ) {
+					highlightEntitiesAtPosition.call( this, this.editorSystem.cursorWorldPosition )
 				}
 			},
 
@@ -338,7 +344,7 @@ define("spell/script/editor/entityMover",
 
 				if(!this.selectedEntity && this.matchedEntities.length > 0 ) {
 					//if no entity is selected and a drag is going on
-					this.selectedEntity = this.matchedEntities[ this.matchedEntities.length - 1 ]
+					selectEntity.call( this, this.matchedEntities[ this.matchedEntities.length - 1 ] )
 				}
 
 				if( this.selectedEntity ) {
@@ -353,10 +359,9 @@ define("spell/script/editor/entityMover",
 			},
 
 			onMouseMove: function( spell, editorSystem, event ) {
-				this.currentWorldPosition = spell.renderingContext.transformScreenToWorld( event.position )
 
 				if( this.selectedEntity && this.isDragging ) {
-					updateEntityByWorldPosition.call( this, this.selectedEntity, this.currentWorldPosition )
+					updateEntityByWorldPosition.call( this, this.selectedEntity, this.editorSystem.cursorWorldPosition )
 				}
 			},
 

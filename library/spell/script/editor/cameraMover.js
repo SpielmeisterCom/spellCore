@@ -160,8 +160,8 @@ define(
 				var currentTranslation = editorSystem.transforms[ this.editorCameraEntityId ].translation,
 					currentScale = editorSystem.transforms[ this.editorCameraEntityId ].scale
 
-				currentTranslation[ 0 ] -= ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ]
-				currentTranslation[ 1 ] += ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ]
+				currentTranslation[ 0 ] -= ( event.position[ 0 ] - this.lastMousePosition[ 0 ] ) * currentScale[ 0 ] * 0.5
+				currentTranslation[ 1 ] += ( event.position[ 1 ] - this.lastMousePosition[ 1 ] ) * currentScale[ 1 ] * 0.5
 
 				this.lastMousePosition = [ event.position[ 0 ], event.position[ 1 ] ]
 			}

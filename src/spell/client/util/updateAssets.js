@@ -165,12 +165,13 @@ define(
 				newAssetDefinitions,
 				function( assetDefinition ) {
 					var asset,
-						type = assetDefinition.subtype
+						type    = assetDefinition.subtype,
+						assetId = createAssetId( type, assetDefinition.namespace, assetDefinition.name)
 
 					if( type === 'appearance' || type === 'sound' ) {
-						asset = {
-							type : type
-						}
+					asset = {
+						type : type
+					}
 
 					} else if( type === 'spriteSheet' ) {
 						asset = createSpriteSheetAsset( assetDefinition )
@@ -191,7 +192,11 @@ define(
 
 					addResourceId( asset, assetDefinition )
 
-					assets[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = asset
+					if (asset) {
+						asset.assetId  = assetId
+					}
+
+					assets[ assetId ] = asset
 				}
 			)
 

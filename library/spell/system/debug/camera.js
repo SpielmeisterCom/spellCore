@@ -8,6 +8,7 @@ define(
 	[
 		'spell/script/editor/cameraMover',
 		'spell/script/editor/entityMover',
+		'spell/script/editor/tilemapEditor',
 
 		'spell/math/vec2',
 		'spell/math/mat3',
@@ -16,6 +17,7 @@ define(
 	function(
 		cameraMover,
 		entityMover,
+		tilemapEditor,
 
 		vec2,
 		mat3,
@@ -44,6 +46,9 @@ define(
 				invoke( this.plugins, 'onMouseWheel', spell, this, event)
 
 			} else if ( event.type == 'mousemove' ) {
+
+				this.cursorWorldPosition = spell.renderingContext.transformScreenToWorld( event.position )
+
 				invoke( this.plugins, 'onMouseMove', spell, this, event)
 
 			} else if ( event.type == 'mousedown' ) {
@@ -53,11 +58,12 @@ define(
 				invoke( this.plugins, 'onMouseUp', spell, this, event)
 
 			} else if ( event.type == 'keydown' ) {
+
 				if( this.commandMode ) {
 					invoke( this.plugins, 'onKeyDown', spell, this, event)
 				}
 
-				if( event.keyCode == keyCodes.CRTL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
+				if( event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
 					this.commandMode = true
 				}
 
@@ -66,7 +72,7 @@ define(
 					invoke( this.plugins, 'onKeyUp', spell, this, event)
 				}
 
-				if( event.keyCode == keyCodes.CRTL || event.keyCode == keyCodes.LEFT_WINDOW_KEY ) {
+				if( event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY ) {
 					this.commandMode = false
 				}
 			}
@@ -79,13 +85,16 @@ define(
 		 * @constructor
 		 * @param {Object} [spell] The spell object.
 		 */
-		var camera = function( spell ) {
+		var interactiveEditingSystem = function( spell ) {
 
-			this.activePlugins = [ cameraMover, entityMover ]
+			this.activePlugins = [ cameraMover, entityMover, tilemapEditor ]
 
 			//initialize activePlugins
 			this.plugins = [ ]
-			this.commandMode = false
+
+			this.commandMode            = false
+			this.selectedEntity         = null
+			this.cursorWorldPosition    = null
 
 			for (var i= 0; i< this.activePlugins.length; i++) {
 				var pluginConstructor = this.activePlugins[ i ],
@@ -95,7 +104,15 @@ define(
 			}
 		}
 
-		camera.prototype = {
+		interactiveEditingSystem.prototype = {
+			setSelectedEntity: function ( entityId ) {
+				this.selectedEntity = entityId
+			},
+
+			getSelectedEntity: function ( entityId ) {
+				return this.selectedEntity
+			},
+
 			/**
 			 * Gets called when the system is created.
 			 *
@@ -157,6 +174,6 @@ define(
 			}
 		}
 
-		return camera
+		return interactiveEditingSystem
 	}
 )
