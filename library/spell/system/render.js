@@ -160,6 +160,7 @@ define(
 							var assetSpriteSheet  = asset.spriteSheet,
 								tilemapDimensions = asset.tilemapDimensions,
 								tilemapData       = asset.tilemapData,
+								frameOffsets      = assetSpriteSheet.frameOffsets,
 								frameDimensions   = assetSpriteSheet.frameDimensions,
 								maxX              = tilemapDimensions[ 0 ] - 1,
 								maxY              = tilemapDimensions[ 1 ] - 1
