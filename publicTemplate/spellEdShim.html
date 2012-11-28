@@ -115,7 +115,7 @@
 		var handleMessageFromEditor = function( event ) {
 			var message = JSON.parse( event.data )
 
-			var isDebugMessage = message.type.indexOf( 'spelled.debug' ) === 0
+			var isDebugMessage = message.type.indexOf( 'spell.debug' ) === 0
 
 			if( isDebugMessage ) spell.sendDebugMessage( message )
 		}
