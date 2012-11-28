@@ -8,6 +8,8 @@ define(
 	[
 		'spell/script/editor/cameraMover',
 		'spell/script/editor/entityMover',
+		'spell/script/editor/selectedEntityHighlighter',
+
 		'spell/script/editor/tilemapEditor',
 
 		'spell/math/vec2',
@@ -17,6 +19,7 @@ define(
 	function(
 		cameraMover,
 		entityMover,
+		selectedEntityHighlighter,
 		tilemapEditor,
 
 		vec2,
@@ -26,9 +29,10 @@ define(
 		'use strict'
 
 		var PLUGIN_MANIFEST = {
-			'cameraMover':      cameraMover,
-			'entityMover':      entityMover,
-			'tilemapEditor':    tilemapEditor
+			'cameraMover':                  cameraMover,
+			'entityMover':                  entityMover,
+			'selectedEntityHighlighter':    selectedEntityHighlighter,
+			'tilemapEditor':                tilemapEditor
 		};
 
 
@@ -176,8 +180,6 @@ define(
 			 * @param {Object} [spell] The spell object.
 			 */
 			init: function( spell ) {
-				invokePlugins( this.plugins, this.activePlugins, 'init', spell, this)
-
 				this.blacklistedPlugins = this.config.deactivatedPlugins
 
 				if (this.config.selectedEntityId) {
@@ -199,6 +201,8 @@ define(
 
 					this.activePlugins.push(pluginName)
 				}
+
+				invokePlugins( this.plugins, this.activePlugins, 'init', spell, this)
 			},
 
 			/**
