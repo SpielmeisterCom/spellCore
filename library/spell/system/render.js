@@ -200,8 +200,8 @@ define(
 										var frameId = tilemapData[ y ][ x ],
 											frameOffset = frameOffsets[ frameId ]
 
-										tmpVec2[ 0 ] = x
-										tmpVec2[ 1 ] = maxY - y
+										tmpVec2[ 0 ] = x - maxX/2 - 0.5
+										tmpVec2[ 1 ] = (maxY - y) - maxY/2 - 0.5
 
 										context.drawSubTexture(
 											texture,

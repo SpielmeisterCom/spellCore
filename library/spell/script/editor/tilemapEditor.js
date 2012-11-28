@@ -129,7 +129,7 @@ define(
 				var offsetX = Math.floor( worldPosition[0] / frameDimensions[0]),
 					offsetY = Math.floor( worldPosition[1] / frameDimensions[1]),
 					newX = offsetX * frameDimensions[0] + frameDimensions[0] / 2 + 3,
-					newY = offsetY * frameDimensions[1] + frameDimensions[1] / 2 - 1
+					newY = offsetY * frameDimensions[1] + frameDimensions[1] / 2 - 2
 
 				this.currentOffset = [ offsetX, offsetY ]
 
@@ -160,9 +160,29 @@ define(
 		}
 
 		var updateTilemap = function( offset, frameIndex ) {
-			console.log('updating tilemap')
+			var tilemap           = this.tilemaps[ this.currentTilemap ],
+				asset             = tilemap.asset,
+				tilemapDimensions = asset.tilemapDimensions,
+				tilemapData       = asset.tilemapData,
+				maxY              = parseInt(tilemapDimensions[ 1 ],10) - 1,
+				normalizedOffsetX = offset[ 0 ] + Math.floor(tilemapDimensions[ 0 ] / 2),
+				normalizedOffsetY = maxY - (offset[ 1 ] + Math.floor(maxY / 2) + 1)
+
 			console.log(offset)
-			console.log(frameIndex)
+			console.log(normalizedOffsetX, normalizedOffsetY)
+
+			//make sure the tilemapData structure is initialized
+			for (var y=0; y < tilemapDimensions[1].length; y++) {
+				for (var x=0; x < tilemapDimensions[0].length; x++) {
+					if (tilemapData[ y ][ x ] === undefined) {
+						tilemapData[ y ][ x ] = null
+					}
+				}
+			}
+
+			tilemapData[ normalizedOffsetY ][ normalizedOffsetX ] = frameIndex
+
+			//TODO: send change back to editor
 		}
 
 		var showTilemapSelector = function( cursorWorldPosition, tilemapAsset ) {
