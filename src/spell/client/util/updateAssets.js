@@ -43,6 +43,7 @@ define(
 				type                : asset.subtype,
 				resourceId          : spriteSheetAsset.resourceId,
 				spriteSheet         : spriteSheetAsset,
+				config              : asset.config,
 				tilemapDimensions   : [ asset.config.width, asset.config.height ],
 				tilemapData         : asset.config.tileLayerData
 			}

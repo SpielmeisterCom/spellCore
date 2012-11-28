@@ -179,8 +179,24 @@ define(
 			}
 
 			tilemapData[ normalizedOffsetY ][ normalizedOffsetX ] = frameIndex
+		}
 
-			//TODO: send change back to editor
+		var sendChangedAssetDataToEditor = function() {
+			var tilemap           = this.tilemaps[ this.currentTilemap ],
+				asset             = tilemap.asset,
+				data              = {
+					id: tilemap.assetId,
+					config: {
+						'width':            asset.config['width'],
+						'height':           asset.config['height'],
+						'tileLayerData':    asset.tilemapData
+					},
+					assetId: asset.spriteSheet.assetId
+				}
+
+			this.spell.sendMessageToEditor(
+				'spelled.debug.library.updateAsset', data
+			)
 		}
 
 		var showTilemapSelector = function( cursorWorldPosition, tilemapAsset ) {
@@ -381,6 +397,8 @@ define(
 				if(this.state === STATE_DRAW_TILE) {
 					this.currentOffset                  = null
 					this.state = STATE_READY_TO_DRAW
+
+					sendChangedAssetDataToEditor.call( this )
 				}
 			},
 
