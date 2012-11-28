@@ -175,7 +175,7 @@ define(
 							// text appearance
 							drawText( context, asset, texture, 0, 0, appearance.text, appearance.spacing )
 
-						} else if( asset.type === '2dTileMap' ) {
+						} else if( asset.type === '2dTileMap' && asset.tilemapData !== null ) {
 							// 2d tilemap
 							var assetSpriteSheet  = asset.spriteSheet,
 								tilemapDimensions = asset.tilemapDimensions,
