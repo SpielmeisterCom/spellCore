@@ -21,6 +21,7 @@ define(
 
 		'spell/math/util',
 		'spell/math/mat3',
+		'spell/math/vec2',
 
 		'spell/functions'
 	],
@@ -35,6 +36,7 @@ define(
 
 		mathUtil,
 		mat3,
+		vec2,
 
 		_
 	) {
@@ -54,7 +56,9 @@ define(
 			APPEARANCE_TRANSFORM_COMPONENT_ID = Defines.APPEARANCE_TRANSFORM_COMPONENT_ID,
 			EVENT_HANDLERS_COMPONENT_ID       = Defines.EVENT_HANDLERS_COMPONENT_ID,
 			STATIC_APPEARANCE_COMPONENT_ID    = Defines.STATIC_APPEARANCE_COMPONENT_ID,
-			ANIMATED_APPEARANCE_COMPONENT_ID  = Defines.ANIMATED_APPEARANCE_COMPONENT_ID
+			ANIMATED_APPEARANCE_COMPONENT_ID  = Defines.ANIMATED_APPEARANCE_COMPONENT_ID,
+			QUAD_GEOMETRY_COMPONENT_ID        = Defines.QUAD_GEOMETRY_COMPONENT_ID,
+			TILEMAP_COMPONENT_ID              = Defines.TILEMAP_COMPONENT_ID
 
 		/**
 		 * Returns an entity id. If no entity id is provided a new one is generated.
@@ -461,34 +465,43 @@ define(
 			var staticAppearances   = componentDictionaries[ STATIC_APPEARANCE_COMPONENT_ID ],
 				animatedAppearances = componentDictionaries[ ANIMATED_APPEARANCE_COMPONENT_ID ],
 				transforms          = componentDictionaries[ TRANSFORM_COMPONENT_ID ],
-				width               = 100,
-				height              = 100
+				quadGeometries      = componentDictionaries[ QUAD_GEOMETRY_COMPONENT_ID ],
+				tilemaps            = componentDictionaries[ TILEMAP_COMPONENT_ID ],
+				dimensions          = vec2.create()
 
-			if( staticAppearances && staticAppearances[ entityId ] &&
+
+			if( quadGeometries && quadGeometries[ entityId ] && quadGeometries[ entityId ].dimensions ) {
+				//if a quadGeometry is specified, always take this
+				vec2.set( quadGeometries[ entityId ].dimensions, dimensions )
+
+			} else if( staticAppearances && staticAppearances[ entityId ] &&
 				staticAppearances[ entityId ].asset &&
 				staticAppearances[ entityId ].asset.resource &&
 				staticAppearances[ entityId ].asset.resource.dimensions ) {
 
 				// entity has a static appearance
-				width  = staticAppearances[ entityId ].asset.resource.dimensions[ 0 ]
-				height = staticAppearances[ entityId ].asset.resource.dimensions[ 1 ]
+				vec2.set( staticAppearances[ entityId ].asset.resource.dimensions, dimensions )
 
 			} else if( animatedAppearances && animatedAppearances[ entityId ] &&
 				animatedAppearances[ entityId ].asset &&
 				animatedAppearances[ entityId ].asset.frameDimensions ) {
 
 				// entity has an animated appearance
-				width  = animatedAppearances[ entityId ].asset.frameDimensions[ 0 ],
-				height = animatedAppearances[ entityId ].asset.frameDimensions[ 1 ]
+				vec2.set( animatedAppearances[ entityId ].asset.frameDimensions, dimensions )
+
+			} else if( tilemaps && tilemaps[ entityId ] && tilemaps[ entityId ].asset ) {
+
+				//entity is an tilemap
+				vec2.set( tilemaps[ entityId ].asset.tilemapDimensions, dimensions )
+				vec2.multiply( dimensions, tilemaps[ entityId ].asset.spriteSheet.frameDimensions, dimensions )
 			}
 
 			// apply scale factor
 			if( transforms && transforms[ entityId ] ) {
-				width  *= Math.abs( transforms[ entityId ].worldScale[ 0 ] )
-				height *= Math.abs( transforms[ entityId ].worldScale[ 1 ] )
+				vec2.multiply( dimensions, transforms[ entityId ].worldScale, dimensions )
 			}
 
-			return [ width, height ]
+			return dimensions
 		}
 
 		/*
