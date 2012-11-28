@@ -13,11 +13,46 @@ define(
 		var tilemapEditor = function(spell, editorSystem) {
 			this.state              = STATE_INACTIVE
 			this.transforms         = editorSystem.transforms
+			this.tilemaps           = editorSystem.tilemaps
 			this.spell              = spell
 
+			/**
+			 * Entity of the tilemap that is currently being edited
+			 */
+			this.currentTilemap                 = null
+
+			/**
+			 * The cell the cursor is pointing to atm
+			 * @type {vec2}
+			 */
+			this.currentOffset                  = null
+
+			/**
+			 * The currently selected frame index
+			 * @type {number}
+			 */
+			this.currentFrameIndex              = null
+
+			/**
+			 * Mapping frameindex => entityId for the selection overlay
+			 * @type {Object}
+			 */
 			this.tilemapSelectionMap            = {}
+
+			/**
+			 * Entity if of the entity for the background in the selection screen
+			 */
 			this.tilemapSelectionBackground     = null
+
+			/**
+			 * EntityId of the entity that is currently highlighted
+			 */
 			this.tilemapSelectionHighlighted    = null
+
+			/**
+			 * The entityId of the selection cursor
+			 * @type {null}
+			 */
 			this.tilemapSelectionCursor         = null
 		}
 
@@ -57,7 +92,7 @@ define(
 
 		}
 
-		var destroyTilemapSelectionEntities = function(exceptThisEntityId) {
+		var destroyTilemapSelectionEntities = function( exceptThisEntityId ) {
 			var entityManager = this.spell.entityManager
 
 			if( this.tilemapSelectionBackground !== null ) {
@@ -73,6 +108,61 @@ define(
 				}
 			}
 			this.tilemapSelectionMap = {}
+		}
+
+		var alignToGrid = function( entityId, worldPosition, tilemap, tilemapTransform ) {
+			var entityManager       = this.spell.entityManager,
+				tilemap             = this.tilemaps[ this.currentTilemap ],
+				tilemapTransform    = this.transforms[ this.currentTilemap ],
+				tilemapDimensions   = entityManager.getEntityDimensions( this.currentTilemap ),
+				tilemapTranslation  = tilemapTransform.worldTranslation,
+				frameDimensions     = tilemap.asset.spriteSheet.frameDimensions
+
+			if(
+				isPointInRect( worldPosition, tilemapTranslation, tilemapDimensions[ 0 ], tilemapDimensions[ 1 ], 0 )
+			) {
+
+				if (entityManager.hasComponent(entityId, 'spell.component.2d.graphics.shape.rectangle')) {
+					entityManager.removeComponent(entityId, 'spell.component.2d.graphics.shape.rectangle')
+				}
+
+				var offsetX = Math.floor( worldPosition[0] / frameDimensions[0]),
+					offsetY = Math.floor( worldPosition[1] / frameDimensions[1]),
+					newX = offsetX * frameDimensions[0] + frameDimensions[0] / 2 + 3,
+					newY = offsetY * frameDimensions[1] + frameDimensions[1] / 2 - 1
+
+				this.currentOffset = [ offsetX, offsetY ]
+
+				entityManager.updateComponent(entityId, 'spell.component.2d.transform', {
+					translation: [ newX, newY ]
+				})
+
+			} else {
+				//it's not placeable here
+				this.currentOffset = null
+
+				if( !entityManager.hasComponent(entityId, 'spell.component.2d.graphics.shape.rectangle') ) {
+
+					entityManager.addComponent(entityId, 'spell.component.2d.graphics.shape.rectangle',
+						{
+							'lineColor': [1, 0, 0],
+							'lineWidth': 3,
+							'width': frameDimensions[0],
+							'height': frameDimensions[1]
+						})
+				}
+
+				entityManager.updateComponent(entityId, 'spell.component.2d.transform', {
+					translation: worldPosition
+				})
+
+			}
+		}
+
+		var updateTilemap = function( offset, frameIndex ) {
+			console.log('updating tilemap')
+			console.log(offset)
+			console.log(frameIndex)
 		}
 
 		var showTilemapSelector = function( cursorWorldPosition, tilemapAsset ) {
@@ -182,13 +272,15 @@ define(
 					if( matchedEntities.length > 0 ) {
 						this.tilemapSelectionHighlighted = matchedEntities[ 0 ]
 
+						var frameDimensions = this.tilemaps[ this.currentTilemap ].asset.spriteSheet.frameDimensions
+
 						if (!entityManager.hasComponent(this.tilemapSelectionHighlighted, 'spell.component.2d.graphics.shape.rectangle')) {
 							entityManager.addComponent(this.tilemapSelectionHighlighted, 'spell.component.2d.graphics.shape.rectangle',
 								{
-									'lineColor': [1, 0, 0],
-									'lineWidth': 2,
-									'width': 64,
-									'height': 64
+									'lineColor': [0, 1, 0],
+									'lineWidth': 3,
+									'width': frameDimensions[0],
+									'height': frameDimensions[1]
 								})
 						}
 
@@ -199,21 +291,19 @@ define(
 
 			keydown: function( spell, editorSystem, event ) {
 				var keyCodes        = spell.inputManager.getKeyCodes(),
-					selectedEntity  = editorSystem.selectedEntity,
-					tilemaps        = editorSystem.tilemaps,
-					tilemap         = null
+					selectedEntityId  = editorSystem.selectedEntity
 
-				if(event.keyCode === keyCodes.SPACE && selectedEntity !== null && tilemaps[ selectedEntity ]) {
+				if( event.keyCode === keyCodes.SPACE && selectedEntityId !== null && this.tilemaps[ selectedEntityId ] ) {
 
 					editorSystem.prototype.acquireEventLock.call( editorSystem, this, ['mousemove', 'mousedown', 'mouseup', 'keydown', 'keyup'] )
 					editorSystem.prototype.acquireProcessLock.call( editorSystem, this )
 
-					tilemap = tilemaps[ selectedEntity ]
+					this.currentTilemap = selectedEntityId
 					this.state = STATE_SELECT_TILE
 
 					destroyTilemapSelectionEntities.call( this )
 
-					showTilemapSelector.call( this, editorSystem.cursorWorldPosition, tilemap )
+					showTilemapSelector.call( this, editorSystem.cursorWorldPosition, this.tilemaps[ selectedEntityId ] )
 
 				}
 			},
@@ -222,18 +312,28 @@ define(
 				var entityManager = spell.entityManager
 
 				if( this.state === STATE_SELECT_TILE && this.tilemapSelectionHighlighted !== null ) {
-					destroyTilemapSelectionEntities.call(this, this.tilemapSelectionHighlighted )
-
 
 					this.tilemapSelectionCursor         = this.tilemapSelectionHighlighted
 					this.tilemapSelectionHighlighted    = null
+
+					//find the current selected frame index
+					for(var frameIndex in this.tilemapSelectionMap) {
+						var entityId = this.tilemapSelectionMap[ frameIndex ]
+
+						if(entityId === this.tilemapSelectionCursor ) {
+							this.currentFrameIndex = frameIndex
+							break
+						}
+					}
+
+					destroyTilemapSelectionEntities.call(this, this.tilemapSelectionCursor )
 
 					entityManager.removeComponent( this.tilemapSelectionCursor, 'spell.component.2d.graphics.shape.rectangle' )
 
 					this.state = STATE_DRAW_TILE
 
-				} else if( this.state === STATE_DRAW_TILE && this.tilemapSelectionCursor !== null ) {
-					//TODO: lookup which x/y was hit and update the asset
+				} else if( this.state === STATE_DRAW_TILE && this.tilemapSelectionCursor !== null && this.currentOffset !== null ) {
+					updateTilemap.call( this, this.currentOffset, this.currentFrameIndex )
 				}
 			},
 
@@ -244,11 +344,11 @@ define(
 			mousemove: function( spell, editorSystem, event ) {
 				var entityManager = spell.entityManager
 
-				if(this.state === STATE_DRAW_TILE && this.tilemapSelectionCursor !== null ) {
-					entityManager.updateComponent(this.tilemapSelectionCursor, 'spell.component.2d.transform',
-					{
-						translation: editorSystem.cursorWorldPosition
-					})
+				if(this.state === STATE_DRAW_TILE && this.tilemapSelectionCursor !== null && this.currentTilemap !== null) {
+					alignToGrid.call(
+						this,
+						this.tilemapSelectionCursor,
+						editorSystem.cursorWorldPosition)
 				}
 			}
 		}
