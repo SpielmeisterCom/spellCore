@@ -24,12 +24,12 @@ define(
 		return function( spell, startEngine ) {
 			return createMessageDispatcher(
 				{
-					'spelled.debug.component'     : createComponentMessageHandler( spell ),
-					'spelled.debug.entity'        : createEntityMessageHandler( spell ),
-					'spelled.debug.library'       : createLibraryMessageHandler( spell ),
-					'spelled.debug.runtimeModule' : createRuntimeModuleMessageHandler( spell, startEngine ),
-					'spelled.debug.settings'      : createSettingsMessageHandler( spell ),
-					'spelled.debug.system'        : createSystemMessageHandler( spell )
+					'spell.debug.component'     : createComponentMessageHandler( spell ),
+					'spell.debug.entity'        : createEntityMessageHandler( spell ),
+					'spell.debug.library'       : createLibraryMessageHandler( spell ),
+					'spell.debug.runtimeModule' : createRuntimeModuleMessageHandler( spell, startEngine ),
+					'spell.debug.settings'      : createSettingsMessageHandler( spell ),
+					'spell.debug.system'        : createSystemMessageHandler( spell )
 				}
 			)
 		}
