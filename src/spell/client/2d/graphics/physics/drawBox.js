@@ -5,11 +5,11 @@ define(
 
 
 		return function( context, width, height, color, lineWidth ) {
-			var halfWidth    = width * 0.5,
-				quarterWidth = width * 0.25
+			var halfWidth  = width * 0.5,
+				halfHeight = height * 0.5
 
 			context.setLineColor( color )
-			context.drawRect( 0, 0, width, height, lineWidth )
+			context.drawRect( -halfWidth, -halfHeight, width, height, lineWidth )
 			context.drawLine( halfWidth * 0.618, 0, halfWidth, 0, lineWidth )
 		}
 	}

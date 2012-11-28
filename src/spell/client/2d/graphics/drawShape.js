@@ -5,17 +5,19 @@ define(
 
 
 		return {
-			rectangle: function( context, shape ) {
-				var halfWidth    = shape.width * 0.5,
-					quarterWidth = shape.width * 0.25
+			rectangle : function( context, shape ) {
+				var width         = shape.width,
+					height        = shape.height,
+					negHalfWidth  = width * -0.5,
+					negHalfHeight = height * -0.5
 
 				if( shape.fill ) {
 					context.setColor( shape.fillColor )
-					context.fillRect( 0, 0, shape.width, shape.height )
+					context.fillRect( negHalfWidth, negHalfHeight, width, height )
 				}
 
 				context.setLineColor( shape.lineColor )
-				context.drawRect( 0, 0, shape.width, shape.height, shape.lineWidth )
+				context.drawRect( negHalfWidth, negHalfHeight, width, height, shape.lineWidth )
 			}
 		}
 	}
