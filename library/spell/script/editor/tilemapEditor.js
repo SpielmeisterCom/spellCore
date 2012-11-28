@@ -1,9 +1,16 @@
 define(
 	'spell/script/editor/tilemapEditor',
 	[
+		'spell/math/vec2',
+		'spell/math/mat3',
+
 		'spell/functions'
 	],
-	function(_) {
+	function(
+		vec2,
+		mat3,
+		_
+		) {
 		'use strict'
 
 		var STATE_INACTIVE      = 0,
@@ -65,6 +72,8 @@ define(
 			 */
 			this.tilemapSelectionCursor         = null
 		}
+
+		var tmpVec2 = vec2.create()
 
 		//private functions
 		var isPointInRect = function( point, rectOrigin, rectWidth, rectHeight, rectRotation ) {
@@ -128,23 +137,23 @@ define(
 			) {
 
 				//convert worldposition to coordinates which are local to the tilemaps origin
-
-				//worldPosition
-
+				mat3.multiplyVec2(tilemapTransform.worldToLocalMatrix, worldPosition, tmpVec2)
 
 				if (entityManager.hasComponent(entityId, 'spell.component.2d.graphics.shape.rectangle')) {
 					entityManager.removeComponent(entityId, 'spell.component.2d.graphics.shape.rectangle')
 				}
 
-				var offsetX = Math.floor( worldPosition[0] / frameDimensions[0]),
-					offsetY = Math.floor( worldPosition[1] / frameDimensions[1]),
-					newX = offsetX * frameDimensions[0] + frameDimensions[0] / 2,
-					newY = offsetY * frameDimensions[1] + frameDimensions[1] / 2
+				var offsetX         = Math.floor( tmpVec2[0] / frameDimensions[0]),
+					offsetY         = Math.floor( tmpVec2[1] / frameDimensions[1]),
+					currentOffset   = [ offsetX, offsetY ]
 
-				currentOffset = [ offsetX, offsetY ]
+				//transform the grid aligned local coordinates to world coordinates again
+				tmpVec2[0] = offsetX * frameDimensions[0] + frameDimensions[0] / 2
+				tmpVec2[1] = offsetY * frameDimensions[1] + frameDimensions[1] / 2
+				mat3.multiplyVec2(tilemapTransform.worldMatrix, tmpVec2, tmpVec2)
 
 				entityManager.updateComponent(entityId, 'spell.component.2d.transform', {
-					translation: [ newX, newY ]
+					translation: tmpVec2
 				})
 
 			} else {
