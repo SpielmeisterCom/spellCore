@@ -15,7 +15,7 @@ define(
 			CAMERA_COMPONENT_ID                       : 'spell.component.2d.graphics.camera',
 			STATIC_APPEARANCE_COMPONENT_ID            : 'spell.component.2d.graphics.appearance',
 			ANIMATED_APPEARANCE_COMPONENT_ID          : 'spell.component.2d.graphics.animatedAppearance',
-			QUAD_GEOMETRY_COMPONENT_ID                : 'spell.component.2d.graphics.quadGeometry',
+			QUAD_GEOMETRY_COMPONENT_ID                : 'spell.component.2d.graphics.geometry.quad',
 			TILEMAP_COMPONENT_ID                      : 'spell.component.2d.graphics.tilemap',
 			PHYSICS_BODY_COMPONENT_ID                 : 'spell.component.physics.body',
 			PHYSICS_FIXTURE_COMPONENT_ID              : 'spell.component.physics.fixture',

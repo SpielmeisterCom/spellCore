@@ -117,7 +117,8 @@ define(
 				tilemapTransform    = this.transforms[ this.currentTilemap ],
 				tilemapDimensions   = entityManager.getEntityDimensions( this.currentTilemap ),
 				tilemapTranslation  = tilemapTransform.worldTranslation,
-				frameDimensions     = tilemap.asset.spriteSheet.frameDimensions
+				frameDimensions     = tilemap.asset.spriteSheet.frameDimensions,
+				currentOffset       = null
 
 			if(
 				isPointInRect( worldPosition, tilemapTranslation, tilemapDimensions[ 0 ], tilemapDimensions[ 1 ], 0 )
@@ -140,8 +141,6 @@ define(
 
 			} else {
 				//it's not placeable here
-				this.currentOffset = null
-
 				if( !entityManager.hasComponent(entityId, 'spell.component.2d.graphics.shape.rectangle') ) {
 
 					entityManager.addComponent(entityId, 'spell.component.2d.graphics.shape.rectangle',
@@ -158,9 +157,14 @@ define(
 				})
 
 			}
+
+			return currentOffset
 		}
 
 		var updateTilemap = function( offset, frameIndex ) {
+
+			console.log('Update Tilemap got ', offset)
+
 			var tilemap           = this.tilemaps[ this.currentTilemap ],
 				asset             = tilemap.asset,
 				tilemapDimensions = asset.tilemapDimensions,
@@ -180,6 +184,7 @@ define(
 
 			tilemapData[ normalizedOffsetY ][ normalizedOffsetX ] = frameIndex
 
+			console.log(' Setting ' + normalizedOffsetY + ', ' + normalizedOffsetX + ' to ' + frameIndex)
 			//TODO: send change back to editor
 		}
 
@@ -234,7 +239,7 @@ define(
 							'drawAllFrames': false,
 							'frames': [ x ]
 						},
-						'spell.component.2d.graphics.quadGeometry': {
+						'spell.component.2d.graphics.geometry.quad': {
 							'dimensions': [ frameDimensions[ 0 ], frameDimensions[ 1 ] ]
 						},
 						'spell.component.visualObject': {
@@ -369,12 +374,12 @@ define(
 				var entityManager = spell.entityManager
 
 				if(this.state === STATE_READY_TO_DRAW && this.tilemapSelectionCursor !== null && this.currentTilemap !== null) {
-					alignToGrid.call(
+					this.currentOffset = alignToGrid.call(
 						this,
 						this.tilemapSelectionCursor,
 						editorSystem.cursorWorldPosition)
 				} else if( this.state === STATE_DRAW_TILE ) {
-					alignToGrid.call(
+					this.currentOffset = alignToGrid.call(
 						this,
 						this.tilemapSelectionCursor,
 						editorSystem.cursorWorldPosition)
