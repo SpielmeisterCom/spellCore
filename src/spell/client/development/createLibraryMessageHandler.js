@@ -21,7 +21,7 @@ define(
 			return createMessageDispatcher(
 				{
 					'updateAsset' : _.bind( updateAsset, null, spell ),
-					'updateScript' : _.bind( updateScript, null, spell ),
+					'updateScript' : _.bind( updateScript, null, spell )
 				}
 			)
 		}
