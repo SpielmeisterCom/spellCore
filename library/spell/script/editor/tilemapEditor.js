@@ -76,16 +76,6 @@ define(
 
 
 		var isPointWithinEntity = function ( worldPosition, entityId ) {
-			var isTilemapSelectionEntity = _.contains(
-				_.values( this.tilemapSelectionMap ),
-				entityId
-			)
-
-			if (!isTilemapSelectionEntity) {
-				//no further processing for overlay entites
-				return false
-			}
-
 			var transform = this.transforms[ entityId ],
 				entityDimensions = this.spell.entityManager.getEntityDimensions( entityId )
 
@@ -167,8 +157,6 @@ define(
 
 		var updateTilemap = function( offset, frameIndex ) {
 
-			console.log('Update Tilemap got ', offset)
-
 			var tilemap           = this.tilemaps[ this.currentTilemap ],
 				asset             = tilemap.asset,
 				tilemapDimensions = asset.tilemapDimensions,
@@ -186,9 +174,12 @@ define(
 				}
 			}
 
+			if (frameIndex == 9999) {
+				frameIndex = null
+			}
+
 			tilemapData[ normalizedOffsetY ][ normalizedOffsetX ] = frameIndex
 
-			console.log(' Setting ' + normalizedOffsetY + ', ' + normalizedOffsetX + ' to ' + frameIndex)
 			//TODO: send change back to editor
 		}
 
@@ -196,10 +187,11 @@ define(
 			var entityManager               = this.spell.entityManager,
 				spriteSheetAssetId          = tilemapAsset.asset.spriteSheet.assetId,
 				frameDimensions             = tilemapAsset.asset.spriteSheet.frameDimensions,
-				numFrames                   = tilemapAsset.asset.spriteSheet.numFrames
+				numFrames                   = tilemapAsset.asset.spriteSheet.numFrames,
+				numFrames                   = numFrames + 1 //we add one frame for the delete icon
 
 			//present a nice quadratic selection menu for the tiles
-			var framesPerRow = Math.floor( Math.sqrt(numFrames) ) + 1
+			var framesPerRow = Math.floor( Math.sqrt(numFrames) )
 
 			var offsetX     = cursorWorldPosition[ 0 ],
 				offsetY     = cursorWorldPosition[ 1 ],
@@ -216,23 +208,23 @@ define(
 						]
 					},
 					'spell.component.visualObject': {
-						'opacity': 0.5,
+						'opacity': 0.7,
 						'layer': 99999997
 					},
 					'spell.component.2d.graphics.shape.rectangle': {
 						'fill': true,
 						'fillColor': [0.35, 0.35, 0.35],
-						'lineColor': [0.1, 0.1, 0.1],
-						'lineWidth': 2,
-						'width': frameWidth + 5,
-						'height': frameHeight + 5
+						'lineColor': [0.5, 0.5, 0.5],
+						'lineWidth': 3,
+						'width': frameWidth + 10,
+						'height': frameHeight + 10
 					}
 				}
 			})
 
 			//draw every tile of the tileset
 			this.tilemapSelectionMap = {}
-			for (var x=0; x<numFrames; x++) {
+			for (var x=0; x<numFrames-1; x++) {
 				this.tilemapSelectionMap[ x ] = entityManager.createEntity({
 					'config': {
 						'spell.component.2d.transform': {
@@ -259,6 +251,25 @@ define(
 					offsetX = cursorWorldPosition[ 0 ]
 				}
 			}
+
+
+			this.tilemapSelectionMap[9999] = entityManager.createEntity({
+				'config': {
+					'spell.component.2d.transform': {
+						'translation': [ offsetX, offsetY ]
+					},
+					'spell.component.2d.graphics.appearance': {
+						'assetId': 'appearance:spell.remove'
+					},
+					'spell.component.2d.graphics.geometry.quad': {
+						'dimensions': [ frameDimensions[ 0 ], frameDimensions[ 1 ] ]
+					},
+					'spell.component.visualObject': {
+						'layer': 99999998
+					}
+				}
+			})
+
 		}
 
 		//public functions
@@ -282,7 +293,7 @@ define(
 				if( this.state === STATE_SELECT_TILE ) {
 					//find all entities that match with the current cursor position
 					var matchedEntities = _.filter(
-						_.keys( this.transforms ),
+						_.values( this.tilemapSelectionMap ),
 						_.bind(
 							isPointWithinEntity,
 							this,
