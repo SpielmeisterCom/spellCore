@@ -190,6 +190,9 @@ define(
 
 			if (frameIndex == 9999) {
 				frameIndex = null
+
+			} else {
+				frameIndex = parseInt(frameIndex, 10)
 			}
 
 			tilemapData[ normalizedOffsetY ][ normalizedOffsetX ] = frameIndex
