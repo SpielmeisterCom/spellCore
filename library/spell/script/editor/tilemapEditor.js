@@ -127,6 +127,11 @@ define(
 				isPointInRect( worldPosition, tilemapTranslation, tilemapDimensions[ 0 ], tilemapDimensions[ 1 ], 0 )
 			) {
 
+				//convert worldposition to coordinates which are local to the tilemaps origin
+
+				//worldPosition
+
+
 				if (entityManager.hasComponent(entityId, 'spell.component.2d.graphics.shape.rectangle')) {
 					entityManager.removeComponent(entityId, 'spell.component.2d.graphics.shape.rectangle')
 				}

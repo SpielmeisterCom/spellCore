@@ -41,6 +41,12 @@ define(
 		var interactiveEditingSystem = function( spell ) {
 
 			/**
+			 * Array holding a list of blacklisted plugins (plugins, that are not activated by default and can't be activated)
+			 * @type {Array}
+			 */
+			this.blacklistedPlugins = []
+
+			/**
 			 * Array holding a list of all plugins that a currently active
 			 * @type {Array}
 			 */
@@ -58,6 +64,10 @@ define(
 			this.spell      = spell
 
 			this.commandMode                = false
+
+			/**
+			 * The entityId of the currently selected entity
+			 */
 			this.selectedEntity             = null
 
 			/**
@@ -67,15 +77,6 @@ define(
 			 */
 			this.cursorWorldPosition        = null
 
-			for (var pluginName in PLUGIN_MANIFEST) {
-
-				var pluginConstructor = PLUGIN_MANIFEST[ pluginName ],
-					pluginInstance = new pluginConstructor( spell, this )
-
-				this.plugins[ pluginName ] = pluginInstance
-
-				this.activePlugins.push(pluginName)
-			}
 		}
 
 		//private
@@ -84,8 +85,13 @@ define(
 
 			for( var i = 0; i < pluginNames.length; i++ ) {
 				var pluginName          = pluginNames[ i ],
-					pluginInstance      = plugins[ pluginName ],
-					fn                  = pluginInstance.__proto__[ functionName ]
+					pluginInstance      = plugins[ pluginName ]
+
+				if( !pluginInstance ) {
+					continue
+				}
+
+				var	fn                  = pluginInstance.__proto__[ functionName ]
 
 				if ( fn ) {
 					fn.apply( pluginInstance, args )
@@ -123,6 +129,11 @@ define(
 			},
 
 			activatePlugin: function(pluginName) {
+				if( !this.plugins[ pluginName ] ) {
+					//plugin is not available
+					return
+				}
+
 				this.activePlugins.push(pluginName)
 
 				invokePlugins( this.plugins, [pluginName], 'activate', this.spell, this)
@@ -152,9 +163,6 @@ define(
 						return true
 					}
 				)
-
-				console.log( this.activePlugins )
-
 			},
 
 			deactivateAllPlugins: function() {
@@ -169,6 +177,28 @@ define(
 			 */
 			init: function( spell ) {
 				invokePlugins( this.plugins, this.activePlugins, 'init', spell, this)
+
+				this.blacklistedPlugins = this.config.deactivatedPlugins
+
+				if (this.config.selectedEntityId) {
+					this.selectedEntity     = this.config.selectedEntityId
+				}
+
+				this.activePlugins = []
+				for (var pluginName in PLUGIN_MANIFEST) {
+
+					if ( _.indexOf(this.blacklistedPlugins, pluginName) !== -1 ) {
+						//if this plugin is blacklisted, ignore it completly
+						continue
+					}
+
+					var pluginConstructor = PLUGIN_MANIFEST[ pluginName ],
+						pluginInstance = new pluginConstructor( spell, this )
+
+					this.plugins[ pluginName ] = pluginInstance
+
+					this.activePlugins.push(pluginName)
+				}
 			},
 
 			/**

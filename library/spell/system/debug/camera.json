@@ -35,6 +35,18 @@
 			"type": "boolean",
 			"default": false,
 			"doc": "if false the system will be skipped during processing"
-		}
+		},
+        {
+            "name": "selectedEntityId",
+            "type": "string",
+            "default": "",
+            "doc": "the entityId of the entity which should be preselected"
+        },
+        {
+            "name": "deactivatedPlugins",
+            "type": "list",
+            "default": [],
+            "doc": "list of plugin names that should be deactivated"
+        }
 	]
 }
