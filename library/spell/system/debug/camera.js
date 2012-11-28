@@ -22,18 +22,73 @@ define(
 		vec2,
 		mat3,
 		_
-	) {
+		) {
 		'use strict'
 
-		var invoke = function( list, functionName ) {
-			var args = Array.prototype.slice.call(arguments, 2);
+		var PLUGIN_MANIFEST = {
+			'cameraMover':      cameraMover,
+			'entityMover':      entityMover,
+			'tilemapEditor':    tilemapEditor
+		};
 
-			for( var i = 0; i < list.length; i++ ) {
-				var listItem = list[ i ],
-					fn = listItem.__proto__[ functionName ]
+
+		/**
+		 * Creates an instance of the system.
+		 *
+		 * @constructor
+		 * @param {Object} [spell] The spell object.
+		 */
+		var interactiveEditingSystem = function( spell ) {
+
+			/**
+			 * Array holding a list of all plugins that a currently active
+			 * @type {Array}
+			 */
+			this.activePlugins = []
+
+			/**
+			 * Map holding pluginName => pluginInstance
+			 * @type {Object}
+			 */
+			this.plugins = {}
+
+			/**
+			 * Reference to the spell object
+			 */
+			this.spell      = spell
+
+			this.commandMode                = false
+			this.selectedEntity             = null
+
+			/**
+			 * vec2 holding holding the current position of the pointer in world coordinates
+			 * (null unless initialized
+			 * @type {null}
+			 */
+			this.cursorWorldPosition        = null
+
+			for (var pluginName in PLUGIN_MANIFEST) {
+
+				var pluginConstructor = PLUGIN_MANIFEST[ pluginName ],
+					pluginInstance = new pluginConstructor( spell, this )
+
+				this.plugins[ pluginName ] = pluginInstance
+
+				this.activePlugins.push(pluginName)
+			}
+		}
+
+		//private
+		var invokePlugins = function( plugins, pluginNames, functionName ) {
+			var args = Array.prototype.slice.call(arguments, 3);
+
+			for( var i = 0; i < pluginNames.length; i++ ) {
+				var pluginName          = pluginNames[ i ],
+					pluginInstance      = plugins[ pluginName ],
+					fn                  = pluginInstance.__proto__[ functionName ]
 
 				if ( fn ) {
-					fn.apply( listItem, args )
+					fn.apply( pluginInstance, args )
 				}
 			}
 		}
@@ -47,49 +102,18 @@ define(
 			}
 
 			if(event.type == 'keydown' &&  event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
+
 				this.commandMode = true
 			} else if(event.type == 'keyup' &&  event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
+
 				this.commandMode = false
 			}
 
-			if( this.eventLockPluginInstance && _.indexOf(this.eventLockNames, event.type) !== -1 ) {
-				invoke( [ this.eventLockPluginInstance ], event.type, spell, this, event)
-			} else {
-				invoke( this.plugins, event.type, spell, this, event )
-			}
-
+			invokePlugins( this.plugins, this.activePlugins, event.type, spell, this, event )
 		}
 
-		/**
-		 * Creates an instance of the system.
-		 *
-		 * @constructor
-		 * @param {Object} [spell] The spell object.
-		 */
-		var interactiveEditingSystem = function( spell ) {
 
-			this.activePlugins = [ cameraMover, entityMover, tilemapEditor ]
-
-			//initialize activePlugins
-			this.plugins = [ ]
-
-			this.commandMode                = false
-			this.selectedEntity             = null
-			this.cursorWorldPosition        = null
-
-			this.eventLockPluginInstance    = null
-			this.eventLockNames             = []
-
-			this.processLockPluginInstance  = null
-
-			for (var i= 0; i< this.activePlugins.length; i++) {
-				var pluginConstructor = this.activePlugins[ i ],
-					plugin = new pluginConstructor( spell, this )
-
-				this.plugins.push( plugin )
-			}
-		}
-
+		//public
 		interactiveEditingSystem.prototype = {
 			setSelectedEntity: function( entityId ) {
 				this.selectedEntity = entityId
@@ -99,35 +123,44 @@ define(
 				return this.selectedEntity
 			},
 
-			/**
-			 * This function can be used by a plugin to acquire an exclusive process lock.
-			 * Only the process function for this function will be called after the lock has been set.
-			 * @param pluginInstance
-			 */
-			acquireProcessLock: function( pluginInstance ) {
-				this.processLockPluginInstance = pluginInstance
+			activatePlugin: function(pluginName) {
+				this.activePlugins.push(pluginName)
+
+				invokePlugins( this.plugins, [pluginName], 'activate', this.spell, this)
 			},
 
-			releaseProcessLock: function () {
-				this.processLockPluginInstance = null
+			activateAllPlugins: function() {
+				this.activePlugins = _.keys(PLUGIN_MANIFEST)
+
+				invokePlugins( this.plugins, this.activePlugins, 'activate', this.spell, this)
 			},
 
-			/**
-			 * This function can be used by a plugin to acquire exlusive access to input events
-			 * @param pluginInstance
-			 */
-			acquireEventLock: function( pluginInstance, eventNames ) {
-				this.eventLockNames          = eventNames
-				this.eventLockPluginInstance = pluginInstance
+			deactivatePlugin: function( pluginName ) {
+				var plugins         = this.plugins,
+					activePlugins   = this.activePlugins,
+					spell           = this.spell,
+					me              = this
+
+				this.activePlugins = _.filter(
+					activePlugins,
+					function( pluginNameIter ) {
+						if( pluginNameIter === pluginName ) {
+							invokePlugins( plugins, [ pluginName ], 'deactivate', spell, me)
+
+							return false
+						}
+
+						return true
+					}
+				)
+
+				console.log( this.activePlugins )
+
 			},
 
-			/**
-			 * If the mouse lock can be released this function must be called
-			 * @param pluginInstance
-			 */
-			releaseEventLock: function( ) {
-				this.eventLockNames             = []
-				this.eventLockPluginInstance    = null
+			deactivateAllPlugins: function() {
+				invokePlugins( this.plugins, this.activePlugins, 'deactivate', this.spell, this)
+				this.activePlugins = []
 			},
 
 			/**
@@ -136,7 +169,7 @@ define(
 			 * @param {Object} [spell] The spell object.
 			 */
 			init: function( spell ) {
-				invoke( this.plugins, 'init', spell, this)
+				invokePlugins( this.plugins, this.activePlugins, 'init', spell, this)
 			},
 
 			/**
@@ -154,7 +187,7 @@ define(
 			 * @param {Object} [spell] The spell object.
 			 */
 			activate: function( spell ) {
-				invoke( this.plugins, 'activate', spell, this)
+				this.prototype.activateAllPlugins.call( this )
 			},
 
 			/**
@@ -163,7 +196,7 @@ define(
 			 * @param {Object} [spell] The spell object.
 			 */
 			deactivate: function( spell ) {
-				invoke( this.plugins, 'deactivate', spell, this)
+				this.prototype.deactivateAllPlugins.call( this )
 			},
 
 			/**
@@ -183,11 +216,7 @@ define(
 
 				}
 
-				if( this.processLockPluginInstance !== null) {
-					invoke( [ this.processLockPluginInstance ], 'process', spell, this, timeInMs, deltaTimeInMs)
-				} else {
-					invoke( this.plugins, 'process', spell, this, timeInMs, deltaTimeInMs)
-				}
+				invokePlugins( this.plugins, this.activePlugins, 'process', spell, this, timeInMs, deltaTimeInMs)
 
 				//consume all input events if we're in commandMode
 				if( this.commandMode == true ) {

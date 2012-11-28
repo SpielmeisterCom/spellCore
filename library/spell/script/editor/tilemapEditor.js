@@ -349,8 +349,7 @@ define(
 
 				if( event.keyCode === keyCodes.SPACE && selectedEntityId !== null && this.tilemaps[ selectedEntityId ] ) {
 
-					editorSystem.prototype.acquireEventLock.call( editorSystem, this, ['mousemove', 'mousedown', 'mouseup', 'keydown', 'keyup'] )
-					editorSystem.prototype.acquireProcessLock.call( editorSystem, this )
+					editorSystem.prototype.deactivatePlugin.call( editorSystem, 'entityMover' )
 
 					this.currentTilemap = selectedEntityId
 					this.state = STATE_SELECT_TILE
@@ -364,6 +363,12 @@ define(
 
 			mousedown: function( spell, editorSystem, event ) {
 				var entityManager = spell.entityManager
+
+				if(event.button != 0) {
+					//only respond to left mouseclicks
+					return
+				}
+
 
 				if( this.state === STATE_SELECT_TILE && this.tilemapSelectionHighlighted !== null ) {
 
