@@ -108,6 +108,10 @@ define(
 					entityManager.removeEntity( entityId )
 				}
 			}
+
+			if (this.tilemapSelectionCursor !== null && this.tilemapSelectionCursor !== exceptThisEntityId) {
+				entityManager.removeEntity(this.tilemapSelectionCursor)
+			}
 			this.tilemapSelectionMap = {}
 		}
 
@@ -133,7 +137,7 @@ define(
 					newX = offsetX * frameDimensions[0] + frameDimensions[0] / 2,
 					newY = offsetY * frameDimensions[1] + frameDimensions[1] / 2
 
-				this.currentOffset = [ offsetX, offsetY ]
+				currentOffset = [ offsetX, offsetY ]
 
 				entityManager.updateComponent(entityId, 'spell.component.2d.transform', {
 					translation: [ newX, newY ]
