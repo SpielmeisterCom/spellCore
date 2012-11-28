@@ -8,7 +8,8 @@ define(
 
 		var STATE_INACTIVE      = 0,
 			STATE_SELECT_TILE   = 1,
-			STATE_DRAW_TILE     = 2
+			STATE_READY_TO_DRAW = 2,
+			STATE_DRAW_TILE     = 3
 
 		var tilemapEditor = function(spell, editorSystem) {
 			this.state              = STATE_INACTIVE
@@ -128,8 +129,8 @@ define(
 
 				var offsetX = Math.floor( worldPosition[0] / frameDimensions[0]),
 					offsetY = Math.floor( worldPosition[1] / frameDimensions[1]),
-					newX = offsetX * frameDimensions[0] + frameDimensions[0] / 2 + 3,
-					newY = offsetY * frameDimensions[1] + frameDimensions[1] / 2 - 2
+					newX = offsetX * frameDimensions[0] + frameDimensions[0] / 2,
+					newY = offsetY * frameDimensions[1] + frameDimensions[1] / 2
 
 				this.currentOffset = [ offsetX, offsetY ]
 
@@ -167,9 +168,6 @@ define(
 				maxY              = parseInt(tilemapDimensions[ 1 ],10) - 1,
 				normalizedOffsetX = offset[ 0 ] + Math.floor(tilemapDimensions[ 0 ] / 2),
 				normalizedOffsetY = maxY - (offset[ 1 ] + Math.floor(maxY / 2) + 1)
-
-			console.log(offset)
-			console.log(normalizedOffsetX, normalizedOffsetY)
 
 			//make sure the tilemapData structure is initialized
 			for (var y=0; y < tilemapDimensions[1].length; y++) {
@@ -350,25 +348,40 @@ define(
 
 					entityManager.removeComponent( this.tilemapSelectionCursor, 'spell.component.2d.graphics.shape.rectangle' )
 
-					this.state = STATE_DRAW_TILE
+					this.state = STATE_READY_TO_DRAW
 
-				} else if( this.state === STATE_DRAW_TILE && this.tilemapSelectionCursor !== null && this.currentOffset !== null ) {
+				} else if( this.state === STATE_READY_TO_DRAW && this.tilemapSelectionCursor !== null && this.currentOffset !== null ) {
+					this.state = STATE_DRAW_TILE
 					updateTilemap.call( this, this.currentOffset, this.currentFrameIndex )
 				}
 			},
 
 			mouseup: function( spell, editorSystem, event ) {
+
+				if(this.state === STATE_DRAW_TILE) {
+					this.currentOffset                  = null
+					this.state = STATE_READY_TO_DRAW
+				}
 			},
 
 
 			mousemove: function( spell, editorSystem, event ) {
 				var entityManager = spell.entityManager
 
-				if(this.state === STATE_DRAW_TILE && this.tilemapSelectionCursor !== null && this.currentTilemap !== null) {
+				if(this.state === STATE_READY_TO_DRAW && this.tilemapSelectionCursor !== null && this.currentTilemap !== null) {
 					alignToGrid.call(
 						this,
 						this.tilemapSelectionCursor,
 						editorSystem.cursorWorldPosition)
+				} else if( this.state === STATE_DRAW_TILE ) {
+					alignToGrid.call(
+						this,
+						this.tilemapSelectionCursor,
+						editorSystem.cursorWorldPosition)
+
+					if(this.tilemapSelectionCursor !== null && this.currentOffset !== null) {
+						updateTilemap.call( this, this.currentOffset, this.currentFrameIndex )
+					}
 				}
 			}
 		}

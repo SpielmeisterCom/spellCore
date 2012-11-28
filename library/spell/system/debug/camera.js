@@ -125,7 +125,7 @@ define(
 			 * If the mouse lock can be released this function must be called
 			 * @param pluginInstance
 			 */
-			releaseEventLock: function( pluginInstance ) {
+			releaseEventLock: function( ) {
 				this.eventLockNames             = []
 				this.eventLockPluginInstance    = null
 			},
