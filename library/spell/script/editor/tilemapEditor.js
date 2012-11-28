@@ -15,7 +15,16 @@ define(
 			this.state              = STATE_INACTIVE
 			this.transforms         = editorSystem.transforms
 			this.tilemaps           = editorSystem.tilemaps
-			this.spell              = spell
+
+			/**
+			 * Reference to the spell object
+			 */
+			this.spell                          = spell
+
+			/**
+			 * Reference to the editorSystem
+			 */
+			this.editorSystem                   = editorSystem
 
 			/**
 			 * Entity of the tilemap that is currently being edited
@@ -199,6 +208,38 @@ define(
 			)
 		}
 
+		/**
+		 * Gets called when tile editing starts for a selectedEntity
+		 */
+		var beginTileEditing = function() {
+			var editorSystem        = this.editorSystem,
+				selectedEntityId    = editorSystem.selectedEntity
+
+			editorSystem.prototype.deactivatePlugin.call( editorSystem, 'entityMover' )
+
+			this.currentTilemap = selectedEntityId
+			this.state          = STATE_SELECT_TILE
+
+			destroyTilemapSelectionEntities.call( this )
+
+			showTilemapSelector.call( this, editorSystem.cursorWorldPosition, this.tilemaps[ selectedEntityId ] )
+		}
+
+		/**
+		 * Gets calles when tile editing ends for a selectedEntity
+		 */
+		var endTileEditing = function() {
+			var editorSystem        = this.editorSystem,
+				selectedEntityId    = editorSystem.selectedEntity
+
+			this.state = STATE_INACTIVE
+			destroyTilemapSelectionEntities.call( this )
+
+			editorSystem.prototype.activatePlugin.call( editorSystem, 'entityMover' )
+
+		}
+
+
 		var showTilemapSelector = function( cursorWorldPosition, tilemapAsset ) {
 			var entityManager               = this.spell.entityManager,
 				spriteSheetAssetId          = tilemapAsset.asset.spriteSheet.assetId,
@@ -349,16 +390,20 @@ define(
 
 				if( event.keyCode === keyCodes.SPACE && selectedEntityId !== null && this.tilemaps[ selectedEntityId ] ) {
 
-					editorSystem.prototype.deactivatePlugin.call( editorSystem, 'entityMover' )
+					beginTileEditing.call( this )
 
-					this.currentTilemap = selectedEntityId
-					this.state = STATE_SELECT_TILE
+				} else if (
+					event.keyCode === keyCodes.ESCAPE &&
+					(
+						this.state === STATE_SELECT_TILE ||
+						this.state === STATE_READY_TO_DRAW ||
+						this.state === STATE_DRAW_TILE
+					)
+				) {
 
-					destroyTilemapSelectionEntities.call( this )
-
-					showTilemapSelector.call( this, editorSystem.cursorWorldPosition, this.tilemaps[ selectedEntityId ] )
-
+					endTileEditing.call( this )
 				}
+
 			},
 
 			mousedown: function( spell, editorSystem, event ) {
@@ -368,7 +413,6 @@ define(
 					//only respond to left mouseclicks
 					return
 				}
-
 
 				if( this.state === STATE_SELECT_TILE && this.tilemapSelectionHighlighted !== null ) {
 
