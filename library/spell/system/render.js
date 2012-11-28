@@ -139,9 +139,9 @@ define(
 						context.setGlobalAlpha( visualObjectOpacity )
 					}
 
-					var appearance      = appearances[ id ] || animatedAppearances[ id ] || tilemaps[ id ] || textAppearances[ id ] ||  spriteSheetAppearances[ id ],
-						shape           = rectangles[ id ],
-						quadGeometry    = quadGeometries[ id ]
+					var appearance   = appearances[ id ] || animatedAppearances[ id ] || tilemaps[ id ] || textAppearances[ id ] ||  spriteSheetAppearances[ id ],
+						shape        = rectangles[ id ],
+						quadGeometry = quadGeometries[ id ]
 
 					if( appearance ) {
 						var asset   = appearance.asset,
@@ -254,13 +254,12 @@ define(
 								frameOffsets      = asset.frameOffsets,
 								numFrames         = asset.numFrames,
 								frameOffset       = null,
-								quadDimensions    = quadGeometry ? quadGeometry.dimensions :  [ (frames.length-0) * frameDimensions[0], frameDimensions[1] ],
+								quadDimensions    = quadGeometry ? quadGeometry.dimensions :  [ ( frames.length -0 ) * frameDimensions[ 0 ], frameDimensions[ 1 ] ],
 								numFramesInQuad   = [
-									Math.floor( quadDimensions[ 0 ] / frameDimensions[0] ),
-									Math.floor( quadDimensions[ 1 ] / frameDimensions[1] )
+									Math.floor( quadDimensions[ 0 ] / frameDimensions[ 0 ] ),
+									Math.floor( quadDimensions[ 1 ] / frameDimensions[ 1 ] )
 								],
 								totalFramesInQuad = numFramesInQuad[ 0 ] * numFramesInQuad[ 1 ]
-
 
 							if( totalFramesInQuad > 0 ) {
 								//only draw spriteSheet if we have at least space to draw one tile
@@ -270,7 +269,7 @@ define(
 									context.scale( frameDimensions )
 
 									for(
-										var x=0, length = frames.length;
+										var x = 0, length = frames.length;
 									     x < length &&
 										 x < totalFramesInQuad;
 									     x++
@@ -278,7 +277,6 @@ define(
 
 										frameId     = frames[ x ]
 										frameOffset = frameOffsets[ frameId ]
-
 
 										tmpVec2[ 0 ] = -(quadDimensions[ 0 ] / frameDimensions[ 0 ]) / 2 + x % numFramesInQuad[ 0 ]
 										tmpVec2[ 1 ] = -(quadDimensions[ 1 ] / frameDimensions[ 1 ]) / 2 + Math.floor( x / numFramesInQuad[ 0 ] )
@@ -294,9 +292,7 @@ define(
 									}
 								}
 								context.restore()
-
 							}
-
 						}
 					}
 

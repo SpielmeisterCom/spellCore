@@ -8,13 +8,13 @@
             "name": "width",
             "type": "number",
             "default": 2,
-            "doc": "the width of the box"
+            "doc": "the width of the rectangle"
         },
         {
             "name": "height",
             "type": "number",
             "default": 2,
-            "doc": "the height of the box"
+            "doc": "the height of the rectangle"
         },
         {
             "name": "lineColor",
@@ -26,7 +26,7 @@
             "name": "lineWidth",
             "type": "number",
             "default": 1,
-            "doc": "the width of the box"
+            "doc": "the width of the rectangle"
         },
         {
             "name": "fill",
