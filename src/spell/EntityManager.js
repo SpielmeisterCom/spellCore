@@ -165,7 +165,6 @@ define(
 
 			mat3.identity( matrix )
 			mat3.translate( matrix, appearanceTransform.translation )
-			mat3.rotate( matrix, appearanceTransform.rotation )
 			mat3.scale( matrix, appearanceTransform.scale )
 		}
 
