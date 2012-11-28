@@ -15,9 +15,10 @@ define(
 			this.transforms         = editorSystem.transforms
 			this.spell              = spell
 
-			this.tilemapSelectionMap        = {}
-			this.tilemapSelectionBackground = null
-			this.tilemapSelectionCursor     = null
+			this.tilemapSelectionMap            = {}
+			this.tilemapSelectionBackground     = null
+			this.tilemapSelectionHighlighted    = null
+			this.tilemapSelectionCursor         = null
 		}
 
 		//private functions
@@ -56,21 +57,20 @@ define(
 
 		}
 
-		var destroyTilemapSelectionEntities = function() {
+		var destroyTilemapSelectionEntities = function(exceptThisEntityId) {
 			var entityManager = this.spell.entityManager
-
-			if ( this.tilemapSelectionCursor !== null ) {
-				entityManager.removeEntity( this.tilemapSelectionCursor )
-				this.tilemapSelectionCursor = null
-			}
 
 			if( this.tilemapSelectionBackground !== null ) {
 				entityManager.removeEntity( this.tilemapSelectionBackground )
 				this.tilemapSelectionBackground = null
 			}
 
-			for (var frameIndex in this.tilemapSelectionMap) {
-				entityManager.removeEntity( this.tilemapSelectionMap[ frameIndex ] )
+			for( var frameIndex in this.tilemapSelectionMap ) {
+				var entityId = this.tilemapSelectionMap[ frameIndex ]
+
+				if( !exceptThisEntityId || exceptThisEntityId !== entityId ) {
+					entityManager.removeEntity( entityId )
+				}
 			}
 			this.tilemapSelectionMap = {}
 		}
@@ -174,20 +174,19 @@ define(
 					)
 
 					//clear all rects
-					_.each( _.keys( this.transforms ), function( entityId, frameIndex ) {
+					_.each( this.tilemapSelectionMap, function( entityId, frameIndex ) {
 						entityManager.removeComponent( entityId, 'spell.component.2d.graphics.shape.rectangle' )
 					} )
 
-					this.tilemapSelectionCursor = null
-
+					this.tilemapSelectionHighlighted = null
 					if( matchedEntities.length > 0 ) {
-						this.tilemapSelectionCursor = matchedEntities[ 0 ]
+						this.tilemapSelectionHighlighted = matchedEntities[ 0 ]
 
-						if (!entityManager.hasComponent(this.tilemapSelectionCursor, 'spell.component.2d.graphics.shape.rectangle')) {
-							entityManager.addComponent(this.tilemapSelectionCursor, 'spell.component.2d.graphics.shape.rectangle',
+						if (!entityManager.hasComponent(this.tilemapSelectionHighlighted, 'spell.component.2d.graphics.shape.rectangle')) {
+							entityManager.addComponent(this.tilemapSelectionHighlighted, 'spell.component.2d.graphics.shape.rectangle',
 								{
 									'lineColor': [1, 0, 0],
-									'lineWidth': 1,
+									'lineWidth': 2,
 									'width': 64,
 									'height': 64
 								})
@@ -206,7 +205,7 @@ define(
 
 				if(event.keyCode === keyCodes.SPACE && selectedEntity !== null && tilemaps[ selectedEntity ]) {
 
-					editorSystem.prototype.acquireEventLock.call( editorSystem, this, ['mousemove', 'mousedown', 'mouseup'] )
+					editorSystem.prototype.acquireEventLock.call( editorSystem, this, ['mousemove', 'mousedown', 'mouseup', 'keydown', 'keyup'] )
 					editorSystem.prototype.acquireProcessLock.call( editorSystem, this )
 
 					tilemap = tilemaps[ selectedEntity ]
@@ -220,9 +219,21 @@ define(
 			},
 
 			mousedown: function( spell, editorSystem, event ) {
+				var entityManager = spell.entityManager
 
-				if( this.state === STATE_SELECT_TILE ) {
-					console.log('mouseclick')
+				if( this.state === STATE_SELECT_TILE && this.tilemapSelectionHighlighted !== null ) {
+					destroyTilemapSelectionEntities.call(this, this.tilemapSelectionHighlighted )
+
+
+					this.tilemapSelectionCursor         = this.tilemapSelectionHighlighted
+					this.tilemapSelectionHighlighted    = null
+
+					entityManager.removeComponent( this.tilemapSelectionCursor, 'spell.component.2d.graphics.shape.rectangle' )
+
+					this.state = STATE_DRAW_TILE
+
+				} else if( this.state === STATE_DRAW_TILE && this.tilemapSelectionCursor !== null ) {
+					//TODO: lookup which x/y was hit and update the asset
 				}
 			},
 
@@ -231,6 +242,14 @@ define(
 
 
 			mousemove: function( spell, editorSystem, event ) {
+				var entityManager = spell.entityManager
+
+				if(this.state === STATE_DRAW_TILE && this.tilemapSelectionCursor !== null ) {
+					entityManager.updateComponent(this.tilemapSelectionCursor, 'spell.component.2d.transform',
+					{
+						translation: editorSystem.cursorWorldPosition
+					})
+				}
 			}
 		}
 
