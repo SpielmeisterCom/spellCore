@@ -27,10 +27,18 @@ define("spell/script/editor/entityMover",
 		}
 
 		var isPointWithinEntity = function ( worldPosition, entityId ) {
+			var editorConfigurations = this.editorConfigurations,
+				editorConfiguration  = editorConfigurations[ entityId ]
+
 			var isOverlayEntity = _.contains(
 				_.values( this.overlayEntityMap ),
 				entityId
 			)
+
+			if( editorConfiguration && editorConfiguration.isSelectable === false) {
+				return false
+			}
+
 
 			if (isOverlayEntity) {
 				//no further processing for overlay entites
@@ -173,6 +181,11 @@ define("spell/script/editor/entityMover",
 		}
 
 		var startDragging = function( entityId, cursorPosition ) {
+
+			if (! isMovementAllowed.call( this, entityId )) {
+				return false
+			}
+
 			this.isDragging = true
 
 			var transform = this.transforms[ entityId ]
@@ -262,6 +275,16 @@ define("spell/script/editor/entityMover",
 			this.editorSystem.prototype.setSelectedEntity.call( this.editorSystem, entityId )
 		}
 
+		var isMovementAllowed = function( entityId ) {
+			var editorConfigurations = this.editorConfigurations,
+				editorConfiguration  = editorConfigurations[ entityId ]
+
+			if( editorConfiguration && editorConfiguration.isMoveable === false) {
+				return false
+			} else {
+				return true
+			}
+		}
 
 		var entityMover = function(spell, editorSystem) {
 			this.editorSystem       = editorSystem
@@ -318,6 +341,7 @@ define("spell/script/editor/entityMover",
 				this.transforms             = editorSystem.transforms
 				this.appearances            = editorSystem.appearances
 				this.animatedAppearances    = editorSystem.animatedAppearances
+				this.editorConfigurations   = editorSystem.editorConfigurations
 				this.names                  = editorSystem.names
 			},
 
@@ -368,6 +392,8 @@ define("spell/script/editor/entityMover",
 			},
 
 			keydown: function( spell, editorSystem, event ) {
+				var movementAllowed = isMovementAllowed.call( this, this.selectedEntity )
+
 				if(event.keyCode == 27 && this.selectedEntity ) {
 					//ESC cancels selection
 					cancelSelection.call( this )
@@ -376,19 +402,19 @@ define("spell/script/editor/entityMover",
 					//TAB toggles through selected entity
 					toggleThroughMatchedEntites.call(this, this.matchedEntities, this.selectedEntity )
 
-				} else if( event.keyCode == 37 && this.selectedEntity ) {
+				} else if( event.keyCode == 37 && this.selectedEntity && movementAllowed ) {
 					//Left arrow moves the selected entity one pixel to the left
 					updateEntityByRelativeOffset.call( this, this.selectedEntity, [-1, 0])
 
-				} else if( event.keyCode == 38 && this.selectedEntity ) {
+				} else if( event.keyCode == 38 && this.selectedEntity && movementAllowed ) {
 					//top arrow moves the selected entity one pixel up
 					updateEntityByRelativeOffset.call( this, this.selectedEntity, [0, 1])
 
-				} else if( event.keyCode == 39 && this.selectedEntity ) {
+				} else if( event.keyCode == 39 && this.selectedEntity && movementAllowed ) {
 					//right arrow moves the selected entity one pixel to the right
 					updateEntityByRelativeOffset.call( this, this.selectedEntity, [1, 0])
 
-				} else if( event.keyCode == 40 && this.selectedEntity ) {
+				} else if( event.keyCode == 40 && this.selectedEntity && movementAllowed ) {
 					//down arrow moves the selected entity one pixel down
 					updateEntityByRelativeOffset.call( this, this.selectedEntity, [0, -1])
 
