@@ -64,19 +64,21 @@ define("spell/script/editor/entityMover",
 					vec2.set( transform.worldTranslation, transformOverlay.translation )
 					transformOverlay.rotation = transform.worldRotation
 
-					var text, color
+					var text, color, lineWidth
 
 					if( this.selectedEntity == entityId ) {
-						text    = (name) ? name.value : entityId
-						color   = [1, 0, 0]
+						text        = (name) ? name.value : entityId
+						color       = [0, 1, 0]
+						lineWidth   = 3
 					} else {
 						text    = ''
 						color   = [1, 0 ,1]
+						lineWidth = 1
 					}
 
 
-					entityManager.updateComponent( overlayEntityMap[ entityId ], 'spell.component.2d.graphics.debug.box', {
-						'color': color,
+					entityManager.updateComponent( overlayEntityMap[ entityId ], 'spell.component.2d.graphics.shape.rectangle', {
+						'lineColor': color,
 						'height': entityDimensions[ 1 ],
 						'width': entityDimensions[ 0 ]
 					})
