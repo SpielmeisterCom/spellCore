@@ -1,0 +1,20 @@
+{
+    "type": "component",
+    "readonly": true,
+    "title": "Interactive Editing Configuration",
+    "attributes": [
+        {
+            "name": "isMoveable",
+            "type": "boolean",
+            "default": true,
+            "doc": "specifies whether this entity should be moveable"
+        },
+        {
+            "name": "isSelectable",
+            "type": "boolean",
+            "default": true,
+            "doc": "specifies whether this entity is selectable"
+        }
+    ],
+    "version": 1
+}

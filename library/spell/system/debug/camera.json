@@ -26,6 +26,10 @@
         {
             "name": "names",
             "componentId": "spell.component.name"
+        },
+        {
+            "name": "editorConfigurations",
+            "componentId": "spell.component.editorConfiguration"
         }
 	],
 	"version": 1,
