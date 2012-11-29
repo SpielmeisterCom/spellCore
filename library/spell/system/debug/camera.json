@@ -30,6 +30,10 @@
         {
             "name": "editorConfigurations",
             "componentId": "spell.component.editorConfiguration"
+        },
+        {
+            "name": "bodies",
+            "componentId": "spell.component.physics.body"
         }
 	],
 	"version": 1,

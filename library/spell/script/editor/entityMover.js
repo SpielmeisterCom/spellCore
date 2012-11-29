@@ -245,15 +245,19 @@ define("spell/script/editor/entityMover",
 			this.isDirty = true
 
 			var transform           = this.transforms[ entityId ],
-				currentTranslation  = transform.translation,
-				overlayEntityId     = this.overlayEntityMap[ entityId ]
+				overlayEntityId     = this.overlayEntityMap[ entityId ],
+				body                = this.bodies[ entityId ]
 
-			vec2.set(currentTranslation, newTranslation)
+			vec2.set(newTranslation, transform.translation)
 
 			if( overlayEntityId && this.transforms[ overlayEntityId ]) {
 				vec2.set(currentTranslation, this.transforms[ overlayEntityId ].translation)
 			}
 
+			//if this object has a phyics body, reposition the physics body
+			if ( body && this.spell.box2dWorlds && this.spell.box2dWorlds.main ) {
+				this.spell.box2dWorlds.main.setPosition( entityId, newTranslation )
+			}
 		}
 
 		var toggleThroughMatchedEntites = function( matchedEntites, activeEntityId ) {
@@ -338,6 +342,7 @@ define("spell/script/editor/entityMover",
 
 			init: function( spell, editorSystem ) {
 				this.spell                  = spell
+				this.bodies                 = editorSystem.bodies
 				this.transforms             = editorSystem.transforms
 				this.appearances            = editorSystem.appearances
 				this.animatedAppearances    = editorSystem.animatedAppearances
