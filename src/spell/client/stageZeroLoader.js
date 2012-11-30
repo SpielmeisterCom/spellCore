@@ -25,18 +25,13 @@ if( !window.console ) {
 
 ;( function( document ) {
 	var MIN_FLASH_PLAYER_VERSION = '10.1.0',
+		MIN_FIREFOX_VERSION_FOR_WEBGL = 17,
 		DEFAULT_CONTAINER_ID = 'spell',
 		MODE = {
 			DEPLOYED : 'deployed',
 			DEVELOPMENT_EMBEDDED : 'development_embedded',
 			DEVELOPMENT_STANDALONE : 'development_standalone'
 		}
-
-	var isFirefox = function() {
-		var match = navigator.userAgent.match( /.*Firefox\/(\d+)/ )
-
-		return !!match
-	}
 
 	var getUrlParameters = function() {
 		var url = window.location.href
@@ -75,50 +70,54 @@ if( !window.console ) {
 	}
 
 	var isHtml5AudioSupported = function() {
-		var elem = document.createElement('audio')
+		var elem              = document.createElement( 'audio' ),
+			audioObjSupported = !!elem.canPlayType
 
-		var audioObjSupported = !!(elem.canPlayType)
+		if( !audioObjSupported ) return false
 
-		if( ! audioObjSupported ) {
-			return false
-		}
+		var supportedFormats = [ 'audio/ogg; codecs="vorbis"', 'audio/mpeg' ]
 
-		var supportedFormats = ['audio/ogg; codecs="vorbis"', 'audio/mpeg'];
-
-		for (var i=0; i<supportedFormats.length; i++) {
-
+		for( var i = 0; i < supportedFormats.length; i++ ) {
 			try {
-
-				if( "" != elem.canPlayType( supportedFormats[ i ]).replace(/^no$/,'') ) {
+				if( '' != elem.canPlayType( supportedFormats[ i ] ).replace( /^no$/,'' ) ) {
 					return true
 				}
 
-			} catch(e) {
-
-			}
+			} catch( e ) {}
 		}
 
 		return false
 	}
 
-	var isCanvasCapable = function() {
-		var canvasElement = document.createElement("canvas");
-
-		return ( !! canvasElement.getContext && !! canvasElement.getContext("2d") )
+	var isHtml5Capable = function() {
+		return isHtml5AudioSupported() &&
+			isCanvasCapable()
 	}
 
-	var isHtml5Capable = function() {
-		return ( isHtml5AudioSupported() && isCanvasCapable() )
+	var isCanvasCapable = function() {
+		var canvasElement = document.createElement( 'canvas' )
+
+		return canvasElement.getContext &&
+			canvasElement.getContext( '2d' )
+	}
+
+	var isWebGlIncapableFirefox = function() {
+		var match = navigator.userAgent.match( /.*Firefox\/(\d+)/ )
+		if( !match ) return false
+
+		var version = parseInt( match[ 1 ], 10 )
+
+		return version < MIN_FIREFOX_VERSION_FOR_WEBGL
 	}
 
 	var isWebGlCapable = function() {
-		if( isFirefox() ) return false
+		if( isWebGlIncapableFirefox() ) return false
 
 		var gl,
-			contextNames = [ "webgl", "experimental-webgl", "webkit-3d", "moz-webgl" ],
+			contextNames = [ 'webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl' ],
 			attributes   = { alpha: false },
 			isSupported  = false,
-			canvas       = document.createElement( "canvas" )
+			canvas       = document.createElement( 'canvas' )
 
 		for( var i = 0; i < contextNames.length; i++ ) {
 			try {
