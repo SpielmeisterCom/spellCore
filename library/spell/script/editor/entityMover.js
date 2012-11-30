@@ -251,7 +251,7 @@ define("spell/script/editor/entityMover",
 			vec2.set(newTranslation, transform.translation)
 
 			if( overlayEntityId && this.transforms[ overlayEntityId ]) {
-				vec2.set(currentTranslation, this.transforms[ overlayEntityId ].translation)
+				vec2.set(newTranslation, this.transforms[ overlayEntityId ].translation)
 			}
 
 			//if this object has a phyics body, reposition the physics body
