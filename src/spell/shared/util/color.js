@@ -54,7 +54,7 @@ define(
 					+ toRange( vec[ 0 ] ) + ', '
 					+ toRange( vec[ 1 ] ) + ', '
 					+ toRange( vec[ 2 ] ) + ', '
-					+ Math.max( 0, Math.min( vec[ 3 ], 1 ) ) + ')'
+					+ mathUtil.clamp( vec[ 3 ], 0, 1 ) + ')'
 			}
 
 			return 'rgb('
