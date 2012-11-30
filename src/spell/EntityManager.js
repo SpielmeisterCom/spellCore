@@ -161,11 +161,20 @@ define(
 		}
 
 		var updateAppearanceTransform = function( appearanceTransform ) {
-			var matrix = appearanceTransform.matrix
+			var matrix      = appearanceTransform.matrix,
+				translation = appearanceTransform.translation,
+				scale       = appearanceTransform.scale
 
 			mat3.identity( matrix )
-			mat3.translate( matrix, appearanceTransform.translation )
-			mat3.scale( matrix, appearanceTransform.scale )
+			mat3.translate( matrix, translation )
+			mat3.scale( matrix, scale )
+
+			appearanceTransform.isIdentity = (
+				translation[ 0 ] === 0 &&
+				translation[ 1 ] === 0 &&
+				scale[ 0 ] === 1 &&
+				scale[ 1 ] === 1
+			)
 		}
 
 		var addComponentType = function( componentMaps, componentId ) {
