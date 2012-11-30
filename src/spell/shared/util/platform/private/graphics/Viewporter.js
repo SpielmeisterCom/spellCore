@@ -86,7 +86,6 @@ define(
 				// if we are on Desktop, no need to go further
 				if (!viewporter.ACTIVE) {
 					window.onresize = publishScreenResizedEvent
-					publishScreenResizedEvent()
 
 					return
 				}
