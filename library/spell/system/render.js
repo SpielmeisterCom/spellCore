@@ -48,12 +48,14 @@ define(
 		 */
 
 		var tmpVec2           = vec2.create(),
+			tmpVec2_1         = vec2.create(),
 			tmpMat3           = mat3.identity(),
 			clearColor        = vec4.create( [ 0, 0, 0, 1 ] ),
 			markerColor       = vec4.create( [ 0.45, 0.45, 0.45, 1 ] ),
 			debugFontAssetId  = 'font:spell.OpenSans14px',
 			drawDebugShapes   = true,
 			defaultDimensions = vec2.create( [ 1, 1 ] ),
+			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
 			currentCameraId
 
 		var roundVec2 = function( v ) {
@@ -103,6 +105,91 @@ define(
 				offsetInMs / animationLengthInMs
 		}
 
+		var transformTo2dTileMapCoordinates = function( worldToLocalMatrix, tilemapDimensions, frameDimensions, maxTileMapY, point ) {
+			var transformedPoint = vec2.divide(
+				mat3.multiplyVec2(
+					worldToLocalMatrix,
+					point,
+					tmpVec2
+				),
+				frameDimensions,
+				tmpVec2
+			)
+
+			vec2.add(
+				vec2.scale( tilemapDimensions, 0.5, tmpVec2_1 ),
+				transformedPoint
+			)
+
+			transformedPoint[ 1 ] = maxTileMapY - transformedPoint[ 1 ]
+
+			return transformedPoint
+		}
+
+		var draw2dTileMap = function( context, texture, viewFrustum, asset, transform ) {
+			var tilemapData = asset.tilemapData
+
+			if( !tilemapData ) return
+
+			var assetSpriteSheet  = asset.spriteSheet,
+				tilemapDimensions = asset.tilemapDimensions,
+				frameOffsets      = assetSpriteSheet.frameOffsets,
+				frameDimensions   = assetSpriteSheet.frameDimensions,
+				maxTileMapX       = tilemapDimensions[ 0 ] - 1,
+				maxTileMapY       = tilemapDimensions[ 1 ] - 1
+
+			// transform the view frustum to tile map coordinates, clamp to effective range
+			var lowerLeft = transformTo2dTileMapCoordinates(
+				transform.worldToLocalMatrix,
+				tilemapDimensions,
+				frameDimensions,
+				maxTileMapY,
+				viewFrustum.bottomLeft
+			)
+
+			var minTileMapSectionX = Math.max( Math.floor( lowerLeft[ 0 ] ), 0 ),
+				maxTileMapSectionY = Math.min( Math.ceil( lowerLeft[ 1 ] ), maxTileMapY )
+
+			var topRight = transformTo2dTileMapCoordinates(
+				transform.worldToLocalMatrix,
+				tilemapDimensions,
+				frameDimensions,
+				maxTileMapY,
+				viewFrustum.topRight
+			)
+
+			var minTileSectionMapY = Math.max( Math.floor( topRight[ 1 ] ), 0 ),
+				maxTileSectionMapX = Math.min( Math.ceil( topRight[ 0 ] ), maxTileMapX )
+
+			context.save()
+			{
+				context.scale( frameDimensions )
+
+				for( var y = minTileSectionMapY; y <= maxTileMapSectionY ; y++ ) {
+					var tilemapRow = tilemapData[ y ]
+
+					for( var x = minTileMapSectionX; x <= maxTileSectionMapX; x++ ) {
+						if( !tilemapRow ) continue
+
+						var frameId = tilemapRow[ x ]
+						if( frameId === null ) continue
+
+						tmpVec2[ 0 ] = x - maxTileMapX / 2 - 0.5
+						tmpVec2[ 1 ] = ( maxTileMapY - y ) - maxTileMapY / 2 - 0.5
+
+						context.drawSubTexture(
+							texture,
+							frameOffsets[ frameId ],
+							frameDimensions,
+							tmpVec2,
+							defaultDimensions
+						)
+					}
+				}
+			}
+			context.restore()
+		}
+
 		var drawVisualObject = function(
 			context,
 			transforms,
@@ -118,6 +205,7 @@ define(
 			rectangles,
 			deltaTimeInMs,
 			id,
+			viewFrustum,
 			next
 		) {
 			var visualObject = visualObjects[ id ],
@@ -158,7 +246,7 @@ define(
 							// static appearance
 							context.save()
 							{
-								var textureMatrix = appearanceTransform ?
+								var textureMatrix = appearanceTransform && !appearanceTransform.isIdentity ?
 									appearanceTransform.matrix :
 									undefined
 
@@ -175,45 +263,8 @@ define(
 							// text appearance
 							drawText( context, asset, texture, 0, 0, appearance.text, appearance.spacing )
 
-						} else if( asset.type === '2dTileMap' && asset.tilemapData !== null ) {
-							// 2d tilemap
-							var assetSpriteSheet  = asset.spriteSheet,
-								tilemapDimensions = asset.tilemapDimensions,
-								tilemapData       = asset.tilemapData,
-								frameOffsets      = assetSpriteSheet.frameOffsets,
-								frameDimensions   = assetSpriteSheet.frameDimensions,
-								maxX              = tilemapDimensions[ 0 ] - 1,
-								maxY              = tilemapDimensions[ 1 ] - 1
-
-							context.save()
-							{
-								context.scale( frameDimensions )
-
-								for( var y = 0; y <= maxY ; y++ ) {
-									for( var x = 0; x <= maxX; x++ ) {
-										if( !tilemapData[ y ] ||
-											tilemapData[ y ][ x ] === null ) {
-
-											continue
-										}
-
-										var frameId = tilemapData[ y ][ x ],
-											frameOffset = frameOffsets[ frameId ]
-
-										tmpVec2[ 0 ] = x - maxX/2 - 0.5
-										tmpVec2[ 1 ] = (maxY - y) - maxY/2 - 0.5
-
-										context.drawSubTexture(
-											texture,
-											frameOffset,
-											frameDimensions,
-											tmpVec2,
-											defaultDimensions
-										)
-									}
-								}
-							}
-							context.restore()
+						} else if( asset.type === '2dTileMap' ) {
+							draw2dTileMap( context, texture, viewFrustum, asset, transform )
 
 						} else if( asset.type === 'animation' ) {
 							// animated appearance
@@ -252,7 +303,6 @@ define(
 							var frames            = appearance.drawAllFrames ? asset.frames : appearance.frames,
 								frameDimensions   = asset.frameDimensions,
 								frameOffsets      = asset.frameOffsets,
-								numFrames         = asset.numFrames,
 								frameOffset       = null,
 								quadDimensions    = quadGeometry ? quadGeometry.dimensions :  [ ( frames.length -0 ) * frameDimensions[ 0 ], frameDimensions[ 1 ] ],
 								numFramesInQuad   = [
@@ -285,7 +335,6 @@ define(
 											texture,
 											frameOffset,
 											frameDimensions,
-
 											tmpVec2,
 											defaultDimensions
 										)
@@ -309,7 +358,7 @@ define(
 						numChildrenIds = childrenIds.length
 
 					for( var i = 0; i < numChildrenIds; i++ ) {
-						next( deltaTimeInMs, childrenIds[ i ], next )
+						next( deltaTimeInMs, childrenIds[ i ], viewFrustum, next )
 					}
 				}
 			}
@@ -395,6 +444,24 @@ define(
 			context.viewport( 0, 0, screenDimensions[ 0 ], screenDimensions [ 1 ] )
 		}
 
+		var createViewFrustum = function( cameraDimensions, cameraTranslation ) {
+			var halfCameraDimensions = vec2.scale( cameraDimensions, 0.5, tmpVec2 )
+
+			vec2.subtract(
+				cameraTranslation,
+				halfCameraDimensions,
+				tmpViewFrustum.bottomLeft
+			)
+
+			vec2.add(
+				cameraTranslation,
+				halfCameraDimensions,
+				tmpViewFrustum.topRight
+			)
+
+			return tmpViewFrustum
+		}
+
 		var init = function( spell ) {
 			var eventManager = spell.eventManager
 
@@ -442,9 +509,12 @@ define(
 				context                 = this.context,
 				drawVisualObjectPartial = this.drawVisualObjectPartial,
 				screenSize              = this.screenSize,
-				screenAspectRatio       = this.debugSettings && this.debugSettings.screenAspectRatio ?
-					this.debugSettings.screenAspectRatio :
-					screenSize[ 0 ] / screenSize[ 1 ]
+				viewFrustum
+
+			var screenAspectRatio = ( this.debugSettings && this.debugSettings.screenAspectRatio ?
+				this.debugSettings.screenAspectRatio :
+				( this.screenSize[ 0 ] / this.screenSize[ 1 ] )
+			)
 
 			// set the camera
 			var activeCameraId  = getActiveCameraId( cameras ),
@@ -459,6 +529,7 @@ define(
 
 				if( effectiveCameraDimensions ) {
 					setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
+					viewFrustum = createViewFrustum( effectiveCameraDimensions, cameraTransform.translation )
 				}
 			}
 
@@ -476,7 +547,7 @@ define(
 			_.each(
 				sortedVisualObjects,
 				function( id ) {
-					drawVisualObjectPartial( deltaTimeInMs, id, drawVisualObjectPartial )
+					drawVisualObjectPartial( deltaTimeInMs, id, viewFrustum, drawVisualObjectPartial )
 				}
 			)
 
