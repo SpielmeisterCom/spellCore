@@ -1,0 +1,30 @@
+{
+    "version": 1,
+    "type": "system",
+    "input": [
+        {
+            "name": "parallax",
+            "componentId": "spell.component.2d.graphics.parallax"
+        },
+        {
+            "name": "transforms",
+            "componentId": "spell.component.2d.transform"
+        },
+        {
+            "name": "appearanceTransforms",
+            "componentId": "spell.component.2d.graphics.appearanceTransform"
+        },
+        {
+            "name": "quads",
+            "componentId": "spell.component.2d.graphics.geometry.quad"
+        }
+    ],
+    "config": [
+        {
+            "name": "active",
+            "type": "boolean",
+            "default": true,
+            "doc": "if active is false the system will be skipped during processing"
+        }
+    ]
+}

@@ -1,0 +1,76 @@
+{
+    "version": 1,
+    "type": "component",
+    "title": "",
+    "doc": "",
+    "icon": "",
+    "attributes": [
+        {
+            "name": "refEntityName",
+            "default": "camera",
+            "engineInternal": false,
+            "type": "string",
+            "doc": "name of entity which translation should function as reference for the parallax effect"
+        },
+        {
+            "name": "stickToRefX",
+            "default": true,
+            "engineInternal": false,
+            "type": "boolean",
+            "doc": "specifies if this parallax layer should stick to the x translation value of the reference entity"
+        },
+        {
+            "name": "stickToRefY",
+            "default": true,
+            "engineInternal": false,
+            "type": "boolean",
+            "doc": "specifies if this parallax layer should stick to the y translation value of the reference entity"
+        },
+        {
+            "name": "offsetToRefEntity",
+            "default": [
+                0,
+                0
+            ],
+            "engineInternal": false,
+            "type": "vec2",
+            "doc": "if this parallax layer sticks to the x or y value of the reference entity, you can specify an offset to this value here which will be added to the reference entity's translation"
+        },
+        {
+            "name": "moveSpeed",
+            "default": [
+                1,
+                1
+            ],
+            "engineInternal": false,
+            "type": "vec2",
+            "doc": "the speed factor for the parallax effect which will be multiplied with the reference entity's translation"
+        },
+
+        {
+            "name": "textureOffset",
+            "default": [
+                0,
+                0
+            ],
+            "engineInternal": false,
+            "type": "vec2",
+            "doc": "an offset which will added to the parallax texture matrix (useful to set a starting texture position)"
+        },
+        {
+            "name": "repeatX",
+            "default": false,
+            "engineInternal": false,
+            "type": "boolean",
+            "doc": "specifies if this parallax layer will repeat itselfs in the x direction"
+        },
+        {
+            "name": "repeatY",
+            "default": false,
+            "engineInternal": false,
+            "type": "boolean",
+            "doc": "specifies if this parallax layer will repeat itselfs in the y direction"
+        }
+
+    ]
+}
