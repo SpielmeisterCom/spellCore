@@ -90,16 +90,16 @@ define(
 				var entityManager = spell.entityManager
 
 
-				for (var entityId in this.parallaxScrollings) {
-					var parallaxScrolling       = this.parallaxScrollings[ entityId ],
-						refEntityName           = parallaxScrolling.refEntityName,
-						moveSpeed               = parallaxScrolling.moveSpeed,
-						offsetToRefEntity       = parallaxScrolling.offsetToRefEntity,
-						stickToRefX             = parallaxScrolling.stickToRefX,
-						stickToRefY             = parallaxScrolling.stickToRefY,
-						textureOffset           = parallaxScrolling.textureOffset,
-						repeatX                 = parallaxScrolling.repeatX,
-						repeatY                 = parallaxScrolling.repeatY,
+				for (var entityId in this.parallax) {
+					var parallax       = this.parallax[ entityId ],
+						refEntityName           = parallax.refEntityName,
+						moveSpeed               = parallax.moveSpeed,
+						offsetToRefEntity       = parallax.offsetToRefEntity,
+						stickToRefX             = parallax.stickToRefX,
+						stickToRefY             = parallax.stickToRefY,
+						textureOffset           = parallax.textureOffset,
+						repeatX                 = parallax.repeatX,
+						repeatY                 = parallax.repeatY,
 
 
 						refEntityId             = lookupEntityId.call( this, refEntityName ),
