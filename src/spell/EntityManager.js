@@ -900,6 +900,10 @@ define(
 				updateWorldTransform( this.componentDictionaries, entityId )
 			},
 
+			updateAppearanceTransform : function( entityId ) {
+				updateAppearanceTransform(  this.componentDictionaries[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
+			},
+
 			/**
 			 * Updates all components which reference the asset with the updated asset instance.
 			 *
