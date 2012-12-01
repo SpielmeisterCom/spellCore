@@ -4,7 +4,7 @@
  */
 
 define(
-	'parallax',
+	'spell/system/parallax',
 	[
 		'spell/math/vec2',
 		'spell/functions'
