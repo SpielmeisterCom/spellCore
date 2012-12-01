@@ -807,7 +807,7 @@ define(
 			 * @param {String} entityId the id of the requested entity
 			 * @return {Object}
 			 */
-			getComponentById : function( componentId, entityId ) {
+			getComponentById : function( entityId, componentId ) {
 				var componentDictionary = this.componentDictionaries[ componentId ]
 
 				return componentDictionary ? componentDictionary[ entityId ] : undefined
@@ -854,7 +854,7 @@ define(
 			 * @return {Boolean} true if the component could be found, false otherwise
 			 */
 			updateComponent : function( entityId, componentId, attributeConfig ) {
-				var component = this.getComponentById( componentId, entityId )
+				var component = this.getComponentById( entityId, componentId )
 
 				if( !component ) return false
 

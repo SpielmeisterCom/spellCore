@@ -101,7 +101,7 @@ define(
 
 				for( var componentId in animate ) {
 					var componentAnimation = animate[ componentId ],
-						component          = entityManager.getComponentById( componentId, id )
+						component          = entityManager.getComponentById( id, componentId )
 
 					if( !component ) {
 						throw 'Error: Unable to access component \'' + componentId + '\' of entity \'' + id + '\'.'
