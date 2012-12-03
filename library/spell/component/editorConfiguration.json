@@ -14,6 +14,18 @@
             "type": "boolean",
             "default": true,
             "doc": "specifies whether this entity is selectable"
+        },
+        {
+            "name": "isCloneable",
+            "type": "boolean",
+            "default": true,
+            "doc": "specifies whether this entity is cloneable"
+        },
+        {
+            "name": "isRemovable",
+            "type": "boolean",
+            "default": true,
+            "doc": "specifies whether this entity is removable"
         }
     ],
     "version": 1
