@@ -167,6 +167,10 @@ define("spell/script/editor/entityMover",
 		}
 
 		var sendTransformToSpellEd = function( entityId ) {
+			if(!this.transforms[ entityId ]) {
+				return false
+			}
+
 			this.spell.entityManager.updateWorldTransform( entityId )
 			this.isDirty = false
 
@@ -182,8 +186,23 @@ define("spell/script/editor/entityMover",
 
 		var startDragging = function( entityId, cursorPosition ) {
 
-			if (! isMovementAllowed.call( this, entityId )) {
+			var isMoveable  = this.editorSystem.prototype.isMoveable.call( this.editorSystem, entityId ),
+				isCloneable = this.editorSystem.prototype.isCloneable.call( this.editorSystem, entityId )
+
+			if(!isMoveable) {
 				return false
+			}
+
+
+			if( isCloneable === true && this.editorSystem.commandMode === true) {
+				//if STRG is pressed while the dragging starts, clone the entity
+
+				this.spell.sendMessageToEditor(
+					'spelled.debug.entity.clone',
+					{
+						id: entityId
+					}
+				)
 			}
 
 			this.isDragging = true
@@ -220,6 +239,12 @@ define("spell/script/editor/entityMover",
 		}
 
 		var updateEntityByWorldPosition = function( entityId, cursorPosition ) {
+
+			if( !this.transforms[ entityId ] ) {
+				//no transform available for this object. This can happen if it was removed during dragging.
+				//Ignore this update
+				return
+			}
 
 			var transform        = this.transforms[ entityId ],
 				distance         = vec2.create( ),
@@ -277,17 +302,6 @@ define("spell/script/editor/entityMover",
 		var selectEntity = function( entityId ) {
 			this.selectedEntity = entityId
 			this.editorSystem.prototype.setSelectedEntity.call( this.editorSystem, entityId )
-		}
-
-		var isMovementAllowed = function( entityId ) {
-			var editorConfigurations = this.editorConfigurations,
-				editorConfiguration  = editorConfigurations[ entityId ]
-
-			if( editorConfiguration && editorConfiguration.isMoveable === false) {
-				return false
-			} else {
-				return true
-			}
 		}
 
 		var entityMover = function(spell, editorSystem) {
@@ -397,7 +411,7 @@ define("spell/script/editor/entityMover",
 			},
 
 			keydown: function( spell, editorSystem, event ) {
-				var movementAllowed = isMovementAllowed.call( this, this.selectedEntity )
+				var movementAllowed = this.editorSystem.prototype.isMoveable.call( this.editorSystem, this.selectedEntity )
 
 				if(event.keyCode == 27 && this.selectedEntity ) {
 					//ESC cancels selection
