@@ -121,11 +121,47 @@ define(
 			invokePlugins( this.plugins, this.activePlugins, event.type, spell, this, event )
 		}
 
+		var checkPermission = function( entityId, permission ) {
+			var editorConfigurations = this.editorConfigurations,
+				editorConfiguration  = editorConfigurations[ entityId ]
+
+			if( editorConfiguration && editorConfiguration[ permission ] === false) {
+				return false
+			} else {
+				return true
+			}
+		}
 
 		//public
 		interactiveEditingSystem.prototype = {
 			setSelectedEntity: function( entityId ) {
 				this.selectedEntity = entityId
+/*
+				this.spell.sendMessageToEditor(
+					'spelled.debug.entity.select',
+					{
+						id: entityId
+					}
+				)
+
+
+*/
+			},
+
+			isMoveable: function( entityId ) {
+				return checkPermission.call( this, entityId, 'isMoveable' )
+			},
+
+			isCloneable: function ( entityId ) {
+				return checkPermission.call( this, entityId, 'isCloneable' )
+			},
+
+			isSelectable: function( entityId ) {
+				return checkPermission.call( this, entityId, 'isSelectable' )
+			},
+
+			isRemovable: function( entityId ) {
+				return checkPermission.call( this, entityId, 'isRemovable' )
 			},
 
 			getSelectedEntity: function( entityId ) {
