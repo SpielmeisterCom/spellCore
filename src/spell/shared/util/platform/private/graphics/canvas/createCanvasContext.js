@@ -165,10 +165,7 @@ define(
 		 * public
 		 */
 		var transformScreenToWorld = function( vec ) {
-			var worldPosition = vec2.create()
-			mat3.multiplyVec2( screenToWorld, vec, worldPosition )
-
-			return worldPosition
+			return mat3.multiplyVec2( screenToWorld, vec, vec2.create() )
 		}
 
 		var setColor = function( vec ) {
@@ -230,11 +227,8 @@ define(
 			context.restore()
 		}
 
-		var drawTexture = function( texture, dx, dy, dw, dh ) {
+		var drawTexture = function( texture, destinationPosition, destinationDimensions, textureMatrix ) {
 			if( texture === undefined ) throw 'Texture is undefined'
-
-			if( !dw ) dw = 1.0
-			if( !dh ) dh = 1.0
 
 			context.save()
 			{
@@ -252,17 +246,17 @@ define(
 				)
 
 				// rotating the image so that it is not upside down
-				context.translate( dx, dy )
+				context.translate( destinationPosition[ 0 ], destinationPosition[ 1 ] )
 				context.rotate( Math.PI )
 				context.scale( -1, 1 )
-				context.translate( 0, -dh )
+				context.translate( 0, -destinationDimensions[ 1 ] )
 
-				context.drawImage( texture.privateImageResource, 0 , 0, dw, dh )
+				context.drawImage( texture.privateImageResource, 0 , 0, destinationDimensions[ 0 ], destinationDimensions[ 1 ] )
 			}
 			context.restore()
 		}
 
-		var drawSubTexture = function( texture, sx, sy, sw, sh, dx, dy, dw, dh ) {
+		var drawSubTexture = function( texture, sourcePosition, sourceDimensions, destinationPosition, destinationDimensions ) {
 			if( texture === undefined ) throw 'Texture is undefined'
 
 			context.save()
@@ -281,12 +275,22 @@ define(
 				)
 
 				// rotating the image so that it is not upside down
-				context.translate( dx, dy )
+				context.translate( destinationPosition[ 0 ], destinationPosition[ 1 ] )
 				context.rotate( Math.PI )
 				context.scale( -1.015, 1.015 )
-				context.translate( 0, -dh )
+				context.translate( 0, -destinationDimensions[ 1 ] )
 
-				context.drawImage( texture.privateImageResource, sx, sy, sw, sh, 0 , 0, dw , dh )
+				context.drawImage(
+					texture.privateImageResource,
+					sourcePosition[ 0 ],
+					sourcePosition[ 1 ],
+					sourceDimensions[ 0 ],
+					sourceDimensions[ 1 ],
+					0,
+					0,
+					destinationDimensions[ 0 ],
+					destinationDimensions[ 1 ]
+				)
 			}
 			context.restore()
 		}
@@ -309,10 +313,8 @@ define(
 					modelToWorld[ 7 ]
 				)
 
-				var halfWidth = dw * 0.5
-
 				context.lineWidth = pixelScale * lineWidth
-			    context.strokeRect( dx - halfWidth, dy - dh * 0.5, dw, dh )
+			    context.strokeRect( dx, dy, dw, dh )
 			}
 			context.restore()
 		}
