@@ -9,6 +9,7 @@ define(
 		'spell/script/editor/cameraMover',
 		'spell/script/editor/entityMover',
 		'spell/script/editor/selectedEntityHighlighter',
+		'spell/script/editor/entityRemover',
 
 		'spell/script/editor/tilemapEditor',
 
@@ -20,6 +21,7 @@ define(
 		cameraMover,
 		entityMover,
 		selectedEntityHighlighter,
+		entityRemover,
 		tilemapEditor,
 
 		vec2,
@@ -31,6 +33,7 @@ define(
 		var PLUGIN_MANIFEST = {
 			'cameraMover':                  cameraMover,
 			'entityMover':                  entityMover,
+			'entityRemover':                entityRemover,
 			'selectedEntityHighlighter':    selectedEntityHighlighter,
 			'tilemapEditor':                tilemapEditor
 		};
