@@ -89,12 +89,18 @@ define(
 			if( !body ) return
 
 			for( var fixture = body.GetFixtureList(); fixture; fixture = fixture.GetNext() ) {
-				var filterData = createB2FilterData()
+				var filterData    = fixture.GetFilterData(),
+					newFilterData = createB2FilterData()
 
-				filterData.categoryBits = categoryBits
-				filterData.maskBits     = maskBits
+				newFilterData.categoryBits = categoryBits === undefined ?
+					filterData.categoryBits :
+					categoryBits
 
-				fixture.SetFilterData( filterData )
+				newFilterData.maskBits = maskBits === undefined ?
+					filterData.maskBits :
+					maskBits
+
+				fixture.SetFilterData( newFilterData )
 			}
 		}
 
