@@ -15,10 +15,19 @@ define("spell/script/editor/entityRemover",
 				var keyCodes        = spell.inputManager.getKeyCodes(),
 					selectedEntityId  = editorSystem.selectedEntity
 
-				if( (
-						event.keyCode === keyCodes.DELETE ||
-						event.keyCode === keyCodes.BACKSPACE ) &&
-					selectedEntityId !== null ) {
+				if( !selectedEntityId ) {
+					return
+				}
+
+				var isRemovable  = editorSystem.prototype.isRemovable.call( editorSystem, selectedEntityId )
+
+
+					if( isRemovable &&
+						(
+							event.keyCode === keyCodes.DELETE ||
+							event.keyCode === keyCodes.BACKSPACE
+						)
+					) {
 
 
 					spell.sendMessageToEditor(
