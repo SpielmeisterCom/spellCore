@@ -59,7 +59,7 @@ define("spell/script/editor/entityMover",
 
 				var entityId            = matchedEntites[ i ],
 					transform           = this.transforms[ entityId ],
-					name                = this.names[ entityId ],
+					name                = this.metadata[ entityId ],
 					entityDimensions    = entityManager.getEntityDimensions( entityId ),
 					overlayEntityId     = overlayEntityMap[ entityId ]
 
@@ -75,7 +75,7 @@ define("spell/script/editor/entityMover",
 					var text, color, lineWidth
 
 					if( this.selectedEntity == entityId ) {
-						text        = (name) ? name.value : entityId
+						text        = (name) ? name.name : entityId
 						color       = [0, 1, 0]
 						lineWidth   = 3
 					} else {
@@ -361,7 +361,7 @@ define("spell/script/editor/entityMover",
 				this.appearances            = editorSystem.appearances
 				this.animatedAppearances    = editorSystem.animatedAppearances
 				this.editorConfigurations   = editorSystem.editorConfigurations
-				this.names                  = editorSystem.names
+				this.metadata                  = editorSystem.metadata
 			},
 
 			activate: function( spell, editorSystem, event ) {
