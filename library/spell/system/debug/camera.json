@@ -24,8 +24,8 @@
             "componentId": "spell.component.2d.graphics.tilemap"
         },
         {
-            "name": "names",
-            "componentId": "spell.component.name"
+            "name": "metadata",
+            "componentId": "spell.component.entityMetaData"
         },
         {
             "name": "editorConfigurations",

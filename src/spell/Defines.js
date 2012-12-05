@@ -8,7 +8,7 @@ define(
 			ROOT_COMPONENT_ID                         : 'spell.component.entityComposite.root',
 			PARENT_COMPONENT_ID                       : 'spell.component.entityComposite.parent',
 			CHILDREN_COMPONENT_ID                     : 'spell.component.entityComposite.children',
-			METADATA_COMPONENT_ID                     : 'spell.component.metadata',
+			METADATA_COMPONENT_ID                     : 'spell.component.entityMetaData',
 			EVENT_HANDLERS_COMPONENT_ID               : 'spell.component.eventHandlers',
 			TRANSFORM_COMPONENT_ID                    : 'spell.component.2d.transform',
 			APPEARANCE_TRANSFORM_COMPONENT_ID         : 'spell.component.2d.graphics.appearanceTransform',
