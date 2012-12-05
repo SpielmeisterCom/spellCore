@@ -248,7 +248,7 @@ define(
 					)
 
 					if( entityTemplateChildConfig ) {
-						entityTemplateChildConfig.children = overloadedChildConfig.children
+						entityTemplateChildConfig.children = mergeOverloadedChildren( entityTemplateChildConfig.children, overloadedChildConfig.children )
 						entityTemplateChildConfig.id       = overloadedChildConfig.id
 
 						entityTemplateChildConfig.config = applyComponentConfig( entityTemplateChildConfig.config, overloadedChildConfig.config )
@@ -261,6 +261,42 @@ define(
 				},
 				deepClone( entityTemplateChildrenConfig )
 			)
+		}
+
+		var mergeOverloadedChildren = function( entityTemplateChildren, overloadedChildren ) {
+
+			if( !overloadedChildren || overloadedChildren.length === 0 ) {
+				return overloadedChildren
+			}
+
+			if( !entityTemplateChildren || entityTemplateChildren.length === 0 ) {
+				return overloadedChildren
+			}
+
+			var result = deepClone( entityTemplateChildren )
+
+			for (var i = 0; i < result.length; i++ ) {
+				var entityTemplateChild = result[ i ]
+
+				var overloadedChild = _.find(
+					overloadedChildren,
+					function( tmp ) {
+						return tmp.name === entityTemplateChild.name
+					}
+				)
+
+				if( !overloadedChild ) {
+					continue
+				}
+
+				entityTemplateChild.config = applyComponentConfig( entityTemplateChild.config, overloadedChild.config )
+
+				if( overloadedChild.id ) {
+					entityTemplateChild.id = overloadedChild.id
+				}
+			}
+
+			return result
 		}
 
 		var attachEntityToParent = function( componentDictionaries, entityId, parentEntityId ) {
@@ -416,7 +452,7 @@ define(
 			// add additional components which the engine requires
 			_.extend(
 				config,
-				createAdditionalEntityConfig( isRoot, parentId, childEntityIds, entityConfig.name, entityConfig.entityTemplateId )
+				createAdditionalEntityConfig( isRoot, parentId, childEntityIds, entityConfig.name, entityTemplateId )
 			)
 
 			// creating the entity
