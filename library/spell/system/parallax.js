@@ -92,28 +92,28 @@ define(
 
 				for (var entityId in this.parallax) {
 					var parallax       = this.parallax[ entityId ],
+						layerQuad               = this.quads[ entityId ],
+						layerTransform          = this.transforms[ entityId ],
 						refEntityName           = parallax.refEntityName,
-						moveSpeed               = parallax.moveSpeed,
+						refEntityId             = lookupEntityId.call( this, refEntityName ),
+						refEntityTransform      = this.transforms[ refEntityId ],
+						appearanceTransform     = this.appearanceTransforms[ entityId ]
+
+
+						if( !layerTransform || !refEntityTransform || !layerQuad ) {
+							throw 'could not get a valid parallax configuration for entity id ' + entityId
+						}
+
+					var moveSpeed               = parallax.moveSpeed,
 						offsetToRefEntity       = parallax.offsetToRefEntity,
 						stickToRefX             = parallax.stickToRefX,
 						stickToRefY             = parallax.stickToRefY,
 						textureOffset           = parallax.textureOffset,
 						repeatX                 = parallax.repeatX,
 						repeatY                 = parallax.repeatY,
-
-
-						refEntityId             = lookupEntityId.call( this, refEntityName ),
-						refEntityTransform      = this.transforms[ refEntityId ],
 						refEntityTranslation    = refEntityTransform.translation,
-
-						layerTransform          = this.transforms[ entityId ],
 						layerTranslation        = layerTransform.translation,
-
-
-						layerQuad               = this.quads[ entityId ],
 						layerQuadDimensions     = layerQuad.dimensions,
-
-						appearanceTransform     = this.appearanceTransforms[ entityId ],
 						appearanceTranslation   = appearanceTransform.translation
 
 
