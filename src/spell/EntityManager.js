@@ -51,7 +51,7 @@ define(
 			ROOT_COMPONENT_ID                 = Defines.ROOT_COMPONENT_ID,
 			CHILDREN_COMPONENT_ID             = Defines.CHILDREN_COMPONENT_ID,
 			PARENT_COMPONENT_ID               = Defines.PARENT_COMPONENT_ID,
-			NAME_COMPONENT_ID                 = Defines.NAME_COMPONENT_ID,
+			METADATA_COMPONENT_ID             = Defines.METADATA_COMPONENT_ID,
 			TRANSFORM_COMPONENT_ID            = Defines.TRANSFORM_COMPONENT_ID,
 			APPEARANCE_TRANSFORM_COMPONENT_ID = Defines.APPEARANCE_TRANSFORM_COMPONENT_ID,
 			EVENT_HANDLERS_COMPONENT_ID       = Defines.EVENT_HANDLERS_COMPONENT_ID,
@@ -361,7 +361,7 @@ define(
 			}
 		}
 
-		var createAdditionalEntityConfig = function( isRoot, parentId, childEntityIds, name ) {
+		var createAdditionalEntityConfig = function( isRoot, parentId, childEntityIds, name, entityTemplateId ) {
 			var result = {}
 
 			if( isRoot && !parentId ) {
@@ -380,8 +380,9 @@ define(
 				}
 			}
 
-			result[ NAME_COMPONENT_ID ] = {
-				value : name
+			result[ METADATA_COMPONENT_ID ] = {
+				'name':                 name,
+				'entityTemplateId':     entityTemplateId
 			}
 
 			return result
@@ -415,7 +416,7 @@ define(
 			// add additional components which the engine requires
 			_.extend(
 				config,
-				createAdditionalEntityConfig( isRoot, parentId, childEntityIds, entityConfig.name )
+				createAdditionalEntityConfig( isRoot, parentId, childEntityIds, entityConfig.name, entityConfig.entityTemplateId )
 			)
 
 			// creating the entity
@@ -684,17 +685,17 @@ define(
 			 * @return {Array}
 			 */
 			getEntityIdsByName : function( name, entityId ) {
-				var nameComponents = this.componentDictionaries[ NAME_COMPONENT_ID ],
+				var metaDataComponents = this.componentDictionaries[ METADATA_COMPONENT_ID ],
 					resultIds      = []
 
 				var ids = entityId ?
 					getEntityCompositeIds( this.componentDictionaries[ CHILDREN_COMPONENT_ID ], entityId, [] ) :
-					_.keys( nameComponents )
+					_.keys( metaDataComponents )
 
 				for( var i = 0, numIds = ids.length; i < numIds; i++ ) {
 					var nameComponentId = ids[ i ]
 
-					if( nameComponents[ nameComponentId ].value === name ) {
+					if( metaDataComponents[ nameComponentId ][ 'name' ] === name ) {
 						resultIds.push( nameComponentId )
 					}
 				}
