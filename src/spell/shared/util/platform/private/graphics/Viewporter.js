@@ -182,14 +182,15 @@ define(
 								// set minimum height of content to new window height
 								document.documentElement.style.minHeight = window.innerHeight + 'px'
 
-								if( !document.getElementById(id) ) throw 'Viewport element Missing'
+								if( id && document.getElementById(id) ) {
+									// set the right height for the body wrapper to allow bottom positioned elements
+									document.getElementById(id).style.position = 'relative'
+									document.getElementById(id).style.height = window.innerHeight + 'px'
 
-								// set the right height for the body wrapper to allow bottom positioned elements
-								document.getElementById(id).style.position = 'relative'
-								document.getElementById(id).style.height = window.innerHeight + 'px'
+									// fire events, get ready
+									that.postProcess( )
+								}
 
-								// fire events, get ready
-								that.postProcess( )
 
 							}
 
