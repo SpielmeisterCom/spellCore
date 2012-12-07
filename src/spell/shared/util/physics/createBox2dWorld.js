@@ -22,7 +22,7 @@ define(
 
 		var getBodyById = function( entityId ) {
 			for( var body = this.rawWorld.GetBodyList(); body; body = body.GetNext() ) {
-				if( body.GetUserData() === entityId ) {
+				if( body.GetUserData() == entityId + '' ) {
 					return body
 				}
 			}
