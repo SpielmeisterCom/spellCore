@@ -86,7 +86,7 @@ define(
 			return _.reduce(
 				config,
 				function( memo, record ) {
-					memo[ record.name ] = record.default
+					memo[ record[ 'name' ] ] = record[ 'default' ]
 
 					return memo
 				},
