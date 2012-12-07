@@ -105,7 +105,7 @@ define(
 			 * @param {String} text
 			 */
 			log : function( level, text ) {
-				if( _.size( arguments ) === 1 ) {
+				if( arguments.length === 1 ) {
 					text = level
 					level = LOG_LEVEL_DEBUG
 				}
