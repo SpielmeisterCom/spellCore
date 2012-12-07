@@ -16,7 +16,7 @@ define(
 				require : function( moduleId ) {
 					var config = {
 						cache          : isModeDevelopment ? resourceLoader.getCache() : null,
-						hashModuleId   : isModeDevelopment ? hashModuleId : null,
+						hashModuleId   : hashModuleId,
 						loadingAllowed : isModeDevelopment
 					}
 
