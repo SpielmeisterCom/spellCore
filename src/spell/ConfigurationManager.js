@@ -7,6 +7,7 @@ define(
 	[
 		'spell/client/util/createIncludedRectangle',
 		'spell/math/util',
+		'spell/math/vec2',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/Events',
 
@@ -15,6 +16,7 @@ define(
 	function(
 		createIncludedRectangle,
 		mathUtil,
+		vec2,
 		PlatformKit,
 		Events,
 
@@ -59,6 +61,9 @@ define(
 		var extractVec2 =  function( validValues, value ) {
 			if( _.isArray( value ) &&
 				value.length === 2 ) {
+
+				value[ 0 ] =  parseFloat( value[ 0 ] )
+				value[ 1 ] =  parseFloat( value[ 1 ] )
 
 				return value
 			}
@@ -116,7 +121,7 @@ define(
 		var defaultOptions = {
 			screenMode        : 'fixed',
 			screenSize        : [ 300, 200 ],
-			currentScreenSize : [ 1, 1 ],
+			currentScreenSize : [ 300, 200 ],
 			gameServer        : 'internal',
 			resourceServer    : 'internal',
 			id                : 'spell' // dom node id
@@ -129,7 +134,6 @@ define(
 			// PlatformKit.configurationOptions.* holds the platform specific options
 			_.defaults( defaultOptions, PlatformKit.configurationOptions.defaultOptions )
 			_.defaults( validOptions, PlatformKit.configurationOptions.validOptions )
-
 
 			var suppliedParameters = parameters
 
@@ -182,6 +186,9 @@ define(
 			)
 
 			config.platform = PlatformKit.getPlatformInfo()
+
+			// initialize currentScreenSize with screenSize
+			vec2.set( config.screenSize, config.currentScreenSize )
 
 			return config
 		}

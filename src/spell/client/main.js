@@ -62,8 +62,8 @@ define(
 			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
 				spell.eventManager,
 				configurationManager.id,
-				1,
-				1,
+				configurationManager.currentScreenSize[ 0 ],
+				configurationManager.currentScreenSize[ 1 ],
 				configurationManager.renderingBackEnd
 			)
 
