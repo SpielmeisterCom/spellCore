@@ -1,16 +1,21 @@
 define(
 	"spell/shared/util/platform/private/system/features",
 	[
-		"modernizr"
 	],
 	function(
-		modernizr
 	) {
-		"use strict";
+		"use strict"
 
+		var hasTouchSupport = function() {
+			//return ('ontouchstart' in window) || ( window.DocumentTouch && document instanceof DocumentTouch)
+			return false
+		}
+
+
+		var touchSupport = hasTouchSupport()
 
 		return {
-			touch : !!modernizr.touch
+			touch : touchSupport
 		}
 	}
 )
