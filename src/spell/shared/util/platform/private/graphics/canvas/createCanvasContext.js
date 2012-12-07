@@ -21,7 +21,7 @@ define(
 		 * private
 		 */
 
-		var context
+		var context, canvas
 		var clearColor   = color.formatCanvas( [ 0.0, 0.0, 0.0, 1.0 ] )
 		var stateStack   = new StateStack( 32 )
 		var currentState = stateStack.getTop()
@@ -59,8 +59,8 @@ define(
 				bottomBorder = y
 
 			return ( leftBorder <= 0 &&
-				rightBorder >= context.canvas.width &&
-				topBorder >= context.canvas.height &&
+				rightBorder >= canvas.width &&
+				topBorder >= canvas.height &&
 				bottomBorder <= 0 )
 		}
 
@@ -88,11 +88,11 @@ define(
 		}
 
 		var initWrapperContext = function() {
-			viewport( 0, 0, context.canvas.width, context.canvas.height )
+			viewport( 0, 0, canvas.width, canvas.height )
 
 			// world space to view space matrix
-			var cameraWidth  = context.canvas.width,
-				cameraHeight = context.canvas.height
+			var cameraWidth  = canvas.width,
+				cameraHeight = canvas.height
 
 			mat3.ortho(
 				-cameraWidth / 2,
@@ -146,12 +146,12 @@ define(
 		 *
 		 * @param canvas - the canvas dom element
 		 */
-		var createCanvasContext = function( canvas ) {
-			if( canvas === undefined ) throw 'Missing first argument.'
+		var createCanvasContext = function( canvasObj ) {
+			if( canvasObj === undefined ) throw 'Missing first argument.'
 
 			if( context !== undefined ) return context
 
-
+			canvas  = canvasObj
 			context = canvas.getContext( '2d' )
 
 			if( context === null ) return null
@@ -222,7 +222,7 @@ define(
 
 				context.globalAlpha = 1.0
 				context.fillStyle = clearColor
-				context.fillRect( 0, 0, context.canvas.width, context.canvas.height )
+				context.fillRect( 0, 0, canvas.width, canvas.height )
 			}
 			context.restore()
 		}
@@ -403,8 +403,8 @@ define(
 		}
 
 		var resizeColorBuffer = function( width, height ) {
-			context.canvas.width  = width
-			context.canvas.height = height
+			canvas.width  = width
+			canvas.height = height
 		}
 
 		var transform = function( matrix ) {
@@ -443,8 +443,8 @@ define(
 		var getConfiguration = function() {
 			return {
 				type   : 'canvas-2d',
-				width  : context.canvas.width,
-				height : context.canvas.height
+				width  : canvas.width,
+				height : canvas.height
 			}
 		}
 
