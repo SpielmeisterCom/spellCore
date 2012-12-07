@@ -168,6 +168,7 @@ define(
         }
 
         SoundManager.prototype = {
+	        detectExtension           : detectExtension,
             audioFormats              : audioFormats,
             getFreeChannel            : getFreeChannel,
             checkMaxAvailableChannels : checkMaxAvailableChannels,

@@ -39,8 +39,16 @@ define(
 		SoundLoader.prototype = {
 			start: function() {
 				var src          = this.resourcePath + '/' + this.resourceName,
-					soundManager = new SoundManager()
+					soundManager = new SoundManager(),
+					playableExt  = soundManager.detectExtension()
 				//TODO: refactor soundmanager
+
+				var parts = src.split( '.')
+				parts.pop()
+				parts.push( playableExt )
+
+				src = parts.join( '.' )
+
 				soundManager.createAudio({
 					id: src,
 					resource: src,
