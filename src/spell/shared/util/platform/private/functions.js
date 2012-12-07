@@ -98,7 +98,7 @@ define(
 			if (obj == null) return;
 			if (nativeForEach && obj.forEach === nativeForEach) {
 				obj.forEach(iterator, context);
-			} else if (obj.length === +obj.length) {
+			} else if ( _.isArray( obj ) ) {
 				for (var i = 0, l = obj.length; i < l; i++) {
 					if (i in obj && iterator.call(context, obj[i], i, obj) === breaker) return;
 				}
@@ -120,7 +120,7 @@ define(
 			each(obj, function(value, index, list) {
 				results[results.length] = iterator.call(context, value, index, list);
 			});
-			if (obj.length === +obj.length) results.length = obj.length;
+			if ( _.isArray( obj ) ) results.length = obj.length;
 			return results;
 		};
 
