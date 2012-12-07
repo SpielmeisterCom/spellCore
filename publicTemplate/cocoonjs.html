@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>SpellJS</title>
+		<meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=10, IE=9" >
+        <link rel="stylesheet" href="main.css" type="text/css" />
+        <script type="text/javascript">
+            var config = {
+                'id':               'spell',
+                'platform':         'html5',
+                'renderingBackEnd': 'canvas-2d',
+                'verbose':          true,
+                'mode':             'deployed'
+            }
+
+            window.spell = {
+                setCache : function( cachedContent ) {
+                    this.cache = cachedContent
+                },
+                setRuntimeModule : function( module ) {
+                    this.runtimeModule = module
+                }
+            }
+        </script>
+		<script type="text/javascript" src="html5/spell.js"></script>
+        <script type="text/javascript" src="html5/data.js"></script>
+        <script type="text/javascript">
+
+            window.onload = function()  {
+                var engineInstance = require( 'spell/client/main', config )
+                engineInstance.start( spell.runtimeModule, spell.cache )
+            }
+
+            /*  var canvas = document.createElement("canvas");
+             canvas.width = 640;
+             canvas.height = 480;
+             var canvasContext2D = canvas.getContext("2d");
+             canvasContext2D.fillStyle = "red";
+             canvasContext2D.fillRect(0, 0, canvas.width, canvas.height);
+             document.body.appendChild(canvas);*/
+
+
+        </script>
+
+    </head>
+
+	<body>
+        <div id="spell"></div>
+    </body>
+</html>
