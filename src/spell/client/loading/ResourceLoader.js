@@ -241,7 +241,7 @@ define(
 			},
 
 			load: function( resourcesToLoad ) {
-				var numArguments = _.size( arguments ),
+				var numArguments = arguments.length,
 					config       = {},
 					name
 
