@@ -82,6 +82,18 @@ define(
 			return create( constructor, [ spell ], attributes )
 		}
 
+		var createConfigFromSystemTemplateConfig = function( config ) {
+			return _.reduce(
+				config,
+				function( memo, record ) {
+					memo[ record.name ] = record.default
+
+					return memo
+				},
+				{}
+			)
+		}
+
 		var createSystems = function( spell, entityManager, templateManager, systems, isModeDevelopment ) {
 			return _.reduce(
 				systems,
@@ -95,7 +107,16 @@ define(
 
 					return memo.add(
 						systemId,
-						createSystem( spell, entityManager, systemTemplate, isModeDevelopment, system.config )
+						createSystem(
+							spell,
+							entityManager,
+							systemTemplate,
+							isModeDevelopment,
+							_.defaults(
+								system.config,
+								createConfigFromSystemTemplateConfig( systemTemplate.config )
+							)
+						)
 					)
 				},
 				new SortedMap()
