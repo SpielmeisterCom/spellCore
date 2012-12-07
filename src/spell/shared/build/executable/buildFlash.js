@@ -11,8 +11,10 @@ define(
 		'path',
 		'xmlbuilder',
 
+		'os',
+
 		'underscore.string',
-		'spell/functions'
+		'spell/functions',
 	],
 	function(
 		copyFile,
@@ -24,6 +26,8 @@ define(
 		mkdirp,
 		path,
 		xmlbuilder,
+
+		os,
 
 		_s,
 		_
@@ -103,7 +107,7 @@ define(
 							.txt( spellFlashPath + '/lib/Coral/src' )
 						.up()
 						.ele( 'path-element' )
-							.txt( spellFlashPath + '/lib/Box2D/source' )
+							.txt( spellFlashPath + '/lib/Box2D/Source' )
 						.up()
 						.ele( 'path-element' )
 							.txt( projectPath + '/build/src' )
@@ -150,7 +154,7 @@ define(
 		}
 
 		var compile = function( flexSdkPath, configFilePath, next ) {
-			var executablePath = path.join( flexSdkPath, 'bin/mxmlc.bat' )
+			var executablePath = path.join( flexSdkPath, os.platform() == 'win32' ? 'bin/mxmlc.bat' : 'bin/mxmlc' )
 
 			child_process.execFile(
 				executablePath,
