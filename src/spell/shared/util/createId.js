@@ -10,7 +10,7 @@ define(
 
 
 		return function( args ) {
-			var numArgs = _.size( arguments )
+			var numArgs = arguments.length
 
 			if( numArgs === 1 ) {
 				if( !_.isArray( args ) ) {
