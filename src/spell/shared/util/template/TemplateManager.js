@@ -137,11 +137,9 @@ define(
 		}
 
 		var addTemplate = function( assets, moduleLoader, onComponentTypeAdded, templates, componentsWithAssets, entityPrototypes, definition, overwrite ) {
-			console.log('namespace ' + definition.namespace)
-			console.log('name ' + definition.name)
 			var templateId = createName( definition.namespace, definition.name ),
 				type       = definition.type
-console.log('templateId ' + templateId )
+
 			if( !overwrite &&
 				_.has( templates, templateId ) ) {
 
