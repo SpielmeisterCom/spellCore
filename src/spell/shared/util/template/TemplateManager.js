@@ -29,16 +29,8 @@ define(
 		 * private
 		 */
 
-		var createName = function() {
-		    return _.reduce(
-		        arguments,
-		        function( memo, argument ) {
-		            if( argument === '' ) return memo
-
-		            return memo + ( memo !== '' ? '.' : '' )  + argument
-		        },
-		        ''
-		    )
+		var createName = function(namespace, name) {
+			return namespace + '.' + name
 		}
 
 		var isValidComponentTemplate = function( template ) {
@@ -145,9 +137,11 @@ define(
 		}
 
 		var addTemplate = function( assets, moduleLoader, onComponentTypeAdded, templates, componentsWithAssets, entityPrototypes, definition, overwrite ) {
+			console.log('namespace ' + definition.namespace)
+			console.log('name ' + definition.name)
 			var templateId = createName( definition.namespace, definition.name ),
 				type       = definition.type
-
+console.log('templateId ' + templateId )
 			if( !overwrite &&
 				_.has( templates, templateId ) ) {
 
