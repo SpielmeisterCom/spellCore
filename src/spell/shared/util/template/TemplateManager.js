@@ -30,7 +30,7 @@ define(
 		 */
 
 		var createName = function(namespace, name) {
-			return namespace + '.' + name
+			return (!namespace) ?  name : namespace + '.' + name
 		}
 
 		var isValidComponentTemplate = function( template ) {
