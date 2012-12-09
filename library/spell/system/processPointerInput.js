@@ -58,7 +58,6 @@ define(
 		
 		//private
 		var isPointWithinEntity = function ( entityManager, transform, worldPosition, entityId ) {
-			debugger
 			var entityDimensions 	= entityManager.getEntityDimensions( entityId )
 
 			return mathUtil.isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.worldRotation )
