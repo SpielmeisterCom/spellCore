@@ -2,3 +2,4 @@
 /docs/generated/*
 /.idea
 /*.iml
+atlassian-ide-plugin.xml
