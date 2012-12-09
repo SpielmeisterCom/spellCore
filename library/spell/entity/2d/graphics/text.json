@@ -1,7 +1,11 @@
-/**
- * Created with JetBrains PhpStorm.
- * User: julian
- * Date: 09.12.12
- * Time: 22:01
- * To change this template use File | Settings | File Templates.
- */
+{
+    "type": "entityTemplate",
+    "config": {
+        "spell.component.2d.graphics.textAppearance": {},
+        "spell.component.2d.transform": {},
+        "spell.component.visualObject": {}
+    },
+    "children": [],
+    "version": 1
+}
+
