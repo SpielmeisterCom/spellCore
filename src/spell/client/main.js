@@ -5,7 +5,7 @@ define(
 		'spell/client/staticInclude',
 		'spell/shared/util/createMainLoop',
 		'spell/EntityManager',
-		'spell/shared/util/scene/SceneManager',
+		'spell/SceneManager',
 		'spell/shared/util/template/TemplateManager',
 		'spell/ConfigurationManager',
 		'spell/EventManager',

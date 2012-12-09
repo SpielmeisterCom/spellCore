@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/scene/SceneManager',
+	'spell/SceneManager',
 	[
 		'spell/client/loading/loadSceneResources',
 		'spell/shared/util/scene/Scene',
