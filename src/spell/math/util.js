@@ -98,6 +98,31 @@ define(
    			return value - rest + ( rest > ( resolution / 2 ) ? resolution : 0 )
 		}
 
+		/**
+		 * Checks whether a point is contained in a (rotated) rectangle or not
+		 * @param point vec2 point to check
+		 * @param rectOrigin vec2 point the original from the rectangle (in the middle)
+		 * @param rectWidth Number Width of the rectangle
+		 * @param rectHeight Number Height of the rectangle
+		 * @param rectRotation Number Rotation in radians
+		 * @return {Boolean}
+		 */
+		mathUtil.isPointInRect = function( point, rectOrigin, rectWidth, rectHeight, rectRotation ) {
+			var tmp     = -rectRotation, /** Math.PI / 180,*/
+				c       = Math.cos( tmp ),
+				s       = Math.sin( tmp ),
+				leftX   = rectOrigin[ 0 ] - rectWidth / 2,
+				rightX  = rectOrigin[ 0 ] + rectWidth / 2,
+				topY    = rectOrigin[ 1 ] - rectHeight / 2,
+				bottomY = rectOrigin[ 1 ] + rectHeight / 2
+
+			// Unrotate the point depending on the rotation of the rectangle
+			var rotatedX = rectOrigin[ 0 ] + c * ( point[ 0 ] - rectOrigin[ 0 ] ) - s * ( point[ 1 ] - rectOrigin[1] ),
+				rotatedY = rectOrigin[ 1 ] + s * ( point[ 0 ] - rectOrigin[ 0 ] ) + c * ( point[ 1 ] - rectOrigin[1] )
+
+			return leftX <= rotatedX && rotatedX <= rightX && topY <= rotatedY && rotatedY <= bottomY
+		}
+
 		return mathUtil
 	}
 )
