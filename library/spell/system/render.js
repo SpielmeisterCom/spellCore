@@ -544,24 +544,18 @@ define(
 			// draw scene
 			var sortedVisualObjects = createSortedByLayer( this.visualObjects, rootTransforms )
 
-			_.each(
-				sortedVisualObjects,
-				function( id ) {
-					drawVisualObjectPartial( deltaTimeInMs, id, viewFrustum, drawVisualObjectPartial )
-				}
-			)
+			for( var i in sortedVisualObjects ) {
+				drawVisualObjectPartial( deltaTimeInMs, sortedVisualObjects[ i ], viewFrustum, drawVisualObjectPartial )
+			}
 
 			if( this.config.debug &&
 				drawDebugShapes ) {
 
 				var drawDebugPartial = this.drawDebugPartial
 
-				_.each(
-					sortedVisualObjects,
-					function( id ) {
-						drawDebugPartial( deltaTimeInMs, id, drawDebugPartial )
-					}
-				)
+				for( var i in sortedVisualObjects ) {
+					drawDebugPartial( deltaTimeInMs, sortedVisualObjects[ i ], drawDebugPartial )
+				}
 			}
 
 			// clear unsafe area
