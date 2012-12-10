@@ -127,10 +127,8 @@ define(
 
 		return function( spell, sceneId, next, progressCallback ) {
 			var eventManager     = spell.eventManager,
-				renderingContext = spell.renderingContext,
 				resourceLoader   = spell.resourceLoader,
 				resources        = spell.resources,
-				runtimeModule    = spell.runtimeModule,
 				templateManager  = spell.templateManager
 
 			var libraryBundleName  = 'library',

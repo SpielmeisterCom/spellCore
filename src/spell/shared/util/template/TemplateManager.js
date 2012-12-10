@@ -140,12 +140,6 @@ define(
 			var templateId = createName( definition.namespace, definition.name ),
 				type       = definition.type
 
-			if( !overwrite &&
-				_.has( templates, templateId ) ) {
-
-				throw 'Error: Template definition \'' + templateId + '\' already exists.'
-			}
-
 			templates[ templateId ] = definition
 
 			if( type === TemplateTypes.ENTITY ) {

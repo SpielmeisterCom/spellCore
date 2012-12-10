@@ -16,6 +16,11 @@ define(
 
 
 		var postLoadedResources = function( spell, entityManager, templateManager, isModeDevelopment, sceneId ) {
+			if( this.activeScene ) {
+				this.activeScene.destroy()
+				this.entityManager.reset()
+			}
+
 			var scene       = new Scene( spell, entityManager, templateManager, isModeDevelopment ),
 				sceneConfig = spell.scenes[ sceneId ]
 
