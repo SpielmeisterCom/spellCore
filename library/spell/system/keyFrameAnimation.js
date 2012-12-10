@@ -1,3 +1,18 @@
+/**
+ * Emits the following events on events to EventHandlers
+ *
+ * animationStart
+ * The animationstart event occurs at the start of the animation.
+ *
+ * animationEnd
+ * The animationend event occurs when the animation finishes.
+ *
+ * animationiteration
+ * The animationiteration event occurs at the end of each iteration of an animation,
+ * except when an animationend event would fire at the same time.
+ * This means that this event does not occur for animations with an iteration count of one or less.
+ *
+ */
 define(
 	'spell/system/keyFrameAnimation',
 	[
@@ -98,6 +113,9 @@ define(
 				keyFrameAnimation.offset  = offset
 				keyFrameAnimation.playing = updatePlaying( lengthInMs, rawOffset, keyFrameAnimation.looped )
 
+				if( keyFrameAnimation.playing === false ) {
+					entityManager.triggerEvent( id, 'animationEnd', [ 'keyFrameAnimation', keyFrameAnimation ] )
+				}
 
 				for( var componentId in animate ) {
 					var componentAnimation = animate[ componentId ],
