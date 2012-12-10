@@ -110,7 +110,6 @@ define(
 					for( var attributeId in componentAnimation ) {
 						var attributeAnimation = componentAnimation[ attributeId ],
 							keyFrames          = attributeAnimation.keyFrames,
-							animationLength    = attributeAnimation.length,
 							keyFrameIdA        = getKeyFrameIdA( keyFrames, offset )
 
 						if( keyFrameIdA < 0 ) {
