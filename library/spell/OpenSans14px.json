@@ -581,7 +581,8 @@
 				"y": 136
 			}
 		},
-		"spacing": 1
+		"vSpacing": 0,
+		"hSpacing": 1
 	},
 	"version": 1
 }
