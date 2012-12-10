@@ -12,8 +12,9 @@ define(
 		/*
 		 * private
 		 */
-		var context
-		var sourcesNodes = {}
+		var context,
+			sourcesNodes = {},
+			isMutedValue = false
 
 		var create = function( id, audioResource ) {
 			var gainNode   = context.createGainNode(),
@@ -40,6 +41,8 @@ define(
 
 			setLoop( id, loop )
 			setVolume( id, volume )
+
+			if( isMuted() ) mute( id )
 
 			sourceNode.noteOn( 0 )
 		}
@@ -102,6 +105,14 @@ define(
 			}
 		}
 
+		var setMute = function( isMute ) {
+			isMutedValue = isMute
+		}
+
+		var isMuted = function() {
+			return isMutedValue
+		}
+
 		/*
 		 * Creates a wrapper context from the backend context.
 		 */
@@ -111,6 +122,8 @@ define(
 				play        : play,
 				setLoop     : setLoop,
 				setVolume   : setVolume,
+				setAllMuted : setMute,
+				isAllMuted  : isMuted,
 				stop        : stop,
 				mute        : mute,
 				destroy     : destroy,

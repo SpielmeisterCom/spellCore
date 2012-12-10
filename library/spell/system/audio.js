@@ -85,7 +85,7 @@ define(
 					audioContext.setLoop( id, soundEmitter.loop )
 					audioContext.setVolume( id, soundEmitter.volume )
 
-					if( soundEmitter.mute ) audioContext.mute( id )
+					if( soundEmitter.mute || audioContext.isAllMuted() ) audioContext.mute( id )
 				}
 			}
 		}

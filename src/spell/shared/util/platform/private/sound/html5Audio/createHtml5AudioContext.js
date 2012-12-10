@@ -11,7 +11,8 @@ define(
 		/*
 		 * private
 		 */
-		var audioElements = {}
+		var audioElements = {},
+			isMutedValue  = false
 
 		var create = function( id, audioResource ) {
 			var audio = audioResource.privateAudioResource.cloneNode(true)
@@ -63,6 +64,8 @@ define(
 			setLoop( id, loop )
 			setVolume( id, volume )
 
+			if( isMuted() ) mute( id )
+
 			//This should never happen, but if, then free object
 			audioElement.addEventListener( 'ended', removeCallback, false )
 			audioElement.addEventListener( 'play', playingCallback, false )
@@ -94,6 +97,14 @@ define(
 
 		var mute = function( id ) {
 			setVolume( id, 0 )
+		}
+
+		var setMute = function( isMute ) {
+			isMutedValue = isMute
+		}
+
+		var isMuted = function() {
+			return isMutedValue
 		}
 
 		var destroy = function( id ) {
@@ -133,6 +144,8 @@ define(
 				play        : play,
 				setLoop     : setLoop,
 				setVolume   : setVolume,
+				setAllMuted : setMute,
+				isAllMuted  : isMuted,
 				stop        : stop,
 				mute        : mute,
 				destroy     : destroy,
