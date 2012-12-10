@@ -5201,7 +5201,10 @@ Box2D.postDefs = [];
          var fixtureB = c.GetFixtureB();
          var bodyA = fixtureA.GetBody();
          var bodyB = fixtureB.GetBody();
-         if (bodyA.IsAwake() == false && bodyB.IsAwake() == false) {
+         var activeA = bodyA.IsAwake() && bodyA.m_type != b2Body.b2_staticBody;
+         var activeB = bodyB.IsAwake() && bodyB.m_type != b2Body.b2_staticBody;
+         // At least one body must be awake and it must be dynamic or kinematic.
+         if (activeA == false && activeB == false) {
             c = c.GetNext();
             continue;
          }
@@ -5578,12 +5581,8 @@ Box2D.postDefs = [];
          for (i = 0;
          i < this.m_bodyCount; ++i) {
             b = this.m_bodies[i];
-            if (b.GetType() == b2Body.b2_staticBody) {
+            if (b.m_type == b2Body.b2_staticBody) {
                continue;
-            }
-            if ((b.m_flags & b2Body.e_allowSleepFlag) == 0) {
-               b.m_sleepTime = 0.0;
-               minSleepTime = 0.0;
             }
             if ((b.m_flags & b2Body.e_allowSleepFlag) == 0 || b.m_angularVelocity * b.m_angularVelocity > angTolSqr || b2Math.Dot(b.m_linearVelocity, b.m_linearVelocity) > linTolSqr) {
                b.m_sleepTime = 0.0;
@@ -6329,7 +6328,9 @@ Box2D.postDefs = [];
                fB = c.m_fixtureB;
                bA = fA.m_body;
                bB = fB.m_body;
-               if ((bA.GetType() != b2Body.b2_dynamicBody || bA.IsAwake() == false) && (bB.GetType() != b2Body.b2_dynamicBody || bB.IsAwake() == false)) {
+               var activeA = bA.IsAwake() && bA.m_type != b2Body.b2_staticBody;
+               var activeB = bB.IsAwake() && bB.m_type != b2Body.b2_staticBody;
+               if (activeA == false && activeB == false) {
                   continue;
                }
                var t0 = bA.m_sweep.t0;
