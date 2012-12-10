@@ -22,17 +22,18 @@ define(
 		 * @param dx
 		 * @param dy
 		 * @param spacing the actual spacing to be used
-		 * @param fontMapSpacing the fake spacing introduced by the font map
+		 * @param fontMapHSpacing the fake horizontal spacing introduced by the font map
+		 * @param fontMapVSpacing the fake vertical spacing introduced by the font map
 		 */
-		var drawCharacter = function( context, texture, charData, dx, dy, spacing, fontMapSpacing ) {
-			sourcePosition[ 0 ] = charData.x - fontMapSpacing
+		var drawCharacter = function( context, texture, charData, dx, dy, spacing, fontMapHSpacing, fontMapVSpacing ) {
+			sourcePosition[ 0 ] = charData.x - fontMapHSpacing
 			sourcePosition[ 1 ] = charData.y
 
-			destinationPosition[ 0 ] = dx - fontMapSpacing
-			destinationPosition[ 1 ] = dy
+			destinationPosition[ 0 ] = dx - fontMapHSpacing
+			destinationPosition[ 1 ] = dy - fontMapVSpacing
 
-			dimensions[ 0 ] = charData.width + fontMapSpacing * 2
-			dimensions[ 1 ] = charData.height
+			dimensions[ 0 ] = charData.width + fontMapHSpacing * 2
+			dimensions[ 1 ] = charData.height + fontMapHSpacing * 2
 
 			context.drawSubTexture(
 				texture,
@@ -42,16 +43,17 @@ define(
 				dimensions
 			)
 
-			return charData.width + spacing + fontMapSpacing
+			return charData.width + spacing + fontMapHSpacing
 		}
 
 		return function( context, fontAsset, fontTexture, dx, dy, text, spacing ) {
 			spacing = spacing || 0
 			text    = text.toString()
 
-			var numCharacters  = text.length,
-				charset        = fontAsset.config.charset,
-				fontMapSpacing = fontAsset.config.spacing
+			var numCharacters   = text.length,
+				charset         = fontAsset.config.charset,
+				fontMapHSpacing = fontAsset.config.hSpacing,
+				fontMapVSpacing = fontAsset.config.vSpacing
 
 			for( var i = 0; i < numCharacters; i++ ) {
 				var charData = charset[ text.charAt( i ) ]
@@ -61,7 +63,7 @@ define(
 					charData = charset[ ' ' ]
 				}
 
-				dx += drawCharacter( context, fontTexture, charData, dx, dy, spacing, fontMapSpacing )
+				dx += drawCharacter( context, fontTexture, charData, dx, dy, spacing, fontMapHSpacing, fontMapVSpacing )
 			}
 		}
     }
