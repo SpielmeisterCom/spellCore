@@ -115,10 +115,10 @@ define(
 				parentMatrix
 
 			// set new localToWorldMatrix
-			mat3.identity(  localMatrix )
+			mat3.identity( localMatrix )
 			mat3.translate( localMatrix, transform.translation )
-			mat3.rotate(    localMatrix, transform.rotation )
-			mat3.scale(     localMatrix, transform.scale )
+			mat3.rotate( localMatrix, transform.rotation )
+			mat3.scale( localMatrix, transform.scale )
 
 			// search for next parent with an transform component
 			while( parent = parentComponents[ parentEntityId ] ) {
