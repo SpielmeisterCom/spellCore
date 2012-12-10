@@ -760,6 +760,18 @@ define(
 			},
 
 			/**
+			 * Resets the entity manager. Removes all entity instances in the process.
+			 */
+			reset : function() {
+				var componentDictionaries = this.componentDictionaries
+
+				for( var componentId in componentDictionaries ) {
+					componentDictionaries[ componentId ] = {}
+				}
+			},
+
+
+			/**
 			 * Reassigns an entity to become the child of a parent entity.
 			 *
 			 * Example usage:
@@ -965,6 +977,13 @@ define(
 				}
 			},
 
+			/**
+			 * Triggers an event on the specified entity.
+			 *
+			 * @param entityId
+			 * @param eventId
+			 * @param eventArguments
+			 */
 			triggerEvent : function( entityId, eventId, eventArguments ) {
 				var component = this.componentDictionaries[ EVENT_HANDLERS_COMPONENT_ID ][ entityId ]
 
