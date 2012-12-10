@@ -190,15 +190,6 @@ define(
 			)
 		}
 
-		var createDataFileContent = function( dataFileTemplate, scriptSource, cachedResources, projectConfig ) {
-			return _s.sprintf(
-				dataFileTemplate,
-				scriptSource,
-				JSON.stringify( cachedResources ),
-				JSON.stringify( projectConfig )
-			)
-		}
-
 		var loadAssociatedScriptModules = function( projectLibraryPath, libraryRecords ) {
 			return _.reduce(
 				libraryRecords,
