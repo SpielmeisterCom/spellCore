@@ -35,7 +35,7 @@ define(
 		 * private
 		 */
 
-		var gl,
+		var gl, canvas,
 			stateStack           = new StateStack( 32 ),
 			currentState         = stateStack.getTop(),
 			NUM_CIRCLE_VERTICES  = 32,
@@ -146,7 +146,8 @@ define(
 				transform               : transform,
 				translate               : translate,
 				viewport                : _.bind( viewport, null, shaderProgram ),
-				transformScreenToWorld  : transformScreenToWorld
+				transformScreenToWorld  : transformScreenToWorld,
+				getCanvasElement        : function() { return canvas }
 			}
 		}
 
@@ -155,12 +156,12 @@ define(
 		 *
 		 * @param canvas - the canvas dom element
 		 */
-		var createWebGlContext = function( canvas ) {
-			if( canvas === undefined ) throw 'Missing first argument.'
+		var createWebGlContext = function( canvasObj ) {
+			if( canvasObj === undefined ) throw 'Missing first argument.'
 
 			if( gl !== undefined ) return gl
 
-
+			canvas = canvasObj
 			gl = createContext( canvas )
 
 			if( gl === null ) return null

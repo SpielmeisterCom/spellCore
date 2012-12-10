@@ -95,8 +95,8 @@ define(
 		}
 
 
-		var InputManager = function( configurationManager ) {
-			this.nativeInput = PlatformKit.createInput( configurationManager )
+		var InputManager = function( spell, configurationManager ) {
+			this.nativeInput = PlatformKit.createInput( spell, configurationManager )
 			this.configurationManager = configurationManager
 		}
 

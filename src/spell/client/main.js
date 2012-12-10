@@ -73,9 +73,6 @@ define(
 
 			var audioContext = PlatformKit.AudioFactory.createAudioContext()
 
-			var inputManager = new InputManager( configurationManager )
-			inputManager.init()
-
 			var resourceLoader = new ResourceLoader( spell, spell.eventManager, renderingContext, audioContext, configurationManager.resourceServer )
 
 			if( cacheContent ) resourceLoader.setCache( cacheContent )
@@ -102,7 +99,6 @@ define(
 				spell,
 				{
 					configurationManager : configurationManager,
-					inputManager         : inputManager,
 					renderingContext     : renderingContext,
 					audioContext         : audioContext,
 					resourceLoader       : resourceLoader,
@@ -116,6 +112,11 @@ define(
 					sendMessageToEditor  : this.sendMessageToEditor
 				}
 			)
+
+			//the inputManager must be registered after the renderingContext has been assigned to the spell Object
+			var inputManager = new InputManager( spell, configurationManager )
+			inputManager.init()
+			spell.inputManager = inputManager
 
 			spell.sceneManager.startScene( spell.runtimeModule.startScene )
 			spell.mainLoop.run()

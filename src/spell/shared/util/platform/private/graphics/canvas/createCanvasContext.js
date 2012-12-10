@@ -137,7 +137,8 @@ define(
 				transform               : transform,
 				translate               : translate,
 				viewport                : viewport,
-				transformScreenToWorld  : transformScreenToWorld
+				transformScreenToWorld  : transformScreenToWorld,
+				getCanvasElement        : function() { return canvas }
 			}
 		}
 
