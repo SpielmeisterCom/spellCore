@@ -129,6 +129,10 @@ define(
 						undefined
 		}
 
+		var isBodyTypeStatic = function( type ) {
+			return type === 'static'
+		}
+
 		var createBodyDef = function( entityId, body, transform ) {
 			var translation = transform.translation,
 				bodyDef     = createB2BodyDef(),
@@ -137,6 +141,7 @@ define(
 
 			if( type === undefined ) return
 
+			bodyDef.awake         = !isBodyTypeStatic( body.type )
 			bodyDef.fixedRotation = body.fixedRotation
 			bodyDef.type          = type
 			bodyDef.position.x    = translation[ 0 ] * scale
