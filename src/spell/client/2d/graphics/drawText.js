@@ -33,7 +33,7 @@ define(
 			destinationPosition[ 1 ] = dy - fontMapVSpacing
 
 			dimensions[ 0 ] = charData.width + fontMapHSpacing * 2
-			dimensions[ 1 ] = charData.height + fontMapHSpacing * 2
+			dimensions[ 1 ] = charData.height + fontMapVSpacing * 2
 
 			context.drawSubTexture(
 				texture,
