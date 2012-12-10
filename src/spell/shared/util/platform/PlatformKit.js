@@ -53,8 +53,8 @@ define(
 			return 'html5'
 		}
 
-		var createInput = function( spell, configurationManager ) {
-			return new Input( spell, configurationManager )
+		var createInput = function( configurationManager, renderingContext ) {
+			return new Input( configurationManager, renderingContext )
 		}
 
         var registerOnScreenResize = function( eventManager, id, initialScreenSize ) {

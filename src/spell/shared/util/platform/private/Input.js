@@ -198,9 +198,9 @@ define(
 		 * public
 		 */
 
-		var Input = function( spell, configurationManager ) {
+		var Input = function( configurationManager, renderingContext ) {
 			this.configurationManager = configurationManager
-			this.container = spell.renderingContext.getCanvasElement()
+			this.container            = renderingContext.getCanvasElement()
 		}
 
 		var setListener = function( eventName, callback ) {
