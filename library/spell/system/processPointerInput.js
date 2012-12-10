@@ -65,14 +65,38 @@ define(
 		}
 		
 		var processEvent = function( spell, entityManager, inputEvent ) {
+			var pointedEntityMap = this.pointedEntityMap
 		
-			if ( inputEvent.type === 'mousedown' ) {
+			if ( inputEvent.type === 'mousedown' || inputEvent.type === 'mousemove' ) {
+
 				var cursorWorldPosition = spell.renderingContext.transformScreenToWorld( inputEvent.position )
 		
 				for( var entityId in this.transforms ) {
+					if( pointedEntityMap[ entityId ] === undefined ) {
+						pointedEntityMap[ entityId ] = false
+					}
+
 					if( isPointWithinEntity( entityManager, this.transforms[ entityId ], cursorWorldPosition, entityId ) ) {
 						
-						entityManager.triggerEvent( entityId, 'pointerDown' )
+						if( inputEvent.type === 'mousedown') {
+							entityManager.triggerEvent( entityId, 'pointerDown' )
+
+						} else if ( inputEvent.type === 'mousemove' ) {
+							entityManager.triggerEvent( entityId, 'pointerMove' )
+						}
+
+						if( pointedEntityMap[ entityId ] === false ) {
+							pointedEntityMap[ entityId ] = true
+							entityManager.triggerEvent( entityId, 'pointerOver' )
+						}
+
+					} else {
+
+						if( pointedEntityMap[ entityId ] === true ) {
+							pointedEntityMap[ entityId ] = false
+							entityManager.triggerEvent( entityId, 'pointerOut' )
+						}
+
 					}
 				}
 			}
@@ -87,7 +111,11 @@ define(
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			init: function( spell ) {
-				
+				/**
+				 * Holds a map entityId => Boolean whether an entity is currently pointed to or not
+				 * @type {Object}
+				 */
+				this.pointedEntityMap = {}
 			},
 		
 			/**
