@@ -74,13 +74,21 @@ define(
 			 */
 			process: function( spell, timeInMs, deltaTimeInMs ) {
 				var soundEmitters = this.soundEmitters,
+					entityManager = spell.entityManager,
 					audioContext  = spell.audioContext
 
 				audioContext.tick()
 
 				for( var id in soundEmitters ) {
 					var soundEmitter = soundEmitters[ id ]
-					this.prototype.playSound( audioContext, id, soundEmitter )
+
+					if(	!soundEmitter.play ) {
+						this.prototype.playSound( audioContext, id, soundEmitter )
+
+						entityManager.updateComponent( id, 'spell.component.audio.soundEmitter', {
+							'play': true
+						})
+					}
 
 					audioContext.setLoop( id, soundEmitter.loop )
 					audioContext.setVolume( id, soundEmitter.volume )

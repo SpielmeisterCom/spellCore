@@ -17,38 +17,18 @@ define(
 		var create = function( id, audioResource ) {
 			var audio = audioResource.privateAudioResource.cloneNode(true)
 
-			audio.playing  = false
 			audioElements[ id ] = audio
 			return audio
 		}
 
-		var pauseCallback = function () {
-			if ( parseFloat( this.currentTime ) >= parseFloat( this.duration ) && this.paused === false) {
-				this.playing = false
-				this.pause()
-			}
-		}
-
-		var playingCallback = function() {
-			if( this.playing === false ) {
-				this.playing = true
-				this.addEventListener( 'timeupdate', pauseCallback, false )
-			}
-		}
-
-
 		var loopCallback = function() {
-			if( this.playing === false ) {
-				this.removeEventListener( 'timeupdate', pauseCallback, false )
-				this.play()
-			}
+			this.currentTime = 0
+			this.play()
 		}
 
 		var removeCallback = function() {
 			this.removeEventListener( 'ended', removeCallback, false )
-			this.removeEventListener( 'timeupdate', pauseCallback, false )
-			this.removeEventListener( 'pause', removeCallback, false )
-			this.removeEventListener( 'playing', playingCallback, false )
+			this.removeEventListener( 'ended', loopCallback, false )
 		}
 
 		/**
@@ -66,17 +46,12 @@ define(
 
 			if( isMuted() ) mute( id )
 
-			//This should never happen, but if, then free object
-			audioElement.addEventListener( 'ended', removeCallback, false )
-			audioElement.addEventListener( 'play', playingCallback, false )
-
 			audioElement.play()
 		}
 
 		var stop = function( id ) {
 			var audioElement = audioElements[ id ]
 
-			audioElement.playing = false
 			audioElement.pause()
 		}
 
@@ -91,8 +66,13 @@ define(
 			loop = !!loop
 			var audioElement = audioElements[ id ]
 
-			if( loop ) audioElement.addEventListener( 'pause', loopCallback, false )
-			else audioElement.addEventListener( 'pause', removeCallback, false )
+			if( loop ) {
+				audioElement.addEventListener( 'ended', loopCallback, false )
+				audioElement.removeEventListener( 'ended', removeCallback, false )
+			} else {
+				audioElement.removeEventListener( 'ended', loopCallback, false )
+				audioElement.addEventListener( 'ended', removeCallback, false )
+			}
 		}
 
 		var mute = function( id ) {
@@ -111,9 +91,7 @@ define(
 			var audioElement = audioElements[ id ]
 
 			audioElement.removeEventListener( 'ended', removeCallback, false )
-			audioElement.removeEventListener( 'timeupdate', pauseCallback, false )
-			audioElement.removeEventListener( 'pause', removeCallback, false )
-			audioElement.removeEventListener( 'playing', playingCallback, false )
+			audioElement.removeEventListener( 'ended', loopCallback, false )
 
 			audioElement.pause()
 			delete audioElements[ id ]
