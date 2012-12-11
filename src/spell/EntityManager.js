@@ -178,6 +178,8 @@ define(
 		}
 
 		var addComponentType = function( componentMaps, componentId ) {
+			if( componentMaps[ componentId ] ) return
+
 			componentMaps[ componentId ] = {}
 		}
 
@@ -337,7 +339,6 @@ define(
 
 			var rootComponents     = componentDictionaries[ ROOT_COMPONENT_ID ],
 				childrenComponents = componentDictionaries[ CHILDREN_COMPONENT_ID ],
-				parentComponents   = componentDictionaries[ PARENT_COMPONENT_ID ],
 				isRoot             = !!rootComponents[ entityId ]
 
 			if( isRoot && !parentEntityId ) return
