@@ -108,6 +108,16 @@ define(
 		}
 
 		var setMute = function( isMute ) {
+			if( isMute === true ) {
+				_.each( sourcesNodes, function( value, key ) {
+					mute( key )
+				} )
+			} else {
+				_.each( sourcesNodes, function( value, key ) {
+					setVolume( key, 1 )
+				} )
+			}
+
 			isMutedValue = isMute
 		}
 

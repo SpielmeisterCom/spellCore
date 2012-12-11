@@ -82,6 +82,16 @@ define(
 		}
 
 		var setMute = function( isMute ) {
+			if( isMute === true ) {
+				_.each( audioElements, function( value, key ) {
+					mute( key )
+				} )
+			} else {
+				_.each( audioElements, function( value, key ) {
+					setVolume( key, 1 )
+				} )
+			}
+
 			isMutedValue = isMute
 		}
 
