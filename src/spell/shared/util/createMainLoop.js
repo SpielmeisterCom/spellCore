@@ -22,10 +22,11 @@ define(
 		var UPDATE_INTERVAL_IN_MS  = 16,
 			MAX_ELAPSED_TIME_IN_MS = 100
 
-		var MainLoop = function( eventManager, statisticsManager, updateIntervalInMs ) {
+		var MainLoop = function( eventManager, statisticsManager, updateIntervalInMs, spell ) {
 			this.updateIntervalInMs  = updateIntervalInMs || UPDATE_INTERVAL_IN_MS
-			this.renderCallback      = null
-			this.updateCallback      = null
+			this.render              = null
+			this.update              = null
+			this.preNextFrame        = null
 			this.accumulatedTimeInMs = this.updateIntervalInMs
 
 			// Until the proper remote game time is computed local time will have to do.
@@ -35,12 +36,20 @@ define(
 
 		MainLoop.prototype = {
 			setRenderCallback : function( f ) {
-				this.renderCallback = f
+				this.render = f
 			},
 			setUpdateCallback : function( f ) {
-				this.updateCallback = f
+				this.update = f
+			},
+			setPreNextFrame: function( f ) {
+				this.preNextFrame = f
 			},
 			callEveryFrame : function( currentTimeInMs ) {
+				if( this.preNextFrame ) {
+					this.preNextFrame()
+					this.preNextFrame = null
+				}
+
 				var timer = this.timer
 
 				timer.update()
@@ -49,11 +58,11 @@ define(
 					localTimeInMs       = timer.getLocalTime(),
 					elapsedTimeInMs     = Math.min( timer.getElapsedTime(), MAX_ELAPSED_TIME_IN_MS )
 
-				if( this.updateCallback ) {
+				if( this.update ) {
 					var accumulatedTimeInMs = this.accumulatedTimeInMs + elapsedTimeInMs
 
 					while( accumulatedTimeInMs >= updateIntervalInMs ) {
-						this.updateCallback( localTimeInMs, updateIntervalInMs )
+						this.update( localTimeInMs, updateIntervalInMs )
 
 						accumulatedTimeInMs -= updateIntervalInMs
 					}
@@ -61,8 +70,8 @@ define(
 					this.accumulatedTimeInMs = accumulatedTimeInMs
 				}
 
-				if( this.renderCallback ) {
-					this.renderCallback( localTimeInMs, elapsedTimeInMs )
+				if( this.render ) {
+					this.render( localTimeInMs, elapsedTimeInMs )
 				}
 
 				PlatformKit.callNextFrame( this.callEveryFramePartial )

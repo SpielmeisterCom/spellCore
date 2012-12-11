@@ -53,27 +53,38 @@ define(
 
 		SceneManager.prototype = {
 			startScene : function( sceneId ) {
-				var onProgress = this.sendMessageToEditor ?
-					_.bind( this.sendMessageToEditor, null, 'spelled.loadingProgress' ) :
-					undefined
+				var preNextFrame = function() {
+					if( this.activeScene ) {
+						this.mainLoop.setRenderCallback()
+						this.mainLoop.setUpdateCallback()
+						this.activeScene.destroy()
+						this.entityManager.reset()
+					}
 
-				this.cmdQueue = []
-				this.loadingPending = true
+					var onProgress = this.sendMessageToEditor ?
+						_.bind( this.sendMessageToEditor, null, 'spelled.loadingProgress' ) :
+						undefined
 
-				loadSceneResources(
-					this.spell,
-					sceneId,
-					_.bind(
-						postLoadedResources,
-						this,
+					this.cmdQueue = []
+					this.loadingPending = true
+
+					loadSceneResources(
 						this.spell,
-						this.entityManager,
-						this.templateManager,
-						this.isModeDevelopment,
-						sceneId
-					),
-					onProgress
-				)
+						sceneId,
+						_.bind(
+							postLoadedResources,
+							this,
+							this.spell,
+							this.entityManager,
+							this.templateManager,
+							this.isModeDevelopment,
+							sceneId
+						),
+						onProgress
+					)
+				}
+
+				this.mainLoop.setPreNextFrame( _.bind( preNextFrame, this ) )
 			},
 
 			processCmdQueue : function() {
