@@ -46,9 +46,36 @@ define(
 			return charData.width + spacing + fontMapHSpacing
 		}
 
-		return function( context, fontAsset, fontTexture, dx, dy, text, spacing ) {
+		var calculateAlignPosition = function( text, fontAsset, align, spacing ) {
+			spacing = fontAsset.config.hSpacing + spacing
+
+			var width           = 0,
+				numCharacters   = text.length,
+				charset         = fontAsset.config.charset
+
+			if( align === 'left' ) return width
+			if( align === 'right' ) return width
+
+			if( align === 'center' ){
+				for( var i = 0; i < numCharacters; i++ ) {
+					var charData = charset[ text.charAt( i ) ]
+
+					// in case of unsupported character perform a fallback
+					if( !charData ) {
+						charData = charset[ ' ' ]
+					}
+
+					width += charData.width + spacing
+				}
+
+				return width / 2
+			}
+		}
+
+		return function( context, fontAsset, fontTexture, dx, dy, text, spacing, align ) {
 			spacing = spacing || 0
 			text    = text.toString()
+			dx      = dx - calculateAlignPosition( text, fontAsset, align, spacing )
 
 			var numCharacters   = text.length,
 				charset         = fontAsset.config.charset,

@@ -17,6 +17,18 @@
 			"doc": "the spacing that is used to draw the characters"
 		},
 		{
+			"name": "align",
+			"type": {
+				"name": "enum",
+				"values":[
+					"center",
+					"left"
+				]
+			},
+			"default": "left",
+			"doc": "the text align that is used"
+		},
+		{
 			"name": "text",
 			"type": "string",
 			"default": "blank",

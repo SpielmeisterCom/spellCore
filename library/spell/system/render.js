@@ -261,7 +261,7 @@ define(
 
 						} else if( asset.type === 'font' ) {
 							// text appearance
-							drawText( context, asset, texture, 0, 0, appearance.text, appearance.spacing )
+							drawText( context, asset, texture, 0, 0, appearance.text, appearance.spacing, appearance.align )
 
 						} else if( asset.type === '2dTileMap' ) {
 							draw2dTileMap( context, texture, viewFrustum, asset, transform )
