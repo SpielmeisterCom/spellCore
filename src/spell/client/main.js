@@ -113,7 +113,7 @@ define(
 				}
 			)
 
-			//the inputManager must be registered after the renderingContext has been assigned to the spell Object
+			// the inputManager must be registered after the renderingContext has been assigned to the spell Object
 			var inputManager = new InputManager( configurationManager, renderingContext )
 			inputManager.init()
 			spell.inputManager = inputManager
