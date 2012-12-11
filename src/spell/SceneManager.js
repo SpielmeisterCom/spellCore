@@ -131,6 +131,15 @@ define(
 				} )
 
 				this.processCmdQueue()
+			},
+
+			updateSystem : function( systemId, executionGroupId, systemConfig ) {
+				this.cmdQueue.push( {
+					fn   : 'updateSystem',
+					args : [ systemId, executionGroupId, systemConfig ]
+				} )
+
+				this.processCmdQueue()
 			}
 		}
 

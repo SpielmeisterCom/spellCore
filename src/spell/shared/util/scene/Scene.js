@@ -253,6 +253,7 @@ define(
 				if( system.config.active ) {
 					system.prototype.deactivate.call( system, spell )
 				}
+
 				system.prototype.destroy.call( system, spell )
 
 				// initializing and activating the new system instance
@@ -319,6 +320,24 @@ define(
 
 				srcExecutionGroup.removeByKey( systemId )
 				dstExecutionGroup.insert( systemId, system, dstIndex )
+			},
+			updateSystem: function( systemId, executionGroupId, systemConfig ) {
+				if( !systemConfig ) return
+
+				var executionGroups = this.executionGroups
+
+				if( !executionGroupId ) {
+					// figure out in which execution group the system is contained
+					executionGroupId = getExecutionGroupIdBySystemId( executionGroups, systemId )
+				}
+
+				var executionGroup = executionGroups[ executionGroupId ]
+				if( !executionGroup ) return
+
+				var system = executionGroup.getByKey( systemId )
+				if( !system ) return
+
+				_.extend( system.config, systemConfig )
 			}
 		}
 
