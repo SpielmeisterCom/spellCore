@@ -204,11 +204,11 @@ define(
 						this.isModeDevelopment
 					)
 
-					invoke( executionGroups.render, 'init', false, [ spell, sceneConfig ] )
-					invoke( executionGroups.update, 'init', false, [ spell, sceneConfig ] )
+					invoke( executionGroups.render, 'init', false, [ spell, sceneConfig, sceneData ] )
+					invoke( executionGroups.update, 'init', false, [ spell, sceneConfig, sceneData ] )
 
-					invoke( executionGroups.render, 'activate', true, [ spell, sceneConfig ] )
-					invoke( executionGroups.update, 'activate', true, [ spell, sceneConfig ] )
+					invoke( executionGroups.render, 'activate', true, [ spell, sceneConfig, sceneData ] )
+					invoke( executionGroups.update, 'activate', true, [ spell, sceneConfig, sceneData ] )
 				}
 
 				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
