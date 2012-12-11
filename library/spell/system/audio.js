@@ -62,7 +62,7 @@ define(
 			},
 
 			playSound: function( audioContext, id, soundEmitter ) {
-				audioContext.play( id, soundEmitter.asset.resource, soundEmitter.volume, soundEmitter.loop )
+				audioContext.play( soundEmitter.asset.resource, id, soundEmitter.volume, soundEmitter.loop )
 			},
 		
 			/**

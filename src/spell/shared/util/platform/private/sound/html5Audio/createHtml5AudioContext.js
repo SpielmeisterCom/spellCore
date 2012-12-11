@@ -12,7 +12,8 @@ define(
 		 * private
 		 */
 		var audioElements = {},
-			isMutedValue  = false
+			isMutedValue  = false,
+			soundCounter  = 0
 
 		var create = function( id, audioResource ) {
 			var audio = audioResource.privateAudioResource.cloneNode(true)
@@ -33,12 +34,13 @@ define(
 
 		/**
 		 *
-		 * @param id
 		 * @param audioResource
+		 * @param id
 		 * @param volume
 		 * @param loop
 		 */
-		var play = function( id, audioResource, volume, loop ) {
+		var play = function( audioResource, id, volume, loop ) {
+			id = ( id ) ? id : "tmp_sound_" + soundCounter++
 			var audioElement = ( _.has( audioElements, id ) ) ? audioElements[id] : create( id, audioResource )
 
 			setLoop( id, loop )

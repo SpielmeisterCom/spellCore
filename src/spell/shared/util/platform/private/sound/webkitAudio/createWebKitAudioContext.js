@@ -14,7 +14,8 @@ define(
 		 */
 		var context,
 			sourcesNodes = {},
-			isMutedValue = false
+			isMutedValue = false,
+			soundCounter = 0
 
 		var create = function( id, audioResource ) {
 			var gainNode   = context.createGainNode(),
@@ -31,12 +32,13 @@ define(
 
 		/**
 		 *
-		 * @param id
 		 * @param audioResource
+		 * @param id
 		 * @param volume
 		 * @param loop
 		 */
-		var play = function( id, audioResource, volume, loop ) {
+		var play = function( audioResource, id, volume, loop ) {
+			id = ( id ) ? id : "tmp_sound_" + soundCounter++
 			var sourceNode = ( _.has( sourcesNodes, id ) ) ? sourcesNodes[id] : create( id, audioResource )
 
 			setLoop( id, loop )
