@@ -174,7 +174,7 @@ define(
 			update: function( timeInMs, deltaTimeInMs ) {
 				invoke( this.executionGroups.update, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
-			init: function( sceneConfig ) {
+			init: function( sceneConfig, sceneData ) {
 				var spell = this.spell
 
 				if( !hasActiveCamera( sceneConfig ) ) {
@@ -215,7 +215,7 @@ define(
 
 				this.script = spell.moduleLoader.require( moduleId )
 
-				this.script.init( spell, sceneConfig )
+				this.script.init( spell, sceneConfig, sceneData )
 			},
 			destroy: function( sceneConfig ) {
 				var executionGroups = this.executionGroups

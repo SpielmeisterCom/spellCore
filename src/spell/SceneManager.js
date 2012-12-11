@@ -15,7 +15,7 @@ define(
 		'use strict'
 
 
-		var postLoadedResources = function( spell, entityManager, templateManager, isModeDevelopment, sceneId ) {
+		var postLoadedResources = function( spell, entityManager, templateManager, isModeDevelopment, sceneId, sceneData ) {
 			if( this.activeScene ) {
 				this.activeScene.destroy()
 				this.entityManager.reset()
@@ -28,7 +28,7 @@ define(
 				throw 'Error: Could not find scene configuration for scene \'' + sceneId + '\'.'
 			}
 
-			scene.init( sceneConfig )
+			scene.init( sceneConfig, sceneData )
 
 			this.mainLoop.setRenderCallback( _.bind( scene.render, scene ) )
 			this.mainLoop.setUpdateCallback( _.bind( scene.update, scene ) )
@@ -52,7 +52,7 @@ define(
 		}
 
 		SceneManager.prototype = {
-			startScene : function( sceneId ) {
+			startScene : function( sceneId, sceneData ) {
 				var preNextFrame = function() {
 					if( this.activeScene ) {
 						this.mainLoop.setRenderCallback()
@@ -78,7 +78,8 @@ define(
 							this.entityManager,
 							this.templateManager,
 							this.isModeDevelopment,
-							sceneId
+							sceneId,
+							sceneData
 						),
 						onProgress
 					)
