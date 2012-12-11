@@ -44,14 +44,15 @@ define(
 			_.each(
 				config.events,
 				function( event ) {
-					eventManager.subscribe(
-						event.scope,
-						function( eventArgs ) {
-							if( event.subscriber ) event.subscriber( eventArgs )
+					var handler = function( eventArgs ) {
+						if( event.subscriber ) event.subscriber( eventArgs )
 
-							lock()
-						}
-					)
+						eventManager.unsubscribe( event.scope, handler )
+
+						lock()
+					}
+
+					eventManager.subscribe( event.scope, handler )
 				}
 			)
 		}
