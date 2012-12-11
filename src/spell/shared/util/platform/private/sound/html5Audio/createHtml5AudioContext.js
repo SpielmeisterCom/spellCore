@@ -51,6 +51,18 @@ define(
 			audioElement.play()
 		}
 
+		var stopAll = function() {
+			_.each( audioElements, function( value, key ) {
+				mute( key )
+			} )
+		}
+
+		var resumeAll = function() {
+			_.each( audioElements, function( value, key ) {
+				setVolume( key, 1 )
+			} )
+		}
+
 		var stop = function( id ) {
 			var audioElement = audioElements[ id ]
 
@@ -139,7 +151,9 @@ define(
 				stop        : stop,
 				mute        : mute,
 				destroy     : destroy,
-				createSound : createSound
+				createSound : createSound,
+				stopAll     : stopAll,
+				resumeAll   : resumeAll
 			}
 		}
 

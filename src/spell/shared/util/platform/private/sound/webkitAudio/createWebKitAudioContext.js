@@ -49,6 +49,18 @@ define(
 			sourceNode.noteOn( 0 )
 		}
 
+		var stopAll = function() {
+			_.each( sourcesNodes, function( value, key ) {
+				mute( key )
+			} )
+		}
+
+		var resumeAll = function() {
+			_.each( sourcesNodes, function( value, key ) {
+				setVolume( key, 1 )
+			} )
+		}
+
 		var stop = function( id ) {
 			var sourceNode = sourcesNodes[ id ]
 			if( sourceNode ) sourceNode.noteOff(0)
@@ -74,6 +86,7 @@ define(
 		var destroy = function( id ) {
 			stop( id )
 
+			sourcesNodes[ id ] = null
 			delete sourcesNodes[ id ]
 		}
 
@@ -139,7 +152,9 @@ define(
 				stop        : stop,
 				mute        : mute,
 				destroy     : destroy,
-				createSound : createSound
+				createSound : createSound,
+				stopAll     : stopAll,
+				resumeAll   : resumeAll
 			}
 		}
 
