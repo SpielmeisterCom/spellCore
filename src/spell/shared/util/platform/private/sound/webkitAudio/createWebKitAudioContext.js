@@ -46,7 +46,7 @@ define(
 
 			if( isMuted() ) mute( id )
 
-			sourceNode.noteOn( 0 )
+			if( sourceNode.playbackState !== sourceNode.PLAYING_STATE ) sourceNode.noteOn( 0 )
 		}
 
 		var stopAll = function() {
