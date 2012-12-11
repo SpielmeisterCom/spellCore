@@ -764,10 +764,15 @@ define(
 			 * Resets the entity manager. Removes all entity instances in the process.
 			 */
 			reset : function() {
-				var componentDictionaries = this.componentDictionaries
+				var componentDictionaries = this.componentDictionaries,
+					eventManager          = this.eventManager
 
 				for( var componentId in componentDictionaries ) {
-					componentDictionaries[ componentId ] = {}
+					var components = componentDictionaries[ componentId ]
+
+					for( var entityId in components ) {
+						removeComponents( eventManager, componentDictionaries, entityId )
+					}
 				}
 			},
 

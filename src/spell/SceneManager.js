@@ -16,11 +16,6 @@ define(
 
 
 		var postLoadedResources = function( spell, entityManager, templateManager, isModeDevelopment, sceneId, sceneData ) {
-			if( this.activeScene ) {
-				this.activeScene.destroy()
-				this.entityManager.reset()
-			}
-
 			var scene       = new Scene( spell, entityManager, templateManager, isModeDevelopment ),
 				sceneConfig = spell.scenes[ sceneId ]
 
@@ -57,8 +52,8 @@ define(
 					if( this.activeScene ) {
 						this.mainLoop.setRenderCallback()
 						this.mainLoop.setUpdateCallback()
-						this.activeScene.destroy()
 						this.entityManager.reset()
+						this.activeScene.destroy()
 					}
 
 					var onProgress = this.sendMessageToEditor ?
