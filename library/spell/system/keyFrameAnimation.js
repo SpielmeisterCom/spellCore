@@ -87,8 +87,6 @@ define(
 			return a + ( b - a ) * t
 		}
 
-		var init = function( spell ) {}
-
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var entityManager      = this.entityManager,
 				keyFrameAnimations = this.keyFrameAnimations
@@ -172,7 +170,7 @@ define(
 		}
 
 		KeyFrameAnimation.prototype = {
-			init : init,
+			init : function() {},
 			destroy : function() {},
 			activate : function() {},
 			deactivate : function() {},
