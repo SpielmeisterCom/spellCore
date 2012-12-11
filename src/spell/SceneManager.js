@@ -54,6 +54,7 @@ define(
 						this.mainLoop.setUpdateCallback()
 						this.entityManager.reset()
 						this.activeScene.destroy()
+						this.activeScene = null
 					}
 
 					var onProgress = this.sendMessageToEditor ?
