@@ -41,7 +41,7 @@ define(
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			destroy: function( spell ) {
-				
+
 			},
 		
 			/**
@@ -58,7 +58,21 @@ define(
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			deactivate: function( spell ) {
-				
+				var soundEmitters = this.soundEmitters,
+					entityManager = spell.entityManager,
+					audioContext  = spell.audioContext
+
+				for( var id in soundEmitters ) {
+					var soundEmitter = soundEmitters[ id ]
+
+					audioContext.stop( id )
+
+					entityManager.updateComponent( id, 'spell.component.audio.soundEmitter', {
+						'play': false
+					})
+				}
+
+				audioContext.tick()
 			},
 
 			playSound: function( audioContext, id, soundEmitter ) {
