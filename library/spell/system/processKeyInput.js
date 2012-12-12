@@ -69,16 +69,18 @@ define(
 		 * public
 		 */
 
-		var KeyInput = function( spell ) {}
+		var processKeyInput = function( spell ) {}
 
-		KeyInput.prototype = {
-			init : function( spell ) {},
+		processKeyInput.prototype = {
+			init : function( spell ) {
+				spell.inputManager.clearInputEvents()
+			},
 			destroy : function( spell ) {},
 			activate : function( spell ) {},
 			deactivate : function( spell ) {},
 			process : process
 		}
 
-		return KeyInput
+		return processKeyInput
 	}
 )

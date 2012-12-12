@@ -160,12 +160,14 @@ define(
 		 * public
 		 */
 
-		var Scene = function( spell, entityManager, templateManager, isModeDevelopment ) {
+		var Scene = function( spell, entityManager, templateManager, isModeDevelopment, sceneConfig, sceneData ) {
 			this.spell             = spell
 			this.entityManager     = entityManager
 			this.templateManager   = templateManager
 			this.isModeDevelopment = isModeDevelopment
 			this.executionGroups   = { render : null, update : null }
+			this.sceneConfig       = sceneConfig
+			this.sceneData         = sceneData
 			this.script            = null
 		}
 
@@ -220,18 +222,19 @@ define(
 				invoke( executionGroups.update, 'activate', true, [ spell, sceneConfig, sceneData ] )
 			},
 			destroy: function( sceneConfig ) {
-				var executionGroups = this.executionGroups
+				var executionGroups = this.executionGroups,
+					spell           = this.spell
 
 				// deactivating systems
-				invoke( executionGroups.render, 'deactivate', true, [ this.spell, sceneConfig ] )
-				invoke( executionGroups.update, 'deactivate', true, [ this.spell, sceneConfig ] )
+				invoke( executionGroups.render, 'deactivate', true, [ spell, sceneConfig ] )
+				invoke( executionGroups.update, 'deactivate', true, [ spell, sceneConfig ] )
 
 				// destroying scene
 				this.script.destroy( this.spell, sceneConfig )
 
 				// destroying systems
-				invoke( executionGroups.render, 'destroy', false, [ this.spell, sceneConfig ] )
-				invoke( executionGroups.update, 'destroy', false, [ this.spell, sceneConfig ] )
+				invoke( executionGroups.render, 'destroy', false, [ spell, sceneConfig ] )
+				invoke( executionGroups.update, 'destroy', false, [ spell, sceneConfig ] )
 			},
 			restartSystem: function( systemId, executionGroupId, systemConfig ) {
 				var executionGroups = this.executionGroups
@@ -342,7 +345,22 @@ define(
 				var system = executionGroup.getByKey( systemId )
 				if( !system ) return
 
-				_.extend( system.config, systemConfig )
+				var changedActive = systemConfig.active !== undefined &&
+					system.config !== systemConfig.active
+
+				_.extend(
+					system.config,
+					deepClone( systemConfig )
+				)
+
+				if( changedActive ) {
+					if( systemConfig.active ) {
+						system.prototype.activate( spell, this.sceneConfig, this.sceneData )
+
+					} else {
+						system.prototype.deactivate( spell, this.sceneConfig )
+					}
+				}
 			}
 		}
 

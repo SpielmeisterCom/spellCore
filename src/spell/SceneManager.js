@@ -16,12 +16,14 @@ define(
 
 
 		var postLoadedResources = function( spell, entityManager, templateManager, isModeDevelopment, sceneId, sceneData ) {
-			var scene       = new Scene( spell, entityManager, templateManager, isModeDevelopment ),
-				sceneConfig = spell.scenes[ sceneId ]
+			var sceneConfig = spell.scenes[ sceneId ]
 
 			if( !sceneConfig ) {
 				throw 'Error: Could not find scene configuration for scene \'' + sceneId + '\'.'
 			}
+
+			var scene = new Scene( spell, entityManager, templateManager, isModeDevelopment, sceneConfig, sceneData )
+
 
 			scene.init( sceneConfig, sceneData )
 
@@ -52,8 +54,8 @@ define(
 					if( this.activeScene ) {
 						this.mainLoop.setRenderCallback()
 						this.mainLoop.setUpdateCallback()
-						this.entityManager.reset()
 						this.activeScene.destroy()
+						this.entityManager.reset()
 						this.activeScene = null
 					}
 
