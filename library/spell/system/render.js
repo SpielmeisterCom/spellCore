@@ -112,7 +112,7 @@ define(
 		var updatePlaying = function( animationLengthInMs, offsetInMs, looped ) {
 			return looped ?
 				true :
-				isInInterval( offsetInMs, 0, animationLengthInMs )
+				offsetInMs < animationLengthInMs
 		}
 
 		var transformTo2dTileMapCoordinates = function( worldToLocalMatrix, tilemapDimensions, frameDimensions, maxTileMapY, point ) {
@@ -201,6 +201,7 @@ define(
 		}
 
 		var drawVisualObject = function(
+			entityManager,
 			context,
 			transforms,
 			appearances,
@@ -295,10 +296,6 @@ define(
 								asset.frameDuration,
 								appearance.looped
 							)
-							appearance.playing = updatePlaying( animationLengthInMs, appearance.offset, appearance.looped )
-							if( appearance.playing === false ) {
-								entityManager.triggerEvent( id, 'animationEnd', [ 'animation', appearance ] )
-							}
 
 							var frameId     = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
 								frameOffset = asset.frameOffsets[ frameId ]
@@ -314,6 +311,16 @@ define(
 								)
 							}
 							context.restore()
+
+							var isPlaying = updatePlaying( animationLengthInMs, appearance.offset * animationLengthInMs, appearance.looped )
+
+							if( isPlaying !== appearance.playing ) {
+								appearance.playing = isPlaying
+
+								if( isPlaying === false ) {
+									entityManager.triggerEvent( id, 'animationEnd', [ 'animation', appearance ] )
+								}
+							}
 
 						} else if( asset.type === 'spriteSheet' ) {
 							var frames            = appearance.drawAllFrames ? asset.frames : appearance.frames,
@@ -641,6 +648,7 @@ define(
 			this.drawVisualObjectPartial = _.bind(
 				drawVisualObject,
 				null,
+				spell.entityManager,
 				this.context,
 				this.transforms,
 				this.appearances,
