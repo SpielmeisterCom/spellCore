@@ -266,7 +266,6 @@ define(
 		}
 
 		var mergeOverloadedChildren = function( entityTemplateChildren, overloadedChildren ) {
-
 			if( !overloadedChildren || overloadedChildren.length === 0 ) {
 				return overloadedChildren
 			}
@@ -277,7 +276,7 @@ define(
 
 			var result = deepClone( entityTemplateChildren )
 
-			for (var i = 0; i < result.length; i++ ) {
+			for( var i = 0; i < result.length; i++ ) {
 				var entityTemplateChild = result[ i ]
 
 				var overloadedChild = _.find(
