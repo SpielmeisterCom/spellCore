@@ -355,10 +355,10 @@ define(
 
 				if( changedActive ) {
 					if( systemConfig.active ) {
-						system.prototype.activate( spell, this.sceneConfig, this.sceneData )
+						system.prototype.activate.call( system, this.spell, this.sceneConfig, this.sceneData )
 
 					} else {
-						system.prototype.deactivate( spell, this.sceneConfig )
+						system.prototype.deactivate.call( system, this.spell, this.sceneConfig )
 					}
 				}
 			}
