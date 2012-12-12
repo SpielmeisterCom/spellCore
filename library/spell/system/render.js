@@ -14,6 +14,8 @@ define(
 		'spell/shared/util/Events',
 		'spell/shared/util/platform/PlatformKit',
 
+		'spell/math/util',
+
 		'spell/math/vec2',
 		'spell/math/vec4',
 		'spell/math/mat3',
@@ -34,6 +36,7 @@ define(
 		Events,
 		PlatformKit,
 
+		mathUtil,
 		vec2,
 		vec4,
 		mat3,
@@ -56,6 +59,7 @@ define(
 			drawDebugShapes   = true,
 			defaultDimensions = vec2.create( [ 1, 1 ] ),
 			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
+			isInInterval      = mathUtil.isInInterval,
 			currentCameraId
 
 		var roundVec2 = function( v ) {
@@ -103,6 +107,12 @@ define(
 			return animationLengthInMs === 0 ?
 				0 :
 				offsetInMs / animationLengthInMs
+		}
+
+		var updatePlaying = function( animationLengthInMs, offsetInMs, looped ) {
+			return looped ?
+				true :
+				isInInterval( offsetInMs, 0, animationLengthInMs )
 		}
 
 		var transformTo2dTileMapCoordinates = function( worldToLocalMatrix, tilemapDimensions, frameDimensions, maxTileMapY, point ) {
@@ -269,7 +279,9 @@ define(
 						} else if( asset.type === 'animation' ) {
 							// animated appearance
 							var assetFrameDimensions = asset.frameDimensions,
-								assetNumFrames       = asset.numFrames
+								assetNumFrames       = asset.numFrames,
+								assetFrameDuration   = asset.frameDuration,
+								animationLengthInMs  = assetNumFrames * assetFrameDuration
 
 							var quadDimensions = quadGeometry ?
 								quadGeometry.dimensions :
@@ -283,6 +295,10 @@ define(
 								asset.frameDuration,
 								appearance.looped
 							)
+							appearance.playing = updatePlaying( animationLengthInMs, appearance.offset, appearance.looped )
+							if( appearance.playing === false ) {
+								entityManager.triggerEvent( id, 'animationEnd', [ 'animation', appearance ] )
+							}
 
 							var frameId     = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
 								frameOffset = asset.frameOffsets[ frameId ]

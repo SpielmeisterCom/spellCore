@@ -22,6 +22,12 @@
 			"default": 0,
 			"doc": "current offset into the played animation in milliseconds"
 		},
+        {
+            "name": "playing",
+            "type": "boolean",
+            "default": true,
+            "doc": "if true the animation is playing; gets set to false if the end of the animation is reached and looping is disabled"
+        },
 		{
 			"name": "replaySpeed",
 			"type": "number",
