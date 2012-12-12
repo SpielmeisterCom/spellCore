@@ -52,8 +52,8 @@ define(
 					if( this.activeScene ) {
 						this.mainLoop.setRenderCallback()
 						this.mainLoop.setUpdateCallback()
-						this.entityManager.reset()
 						this.activeScene.destroy()
+						this.entityManager.reset()
 						this.activeScene = null
 					}
 
