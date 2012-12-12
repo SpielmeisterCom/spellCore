@@ -1,9 +1,13 @@
 define(
 	'spell/shared/util/template/applyComponentConfig',
 	[
+		'spell/shared/util/deepClone',
+
 		'spell/functions'
 	],
 	function(
+		deepClone,
+
 		_
 	) {
 		'use strict'
@@ -22,7 +26,7 @@ define(
 				function( entity, attributeConfig, componentId ) {
 					entity[ componentId ] = _.extend(
 						entity[ componentId ] || {},
-						attributeConfig
+						deepClone( attributeConfig )
 					)
 
 					return entity
