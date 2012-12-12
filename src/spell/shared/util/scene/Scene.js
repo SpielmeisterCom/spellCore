@@ -6,6 +6,7 @@ define(
 		'spell/shared/util/create',
 		'spell/shared/util/createId',
 		'spell/shared/util/createModuleId',
+		'spell/shared/util/deepClone',
 		'spell/shared/util/entityConfig/flatten',
 		'spell/shared/util/Events',
 		'spell/shared/util/SortedMap',
@@ -18,6 +19,7 @@ define(
 		create,
 		createId,
 		createModuleId,
+		deepClone,
 		flattenEntityConfig,
 		Events,
 		SortedMap,
@@ -86,7 +88,7 @@ define(
 			return _.reduce(
 				config,
 				function( memo, record ) {
-					memo[ record[ 'name' ] ] = record[ 'default' ]
+					memo[ record[ 'name' ] ] = deepClone( record[ 'default' ] )
 
 					return memo
 				},
@@ -113,7 +115,7 @@ define(
 							systemTemplate,
 							isModeDevelopment,
 							_.defaults(
-								system.config,
+								deepClone( system.config ),
 								createConfigFromSystemTemplateConfig( systemTemplate.config )
 							)
 						)
