@@ -183,50 +183,53 @@ define(
 					return
 				}
 
-				if( sceneConfig.systems ) {
-					var entityManager   = this.entityManager,
-						templateManager = this.templateManager,
-						executionGroups = this.executionGroups
+				var entityManager   = this.entityManager,
+					templateManager = this.templateManager,
+					executionGroups = this.executionGroups
 
-					executionGroups.render = createSystems(
-						spell,
-						entityManager,
-						templateManager,
-						sceneConfig.systems.render,
-						this.isModeDevelopment
-					)
+				executionGroups.render = createSystems(
+					spell,
+					entityManager,
+					templateManager,
+					sceneConfig.systems.render,
+					this.isModeDevelopment
+				)
 
-					executionGroups.update = createSystems(
-						spell,
-						entityManager,
-						templateManager,
-						sceneConfig.systems.update,
-						this.isModeDevelopment
-					)
+				executionGroups.update = createSystems(
+					spell,
+					entityManager,
+					templateManager,
+					sceneConfig.systems.update,
+					this.isModeDevelopment
+				)
 
-					invoke( executionGroups.render, 'init', false, [ spell, sceneConfig, sceneData ] )
-					invoke( executionGroups.update, 'init', false, [ spell, sceneConfig, sceneData ] )
+				// initializing systems
+				invoke( executionGroups.render, 'init', false, [ spell, sceneConfig, sceneData ] )
+				invoke( executionGroups.update, 'init', false, [ spell, sceneConfig, sceneData ] )
 
-					invoke( executionGroups.render, 'activate', true, [ spell, sceneConfig, sceneData ] )
-					invoke( executionGroups.update, 'activate', true, [ spell, sceneConfig, sceneData ] )
-				}
-
+				// initializing scene
 				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
 
 				this.script = spell.moduleLoader.require( moduleId )
-
 				this.script.init( spell, sceneConfig, sceneData )
+
+				// activating systems
+				invoke( executionGroups.render, 'activate', true, [ spell, sceneConfig, sceneData ] )
+				invoke( executionGroups.update, 'activate', true, [ spell, sceneConfig, sceneData ] )
 			},
 			destroy: function( sceneConfig ) {
 				var executionGroups = this.executionGroups
 
+				// deactivating systems
 				invoke( executionGroups.render, 'deactivate', true, [ this.spell, sceneConfig ] )
 				invoke( executionGroups.update, 'deactivate', true, [ this.spell, sceneConfig ] )
 
+				// destroying scene
+				this.script.destroy( this.spell, sceneConfig )
+
+				// destroying systems
 				invoke( executionGroups.render, 'destroy', false, [ this.spell, sceneConfig ] )
 				invoke( executionGroups.update, 'destroy', false, [ this.spell, sceneConfig ] )
-
-				this.script.destroy( this.spell, sceneConfig )
 			},
 			restartSystem: function( systemId, executionGroupId, systemConfig ) {
 				var executionGroups = this.executionGroups
