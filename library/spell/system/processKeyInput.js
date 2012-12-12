@@ -69,9 +69,9 @@ define(
 		 * public
 		 */
 
-		var KeyInput = function( spell ) {}
+		var processKeyInput = function( spell ) {}
 
-		KeyInput.prototype = {
+		processKeyInput.prototype = {
 			init : function( spell ) {},
 			destroy : function( spell ) {},
 			activate : function( spell ) {},
@@ -79,6 +79,6 @@ define(
 			process : process
 		}
 
-		return KeyInput
+		return processKeyInput
 	}
 )
