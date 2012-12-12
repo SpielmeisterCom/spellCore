@@ -72,7 +72,9 @@ define(
 		var processKeyInput = function( spell ) {}
 
 		processKeyInput.prototype = {
-			init : function( spell ) {},
+			init : function( spell ) {
+				spell.inputManager.clearInputEvents()
+			},
 			destroy : function( spell ) {},
 			activate : function( spell ) {},
 			deactivate : function( spell ) {},
