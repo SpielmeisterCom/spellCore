@@ -12,9 +12,9 @@ define(
 		_
 	) {
 		'use strict'
-		
-		
-		
+
+
+
 		/**
 		 * Creates an instance of the system.
 		 *
@@ -22,9 +22,9 @@ define(
 		 * @param {Object} [spell] The spell object.
 		 */
 		var audio = function( spell ) {
-			
+
 		}
-		
+
 		audio.prototype = {
 			/**
 		 	 * Gets called when the system is created.
@@ -32,9 +32,9 @@ define(
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			init: function( spell ) {
-				
+
 			},
-		
+
 			/**
 		 	 * Gets called when the system is destroyed.
 		 	 *
@@ -43,7 +43,7 @@ define(
 			destroy: function( spell ) {
 
 			},
-		
+
 			/**
 		 	 * Gets called when the system is activated.
 		 	 *
@@ -51,7 +51,7 @@ define(
 			 */
 			activate: function( spell ) {
 			},
-		
+
 			/**
 		 	 * Gets called when the system is deactivated.
 		 	 *
@@ -63,13 +63,15 @@ define(
 					audioContext  = spell.audioContext
 
 				for( var id in soundEmitters ) {
-					var soundEmitter = soundEmitters[ id ]
-
 					audioContext.stop( id )
 
-					entityManager.updateComponent( id, 'spell.component.audio.soundEmitter', {
-						'play': false
-					})
+					entityManager.updateComponent(
+						id,
+						'spell.component.audio.soundEmitter',
+						{
+							play : false
+						}
+					)
 				}
 
 				audioContext.tick()
@@ -78,7 +80,7 @@ define(
 			playSound: function( audioContext, id, soundEmitter ) {
 				audioContext.play( soundEmitter.asset.resource, id, soundEmitter.volume, soundEmitter.loop )
 			},
-		
+
 			/**
 		 	 * Gets called to trigger the processing of game state.
 		 	 *
@@ -111,7 +113,7 @@ define(
 				}
 			}
 		}
-		
+
 		return audio
 	}
 )
