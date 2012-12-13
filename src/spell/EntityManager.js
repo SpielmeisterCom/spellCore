@@ -857,8 +857,8 @@ define(
 			/**
 			 * Returns a component from a specific entity.
 			 *
-			 * @param {String} componentId the requested component id
 			 * @param {String} entityId the id of the requested entity
+			 * @param {String} componentId the requested component id
 			 * @return {Object}
 			 */
 			getComponentById : function( entityId, componentId ) {
