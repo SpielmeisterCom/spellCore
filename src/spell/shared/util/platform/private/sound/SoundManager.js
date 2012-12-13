@@ -91,6 +91,8 @@ define(
 			if( !!config.onloadeddata ) {
 				var html5callback = function() {
 					html5Audio.removeEventListener( "canplaythrough", html5callback, false )
+					html5Audio.currentTime = 0
+					html5Audio.pause()
 					config.onloadeddata( html5Audio )
 				}
 
@@ -110,6 +112,8 @@ define(
 			// new WebKit
 			html5Audio.preload = "auto"
 			html5Audio.load()
+			html5Audio.play()
+			html5Audio.volume = 0
 
 			return html5Audio
 		}
