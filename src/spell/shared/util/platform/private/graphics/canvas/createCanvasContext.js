@@ -44,6 +44,100 @@ define(
 		var screenToWorld = mat3.create()
 		mat3.identity( screenToWorld )
 
+		var getUntilTexCoord = function( i, numIterations, endTexCoord ) {
+			if( i + 1 === numIterations ) {
+				var tc = endTexCoord % 1
+
+				return tc === 0 ? 1 : tc
+			}
+
+			return 1
+		}
+
+		var normalizeStartTexCoord = function( tc ) {
+			if( tc < 0 ) {
+				tc += 1
+			}
+
+			return tc % 1
+		}
+
+		/**
+		 * This function emulates texture mapping on canvas-2d. Rotation transformations and negative scales are not
+		 * supported.
+		 *
+		 * @param context
+		 * @param texture
+		 * @param textureMatrix
+		 * @param destinationDimensions
+		 */
+		var mapTexture = function( context, texture, textureMatrix, destinationDimensions ) {
+			var scaleX            = Math.abs( textureMatrix[ 0 ] ),
+				scaleY            = Math.abs( textureMatrix[ 4 ] ),
+				textureWidth      = texture.dimensions[ 0 ],
+				textureHeight     = texture.dimensions[ 1 ],
+				destinationWidth  = destinationDimensions[ 0 ],
+				destinationHeight = destinationDimensions[ 1 ]
+
+			var startTexCoordX = textureMatrix[ 6 ],
+				startTexCoordY = textureMatrix[ 7 ],
+				endTexCoordX   = startTexCoordX + Math.abs( scaleX ),
+				endTexCoordY   = startTexCoordY + Math.abs( scaleY )
+
+			var numIterationsX = Math.round( Math.ceil( endTexCoordX ) - Math.floor( startTexCoordX ) ),
+				numIterationsY = Math.round( Math.ceil( endTexCoordY ) - Math.floor( startTexCoordY ) )
+
+			for( var y = 0,
+				 fromTexCoordY = normalizeStartTexCoord( startTexCoordY ),
+				 untilTexCoordY = 0,
+				 texCoordRangeY = 0,
+				 scaledTexCoordRangeY = 0,
+				 scaledTexCoordRangeX = 0,
+				 destinationPositionY = 0,
+				 coveredTexCoordY = 0;
+				 y < numIterationsY;
+				 y++ ) {
+
+				untilTexCoordY       = getUntilTexCoord( y, numIterationsY, endTexCoordY )
+				texCoordRangeY       = untilTexCoordY - fromTexCoordY
+				coveredTexCoordY     += texCoordRangeY
+				scaledTexCoordRangeY = texCoordRangeY / scaleY
+
+				for( var x = 0,
+					 fromTexCoordX = normalizeStartTexCoord( startTexCoordX ),
+					 untilTexCoordX = 0,
+					 texCoordRangeX = 0,
+					 destinationPositionX = 0,
+					 coveredTexCoordX = 0;
+					 x < numIterationsX;
+					 x++ ) {
+
+					untilTexCoordX       = getUntilTexCoord( x, numIterationsX, endTexCoordX )
+					texCoordRangeX       = untilTexCoordX - fromTexCoordX
+					coveredTexCoordX     += texCoordRangeX
+					scaledTexCoordRangeX = texCoordRangeX / scaleX
+
+					context.drawImage(
+						texture.privateImageResource,
+						textureWidth * fromTexCoordX,
+						textureHeight * fromTexCoordY,
+						textureWidth * texCoordRangeX,
+						textureHeight * texCoordRangeY,
+						destinationWidth * destinationPositionX,
+						destinationHeight * destinationPositionY,
+						destinationWidth * scaledTexCoordRangeX,
+						destinationHeight * scaledTexCoordRangeY
+					)
+
+					destinationPositionX += scaledTexCoordRangeX
+					fromTexCoordX = 0
+				}
+
+				destinationPositionY += scaledTexCoordRangeY
+				fromTexCoordY = 0
+			}
+		}
+
 		/*
 		 * Returns true if the supplied quad covers the full screen, false otherwise.
 		 *
@@ -246,13 +340,36 @@ define(
 					modelToWorld[ 7 ]
 				)
 
-				// rotating the image so that it is not upside down
-				context.translate( destinationPosition[ 0 ], destinationPosition[ 1 ] )
-				context.rotate( Math.PI )
-				context.scale( -1, 1 )
-				context.translate( 0, -destinationDimensions[ 1 ] )
+				if( !textureMatrix ) {
+					// rotating the image so that it is not upside down
+					context.translate( destinationPosition[ 0 ], destinationPosition[ 1 ] )
+					context.rotate( Math.PI )
+					context.scale( -1, 1 )
+					context.translate( 0, -destinationDimensions[ 1 ] )
 
-				context.drawImage( texture.privateImageResource, 0 , 0, destinationDimensions[ 0 ], destinationDimensions[ 1 ] )
+					context.drawImage( texture.privateImageResource, 0 , 0, destinationDimensions[ 0 ], destinationDimensions[ 1 ] )
+
+				} else {
+					context.translate( destinationPosition[ 0 ], destinationPosition[ 1 ] )
+					context.rotate( Math.PI )
+
+					// Compensating for the lack of negative scales support in mapTexture by letting canvas do the work.
+					// Macgyver would have been proud.
+					var xAxisInverted = textureMatrix[ 0 ] < 0,
+						yAxisInverted = textureMatrix[ 4 ] < 0
+
+					context.scale(
+						xAxisInverted ? 1 : -1,
+						yAxisInverted ? -1 : 1
+					)
+
+					context.translate(
+						xAxisInverted ? -destinationDimensions[ 0 ] : 0,
+						yAxisInverted ? 0 : -destinationDimensions[ 1 ]
+					)
+
+					mapTexture( context, texture, textureMatrix, destinationDimensions )
+				}
 			}
 			context.restore()
 		}
