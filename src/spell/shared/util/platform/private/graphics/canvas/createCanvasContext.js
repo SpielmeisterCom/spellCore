@@ -4,6 +4,7 @@ define(
 		'spell/shared/util/platform/private/graphics/StateStack',
 		'spell/shared/util/color',
 
+		'spell/math/util',
 		'spell/math/vec2',
 		'spell/math/mat3'
 	],
@@ -11,6 +12,7 @@ define(
 		StateStack,
 		color,
 
+		mathUtil,
 		vec2,
 		mat3
 	) {
@@ -20,11 +22,11 @@ define(
 		/*
 		 * private
 		 */
-
 		var context, canvas
 		var clearColor   = color.formatCanvas( [ 0.0, 0.0, 0.0, 1.0 ] )
 		var stateStack   = new StateStack( 32 )
 		var currentState = stateStack.getTop()
+		var modulo       = mathUtil.modulo
 
 		// scaling factor which must be applied to draw a one pixel wide line
 		var pixelScale
@@ -59,7 +61,7 @@ define(
 				tc += 1
 			}
 
-			return tc % 1
+			return modulo( tc, 1 )
 		}
 
 		/**
@@ -79,8 +81,8 @@ define(
 				destinationWidth  = destinationDimensions[ 0 ],
 				destinationHeight = destinationDimensions[ 1 ]
 
-			var startTexCoordX = textureMatrix[ 6 ],
-				startTexCoordY = textureMatrix[ 7 ],
+			var startTexCoordX = normalizeStartTexCoord( textureMatrix[ 6 ] ),
+				startTexCoordY = normalizeStartTexCoord( textureMatrix[ 7 ] ),
 				endTexCoordX   = startTexCoordX + Math.abs( scaleX ),
 				endTexCoordY   = startTexCoordY + Math.abs( scaleY )
 
@@ -88,7 +90,7 @@ define(
 				numIterationsY = Math.round( Math.ceil( endTexCoordY ) - Math.floor( startTexCoordY ) )
 
 			for( var y = 0,
-				 fromTexCoordY = normalizeStartTexCoord( startTexCoordY ),
+				 fromTexCoordY = startTexCoordY,
 				 untilTexCoordY = 0,
 				 texCoordRangeY = 0,
 				 scaledTexCoordRangeY = 0,
@@ -104,7 +106,7 @@ define(
 				scaledTexCoordRangeY = texCoordRangeY / scaleY
 
 				for( var x = 0,
-					 fromTexCoordX = normalizeStartTexCoord( startTexCoordX ),
+					 fromTexCoordX = startTexCoordX,
 					 untilTexCoordX = 0,
 					 texCoordRangeX = 0,
 					 destinationPositionX = 0,
