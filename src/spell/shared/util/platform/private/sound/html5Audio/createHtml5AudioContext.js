@@ -66,19 +66,21 @@ define(
 		var stop = function( id ) {
 			var audioElement = audioElements[ id ]
 
-			audioElement.pause()
+			if( audioElement ) audioElement.pause()
 		}
 
 		var setVolume = function ( id, volume ) {
 			volume = ( !isNaN(volume) && volume < 1 && volume >= 0 ) ? volume : 1
 			var audioElement = audioElements[ id ]
 
-			audioElement.volume = volume
+			if( audioElement ) audioElement.volume = volume
 		}
 
 		var setLoop = function( id, loop ) {
 			loop = !!loop
 			var audioElement = audioElements[ id ]
+
+			if( !audioElement ) return
 
 			if( loop ) {
 				audioElement.addEventListener( 'ended', loopCallback, false )
@@ -113,6 +115,8 @@ define(
 
 		var destroy = function( id ) {
 			var audioElement = audioElements[ id ]
+
+			if( !audioElement ) return
 
 			audioElement.removeEventListener( 'ended', removeCallback, false )
 			audioElement.removeEventListener( 'ended', loopCallback, false )
