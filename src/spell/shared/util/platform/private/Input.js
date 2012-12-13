@@ -52,6 +52,10 @@ define(
 		}
 
 		function getOffset( element ) {
+            if( !element.getBoundingClientRect ) {
+                return [ 0, 0 ]
+            }
+
 			var box = element.getBoundingClientRect()
 
 			var body    = document.body
@@ -210,7 +214,7 @@ define(
 				nativeEvents    = nativeEventMap[ eventName ]
 
 			_.each( nativeEvents, function( nativeEventHandler, nativeEventName ) {
-				addEvent( document.body, nativeEventName,  _.bind( nativeEventHandler, me, callback ) )
+				addEvent( document, nativeEventName,  _.bind( nativeEventHandler, me, callback ) )
 			})
 		}
 

@@ -8,7 +8,7 @@ define(
 
 		var hasTouchSupport = function() {
 			//return ('ontouchstart' in window) || ( window.DocumentTouch && document instanceof DocumentTouch)
-			return false
+			return true
 		}
 
 

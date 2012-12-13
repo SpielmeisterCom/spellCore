@@ -5,6 +5,10 @@ define(
 
 
 		var getOffset = function( element ) {
+            if( !element.getBoundingClientRect ) {
+                return [ 0, 0 ]
+            }
+
 			var box = element.getBoundingClientRect()
 
 			var body    = document.body
