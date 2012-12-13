@@ -48,6 +48,7 @@ define(
 
 		var calculateAlignPosition = function( text, fontAsset, align, spacing ) {
 			spacing = fontAsset.config.hSpacing + spacing
+			if( !align ) return 0
 
 			var width           = 0,
 				numCharacters   = text.length,
