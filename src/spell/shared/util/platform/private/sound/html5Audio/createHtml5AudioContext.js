@@ -16,7 +16,18 @@ define(
 			soundCounter  = 0
 
 		var create = function( id, audioResource ) {
-			var audio = audioResource.privateAudioResource.cloneNode(true)
+			var audio
+
+			if( audioResource.privateAudioResource.cloneNode ) {
+
+				audio = audioResource.privateAudioResource.cloneNode(true)
+
+			} else {
+
+				audio       = new Audio()
+				audio.src   = audioResource.privateAudioResource.src
+			}
+
 
 			audioElements[ id ] = audio
 			return audio
