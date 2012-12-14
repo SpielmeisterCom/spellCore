@@ -19,14 +19,18 @@ define(
 		'use strict'
 
 
-		/*
-		 * private
-		 */
-		var context, canvas
-		var clearColor   = color.formatCanvas( [ 0.0, 0.0, 0.0, 1.0 ] )
-		var stateStack   = new StateStack( 32 )
-		var currentState = stateStack.getTop()
-		var modulo       = mathUtil.modulo
+		var modulo = mathUtil.modulo
+
+		var context,
+			canvas,
+			clearColor   = color.formatCanvas( [ 0.0, 0.0, 0.0, 1.0 ] ),
+			stateStack   = new StateStack( 32 ),
+			currentState = stateStack.getTop()
+
+
+		// HACK: this scale factor is used to mitigate the insane canvas-2d rasterization rules
+		var magicScale    = 1.015,
+			negMagicScale = -magicScale
 
 		// scaling factor which must be applied to draw a one pixel wide line
 		var pixelScale
@@ -125,10 +129,10 @@ define(
 						textureHeight * fromTexCoordY,
 						textureWidth * texCoordRangeX,
 						textureHeight * texCoordRangeY,
-						destinationWidth * destinationPositionX,
-						destinationHeight * destinationPositionY,
-						destinationWidth * scaledTexCoordRangeX,
-						destinationHeight * scaledTexCoordRangeY
+						destinationWidth * destinationPositionX - 0.5,
+						destinationHeight * destinationPositionY - 0.5,
+						destinationWidth * scaledTexCoordRangeX + 1,
+						destinationHeight * scaledTexCoordRangeY + 1
 					)
 
 					destinationPositionX += scaledTexCoordRangeX
@@ -253,7 +257,6 @@ define(
 
 			if( context === null ) return null
 
-
 			return createWrapperContext()
 		}
 
@@ -349,7 +352,13 @@ define(
 					context.scale( -1, 1 )
 					context.translate( 0, -destinationDimensions[ 1 ] )
 
-					context.drawImage( texture.privateImageResource, 0 , 0, destinationDimensions[ 0 ], destinationDimensions[ 1 ] )
+					context.drawImage(
+						texture.privateImageResource,
+						0,
+						0,
+						destinationDimensions[ 0 ],
+						destinationDimensions[ 1 ]
+					)
 
 				} else {
 					context.translate( destinationPosition[ 0 ], destinationPosition[ 1 ] )
@@ -397,7 +406,7 @@ define(
 				// rotating the image so that it is not upside down
 				context.translate( destinationPosition[ 0 ], destinationPosition[ 1 ] )
 				context.rotate( Math.PI )
-				context.scale( -1.015, 1.015 )
+				context.scale( negMagicScale, magicScale )
 				context.translate( 0, -destinationDimensions[ 1 ] )
 
 				context.drawImage(
