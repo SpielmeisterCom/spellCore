@@ -1,8 +1,8 @@
 define(
-	"spell/shared/util/platform/private/Input",
+	'spell/shared/util/platform/private/Input',
 	[
-		"spell/shared/util/input/keyCodes",
-		"spell/math/util",
+		'spell/shared/util/input/keyCodes',
+		'spell/math/util',
 
 		'spell/functions'
 	],
@@ -12,23 +12,8 @@ define(
 
 		_
 	) {
-		"use strict"
+		'use strict'
 
-
-		/*
-		 * private
-		 */
-
-		var preventDefault = function( event ) {
-			if( event.preventDefault ) {
-				event.preventDefault()
-
-			} else if ( event.stopPropagation ) {
-				e.stopPropagation()
-			} else {
-				event.returnValue = false
-			}
-		}
 
 		/*
 		 * Thanks to John Resig. http://ejohn.org/blog/flexible-javascript-events/
@@ -38,13 +23,26 @@ define(
 		 * @param fn
 		 */
 		var addEvent = function( obj, type, fn ) {
-		  if ( obj.attachEvent ) {
-		    obj['e'+type+fn] = fn;
-		    obj[type+fn] = function(){obj['e'+type+fn]( window.event );}
-		    obj.attachEvent( 'on'+type, obj[type+fn] );
-		  } else if ( obj.addEventListener ) {
-            obj.addEventListener( type, fn, false );
-          }
+			if( obj.attachEvent ) {
+				obj['e'+type+fn] = fn;
+				obj[type+fn] = function(){obj['e'+type+fn]( window.event );}
+				obj.attachEvent( 'on'+type, obj[type+fn] );
+
+			} else if( obj.addEventListener ) {
+				obj.addEventListener( type, fn, false );
+			}
+		}
+
+		var preventDefault = function( event ) {
+			if( event.preventDefault ) {
+				event.preventDefault()
+
+			} else if( event.stopPropagation ) {
+				e.stopPropagation()
+
+			} else {
+				event.returnValue = false
+			}
 		}
 
 		var isEventSupported = function( eventName ) {
@@ -52,9 +50,9 @@ define(
 		}
 
 		function getOffset( element ) {
-            if( !element.getBoundingClientRect ) {
-                return [ 0, 0 ]
-            }
+			if( !element.getBoundingClientRect ) {
+				return [ 0, 0 ]
+			}
 
 			var box = element.getBoundingClientRect()
 
@@ -93,7 +91,7 @@ define(
 			}
 
 			callback( {
-				type     : event.type,
+				type : event.type,
 				position : position
 			} )
 		}
@@ -104,15 +102,15 @@ define(
 		}
 
 		var nativeMouseWheelHandler = function( callback, event ) {
-			var delta = event.wheelDelta ? event.wheelDelta : (event.detail * -1)
+			var delta     = event.wheelDelta ? event.wheelDelta : event.detail * -1,
+				direction = delta > 0 ? 1 : -1
 
-			var direction = delta > 0 ? 1 : -1
 			preventDefault( event )
 
 			callback( {
-				type:       'mousewheel',
-				direction:  direction
-			})
+				type : 'mousewheel',
+				direction : direction
+			} )
 		}
 
         var nativeMouseClickHandler = function( callback, event ) {
@@ -132,8 +130,8 @@ define(
             }
 
             callback( {
-                type     : event.type,      //mousedown, mouseup
-	            button   : event.button,    //0=left button, 1=middle button if present, 2=right button
+                type : event.type,     // mousedown, mouseup
+	            button : event.button, // 0=left button, 1=middle button if present, 2=right button
                 position : position
             } )
         }
@@ -155,13 +153,13 @@ define(
 			}
 
 			callback( {
-				type     : event.type, //mousemove
+				type : event.type,  // mousemove
 				position : position
 			} )
 		}
 
 		var nativeContextMenuHandler = function( callback, event ) {
-			//prevent the default context menu in the browser
+			// prevent the default context menu in the browser
 			preventDefault( event )
 		}
 
@@ -169,53 +167,48 @@ define(
 		 * maps the internal event name to to native event name and callback
 		 */
 		var nativeEventMap = {
-            touchstart : {
-	            'touchstart'      : nativeTouchHandler
-            },
-            touchend : {
-	            'touchend'        : nativeTouchHandler
-            },
+			touchstart : {
+				touchstart : nativeTouchHandler
+			},
+			touchend : {
+				touchend : nativeTouchHandler
+			},
 			mousedown : {
-				'mousedown'       : nativeMouseClickHandler,
-				'contextmenu'     : nativeContextMenuHandler
+				mousedown : nativeMouseClickHandler,
+				contextmenu : nativeContextMenuHandler
 			},
 			mouseup : {
-				'mouseup'         : nativeMouseClickHandler
+				mouseup : nativeMouseClickHandler
 			},
 			mousemove : {
-				'mousemove'       : nativeMouseMoveHandler
+				mousemove : nativeMouseMoveHandler
 			},
 			mousewheel : {
-				'mousewheel'      : nativeMouseWheelHandler,
-				'DOMMouseScroll'  : nativeMouseWheelHandler
+				mousewheel : nativeMouseWheelHandler,
+				DOMMouseScroll : nativeMouseWheelHandler
 			},
 			keydown : {
-				'keydown'         : nativeKeyHandler
+				keydown : nativeKeyHandler
 			},
 			keyup : {
-				'keyup'           : nativeKeyHandler
+				keyup : nativeKeyHandler
 			}
-		}
-
-
-		/*
-		 * public
-		 */
-
-		var Input = function( configurationManager, renderingContext ) {
-			this.configurationManager = configurationManager
-			this.container            = renderingContext.getCanvasElement()
 		}
 
 		var setListener = function( eventName, callback ) {
 			if( !isEventSupported( eventName ) ) return
 
-			var me              = this,
-				nativeEvents    = nativeEventMap[ eventName ]
+			var nativeEvents = nativeEventMap[ eventName ]
 
-			_.each( nativeEvents, function( nativeEventHandler, nativeEventName ) {
-				addEvent( document, nativeEventName,  _.bind( nativeEventHandler, me, callback ) )
-			})
+			for( var nativeEventName in nativeEvents ) {
+				var nativeEventHandler = nativeEvents[ nativeEventName ]
+
+				addEvent(
+					document,
+					nativeEventName,
+					_.bind( nativeEventHandler, this, callback )
+				)
+			}
 		}
 
 		var removeListener = function( eventName ) {
@@ -223,13 +216,19 @@ define(
 
 			var nativeEvent = nativeEventMap[ eventName ]
 
-			for (var i = 0; i < nativeEvent.eventNames; i++ ) {
+			for( var i = 0; i < nativeEvent.eventNames; i++ ) {
 				this.container[ 'on' + nativeEvent.eventNames[ i ] ] = null
 			}
 		}
 
+
+		var Input = function( configurationManager, renderingContext ) {
+			this.configurationManager = configurationManager
+			this.container = renderingContext.getCanvasElement()
+		}
+
 		Input.prototype = {
-			setInputEventListener    : setListener,
+			setInputEventListener : setListener,
 			removeInputEventListener : removeListener
 		}
 

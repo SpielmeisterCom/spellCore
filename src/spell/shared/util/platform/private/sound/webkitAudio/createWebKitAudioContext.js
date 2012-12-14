@@ -38,15 +38,22 @@ define(
 		 * @param loop
 		 */
 		var play = function( audioResource, id, volume, loop ) {
-			id = ( id ) ? id : "tmp_sound_" + soundCounter++
-			var sourceNode = ( _.has( sourcesNodes, id ) ) ? sourcesNodes[id] : create( id, audioResource )
+			id     = id ? id : "tmp_sound_" + soundCounter++
+			loop   = !!loop
+			volume = volume ? volume : 1
+
+			var sourceNode = _.has( sourcesNodes, id ) ?
+				sourcesNodes[ id ] :
+				create( id, audioResource )
 
 			setLoop( id, loop )
 			setVolume( id, volume )
 
 			if( isMuted() ) mute( id )
 
-			if( sourceNode.playbackState !== sourceNode.PLAYING_STATE ) sourceNode.noteOn( 0 )
+			if( sourceNode.playbackState !== sourceNode.PLAYING_STATE ) {
+				sourceNode.noteOn( 0 )
+			}
 		}
 
 		var stopAll = function() {
@@ -67,7 +74,7 @@ define(
 		}
 
 		var setVolume = function ( id, volume ) {
-			volume = ( !isNaN(volume) ) ? volume : 1
+			volume = !isNaN( volume ) ? volume : 1
 			var sourceNode = sourcesNodes[ id ]
 			if( sourceNode ) sourceNode.gain.value = volume
 		}

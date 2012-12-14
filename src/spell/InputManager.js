@@ -34,7 +34,7 @@ define(
 			event.position[ 1 ] *= this.configurationManager.currentScreenSize[ 1 ]
 
 			var internalEvent = {
-				type           : event.type, //mousedown, mouseup
+				type           : event.type, // mousedown, mouseup
 				sequenceNumber : nextSequenceNumber++,
                 position       : event.position,
 				button         : event.button
@@ -49,7 +49,7 @@ define(
 			event.position[ 1 ] *= this.configurationManager.currentScreenSize[ 1 ]
 
 			var internalEvent = {
-				type           : event.type, //mousemove
+				type           : event.type, // mousemove
 				sequenceNumber : nextSequenceNumber++,
 				position       : event.position
 			}
@@ -58,7 +58,6 @@ define(
 		}
 
 		var mouseWheelHandler = function( event ) {
-
 			var internalEvent = {
 				type           : event.type, // mousewheel
 				sequenceNumber : nextSequenceNumber++,
