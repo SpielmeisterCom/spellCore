@@ -9,6 +9,7 @@ define(
 		'flob',
 		'mkdirp',
 		'path',
+		'rimraf',
 		'util',
 		'spell/functions'
 	],
@@ -21,6 +22,7 @@ define(
 		flob,
 		mkdirp,
 		path,
+		rmdir,
 		util,
 		_
 	) {
@@ -61,6 +63,36 @@ define(
 					}
 
 					copyFile( sourceFilePath, targetFilePath )
+				}
+			)
+		}
+
+		var createDescendantDirectoryPaths = function( inputPath ) {
+			return _.filter(
+				flob.sync(
+					'*',
+					{
+						root : inputPath,
+						nomount : true
+					}
+				),
+				function( x ) {
+					var absolutePath = path.resolve( inputPath, x )
+
+					return isDirectory( absolutePath )
+				}
+			)
+		}
+
+		var clearTargetLibraryPath = function( spellCoreLibraryPath, projectLibraryPath ) {
+			_.each(
+				createDescendantDirectoryPaths( spellCoreLibraryPath ),
+				function( directoryPath ) {
+					var absolutePath = path.resolve( projectLibraryPath, directoryPath )
+
+					if( !isDirectory( absolutePath ) ) return
+
+					rmdir.sync( absolutePath )
 				}
 			)
 		}
@@ -110,8 +142,14 @@ define(
 				)
 			}
 
+			var spellCoreLibraryPath = path.join( spellCorePath, LIBRARY_PATH ),
+				projectLibraryPath   = path.join( projectPath, LIBRARY_PATH )
+
+			// remove old spell sdk library
+			clearTargetLibraryPath( spellCoreLibraryPath, projectLibraryPath )
+
 			// copy spell sdk library
-			copyDirectory( path.join( spellCorePath, LIBRARY_PATH ), path.join( projectPath, LIBRARY_PATH ) )
+			copyDirectory( spellCoreLibraryPath, projectLibraryPath )
 
 
 			// populate public directory
