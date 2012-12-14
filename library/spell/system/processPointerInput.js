@@ -2,14 +2,17 @@ define(
 	'spell/system/processPointerInput',
 	[
 		'spell/math/util',
+
 		'spell/functions'
 	],
 	function(
 		mathUtil,
+
 		_
 	) {
 		'use strict'
-		
+
+
 		var eventHandlerNames = [
 			/**
 			 * Event that is triggered when a contact touches the screen on element
@@ -20,32 +23,32 @@ define(
 			 * Event that is triggered when a contact moves on the screen while over an element
 			 */
 			'pointerMove',
-			
+
 			/**
 			 * Event that is triggered when a contact is raised off of the screen over an element
 			 */
 			'pointerUp',
-			
+
 			/**
-			 * Event that is triggered when a contact moves from outside to inside the bounds of this element. 
+			 * Event that is triggered when a contact moves from outside to inside the bounds of this element.
 			 * This event is always raised, whether or not the pointer is captured to this element
 			 */
 			'pointerOver',
-			
+
 			/**
-			 * This event is triggered when a pointer moves from inside to outside the boundaries of this element. 
+			 * This event is triggered when a pointer moves from inside to outside the boundaries of this element.
 			 * This event is always raised, whether or not the pointer is captured to this element.
 			 */
 			'pointerOut',
-			
+
 			/**
 			 * Event that is triggered when a contact (normally a pen) moves over an element without touching the surface
 			 */
 			'pointerHoover'
 		]
-		
+
 		var registeredEventHandlerMap = {}
-		
+
 		/**
 		 * Creates an instance of the system.
 		 *
@@ -53,57 +56,59 @@ define(
 		 * @param {Object} [spell] The spell object.
 		 */
 		var processPointerInput = function( spell ) {
-			
-		}
-		
-		//private
-		var isPointWithinEntity = function ( entityManager, transform, worldPosition, entityId ) {
-			var entityDimensions 	= entityManager.getEntityDimensions( entityId )
-
-			return mathUtil.isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.worldRotation )
 
 		}
-		
-		var processEvent = function( spell, entityManager, inputEvent ) {
-			var pointedEntityMap = this.pointedEntityMap
-		
-			if ( inputEvent.type === 'mousedown' || inputEvent.type === 'mousemove' ) {
 
-				var cursorWorldPosition = spell.renderingContext.transformScreenToWorld( inputEvent.position )
-		
-				for( var entityId in this.transforms ) {
-					if( pointedEntityMap[ entityId ] === undefined ) {
-						pointedEntityMap[ entityId ] = false
+		var isPointWithinEntity = function ( entityDimensions, transform, worldPosition ) {
+			return mathUtil.isPointInRect(
+				worldPosition,
+				transform.worldTranslation,
+				entityDimensions[ 0 ],
+				entityDimensions[ 1 ],
+				transform.worldRotation
+			)
+		}
+
+		var processEvent = function( entityManager, pointedEntityMap, renderingContext, transforms, inputEvent ) {
+			if( inputEvent.type !== 'mousedown' &&
+				inputEvent.type !== 'mousemove' ) {
+
+				return
+			}
+
+			var cursorWorldPosition = renderingContext.transformScreenToWorld( inputEvent.position )
+
+			for( var entityId in transforms ) {
+				if( pointedEntityMap[ entityId ] === undefined ) {
+					pointedEntityMap[ entityId ] = false
+				}
+
+				var entityDimensions = entityManager.getEntityDimensions( entityId )
+
+				if( entityDimensions &&
+					isPointWithinEntity( entityDimensions, transforms[ entityId ], cursorWorldPosition ) ) {
+
+					if( inputEvent.type === 'mousedown') {
+						entityManager.triggerEvent( entityId, 'pointerDown' )
+
+					} else if ( inputEvent.type === 'mousemove' ) {
+						entityManager.triggerEvent( entityId, 'pointerMove' )
 					}
 
-					if( isPointWithinEntity( entityManager, this.transforms[ entityId ], cursorWorldPosition, entityId ) ) {
-						
-						if( inputEvent.type === 'mousedown') {
-							entityManager.triggerEvent( entityId, 'pointerDown' )
+					if( pointedEntityMap[ entityId ] === false ) {
+						pointedEntityMap[ entityId ] = true
+						entityManager.triggerEvent( entityId, 'pointerOver' )
+					}
 
-						} else if ( inputEvent.type === 'mousemove' ) {
-							entityManager.triggerEvent( entityId, 'pointerMove' )
-						}
-
-						if( pointedEntityMap[ entityId ] === false ) {
-							pointedEntityMap[ entityId ] = true
-							entityManager.triggerEvent( entityId, 'pointerOver' )
-						}
-
-					} else {
-
-						if( pointedEntityMap[ entityId ] === true ) {
-							pointedEntityMap[ entityId ] = false
-							entityManager.triggerEvent( entityId, 'pointerOut' )
-						}
-
+				} else {
+					if( pointedEntityMap[ entityId ] === true ) {
+						pointedEntityMap[ entityId ] = false
+						entityManager.triggerEvent( entityId, 'pointerOut' )
 					}
 				}
 			}
-			
-
 		}
-		
+
 		processPointerInput.prototype = {
 			/**
 		 	 * Gets called when the system is created.
@@ -117,34 +122,34 @@ define(
 				 */
 				this.pointedEntityMap = {}
 			},
-		
+
 			/**
 		 	 * Gets called when the system is destroyed.
 		 	 *
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			destroy: function( spell ) {
-				
+
 			},
-		
+
 			/**
 		 	 * Gets called when the system is activated.
 		 	 *
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			activate: function( spell ) {
-				
+
 			},
-		
+
 			/**
 		 	 * Gets called when the system is deactivated.
 		 	 *
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			deactivate: function( spell ) {
-				
+
 			},
-		
+
 			/**
 		 	 * Gets called to trigger the processing of game state.
 		 	 *
@@ -154,14 +159,17 @@ define(
 			 */
 			process: function( spell, timeInMs, deltaTimeInMs ) {
 				var entityManager    = spell.entityManager,
-					inputEvents      = spell.inputManager.getInputEvents()
+					inputEvents      = spell.inputManager.getInputEvents(),
+					pointedEntityMap = this.pointedEntityMap,
+					renderingContext = spell.renderingContext,
+					transforms       = this.transforms
 
 				for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
-					processEvent.call( this, spell, entityManager, inputEvents[ i ] )
-				}				
+					processEvent( entityManager, pointedEntityMap, renderingContext, transforms, inputEvents[ i ] )
+				}
 			}
 		}
-		
+
 		return processPointerInput
 	}
 )
