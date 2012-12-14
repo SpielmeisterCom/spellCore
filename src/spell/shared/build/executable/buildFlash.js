@@ -41,6 +41,7 @@ define(
 
 		var moduleDefinitionFileTemplate = [
 			'package Spielmeister {',
+			'%3$s',
 			'	public class %1$s implements ModuleDefinition {',
 			'		public function %1$s() {}',
 			'',
@@ -68,7 +69,18 @@ define(
 			'}'
 		].join( '\n' )
 
-		var createModuleDefinitionWrapperClass = function( className, moduleDefinitionSource ) {
+		var createModuleDefinitionFileTemplate = function( className, indentedSource, debug ) {
+			return _s.sprintf(
+				moduleDefinitionFileTemplate,
+				className,
+				indentedSource,
+				debug ? '	import flash.debugger.enterDebugger' : ''
+			)
+		}
+
+		var createModuleDefinitionWrapperClass = function( className, moduleDefinitionSource, debug ) {
+			debug = !!debug
+
 			var indentation = '			' // amount of tabs each line gets indented with
 
 			var indentedSource = _.reduce(
@@ -79,7 +91,7 @@ define(
 				''
 			)
 
-			return _s.sprintf( moduleDefinitionFileTemplate, className, indentedSource )
+			return createModuleDefinitionFileTemplate( className, indentedSource, debug )
 		}
 
 		var writeFile = function( filePath, data ) {
