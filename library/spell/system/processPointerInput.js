@@ -71,7 +71,8 @@ define(
 
 		var processEvent = function( entityManager, pointedEntityMap, renderingContext, transforms, inputEvent ) {
 			if( inputEvent.type !== 'mousedown' &&
-				inputEvent.type !== 'mousemove' ) {
+				inputEvent.type !== 'mousemove' &&
+				inputEvent.type !== 'mouseup' ) {
 
 				return
 			}
@@ -90,6 +91,9 @@ define(
 
 					if( inputEvent.type === 'mousedown') {
 						entityManager.triggerEvent( entityId, 'pointerDown' )
+
+					} else if( inputEvent.type === 'mouseup') {
+						entityManager.triggerEvent( entityId, 'pointerUp' )
 
 					} else if ( inputEvent.type === 'mousemove' ) {
 						entityManager.triggerEvent( entityId, 'pointerMove' )
