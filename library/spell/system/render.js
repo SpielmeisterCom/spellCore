@@ -222,6 +222,28 @@ define(
 			var visualObject = visualObjects[ id ],
 				transform    = transforms[ id ]
 
+			if(appearances[ id ] && transform) {
+				var appearance      = appearances[ id ],
+					quadGeometry    = quadGeometries[ id ],
+					dimensions      = quadGeometry ? quadGeometry.dimensions : appearance.asset.resource.dimensions,
+
+					halfTextureWidth    = dimensions[0] / 2,
+					halfTextureHeight   = dimensions[1] / 2,
+
+					minX                = viewFrustum.bottomLeft[0] - halfTextureWidth,
+					maxX                = viewFrustum.topRight[0] + halfTextureWidth,
+					minY                = viewFrustum.bottomLeft[1] - halfTextureHeight,
+					maxY                = viewFrustum.topRight[1] + halfTextureHeight,
+
+					curX                = transform.worldTranslation[0],
+					curY                = transform.worldTranslation[1]
+
+				if (curX < minX || curX > maxX || curY < minY || curY > maxY) {
+					return
+				}
+
+			}
+
 			context.save()
 			{
 				if( transform ) {
