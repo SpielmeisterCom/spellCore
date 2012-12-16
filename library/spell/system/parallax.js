@@ -116,6 +116,7 @@ define(
 						repeatY               = parallax.repeatY,
 						refEntityTranslation  = refEntityTransform.translation,
 						layerTranslation      = layerTransform.translation,
+                        layerWorldTranslation = layerTransform.worldTranslation,
 						layerQuadDimensions   = layerQuad.dimensions,
 						appearanceTranslation = appearanceTransform.translation
 
@@ -123,11 +124,13 @@ define(
 					// if configured: stick the parallax layer to the current camera position (plus specified offsetToCamera)
 					if( stickToRefX === true ) {
 						layerTranslation[0] = refEntityTranslation[0] + offsetToRefEntity[0]
+                        layerWorldTranslation[0] = layerTranslation[0]
 					}
 
 					if( stickToRefY === true ) {
 						layerTranslation[1] = refEntityTranslation[1] + offsetToRefEntity[1]
-					}
+                        layerWorldTranslation[1] = layerTranslation[1]
+                    }
 
 
 					// set the texture coordinates to the new position, according to speed, camera position and texture offset
