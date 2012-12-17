@@ -222,7 +222,8 @@ define(
 				engineSourceFilePath,
 				createModuleDefinitionWrapperClass(
 					'SpellEngine',
-					processSource( engineSource, minify, anonymizeModuleIds )
+					processSource( engineSource, minify, anonymizeModuleIds ),
+					debug
 				)
 			)
 
@@ -231,7 +232,8 @@ define(
 				path.join( tmpSourcePath, 'ScriptModules.as' ),
 				createModuleDefinitionWrapperClass(
 					'ScriptModules',
-					scriptSource
+					scriptSource,
+					debug
 				)
 			)
 

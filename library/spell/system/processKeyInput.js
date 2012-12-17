@@ -13,7 +13,7 @@ define(
 		 * private
 		 */
 
-		var updateActors = function( actors, eventManager, actorId, actionId, isExecuting ) {
+		var updateActors = function( actors, eventManager, entityManager, actorId, actionId, isExecuting ) {
 			for( var id in actors ) {
 				var actor  = actors[ id ],
 					action = actor.actions[ actionId ]
@@ -24,6 +24,9 @@ define(
 
 					action.executing = isExecuting
 
+					entityManager.triggerEvent( id, actionId + 'Action' + (isExecuting ? 'Started' : 'Stopped'))
+
+					//TODO: remove legacy way to access action events: via global eventManager
 					eventManager.publish(
 						[ isExecuting ? Events.ACTION_STARTED : Events.ACTION_STOPPED, actionId ],
 						[ id ]
@@ -32,7 +35,7 @@ define(
 			}
 		}
 
-		var processEvent = function( eventManager, inputEvent, actors, inputDefinitions ) {
+		var processEvent = function( eventManager, entityManager, inputEvent, actors, inputDefinitions ) {
 			for( var id in inputDefinitions ) {
 				var inputDefinition     = inputDefinitions[ id ],
 					keyToActionMapAsset = inputDefinition.asset,
@@ -41,7 +44,7 @@ define(
 				if( actionId ) {
 					var isExecuting = ( inputEvent.type === 'keydown' )
 
-					updateActors( actors, eventManager, inputDefinition.actorId, actionId, isExecuting )
+					updateActors( actors, eventManager, entityManager, inputDefinition.actorId, actionId, isExecuting )
 				}
 			}
 		}
@@ -56,11 +59,12 @@ define(
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var actors           = this.actors,
 				eventManager     = spell.eventManager,
+				entityManager    = spell.entityManager,
 				inputEvents      = spell.inputManager.getInputEvents(),
 				inputDefinitions = this.inputDefinitions
 
 			for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
-				processEvent( eventManager, inputEvents[ i ], actors, inputDefinitions )
+				processEvent( eventManager, entityManager, inputEvents[ i ], actors, inputDefinitions )
 			}
 		}
 
