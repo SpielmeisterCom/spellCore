@@ -73,7 +73,7 @@ define(
 
 			var audioContext = PlatformKit.AudioFactory.createAudioContext()
 
-			var storageManager = PlatformKit.createStorageManager()
+			var storage = PlatformKit.createPersistentStorage()
 
 			var resourceLoader = new ResourceLoader( spell, spell.eventManager, renderingContext, audioContext, configurationManager.resourceServer )
 
@@ -112,7 +112,7 @@ define(
 					box2dWorlds          : {},
 					sceneManager         : sceneManager,
 					sendMessageToEditor  : this.sendMessageToEditor,
-					storageManager       : storageManager
+					storage              : storage
 				}
 			)
 
