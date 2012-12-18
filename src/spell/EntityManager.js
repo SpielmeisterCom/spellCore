@@ -731,7 +731,7 @@ define(
 				for( var i = 0, numIds = ids.length; i < numIds; i++ ) {
 					var nameComponentId = ids[ i ]
 
-					if( metaDataComponents[ nameComponentId ][ 'name' ] === name ) {
+					if( metaDataComponents[ nameComponentId ] && metaDataComponents[ nameComponentId ][ 'name' ] === name ) {
 						resultIds.push( nameComponentId )
 					}
 				}
