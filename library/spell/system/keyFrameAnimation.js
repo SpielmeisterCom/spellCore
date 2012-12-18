@@ -111,10 +111,6 @@ define(
 				keyFrameAnimation.offset  = offset
 				keyFrameAnimation.playing = updatePlaying( lengthInMs, rawOffset, keyFrameAnimation.looped )
 
-				if( keyFrameAnimation.playing === false ) {
-					entityManager.triggerEvent( id, 'animationEnd', [ 'keyFrameAnimation', keyFrameAnimation ] )
-				}
-
 				for( var componentId in animate ) {
 					var componentAnimation = animate[ componentId ],
 						component          = entityManager.getComponentById( id, componentId )
@@ -159,6 +155,10 @@ define(
 							component[ attributeId ] = lerp( keyFrameA.value, keyFrameB.value, t )
 						}
 					}
+				}
+
+				if( keyFrameAnimation.playing === false ) {
+					entityManager.triggerEvent( id, 'animationEnd', [ 'keyFrameAnimation', keyFrameAnimation ] )
 				}
 
 				entityManager.updateWorldTransform( id )
