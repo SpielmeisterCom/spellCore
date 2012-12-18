@@ -20,7 +20,7 @@ define(
 		'spell/shared/util/platform/private/loader/TextLoader',
 		'spell/shared/util/platform/private/Input',
 		'spell/shared/util/platform/private/configurationOptions',
-		'spell/shared/util/platform/private/storage/StorageManager',
+		'spell/shared/util/platform/private/storage/PersistentStorage',
 		'spell/shared/util/platform/private/system/features',
         'spell/shared/util/platform/private/graphics/Viewporter'
 	],
@@ -40,7 +40,7 @@ define(
 		TextLoader,
 		Input,
 		configurationOptions,
-		StorageManager,
+		PersistentStorage,
 		features,
         Viewporter
 	) {
@@ -140,8 +140,8 @@ define(
 			 */
 			registerOnScreenResize : registerOnScreenResize,
 
-			createStorageManager: function() {
-				return new StorageManager()
+			createPersistentStorage : function() {
+				return new PersistentStorage()
 			},
 
 			createImageLoader : function( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
