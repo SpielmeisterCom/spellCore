@@ -310,6 +310,10 @@ define(
 								quadGeometry.dimensions :
 								assetFrameDimensions
 
+							if( appearance.playing === true && appearance.offset == 0) {
+								entityManager.triggerEvent( id, 'animationStart', [ 'animation', appearance ] )
+							}
+
 							appearance.offset = createOffset(
 								deltaTimeInMs,
 								appearance.offset,
