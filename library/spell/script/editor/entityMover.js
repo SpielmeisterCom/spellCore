@@ -182,6 +182,47 @@ define("spell/script/editor/entityMover",
 					translation: this.transforms[ entityId ].translation
 				}
 			})
+
+			if (
+				this.spell.entityManager.hasComponent(
+				entityId,
+				'spellStaged.jumpAndRun.platform'
+				) ) {
+
+				this.spell.entityManager.updateComponent(
+					entityId,
+					'spellStaged.jumpAndRun.platform',
+					{
+						origin: [
+							this.transforms[ entityId ].translation[0],
+							this.transforms[ entityId ].translation[1]
+						],
+						offset: 0
+					}
+				)
+			}
+
+			if (
+				this.spell.entityManager.hasComponent(
+					entityId,
+					'spellStaged.jumpAndRun.enemy'
+				) ) {
+
+				this.spell.entityManager.updateComponent(
+					entityId,
+					'spellStaged.jumpAndRun.enemy',
+					{
+						origin: [
+							this.transforms[ entityId ].translation[0],
+							this.transforms[ entityId ].translation[1]
+						],
+						offset: 0
+					}
+				)
+			}
+
+
+
 		}
 
 		var startDragging = function( entityId, cursorPosition ) {
