@@ -22,6 +22,7 @@ define(
 		'spell/shared/util/platform/private/configurationOptions',
 		'spell/shared/util/platform/private/storage/PersistentStorage',
 		'spell/shared/util/platform/private/system/features',
+		'spell/shared/util/platform/private/Window',
         'spell/shared/util/platform/private/graphics/Viewporter'
 	],
 	function(
@@ -42,6 +43,7 @@ define(
 		configurationOptions,
 		PersistentStorage,
 		features,
+		Window,
         Viewporter
 	) {
 		'use strict'
@@ -139,6 +141,8 @@ define(
 			 *
 			 */
 			registerOnScreenResize : registerOnScreenResize,
+
+			Window: Window,
 
 			createPersistentStorage : function() {
 				return new PersistentStorage()
