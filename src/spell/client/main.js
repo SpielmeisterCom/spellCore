@@ -75,7 +75,7 @@ define(
 
 			var storage = PlatformKit.createPersistentStorage()
 
-			var resourceLoader = new ResourceLoader( spell, spell.eventManager, renderingContext, audioContext, configurationManager.resourceServer )
+			var resourceLoader = new ResourceLoader( spell, spell.eventManager, renderingContext, audioContext, configurationManager.resourceServer, configurationManager.baseUrlPrefix )
 
 			if( cacheContent ) resourceLoader.setCache( cacheContent )
 

@@ -28,6 +28,9 @@ define(
 				validValues  : [ 'webgl', 'canvas-2d' ],
 				configurable : true,
 				extractor    : extractRenderingBackEnd
+			},
+			baseUrlPrefix : {
+				configurable : false
 			}
 		}
 
@@ -35,7 +38,8 @@ define(
 		 * These options are used when they are not overridden by the environment configuration set up by the stage-0-loader.
 		 */
 		var defaultOptions = {
-			renderingBackEnd : 'canvas-2d'
+			renderingBackEnd : 'canvas-2d',
+			baseUrlPrefix : ''
 		}
 
 		return {

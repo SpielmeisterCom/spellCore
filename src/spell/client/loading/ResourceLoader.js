@@ -181,10 +181,10 @@ define(
 			)
 		}
 
-		var normalizeConfig = function( config ) {
+		var normalizeConfig = function( baseUrlPrefix, config ) {
 			return {
 				processOnLoad      : _.isFunction( config.processOnLoad ) ? config.processOnLoad : undefined,
-				baseUrl            : config.baseUrl ? config.baseUrl : BASE_URL,
+				baseUrl            : config.baseUrl ? config.baseUrl : baseUrlPrefix + BASE_URL,
 				name               : config.name,
 				omitCache          : !!config.omitCache,
 				onLoadingCompleted : config.onLoadingCompleted,
@@ -197,11 +197,12 @@ define(
 		 * public
 		 */
 
-		var ResourceLoader = function( spell, eventManager, renderingContext, soundContext, hostConfig ) {
+		var ResourceLoader = function( spell, eventManager, renderingContext, soundContext, hostConfig, baseUrlPrefix ) {
 			this.eventManager    = eventManager
 			this.resourceBundles = {}
 			this.cache           = {}
 			this.host            = ( hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host )
+			this.baseUrlPrefix   = baseUrlPrefix
 
 			this.resourceTypes = [
 				{
@@ -279,7 +280,7 @@ define(
 					this.resourceTypes,
 					resourcesToLoad,
 					name,
-					normalizeConfig( config )
+					normalizeConfig( this.baseUrlPrefix, config )
 				)
 			}
 		}
