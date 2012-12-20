@@ -5,14 +5,18 @@
 
 define(
 	'spell/system/audio',
-	[
-		'spell/functions'
-	],
-	function(
-		_
-	) {
+	function() {
 		'use strict'
 
+
+		var playSound = function( audioContext, id, soundEmitter ) {
+			audioContext.play(
+				soundEmitter.asset.resource,
+				id,
+				soundEmitter.volume,
+				soundEmitter.loop
+			)
+		}
 
 
 		/**
@@ -77,10 +81,6 @@ define(
 				audioContext.tick()
 			},
 
-			playSound: function( audioContext, id, soundEmitter ) {
-				audioContext.play( soundEmitter.asset.resource, id, soundEmitter.volume, soundEmitter.loop )
-			},
-
 			/**
 		 	 * Gets called to trigger the processing of game state.
 		 	 *
@@ -99,17 +99,25 @@ define(
 					var soundEmitter = soundEmitters[ id ]
 
 					if(	!soundEmitter.play ) {
-						this.prototype.playSound( audioContext, id, soundEmitter )
+						playSound( audioContext, id, soundEmitter )
 
-						entityManager.updateComponent( id, 'spell.component.audio.soundEmitter', {
-							'play': true
-						})
+						entityManager.updateComponent(
+							id,
+							'spell.component.audio.soundEmitter',
+							{
+								play : true
+							}
+						)
 					}
 
 					audioContext.setLoop( id, soundEmitter.loop )
 					audioContext.setVolume( id, soundEmitter.volume )
 
-					if( soundEmitter.mute || audioContext.isAllMuted() ) audioContext.mute( id )
+					if( soundEmitter.mute ||
+						audioContext.isAllMuted() ) {
+
+						audioContext.mute( id )
+					}
 				}
 			}
 		}
