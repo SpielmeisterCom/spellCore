@@ -9,7 +9,8 @@ define(
 
 			var resource = resources[ asset.resourceId ]
 
-			if( !resource ) throw 'Error: Could not resolve resource id \'' + asset.resourceId + '\'.'
+//			if( !resource ) throw 'Error: Could not resolve resource id \'' + asset.resourceId + '\'.'
+			if( !resource ) return
 
 			asset.resource = resource
 		}
