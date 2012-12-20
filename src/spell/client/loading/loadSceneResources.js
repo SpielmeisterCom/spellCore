@@ -131,8 +131,8 @@ define(
 				resources        = spell.resources,
 				templateManager  = spell.templateManager
 
-			var libraryBundleName  = 'library',
-				resourceBundleName = 'resources'
+			var libraryBundleName  = sceneId + '-library',
+				resourceBundleName = sceneId + '-resources'
 
 			var loadingProgress = createLoadingProgress( eventManager, progressCallback )
 
