@@ -163,19 +163,28 @@ define(
 		 * public
 		 */
 
-		return function( assets, newAssetDefinitions ) {
+		return function( assets, newAssetDefinitions, overwriteExisting ) {
+			var filteredAssetDefinitions = !overwriteExisting ?
+				_.filter(
+					newAssetDefinitions,
+					function( assetDefinition ) {
+						return !assets[ createAssetId( assetDefinition.subtype, assetDefinition.namespace, assetDefinition.name ) ]
+					}
+				) :
+				newAssetDefinitions
+
 			// in a first pass all assets which do not depend on other assets are created
 			_.each(
-				newAssetDefinitions,
+				filteredAssetDefinitions,
 				function( assetDefinition ) {
 					var asset,
 						type    = assetDefinition.subtype,
-						assetId = createAssetId( type, assetDefinition.namespace, assetDefinition.name)
+						assetId = createAssetId( type, assetDefinition.namespace, assetDefinition.name )
 
 					if( type === 'appearance' || type === 'sound' ) {
-					asset = {
-						type : type
-					}
+						asset = {
+							type : type
+						}
 
 					} else if( type === 'spriteSheet' ) {
 						asset = createSpriteSheetAsset( assetDefinition )
@@ -184,7 +193,7 @@ define(
 
 						asset = {
 							config : assetDefinition.config,
-							type   : type
+							type : type
 						}
 
 					} else if( type === 'keyToActionMap' ) {
