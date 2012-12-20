@@ -3,10 +3,14 @@ define(
 	function() {
 		"use strict"
 
-		return {
+		var Window = function() {}
+
+		Window.prototype = {
 			open: function( href, name ) {
 				window.open( href, name )
 			}
 		}
+
+		return Window
 	}
 )

@@ -142,8 +142,9 @@ define(
 			 */
 			registerOnScreenResize : registerOnScreenResize,
 
-			Window: Window,
-
+			createWindow: function() {
+				return new Window()
+			},
 			createPersistentStorage : function() {
 				return new PersistentStorage()
 			},
