@@ -17,7 +17,8 @@ define(
 		'fs',
 		'flob',
 		'mkdirp',
-		'path'
+		'path',
+		'rimraf'
 	],
 	function(
 		copyFiles,
@@ -36,7 +37,8 @@ define(
 		fs,
 		flob,
 		mkdirp,
-		path
+		path,
+		rmdir
 	) {
 		'use strict'
 
@@ -44,15 +46,9 @@ define(
 		var LIBRARY_PATH = 'library'
 		var DEPLOY_PATH  = 'build/deploy'
 
-		var dataFileTemplate = [
-			'%1$s;',
-			'spell.setCache(%2$s);',
-			'spell.setRuntimeModule(%3$s);'
-		].join( '\n' )
-
 		var targetToBuilder = {
 			html5 : buildHtml5,
-			flash : buildFlash,
+			flash : buildFlash
 		}
 
 
@@ -121,21 +117,12 @@ define(
 		var createProjectConfig = function( projectConfigRaw, anonymizeModuleIds ) {
 			var result = _.pick( projectConfigRaw, 'name', 'startScene', 'libraryIds', 'config' )
 
-			result.scenes = createSceneList( projectConfigRaw.scenes, anonymizeModuleIds )
+			result.scenes = createSceneList( projectConfigRaw.scenes )
 
 			return result
 		}
 
-		var writeFile = function( filePath, content ) {
-			// delete file if it already exists
-			if( isFile( filePath ) ) {
-				fs.unlinkSync( filePath )
-			}
-
-			fs.writeFileSync( filePath, content, 'utf-8' )
-		}
-
-		var createSceneList = function( scenes, anonymizeModuleIds ) {
+		var createSceneList = function( scenes ) {
 			return _.map(
 				scenes,
 				function( scene ) {
@@ -209,13 +196,25 @@ define(
 			)
 		}
 
+		var createProjectLibraryFilePaths = function( projectLibraryPath ) {
+			var filePaths = _.filter(
+				flob.sync( '**/*', { cwd : projectLibraryPath } ),
+				function( filePath ) {
+					var extension = path.extname( filePath )
+
+					return extension !== '.js' && extension !== '.json'
+				}
+			)
+
+			return filePaths
+		}
+
 
 		return function( target, spellCorePath, projectPath, projectFilePath, minify, anonymizeModuleIds, debug, callback ) {
 			var errors             = [],
 				projectLibraryPath = path.join( projectPath, LIBRARY_PATH ),
 				deployPath         = path.join( projectPath, DEPLOY_PATH ),
 				deployLibraryPath  = path.join( deployPath, LIBRARY_PATH ),
-				deployHtml5Path    = path.join( deployPath, 'html5' ),
 				projectConfigData  = readProjectConfigFile( projectFilePath ),
 				projectConfigRaw   = parseProjectConfig( projectConfigData, callback ),
 				projectConfig      = createProjectConfig( projectConfigRaw, anonymizeModuleIds )
@@ -265,7 +264,7 @@ define(
 			// copy common files
 
 			// the library files
-			var deployFilePaths = flob.sync( '**/*', { cwd : projectLibraryPath } )
+			var deployFilePaths = createProjectLibraryFilePaths( projectLibraryPath )
 
 			// public template files go to "build/deploy/*"
 			deployFilePaths.push( [
@@ -284,6 +283,10 @@ define(
 				path.join( deployPath, 'spell.js' )
 			] )
 
+			// remove old library content
+			rmdir.sync( deployLibraryPath )
+
+			// copy new library content to destination
 			copyFiles( projectLibraryPath, deployLibraryPath, deployFilePaths )
 
 
