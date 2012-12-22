@@ -12,7 +12,7 @@ define(
 		'spell/InputManager',
 		'spell/client/loading/ResourceLoader',
 		'spell/shared/util/createModuleLoader',
-		'spell/shared/util/StatisticsManager',
+		'spell/StatisticsManager',
 		'spell/shared/util/Logger',
 		'spell/shared/util/physics/createBox2dContext',
 		'spell/shared/util/platform/PlatformKit',

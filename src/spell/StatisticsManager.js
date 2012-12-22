@@ -1,5 +1,5 @@
 define(
-	"spell/shared/util/StatisticsManager",
+	"spell/StatisticsManager",
 	[
 		'spell/functions'
 	],
