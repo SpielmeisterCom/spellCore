@@ -2,7 +2,7 @@ define(
 	"spell/shared/util/platform/private/loader/SoundLoader",
 	[
 		"spell/shared/util/platform/private/sound/SoundManager",
-		"spell/shared/util/Events",
+		"spell/Events",
 
 		'spell/functions'
 	],

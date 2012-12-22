@@ -1,7 +1,7 @@
 define(
 	'spell/shared/util/Timer',
 	[
-		'spell/shared/util/Events',
+		'spell/Events',
 		'spell/shared/util/platform/Types',
 
 		'spell/functions'

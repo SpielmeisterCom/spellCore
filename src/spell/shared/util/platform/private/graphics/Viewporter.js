@@ -1,7 +1,7 @@
 define(
 	'spell/shared/util/platform/private/graphics/Viewporter',
 	[
-		'spell/shared/util/Events',
+		'spell/Events',
 		'spell/shared/util/platform/private/getAvailableScreenSize'
 	],
 	function(

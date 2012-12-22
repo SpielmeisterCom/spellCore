@@ -1,7 +1,7 @@
 define(
 	'spell/shared/util/createMainLoop',
 	[
-		'spell/shared/util/Events',
+		'spell/Events',
 		'spell/shared/util/Timer',
 		'spell/shared/util/platform/Types',
 		'spell/shared/util/platform/PlatformKit',

@@ -1,7 +1,7 @@
 define(
 	"spell/shared/util/platform/private/loader/ImageLoader",
 	[
-		"spell/shared/util/Events",
+		"spell/Events",
 
 		'spell/functions'
 	],

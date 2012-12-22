@@ -9,7 +9,7 @@ define(
 		'spell/math/util',
 		'spell/math/vec2',
 		'spell/shared/util/platform/PlatformKit',
-		'spell/shared/util/Events',
+		'spell/Events',
 
 		'spell/functions'
 	],

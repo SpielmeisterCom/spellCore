@@ -4,7 +4,7 @@ define(
 		'spell/ConfigurationManager',
 		'spell/EventManager',
 		'spell/client/loading/ResourceLoader',
-		'spell/shared/util/Events',
+		'spell/Events',
 		'spell/shared/util/Logger',
 		'spell/shared/util/platform/PlatformKit',
 

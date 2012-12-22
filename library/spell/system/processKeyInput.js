@@ -1,7 +1,7 @@
 define(
 	'spell/system/processKeyInput',
 	[
-		'spell/shared/util/Events'
+		'spell/Events'
 	],
 	function(
 		Events

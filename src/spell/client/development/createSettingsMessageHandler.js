@@ -2,7 +2,7 @@ define(
 	'spell/client/development/createSettingsMessageHandler',
 	[
 		'spell/client/development/createMessageDispatcher',
-		'spell/shared/util/Events'
+		'spell/Events'
 	],
 	function(
 		createMessageDispatcher,

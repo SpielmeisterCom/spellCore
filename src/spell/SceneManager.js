@@ -15,14 +15,14 @@ define(
 		'use strict'
 
 
-		var postLoadedResources = function( spell, entityManager, templateManager, isModeDevelopment, sceneId, sceneData ) {
+		var postLoadedResources = function( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneId, sceneData ) {
 			var sceneConfig = spell.scenes[ sceneId ]
 
 			if( !sceneConfig ) {
 				throw 'Error: Could not find scene configuration for scene \'' + sceneId + '\'.'
 			}
 
-			var scene = new Scene( spell, entityManager, templateManager, isModeDevelopment, sceneConfig, sceneData )
+			var scene = new Scene( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneConfig, sceneData )
 
 
 			scene.init( sceneConfig, sceneData )
@@ -75,6 +75,7 @@ define(
 							this.spell,
 							this.entityManager,
 							this.templateManager,
+							this.statisticsManager,
 							this.isModeDevelopment,
 							sceneId,
 							sceneData

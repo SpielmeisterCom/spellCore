@@ -47,7 +47,8 @@ define(
 			init : function() {
 				this.addSeries( 'fps', 'frames per second', 'fps' )
 				this.addSeries( 'totalTimeSpent', 'total time spent', 'ms' )
-				this.addSeries( 'timeSpentRendering', 'time spent rendering', 'ms' )
+				this.addSeries( 'timeSpentUpdateLoop', 'time spent in the update loop', 'ms' )
+				this.addSeries( 'timeSpentRenderLoop', 'time spent in the render loop', 'ms' )
 			},
 			/*
 			 * call this method to signal the beginning of a new measurement period

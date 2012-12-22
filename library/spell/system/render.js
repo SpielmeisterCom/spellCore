@@ -11,7 +11,7 @@ define(
 		'spell/client/2d/graphics/drawTitleSafeOutline',
 		'spell/client/util/createComprisedRectangle',
 		'spell/client/util/createIncludedRectangle',
-		'spell/shared/util/Events',
+		'spell/Events',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/math/util',

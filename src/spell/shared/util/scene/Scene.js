@@ -8,9 +8,11 @@ define(
 		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
 		'spell/shared/util/entityConfig/flatten',
-		'spell/shared/util/Events',
+		'spell/Events',
 		'spell/shared/util/SortedMap',
 		'spell/shared/util/platform/PlatformKit',
+
+		'spell/shared/util/platform/Types',
 
 		'spell/functions'
 	],
@@ -24,6 +26,8 @@ define(
 		Events,
 		SortedMap,
 		PlatformKit,
+
+		Types,
 
 		_
 	) {
@@ -160,10 +164,11 @@ define(
 		 * public
 		 */
 
-		var Scene = function( spell, entityManager, templateManager, isModeDevelopment, sceneConfig, sceneData ) {
+		var Scene = function( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneConfig, sceneData ) {
 			this.spell             = spell
 			this.entityManager     = entityManager
 			this.templateManager   = templateManager
+			this.statisticsManager = statisticsManager
 			this.isModeDevelopment = isModeDevelopment
 			this.executionGroups   = { render : null, update : null }
 			this.sceneConfig       = sceneConfig
@@ -173,10 +178,18 @@ define(
 
 		Scene.prototype = {
 			render: function( timeInMs, deltaTimeInMs ) {
+				var time = Types.Time.getCurrentInMs()
 				invoke( this.executionGroups.render, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
+				time -= Types.Time.getCurrentInMs()
+
+				//this.statisticsManager.updateSeries( 'timeSpentRenderLoop', Math.abs( time ) )
 			},
 			update: function( timeInMs, deltaTimeInMs ) {
+				var time = Types.Time.getCurrentInMs()
 				invoke( this.executionGroups.update, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
+				time -= Types.Time.getCurrentInMs()
+
+				//this.statisticsManager.updateSeries( 'timeSpentUpdateLoop', Math.abs( time) )
 			},
 			init: function( sceneConfig, sceneData ) {
 				var spell = this.spell
@@ -203,7 +216,7 @@ define(
 					spell,
 					entityManager,
 					templateManager,
-					sceneConfig.systems.update,
+					sceneConfig .systems.update,
 					this.isModeDevelopment
 				)
 

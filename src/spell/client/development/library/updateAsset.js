@@ -9,7 +9,7 @@ define(
 		'spell/shared/util/createId',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/createLibraryFilePathFromId',
-		'spell/shared/util/Events',
+		'spell/Events',
 
 		'spell/functions'
 	],

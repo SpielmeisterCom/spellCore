@@ -2,7 +2,7 @@ define(
 	'spell/system/physics',
 	[
 		'spell/Defines',
-		'spell/shared/util/Events',
+		'spell/Events',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'

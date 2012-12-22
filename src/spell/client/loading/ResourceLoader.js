@@ -2,7 +2,7 @@ define(
 	'spell/client/loading/ResourceLoader',
 	[
 		'spell/shared/util/platform/PlatformKit',
-		'spell/shared/util/Events',
+		'spell/Events',
 
 		'spell/functions'
 	],

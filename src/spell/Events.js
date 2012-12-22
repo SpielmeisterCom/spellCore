@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/Events',
+	'spell/Events',
 	[
 		'spell/shared/util/createEnumesqueObject'
 	],

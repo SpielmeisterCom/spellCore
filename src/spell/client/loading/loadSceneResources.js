@@ -7,7 +7,7 @@ define(
 		'spell/client/loading/injectResource',
 		'spell/math/util',
 		'spell/shared/util/createId',
-		'spell/shared/util/Events',
+		'spell/Events',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'

@@ -15,7 +15,7 @@ define(
 		'spell/shared/util/arrayRemove',
 		'spell/shared/util/create',
 		'spell/shared/util/deepClone',
-		'spell/shared/util/Events',
+		'spell/Events',
 		'spell/shared/util/template/applyComponentConfig',
 		'spell/shared/util/template/TemplateTypes',
 
