@@ -9,8 +9,8 @@ define(
 		'spell/shared/util/platform/private/callNextFrame',
 		'spell/shared/util/platform/private/createHost',
 		'spell/shared/util/platform/private/jsonCoder',
-		'spell/shared/util/platform/private/network/createHttpRequest',
 		'spell/shared/util/platform/private/network/createSocket',
+		'spell/shared/util/platform/private/network/performHttpRequest',
 		'spell/shared/util/platform/private/getAvailableScreenSize',
 		'spell/shared/util/platform/private/ModuleLoader',
 		'spell/shared/util/platform/private/graphics/RenderingFactory',
@@ -31,8 +31,8 @@ define(
 		callNextFrame,
 		createHost,
 		jsonCoder,
-		createHttpRequest,
 		createSocket,
+		performHttpRequest,
 		getAvailableScreenSize,
 		ModuleLoader,
 		RenderingFactory,
@@ -88,8 +88,8 @@ define(
 			 *
 			 */
 			network : {
-				createHttpRequest : createHttpRequest,
-				createSocket : createSocket
+				createSocket : createSocket,
+				performHttpRequest : performHttpRequest
 			},
 
 			/*
