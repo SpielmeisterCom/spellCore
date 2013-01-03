@@ -36,12 +36,13 @@ define(
 			this.processCmdQueue()
 		}
 
-		var SceneManager = function( spell, entityManager, templateManager, mainLoop, sendMessageToEditor, isModeDevelopment ) {
+		var SceneManager = function( spell, entityManager, statisticsManager, templateManager, mainLoop, sendMessageToEditor, isModeDevelopment ) {
 			this.activeScene
 			this.entityManager       = entityManager
 			this.mainLoop            = mainLoop
 			this.sendMessageToEditor = sendMessageToEditor
 			this.spell               = spell
+			this.statisticsManager   = statisticsManager
 			this.templateManager     = templateManager
 			this.isModeDevelopment   = isModeDevelopment
 			this.cmdQueue            = []

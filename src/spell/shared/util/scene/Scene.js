@@ -10,6 +10,7 @@ define(
 		'spell/shared/util/entityConfig/flatten',
 		'spell/Events',
 		'spell/shared/util/SortedMap',
+		'spell/shared/util/StopWatch',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/shared/util/platform/Types',
@@ -25,6 +26,7 @@ define(
 		flattenEntityConfig,
 		Events,
 		SortedMap,
+		StopWatch,
 		PlatformKit,
 
 		Types,
@@ -39,6 +41,8 @@ define(
 		 */
 
 		var CAMERA_COMPONENT_ID = Defines.CAMERA_COMPONENT_ID
+
+		var stopWatch = new StopWatch()
 
 		/*
 		 * TODO: Remove this custom invoke that knows how to handle the borked instances produced by the "create" constructor wrapper function.
@@ -140,7 +144,7 @@ define(
 						return false
 					}
 
-					var cameraComponent     = entityConfig.config[ CAMERA_COMPONENT_ID ]
+					var cameraComponent = entityConfig.config[ CAMERA_COMPONENT_ID ]
 
 					if( !cameraComponent ) return false
 
@@ -178,18 +182,18 @@ define(
 
 		Scene.prototype = {
 			render: function( timeInMs, deltaTimeInMs ) {
-				var time = Types.Time.getCurrentInMs()
-				invoke( this.executionGroups.render, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
-				time -= Types.Time.getCurrentInMs()
+				stopWatch.start()
 
-				//this.statisticsManager.updateSeries( 'timeSpentRenderLoop', Math.abs( time ) )
+				invoke( this.executionGroups.render, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
+
+				this.statisticsManager.updateSeries( 'render', stopWatch.stop() )
 			},
 			update: function( timeInMs, deltaTimeInMs ) {
-				var time = Types.Time.getCurrentInMs()
-				invoke( this.executionGroups.update, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
-				time -= Types.Time.getCurrentInMs()
+				stopWatch.start()
 
-				//this.statisticsManager.updateSeries( 'timeSpentUpdateLoop', Math.abs( time) )
+				invoke( this.executionGroups.update, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
+
+				this.statisticsManager.updateSeries( 'update', stopWatch.stop() )
 			},
 			init: function( sceneConfig, sceneData ) {
 				var spell = this.spell
