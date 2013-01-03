@@ -26,6 +26,7 @@ define(
 //			console.log( 'WARNING: clock reset into past by ' + tmp + ' ms' )
 //		}
 
+		var getCurrentTimeInMs = Types.Time.getCurrentInMs
 
 		/*
 		 * public
@@ -36,7 +37,7 @@ define(
 			this.remoteTime           = initialTime
 			this.newRemoteTimPending  = false
 			this.localTime            = initialTime
-			this.previousSystemTime   = Types.Time.getCurrentInMs()
+			this.previousSystemTime   = getCurrentTimeInMs()
 			this.elapsedTime          = 0
 			this.deltaLocalRemoteTime = 0
 			this.statisticsManager    = statisticsManager
@@ -82,7 +83,7 @@ define(
 				}
 
 				// measuring time
-				var systemTime            = Types.Time.getCurrentInMs()
+				var systemTime            = getCurrentTimeInMs()
 				this.elapsedTime          = Math.max( systemTime - this.previousSystemTime, 0 ) // it must never be smaller than 0
 				this.previousSystemTime   = systemTime
 

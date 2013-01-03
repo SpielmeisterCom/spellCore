@@ -91,6 +91,7 @@ define(
 			var sceneManager = new SceneManager(
 				spell,
 				entityManager,
+				spell.statisticsManager,
 				templateManager,
 				spell.mainLoop,
 				this.sendMessageToEditor,
