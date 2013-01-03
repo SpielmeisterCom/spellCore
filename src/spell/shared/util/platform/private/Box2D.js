@@ -23,6 +23,8 @@ define(
 	'spell/shared/util/platform/private/Box2D',
 	function() {
 
+var FLOAT_EPSILON = 0.000001;
+
 var Box2D = {};
 
 (function (a2j, undefined) {
@@ -744,7 +746,7 @@ Box2D.postDefs = [];
       var t2 = 0;
       var t3 = 0;
       var s = 0; {
-         if (absDX < Number.MIN_VALUE) {
+         if (absDX < FLOAT_EPSILON) {
             if (pX < this.lowerBound.x || this.upperBound.x < pX) return false;
          }
          else {
@@ -767,7 +769,7 @@ Box2D.postDefs = [];
             if (tmin > tmax) return false;
          }
       } {
-         if (absDY < Number.MIN_VALUE) {
+         if (absDY < FLOAT_EPSILON) {
             if (pY < this.lowerBound.y || this.upperBound.y < pY) return false;
          }
          else {
@@ -1201,7 +1203,7 @@ Box2D.postDefs = [];
       var vertIndex2 = parseInt(vertIndex1 + 1 < vertexCount ? vertIndex1 + 1 : 0);
       var v1 = vertices[vertIndex1];
       var v2 = vertices[vertIndex2];
-      if (separation < Number.MIN_VALUE) {
+      if (separation < FLOAT_EPSILON) {
          manifold.m_pointCount = 1;
          manifold.m_type = b2Manifold.e_faceA;
          manifold.m_localPlaneNormal.SetV(normals[normalIndex]);
@@ -1366,7 +1368,7 @@ Box2D.postDefs = [];
          if (distanceSqr2 > distanceSqr1) {}
          distanceSqr1 = distanceSqr2;
          var d = simplex.GetSearchDirection();
-         if (d.LengthSquared() < Number.MIN_VALUE * Number.MIN_VALUE) {
+         if (d.LengthSquared() < FLOAT_EPSILON * FLOAT_EPSILON) {
             break;
          }
          var vertex = vertices[simplex.m_count];
@@ -1397,7 +1399,7 @@ Box2D.postDefs = [];
       if (input.useRadii) {
          var rA = proxyA.m_radius;
          var rB = proxyB.m_radius;
-         if (output.distance > rA + rB && output.distance > Number.MIN_VALUE) {
+         if (output.distance > rA + rB && output.distance > FLOAT_EPSILON) {
             output.distance -= rA + rB;
             var normal = b2Math.SubtractVV(output.pointB, output.pointA);
             normal.Normalize();
@@ -1920,7 +1922,7 @@ Box2D.postDefs = [];
       var dY = this.p2.y - this.p1.y;
       var nX = dY;
       var nY = (-dX);
-      var k_slop = 100.0 * Number.MIN_VALUE;
+      var k_slop = 100.0 * FLOAT_EPSILON;
       var denom = (-(rX * nX + rY * nY));
       if (denom > k_slop) {
          var bX = s.x - this.p1.x;
@@ -2212,7 +2214,7 @@ Box2D.postDefs = [];
       if (this.m_count > 1) {
          var metric1 = cache.metric;
          var metric2 = this.GetMetric();
-         if (metric2 < .5 * metric1 || 2.0 * metric1 < metric2 || metric2 < Number.MIN_VALUE) {
+         if (metric2 < .5 * metric1 || 2.0 * metric1 < metric2 || metric2 < FLOAT_EPSILON) {
             this.m_count = 0;
          }
       }
@@ -2423,7 +2425,7 @@ Box2D.postDefs = [];
       var sweepA = input.sweepA;
       var sweepB = input.sweepB;
       b2Settings.b2Assert(sweepA.t0 == sweepB.t0);
-      b2Settings.b2Assert(1.0 - sweepA.t0 > Number.MIN_VALUE);
+      b2Settings.b2Assert(1.0 - sweepA.t0 > FLOAT_EPSILON);
       var radius = proxyA.m_radius + proxyB.m_radius;
       var tolerance = input.tolerance;
       var alpha = 0.0;
@@ -2507,7 +2509,7 @@ Box2D.postDefs = [];
             }
             b2TimeOfImpact.b2_toiMaxRootIters = b2Math.Max(b2TimeOfImpact.b2_toiMaxRootIters, rootIterCount);
          }
-         if (newAlpha < (1.0 + 100.0 * Number.MIN_VALUE) * alpha) {
+         if (newAlpha < (1.0 + 100.0 * FLOAT_EPSILON) * alpha) {
             break;
          }
          alpha = newAlpha;
@@ -2577,7 +2579,7 @@ Box2D.postDefs = [];
             var dX = pointBX - pointAX;
             var dY = pointBY - pointAY;
             var d2 = dX * dX + dY * dY;
-            if (d2 > Number.MIN_VALUE * Number.MIN_VALUE) {
+            if (d2 > FLOAT_EPSILON * FLOAT_EPSILON) {
                var d = Math.sqrt(d2);
                this.m_normal.x = dX / d;
                this.m_normal.y = dY / d;
@@ -2816,7 +2818,7 @@ Box2D.postDefs = [];
       var c = (sX * rX + sY * rY);
       var rr = (rX * rX + rY * rY);
       var sigma = c * c - rr * b;
-      if (sigma < 0.0 || rr < Number.MIN_VALUE) {
+      if (sigma < 0.0 || rr < FLOAT_EPSILON) {
          return false;
       }
       var a = (-(c + Math.sqrt(sigma)));
@@ -2847,7 +2849,7 @@ Box2D.postDefs = [];
       if (offset === undefined) offset = 0;
       var p = b2Math.MulX(xf, this.m_p);
       var l = (-(b2Math.Dot(normal, p) - offset));
-      if (l < (-this.m_radius) + Number.MIN_VALUE) {
+      if (l < (-this.m_radius) + FLOAT_EPSILON) {
          return 0;
       }
       if (l > this.m_radius) {
@@ -2913,7 +2915,7 @@ Box2D.postDefs = [];
       var v1Y = transform.position.y + (tMat.col1.y * this.m_v1.x + tMat.col2.y * this.m_v1.y);
       var nX = transform.position.y + (tMat.col1.y * this.m_v2.x + tMat.col2.y * this.m_v2.y) - v1Y;
       var nY = (-(transform.position.x + (tMat.col1.x * this.m_v2.x + tMat.col2.x * this.m_v2.y) - v1X));
-      var k_slop = 100.0 * Number.MIN_VALUE;
+      var k_slop = 100.0 * FLOAT_EPSILON;
       var denom = (-(rX * nX + rY * nY));
       if (denom > k_slop) {
          var bX = input.p1.x - v1X;
@@ -3139,7 +3141,7 @@ Box2D.postDefs = [];
          var i1 = parseInt(i);
          var i2 = parseInt(i + 1 < this.m_vertexCount ? i + 1 : 0);
          var edge = b2Math.SubtractVV(this.m_vertices[i2], this.m_vertices[i1]);
-         b2Settings.b2Assert(edge.LengthSquared() > Number.MIN_VALUE);
+         b2Settings.b2Assert(edge.LengthSquared() > FLOAT_EPSILON);
          this.m_normals[i].SetV(b2Math.CrossVF(edge, 1.0));
          this.m_normals[i].Normalize();
       }
@@ -3283,7 +3285,7 @@ Box2D.postDefs = [];
                upper = numerator / denominator;
             }
          }
-         if (upper < lower - Number.MIN_VALUE) {
+         if (upper < lower - FLOAT_EPSILON) {
             return false;
          }
       }
@@ -3373,7 +3375,7 @@ Box2D.postDefs = [];
       for (i = 0;
       i < this.m_vertexCount; ++i) {
          depths[i] = b2Math.Dot(normalL, this.m_vertices[i]) - offsetL;
-         var isSubmerged = depths[i] < (-Number.MIN_VALUE);
+         var isSubmerged = depths[i] < (-FLOAT_EPSILON);
          if (i > 0) {
             if (isSubmerged) {
                if (!lastSubmerged) {
@@ -3600,7 +3602,7 @@ Box2D.postDefs = [];
       simplexCache.count = 0;
       var output = new b2DistanceOutput();
       b2Distance.Distance(output, simplexCache, input);
-      return output.distance < 10.0 * Number.MIN_VALUE;
+      return output.distance < 10.0 * FLOAT_EPSILON;
    }
    b2Shape.prototype.b2Shape = function () {
       this.m_type = b2Shape.e_unknownShape;
@@ -4121,7 +4123,7 @@ Box2D.postDefs = [];
    }
    b2Sweep.prototype.Advance = function (t) {
       if (t === undefined) t = 0;
-      if (this.t0 < t && 1.0 - this.t0 > Number.MIN_VALUE) {
+      if (this.t0 < t && 1.0 - this.t0 > FLOAT_EPSILON) {
          var alpha = (t - this.t0) / (1.0 - this.t0);
          this.c0.x = (1.0 - alpha) * this.c0.x + alpha * this.c.x;
          this.c0.y = (1.0 - alpha) * this.c0.y + alpha * this.c.y;
@@ -4247,7 +4249,7 @@ Box2D.postDefs = [];
    }
    b2Vec2.prototype.Normalize = function () {
       var length = Math.sqrt(this.x * this.x + this.y * this.y);
-      if (length < Number.MIN_VALUE) {
+      if (length < FLOAT_EPSILON) {
          return 0.0;
       }
       var invLength = 1.0 / length;
@@ -6351,12 +6353,12 @@ Box2D.postDefs = [];
                c.m_toi = toi;
                c.m_flags |= b2Contact.e_toiFlag;
             }
-            if (Number.MIN_VALUE < toi && toi < minTOI) {
+            if (FLOAT_EPSILON < toi && toi < minTOI) {
                minContact = c;
                minTOI = toi;
             }
          }
-         if (minContact == null || 1.0 - 100.0 * Number.MIN_VALUE < minTOI) {
+         if (minContact == null || 1.0 - 100.0 * FLOAT_EPSILON < minTOI) {
             break;
          }
          fA = minContact.m_fixtureA;
@@ -7451,7 +7453,7 @@ Box2D.postDefs = [];
             var dX = pointBX - pointAX;
             var dY = pointBY - pointAY;
             var d2 = dX * dX + dY * dY;
-            if (d2 > Number.MIN_VALUE * Number.MIN_VALUE) {
+            if (d2 > FLOAT_EPSILON * FLOAT_EPSILON) {
                var d = Math.sqrt(d2);
                this.m_normal.x = dX / d;
                this.m_normal.y = dY / d;
@@ -7605,7 +7607,7 @@ Box2D.postDefs = [];
          areac.y /= area;
          massc.x /= mass;
          massc.y /= mass;
-         if (area < Number.MIN_VALUE) continue;
+         if (area < FLOAT_EPSILON) continue;
          var buoyancyForce = this.gravity.GetNegative();
          buoyancyForce.Multiply(this.density * area);
          body.ApplyForce(buoyancyForce, massc);
@@ -7731,7 +7733,7 @@ Box2D.postDefs = [];
                dx = p2.x - p1.x;
                dy = p2.y - p1.y;
                r2 = dx * dx + dy * dy;
-               if (r2 < Number.MIN_VALUE) continue;
+               if (r2 < FLOAT_EPSILON) continue;
                f = new b2Vec2(dx, dy);
                f.Multiply(this.G / r2 / Math.sqrt(r2) * mass1 * body2.GetMass());
                if (body1.IsAwake()) body1.ApplyForce(f, p1);
@@ -7753,7 +7755,7 @@ Box2D.postDefs = [];
                dx = p2.x - p1.x;
                dy = p2.y - p1.y;
                r2 = dx * dx + dy * dy;
-               if (r2 < Number.MIN_VALUE) continue;
+               if (r2 < FLOAT_EPSILON) continue;
                f = new b2Vec2(dx, dy);
                f.Multiply(this.G / r2 * mass1 * body2.GetMass());
                if (body1.IsAwake()) body1.ApplyForce(f, p1);
@@ -7786,7 +7788,7 @@ Box2D.postDefs = [];
    }
    b2TensorDampingController.prototype.Step = function (step) {
       var timestep = step.dt;
-      if (timestep <= Number.MIN_VALUE) return;
+      if (timestep <= FLOAT_EPSILON) return;
       if (timestep > this.maxTimestep && this.maxTimestep > 0) timestep = this.maxTimestep;
       for (var i = this.m_bodyList; i; i = i.nextBody) {
          var body = i.body;
@@ -8780,7 +8782,7 @@ Box2D.postDefs = [];
          this.m_a1 = (dX + r1X) * this.m_axis.y - (dY + r1Y) * this.m_axis.x;
          this.m_a2 = r2X * this.m_axis.y - r2Y * this.m_axis.x;
          this.m_motorMass = this.m_invMassA + this.m_invMassB + this.m_invIA * this.m_a1 * this.m_a1 + this.m_invIB * this.m_a2 * this.m_a2;
-         this.m_motorMass = this.m_motorMass > Number.MIN_VALUE ? 1.0 / this.m_motorMass : 0.0;
+         this.m_motorMass = this.m_motorMass > FLOAT_EPSILON ? 1.0 / this.m_motorMass : 0.0;
       } {
          this.m_perp.SetV(b2Math.MulMV(xf1.R, this.m_localYAxis1));
          this.m_s1 = (dX + r1X) * this.m_perp.y - (dY + r1Y) * this.m_perp.x;
@@ -9393,7 +9395,7 @@ Box2D.postDefs = [];
          this.m_a1 = (dX + r1X) * this.m_axis.y - (dY + r1Y) * this.m_axis.x;
          this.m_a2 = r2X * this.m_axis.y - r2Y * this.m_axis.x;
          this.m_motorMass = this.m_invMassA + this.m_invMassB + this.m_invIA * this.m_a1 * this.m_a1 + this.m_invIB * this.m_a2 * this.m_a2;
-         if (this.m_motorMass > Number.MIN_VALUE) this.m_motorMass = 1.0 / this.m_motorMass;
+         if (this.m_motorMass > FLOAT_EPSILON) this.m_motorMass = 1.0 / this.m_motorMass;
       } {
          this.m_perp.SetV(b2Math.MulMV(xf1.R, this.m_localYAxis1));
          this.m_s1 = (dX + r1X) * this.m_perp.y - (dY + r1Y) * this.m_perp.x;
