@@ -48,15 +48,19 @@ define(
 		 * TODO: Remove this custom invoke that knows how to handle the borked instances produced by the "create" constructor wrapper function.
 		 * Instances created by "create" for some unknown reason do not support prototype chain method look-up. See "Fix create"
 		 */
-		var invoke = function( sortedMap, functionName, activeSystemsOnly, args ) {
+		var invoke = function( sortedMap, functionName, statisticsManager, activeSystemsOnly, args ) {
 			var systems = sortedMap.values
 
 			for( var i = 0, numSystems = systems.length; i < numSystems; i++ ) {
+				stopWatch.start()
+
 				var system = systems[ i ]
 
 				if( !activeSystemsOnly || system.config.active ) {
 					system.prototype[ functionName ].apply( system, args )
 				}
+
+				statisticsManager.updateSeries( sortedMap.keys[ i ], stopWatch.stop() )
 			}
 		}
 
@@ -163,6 +167,14 @@ define(
 			}
 		}
 
+		var addStatisticsSeries = function( statisticsManager, systems ) {
+			for( var i = 0, numSystems = systems.length; i < numSystems; i++ ) {
+				var system = systems[ i ]
+
+				statisticsManager.addSeries( system.id, '', 'ms' )
+			}
+		}
+
 
 		/*
 		 * public
@@ -182,18 +194,10 @@ define(
 
 		Scene.prototype = {
 			render: function( timeInMs, deltaTimeInMs ) {
-				stopWatch.start()
-
-				invoke( this.executionGroups.render, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
-
-				this.statisticsManager.updateSeries( 'render', stopWatch.stop() )
+				invoke( this.executionGroups.render, 'process', this.statisticsManager, true, [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			update: function( timeInMs, deltaTimeInMs ) {
-				stopWatch.start()
-
-				invoke( this.executionGroups.update, 'process', true, [ this.spell, timeInMs, deltaTimeInMs ] )
-
-				this.statisticsManager.updateSeries( 'update', stopWatch.stop() )
+				invoke( this.executionGroups.update, 'process', this.statisticsManager, true, [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			init: function( sceneConfig, sceneData ) {
 				var spell = this.spell
@@ -220,13 +224,18 @@ define(
 					spell,
 					entityManager,
 					templateManager,
-					sceneConfig .systems.update,
+					sceneConfig.systems.update,
 					this.isModeDevelopment
 				)
 
+
+				addStatisticsSeries( this.statisticsManager, sceneConfig.systems.render )
+				addStatisticsSeries( this.statisticsManager, sceneConfig.systems.update )
+
+
 				// initializing systems
-				invoke( executionGroups.render, 'init', false, [ spell, sceneConfig, sceneData ] )
-				invoke( executionGroups.update, 'init', false, [ spell, sceneConfig, sceneData ] )
+				invoke( executionGroups.render, 'init', this.statisticsManager, false, [ spell, sceneConfig, sceneData ] )
+				invoke( executionGroups.update, 'init', this.statisticsManager, false, [ spell, sceneConfig, sceneData ] )
 
 				// initializing scene
 				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
@@ -235,23 +244,23 @@ define(
 				this.script.init( spell, sceneConfig, sceneData )
 
 				// activating systems
-				invoke( executionGroups.render, 'activate', true, [ spell, sceneConfig, sceneData ] )
-				invoke( executionGroups.update, 'activate', true, [ spell, sceneConfig, sceneData ] )
+				invoke( executionGroups.render, 'activate', this.statisticsManager, true, [ spell, sceneConfig, sceneData ] )
+				invoke( executionGroups.update, 'activate', this.statisticsManager, true, [ spell, sceneConfig, sceneData ] )
 			},
 			destroy: function( sceneConfig ) {
 				var executionGroups = this.executionGroups,
 					spell           = this.spell
 
 				// deactivating systems
-				invoke( executionGroups.render, 'deactivate', true, [ spell, sceneConfig ] )
-				invoke( executionGroups.update, 'deactivate', true, [ spell, sceneConfig ] )
+				invoke( executionGroups.render, 'deactivate', this.statisticsManager, true, [ spell, sceneConfig ] )
+				invoke( executionGroups.update, 'deactivate', this.statisticsManager, true, [ spell, sceneConfig ] )
 
 				// destroying scene
 				this.script.destroy( this.spell, sceneConfig )
 
 				// destroying systems
-				invoke( executionGroups.render, 'destroy', false, [ spell, sceneConfig ] )
-				invoke( executionGroups.update, 'destroy', false, [ spell, sceneConfig ] )
+				invoke( executionGroups.render, 'destroy', this.statisticsManager, false, [ spell, sceneConfig ] )
+				invoke( executionGroups.update, 'destroy', this.statisticsManager, false, [ spell, sceneConfig ] )
 			},
 			restartSystem: function( systemId, executionGroupId, systemConfig ) {
 				var executionGroups = this.executionGroups

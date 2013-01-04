@@ -26,6 +26,8 @@ define(
 			PERFORMANCE_PRINT_INTERVAL_IN_MS = 1000
 
 		var printSeriesInfo = function( seriesId, seriesInfo ) {
+			if( !seriesInfo ) return
+
 //			console.log( seriesId + ': ' + seriesInfo.avg + '/' + seriesInfo.min + '/' + seriesInfo.max )
 			trace( seriesId + ': ' + seriesInfo.avg + '/' + seriesInfo.min + '/' + seriesInfo.max )
 		}
@@ -45,6 +47,7 @@ define(
 			this.timeSinceLastPerfPrintInMs = 0
 			this.statisticsManager = statisticsManager
 			this.stopWatch         = new StopWatch()
+			this.totalStopWatch    = new StopWatch()
 		}
 
 		MainLoop.prototype = {
@@ -65,7 +68,7 @@ define(
 
 				var statisticsManager = this.statisticsManager
 
-				this.stopWatch.start()
+				this.totalStopWatch.start()
 				statisticsManager.startTick()
 
 				var timer = this.timer
@@ -76,6 +79,8 @@ define(
 					elapsedTimeInMs    = Math.min( timer.getElapsedTime(), MAX_ELAPSED_TIME_IN_MS )
 
 				if( this.update ) {
+					this.stopWatch.start()
+
 					var accumulatedTimeInMs = this.accumulatedTimeInMs + elapsedTimeInMs
 
 					while( accumulatedTimeInMs >= updateIntervalInMs ) {
@@ -85,13 +90,19 @@ define(
 					}
 
 					this.accumulatedTimeInMs = accumulatedTimeInMs
+
+					statisticsManager.updateSeries( 'update', this.stopWatch.stop() )
 				}
 
 				if( this.render ) {
+					this.stopWatch.start()
+
 					this.render( localTimeInMs, elapsedTimeInMs )
+
+					statisticsManager.updateSeries( 'render', this.stopWatch.stop() )
 				}
 
-				statisticsManager.updateSeries( 'total', this.stopWatch.stop() )
+				statisticsManager.updateSeries( 'total', this.totalStopWatch.stop() )
 
 
 				// print performance statistics
@@ -99,6 +110,7 @@ define(
 					this.timeSinceLastPerfPrintInMs -= PERFORMANCE_PRINT_INTERVAL_IN_MS
 
 					printSeriesInfo( 'update', statisticsManager.getSeriesInfo( 'update', 60 ) )
+					printSeriesInfo( 'superkumba.system.physics', statisticsManager.getSeriesInfo( 'superkumba.system.physics', 60 ) )
 					printSeriesInfo( 'render', statisticsManager.getSeriesInfo( 'render', 60 ) )
 					printSeriesInfo( 'total', statisticsManager.getSeriesInfo( 'total', 60 ) )
 //					console.log( '' )

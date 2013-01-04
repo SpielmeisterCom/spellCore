@@ -69,8 +69,6 @@ define(
 			addSeries : function( id, name, unit ) {
 				if( !id ) return
 
-				if( _.has( this.series, id ) ) throw 'Series with id "' + id + '" already exists'
-
 				this.series[ id ] = createSeries( id, name, unit )
 			},
 			updateSeries : function( id, value ) {
@@ -93,13 +91,14 @@ define(
 				if( !series ) return
 
 				var numRecordedValues = Math.min( this.numRecordedValues, n ),
+					harmonicMean = 0,
 					min = Number.MAX_VALUE,
 					max = 0
 
 				for( var i = NUM_VALUES - 1, lowestIndex = NUM_VALUES - numRecordedValues, sum = 0, seriesValues = series.values; i >= lowestIndex; i-- ) {
 					var value = seriesValues[ i ]
 
-					if( value == 0 ) continue
+					if( value === 0 ) continue
 
 					if( value < min ) min = value
 					if( value > max ) max = value
@@ -107,7 +106,12 @@ define(
 					sum += 1 / value
 				}
 
-				var harmonicMean = sum == 0 ? 0 : numRecordedValues / sum
+				if( sum !== 0 ) {
+					harmonicMean = numRecordedValues / sum
+
+				} else {
+					min = 0
+				}
 
 				return {
 					avg : harmonicMean.toFixed( FLOAT_DIGITS ),
