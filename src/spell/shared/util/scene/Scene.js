@@ -60,7 +60,7 @@ define(
 					system.prototype[ functionName ].apply( system, args )
 				}
 
-				statisticsManager.updateSeries( sortedMap.keys[ i ], stopWatch.stop() )
+				statisticsManager.updateNode( sortedMap.keys[ i ], stopWatch.stop() )
 			}
 		}
 
@@ -167,11 +167,11 @@ define(
 			}
 		}
 
-		var addStatisticsSeries = function( statisticsManager, systems ) {
+		var addStatisticsSeries = function( statisticsManager, systems, parentNodeId ) {
 			for( var i = 0, numSystems = systems.length; i < numSystems; i++ ) {
 				var system = systems[ i ]
 
-				statisticsManager.addSeries( system.id, '', 'ms' )
+				statisticsManager.addNode( system.id, parentNodeId )
 			}
 		}
 
@@ -202,6 +202,8 @@ define(
 			init: function( sceneConfig, sceneData ) {
 				var spell = this.spell
 
+				this.statisticsManager.init()
+
 				if( !hasActiveCamera( sceneConfig ) ) {
 					spell.logger.error( 'Could not start scene "' + sceneConfig.name + '" because no camera entity was found. A scene must have at least one active camera entity.' )
 
@@ -229,8 +231,8 @@ define(
 				)
 
 
-				addStatisticsSeries( this.statisticsManager, sceneConfig.systems.render )
-				addStatisticsSeries( this.statisticsManager, sceneConfig.systems.update )
+				addStatisticsSeries( this.statisticsManager, sceneConfig.systems.render, 'render' )
+				addStatisticsSeries( this.statisticsManager, sceneConfig.systems.update, 'update' )
 
 
 				// initializing systems

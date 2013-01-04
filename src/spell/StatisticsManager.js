@@ -1,20 +1,20 @@
 define(
 	'spell/StatisticsManager',
 	[
-		'spell/functions'
+		'spell/shared/util/data/Tree'
 	],
 	function(
-		_
+		Tree
 	) {
 		'use strict'
 
 
-		/*
-		 * private
-		 */
-
-		var NUM_VALUES   = 512,
+		var NUM_VALUES   = 63,
 			FLOAT_DIGITS = 1
+
+		var addNode = Tree.addNode,
+			getNode = Tree.getNode,
+			eachNode = Tree.eachNode
 
 		var createBuffer = function( bufferSize ) {
 			var buffer = []
@@ -25,14 +25,6 @@ define(
 			}
 
 			return buffer
-		}
-
-		var createSeries = function( id, name, unit ) {
-			return {
-				values : createBuffer( NUM_VALUES ),
-				name   : name,
-				unit   : unit
-			}
 		}
 
 		/**
@@ -53,92 +45,91 @@ define(
 			return Math.sqrt( sum / numValues )
 		}
 
+		var createNode = function( id ) {
+			return {
+				children : [],
+				id : id,
+				metrics : [ 0, 0, 0, 0 ],
+				values : createBuffer( NUM_VALUES )
+			}
+		}
 
-		/*
-		 * public
-		 */
+		var updateNodeMetrics = function( node ) {
+			var values = node.values,
+				mean = 0,
+				min = Number.MAX_VALUE,
+				max = 0,
+				sum = 0
+
+			for( var i = 0, numValues = values.length; i < numValues; i++ ) {
+				var value = values[ i ]
+
+				if( value === 0 ) continue
+
+				if( value < min ) min = value
+				if( value > max ) max = value
+
+				sum += value
+			}
+
+			if( sum !== 0 ) {
+				mean = sum / NUM_VALUES
+
+			} else {
+				min = 0
+			}
+
+			var metrics = node.metrics
+
+			metrics[ 0 ] = mean.toFixed( FLOAT_DIGITS )
+			metrics[ 1 ] = min.toFixed( FLOAT_DIGITS )
+			metrics[ 2 ] = max.toFixed( FLOAT_DIGITS )
+			metrics[ 3 ] = createStandardDeviation( mean, values ).toFixed( 2 )
+		}
+
 
 		var StatisticsManager = function() {
-			this.series = {}
-			this.numRecordedValues = 0
+			this.tree = null
 		}
 
 		StatisticsManager.prototype = {
 			init : function() {
-				this.addSeries( 'total', 'total time spent', 'ms' )
-				this.addSeries( 'update', 'time spent in the update loop', 'ms' )
-				this.addSeries( 'render', 'time spent in the render loop', 'ms' )
+				this.tree = createNode( 'total' )
+
+				addNode( this.tree, 'total', createNode( 'render' ) )
+				addNode( this.tree, 'total', createNode( 'update' ) )
+			},
+			addNode : function( id, parentId ) {
+				var success = addNode( this.tree, parentId, createNode( id ) )
+
+				if( !success ) {
+					throw 'Could not add node "' + id + '" to parent node "' + parentId + '".'
+				}
 			},
 			/*
 			 * call this method to signal the beginning of a new measurement period
 			 */
 			startTick : function() {
-				var series = this.series
+				eachNode(
+					this.tree,
+					function( node ) {
+						var values = node.values
 
-				for( var id in series ) {
-					var seriesIter = series[ id ]
-
-					seriesIter.values.push( 0 )
-					seriesIter.values.shift()
-				}
-
-				this.numRecordedValues = Math.min( this.numRecordedValues + 1, NUM_VALUES )
+						values.push( 0 )
+						values.shift()
+					}
+				)
 			},
-			addSeries : function( id, name, unit ) {
-				if( !id ) return
+			updateNode : function( id, value ) {
+				var node = getNode( this.tree, id )
+				if( !node ) return
 
-				this.series[ id ] = createSeries( id, name, unit )
+				node.values[ node.values.length - 1 ] += value
 			},
-			updateSeries : function( id, value ) {
-				if( !id ) return
+			getMetrics : function() {
+				eachNode( this.tree, updateNodeMetrics )
 
-				var series = this.series[ id ]
-
-				if( !series ) return
-
-				series.values[ NUM_VALUES - 1 ] += value
-			},
-			getValues : function() {
-				return this.series
-			},
-			getSeriesValues : function( id ) {
-				return this.series[ id ]
-			},
-			getSeriesInfo : function( id, n ) {
-				var series = this.series[ id ]
-				if( !series ) return
-
-				var numRecordedValues = Math.min( this.numRecordedValues, n ),
-					lowestIndex = NUM_VALUES - numRecordedValues,
-					seriesValues = series.values,
-					harmonicMean = 0,
-					min = Number.MAX_VALUE,
-					max = 0
-
-				for( var i = NUM_VALUES - 1, sum = 0; i >= lowestIndex; i-- ) {
-					var value = seriesValues[ i ]
-
-					if( value === 0 ) continue
-
-					if( value < min ) min = value
-					if( value > max ) max = value
-
-					sum += 1 / value
-				}
-
-				if( sum !== 0 ) {
-					harmonicMean = numRecordedValues / sum
-
-				} else {
-					min = 0
-				}
-
-				return {
-					avg : harmonicMean.toFixed( FLOAT_DIGITS ),
-					min : min.toFixed( FLOAT_DIGITS ),
-					max : max.toFixed( FLOAT_DIGITS ),
-					deviation : createStandardDeviation( harmonicMean, seriesValues.slice( lowestIndex, NUM_VALUES ) ).toFixed( 2 )
-				}
+				return this.tree
 			}
 		}
 

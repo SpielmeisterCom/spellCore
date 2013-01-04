@@ -67,11 +67,11 @@ define(
 			)
 
 			// setting up statistics
-			statisticsManager.addSeries( 'remoteTime', '' )
-			statisticsManager.addSeries( 'localTime', '' )
-			statisticsManager.addSeries( 'deltaLocalRemoteTime', '' )
-			statisticsManager.addSeries( 'relativeClockSkew', '' )
-			statisticsManager.addSeries( 'newRemoteTimeTransfered', '' )
+//			statisticsManager.addSeries( 'remoteTime', '' )
+//			statisticsManager.addSeries( 'localTime', '' )
+//			statisticsManager.addSeries( 'deltaLocalRemoteTime', '' )
+//			statisticsManager.addSeries( 'relativeClockSkew', '' )
+//			statisticsManager.addSeries( 'newRemoteTimeTransfered', '' )
 		}
 
 		Timer.prototype = {
@@ -96,10 +96,10 @@ define(
 				this.relativeClockSkew = ( ( this.localTime / this.remoteTime * factor ) - factor ) * 2 + 1
 
 				// updating statistics
-				this.statisticsManager.updateSeries( 'remoteTime', this.remoteTime % 2000 )
-				this.statisticsManager.updateSeries( 'localTime', this.localTime % 2000 )
-				this.statisticsManager.updateSeries( 'deltaLocalRemoteTime', this.deltaLocalRemoteTime + 250 )
-				this.statisticsManager.updateSeries( 'relativeClockSkew', this.relativeClockSkew )
+//				this.statisticsManager.updateSeries( 'remoteTime', this.remoteTime % 2000 )
+//				this.statisticsManager.updateSeries( 'localTime', this.localTime % 2000 )
+//				this.statisticsManager.updateSeries( 'deltaLocalRemoteTime', this.deltaLocalRemoteTime + 250 )
+//				this.statisticsManager.updateSeries( 'relativeClockSkew', this.relativeClockSkew )
 			},
 			getLocalTime : function() {
 				return this.localTime

@@ -2,6 +2,7 @@ define(
 	'spell/shared/util/createMainLoop',
 	[
 		'spell/Events',
+		'spell/shared/util/data/Tree',
 		'spell/shared/util/StopWatch',
 		'spell/shared/util/Timer',
 		'spell/shared/util/platform/Types',
@@ -11,6 +12,7 @@ define(
 	],
 	function(
 		Events,
+		Tree,
 		StopWatch,
 		Timer,
 		Types,
@@ -25,11 +27,31 @@ define(
 			MAX_ELAPSED_TIME_IN_MS = 100,
 			PERFORMANCE_PRINT_INTERVAL_IN_MS = 1000
 
-		var printSeriesInfo = function( seriesId, seriesInfo ) {
-			if( !seriesInfo ) return
+		var eachNode = Tree.eachNode
 
-			console.log( seriesId + ': ' + seriesInfo.avg + '/' + seriesInfo.min + '/' + seriesInfo.max + '/' + seriesInfo.deviation )
-//			trace( seriesId + ': ' + seriesInfo.avg + '/' + seriesInfo.min + '/' + seriesInfo.max + '/' + seriesInfo.deviation )
+		var indent = function( n ) {
+			var result = ''
+
+			while( n-- ) {
+				result += ' '
+			}
+
+			return result
+		}
+
+		var printMetrics = function( tree ) {
+			var message = ''
+
+			eachNode(
+				tree,
+				function( node, depth ) {
+					var metrics = node.metrics
+
+					message += indent( depth ) + node.id + ': ' + metrics[ 0 ] + '/' + metrics[ 1 ] + '/' + metrics[ 2 ] + '/' + metrics[ 3 ] + '\n'
+				}
+			)
+
+			console.log( message )
 		}
 
 
@@ -91,7 +113,7 @@ define(
 
 					this.accumulatedTimeInMs = accumulatedTimeInMs
 
-					statisticsManager.updateSeries( 'update', this.stopWatch.stop() )
+					statisticsManager.updateNode( 'update', this.stopWatch.stop() )
 				}
 
 				if( this.render ) {
@@ -99,22 +121,17 @@ define(
 
 					this.render( localTimeInMs, elapsedTimeInMs )
 
-					statisticsManager.updateSeries( 'render', this.stopWatch.stop() )
+					statisticsManager.updateNode( 'render', this.stopWatch.stop() )
 				}
 
-				statisticsManager.updateSeries( 'total', this.totalStopWatch.stop() )
+				statisticsManager.updateNode( 'total', this.totalStopWatch.stop() )
 
 
 				// print performance statistics
 				if( this.timeSinceLastPerfPrintInMs > PERFORMANCE_PRINT_INTERVAL_IN_MS ) {
 					this.timeSinceLastPerfPrintInMs -= PERFORMANCE_PRINT_INTERVAL_IN_MS
 
-					printSeriesInfo( 'update', statisticsManager.getSeriesInfo( 'update', 60 ) )
-					printSeriesInfo( 'superkumba.system.physics', statisticsManager.getSeriesInfo( 'superkumba.system.physics', 60 ) )
-					printSeriesInfo( 'render', statisticsManager.getSeriesInfo( 'render', 60 ) )
-					printSeriesInfo( 'total', statisticsManager.getSeriesInfo( 'total', 60 ) )
-					console.log( '' )
-//					trace( '' )
+					printMetrics( statisticsManager.getMetrics() )
 				}
 
 				this.timeSinceLastPerfPrintInMs += elapsedTimeInMs
