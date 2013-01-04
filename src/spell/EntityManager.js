@@ -722,7 +722,7 @@ define(
 			 */
 			getEntityIdsByName : function( name, entityId ) {
 				var metaDataComponents = this.componentDictionaries[ METADATA_COMPONENT_ID ],
-					resultIds      = []
+					resultIds          = []
 
 				var ids = entityId ?
 					getEntityCompositeIds( this.componentDictionaries[ CHILDREN_COMPONENT_ID ], entityId, [] ) :
