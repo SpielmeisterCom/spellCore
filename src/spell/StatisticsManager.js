@@ -35,6 +35,24 @@ define(
 			}
 		}
 
+		/**
+		 * Computes the "standard deviation of the sample".
+		 * See http://en.wikipedia.org/wiki/Standard_deviation#Standard_deviation_of_the_sample
+		 *
+		 * @param expected
+		 * @param values
+		 */
+		var createStandardDeviation = function( expected, values ) {
+			var numValues = values.length,
+				sum = 0
+
+			for( var i = 0; i < numValues; i++ ) {
+				sum += Math.pow( values[ i ] - expected, 2 )
+			}
+
+			return Math.sqrt( sum / numValues )
+		}
+
 
 		/*
 		 * public
@@ -91,11 +109,13 @@ define(
 				if( !series ) return
 
 				var numRecordedValues = Math.min( this.numRecordedValues, n ),
+					lowestIndex = NUM_VALUES - numRecordedValues,
+					seriesValues = series.values,
 					harmonicMean = 0,
 					min = Number.MAX_VALUE,
 					max = 0
 
-				for( var i = NUM_VALUES - 1, lowestIndex = NUM_VALUES - numRecordedValues, sum = 0, seriesValues = series.values; i >= lowestIndex; i-- ) {
+				for( var i = NUM_VALUES - 1, sum = 0; i >= lowestIndex; i-- ) {
 					var value = seriesValues[ i ]
 
 					if( value === 0 ) continue
@@ -116,7 +136,8 @@ define(
 				return {
 					avg : harmonicMean.toFixed( FLOAT_DIGITS ),
 					min : min.toFixed( FLOAT_DIGITS ),
-					max : max.toFixed( FLOAT_DIGITS )
+					max : max.toFixed( FLOAT_DIGITS ),
+					deviation : createStandardDeviation( harmonicMean, seriesValues.slice( lowestIndex, NUM_VALUES ) ).toFixed( 2 )
 				}
 			}
 		}

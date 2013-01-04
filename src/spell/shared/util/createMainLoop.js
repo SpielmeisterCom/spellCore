@@ -28,8 +28,8 @@ define(
 		var printSeriesInfo = function( seriesId, seriesInfo ) {
 			if( !seriesInfo ) return
 
-//			console.log( seriesId + ': ' + seriesInfo.avg + '/' + seriesInfo.min + '/' + seriesInfo.max )
-			trace( seriesId + ': ' + seriesInfo.avg + '/' + seriesInfo.min + '/' + seriesInfo.max )
+			console.log( seriesId + ': ' + seriesInfo.avg + '/' + seriesInfo.min + '/' + seriesInfo.max + '/' + seriesInfo.deviation )
+//			trace( seriesId + ': ' + seriesInfo.avg + '/' + seriesInfo.min + '/' + seriesInfo.max + '/' + seriesInfo.deviation )
 		}
 
 
@@ -113,8 +113,8 @@ define(
 					printSeriesInfo( 'superkumba.system.physics', statisticsManager.getSeriesInfo( 'superkumba.system.physics', 60 ) )
 					printSeriesInfo( 'render', statisticsManager.getSeriesInfo( 'render', 60 ) )
 					printSeriesInfo( 'total', statisticsManager.getSeriesInfo( 'total', 60 ) )
-//					console.log( '' )
-					trace( '' )
+					console.log( '' )
+//					trace( '' )
 				}
 
 				this.timeSinceLastPerfPrintInMs += elapsedTimeInMs
