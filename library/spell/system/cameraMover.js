@@ -5,12 +5,7 @@
 
 define(
 	'spell/system/cameraMover',
-	[
-		'spell/functions'
-	],
-	function(
-		_
-	) {
+	function() {
 		'use strict'
 
 
@@ -21,7 +16,7 @@ define(
 		 * @param {Object} [spell] The spell object.
 		 */
 		var cameraMover = function( spell ) {
-
+			this.cameraIdToFollowEntityName = {}
 		}
 
 		cameraMover.prototype = {
@@ -31,7 +26,6 @@ define(
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			init: function( spell ) {
-
 			},
 
 			/**
@@ -40,7 +34,6 @@ define(
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			destroy: function( spell ) {
-
 			},
 
 			/**
@@ -49,7 +42,6 @@ define(
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			activate: function( spell ) {
-
 			},
 
 			/**
@@ -58,7 +50,6 @@ define(
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			deactivate: function( spell ) {
-
 			},
 
 			/**
@@ -69,58 +60,61 @@ define(
 			 * @param {Object} [deltaTimeInMs] The elapsed time in ms.
 			 */
 			process: function( spell, timeInMs, deltaTimeInMs ) {
-				
-				for( var cameraEntityId in this.cameraMovements ) {
-					
-					var cameraMovement		= this.cameraMovements[ cameraEntityId ],
-						followEntityName   	= cameraMovement.followEntityName
-						
-					if( !followEntityName ) {
-						throw 'cameraMovement: did not specify an followEntityName which specifies the entity to follow in the cameraFollow component'
+				var cameraIdToFollowEntityName = this.cameraIdToFollowEntityName,
+					cameraMovements            = this.cameraMovements,
+					transforms                 = this.transforms
+
+				for( var cameraId in cameraMovements ) {
+					var cameraMovement    = cameraMovements[ cameraId ],
+						cameraTranslation = transforms[ cameraId ].translation,
+						followEntityName  = cameraIdToFollowEntityName[ cameraId ],
+						followEntityId    = cameraMovement.followEntityId
+
+					if( cameraMovement.followEntityName &&
+						cameraMovement.followEntityName !== followEntityName ) {
+
+						// the camera follows another entity now
+						followEntityName = cameraMovement.followEntityName
+						followEntityId = spell.entityManager.getEntityIdsByName( followEntityName )[ 0 ]
+
+						if( followEntityId ) {
+							cameraMovement.followEntityId = followEntityId
+							cameraIdToFollowEntityName[ cameraId ] = followEntityName
+						}
 					}
-					
-					var entityIdsToFollow = spell.entityManager.getEntityIdsByName( followEntityName )
-					
-					if ( entityIdsToFollow.length < 1 ) {
-						continue
+
+					if( followEntityId ) {
+						var entityTranslation = transforms[ followEntityId ].translation
+
+						if( !cameraTranslation || !entityTranslation ) {
+							throw 'Either the camera or the entity ' + followEntityName + ' does not have a transform component.'
+						}
+
+						cameraTranslation[ 0 ] = entityTranslation[ 0 ]
+						cameraTranslation[ 1 ] = entityTranslation[ 1 ]
 					}
-					
-					var entityIdToFollow = entityIdsToFollow[ 0 ],
-						entityTransform = this.transforms[ entityIdToFollow ],
-						cameraTransform = this.transforms[ cameraEntityId ]
-						
-					if ( !entityTransform || !cameraTransform ) {
-						throw 'cameraMovement: either the camera or the entity ' + followEntityName + ' does not have a transform component set'
-						continue
-					}
-	
-					var cameraTranslation = cameraTransform.translation,
-						entityTranslation = entityTransform.translation
-					
-				    cameraTranslation[ 0 ] = entityTranslation[ 0 ]
-				    cameraTranslation[ 1 ] = entityTranslation[ 1 ]
-					
-					if ( cameraMovement.obeyMinMax === true ) {
+
+					if( cameraMovement.obeyMinMax ) {
 						var minX = cameraMovement.minX,
 							maxX = cameraMovement.maxX,
 							minY = cameraMovement.minY,
 							maxY = cameraMovement.maxY
-							
-	 					if ( cameraTranslation[ 0 ] < minX ) {
+
+	 					if( cameraTranslation[ 0 ] < minX ) {
 					    	cameraTranslation[ 0 ] = minX
 					    }
-					    
-					    if ( cameraTranslation[ 0 ] > maxX ) {
+
+					    if( cameraTranslation[ 0 ] > maxX ) {
 					    	cameraTranslation[ 0 ] = maxX
 					    }
-					    
-					    if ( cameraTranslation[ 1 ] < minY ) {
+
+					    if( cameraTranslation[ 1 ] < minY ) {
 					    	cameraTranslation[ 1 ] = minY
 					    }
-					    
-					    if ( cameraTranslation[ 1 ] > maxY ) {
+
+					    if( cameraTranslation[ 1 ] > maxY ) {
 					    	cameraTranslation[ 1 ] = maxY
-					    }						
+					    }
 					}
 				}
 			}

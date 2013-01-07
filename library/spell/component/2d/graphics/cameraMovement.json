@@ -40,6 +40,11 @@
             "default": "player",
             "engineInternal": false,
             "type": "string"
-        }
+        },
+		{
+			"name": "followEntityId",
+			"engineInternal": true,
+			"type": "string"
+		}
     ]
 }
