@@ -87,9 +87,27 @@ define(
 			metrics[ 3 ] = createStandardDeviation( mean, values ).toFixed( 2 )
 		}
 
+		var createNumValuesInPeriod = function( timestamps, periodInMs ) {
+			if( !periodInMs ) periodInMs = 0
+
+			var numTimestamps = timestamps.length,
+				earliest      = timestamps[ numTimestamps - 1 ] - periodInMs
+
+			for( var i = timestamps.length - 1; i >= 0; i-- ) {
+				var current = timestamps[ i ]
+
+				if( current <= earliest ) {
+					return numTimestamps - i
+				}
+			}
+
+			return numTimestamps
+		}
+
 
 		var StatisticsManager = function() {
 			this.tree = null
+			this.timestamps = createBuffer( NUM_VALUES )
 		}
 
 		StatisticsManager.prototype = {
@@ -109,14 +127,19 @@ define(
 			/*
 			 * call this method to signal the beginning of a new measurement period
 			 */
-			startTick : function() {
+			startTick : function( timestamp ) {
+				var timestamps = this.timestamps
+
+				timestamps.shift()
+				timestamps.push( timestamp )
+
 				eachNode(
 					this.tree,
 					function( node ) {
 						var values = node.values
 
-						values.push( 0 )
 						values.shift()
+						values.push( 0 )
 					}
 				)
 			},
@@ -126,7 +149,7 @@ define(
 
 				node.values[ node.values.length - 1 ] += value
 			},
-			getMetrics : function() {
+			getMetrics : function( periodInMs ) {
 				eachNode( this.tree, updateNodeMetrics )
 
 				return this.tree

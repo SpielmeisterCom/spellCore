@@ -88,17 +88,17 @@ define(
 					this.preNextFrame = null
 				}
 
-				var statisticsManager = this.statisticsManager
+				var statisticsManager = this.statisticsManager,
+					timer             = this.timer
 
-				this.totalStopWatch.start()
-				statisticsManager.startTick()
-
-				var timer = this.timer
 				timer.update()
 
 				var updateIntervalInMs = this.updateIntervalInMs,
 					localTimeInMs      = timer.getLocalTime(),
 					elapsedTimeInMs    = Math.min( timer.getElapsedTime(), MAX_ELAPSED_TIME_IN_MS )
+
+				this.totalStopWatch.start()
+				statisticsManager.startTick( localTimeInMs )
 
 				if( this.update ) {
 					this.stopWatch.start()
@@ -131,7 +131,7 @@ define(
 				if( this.timeSinceLastPerfPrintInMs > PERFORMANCE_PRINT_INTERVAL_IN_MS ) {
 					this.timeSinceLastPerfPrintInMs -= PERFORMANCE_PRINT_INTERVAL_IN_MS
 
-					printMetrics( statisticsManager.getMetrics() )
+					printMetrics( statisticsManager.getMetrics( PERFORMANCE_PRINT_INTERVAL_IN_MS ) )
 				}
 
 				this.timeSinceLastPerfPrintInMs += elapsedTimeInMs
