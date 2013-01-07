@@ -17,6 +17,10 @@ define(
 			// clock synchronization
 			'CLOCK_SYNC_ESTABLISHED',
 
+			// Component
+			'COMPONENT_CREATED',
+			'COMPONENT_UPDATED',
+
 			// Entity
 			'ENTITY_CREATED',
 			'ENTITY_DESTROYED',

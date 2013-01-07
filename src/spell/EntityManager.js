@@ -120,12 +120,14 @@ define(
 			mat3.rotate( localMatrix, transform.rotation )
 			mat3.scale( localMatrix, transform.scale )
 
-			// search for next parent with an transform component
+			// search for next parent with a transform component
 			while( parent = parentComponents[ parentEntityId ] ) {
 				parentEntityId = parent.id
 
-				if( transformComponents[ parentEntityId ] ) {
-					parentMatrix = transformComponents[ parentEntityId ].worldMatrix
+				var parentTransform = transformComponents[ parentEntityId ]
+
+				if( parentTransform ) {
+					parentMatrix = parentTransform.worldMatrix
 					break
 				}
 			}
@@ -183,7 +185,7 @@ define(
 			componentMaps[ componentId ] = {}
 		}
 
-		var addComponents = function( componentDictionaries, entityId, entityComponents ) {
+		var addComponents = function( componentDictionaries, eventManager, entityId, entityComponents ) {
 			_.each(
 				entityComponents,
 				function( component, componentId ) {
@@ -192,6 +194,8 @@ define(
 					}
 
 					componentDictionaries[ componentId ][ entityId ] = component
+
+					eventManager.publish( [ Events.COMPONENT_CREATED, componentId ], [ entityId ] )
 				}
 			)
 		}
@@ -458,7 +462,7 @@ define(
 			// creating the entity
 			var entityComponents = templateManager.createComponents( entityTemplateId, config || {} )
 
-			addComponents( componentDictionaries, entityId, entityComponents )
+			addComponents( componentDictionaries, eventManager, entityId, entityComponents )
 
 			if( parentId ) {
 				attachEntityToParent( componentDictionaries, entityId, parentId )
@@ -936,6 +940,8 @@ define(
 						updateAppearanceTransform( this.componentDictionaries[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
 					}
 				}
+
+				this.eventManager.publish( [ Events.COMPONENT_UPDATED, componentId ], [ entityId ] )
 
 				return true
 			},
