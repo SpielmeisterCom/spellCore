@@ -6,34 +6,32 @@
 define(
 	'spell/system/parallax',
 	[
-		'spell/math/vec2',
-
-		'spell/functions'
+		'spell/math/vec2'
 	],
 	function(
-		vec2,
-
-		_
+		vec2
 	) {
 		'use strict'
 
 
 		var entityLookupMap = {}
 
-		var lookupEntityId = function( entityName ) {
-			if( entityLookupMap[ entityName ] ) {
-				return entityLookupMap[ entityName ]
+		var lookupEntityId = function( entityManager, entityName ) {
+			var entityId = entityLookupMap[ entityName ]
+
+			if( entityId ) {
+				return entityId
 			}
 
-			var entityIds = this.spell.entityManager.getEntityIdsByName( entityName )
+			entityId = entityManager.getEntityIdsByName( entityName )[ 0 ]
 
-			if( !entityIds.length > 0 ) {
+			if( !entityId ) {
 				throw 'Could not find entity with the name ' + entityName
 			}
 
-			entityLookupMap[ entityName ] = entityIds[ 0 ]
+			entityLookupMap[ entityName ] = entityId
 
-			return entityLookupMap[ entityName ]
+			return entityId
 		}
 
 
@@ -91,71 +89,62 @@ define(
 			 * @param {Object} [deltaTimeInMs] The elapsed time in ms.
 			 */
 			process: function( spell, timeInMs, deltaTimeInMs ) {
-				var entityManager = spell.entityManager
+				var entityManager        = spell.entityManager,
+					parallaxComponents   = this.parallaxComponents,
+					quads                = this.quads,
+					transforms           = this.transforms,
+					appearanceTransforms = this.appearanceTransforms
 
-				for( var entityId in this.parallax ) {
-					var parallax            = this.parallax[ entityId ],
-						layerQuad           = this.quads[ entityId ],
-						layerTransform      = this.transforms[ entityId ],
-						refEntityName       = parallax.refEntityName,
-						refEntityId         = lookupEntityId.call( this, refEntityName ),
-						refEntityTransform  = this.transforms[ refEntityId ],
-						appearanceTransform = this.appearanceTransforms[ entityId ]
+				for( var entityId in parallaxComponents ) {
+					var parallax            = parallaxComponents[ entityId ],
+						layerQuad           = quads[ entityId ],
+						layerTransform      = transforms[ entityId ],
+						refEntityTranslation  = transforms[ lookupEntityId( entityManager, parallax.refEntityName ) ].translation,
+						appearanceTranslation = appearanceTransforms[ entityId ].translation
 
-
-					if( !layerTransform || !refEntityTransform || !layerQuad ) {
+					if( !layerTransform || !refEntityTranslation || !layerQuad ) {
 						throw 'could not get a valid parallax configuration for entity id ' + entityId
 					}
 
-					var moveSpeed             = parallax.moveSpeed,
-						offsetToRefEntity     = parallax.offsetToRefEntity,
-						stickToRefX           = parallax.stickToRefX,
-						stickToRefY           = parallax.stickToRefY,
-						textureOffset         = parallax.textureOffset,
-						repeatX               = parallax.repeatX,
-						repeatY               = parallax.repeatY,
-						refEntityTranslation  = refEntityTransform.translation,
+					var offsetToRefEntity     = parallax.offsetToRefEntity,
 						layerTranslation      = layerTransform.translation,
-                        layerWorldTranslation = layerTransform.worldTranslation,
-						layerQuadDimensions   = layerQuad.dimensions,
-						appearanceTranslation = appearanceTransform.translation
-
+                        layerWorldTranslation = layerTransform.worldTranslation
 
 					// if configured: stick the parallax layer to the current camera position (plus specified offsetToCamera)
-					if( stickToRefX === true ) {
-						layerTranslation[0] = refEntityTranslation[0] + offsetToRefEntity[0]
-                        layerWorldTranslation[0] = layerTranslation[0]
+					if( parallax.stickToRefX ) {
+						layerTranslation[ 0 ] = refEntityTranslation[ 0 ] + offsetToRefEntity[ 0 ]
+                        layerWorldTranslation[ 0 ] = layerTranslation[ 0 ]
 					}
 
-					if( stickToRefY === true ) {
-						layerTranslation[1] = refEntityTranslation[1] + offsetToRefEntity[1]
-                        layerWorldTranslation[1] = layerTranslation[1]
+					if( parallax.stickToRefY ) {
+						layerTranslation[ 1 ] = refEntityTranslation[ 1 ] + offsetToRefEntity[ 1 ]
+                        layerWorldTranslation[ 1 ] = layerTranslation[ 1 ]
                     }
 
 
 					// set the texture coordinates to the new position, according to speed, camera position and texture offset
-					vec2.multiply( refEntityTranslation, moveSpeed, appearanceTranslation )
-					vec2.divide( appearanceTranslation, layerQuadDimensions, appearanceTranslation )
-					vec2.add( appearanceTranslation, textureOffset, appearanceTranslation )
+					vec2.multiply( refEntityTranslation, parallax.moveSpeed, appearanceTranslation )
+					vec2.divide( appearanceTranslation, layerQuad.dimensions, appearanceTranslation )
+					vec2.add( appearanceTranslation, parallax.textureOffset, appearanceTranslation )
 
 					// clamp x,y values if we don't want to repeat the texture
-					if( repeatX === false ) {
-						if( appearanceTranslation[0] < 0 ) {
-							appearanceTranslation[0] = 0
+					if( !parallax.repeatX ) {
+						if( appearanceTranslation[ 0 ] < 0 ) {
+							appearanceTranslation[ 0 ] = 0
 						}
 
-						if( appearanceTranslation[0] > 1 ) {
-							appearanceTranslation[0] = 1
+						if( appearanceTranslation[ 0 ] > 1 ) {
+							appearanceTranslation[ 0 ] = 1
 						}
 					}
 
-					if( repeatY === false ) {
-						if( appearanceTranslation[1] < 0 ) {
-							appearanceTranslation[1] = 0
+					if( !parallax.repeatY ) {
+						if( appearanceTranslation[ 1 ] < 0 ) {
+							appearanceTranslation[ 1 ] = 0
 						}
 
-						if( appearanceTranslation[1] > 1 ) {
-							appearanceTranslation[1] = 1
+						if( appearanceTranslation[ 1 ] > 1 ) {
+							appearanceTranslation[ 1 ] = 1
 						}
 					}
 

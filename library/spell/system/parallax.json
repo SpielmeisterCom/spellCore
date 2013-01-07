@@ -3,7 +3,7 @@
     "type": "system",
     "input": [
         {
-            "name": "parallax",
+            "name": "parallaxComponents",
             "componentId": "spell.component.2d.graphics.parallax"
         },
         {
