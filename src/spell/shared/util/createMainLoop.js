@@ -39,7 +39,7 @@ define(
 			return result
 		}
 
-		var printMetrics = function( tree ) {
+		var createMetricsMessage = function( tree ) {
 			var message = ''
 
 			eachNode(
@@ -51,7 +51,7 @@ define(
 				}
 			)
 
-			console.log( message )
+			return message
 		}
 
 
@@ -131,7 +131,9 @@ define(
 				if( this.timeSinceLastPerfPrintInMs > PERFORMANCE_PRINT_INTERVAL_IN_MS ) {
 					this.timeSinceLastPerfPrintInMs -= PERFORMANCE_PRINT_INTERVAL_IN_MS
 
-					printMetrics( statisticsManager.getMetrics( PERFORMANCE_PRINT_INTERVAL_IN_MS ) )
+					console.log(
+						createMetricsMessage( statisticsManager.getMetrics( PERFORMANCE_PRINT_INTERVAL_IN_MS ) )
+					)
 				}
 
 				this.timeSinceLastPerfPrintInMs += elapsedTimeInMs
