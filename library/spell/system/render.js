@@ -11,10 +11,9 @@ define(
 		'spell/client/2d/graphics/drawTitleSafeOutline',
 		'spell/client/util/createComprisedRectangle',
 		'spell/client/util/createIncludedRectangle',
+		'spell/Defines',
 		'spell/Events',
 		'spell/shared/util/platform/PlatformKit',
-
-		'spell/math/util',
 
 		'spell/math/vec2',
 		'spell/math/vec4',
@@ -33,10 +32,10 @@ define(
 		drawTitleSafeOutline,
 		createComprisedRectangle,
 		createIncludedRectangle,
+		Defines,
 		Events,
 		PlatformKit,
 
-		mathUtil,
 		vec2,
 		vec4,
 		mat3,
@@ -59,7 +58,6 @@ define(
 			drawDebugShapes   = true,
 			defaultDimensions = vec2.create( [ 1, 1 ] ),
 			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
-			isInInterval      = mathUtil.isInInterval,
 			currentCameraId
 
 		var roundVec2 = function( v ) {
@@ -445,30 +443,6 @@ define(
 			context.restore()
 		}
 
-		var getActiveCameraId = function( cameras ) {
-			if( _.size( cameras ) === 0 ) return
-
-			// Gets the first active camera. More than one camera being active is an undefined state and the first found active is used.
-			var activeCameraId = undefined
-
-			_.any(
-				cameras,
-				function( camera, id ) {
-					if( camera.active ) {
-						activeCameraId = id
-
-						return true
-					}
-
-					return false
-				}
-			)
-
-			if( currentCameraId !== activeCameraId ) currentCameraId = activeCameraId
-
-			return currentCameraId
-		}
-
 		var setCamera = function( context, cameraDimensions, position ) {
 			// setting up the camera geometry
 			var halfWidth  = cameraDimensions[ 0 ] / 2,
@@ -528,7 +502,7 @@ define(
 				this
 			)
 
-			this.screeAspectRatioHandler =_.bind(
+			this.screeAspectRatioHandler = _.bind(
 				function( aspectRatio ) {
 					this.screenSize = createScreenSize(
 						PlatformKit.getAvailableScreenSize(
@@ -542,8 +516,14 @@ define(
 				this
 			)
 
+			this.cameraChangedHandler = function( component, entityId ) {
+				currentCameraId = component.active ? entityId : null
+			}
+
 			eventManager.subscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
 			eventManager.subscribe( Events.SCREEN_ASPECT_RATIO, this.screeAspectRatioHandler )
+			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 		}
 
 		var destroy = function( spell ) {
@@ -551,6 +531,8 @@ define(
 
 			eventManager.unsubscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
 			eventManager.unsubscribe( Events.SCREEN_ASPECT_RATIO, this.screeAspectRatioHandler )
+			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+			eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
@@ -566,9 +548,8 @@ define(
 			)
 
 			// set the camera
-			var activeCameraId  = getActiveCameraId( cameras ),
-				camera          = cameras[ activeCameraId ],
-				cameraTransform = this.transforms[ activeCameraId ]
+			var camera          = cameras[ currentCameraId ],
+				cameraTransform = this.transforms[ currentCameraId ]
 
 			if( camera && cameraTransform ) {
 				var effectiveCameraDimensions = vec2.multiply(
@@ -670,6 +651,7 @@ define(
 			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
 			this.screenSize           = spell.configurationManager.currentScreenSize
 			this.debugSettings        = spell.configurationManager.debug ? spell.configurationManager.debug : false
+			this.cameraChangedHandler = null
 
 			this.drawVisualObjectPartial = _.bind(
 				drawVisualObject,
