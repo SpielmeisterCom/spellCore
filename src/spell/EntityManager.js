@@ -195,7 +195,7 @@ define(
 
 					componentDictionaries[ componentId ][ entityId ] = component
 
-					eventManager.publish( [ Events.COMPONENT_CREATED, componentId ], [ entityId ] )
+					eventManager.publish( [ Events.COMPONENT_CREATED, componentId ], [ component, entityId ] )
 				}
 			)
 		}
@@ -941,7 +941,7 @@ define(
 					}
 				}
 
-				this.eventManager.publish( [ Events.COMPONENT_UPDATED, componentId ], [ entityId ] )
+				this.eventManager.publish( [ Events.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
 
 				return true
 			},
