@@ -1,7 +1,7 @@
 define(
 	'spell/StatisticsManager',
 	[
-		'spell/shared/util/data/Tree'
+		'spell/data/Tree'
 	],
 	function(
 		Tree

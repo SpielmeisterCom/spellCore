@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/data/Tree',
+	'spell/data/Tree',
 	function() {
 		'use strict'
 

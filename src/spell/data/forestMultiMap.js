@@ -1,12 +1,12 @@
 define(
-	"spell/shared/util/forestMultiMap",
+	'spell/data/forestMultiMap',
 	[
 		'spell/functions'
 	],
 	function(
 		_
 	) {
-		"use strict"
+		'use strict'
 
 
 		function createNode() {

@@ -5,7 +5,7 @@
 define(
 	'spell/EventManager',
 	[
-		'spell/shared/util/forestMultiMap',
+		'spell/data/forestMultiMap',
 		'spell/Events',
 
 		'spell/functions'

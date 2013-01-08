@@ -1,7 +1,7 @@
 define(
-	"spell/shared/util/CircularBuffer",
+	'spell/data/CircularBuffer',
 	function() {
-		"use strict"
+		'use strict'
 
 
 		function CircularBuffer( length, defaultValue ) {

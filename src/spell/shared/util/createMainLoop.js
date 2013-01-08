@@ -2,7 +2,7 @@ define(
 	'spell/shared/util/createMainLoop',
 	[
 		'spell/Events',
-		'spell/shared/util/data/Tree',
+		'spell/data/Tree',
 		'spell/shared/util/StopWatch',
 		'spell/shared/util/Timer',
 		'spell/shared/util/platform/Types',

@@ -1,34 +1,31 @@
 define(
 	'spell/shared/util/scene/Scene',
 	[
+		'spell/Events',
 		'spell/Defines',
-
+		'spell/data/SortedMap',
 		'spell/shared/util/create',
 		'spell/shared/util/createId',
 		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
 		'spell/shared/util/entityConfig/flatten',
-		'spell/Events',
-		'spell/shared/util/SortedMap',
 		'spell/shared/util/StopWatch',
 		'spell/shared/util/platform/PlatformKit',
-
 		'spell/shared/util/platform/Types',
 
 		'spell/functions'
 	],
 	function(
+		Events,
 		Defines,
+		SortedMap,
 		create,
 		createId,
 		createModuleId,
 		deepClone,
 		flattenEntityConfig,
-		Events,
-		SortedMap,
 		StopWatch,
 		PlatformKit,
-
 		Types,
 
 		_
