@@ -108,6 +108,7 @@ define(
 				)
 
 				var offset = normalizeOffset( lengthInMs, rawOffset, keyFrameAnimation.looped )
+
 				keyFrameAnimation.offset  = offset
 				keyFrameAnimation.playing = updatePlaying( lengthInMs, rawOffset, keyFrameAnimation.looped )
 
