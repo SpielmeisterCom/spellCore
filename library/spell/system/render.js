@@ -60,36 +60,66 @@ define(
 			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
 			currentCameraId
 
-		var roundVec2 = function( v ) {
-			v[ 0 ] = Math.round( v[ 0 ] )
-			v[ 1 ] = Math.round( v[ 1 ] )
+//		var statisticsManager
 
-			return v
+		var layerCompareFunctionOld = function( a, b ) {
+			var d1 = a.d,
+				d2 = b.d,
+				l1 = a.l,
+				l2 = b.l
+
+			if( d1 == d2 ) {
+				return ( l1 < l2 ? -1 : ( l1 > l2 ? 1 : 0 ) )
+			}
+
+			return 0
 		}
 
-		var layerCompareFunction = function( a, b ) {
-			var layer1 = a.layer || 0,
-				layer2 = b.layer || 0
+		var createVisualObjectsInDrawOrder = function( visualObjects, ids, parentId, depth ) {
+			var result = []
 
-			return ( layer1 < layer2 ? -1 : ( layer1 > layer2 ? 1 : 0 ) )
+			for( var i = 0, id, visualObject, n = ids.length; i < n; i++ ) {
+				id = ids[ i ]
+				visualObject = visualObjects[ id ]
+
+				result.push( {
+					i : id,
+					l : visualObject ? visualObject.layer : 0
+				} )
+			}
+
+			result.sort( layerCompareFunctionOld )
+
+			return result
 		}
 
-		var createSortedByLayer = function( visualObjects, ids ) {
-			return _.pluck(
-				_.reduce(
-					ids,
-					function( memo, id ) {
-						var visualObject = visualObjects[ id ]
+		var createEntityIdsInDrawOrder = function( childrenComponents, visualObjects, roots, parentId, depth ) {
+			if( !depth ) depth = 0
+			if( !parentId ) parentId = 0
 
-						return memo.concat( {
-							id    : id,
-							layer : visualObject ? visualObject.layer : 0
-						} )
-					},
-					[]
-				).sort( layerCompareFunction ),
-				'id'
-			)
+			var nextDepth = depth + 1,
+				childrenComponent,
+				id,
+				result = [],
+				visualObject,
+				visualObjectsInDrawOrder = createVisualObjectsInDrawOrder( visualObjects, roots, parentId, depth )
+
+			for( var i = 0, n = visualObjectsInDrawOrder.length; i < n; i++ ) {
+				visualObject = visualObjectsInDrawOrder[ i ]
+				id = visualObject.i
+
+				result.push( id )
+
+				childrenComponent = childrenComponents[ id ]
+
+				if( childrenComponent ) {
+					result = result.concat(
+						createEntityIdsInDrawOrder( childrenComponents, visualObjects, childrenComponent.ids, id, nextDepth )
+					)
+				}
+			}
+
+			return result
 		}
 
 		var createOffset = function( deltaTimeInMs, offset, replaySpeed, numFrames, frameDuration, loop ) {
@@ -182,8 +212,8 @@ define(
 						var frameId = tilemapRow[ x ]
 						if( frameId === null ) continue
 
-						tmpVec2[ 0 ] = x - maxTileMapX / 2 - 0.5
-						tmpVec2[ 1 ] = ( maxTileMapY - y ) - maxTileMapY / 2 - 0.5
+						tmpVec2[ 0 ] = x - maxTileMapX * 0.5 - 0.5
+						tmpVec2[ 1 ] = ( maxTileMapY - y ) - maxTileMapY * 0.5 - 0.5
 
 						context.drawSubTexture(
 							texture,
@@ -214,41 +244,37 @@ define(
 			rectangles,
 			deltaTimeInMs,
 			id,
-			viewFrustum,
-			next
+			viewFrustum
 		) {
-			var visualObject = visualObjects[ id ],
-				transform    = transforms[ id ]
+			var tilemap      = tilemaps[ id ],
+				appearance   = appearances[ id ] || animatedAppearances[ id ] || tilemap || textAppearances[ id ] || spriteSheetAppearances[ id ],
+				transform    = transforms[ id ],
+				visualObject = visualObjects[ id ],
+				quadGeometry = quadGeometries[ id ]
 
-			if(appearances[ id ] && transform) {
-				var appearance      = appearances[ id ],
-					quadGeometry    = quadGeometries[ id ],
-					dimensions      = quadGeometry ? quadGeometry.dimensions : appearance.asset.resource.dimensions,
+			if( appearance && transform && visualObject && !tilemap ) {
+				var dimensions        = quadGeometry ? quadGeometry.dimensions : appearance.asset.resource.dimensions,
+					halfTextureWidth  = dimensions[ 0 ] * 0.5,
+					halfTextureHeight = dimensions[ 1 ] * 0.5,
+					minX              = viewFrustum.bottomLeft[ 0 ] - halfTextureWidth,
+					maxX              = viewFrustum.topRight[ 0 ] + halfTextureWidth,
+					minY              = viewFrustum.bottomLeft[ 1 ] - halfTextureHeight,
+					maxY              = viewFrustum.topRight[ 1 ] + halfTextureHeight,
+					curX              = transform.worldTranslation[ 0 ],
+					curY              = transform.worldTranslation[ 1 ]
 
-					halfTextureWidth    = dimensions[0] / 2,
-					halfTextureHeight   = dimensions[1] / 2,
-
-					minX                = viewFrustum.bottomLeft[0] - halfTextureWidth,
-					maxX                = viewFrustum.topRight[0] + halfTextureWidth,
-					minY                = viewFrustum.bottomLeft[1] - halfTextureHeight,
-					maxY                = viewFrustum.topRight[1] + halfTextureHeight,
-
-					curX                = transform.worldTranslation[0],
-					curY                = transform.worldTranslation[1]
-
-				if (curX < minX || curX > maxX || curY < minY || curY > maxY) {
+				if( curX < minX || curX > maxX || curY < minY || curY > maxY ) {
 					return
 				}
-
 			}
 
 			context.save()
 			{
 				if( transform ) {
 					// object to world space transformations go here
-					context.translate( transform.translation )
-					context.rotate( -transform.rotation )
-					context.scale( transform.scale )
+					context.translate( transform.worldTranslation )
+					context.rotate( -transform.worldRotation )
+					context.scale( transform.worldScale )
 				}
 
 				if( visualObject ) {
@@ -258,13 +284,11 @@ define(
 						context.setGlobalAlpha( visualObjectOpacity )
 					}
 
-					var appearance   = appearances[ id ] || animatedAppearances[ id ] || tilemaps[ id ] || textAppearances[ id ] ||  spriteSheetAppearances[ id ],
-						shape        = rectangles[ id ],
-						quadGeometry = quadGeometries[ id ]
-
 					if( appearance ) {
 						var asset   = appearance.asset,
 							texture = asset.resource
+
+//						var performance = window.performance
 
 						if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
 
@@ -273,6 +297,8 @@ define(
 								quadDimensions = quadGeometry ?
 								quadGeometry.dimensions :
 									texture.dimensions
+
+//							var start = performance.webkitNow()
 
 							// static appearance
 							context.save()
@@ -290,12 +316,22 @@ define(
 							}
 							context.restore()
 
+//							var elapsed = performance.webkitNow() - start
+
 						} else if( asset.type === 'font' ) {
+//							var start = performance.webkitNow()
+
 							// text appearance
 							drawText( context, asset, texture, 0, 0, appearance.text, appearance.spacing, appearance.align )
 
+//							var elapsed = performance.webkitNow() - start
+
 						} else if( asset.type === '2dTileMap' ) {
+//							var start = performance.webkitNow()
+
 							draw2dTileMap( context, texture, viewFrustum, asset, transform )
+
+//							var elapsed = performance.webkitNow() - start
 
 						} else if( asset.type === 'animation' ) {
 							// animated appearance
@@ -308,7 +344,7 @@ define(
 								quadGeometry.dimensions :
 								assetFrameDimensions
 
-							if( appearance.playing === true && appearance.offset == 0) {
+							if( appearance.playing === true && appearance.offset == 0 ) {
 								entityManager.triggerEvent( id, 'animationStart', [ 'animation', appearance ] )
 							}
 
@@ -324,6 +360,8 @@ define(
 							var frameId     = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
 								frameOffset = asset.frameOffsets[ frameId ]
 
+//							var start = performance.webkitNow()
+
 							context.save()
 							{
 								context.drawSubTexture(
@@ -335,6 +373,8 @@ define(
 								)
 							}
 							context.restore()
+
+//							var elapsed = performance.webkitNow() - start
 
 							var isPlaying = updatePlaying( animationLengthInMs, appearance.offset * animationLengthInMs, appearance.looped )
 
@@ -359,7 +399,9 @@ define(
 								totalFramesInQuad = numFramesInQuad[ 0 ] * numFramesInQuad[ 1 ]
 
 							if( totalFramesInQuad > 0 ) {
-								//only draw spriteSheet if we have at least space to draw one tile
+								// only draw spriteSheet if we have at least space to draw one tile
+
+//								var start = performance.webkitNow()
 
 								context.save()
 								{
@@ -375,8 +417,8 @@ define(
 										frameId     = frames[ x ]
 										frameOffset = frameOffsets[ frameId ]
 
-										tmpVec2[ 0 ] = -(quadDimensions[ 0 ] / frameDimensions[ 0 ]) / 2 + x % numFramesInQuad[ 0 ]
-										tmpVec2[ 1 ] = -(quadDimensions[ 1 ] / frameDimensions[ 1 ]) / 2 + Math.floor( x / numFramesInQuad[ 0 ] )
+										tmpVec2[ 0 ] = -( quadDimensions[ 0 ] / frameDimensions[ 0 ] ) * 0.5 + x % numFramesInQuad[ 0 ]
+										tmpVec2[ 1 ] = -( quadDimensions[ 1 ] / frameDimensions[ 1 ] ) * 0.5 + Math.floor( x / numFramesInQuad[ 0 ] )
 
 										context.drawSubTexture(
 											texture,
@@ -388,24 +430,18 @@ define(
 									}
 								}
 								context.restore()
+
+//								var elapsed = performance.webkitNow() - start
 							}
 						}
+
+//						statisticsManager.updateNode( 'platform drawing', elapsed )
 					}
+
+					var shape = rectangles[ id ]
 
 					if( shape ) {
 						drawShape.rectangle( context, shape )
-					}
-				}
-
-				// draw children
-				var children = childrenComponents[ id ]
-
-				if( children ) {
-					var childrenIds    = createSortedByLayer( visualObjects, children.ids ),
-						numChildrenIds = childrenIds.length
-
-					for( var i = 0; i < numChildrenIds; i++ ) {
-						next( deltaTimeInMs, childrenIds[ i ], viewFrustum, next )
 					}
 				}
 			}
@@ -445,8 +481,8 @@ define(
 
 		var setCamera = function( context, cameraDimensions, position ) {
 			// setting up the camera geometry
-			var halfWidth  = cameraDimensions[ 0 ] / 2,
-				halfHeight = cameraDimensions[ 1 ] / 2
+			var halfWidth  = cameraDimensions[ 0 ] * 0.5,
+				halfHeight = cameraDimensions[ 1 ] * 0.5
 
 			mat3.ortho( -halfWidth, halfWidth, -halfHeight, halfHeight, tmpMat3 )
 
@@ -483,6 +519,18 @@ define(
 			)
 
 			return tmpViewFrustum
+		}
+
+		var createRootTransformIds = function( roots, transforms ) {
+			var result = []
+
+			for( var rootId in roots ) {
+				if( !( rootId in transforms ) ) continue
+
+				result.push( rootId )
+			}
+
+			return result
 		}
 
 		var init = function( spell ) {
@@ -524,6 +572,12 @@ define(
 			eventManager.subscribe( Events.SCREEN_ASPECT_RATIO, this.screeAspectRatioHandler )
 			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+
+//			statisticsManager = spell.statisticsManager
+//
+//			statisticsManager.addNode( 'drawing', 'spell.system.render' )
+//			statisticsManager.addNode( 'sort', 'spell.system.render' )
+//			statisticsManager.addNode( 'platform drawing', 'drawing' )
 		}
 
 		var destroy = function( spell ) {
@@ -536,10 +590,22 @@ define(
 		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
-			var cameras                 = this.cameras,
-				context                 = this.context,
-				drawVisualObjectPartial = this.drawVisualObjectPartial,
-				screenSize              = this.screenSize,
+			var cameras                = this.cameras,
+				context                = this.context,
+				screenSize             = this.screenSize,
+				context                = this.context,
+				entityManager          = spell.entityManager,
+				transforms             = this.transforms,
+				appearances            = this.appearances,
+				appearanceTransforms   = this.appearanceTransforms,
+				animatedAppearances    = this.animatedAppearances,
+				textAppearances        = this.textAppearances,
+				tilemaps               = this.tilemaps,
+				spriteSheetAppearances = this.spriteSheetAppearances,
+				childrenComponents     = this.childrenComponents,
+				quadGeometries         = this.quadGeometries,
+				visualObjects          = this.visualObjects,
+				rectangles             = this.rectangles,
 				viewFrustum
 
 			var screenAspectRatio = ( this.debugSettings && this.debugSettings.screenAspectRatio ?
@@ -566,25 +632,53 @@ define(
 			// clear color buffer
 			context.clear()
 
-			var rootTransforms = _.intersection(
-				_.keys( this.roots ),
-				_.keys( this.transforms )
-			)
+//			var performance = window.performance,
+//				start       = performance.webkitNow()
 
-			// draw scene
-			var sortedVisualObjects = createSortedByLayer( this.visualObjects, rootTransforms )
+			var rootTransformIds      = createRootTransformIds( this.roots, this.transforms),
+				sortedVisualObjectIds = createEntityIdsInDrawOrder( this.childrenComponents, this.visualObjects, rootTransformIds )
 
-			for( var i in sortedVisualObjects ) {
-				drawVisualObjectPartial( deltaTimeInMs, sortedVisualObjects[ i ], viewFrustum, drawVisualObjectPartial )
+//			var elapsed = performance.webkitNow() - start
+
+//			spell.statisticsManager.updateNode( 'sort', elapsed )
+
+
+//			var start = performance.webkitNow()
+
+			for( var i = 0, n = sortedVisualObjectIds.length; i < n; i++ ) {
+				drawVisualObject(
+					entityManager,
+					context,
+					transforms,
+					appearances,
+					appearanceTransforms,
+					animatedAppearances,
+					textAppearances,
+					tilemaps,
+					spriteSheetAppearances,
+					childrenComponents,
+					quadGeometries,
+					visualObjects,
+					rectangles,
+					deltaTimeInMs,
+					sortedVisualObjectIds[ i ],
+					viewFrustum
+				)
 			}
+
+//			var elapsed = performance.webkitNow() - start
+
+//			spell.statisticsManager.updateNode( 'drawing', elapsed )
+
 
 			if( this.config.debug &&
 				drawDebugShapes ) {
 
-				var drawDebugPartial = this.drawDebugPartial
+				var debugBoxes   = this.debugBoxes,
+					debugCircles = this.debugCircles
 
-				for( var i in sortedVisualObjects ) {
-					drawDebugPartial( deltaTimeInMs, sortedVisualObjects[ i ], drawDebugPartial )
+				for( var i = 0, n = sortedVisualObjectIds.length; i < n; i++ ) {
+					drawDebug( context, childrenComponents, debugBoxes, debugCircles, transforms )
 				}
 			}
 
@@ -595,12 +689,15 @@ define(
 					cameraAspectRatio      = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
 					effectiveTitleSafeDimensions = createIncludedRectangle( screenSize, cameraAspectRatio, true )
 
-				var offset = roundVec2(
-					vec2.scale(
-						vec2.subtract( screenSize, effectiveTitleSafeDimensions, tmpVec2 ),
-						0.5
-					)
+				vec2.scale(
+					vec2.subtract( screenSize, effectiveTitleSafeDimensions, tmpVec2 ),
+					0.5
 				)
+
+				var offset = tmpVec2
+
+				offset[ 0 ] = Math.round( offset[ 0 ] )
+				offset[ 1 ] = Math.round( offset[ 1 ] )
 
 				context.save()
 				{
@@ -652,36 +749,6 @@ define(
 			this.screenSize           = spell.configurationManager.currentScreenSize
 			this.debugSettings        = spell.configurationManager.debug ? spell.configurationManager.debug : false
 			this.cameraChangedHandler = null
-
-			this.drawVisualObjectPartial = _.bind(
-				drawVisualObject,
-				null,
-				spell.entityManager,
-				this.context,
-				this.transforms,
-				this.appearances,
-				this.appearanceTransforms,
-				this.animatedAppearances,
-				this.textAppearances,
-				this.tilemaps,
-				this.spriteSheetAppearances,
-				this.childrenComponents,
-				this.quadGeometries,
-				this.visualObjects,
-				this.rectangles
-			)
-
-			if( this.config.debug ) {
-				this.drawDebugPartial = _.bind(
-					drawDebug,
-					null,
-					this.context,
-					this.childrenComponents,
-					this.debugBoxes,
-					this.debugCircles,
-					this.transforms
-				)
-			}
 
 			var context    = this.context,
 				screenSize = this.screenSize
