@@ -880,7 +880,7 @@ define(
 			 * @return {Object}
 			 */
 			getComponentsByName : function( componentId, name, entityId ) {
-				var componentMap = this.getcomponentMapById( componentId ),
+				var componentMap = this.getComponentMapById( componentId ),
 					ids          = this.getEntityIdsByName( name, entityId )
 
 				if( ids.length === 0 ||
