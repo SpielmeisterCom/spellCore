@@ -589,6 +589,39 @@ define(
 			eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 		}
 
+		var activate = function( spell ) {
+			this.sortedVisualObjectIds = createEntityIdsInDrawOrder(
+				this.childrenComponents,
+				this.visualObjects,
+				createRootTransformIds( this.roots, this.transforms )
+			)
+
+			this.updateSortedVisualObjectIds = _.bind(
+				function() {
+					this.sortedVisualObjectIds = createEntityIdsInDrawOrder(
+						this.childrenComponents,
+						this.visualObjects,
+						createRootTransformIds( this.roots, this.transforms )
+					)
+				},
+				this
+			)
+
+			var eventManager = spell.eventManager
+
+			eventManager.subscribe( Events.ENTITY_DESTROYED, this.updateSortedVisualObjectIds )
+			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.ROOT_COMPONENT_ID ], this.updateSortedVisualObjectIds )
+			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CHILDREN_COMPONENT_ID ], this.updateSortedVisualObjectIds )
+		}
+
+		var deactivate = function( spell ) {
+			var eventManager = spell.eventManager
+
+			eventManager.unsubscribe( Events.ENTITY_DESTROYED, this.updateSortedVisualObjectIds )
+			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.ROOT_COMPONENT_ID ], this.updateSortedVisualObjectIds )
+			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CHILDREN_COMPONENT_ID ], this.updateSortedVisualObjectIds )
+		}
+
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var cameras                = this.cameras,
 				context                = this.context,
@@ -606,6 +639,7 @@ define(
 				quadGeometries         = this.quadGeometries,
 				visualObjects          = this.visualObjects,
 				rectangles             = this.rectangles,
+				sortedVisualObjectIds  = this.sortedVisualObjectIds,
 				viewFrustum
 
 			var screenAspectRatio = ( this.debugSettings && this.debugSettings.screenAspectRatio ?
@@ -631,17 +665,6 @@ define(
 
 			// clear color buffer
 			context.clear()
-
-//			var performance = window.performance,
-//				start       = performance.webkitNow()
-
-			var rootTransformIds      = createRootTransformIds( this.roots, this.transforms),
-				sortedVisualObjectIds = createEntityIdsInDrawOrder( this.childrenComponents, this.visualObjects, rootTransformIds )
-
-//			var elapsed = performance.webkitNow() - start
-
-//			spell.statisticsManager.updateNode( 'sort', elapsed )
-
 
 //			var start = performance.webkitNow()
 
@@ -743,12 +766,13 @@ define(
 		 */
 
 		var Renderer = function( spell ) {
-			this.configurationManager = spell.configurationManager
-			this.context              = spell.renderingContext
-			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
-			this.screenSize           = spell.configurationManager.currentScreenSize
-			this.debugSettings        = spell.configurationManager.debug ? spell.configurationManager.debug : false
-			this.cameraChangedHandler = null
+			this.configurationManager        = spell.configurationManager
+			this.context                     = spell.renderingContext
+			this.debugFontAsset              = spell.assets[ debugFontAssetId ]
+			this.screenSize                  = spell.configurationManager.currentScreenSize
+			this.debugSettings               = spell.configurationManager.debug ? spell.configurationManager.debug : false
+			this.sortedVisualObjectIds       = []
+			this.updateSortedVisualObjectIds = null
 
 			var context    = this.context,
 				screenSize = this.screenSize
@@ -778,8 +802,8 @@ define(
 		Renderer.prototype = {
 			init : init,
 			destroy : destroy,
-			activate : function() {},
-			deactivate : function() {},
+			activate : activate,
+			deactivate : deactivate,
 			process : process
 		}
 
