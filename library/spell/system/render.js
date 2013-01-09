@@ -516,8 +516,8 @@ define(
 				this
 			)
 
-			this.cameraChangedHandler = function( component, entityId ) {
-				currentCameraId = component.active ? entityId : null
+			this.cameraChangedHandler = function( camera, entityId ) {
+				currentCameraId = camera.active ? entityId : null
 			}
 
 			eventManager.subscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
