@@ -68,9 +68,9 @@ define(
 			var attributes = _.reduce(
 				system.input,
 				function( memo, inputDefinition ) {
-					var componentDictionary = entityManager.getComponentDictionaryById( inputDefinition.componentId )
+					var componentMap = entityManager.getComponentMapById( inputDefinition.componentId )
 
-					if( !componentDictionary ) {
+					if( !componentMap ) {
 						throw 'Error: No component list for component template id \'' + inputDefinition.componentId +  '\' available.'
 					}
 
@@ -78,7 +78,7 @@ define(
 						throw 'Error: The system \'' + systemId + '\' uses the reserved keyword \'config\' as a local alias for its input.'
 					}
 
-					memo[ inputDefinition.name ] = componentDictionary
+					memo[ inputDefinition.name ] = componentMap
 
 					return memo
 				},

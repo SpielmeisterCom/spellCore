@@ -84,29 +84,29 @@ define(
 		/**
 		 * Updates the local transformation from a world transformation
 		 *
-		 * @param componentDictionaries
+		 * @param componentMaps
 		 * @param entityId
 		 * @return {*}
 		 */
-		var updateLocalTransform = function( componentDictionaries, entityId ) {
+		var updateLocalTransform = function( componentMaps, entityId ) {
 
 		}
 
 		/**
 		 * Updates the world transformation from a local transformation
 		 *
-		 * @param componentDictionaries
+		 * @param componentMaps
 		 * @param entityId
 		 * @return {*}
 		 */
-		var updateWorldTransform = function( componentDictionaries, entityId ) {
-			var transformComponents = componentDictionaries[ TRANSFORM_COMPONENT_ID ],
+		var updateWorldTransform = function( componentMaps, entityId ) {
+			var transformComponents = componentMaps[ TRANSFORM_COMPONENT_ID ],
 				transform           = transformComponents[ entityId ]
 
 			if( !transform ) return
 
-			var parentComponents    = componentDictionaries[ PARENT_COMPONENT_ID ],
-				childrenComponents  = componentDictionaries[ CHILDREN_COMPONENT_ID ],
+			var parentComponents    = componentMaps[ PARENT_COMPONENT_ID ],
+				childrenComponents  = componentMaps[ CHILDREN_COMPONENT_ID ],
 				children            = childrenComponents[ entityId ],
 				parentEntityId      = entityId, // we will search for the real parent later
 				localMatrix         = transform.localMatrix,
@@ -157,7 +157,7 @@ define(
 				for( var i = 0, length = children.ids.length; i < length; i++ ) {
 					var childrenEntityId = children.ids[ i ]
 
-					updateWorldTransform( componentDictionaries, childrenEntityId )
+					updateWorldTransform( componentMaps, childrenEntityId )
 				}
 			}
 		}
@@ -185,48 +185,48 @@ define(
 			componentMaps[ componentId ] = {}
 		}
 
-		var addComponents = function( componentDictionaries, eventManager, entityId, entityComponents ) {
+		var addComponents = function( componentMaps, eventManager, entityId, entityComponents ) {
 			_.each(
 				entityComponents,
 				function( component, componentId ) {
-					if( !!componentDictionaries[ componentId ][ entityId ] ) {
+					if( !!componentMaps[ componentId ][ entityId ] ) {
 						throw 'Error: Adding a component to the entity with id \'' + entityId + '\' failed because the entity already has a component named \'' + componentId + '\'. Check with hasComponent first if this entity already has this component.'
 					}
 
-					componentDictionaries[ componentId ][ entityId ] = component
+					componentMaps[ componentId ][ entityId ] = component
 
 					eventManager.publish( [ Events.COMPONENT_CREATED, componentId ], [ component, entityId ] )
 				}
 			)
 		}
 
-		var entityExists = function( componentDictionaries, entityId ) {
-			for( var componentId in componentDictionaries ) {
-				var componentDictionary = componentDictionaries[ componentId ]
+		var entityExists = function( componentMaps, entityId ) {
+			for( var componentId in componentMaps ) {
+				var componentMap = componentMaps[ componentId ]
 
-				if( componentDictionary[ entityId ] ) return true
+				if( componentMap[ entityId ] ) return true
 			}
 
 			return false
 		}
 
-		var removeComponents = function( eventManager, componentDictionaries, entityId, entityComponentId ) {
+		var removeComponents = function( eventManager, componentMaps, entityId, entityComponentId ) {
 			if( entityComponentId ) {
 				// remove a single component from the entity
-				delete componentDictionaries[ entityComponentId ][ entityId ]
+				delete componentMaps[ entityComponentId ][ entityId ]
 
-				if( !entityExists( componentDictionaries, entityId ) ) {
+				if( !entityExists( componentMaps, entityId ) ) {
 					eventManager.publish( Events.ENTITY_DESTROYED, entityId )
 				}
 
 			} else {
-				// remove all componentDictionaries, that is "remove the entity"
+				// remove all componentMaps, that is "remove the entity"
 				_.each(
-					componentDictionaries,
-					function( componentDictionary ) {
-						if( !_.has( componentDictionary, entityId ) ) return
+					componentMaps,
+					function( componentMap ) {
+						if( !_.has( componentMap, entityId ) ) return
 
-						delete componentDictionary[ entityId ]
+						delete componentMap[ entityId ]
 					}
 				)
 
@@ -304,9 +304,9 @@ define(
 			return result
 		}
 
-		var attachEntityToParent = function( componentDictionaries, entityId, parentEntityId ) {
-			var parentComponents    = componentDictionaries[ PARENT_COMPONENT_ID ],
-				childrenComponents  = componentDictionaries[ CHILDREN_COMPONENT_ID ],
+		var attachEntityToParent = function( componentMaps, entityId, parentEntityId ) {
+			var parentComponents    = componentMaps[ PARENT_COMPONENT_ID ],
+				childrenComponents  = componentMaps[ CHILDREN_COMPONENT_ID ],
 				children            = childrenComponents[ parentEntityId ]
 
 			// TODO: Check if this code is needed
@@ -337,18 +337,18 @@ define(
 			}
 		}
 
-		var reassignEntity = function( componentDictionaries, entityId, parentEntityId ) {
+		var reassignEntity = function( componentMaps, entityId, parentEntityId ) {
 			if( entityId === parentEntityId ) return
 
-			var rootComponents     = componentDictionaries[ ROOT_COMPONENT_ID ],
-				childrenComponents = componentDictionaries[ CHILDREN_COMPONENT_ID ],
+			var rootComponents     = componentMaps[ ROOT_COMPONENT_ID ],
+				childrenComponents = componentMaps[ CHILDREN_COMPONENT_ID ],
 				isRoot             = !!rootComponents[ entityId ]
 
 			if( isRoot && !parentEntityId ) return
 
 			if( parentEntityId ) {
 				detachEntityFromParent( childrenComponents, entityId, parentEntityId )
-				attachEntityToParent( componentDictionaries, entityId, parentEntityId )
+				attachEntityToParent( componentMaps, entityId, parentEntityId )
 
 				if( isRoot ) {
 					// remove root component from entity
@@ -428,7 +428,7 @@ define(
 			return result
 		}
 
-		var createEntity = function( eventManager, componentDictionaries, templateManager, entityConfig, isRoot ) {
+		var createEntity = function( eventManager, componentMaps, templateManager, entityConfig, isRoot ) {
 			isRoot       = ( isRoot === true || isRoot === undefined )
 			entityConfig = normalizeEntityConfig( templateManager, entityConfig )
 
@@ -449,7 +449,7 @@ define(
 				entityConfig.children,
 				function( entityConfig ) {
 					entityConfig.parentId = entityId
-					return createEntity( eventManager, componentDictionaries, templateManager, entityConfig, false )
+					return createEntity( eventManager, componentMaps, templateManager, entityConfig, false )
 				}
 			)
 
@@ -462,15 +462,15 @@ define(
 			// creating the entity
 			var entityComponents = templateManager.createComponents( entityTemplateId, config || {} )
 
-			addComponents( componentDictionaries, eventManager, entityId, entityComponents )
+			addComponents( componentMaps, eventManager, entityId, entityComponents )
 
 			if( parentId ) {
-				attachEntityToParent( componentDictionaries, entityId, parentId )
+				attachEntityToParent( componentMaps, entityId, parentId )
 			}
 
-			updateWorldTransform( componentDictionaries, entityId )
+			updateWorldTransform( componentMaps, entityId )
 
-			var appearanceTransform = componentDictionaries[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ]
+			var appearanceTransform = componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ]
 
 			if( appearanceTransform ) {
 				updateAppearanceTransform( appearanceTransform )
@@ -481,11 +481,11 @@ define(
 			return entityId
 		}
 
-		var assembleEntityInstance = function( componentDictionaries, id ) {
+		var assembleEntityInstance = function( componentMaps, id ) {
 			return _.reduce(
-				componentDictionaries,
-				function( memo, componentDictionary, componentId ) {
-					var component = componentDictionary[ id ]
+				componentMaps,
+				function( memo, componentMap, componentId ) {
+					var component = componentMap[ id ]
 
 					if( component ) {
 						memo[ componentId ] = component
@@ -510,12 +510,12 @@ define(
 			return resultIds
 		}
 
-		var getEntityDimensions = function( componentDictionaries, entityId ) {
-			var staticAppearances   = componentDictionaries[ STATIC_APPEARANCE_COMPONENT_ID ],
-				animatedAppearances = componentDictionaries[ ANIMATED_APPEARANCE_COMPONENT_ID ],
-				transforms          = componentDictionaries[ TRANSFORM_COMPONENT_ID ],
-				quadGeometries      = componentDictionaries[ QUAD_GEOMETRY_COMPONENT_ID ],
-				tilemaps            = componentDictionaries[ TILEMAP_COMPONENT_ID ],
+		var getEntityDimensions = function( componentMaps, entityId ) {
+			var staticAppearances   = componentMaps[ STATIC_APPEARANCE_COMPONENT_ID ],
+				animatedAppearances = componentMaps[ ANIMATED_APPEARANCE_COMPONENT_ID ],
+				transforms          = componentMaps[ TRANSFORM_COMPONENT_ID ],
+				quadGeometries      = componentMaps[ QUAD_GEOMETRY_COMPONENT_ID ],
+				tilemaps            = componentMaps[ TILEMAP_COMPONENT_ID ],
 				dimensions          = vec2.create()
 
 
@@ -558,13 +558,13 @@ define(
 		 */
 
 		var EntityManager = function( spell, eventManager, templateManager ) {
-			this.componentDictionaries = {}
-			this.eventManager          = eventManager
-			this.templateManager       = templateManager
-			this.spell                 = spell
+			this.componentMaps   = {}
+			this.eventManager    = eventManager
+			this.templateManager = templateManager
+			this.spell           = spell
 
 			this.templateManager.registerComponentTypeAddedCallback(
-				_.bind( addComponentType, null, this.componentDictionaries )
+				_.bind( addComponentType, null, this.componentMaps )
 			)
 		}
 
@@ -649,7 +649,7 @@ define(
 			 * @return {String} the entity id of the newly created entity
 			 */
 			createEntity : function( entityConfig ) {
-				return createEntity( this.eventManager, this.componentDictionaries, this.templateManager, entityConfig )
+				return createEntity( this.eventManager, this.componentMaps, this.templateManager, entityConfig )
 			},
 
 			/**
@@ -678,7 +678,7 @@ define(
 			removeEntity : function( entityId ) {
 				if( !entityId ) throw 'Error: Missing entity id.'
 
-				removeComponents( this.eventManager, this.componentDictionaries, entityId )
+				removeComponents( this.eventManager, this.componentMaps, entityId )
 			},
 
 			/**
@@ -691,7 +691,7 @@ define(
 			 * @return {Object}
 			 */
 			getEntityById : function( entityId ) {
-				return assembleEntityInstance( this.componentDictionaries, entityId )
+				return assembleEntityInstance( this.componentMaps, entityId )
 			},
 
 			/**
@@ -700,10 +700,10 @@ define(
 			 */
 			cloneEntity: function( entityId ) {
 				var entityConfig = {
-					config: assembleEntityInstance( this.componentDictionaries, entityId )
+					config: assembleEntityInstance( this.componentMaps, entityId )
 				}
 
-				return createEntity( this.eventManager, this.componentDictionaries, this.templateManager, entityConfig )
+				return createEntity( this.eventManager, this.componentMaps, this.templateManager, entityConfig )
 			},
 
 
@@ -713,7 +713,7 @@ define(
 			 * @return vec2 2d-vector containing the dimension
 			 */
 			getEntityDimensions: function( entityId ) {
-				return getEntityDimensions( this.componentDictionaries, entityId )
+				return getEntityDimensions( this.componentMaps, entityId )
 			},
 
 
@@ -725,11 +725,11 @@ define(
 			 * @return {Array}
 			 */
 			getEntityIdsByName : function( name, entityId ) {
-				var metaDataComponents = this.componentDictionaries[ METADATA_COMPONENT_ID ],
+				var metaDataComponents = this.componentMaps[ METADATA_COMPONENT_ID ],
 					resultIds          = []
 
 				var ids = entityId ?
-					getEntityCompositeIds( this.componentDictionaries[ CHILDREN_COMPONENT_ID ], entityId, [] ) :
+					getEntityCompositeIds( this.componentMaps[ CHILDREN_COMPONENT_ID ], entityId, [] ) :
 					_.keys( metaDataComponents )
 
 				for( var i = 0, numIds = ids.length; i < numIds; i++ ) {
@@ -767,14 +767,14 @@ define(
 			 * Resets the entity manager. Removes all entity instances in the process.
 			 */
 			reset : function() {
-				var componentDictionaries = this.componentDictionaries,
-					eventManager          = this.eventManager
+				var componentMaps = this.componentMaps,
+					eventManager  = this.eventManager
 
-				for( var componentId in componentDictionaries ) {
-					var components = componentDictionaries[ componentId ]
+				for( var componentId in componentMaps ) {
+					var components = componentMaps[ componentId ]
 
 					for( var entityId in components ) {
-						removeComponents( eventManager, componentDictionaries, entityId )
+						removeComponents( eventManager, componentMaps, entityId )
 					}
 				}
 			},
@@ -797,7 +797,7 @@ define(
 			reassignEntity : function( entityId, parentEntityId ) {
 				if( !entityId ) throw 'Error: Missing entity id.'
 
-				reassignEntity( this.componentDictionaries, entityId, parentEntityId )
+				reassignEntity( this.componentMaps, entityId, parentEntityId )
 			},
 
 			/**
@@ -808,7 +808,7 @@ define(
 			 * @return {Boolean}
 			 */
 			hasComponent : function( entityId, componentId ) {
-				return !!this.componentDictionaries[ componentId ][ entityId ]
+				return !!this.componentMaps[ componentId ][ entityId ]
 			},
 
 			/**
@@ -840,7 +840,7 @@ define(
 				componentConfigs[ componentId ] = attributeConfig || {}
 
 				addComponents(
-					this.componentDictionaries,
+					this.componentMaps,
 					entityId,
 					this.templateManager.createComponents( null, componentConfigs )
 				)
@@ -855,7 +855,7 @@ define(
 			removeComponent : function( entityId, componentId ) {
 				if( !entityId ) throw 'Error: Missing entity id.'
 
-				removeComponents( this.eventManager, this.componentDictionaries, entityId, componentId )
+				removeComponents( this.eventManager, this.componentMaps, entityId, componentId )
 			},
 
 			/**
@@ -866,9 +866,9 @@ define(
 			 * @return {Object}
 			 */
 			getComponentById : function( entityId, componentId ) {
-				var componentDictionary = this.componentDictionaries[ componentId ]
+				var componentMap = this.componentMaps[ componentId ]
 
-				return componentDictionary ? componentDictionary[ entityId ] : undefined
+				return componentMap ? componentMap[ entityId ] : undefined
 			},
 
 			/**
@@ -880,16 +880,16 @@ define(
 			 * @return {Object}
 			 */
 			getComponentsByName : function( componentId, name, entityId ) {
-				var componentDictionary = this.getComponentDictionaryById( componentId ),
-					ids                 = this.getEntityIdsByName( name, entityId )
+				var componentMap = this.getcomponentMapById( componentId ),
+					ids          = this.getEntityIdsByName( name, entityId )
 
 				if( ids.length === 0 ||
-					!componentDictionary ) {
+					!componentMap ) {
 
 					return []
 				}
 
-				return _.pick( componentDictionary, ids )
+				return _.pick( componentMap, ids )
 			},
 
 			/**
@@ -923,7 +923,7 @@ define(
 						attributeConfig.scale ||
 						attributeConfig.rotation ) {
 
-						updateWorldTransform( this.componentDictionaries, entityId )
+						updateWorldTransform( this.componentMaps, entityId )
 
 					} else if( attributeConfig.worldTranslation ||
 						attributeConfig.worldScale ||
@@ -937,7 +937,7 @@ define(
 						attributeConfig.scale ||
 						attributeConfig.rotation ) {
 
-						updateAppearanceTransform( this.componentDictionaries[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
+						updateAppearanceTransform( this.componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
 					}
 				}
 
@@ -947,21 +947,21 @@ define(
 			},
 
 			/**
-			 * Returns a component dictionary of a specific type.
+			 * Returns a component map of a specific type.
 			 *
 			 * @param {String} componentId the requested component type / id
 			 * @return {*}
 			 */
-			getComponentDictionaryById : function( componentId ) {
-				return this.componentDictionaries[ componentId ]
+			getComponentMapById : function( componentId ) {
+				return this.componentMaps[ componentId ]
 			},
 
 			updateWorldTransform : function( entityId ) {
-				updateWorldTransform( this.componentDictionaries, entityId )
+				updateWorldTransform( this.componentMaps, entityId )
 			},
 
 			updateAppearanceTransform : function( entityId ) {
-				updateAppearanceTransform(  this.componentDictionaries[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
+				updateAppearanceTransform( this.componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
 			},
 
 			/**
@@ -976,7 +976,7 @@ define(
 
 				for( var i = 0, numComponentIds = componentIds.length; i < numComponentIds; i++ ) {
 					var componentId  = componentIds[ i ],
-						componentMap = this.componentDictionaries[ componentId ]
+						componentMap = this.componentMaps[ componentId ]
 
 					for( var id in componentMap ) {
 						var component = componentMap[ id ]
@@ -996,7 +996,7 @@ define(
 			 * @param eventArguments
 			 */
 			triggerEvent : function( entityId, eventId, eventArguments ) {
-				var component = this.componentDictionaries[ EVENT_HANDLERS_COMPONENT_ID ][ entityId ]
+				var component = this.componentMaps[ EVENT_HANDLERS_COMPONENT_ID ][ entityId ]
 
 				if( !component ) return
 
