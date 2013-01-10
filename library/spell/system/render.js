@@ -272,9 +272,7 @@ define(
 			{
 				if( transform ) {
 					// object to world space transformations go here
-					context.translate( transform.worldTranslation )
-					context.rotate( -transform.worldRotation )
-					context.scale( transform.worldScale )
+					context.multiplyMatrix( transform.worldMatrix )
 				}
 
 				if( visualObject ) {

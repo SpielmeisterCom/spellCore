@@ -227,6 +227,7 @@ define(
 				restore                 : restore,
 				rotate                  : rotate,
 				save                    : save,
+				multiplyMatrix          : multiplyMatrix,
 				scale                   : scale,
 				setClearColor           : setClearColor,
 				setColor                : setColor,
@@ -297,6 +298,10 @@ define(
 			currentState = stateStack.getTop()
 
 			setViewMatrix( currentState.viewMatrix )
+		}
+
+		var multiplyMatrix = function ( mat ) {
+			mat3.multiply( currentState.matrix, mat )
 		}
 
 		var scale = function( vec ) {
