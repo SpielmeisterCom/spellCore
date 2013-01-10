@@ -136,7 +136,6 @@ define(
 				restore                 : restore,
 				rotate                  : rotate,
 				save                    : save,
-				multiplyMatrix          : multiplyMatrix,
 				scale                   : scale,
 				setClearColor           : setClearColor,
 				setColor                : setColor,
@@ -290,10 +289,6 @@ define(
 
 		var setClearColor = function( vec ) {
 			gl.clearColor( vec[ 0 ], vec[ 1 ], vec[ 2 ], 1.0 )
-		}
-
-		var multiplyMatrix = function ( mat ) {
-			mat3.multiply( currentState.matrix, mat )
 		}
 
 		var scale = function( vec ) {

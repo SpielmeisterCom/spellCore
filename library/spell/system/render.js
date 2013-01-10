@@ -271,8 +271,7 @@ define(
 			context.save()
 			{
 				if( transform ) {
-					// object to world space transformations go here
-					context.multiplyMatrix( transform.worldMatrix )
+					context.setTransform( transform.worldMatrix )
 				}
 
 				if( visualObject ) {
@@ -456,9 +455,7 @@ define(
 			context.save()
 			{
 				if( transform ) {
-					// object to world space transformations go here
-					context.translate( transform.translation )
-					context.rotate( -transform.rotation )
+					context.setTransform( transform.worldMatrix )
 				}
 
 				if( debugBox ) {
