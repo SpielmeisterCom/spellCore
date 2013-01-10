@@ -211,12 +211,15 @@ define(
 		}
 
 		var removeComponents = function( eventManager, componentMaps, entityId, entityComponentId ) {
+			var childrenComponent = componentMaps[ CHILDREN_COMPONENT_ID ][ entityId ],
+				removedEntity     = true
+
 			if( entityComponentId ) {
 				// remove a single component from the entity
 				delete componentMaps[ entityComponentId ][ entityId ]
 
-				if( !entityExists( componentMaps, entityId ) ) {
-					eventManager.publish( Events.ENTITY_DESTROYED, entityId )
+				if( entityExists( componentMaps, entityId ) ) {
+					removedEntity = false
 				}
 
 			} else {
@@ -229,8 +232,18 @@ define(
 						delete componentMap[ entityId ]
 					}
 				)
+			}
 
+			if( removedEntity ) {
 				eventManager.publish( Events.ENTITY_DESTROYED, entityId )
+
+				if( childrenComponent ) {
+					var childrenIds = childrenComponent.ids
+
+					for( var i = 0, n = childrenIds.length; i < n; i++ ) {
+						removeComponents( eventManager, componentMaps, childrenIds[ i ] )
+					}
+				}
 			}
 		}
 

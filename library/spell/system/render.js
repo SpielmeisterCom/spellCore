@@ -607,19 +607,11 @@ define(
 				this
 			)
 
-			var eventManager = spell.eventManager
-
-			eventManager.subscribe( Events.ENTITY_DESTROYED, this.updateSortedVisualObjectIds )
-			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.ROOT_COMPONENT_ID ], this.updateSortedVisualObjectIds )
-			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CHILDREN_COMPONENT_ID ], this.updateSortedVisualObjectIds )
+			spell.eventManager.subscribe( Events.ENTITY_CREATED, this.updateSortedVisualObjectIds )
 		}
 
 		var deactivate = function( spell ) {
-			var eventManager = spell.eventManager
-
-			eventManager.unsubscribe( Events.ENTITY_DESTROYED, this.updateSortedVisualObjectIds )
-			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.ROOT_COMPONENT_ID ], this.updateSortedVisualObjectIds )
-			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CHILDREN_COMPONENT_ID ], this.updateSortedVisualObjectIds )
+			spell.eventManager.unsubscribe( Events.ENTITY_CREATED, this.updateSortedVisualObjectIds )
 		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
