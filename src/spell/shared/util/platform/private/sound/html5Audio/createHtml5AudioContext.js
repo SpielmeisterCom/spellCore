@@ -1,35 +1,28 @@
 define(
 	'spell/shared/util/platform/private/sound/html5Audio/createHtml5AudioContext',
-	[
-		'spell/functions'
-	],
-	function(
-		_
-	) {
+	function() {
 		'use strict'
 
 		/*
 		 * private
 		 */
-		var audioElements = {},
-			isMutedValue  = false,
-			soundCounter  = 0
+		var audioElements  = {},
+			isMutedValue   = false,
+			soundIdCounter = 0
 
 		var create = function( id, audioResource ) {
 			var audio
 
 			if( audioResource.privateAudioResource.cloneNode ) {
-
-				audio = audioResource.privateAudioResource.cloneNode(true)
+				audio = audioResource.privateAudioResource.cloneNode( true )
 
 			} else {
-
-				audio       = new Audio()
-				audio.src   = audioResource.privateAudioResource.src
+				audio = new Audio()
+				audio.src = audioResource.privateAudioResource.src
 			}
 
-
 			audioElements[ id ] = audio
+
 			return audio
 		}
 
@@ -51,54 +44,61 @@ define(
 		 * @param loop
 		 */
 		var play = function( audioResource, id, volume, loop ) {
-			id = ( id ) ? id : "tmp_sound_" + soundCounter++
-			var audioElement = ( _.has( audioElements, id ) ) ? audioElements[id] : create( id, audioResource )
+			if( !id ) {
+				id = "tmp_sound_" + soundIdCounter++
+			}
+
+			var audioElement = audioElements[ id ] || create( id, audioResource )
 
 			setLoop( id, loop )
 			setVolume( id, volume )
 
-			if( isMuted() ) mute( id )
+			if( isMuted() ) {
+				mute( id )
+			}
 
 			audioElement.play()
 		}
 
 		var stopAll = function() {
-			_.each( audioElements, function( value, key ) {
-				mute( key )
-			} )
+			for( var id in audioElements ) {
+				mute( id )
+			}
 		}
 
 		var resumeAll = function() {
-			_.each( audioElements, function( value, key ) {
-				setVolume( key, 1 )
-			} )
+			for( var id in audioElements ) {
+				setVolume( id, 1 )
+			}
 		}
 
 		var stop = function( id ) {
 			var audioElement = audioElements[ id ]
+			if( !audioElement ) return
 
-			if( audioElement ) audioElement.pause()
+			audioElement.pause()
 		}
 
 		var setVolume = function ( id, volume ) {
-			volume = ( !isNaN(volume) && volume < 1 && volume >= 0 ) ? volume : 1
-			var audioElement = audioElements[ id ]
+			volume = !isNaN( volume ) && volume < 1 && volume >= 0 ? volume : 1
 
-			if( audioElement ) audioElement.volume = volume
+			var audioElement = audioElements[ id ]
+			if( !audioElement ) return
+
+			audioElement.volume = volume
 		}
 
 		var setLoop = function( id, loop ) {
-			loop = !!loop
 			var audioElement = audioElements[ id ]
-
 			if( !audioElement ) return
 
 			if( loop ) {
 				audioElement.addEventListener( 'ended', loopCallback, false )
 				audioElement.removeEventListener( 'ended', removeCallback, false )
+
 			} else {
-				audioElement.removeEventListener( 'ended', loopCallback, false )
 				audioElement.addEventListener( 'ended', removeCallback, false )
+				audioElement.removeEventListener( 'ended', loopCallback, false )
 			}
 		}
 
@@ -107,14 +107,11 @@ define(
 		}
 
 		var setMute = function( isMute ) {
-			if( isMute === true ) {
-				_.each( audioElements, function( value, key ) {
-					mute( key )
-				} )
+			if( isMute ) {
+				stopAll()
+
 			} else {
-				_.each( audioElements, function( value, key ) {
-					setVolume( key, 1 )
-				} )
+				resumeAll()
 			}
 
 			isMutedValue = isMute
@@ -131,8 +128,8 @@ define(
 
 			audioElement.removeEventListener( 'ended', removeCallback, false )
 			audioElement.removeEventListener( 'ended', loopCallback, false )
-
 			audioElement.pause()
+
 			delete audioElements[ id ]
 		}
 
@@ -144,8 +141,7 @@ define(
 		var createAudioContext = function() {
 			var context = new Audio()
 
-			if( context === null ) return null
-
+			if( !context ) return null
 
 			return createWrapperContext()
 		}
