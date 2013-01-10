@@ -146,7 +146,7 @@ define(
 			bodyDef.type          = type
 			bodyDef.position.x    = translation[ 0 ] * scale
 			bodyDef.position.y    = translation[ 1 ] * scale
-			bodyDef.angle         = transform.rotation * -1
+			bodyDef.angle         = transform.rotation
 			bodyDef.userData      = entityId
 
 			return this.rawWorld.CreateBody( bodyDef )

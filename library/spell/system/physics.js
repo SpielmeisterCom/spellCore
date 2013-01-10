@@ -210,7 +210,7 @@ define(
 
 				transform.translation[ 0 ] = position.x / worldToPhysicsScale
 				transform.translation[ 1 ] = position.y / worldToPhysicsScale
-				transform.rotation = body.GetAngle() * -1
+				transform.rotation = body.GetAngle()
 
 				var velocityVec2  = body.GetLinearVelocity(),
 					bodyComponent = bodies[ id ]

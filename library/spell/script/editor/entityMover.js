@@ -2,30 +2,16 @@ define("spell/script/editor/entityMover",
 	[
 		'spell/math/vec2',
 		'spell/math/mat3',
+        'spell/math/util',
 		'spell/functions'
 	],
 	function(
 		vec2,
 		mat3,
+        mathUtil,
 		_
 		) {
 		"use strict";
-		var isPointInRect = function( point, rectOrigin, rectWidth, rectHeight, rectRotation ) {
-			var tmp     = -rectRotation, /** Math.PI / 180,*/
-					c       = Math.cos( tmp ),
-				s       = Math.sin( tmp),
-				leftX   = rectOrigin[ 0 ] - rectWidth / 2,
-				rightX  = rectOrigin[ 0 ] + rectWidth / 2,
-				topY    = rectOrigin[ 1 ] - rectHeight / 2,
-				bottomY = rectOrigin[ 1 ] + rectHeight / 2
-
-			// Unrotate the point depending on the rotation of the rectangle
-			var rotatedX = rectOrigin[ 0 ] + c * ( point[ 0 ] - rectOrigin[ 0 ] ) - s * ( point[ 1 ] - rectOrigin[1] ),
-				rotatedY = rectOrigin[ 1 ] + s * ( point[ 0 ] - rectOrigin[ 0 ] ) + c * ( point[ 1 ] - rectOrigin[1] )
-
-			return leftX <= rotatedX && rotatedX <= rightX && topY <= rotatedY && rotatedY <= bottomY
-		}
-
 		var isPointWithinEntity = function ( worldPosition, entityId ) {
 			var editorConfigurations = this.editorConfigurations,
 				editorConfiguration  = editorConfigurations[ entityId ]
@@ -48,7 +34,7 @@ define("spell/script/editor/entityMover",
 			var transform = this.transforms[ entityId ],
 			    entityDimensions = this.spell.entityManager.getEntityDimensions( entityId )
 
-			return isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.worldRotation )
+			return mathUtil.isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.worldRotation )
 
 		}
 

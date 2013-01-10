@@ -108,7 +108,7 @@ define(
 		 * @return {Boolean}
 		 */
 		mathUtil.isPointInRect = function( point, rectOrigin, rectWidth, rectHeight, rectRotation ) {
-			var tmp     = -rectRotation, /** Math.PI / 180,*/
+			var tmp     = rectRotation, /** Math.PI / 180,*/
 				c       = Math.cos( tmp ),
 				s       = Math.sin( tmp ),
 				leftX   = rectOrigin[ 0 ] - rectWidth / 2,
