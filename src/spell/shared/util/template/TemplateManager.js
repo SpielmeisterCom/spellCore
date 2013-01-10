@@ -40,10 +40,9 @@ define(
 				function( memo, attributeConfig ) {
 					var attributeName = attributeConfig.name
 
-					memo[ attributeName ] = ( _.has( memo, attributeName ) ?
-						memo[ attributeName ] += 1 :
+					memo[ attributeName ] = memo[ attributeName ] ?
+						memo[ attributeName ] + 1 :
 						1
-					)
 
 					return memo
 				},
@@ -63,10 +62,9 @@ define(
 				function( memo, componentConfig ) {
 					var componentId = componentConfig.componentId
 
-					memo[ componentId ] = ( _.has( memo, componentId ) ?
-						memo[ componentId ] += 1 :
+					memo[ componentId ] = memo[ componentId ] ?
+						memo[ componentId ] + 1 :
 						1
-					)
 
 					return memo
 				},

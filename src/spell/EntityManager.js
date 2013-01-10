@@ -224,7 +224,7 @@ define(
 				_.each(
 					componentMaps,
 					function( componentMap ) {
-						if( !_.has( componentMap, entityId ) ) return
+						if( !componentMap[ entityId ] ) return
 
 						delete componentMap[ entityId ]
 					}
