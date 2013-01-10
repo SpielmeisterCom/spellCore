@@ -83,7 +83,7 @@ define(
 				var eventManager = spell.eventManager
 
 				eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterCreatedHandler )
-				eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterChangedHandler )
+				eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterUpdatedHandler )
 			},
 
 			/**
