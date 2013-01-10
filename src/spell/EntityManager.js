@@ -224,14 +224,13 @@ define(
 
 			} else {
 				// remove all componentMaps, that is "remove the entity"
-				_.each(
-					componentMaps,
-					function( componentMap ) {
-						if( !componentMap[ entityId ] ) return
+				for( var componentId in componentMaps ) {
+					var componentMap = componentMaps[ componentId ]
 
+					if( componentMap[ entityId ] ) {
 						delete componentMap[ entityId ]
 					}
-				)
+				}
 			}
 
 			if( removedEntity ) {
