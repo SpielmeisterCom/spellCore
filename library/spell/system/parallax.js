@@ -107,18 +107,15 @@ define(
 					}
 
 					var offsetToRefEntity     = parallax.offsetToRefEntity,
-						layerTranslation      = layerTransform.translation,
-                        layerWorldTranslation = layerTransform.worldTranslation
+						layerTranslation      = layerTransform.translation
 
 					// if configured: stick the parallax layer to the current camera position (plus specified offsetToCamera)
 					if( parallax.stickToRefX ) {
 						layerTranslation[ 0 ] = refEntityTranslation[ 0 ] + offsetToRefEntity[ 0 ]
-                        layerWorldTranslation[ 0 ] = layerTranslation[ 0 ]
 					}
 
 					if( parallax.stickToRefY ) {
 						layerTranslation[ 1 ] = refEntityTranslation[ 1 ] + offsetToRefEntity[ 1 ]
-                        layerWorldTranslation[ 1 ] = layerTranslation[ 1 ]
                     }
 
 
@@ -149,6 +146,7 @@ define(
 					}
 
 					entityManager.updateAppearanceTransform( entityId )
+					entityManager.updateWorldTransform( entityId )
 				}
 			}
 		}
