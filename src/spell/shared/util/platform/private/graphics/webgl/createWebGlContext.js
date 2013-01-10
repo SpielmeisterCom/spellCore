@@ -186,6 +186,16 @@ define(
 			gl.linkProgram( shaderProgram )
 			gl.useProgram( shaderProgram )
 
+			// storing the attribute and uniform locations
+			shaderProgram.aVertexPosition        = gl.getAttribLocation( shaderProgram, 'aVertexPosition' )
+			shaderProgram.uScreenSpaceShimMatrix = gl.getUniformLocation( shaderProgram, 'uScreenSpaceShimMatrix' )
+			shaderProgram.uTextureMatrix         = gl.getUniformLocation( shaderProgram, 'uTextureMatrix' )
+			shaderProgram.uFillRect              = gl.getUniformLocation( shaderProgram, 'uFillRect' )
+			shaderProgram.uGlobalAlpha           = gl.getUniformLocation( shaderProgram, 'uGlobalAlpha' )
+			shaderProgram.uGlobalColor           = gl.getUniformLocation( shaderProgram, 'uGlobalColor' )
+			shaderProgram.uTexture0              = gl.getUniformLocation( shaderProgram, 'uTexture0' )
+			shaderProgram.uModelViewMatrix       = gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' )
+
 			// setting up vertices
 			var angleStep = Math.PI * 2 / NUM_CIRCLE_VERTICES
 
@@ -218,13 +228,11 @@ define(
 			gl.bindBuffer( gl.ARRAY_BUFFER, positionVertexBuffer )
 			gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW )
 
-			var attributeLocation = gl.getAttribLocation( shaderProgram, 'aVertexPosition' )
-			gl.vertexAttribPointer( attributeLocation, 2, gl.FLOAT, false, 0, 0 )
-			gl.enableVertexAttribArray( attributeLocation )
+			gl.vertexAttribPointer( shaderProgram.aVertexPosition, 2, gl.FLOAT, false, 0, 0 )
+			gl.enableVertexAttribArray( shaderProgram.aVertexPosition )
 
 			// setting up screen space shim matrix
-			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uScreenSpaceShimMatrix' )
-			gl.uniformMatrix3fv( uniformLocation, false, screenSpaceShimMatrix )
+			gl.uniformMatrix3fv( shaderProgram.uScreenSpaceShimMatrix, false, screenSpaceShimMatrix )
 
 			// setting up texture matrix
 			setTextureMatrix( shaderProgram, defaultTextureMatrix )
@@ -240,11 +248,11 @@ define(
 			matrix[ 6 ] = tt
 			matrix[ 7 ] = ts
 
-			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uTextureMatrix' ), false, matrix )
+			gl.uniformMatrix3fv( shaderProgram.uTextureMatrix, false, matrix )
 		}
 
 		var setTextureMatrix = function( shaderProgram, textureMatrix ) {
-			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uTextureMatrix' ), false, textureMatrix )
+			gl.uniformMatrix3fv( shaderProgram.uTextureMatrix, false, textureMatrix )
 		}
 
 
@@ -314,19 +322,17 @@ define(
 			if( texture === undefined ) throw 'Texture is undefined'
 
 			// setting up fillRect mode
-			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
-			gl.uniform1i( uniformLocation, 0 )
+			gl.uniform1i( shaderProgram.uFillRect, 0 )
 
 			// setting up global alpha
-			gl.uniform1f( gl.getUniformLocation( shaderProgram, 'uGlobalAlpha' ), currentState.opacity )
+			gl.uniform1f( shaderProgram.uGlobalAlpha, currentState.opacity )
 
 			// setting up global color
-			gl.uniform4fv( gl.getUniformLocation( shaderProgram, 'uGlobalColor' ), currentState.color )
+			gl.uniform4fv( shaderProgram.uGlobalColor, currentState.color )
 
 			// setting up texture
 			gl.bindTexture( gl.TEXTURE_2D, texture.privateGlTextureResource )
-			uniformLocation = gl.getUniformLocation( shaderProgram, 'uTexture0' )
-			gl.uniform1i( uniformLocation, 0 )
+			gl.uniform1i( shaderProgram.uTexture0, 0 )
 
 			// setting up transformation
 			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
@@ -338,7 +344,7 @@ define(
 			mat3.scale( tmpMatrix, destinationDimensions )
 			mat3.translate( tmpMatrix, [ 0, -1 ] )
 
-			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
+			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
 			setTextureMatrix(
 				shaderProgram,
@@ -354,19 +360,17 @@ define(
 			if( texture === undefined ) throw 'Texture is undefined'
 
 			// setting up fillRect mode
-			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
-			gl.uniform1i( uniformLocation, 0 )
+			gl.uniform1i( shaderProgram.uFillRect, 0 )
 
 			// setting up global alpha
-			gl.uniform1f( gl.getUniformLocation( shaderProgram, 'uGlobalAlpha' ), currentState.opacity )
+			gl.uniform1f( shaderProgram.uGlobalAlpha, currentState.opacity )
 
 			// setting up global color
-			gl.uniform4fv( gl.getUniformLocation( shaderProgram, 'uGlobalColor' ), currentState.color )
+			gl.uniform4fv( shaderProgram.uGlobalColor, currentState.color )
 
 			// setting up texture
 			gl.bindTexture( gl.TEXTURE_2D, texture.privateGlTextureResource )
-			uniformLocation = gl.getUniformLocation( shaderProgram, 'uTexture0' )
-			gl.uniform1i( uniformLocation, 0 )
+			gl.uniform1i( shaderProgram.uTexture0, 0 )
 
 			// setting up transformation
 			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
@@ -378,7 +382,7 @@ define(
 			mat3.scale( tmpMatrix, destinationDimensions )
 			mat3.translate( tmpMatrix, [ 0, -1 ] )
 
-			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
+			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
 			// setting up the texture matrix
 			var tw = texture.dimensions[ 0 ],
@@ -402,14 +406,13 @@ define(
 			gl.lineWidth( lineWidth )
 
 			// setting up fillRect mode
-			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
-			gl.uniform1i( uniformLocation, 1 )
+			gl.uniform1i( shaderProgram.uFillRect, 1 )
 
 			// setting up global alpha
-			gl.uniform1f( gl.getUniformLocation( shaderProgram, 'uGlobalAlpha' ), currentState.opacity )
+			gl.uniform1f( shaderProgram.uGlobalAlpha, currentState.opacity )
 
 			// setting up global color
-			gl.uniform4fv( gl.getUniformLocation( shaderProgram, 'uGlobalColor' ), currentState.lineColor )
+			gl.uniform4fv( shaderProgram.uGlobalColor, currentState.lineColor )
 
 			// setting up transformation
 			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
@@ -418,7 +421,7 @@ define(
 			mat3.translate( tmpMatrix, [ dx, dy ] )
 			mat3.scale( tmpMatrix, [ dw, dh ] )
 
-			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
+			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
 			gl.drawArrays( gl.LINE_LOOP, QUAD_VERTEX_OFFSET, 4 )
 		}
@@ -429,14 +432,13 @@ define(
 			gl.lineWidth( lineWidth )
 
 			// setting up fillRect mode
-			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
-			gl.uniform1i( uniformLocation, 1 )
+			gl.uniform1i( shaderProgram.uFillRect, 1 )
 
 			// setting up global alpha
-			gl.uniform1f( gl.getUniformLocation( shaderProgram, 'uGlobalAlpha' ), currentState.opacity )
+			gl.uniform1f( shaderProgram.uGlobalAlpha, currentState.opacity )
 
 			// setting up global color
-			gl.uniform4fv( gl.getUniformLocation( shaderProgram, 'uGlobalColor' ), currentState.lineColor )
+			gl.uniform4fv( shaderProgram.uGlobalColor, currentState.lineColor )
 
 			// setting up transformation
 			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
@@ -445,7 +447,7 @@ define(
 			mat3.translate( tmpMatrix, [ dx, dy ] )
 			mat3.scale( tmpMatrix, [ radius, radius ] )
 
-			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
+			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
 			gl.drawArrays( gl.LINE_LOOP, CIRCLE_VERTEX_OFFSET, NUM_CIRCLE_VERTICES )
 		}
@@ -456,19 +458,18 @@ define(
 			gl.lineWidth( lineWidth )
 
 			// setting up fillRect mode
-			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
-			gl.uniform1i( uniformLocation, 1 )
+			gl.uniform1i( shaderProgram.uFillRect, 1 )
 
 			// setting up global alpha
-			gl.uniform1f( gl.getUniformLocation( shaderProgram, 'uGlobalAlpha' ), currentState.opacity )
+			gl.uniform1f( shaderProgram.uGlobalAlpha, currentState.opacity )
 
 			// setting up global color
-			gl.uniform4fv( gl.getUniformLocation( shaderProgram, 'uGlobalColor' ), currentState.lineColor )
+			gl.uniform4fv( shaderProgram.uGlobalColor, currentState.lineColor )
 
 			// setting up transformation
 			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
 
-			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
+			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
 			// line
 			vertices[ LINE_VERTEX_OFFSET * 2 + 0 ] = ax
@@ -483,14 +484,13 @@ define(
 
 		var fillRect = function( shaderProgram, dx, dy, dw, dh ) {
 			// setting up fillRect mode
-			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uFillRect' )
-			gl.uniform1i( uniformLocation, 1 )
+			gl.uniform1i( shaderProgram.uFillRect, 1 )
 
 			// setting up global alpha
-			gl.uniform1f( gl.getUniformLocation( shaderProgram, 'uGlobalAlpha' ), currentState.opacity )
+			gl.uniform1f( shaderProgram.uGlobalAlpha, currentState.opacity )
 
 			// setting up global color
-			gl.uniform4fv( gl.getUniformLocation( shaderProgram, 'uGlobalColor' ), currentState.color )
+			gl.uniform4fv( shaderProgram.uGlobalColor, currentState.color )
 
 			// setting up transformation
 			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
@@ -499,7 +499,7 @@ define(
 			mat3.translate( tmpMatrix, [ dx, dy ] )
 			mat3.scale( tmpMatrix, [ dw, dh ] )
 
-			gl.uniformMatrix3fv( gl.getUniformLocation( shaderProgram, 'uModelViewMatrix' ), false, tmpMatrix )
+			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
 			gl.drawArrays( gl.TRIANGLE_FAN, QUAD_VERTEX_OFFSET, 4 )
 		}
@@ -535,8 +535,7 @@ define(
 			// reinitialize screen space shim matrix
 			createScreenSpaceShimMatrix( width, height, screenSpaceShimMatrix )
 
-			var uniformLocation = gl.getUniformLocation( shaderProgram, 'uScreenSpaceShimMatrix' )
-			gl.uniformMatrix3fv( uniformLocation, false, screenSpaceShimMatrix )
+			gl.uniformMatrix3fv( shaderProgram.uScreenSpaceShimMatrix, false, screenSpaceShimMatrix )
 		}
 
 		/*
