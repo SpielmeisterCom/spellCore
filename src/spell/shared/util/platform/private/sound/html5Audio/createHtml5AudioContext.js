@@ -92,6 +92,8 @@ define(
 			var audioElement = audioElements[ id ]
 			if( !audioElement ) return
 
+			audioElement.loop = loop
+
 			if( loop ) {
 				audioElement.addEventListener( 'ended', loopCallback, false )
 				audioElement.removeEventListener( 'ended', removeCallback, false )
