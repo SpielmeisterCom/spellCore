@@ -205,10 +205,9 @@ define(
 
 				for( var y = minTileSectionMapY; y <= maxTileMapSectionY ; y++ ) {
 					var tilemapRow = tilemapData[ y ]
+					if( !tilemapRow ) continue
 
 					for( var x = minTileMapSectionX; x <= maxTileSectionMapX; x++ ) {
-						if( !tilemapRow ) continue
-
 						var frameId = tilemapRow[ x ]
 						if( frameId === null ) continue
 
