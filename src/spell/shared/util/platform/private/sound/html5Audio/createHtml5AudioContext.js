@@ -21,7 +21,7 @@ define(
 				audio.src = audioResource.privateAudioResource.src
 			}
 
-			audioElements[ id ] = audio
+			audio.id = id
 
 			return audio
 		}
@@ -32,8 +32,7 @@ define(
 		}
 
 		var removeCallback = function() {
-			this.removeEventListener( 'ended', removeCallback, false )
-			this.removeEventListener( 'ended', loopCallback, false )
+			destroy( this )
 		}
 
 		/**
@@ -48,7 +47,15 @@ define(
 				id = "tmp_sound_" + soundIdCounter++
 			}
 
-			var audioElement = audioElements[ id ] || create( id, audioResource )
+			var audioElement
+
+			if( audioElements[ id ] ) {
+				audioElement = audioElements[ id ]
+
+			} else {
+				audioElement = create( id, audioResource )
+				audioElements[ id ] = audioElement
+			}
 
 			setLoop( id, loop )
 			setVolume( id, volume )
@@ -123,16 +130,12 @@ define(
 			return isMutedValue
 		}
 
-		var destroy = function( id ) {
-			var audioElement = audioElements[ id ]
-
-			if( !audioElement ) return
-
+		var destroy = function( audioElement ) {
 			audioElement.removeEventListener( 'ended', removeCallback, false )
 			audioElement.removeEventListener( 'ended', loopCallback, false )
 			audioElement.pause()
 
-			delete audioElements[ id ]
+			delete audioElements[ audioElement.id ]
 		}
 
 		/*
@@ -163,7 +166,6 @@ define(
 				isAllMuted  : isMuted,
 				stop        : stop,
 				mute        : mute,
-				destroy     : destroy,
 				createSound : createSound,
 				stopAll     : stopAll,
 				resumeAll   : resumeAll

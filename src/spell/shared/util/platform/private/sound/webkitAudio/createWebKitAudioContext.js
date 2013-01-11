@@ -158,7 +158,6 @@ define(
 				isAllMuted  : isMuted,
 				stop        : stop,
 				mute        : mute,
-				destroy     : destroy,
 				createSound : createSound,
 				stopAll     : stopAll,
 				resumeAll   : resumeAll

@@ -16,18 +16,27 @@ define(
 		'use strict'
 
 
-		var playSound = function( audioContext, id, soundEmitter ) {
-			audioContext.play( soundEmitter.asset.resource, id, soundEmitter.volume, soundEmitter.loop )
-		}
-
-		var pushSoundEmitterState = function( audioContext, id, soundEmitter ) {
-			audioContext.setLoop( id, soundEmitter.loop )
-			audioContext.setVolume( id, soundEmitter.volume )
-
+		var playSound = function( entityManager, audioContext, id, soundEmitter ) {
 			if( soundEmitter.mute ||
 				audioContext.isAllMuted() ) {
 
 				audioContext.mute( id )
+			}
+
+			if( !soundEmitter.play ) {
+				audioContext.play( soundEmitter.asset.resource, id, soundEmitter.volume, soundEmitter.loop )
+
+				entityManager.updateComponent(
+					id,
+					'spell.component.audio.soundEmitter',
+					{
+						play : true
+					}
+				)
+
+			} else {
+				audioContext.setLoop( id, soundEmitter.loop )
+				audioContext.setVolume( id, soundEmitter.volume )
 			}
 		}
 
@@ -39,7 +48,6 @@ define(
 		 * @param {Object} [spell] The spell object.
 		 */
 		var audio = function( spell ) {
-			this.soundEmitterCreatedHandler = null
 			this.soundEmitterUpdatedHandler = null
 		}
 
@@ -54,23 +62,11 @@ define(
 					entityManager = spell.entityManager,
 					eventManager  = spell.eventManager
 
-				this.soundEmitterCreatedHandler = function( soundEmitter, id ) {
-					entityManager.updateComponent(
-						id,
-						'spell.component.audio.soundEmitter',
-						{
-							play : true
-						}
-					)
-
-					playSound( audioContext, id, soundEmitter )
-				}
-
 				this.soundEmitterUpdatedHandler = function( soundEmitter, id ) {
-					pushSoundEmitterState( audioContext, id, soundEmitter.assetId )
+					playSound( entityManager, audioContext, id, soundEmitter )
 				}
 
-				eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterCreatedHandler )
+				eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterUpdatedHandler )
 				eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterUpdatedHandler )
 			},
 
@@ -82,7 +78,7 @@ define(
 			destroy: function( spell ) {
 				var eventManager = spell.eventManager
 
-				eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterCreatedHandler )
+				eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterUpdatedHandler )
 				eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterUpdatedHandler )
 			},
 
