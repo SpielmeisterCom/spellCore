@@ -20,7 +20,9 @@ define(
 			STATE_READY_TO_DRAW = 2,
 			STATE_DRAW_TILE     = 3
 
-		var tilemapEditor = function(spell, editorSystem) {
+        var worldToLocalMatrix = mat3.create()
+
+        var tilemapEditor = function(spell, editorSystem) {
 			this.state              = STATE_INACTIVE
 			this.transforms         = editorSystem.transforms
 			this.tilemaps           = editorSystem.tilemaps
@@ -82,7 +84,7 @@ define(
 			var transform = this.transforms[ entityId ],
 				entityDimensions = this.spell.entityManager.getEntityDimensions( entityId )
 
-			return mathUtil.isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.worldRotation )
+			return mathUtil.isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], 0 )
 
 		}
 
@@ -121,8 +123,10 @@ define(
 				mathUtil.isPointInRect( worldPosition, tilemapTranslation, tilemapDimensions[ 0 ], tilemapDimensions[ 1 ], 0 )
 			) {
 
-				//convert worldposition to coordinates which are local to the tilemaps origin
-				mat3.multiplyVec2(tilemapTransform.worldToLocalMatrix, worldPosition, tmpVec2)
+                mat3.inverse(worldToLocalMatrix, tilemapTransform.worldMatrix, worldToLocalMatrix )
+
+                //convert worldposition to coordinates which are local to the tilemaps origin
+				mat3.multiplyVec2(worldToLocalMatrix, worldPosition, tmpVec2)
 
 				if (entityManager.hasComponent(entityId, 'spell.component.2d.graphics.shape.rectangle')) {
 					entityManager.removeComponent(entityId, 'spell.component.2d.graphics.shape.rectangle')

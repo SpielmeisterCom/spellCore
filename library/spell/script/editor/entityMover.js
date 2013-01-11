@@ -34,7 +34,7 @@ define("spell/script/editor/entityMover",
 			var transform = this.transforms[ entityId ],
 			    entityDimensions = this.spell.entityManager.getEntityDimensions( entityId )
 
-			return mathUtil.isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], transform.worldRotation )
+			return mathUtil.isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], 0 )
 
 		}
 
@@ -56,7 +56,7 @@ define("spell/script/editor/entityMover",
 					//don't to this within normal systems
 					var transformOverlay = this.transforms[ overlayEntityId ]
 					vec2.set( transform.worldTranslation, transformOverlay.translation )
-					transformOverlay.rotation = transform.worldRotation
+					transformOverlay.rotation = 0
 
 					var text, color, lineWidth
 

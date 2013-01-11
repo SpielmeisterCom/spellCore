@@ -65,7 +65,7 @@ define(
 				transform.worldTranslation,
 				entityDimensions[ 0 ],
 				entityDimensions[ 1 ],
-				transform.worldRotation
+				transform.rotation //TODO: should be worldRotation
 			)
 		}
 

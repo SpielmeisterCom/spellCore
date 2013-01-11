@@ -49,43 +49,16 @@
 			],
 			"doc": "3x3 matrix that transforms from local to parent entity coordinate space"
 		},
-		{
-			"name": "worldTranslation",
-			"engineInternal": true,
-			"type": "vec2",
-			"default": [
-				0,
-				0
-			],
-			"doc": "position relative to the world's origin"
-		},
-		{
-			"name": "worldRotation",
-			"engineInternal": true,
-			"type": "vec2",
-			"default": 0,
-			"doc": "rotation relative to the world's origin"
-		},
-		{
-			"name": "worldScale",
-			"engineInternal": true,
-			"type": "vec2",
-			"default": [
-				1,
-				1
-			],
-			"doc": "scale relative to the world's origin"
-		},
-		{
-			"name": "worldSkew",
-			"engineInternal": true,
-			"type": "vec2",
-			"default": [
-				0,
-				0
-			],
-			"doc": "2D skew transformation along the X- and the Y-axis"
-		},
+        {
+            "name": "worldTranslation",
+            "engineInternal": true,
+            "type": "vec2",
+            "default": [
+                0,
+                0
+            ],
+            "doc": "position relative to the world's origin"
+        },
 		{
 			"name": "worldMatrix",
 			"engineInternal": true,
@@ -96,17 +69,6 @@
 				0,  0,  1
 			],
 			"doc": "3x3 matrix that transforms from local to world coordinate space"
-		},
-		{
-			"name": "worldToLocalMatrix",
-			"engineInternal": true,
-			"type": "mat3",
-			"default": [
-				1,  0,  0,
-				0,  1,  0,
-				0,  0,  1
-			],
-			"doc": "3x3 matrix that transforms from world to local coordinate space"
 		}
 	],
 	"version": 1

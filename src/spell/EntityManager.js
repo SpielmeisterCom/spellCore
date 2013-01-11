@@ -141,16 +141,8 @@ define(
 				mat3.set( localMatrix, worldMatrix )
 			}
 
-			// update worldToLocalMatrix
-			mat3.inverse( worldMatrix, transform.worldToLocalMatrix )
-
-			// extract worldTranslation, worldScale and worldRotation from worldMatrix
-
-			mat3.decompose( worldMatrix, transform.worldScale, transform.worldSkew, transform.worldTranslation )
-			transform.worldRotation = transform.worldSkew[ 1 ]
-
-			transform.worldTranslation[ 0 ] = worldMatrix[ 6 ]
-			transform.worldTranslation[ 1 ] = worldMatrix[ 7 ]
+            transform.worldTranslation[ 0 ] = worldMatrix[ 6 ]
+            transform.worldTranslation[ 1 ] = worldMatrix[ 7 ]
 
 			// update all childs recursively
 			if( children ) {
@@ -559,7 +551,10 @@ define(
 
 			// apply scale factor
 			if( transforms && transforms[ entityId ] ) {
-				vec2.multiply( dimensions, transforms[ entityId ].worldScale, dimensions )
+
+                //TODO: using the worldScale would be more correct here, but as we don't want to calculate it
+                //only for this test, use the local scale
+				//vec2.multiply( dimensions, transforms[ entityId ].scale, dimensions )
 			}
 
 			return dimensions
@@ -937,11 +932,6 @@ define(
 
 						updateWorldTransform( this.componentMaps, entityId )
 
-					} else if( attributeConfig.worldTranslation ||
-						attributeConfig.worldScale ||
-						attributeConfig.worldRotation ) {
-
-						// TODO: update localTransform from a changed world transform
 					}
 
 				} else if( componentId === APPEARANCE_TRANSFORM_COMPONENT_ID ) {

@@ -164,7 +164,7 @@ define(
 			return transformedPoint
 		}
 
-		var draw2dTileMap = function( context, texture, viewFrustum, asset, transform ) {
+		var draw2dTileMap = function( context, texture, viewFrustum, asset, transform, worldToLocalMatrix ) {
 			var tilemapData = asset.tilemapData
 
 			if( !tilemapData ) return
@@ -178,7 +178,7 @@ define(
 
 			// transform the view frustum to tile map coordinates, clamp to effective range
 			var lowerLeft = transformTo2dTileMapCoordinates(
-				transform.worldToLocalMatrix,
+                worldToLocalMatrix,
 				tilemapDimensions,
 				frameDimensions,
 				maxTileMapY,
@@ -189,7 +189,7 @@ define(
 				maxTileMapSectionY = Math.min( Math.ceil( lowerLeft[ 1 ] ), maxTileMapY )
 
 			var topRight = transformTo2dTileMapCoordinates(
-				transform.worldToLocalMatrix,
+                worldToLocalMatrix,
 				tilemapDimensions,
 				frameDimensions,
 				maxTileMapY,
@@ -226,6 +226,8 @@ define(
 			}
 			context.restore()
 		}
+
+        var worldToLocalMatrixCache = {}
 
 		var drawVisualObject = function(
 			entityManager,
@@ -325,7 +327,13 @@ define(
 						} else if( asset.type === '2dTileMap' ) {
 //							var start = performance.webkitNow()
 
-							draw2dTileMap( context, texture, viewFrustum, asset, transform )
+                            if( !worldToLocalMatrixCache[ id ] ) {
+                                worldToLocalMatrixCache[ id ] = mat3.create()
+                                mat3.inverse( transform.worldMatrix, worldToLocalMatrixCache[ id ] )
+
+                            }
+
+							draw2dTileMap( context, texture, viewFrustum, asset, transform, worldToLocalMatrixCache[ id ] )
 
 //							var elapsed = performance.webkitNow() - start
 
