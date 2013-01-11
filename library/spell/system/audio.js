@@ -26,13 +26,7 @@ define(
 			if( !soundEmitter.play ) {
 				audioContext.play( soundEmitter.asset.resource, id, soundEmitter.volume, soundEmitter.loop )
 
-				entityManager.updateComponent(
-					id,
-					'spell.component.audio.soundEmitter',
-					{
-						play : true
-					}
-				)
+				soundEmitter.play = true
 
 			} else {
 				audioContext.setLoop( id, soundEmitter.loop )
@@ -96,20 +90,11 @@ define(
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			deactivate: function( spell ) {
-				var entityManager = spell.entityManager,
-					audioContext  = spell.audioContext,
+				var audioContext  = spell.audioContext,
 					soundEmitters = this.soundEmitters
 
 				for( var id in soundEmitters ) {
 					audioContext.stop( id )
-
-					entityManager.updateComponent(
-						id,
-						'spell.component.audio.soundEmitter',
-						{
-							play : false
-						}
-					)
 				}
 
 				audioContext.tick()
