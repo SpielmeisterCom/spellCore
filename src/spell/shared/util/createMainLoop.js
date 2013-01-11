@@ -23,7 +23,7 @@ define(
 		'use strict'
 
 
-		var UPDATE_INTERVAL_IN_MS  = 16,
+		var UPDATE_INTERVAL_IN_MS  = 32,
 			MAX_ELAPSED_TIME_IN_MS = 100,
 			PERFORMANCE_PRINT_INTERVAL_IN_MS = 1000
 
