@@ -83,6 +83,7 @@ define(
 			var audioElement = audioElements[ id ]
 			if( !audioElement ) return
 
+			audioElement.currentTime = 0
 			audioElement.pause()
 		}
 
