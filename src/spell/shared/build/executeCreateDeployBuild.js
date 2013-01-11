@@ -254,6 +254,7 @@ define(
 						'component',
 						'entityTemplate',
 						'scene',
+						'script',
 						'system'
 					),
 					true
