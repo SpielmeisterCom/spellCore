@@ -7,12 +7,12 @@ define(
 		"use strict"
 
 		var hasTouchSupport = function() {
-			//return ('ontouchstart' in window) || ( window.DocumentTouch && document instanceof DocumentTouch)
-			return true
+			return  ('ontouchstart' in window) ||
+					( window.DocumentTouch && document instanceof DocumentTouch) ||
+					( 'msMaxTouchPoints' in window.navigator && window.navigator.msMaxTouchPoints > 0 )
 		}
 
-
-		var touchSupport = hasTouchSupport()
+		var touchSupport = true
 
 		return {
 			touch : touchSupport
