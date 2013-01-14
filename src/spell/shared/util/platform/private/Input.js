@@ -30,7 +30,7 @@ define(
 
 			keyHandler.registerListener( document, callback )
 			mousewheelHandler.registerListener( document, callback )
-			pointerHandler.registerListener( this.container, callback )
+			pointerHandler.registerListener( document, this.container, this.configurationManager, callback )
 		}
 
 		var removeListener = function( ) {

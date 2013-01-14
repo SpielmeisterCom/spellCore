@@ -121,9 +121,33 @@ define(
 			})
 		}
 
-		var nativeTouchHandlerImpl = function( callback, eventMappings, event ) {
+		function getOffset( element ) {
+			if( !element.getBoundingClientRect ) {
+				return [ 0, 0 ]
+			}
+
+			var box = element.getBoundingClientRect()
+
+			var body    = document.body
+			var docElem = document.documentElement
+
+			var scrollTop  = window.pageYOffset || docElem.scrollTop || body.scrollTop
+			var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft
+
+			var clientTop  = docElem.clientTop || body.clientTop || 0
+			var clientLeft = docElem.clientLeft || body.clientLeft || 0
+
+			var top  = box.top + scrollTop - clientTop
+			var left = box.left + scrollLeft - clientLeft
+
+			return [ Math.round( left ), Math.round( top ) ]
+		}
+
+		var nativeTouchHandlerImpl = function( callback, eventMappings, container, configurationManager, event ) {
 			var eventType   = event.type,
-				button      = 0
+				button      = 0,
+				screenSize  = configurationManager.currentScreenSize,
+				offset      = getOffset( container )
 
 			event.preventDefault()
 
@@ -134,19 +158,35 @@ define(
 			for( var i = 0, length = event.changedTouches.length; i < length; i++ ) {
 				var touch       = event.changedTouches[ i ],
 					pointerId   = touch.identifier,
-					positionX   = touch.clientX,
-					positionY   = touch.clientY
+					positionX   = touch.pageX - offset[ 0 ],
+					positionY   = touch.pageY - offset[ 1 ]
+
+				// if the event missed the display it gets ignored
+				if( positionX < 0 || positionX > screenSize[ 0 ] ||
+					positionY < 0 || positionY > screenSize [ 1 ]) {
+
+					continue
+				}
 
 				emitSpellPointerEvent( callback, eventType, pointerId, button, positionX, positionY )
 			}
 		}
 
-		var nativePointerHandlerImpl = function( callback, eventMappings, event ) {
+		var nativePointerHandlerImpl = function( callback, eventMappings, container, configurationManager, event ) {
 			var eventType   = event.type,
 				button      = event.button,
 				pointerId   = event.pointerId !== undefined ? event.pointerId :  1,
-				positionX   = event.clientX,
-				positionY   = event.clientY
+				screenSize  = configurationManager.currentScreenSize,
+				offset      = getOffset( container ),
+				positionX   = event.pageX - offset[ 0 ],
+				positionY   = event.pageY - offset[ 1 ]
+
+			// if the event missed the display it gets ignored
+			if( positionX < 0 || positionX > screenSize[ 0 ] ||
+				positionY < 0 || positionY > screenSize [ 1 ]) {
+
+				return
+			}
 
 			event.preventDefault()
 
@@ -157,27 +197,27 @@ define(
 			emitSpellPointerEvent( callback, eventType, pointerId, button, positionX, positionY )
 		}
 
-		var registerListener = function( el, callback ) {
+		var registerListener = function( el, container, configurationManager, callback ) {
 			if ( window.navigator.pointerEnabled ) {
-				nativeHandler = _.bind( nativePointerHandlerImpl, this, callback, eventMappings )
+				nativeHandler = _.bind( nativePointerHandlerImpl, this, callback, eventMappings, container, configurationManager )
 				registeredEvents = [
 					'pointermove', 'pointerup', 'pointerdown', 'pointercancel'
 				]
 
 			} else if ( window.navigator.msPointerEnabled ) {
-				nativeHandler = _.bind( nativePointerHandlerImpl, this, callback, eventMappings )
+				nativeHandler = _.bind( nativePointerHandlerImpl, this, callback, eventMappings, container, configurationManager )
 				registeredEvents = [
 					'MSPointerMove', 'MSPointerUp', 'MSPointerDown', 'MSPointerCancel'
 				]
 
 			} else if ( hasTouchSupport() ) {
-				nativeHandler = _.bind( nativeTouchHandlerImpl, this, callback, eventMappings )
+				nativeHandler = _.bind( nativeTouchHandlerImpl, this, callback, eventMappings, container, configurationManager )
 				registeredEvents = [
 					'touchstart', 'touchmove', 'touchend', 'touchcancel'
 				]
 
 			} else {
-				nativeHandler = _.bind( nativePointerHandlerImpl, this, callback, eventMappings )
+				nativeHandler = _.bind( nativePointerHandlerImpl, this, callback, eventMappings, container, configurationManager )
 				registeredEvents = [
 					'mousemove', 'mousedown', 'mouseup'
 				]
