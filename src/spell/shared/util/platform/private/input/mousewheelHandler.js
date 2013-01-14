@@ -30,8 +30,8 @@ define(
 				direction = delta > 0 ? 1 : -1
 
 			callback( {
-				type : 'mousewheel',
-				direction : direction
+				type        : 'mouseWheel',
+				direction   : direction
 			} )
 
 
