@@ -1,224 +1,42 @@
 define(
 	'spell/shared/util/platform/private/Input',
 	[
-		'spell/shared/util/input/keyCodes',
-		'spell/math/util',
+		'spell/shared/util/platform/private/system/features',
+
+		'spell/shared/util/platform/private/input/keyHandler',
+		'spell/shared/util/platform/private/input/pointerHandler',
+		'spell/shared/util/platform/private/input/mousewheelHandler',
 
 		'spell/functions'
 	],
 	function(
-		keyCodes,
-		mathUtil,
+		features,
+
+		keyHandler,
+		pointerHandler,
+		mousewheelHandler,
 
 		_
 	) {
 		'use strict'
 
-
-		/*
-		 * Thanks to John Resig. http://ejohn.org/blog/flexible-javascript-events/
-		 *
-		 * @param obj
-		 * @param type
-		 * @param fn
-		 */
-		var addEvent = function( obj, type, fn ) {
-			if( obj.attachEvent ) {
-				obj['e'+type+fn] = fn;
-				obj[type+fn] = function(){obj['e'+type+fn]( window.event );}
-				obj.attachEvent( 'on'+type, obj[type+fn] );
-
-			} else if( obj.addEventListener ) {
-				obj.addEventListener( type, fn, false );
-			}
+		var preventDefaultHandler = function( event ) {
+			event.preventDefault()
 		}
 
-		var preventDefault = function( event ) {
-			if( event.preventDefault ) {
-				event.preventDefault()
+		var setListener = function( callback ) {
+			//disable context menu on right click
+			document.addEventListener( 'contextmenu', preventDefaultHandler, true )
 
-			} else if( event.stopPropagation ) {
-				e.stopPropagation()
-
-			} else {
-				event.returnValue = false
-			}
+			keyHandler.registerListener( document, callback )
+			mousewheelHandler.registerListener( document, callback )
+			pointerHandler.registerListener( this.container, callback )
 		}
 
-		var isEventSupported = function( eventName ) {
-			return _.has( nativeEventMap, eventName )
-		}
-
-		function getOffset( element ) {
-			if( !element.getBoundingClientRect ) {
-				return [ 0, 0 ]
-			}
-
-			var box = element.getBoundingClientRect()
-
-			var body    = document.body
-			var docElem = document.documentElement
-
-			var scrollTop  = window.pageYOffset || docElem.scrollTop || body.scrollTop
-			var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft
-
-			var clientTop  = docElem.clientTop || body.clientTop || 0
-			var clientLeft = docElem.clientLeft || body.clientLeft || 0
-
-			var top  = box.top + scrollTop - clientTop
-			var left = box.left + scrollLeft - clientLeft
-
-			return [ Math.round( left ), Math.round( top ) ]
-		}
-
-		var nativeTouchHandler = function( callback, event ) {
-			preventDefault( event )
-
-			var touch = event.changedTouches[ 0 ]
-			var offset = getOffset( this.container )
-			var screenSize = this.configurationManager.currentScreenSize
-
-			var position = [
-				( touch.pageX - offset[ 0 ] ) / screenSize[ 0 ],
-				( touch.pageY - offset[ 1 ] ) / screenSize[ 1 ]
-			]
-
-			// if the event missed the display it gets ignored
-			if( !mathUtil.isInInterval( position[ 0 ], 0.0, 1.0 ) ||
-				!mathUtil.isInInterval( position[ 1 ], 0.0, 1.0 ) ) {
-
-				return
-			}
-
-			callback( {
-				type : event.type,
-				position : position
-			} )
-		}
-
-		var nativeKeyHandler = function( callback, event ) {
-			preventDefault( event )
-			callback( event )
-		}
-
-		var nativeMouseWheelHandler = function( callback, event ) {
-			var delta     = event.wheelDelta ? event.wheelDelta : event.detail * -1,
-				direction = delta > 0 ? 1 : -1
-
-			preventDefault( event )
-
-			callback( {
-				type : 'mousewheel',
-				direction : direction
-			} )
-		}
-
-        var nativeMouseClickHandler = function( callback, event ) {
-			var offset = getOffset( this.container )
-			var screenSize = this.configurationManager.currentScreenSize
-
-			var position = [
-				( event.pageX - offset[ 0 ] ) / screenSize[ 0 ],
-				( event.pageY - offset[ 1 ] ) / screenSize[ 1 ]
-			]
-
-            // if the event missed the display it gets ignored
-            if( !mathUtil.isInInterval( position[ 0 ], 0.0, 1.0 ) ||
-                !mathUtil.isInInterval( position[ 1 ], 0.0, 1.0 ) ) {
-
-                return
-            }
-
-            callback( {
-                type : event.type,     // mousedown, mouseup
-	            button : event.button, // 0=left button, 1=middle button if present, 2=right button
-                position : position
-            } )
-        }
-
-		var nativeMouseMoveHandler = function( callback, event ) {
-			var offset = getOffset( this.container )
-			var screenSize = this.configurationManager.currentScreenSize
-
-			var position = [
-				( event.pageX - offset[ 0 ] ) / screenSize[ 0 ],
-				( event.pageY - offset[ 1 ] ) / screenSize[ 1 ]
-			]
-
-			// if the event missed the display it gets ignored
-			if( !mathUtil.isInInterval( position[ 0 ], 0.0, 1.0 ) ||
-				!mathUtil.isInInterval( position[ 1 ], 0.0, 1.0 ) ) {
-
-				return
-			}
-
-			callback( {
-				type : event.type,  // mousemove
-				position : position
-			} )
-		}
-
-		var nativeContextMenuHandler = function( callback, event ) {
-			// prevent the default context menu in the browser
-			preventDefault( event )
-		}
-
-		/*
-		 * maps the internal event name to to native event name and callback
-		 */
-		var nativeEventMap = {
-			touchstart : {
-				touchstart : nativeTouchHandler
-			},
-			touchend : {
-				touchend : nativeTouchHandler
-			},
-			mousedown : {
-				mousedown : nativeMouseClickHandler,
-				contextmenu : nativeContextMenuHandler
-			},
-			mouseup : {
-				mouseup : nativeMouseClickHandler
-			},
-			mousemove : {
-				mousemove : nativeMouseMoveHandler
-			},
-			mousewheel : {
-				mousewheel : nativeMouseWheelHandler,
-				DOMMouseScroll : nativeMouseWheelHandler
-			},
-			keydown : {
-				keydown : nativeKeyHandler
-			},
-			keyup : {
-				keyup : nativeKeyHandler
-			}
-		}
-
-		var setListener = function( eventName, callback ) {
-			if( !isEventSupported( eventName ) ) return
-
-			var nativeEvents = nativeEventMap[ eventName ]
-
-			for( var nativeEventName in nativeEvents ) {
-				var nativeEventHandler = nativeEvents[ nativeEventName ]
-
-				addEvent(
-					document,
-					nativeEventName,
-					_.bind( nativeEventHandler, this, callback )
-				)
-			}
-		}
-
-		var removeListener = function( eventName ) {
-			if( !isEventSupported( eventName ) ) return
-
-			var nativeEvent = nativeEventMap[ eventName ]
-
-			for( var i = 0; i < nativeEvent.eventNames; i++ ) {
-				this.container[ 'on' + nativeEvent.eventNames[ i ] ] = null
-			}
+		var removeListener = function( ) {
+			keyHandler.removeListener( document )
+			mousewheelHandler.removeListener( document )
+			pointerHandler.removeListener( document )
 		}
 
 

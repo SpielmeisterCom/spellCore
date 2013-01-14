@@ -12,41 +12,6 @@ define(
 	) {
 		'use strict'
 
-
-		var eventHandlerNames = [
-			/**
-			 * Event that is triggered when a contact touches the screen on element
-			 */
-			'pointerDown',
-
-			/**
-			 * Event that is triggered when a contact moves on the screen while over an element
-			 */
-			'pointerMove',
-
-			/**
-			 * Event that is triggered when a contact is raised off of the screen over an element
-			 */
-			'pointerUp',
-
-			/**
-			 * Event that is triggered when a contact moves from outside to inside the bounds of this element.
-			 * This event is always raised, whether or not the pointer is captured to this element
-			 */
-			'pointerOver',
-
-			/**
-			 * This event is triggered when a pointer moves from inside to outside the boundaries of this element.
-			 * This event is always raised, whether or not the pointer is captured to this element.
-			 */
-			'pointerOut',
-
-			/**
-			 * Event that is triggered when a contact (normally a pen) moves over an element without touching the surface
-			 */
-			'pointerHoover'
-		]
-
 		var registeredEventHandlerMap = {}
 
 		/**
@@ -70,9 +35,10 @@ define(
 		}
 
 		var processEvent = function( entityManager, pointedEntityMap, renderingContext, transforms, inputEvent ) {
-			if( inputEvent.type !== 'mousedown' &&
-				inputEvent.type !== 'mousemove' &&
-				inputEvent.type !== 'mouseup' ) {
+			if( inputEvent.type !== 'pointerDown' &&
+				inputEvent.type !== 'pointerMove' &&
+				inputEvent.type !== 'pointerUp' &&
+				inputEvent.type !== 'pointerCancel') {
 
 				return
 			}
@@ -89,13 +55,13 @@ define(
 				if( entityDimensions &&
 					isPointWithinEntity( entityDimensions, transforms[ entityId ], cursorWorldPosition ) ) {
 
-					if( inputEvent.type === 'mousedown') {
+					if( inputEvent.type === 'pointerDown') {
 						entityManager.triggerEvent( entityId, 'pointerDown' )
 
-					} else if( inputEvent.type === 'mouseup') {
+					} else if( inputEvent.type === 'pointerUp' || inputEvent.type === 'pointerCancel' ) {
 						entityManager.triggerEvent( entityId, 'pointerUp' )
 
-					} else if ( inputEvent.type === 'mousemove' ) {
+					} else if ( inputEvent.type === 'pointerMove' ) {
 						entityManager.triggerEvent( entityId, 'pointerMove' )
 					}
 
