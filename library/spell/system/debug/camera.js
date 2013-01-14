@@ -114,10 +114,10 @@ define(
 				this.cursorWorldPosition = spell.renderingContext.transformScreenToWorld( event.position )
 			}
 
-			if(event.type == 'keydown' &&  event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
+			if(event.type == 'keyDown' &&  event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
 				this.commandMode = true
 
-			} else if(event.type == 'keyup' &&  event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
+			} else if(event.type == 'keyUp' &&  event.keyCode == keyCodes.CTRL || event.keyCode == keyCodes.LEFT_WINDOW_KEY) {
 				this.commandMode = false
 			}
 

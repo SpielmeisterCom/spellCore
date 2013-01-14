@@ -11,7 +11,7 @@ define("spell/script/editor/entityRemover",
 		}
 
 		entityRemover.prototype = {
-			keydown: function( spell, editorSystem, event ) {
+			keyDown: function( spell, editorSystem, event ) {
 				var keyCodes        = spell.inputManager.getKeyCodes(),
 					selectedEntityId  = editorSystem.selectedEntity
 

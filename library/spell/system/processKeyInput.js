@@ -42,7 +42,7 @@ define(
 					actionId            = keyToActionMapAsset[ inputEvent.keyCode ]
 
 				if( actionId ) {
-					var isExecuting = ( inputEvent.type === 'keydown' )
+					var isExecuting = ( inputEvent.type === 'keyDown' )
 
 					updateActors( actors, eventManager, entityManager, inputDefinition.actorId, actionId, isExecuting )
 				}

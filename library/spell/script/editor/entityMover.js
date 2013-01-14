@@ -437,7 +437,7 @@ define("spell/script/editor/entityMover",
 				}
 			},
 
-			keydown: function( spell, editorSystem, event ) {
+			keyDown: function( spell, editorSystem, event ) {
 				var movementAllowed = this.editorSystem.prototype.isMoveable.call( this.editorSystem, this.selectedEntity )
 
 				if(event.keyCode == 27 && this.selectedEntity ) {
@@ -467,7 +467,7 @@ define("spell/script/editor/entityMover",
 				}
 			},
 
-			keyup: function( spell, editorSystem, event ) {
+			keyUp: function( spell, editorSystem, event ) {
 
 			}
 		}

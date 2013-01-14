@@ -78,7 +78,7 @@ define(
 			event.preventDefault()
 
 			callback( {
-				type:       event.type, //keyup, keydown
+				type:       ( event.type == 'keyup' ) ? 'keyUp' : 'keyDown',
 				keyCode:    event.keyCode
 			} )
 		}
