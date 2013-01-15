@@ -522,9 +522,11 @@ define(
 				tilemaps            = componentMaps[ TILEMAP_COMPONENT_ID ],
 				dimensions          = vec2.create()
 
+			if( quadGeometries &&
+				quadGeometries[ entityId ] &&
+				quadGeometries[ entityId ].dimensions ) {
 
-			if( quadGeometries && quadGeometries[ entityId ] && quadGeometries[ entityId ].dimensions ) {
-				//if a quadGeometry is specified, always take this
+				// if a quadGeometry is specified, always take this
 				vec2.set( quadGeometries[ entityId ].dimensions, dimensions )
 
 			} else if( staticAppearances && staticAppearances[ entityId ] &&
@@ -535,18 +537,24 @@ define(
 				// entity has a static appearance
 				vec2.set( staticAppearances[ entityId ].asset.resource.dimensions, dimensions )
 
-			} else if( animatedAppearances && animatedAppearances[ entityId ] &&
+			} else if( animatedAppearances &&
+				animatedAppearances[ entityId ] &&
 				animatedAppearances[ entityId ].asset &&
 				animatedAppearances[ entityId ].asset.frameDimensions ) {
 
 				// entity has an animated appearance
 				vec2.set( animatedAppearances[ entityId ].asset.frameDimensions, dimensions )
 
-			} else if( tilemaps && tilemaps[ entityId ] && tilemaps[ entityId ].asset ) {
+			} else if( tilemaps &&
+				tilemaps[ entityId ] &&
+				tilemaps[ entityId ].asset ) {
 
-				//entity is an tilemap
+				// entity is a tilemap
 				vec2.set( tilemaps[ entityId ].asset.tilemapDimensions, dimensions )
 				vec2.multiply( dimensions, tilemaps[ entityId ].asset.spriteSheet.frameDimensions, dimensions )
+
+			} else {
+				return
 			}
 
 			// apply scale factor
@@ -932,6 +940,11 @@ define(
 
 						updateWorldTransform( this.componentMaps, entityId )
 
+					} else if( attributeConfig.worldTranslation ||
+						attributeConfig.worldScale ||
+						attributeConfig.worldRotation ) {
+
+						// TODO: update localTransform from a changed world transform
 					}
 
 				} else if( componentId === APPEARANCE_TRANSFORM_COMPONENT_ID ) {

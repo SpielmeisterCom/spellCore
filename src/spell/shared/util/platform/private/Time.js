@@ -1,7 +1,7 @@
 define(
-	"spell/shared/util/platform/private/Time",
+	'spell/shared/util/platform/private/Time',
 	function() {
-		"use strict"
+		'use strict'
 
 		return {
 			/*

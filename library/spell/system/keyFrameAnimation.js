@@ -92,12 +92,13 @@ define(
 				keyFrameAnimations = this.keyFrameAnimations
 
 			for( var id in keyFrameAnimations ) {
-				var keyFrameAnimation      = keyFrameAnimations[ id ],
-					keyFrameAnimationAsset = keyFrameAnimation.asset,
-					animate                = keyFrameAnimationAsset.animate,
-					lengthInMs             = keyFrameAnimationAsset.length
+				var keyFrameAnimation = keyFrameAnimations[ id ]
 
 				if( !keyFrameAnimation.playing ) continue
+
+				var keyFrameAnimationAsset = keyFrameAnimation.asset,
+					animate                = keyFrameAnimationAsset.animate,
+					lengthInMs             = keyFrameAnimationAsset.length
 
 				var rawOffset = createOffset(
 					deltaTimeInMs,
