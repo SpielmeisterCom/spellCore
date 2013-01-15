@@ -188,7 +188,10 @@ define(
 				return
 			}
 
-			event.preventDefault()
+			if( button > 0 ) {
+				//only prevent default for non left click buttons
+				event.preventDefault()
+			}
 
 			if( eventMappings[ eventType ] ) {
 				eventType = eventMappings[ eventType ]
