@@ -38,7 +38,7 @@ define(
 		var createTimeStamp = function() {
 			var now = new Date()
 
-			return '[' + now.toDateString() + ' ' + now.toLocaleTimeString() + ']'
+			return '[' + now.toDateString() + ' ' + now.toTimeString() + ']'
 		}
 
 		var createMessage = function( level, text ) {
