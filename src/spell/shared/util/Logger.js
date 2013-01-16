@@ -116,7 +116,7 @@ define(
 					)
 				}
 
-				platformLog( createTimeStamp() + ' ' + createMessage( level, text ) )
+				platformLog( createMessage( level, text ) )
 			},
 
 			/**
