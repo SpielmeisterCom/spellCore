@@ -99,7 +99,7 @@ define(
 		 * @param entityId
 		 * @return {*}
 		 */
-		var updateWorldTransform = function( componentMaps, entityId ) {
+		var updateWorldTransform = function( componentMaps, eventManager, entityId, silent ) {
 			var transformComponents = componentMaps[ TRANSFORM_COMPONENT_ID ],
 				transform           = transformComponents[ entityId ]
 
@@ -144,12 +144,16 @@ define(
             transform.worldTranslation[ 0 ] = worldMatrix[ 6 ]
             transform.worldTranslation[ 1 ] = worldMatrix[ 7 ]
 
+			if( !silent ) {
+				eventManager.publish( [ Events.COMPONENT_UPDATED, TRANSFORM_COMPONENT_ID ], [ transform, entityId ] )
+			}
+
 			// update all childs recursively
 			if( children ) {
 				for( var i = 0, length = children.ids.length; i < length; i++ ) {
 					var childrenEntityId = children.ids[ i ]
 
-					updateWorldTransform( componentMaps, childrenEntityId )
+					updateWorldTransform( componentMaps, eventManager, childrenEntityId, silent )
 				}
 			}
 		}
@@ -405,7 +409,7 @@ define(
 			}
 		}
 
-		var createAdditionalEntityConfig = function( isRoot, parentId, childEntityIds, name, entityTemplateId ) {
+		var createAdditionalEntityConfig = function( isRoot, parentId, name, entityTemplateId ) {
 			var result = {}
 
 			if( isRoot && !parentId ) {
@@ -418,15 +422,9 @@ define(
 				}
 			}
 
-			if( _.size( childEntityIds ) > 0 ) {
-				result[ CHILDREN_COMPONENT_ID ] = {
-					ids : childEntityIds
-				}
-			}
-
 			result[ METADATA_COMPONENT_ID ] = {
-				'name':                 name,
-				'entityTemplateId':     entityTemplateId
+				name : name,
+				entityTemplateId : entityTemplateId
 			}
 
 			return result
@@ -448,6 +446,25 @@ define(
 
 			var entityId = getEntityId( entityConfig.id )
 
+			// add additional components which the engine requires
+			_.extend(
+				config,
+				createAdditionalEntityConfig( isRoot, parentId, entityConfig.name, entityTemplateId )
+			)
+
+			// creating the entity
+			var entityComponents = templateManager.createComponents( entityTemplateId, config || {} )
+
+			addComponents( componentMaps, eventManager, entityId, entityComponents )
+			updateWorldTransform( componentMaps, eventManager, entityId, true )
+
+			var appearanceTransform = componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ]
+
+			if( appearanceTransform ) {
+				updateAppearanceTransform( appearanceTransform )
+			}
+
+
 			// creating child entities
 			var childEntityIds = _.map(
 				entityConfig.children,
@@ -457,28 +474,16 @@ define(
 				}
 			)
 
-			// add additional components which the engine requires
-			_.extend(
-				config,
-				createAdditionalEntityConfig( isRoot, parentId, childEntityIds, entityConfig.name, entityTemplateId )
-			)
 
-			// creating the entity
-			var entityComponents = templateManager.createComponents( entityTemplateId, config || {} )
+			// adding the descendant entity ids to this entity
+			var childrenComponentConfig = {}
 
-			addComponents( componentMaps, eventManager, entityId, entityComponents )
-
-			if( parentId ) {
-				attachEntityToParent( componentMaps, entityId, parentId )
+			childrenComponentConfig[ CHILDREN_COMPONENT_ID ] = {
+				ids : childEntityIds
 			}
 
-			updateWorldTransform( componentMaps, entityId )
+			addComponents( componentMaps, eventManager, entityId, childrenComponentConfig )
 
-			var appearanceTransform = componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ]
-
-			if( appearanceTransform ) {
-				updateAppearanceTransform( appearanceTransform )
-			}
 
 			eventManager.publish( Events.ENTITY_CREATED, [ entityId, entityComponents ] )
 
@@ -938,7 +943,7 @@ define(
 						attributeConfig.scale ||
 						attributeConfig.rotation ) {
 
-						updateWorldTransform( this.componentMaps, entityId )
+						updateWorldTransform( this.componentMaps, this.eventManager, entityId, false )
 
 					} else if( attributeConfig.worldTranslation ||
 						attributeConfig.worldScale ||
@@ -972,7 +977,7 @@ define(
 			},
 
 			updateWorldTransform : function( entityId ) {
-				updateWorldTransform( this.componentMaps, entityId )
+				updateWorldTransform( this.componentMaps, this.eventManager, entityId, false )
 			},
 
 			updateAppearanceTransform : function( entityId ) {

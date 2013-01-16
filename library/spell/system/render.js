@@ -568,7 +568,7 @@ define(
 			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 
 
-			this.spatialIndex = new QuadTree( 32768 )
+			this.spatialIndex = new QuadTree( Math.pow( 2, 20 ) )
 
 			var entityManager = spell.entityManager,
 				spatialIndex  = this.spatialIndex
@@ -600,6 +600,8 @@ define(
 			statisticsManager = spell.statisticsManager
 
 			statisticsManager.addNode( 'compiling entity list', 'spell.system.render' )
+			statisticsManager.addNode( '# entities drawn', 'spell.system.render' )
+
 //			statisticsManager.addNode( 'drawing', 'spell.system.render' )
 //			statisticsManager.addNode( 'sort', 'spell.system.render' )
 //			statisticsManager.addNode( 'platform drawing', 'drawing' )
@@ -681,13 +683,12 @@ define(
 
 			var start = performance.now()
 
-			debugger
-
 			var visibleEntityIdsSorted = createVisibleEntityIdsSorted(
 				this.spatialIndex.search( cameraTransform.translation, effectiveCameraDimensions )
 			)
 
 			spell.statisticsManager.updateNode( 'compiling entity list', performance.now() - start )
+			spell.statisticsManager.updateNode( '# entities drawn', visibleEntityIdsSorted.length )
 
 			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
 				drawVisualObject(
