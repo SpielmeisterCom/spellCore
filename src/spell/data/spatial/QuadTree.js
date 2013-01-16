@@ -164,9 +164,9 @@ define(
 			}
 		}
 
-		var createBound = function( position, dimension ) {
-			var halfWidth  = dimension[ 0 ] * 0.5,
-				halfHeight = dimension[ 1 ] * 0.5
+		var createBound = function( position, dimensions ) {
+			var halfWidth  = dimensions[ 0 ] * 0.5,
+				halfHeight = dimensions[ 1 ] * 0.5
 
 			return [
 				position[ 0 ] - halfWidth,  // left
@@ -186,16 +186,16 @@ define(
 			}
 		}
 
-		var createItem = function( size, position, dimension, payload, id ) {
-			// HACK: this is necessary in order to support entities which do not have a dimension
-			if( !dimension ) {
+		var createItem = function( size, position, dimensions, payload, id ) {
+			// HACK: this is necessary in order to support entities which do not have a dimensions
+			if( !dimensions ) {
 				position = [ 0, 0 ]
-				dimension = [ size - 1, size - 1 ]
+				dimensions = [ size - 1, size - 1 ]
 			}
 
 			return {
 				id : id,
-				bound : createBound( position, dimension ),
+				bound : createBound( position, dimensions ),
 				payload : payload
 			}
 		}
@@ -211,7 +211,7 @@ define(
 		}
 
 		QuadTree.prototype = {
-			insert : function( position, dimension, payload, id ) {
+			insert : function( position, dimensions, payload, id ) {
 				if( id &&
 					this.idToNode[ id ] ) {
 
@@ -221,7 +221,7 @@ define(
 				insert(
 					this.idToNode,
 					this.root,
-					createItem( this.size, position, dimension, payload, id )
+					createItem( this.size, position, dimensions, payload, id )
 				)
 			},
 			remove : function( id ) {
@@ -232,12 +232,12 @@ define(
 
 				delete this.idToNode[ id ]
 			},
-			search : function( position, dimension ) {
+			search : function( position, dimensions ) {
 				var result = {}
 
 				searchItems(
 					this.root,
-					createBound( position, dimension ),
+					createBound( position, dimensions ),
 					result
 				)
 

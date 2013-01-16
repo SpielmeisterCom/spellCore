@@ -66,27 +66,14 @@ define(
 			performance = window.performance
 
 		var layerCompareFunction = function( a, b ) {
-			var d1 = a.d,
-				d2 = b.d,
-				l1 = a.l,
-				l2 = b.l
-
-			if( d1 == d2 ) {
-				return ( l1 < l2 ? -1 : ( l1 > l2 ? 1 : 0 ) )
-			}
-
-			return 0
+			return a.layer - b.layer
 		}
 
 		var getRootEntities = function( entities ) {
-			var result = [],
-				entity
-
+			var result = []
 			for( var id in entities ) {
-				entity = entities[ id ]
-
-				if( entity.p === 0 ) {
-					result.push( entity.i )
+				if( entities[ id ].parent === 0 ) {
+					result.push( id )
 				}
 			}
 
@@ -118,11 +105,11 @@ define(
 
 			for( var i = 0, n = visibleEntitiesSorted.length; i < n; i++ ) {
 				visibleEntity = visibleEntitiesSorted[ i ]
-				id = visibleEntity.i
+				id = visibleEntity.id
 
 				result.push( id )
 
-				childrenIds = visibleEntity.c
+				childrenIds = visibleEntity.children
 
 				if( childrenIds ) {
 					createEntityIdsInDrawOrder( visibleEntities, childrenIds, result )
@@ -568,35 +555,6 @@ define(
 			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 
 
-			this.spatialIndex = new QuadTree( Math.pow( 2, 20 ) )
-
-			var entityManager = spell.entityManager,
-				spatialIndex  = this.spatialIndex
-
-			this.addVisibleEntity = function( id ) {
-				var visualObject = entityManager.getComponentById( id, Defines.VISUAL_OBJECT_COMPONENT_ID )
-
-				if( !visualObject ) return
-
-				var transform = entityManager.getComponentById( id, Defines.TRANSFORM_COMPONENT_ID ),
-					parent    = entityManager.getComponentById( id, Defines.PARENT_COMPONENT_ID ),
-					children  = entityManager.getComponentById( id, Defines.CHILDREN_COMPONENT_ID )
-
-				spatialIndex.insert(
-					transform.worldTranslation,
-					entityManager.getEntityDimensions( id ),
-					{
-						i : id,
-						p : parent ? parent.id : 0,
-						c : children ? children.ids : undefined,
-						l : visualObject ? visualObject.layer : 0
-					},
-					id
-				)
-			}
-
-			eventManager.subscribe( Events.ENTITY_CREATED, this.addVisibleEntity )
-
 			statisticsManager = spell.statisticsManager
 
 			statisticsManager.addNode( 'compiling entity list', 'spell.system.render' )
@@ -614,28 +572,6 @@ define(
 			eventManager.unsubscribe( Events.SCREEN_ASPECT_RATIO, this.screeAspectRatioHandler )
 			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 			eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
-			eventManager.unsubscribe( Events.ENTITY_CREATED, this.addVisibleEntity )
-		}
-
-		var activate = function( spell ) {
-			var eventManager     = spell.eventManager,
-				spatialIndex     = this.spatialIndex,
-				addVisibleEntity = this.addVisibleEntity
-
-			this.updateVisibleEntity = function( component, id ) {
-				spatialIndex.remove( id )
-				addVisibleEntity( id )
-			}
-
-			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.TRANSFORM_COMPONENT_ID ], this.updateVisibleEntity )
-			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.VISUAL_OBJECT_COMPONENT_ID ], this.updateVisibleEntity )
-		}
-
-		var deactivate = function( spell ) {
-			var eventManager = spell.eventManager
-
-			eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.TRANSFORM_COMPONENT_ID ], this.updateVisibleEntity )
-			eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.VISUAL_OBJECT_COMPONENT_ID ], this.updateVisibleEntity )
 		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
@@ -684,7 +620,7 @@ define(
 			var start = performance.now()
 
 			var visibleEntityIdsSorted = createVisibleEntityIdsSorted(
-				this.spatialIndex.search( cameraTransform.translation, effectiveCameraDimensions )
+				entityManager.getEntityIdsByRegion( cameraTransform.translation, effectiveCameraDimensions )
 			)
 
 			spell.statisticsManager.updateNode( 'compiling entity list', performance.now() - start )
@@ -793,7 +729,6 @@ define(
 			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
 			this.screenSize           = spell.configurationManager.currentScreenSize
 			this.debugSettings        = spell.configurationManager.debug ? spell.configurationManager.debug : false
-			this.addVisibleEntity     = null
 			this.spatialIndex         = null
 
 			var context    = this.context,
@@ -824,8 +759,8 @@ define(
 		Renderer.prototype = {
 			init : init,
 			destroy : destroy,
-			activate : activate,
-			deactivate : deactivate,
+			activate : function( spell ) {},
+			deactivate : function( spell ) {},
 			process : process
 		}
 
