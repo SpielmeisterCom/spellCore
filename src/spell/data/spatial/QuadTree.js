@@ -19,14 +19,14 @@ define(
 		}
 
 		var split = function( node ) {
-			var bound      = node.bound,
-				left       = bound[ 0 ],
-				right      = bound[ 1 ],
-				bottom     = bound[ 2 ],
-				top        = bound[ 3 ],
-				centerX    = ( left + right ) * 0.5,
-				centerY    = ( bottom + top ) * 0.5,
-				children   = node.children
+			var bound    = node.bound,
+				left     = bound[ 0 ],
+				right    = bound[ 1 ],
+				bottom   = bound[ 2 ],
+				top      = bound[ 3 ],
+				centerX  = ( left + right ) * 0.5,
+				centerY  = ( bottom + top ) * 0.5,
+				children = node.children
 
 			children[ 0 ] = createTreeNode( node, [ centerX, right, centerY, top ] )
 			children[ 1 ] = createTreeNode( node, [ left, centerX, centerY, top ] )
@@ -50,7 +50,20 @@ define(
 			children[ 3 ] = undefined
 		}
 
-		var insert = function( node, item, itemBound ) {
+		var insert = function( idToNode, root, item ) {
+			var node = insertR( root, item, item.bound ),
+				id   = item.id
+
+			if( !node ) {
+				throw 'Could not insert item ' + id ? ' with id "' + id + '" ' : '' + 'because it is not contained in the space covered by the tree.'
+			}
+
+			if( id ) {
+				idToNode[ id ] = node
+			}
+		}
+
+		var insertR = function( node, item, itemBound ) {
 			if( !contains( node.bound, itemBound ) ) return
 
 			var children = node.children
@@ -60,7 +73,7 @@ define(
 			}
 
 			for( var i = 0, success; i < 4; i++ ) {
-				success = insert( children[ i ], item, itemBound )
+				success = insertR( children[ i ], item, itemBound )
 
 				if( success ) {
 					node.numDescendantItems++
@@ -125,19 +138,11 @@ define(
 					// search further down this branch and skip the other branches
 					searchItems( child, searchBound, result )
 
-//					result = result.concat(
-//						searchItems( child, searchBound )
-//					)
-
 					break
 
 				} else if( intersect( childBound, searchBound ) ) {
 					// search further down this branch
 					searchItems( child, searchBound, result )
-
-//					result = result.concat(
-//						searchItems( child, searchBound )
-//					)
 				}
 			}
 		}
@@ -151,7 +156,6 @@ define(
 			}
 
 			// add childrens' items
-
 			var children = node.children
 			if( !children[ 0 ] ) return
 
@@ -160,9 +164,9 @@ define(
 			}
 		}
 
-		var createBound = function( position, dimensions ) {
-			var halfWidth  = dimensions[ 0 ] * 0.5,
-				halfHeight = dimensions[ 1 ] * 0.5
+		var createBound = function( position, dimension ) {
+			var halfWidth  = dimension[ 0 ] * 0.5,
+				halfHeight = dimension[ 1 ] * 0.5
 
 			return [
 				position[ 0 ] - halfWidth,  // left
@@ -182,10 +186,16 @@ define(
 			}
 		}
 
-		var createItem = function( position, dimensions, payload, id ) {
+		var createItem = function( size, position, dimension, payload, id ) {
+			// HACK: this is necessary in order to support entities which do not have a dimension
+			if( !dimension ) {
+				position = [ 0, 0 ]
+				dimension = [ size - 1, size - 1 ]
+			}
+
 			return {
 				id : id,
-				bound : createBound( position, dimensions ),
+				bound : createBound( position, dimension ),
 				payload : payload
 			}
 		}
@@ -201,28 +211,18 @@ define(
 		}
 
 		QuadTree.prototype = {
-			insert : function( position, dimensions, payload, id ) {
-				if( !id ) {
-					throw '"id" must not be undefined'
-				}
+			insert : function( position, dimension, payload, id ) {
+				if( id &&
+					this.idToNode[ id ] ) {
 
-				if( !dimensions ) {
-					position = [ 0, 0 ]
-					dimensions = [ this.size - 1, this.size - 1 ]
-				}
-
-				if( this.idToNode[ id ] ) {
 					throw 'The provided id "' + id + '" is already in use.'
 				}
 
-				var item = createItem( position, dimensions, payload, id ),
-					node = insert( this.root, item, item.bound )
-
-				if( !node ) {
-					throw 'Could not insert item "' + id + '" because it is not contained in the space covered by the tree.'
-				}
-
-				this.idToNode[ id ] = node
+				insert(
+					this.idToNode,
+					this.root,
+					createItem( this.size, position, dimension, payload, id )
+				)
 			},
 			remove : function( id ) {
 				var node = this.idToNode[ id ]
@@ -232,12 +232,12 @@ define(
 
 				delete this.idToNode[ id ]
 			},
-			search : function( position, dimensions ) {
+			search : function( position, dimension ) {
 				var result = {}
 
 				searchItems(
 					this.root,
-					createBound( position, dimensions ),
+					createBound( position, dimension ),
 					result
 				)
 
