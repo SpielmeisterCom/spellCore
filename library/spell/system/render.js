@@ -62,8 +62,8 @@ define(
 			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
 			currentCameraId
 
-		var statisticsManager,
-			performance = window.performance
+//		var statisticsManager,
+//			performance = window.performance
 
 		var layerCompareFunction = function( a, b ) {
 			return a.layer - b.layer
@@ -555,10 +555,10 @@ define(
 			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 
 
-			statisticsManager = spell.statisticsManager
-
-			statisticsManager.addNode( 'compiling entity list', 'spell.system.render' )
-			statisticsManager.addNode( '# entities drawn', 'spell.system.render' )
+//			statisticsManager = spell.statisticsManager
+//
+//			statisticsManager.addNode( 'compiling entity list', 'spell.system.render' )
+//			statisticsManager.addNode( '# entities drawn', 'spell.system.render' )
 
 //			statisticsManager.addNode( 'drawing', 'spell.system.render' )
 //			statisticsManager.addNode( 'sort', 'spell.system.render' )
@@ -617,14 +617,14 @@ define(
 			context.clear()
 
 
-			var start = performance.now()
+//			var start = performance.now()
 
 			var visibleEntityIdsSorted = createVisibleEntityIdsSorted(
 				entityManager.getEntityIdsByRegion( cameraTransform.translation, effectiveCameraDimensions )
 			)
 
-			spell.statisticsManager.updateNode( 'compiling entity list', performance.now() - start )
-			spell.statisticsManager.updateNode( '# entities drawn', visibleEntityIdsSorted.length )
+//			spell.statisticsManager.updateNode( 'compiling entity list', performance.now() - start )
+//			spell.statisticsManager.updateNode( '# entities drawn', visibleEntityIdsSorted.length )
 
 			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
 				drawVisualObject(
