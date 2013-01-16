@@ -109,7 +109,7 @@ define(
 		}
 
 		var hasTouchSupport = function() {
-			return ( 'ontouchstart' in window ) || ( window.DocumentTouch && document instanceof DocumentTouch )
+			return ( 'ontouchstart' in window ) || ( window.DocumentTouch && document instanceof DocumentTouch ) || typeof(ejecta) !== 'undefined'
 		}
 
 		var emitSpellPointerEvent = function( callback, eventType, pointerId, button, positionX, positionY ) {
