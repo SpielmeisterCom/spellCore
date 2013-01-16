@@ -317,14 +317,6 @@ define(
 				childrenComponents  = componentMaps[ CHILDREN_COMPONENT_ID ],
 				children            = childrenComponents[ parentEntityId ]
 
-			// TODO: Check if this code is needed
-//			if( !children ) {
-//				childrenComponents[ parentEntityId ] = { ids : [ entityId ] }
-//
-//			} else {
-//				childrenComponents[ parentEntityId ].ids.push( entityId )
-//			}
-
 			if( children ) {
 				children.ids.push( entityId )
 			}
@@ -464,7 +456,6 @@ define(
 				updateAppearanceTransform( appearanceTransform )
 			}
 
-
 			// creating child entities
 			var childEntityIds = _.map(
 				entityConfig.children,
@@ -473,7 +464,6 @@ define(
 					return createEntity( eventManager, componentMaps, templateManager, entityConfig, false )
 				}
 			)
-
 
 			// adding the descendant entity ids to this entity
 			var childrenComponentConfig = {}
