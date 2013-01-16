@@ -45,10 +45,19 @@ define(
 
 			var cursorWorldPosition = renderingContext.transformScreenToWorld( inputEvent.position )
 
-			for( var entityId in transforms ) {
+            for( var entityId in transforms ) {
 				if( pointedEntityMap[ entityId ] === undefined ) {
 					pointedEntityMap[ entityId ] = false
 				}
+
+                if( inputEvent.type === 'pointerCancel' && pointedEntityMap[ entityId ] === inputEvent.pointerId ) {
+                    entityManager.triggerEvent( entityId, 'pointerCancel' )
+                    entityManager.triggerEvent( entityId, 'pointerUp' )
+                    entityManager.triggerEvent( entityId, 'pointerOut' )
+                    pointedEntityMap[ entityId ] = false
+
+                    continue
+                }
 
 				var entityDimensions = entityManager.getEntityDimensions( entityId )
 
@@ -61,17 +70,24 @@ define(
 					} else if( inputEvent.type === 'pointerUp' || inputEvent.type === 'pointerCancel' ) {
 						entityManager.triggerEvent( entityId, 'pointerUp' )
 
+                        if( pointedEntityMap[ entityId ] !== false ) {
+                            entityManager.triggerEvent( entityId, 'pointerOut' )
+                            pointedEntityMap[ entityId ] = false
+                        }
+
 					} else if ( inputEvent.type === 'pointerMove' ) {
 						entityManager.triggerEvent( entityId, 'pointerMove' )
 					}
 
 					if( pointedEntityMap[ entityId ] === false ) {
-						pointedEntityMap[ entityId ] = true
+						pointedEntityMap[ entityId ] = inputEvent.pointerId
 						entityManager.triggerEvent( entityId, 'pointerOver' )
 					}
 
 				} else {
-					if( pointedEntityMap[ entityId ] === true ) {
+
+					if( pointedEntityMap[ entityId ] === inputEvent.pointerId ) {
+                        //pointer moved out of the entity
 						pointedEntityMap[ entityId ] = false
 						entityManager.triggerEvent( entityId, 'pointerOut' )
 					}
