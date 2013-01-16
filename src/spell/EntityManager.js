@@ -843,7 +843,9 @@ define(
 						removeComponents( eventManager, componentMaps, entityId )
 					}
 				}
-			},
+
+                this.spatialIndex    = new QuadTree( Math.pow( 2, 20 ) )
+            },
 
 
 			/**
