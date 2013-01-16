@@ -128,22 +128,23 @@ define(
                 //convert worldposition to coordinates which are local to the tilemaps origin
 				mat3.multiplyVec2(worldToLocalMatrix, worldPosition, tmpVec2)
 
-				if (entityManager.hasComponent(entityId, 'spell.component.2d.graphics.shape.rectangle')) {
+				if ( entityManager.hasComponent(entityId, 'spell.component.2d.graphics.shape.rectangle') ) {
 					entityManager.removeComponent(entityId, 'spell.component.2d.graphics.shape.rectangle')
 				}
 
-				var offsetX         = Math.floor( tmpVec2[0] / frameDimensions[0]),
-					offsetY         = Math.floor( tmpVec2[1] / frameDimensions[1]),
+				var offsetX         = Math.floor( tmpVec2[ 0 ] / frameDimensions[ 0 ]),
+					offsetY         = Math.floor( tmpVec2[ 1 ] / frameDimensions[ 1 ]),
 					currentOffset   = [ offsetX, offsetY ]
 
 				//transform the grid aligned local coordinates to world coordinates again
-				tmpVec2[0] = offsetX * frameDimensions[0] + frameDimensions[0] / 2
-				tmpVec2[1] = offsetY * frameDimensions[1] + frameDimensions[1] / 2
+				tmpVec2[ 0 ] = offsetX * frameDimensions[ 0 ] + frameDimensions[ 0 ] / 2
+				tmpVec2[ 1 ] = offsetY * frameDimensions[ 1 ] + frameDimensions[ 1 ] / 2
 				mat3.multiplyVec2(tilemapTransform.worldMatrix, tmpVec2, tmpVec2)
 
-				entityManager.updateComponent(entityId, 'spell.component.2d.transform', {
+				entityManager.updateComponent( entityId, 'spell.component.2d.transform', {
 					translation: tmpVec2
 				})
+
 
 			} else {
 				//it's not placeable here
@@ -163,6 +164,8 @@ define(
 				})
 
 			}
+
+			entityManager.updateWorldTransform( entityId )
 
 			return currentOffset
 		}
@@ -412,7 +415,7 @@ define(
 
 			},
 
-			mousedown: function( spell, editorSystem, event ) {
+			pointerDown: function( spell, editorSystem, event ) {
 				var entityManager = spell.entityManager
 
 				if(event.button != 0) {
@@ -447,7 +450,7 @@ define(
 				}
 			},
 
-			mouseup: function( spell, editorSystem, event ) {
+			pointerUp: function( spell, editorSystem, event ) {
 
 				if(this.state === STATE_DRAW_TILE) {
 					this.currentOffset                  = null
@@ -458,7 +461,7 @@ define(
 			},
 
 
-			mousemove: function( spell, editorSystem, event ) {
+			pointerMove: function( spell, editorSystem, event ) {
 				var entityManager = spell.entityManager
 
 				if(this.state === STATE_READY_TO_DRAW && this.tilemapSelectionCursor !== null && this.currentTilemap !== null) {
