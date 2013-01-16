@@ -1,18 +1,21 @@
-define("spell/script/editor/entityMover",
+define(
+	'spell/script/editor/entityMover',
 	[
 		'spell/math/vec2',
 		'spell/math/mat3',
-        'spell/math/util',
+		'spell/math/util',
 		'spell/functions'
 	],
 	function(
 		vec2,
 		mat3,
-        mathUtil,
+		mathUtil,
 		_
-		) {
-		"use strict";
-		var isPointWithinEntity = function ( worldPosition, entityId ) {
+	) {
+		'use strict'
+
+
+		var isPointWithinEntity = function( worldPosition, entityId ) {
 			var editorConfigurations = this.editorConfigurations,
 				editorConfiguration  = editorConfigurations[ entityId ]
 
@@ -26,7 +29,7 @@ define("spell/script/editor/entityMover",
 			}
 
 
-			if (isOverlayEntity) {
+			if(isOverlayEntity) {
 				//no further processing for overlay entites
 				return false
 			}
@@ -34,14 +37,16 @@ define("spell/script/editor/entityMover",
 			var transform = this.transforms[ entityId ],
 			    entityDimensions = this.spell.entityManager.getEntityDimensions( entityId )
 
+			if( !entityDimensions ) return false
+
 			return mathUtil.isPointInRect( worldPosition, transform.worldTranslation, entityDimensions[ 0 ], entityDimensions[ 1 ], 0 )
 
 		}
 
-		var syncOverlayEntitesWithMatchedEntites = function ( overlayEntityMap, matchedEntites ) {
+		var syncOverlayEntitesWithMatchedEntites = function( overlayEntityMap, matchedEntites ) {
 			var entityManager = this.spell.entityManager
 
-			for ( var i= 0,length=matchedEntites.length; i<length; i++) {
+			for( var i= 0,length=matchedEntites.length; i<length; i++) {
 
 				var entityId            = matchedEntites[ i ],
 					transform           = this.transforms[ entityId ],
@@ -49,7 +54,7 @@ define("spell/script/editor/entityMover",
 					entityDimensions    = entityManager.getEntityDimensions( entityId ),
 					overlayEntityId     = overlayEntityMap[ entityId ]
 
-				if ( overlayEntityId  ) {
+				if( overlayEntityId  ) {
 					//overlay for entity already exists, so update it
 
 					//bypass updateComponent mechanic for updating the transform component on purpose
@@ -112,13 +117,13 @@ define("spell/script/editor/entityMover",
 			var currentlyOverlayedEntites   = _.keys( overlayEntityMap),
 				overlaysThatNeedRemovalList = _.difference( currentlyOverlayedEntites, matchedEntites )
 
-			for ( var i= 0,length=overlaysThatNeedRemovalList.length; i<length; i++) {
+			for( var i= 0,length=overlaysThatNeedRemovalList.length; i<length; i++) {
 				var entityId = overlaysThatNeedRemovalList[ i ]
 
 				entityManager.removeEntity( overlayEntityMap[ entityId ] )
 				delete overlayEntityMap[ entityId ]
 
-				if ( entityId == this.selectedEntity && !this.isDragging ) {
+				if( entityId == this.selectedEntity && !this.isDragging ) {
 					//if we removed the selectedEntity and we're not dragging it, deselect it
 					selectEntity.call( this, null )
 				}
@@ -129,14 +134,14 @@ define("spell/script/editor/entityMover",
 
 		var highlightEntitiesAtPosition = function( worldPosition ) {
 
-			if ( this.isDragging ) {
+			if( this.isDragging ) {
 				//Don't highlight entites while dragging
 				this.matchedEntities.length = 0
 			} else {
 				//find all entities that match with the current cursor position
 				this.matchedEntities = _.filter(
 					_.keys( this.transforms ),
-					_.bind (
+					_.bind(
 						isPointWithinEntity,
 						this,
 						worldPosition
@@ -169,7 +174,7 @@ define("spell/script/editor/entityMover",
 				}
 			})
 
-			if (
+			if(
 				this.spell.entityManager.hasComponent(
 				entityId,
 				'spellStaged.jumpAndRun.platform'
@@ -188,7 +193,7 @@ define("spell/script/editor/entityMover",
 				)
 			}
 
-			if (
+			if(
 				this.spell.entityManager.hasComponent(
 					entityId,
 					'spellStaged.jumpAndRun.enemy'
@@ -236,12 +241,12 @@ define("spell/script/editor/entityMover",
 
 			var transform = this.transforms[ entityId ]
 
-			if (!this.dragCursorOffset) {
+			if(!this.dragCursorOffset) {
 				this.dragCursorOffset = vec2.create()
 				vec2.set(this.editorSystem.cursorWorldPosition, this.dragCursorOffset)
 			}
 
-			if (!this.dragEntityOffset && transform) {
+			if(!this.dragEntityOffset && transform) {
 				this.dragEntityOffset = vec2.create()
 				vec2.set(transform.translation, this.dragEntityOffset)
 			}
@@ -309,7 +314,7 @@ define("spell/script/editor/entityMover",
 			entityManager.updateWorldTransform( entityId )
 
 			//if this object has a phyics body, reposition the physics body
-			if ( body && this.spell.box2dWorlds && this.spell.box2dWorlds.main ) {
+			if( body && this.spell.box2dWorlds && this.spell.box2dWorlds.main ) {
 				this.spell.box2dWorlds.main.setPosition( entityId, newTranslation )
 			}
 		}
@@ -399,7 +404,7 @@ define("spell/script/editor/entityMover",
 
 			deactivate: function( spell, editorSystem ) {
 				//remove all overlay entities
-				for ( var entityId in this.overlayEntityMap ) {
+				for( var entityId in this.overlayEntityMap ) {
 					spell.entityManager.removeEntity( this.overlayEntityMap[ entityId ] )
 					delete this.overlayEntityMap[ entityId ]
 				}
@@ -475,6 +480,5 @@ define("spell/script/editor/entityMover",
 		}
 
 		return entityMover
-
-
-})
+	}
+)
