@@ -11,6 +11,7 @@ define(
 		'spell/client/2d/graphics/drawTitleSafeOutline',
 		'spell/client/util/createComprisedRectangle',
 		'spell/client/util/createIncludedRectangle',
+		'spell/data/spatial/QuadTree',
 		'spell/Defines',
 		'spell/Events',
 		'spell/shared/util/platform/PlatformKit',
@@ -32,6 +33,7 @@ define(
 		drawTitleSafeOutline,
 		createComprisedRectangle,
 		createIncludedRectangle,
+		QuadTree,
 		Defines,
 		Events,
 		PlatformKit,
@@ -60,64 +62,69 @@ define(
 			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
 			currentCameraId
 
-//		var statisticsManager
+		var statisticsManager,
+			performance = window.performance
 
-		var layerCompareFunctionOld = function( a, b ) {
-			var d1 = a.d,
-				d2 = b.d,
-				l1 = a.l,
-				l2 = b.l
-
-			if( d1 == d2 ) {
-				return ( l1 < l2 ? -1 : ( l1 > l2 ? 1 : 0 ) )
-			}
-
-			return 0
+		var layerCompareFunction = function( a, b ) {
+			return a.layer - b.layer
 		}
 
-		var createVisualObjectsInDrawOrder = function( visualObjects, ids, parentId, depth ) {
+		var getRootEntities = function( entities ) {
 			var result = []
-
-			for( var i = 0, id, visualObject, n = ids.length; i < n; i++ ) {
-				id = ids[ i ]
-				visualObject = visualObjects[ id ]
-
-				result.push( {
-					i : id,
-					l : visualObject ? visualObject.layer : 0
-				} )
+			for( var id in entities ) {
+				if( entities[ id ].parent === 0 ) {
+					result.push( id )
+				}
 			}
-
-			result.sort( layerCompareFunctionOld )
 
 			return result
 		}
 
-		var createEntityIdsInDrawOrder = function( childrenComponents, visualObjects, roots, parentId, depth ) {
-			if( !depth ) depth = 0
-			if( !parentId ) parentId = 0
+		var createVisualObjectsInDrawOrder = function( visibleEntities, entityIds ) {
+			var result = []
 
-			var nextDepth = depth + 1,
-				childrenComponent,
+			for( var i = 0, id, visibleEntity, n = entityIds.length; i < n; i++ ) {
+				id = entityIds[ i ]
+				visibleEntity = visibleEntities[ id ]
+
+				if( !visibleEntity ) continue
+
+				result.push( visibleEntity )
+			}
+
+			result.sort( layerCompareFunction )
+
+			return result
+		}
+
+		var createEntityIdsInDrawOrder = function( visibleEntities, entityIds, result ) {
+			var childrenIds,
 				id,
-				result = [],
-				visualObject,
-				visualObjectsInDrawOrder = createVisualObjectsInDrawOrder( visualObjects, roots, parentId, depth )
+				visibleEntity,
+				visibleEntitiesSorted = createVisualObjectsInDrawOrder( visibleEntities, entityIds )
 
-			for( var i = 0, n = visualObjectsInDrawOrder.length; i < n; i++ ) {
-				visualObject = visualObjectsInDrawOrder[ i ]
-				id = visualObject.i
+			for( var i = 0, n = visibleEntitiesSorted.length; i < n; i++ ) {
+				visibleEntity = visibleEntitiesSorted[ i ]
+				id = visibleEntity.id
 
 				result.push( id )
 
-				childrenComponent = childrenComponents[ id ]
+				childrenIds = visibleEntity.children
 
-				if( childrenComponent ) {
-					result = result.concat(
-						createEntityIdsInDrawOrder( childrenComponents, visualObjects, childrenComponent.ids, id, nextDepth )
-					)
+				if( childrenIds ) {
+					createEntityIdsInDrawOrder( visibleEntities, childrenIds, result )
 				}
 			}
+		}
+
+		var createVisibleEntityIdsSorted = function( entities ) {
+			var result = []
+
+			createEntityIdsInDrawOrder(
+				entities,
+				getRootEntities( entities ),
+				result
+			)
 
 			return result
 		}
@@ -253,22 +260,6 @@ define(
 				visualObject = visualObjects[ id ],
 				quadGeometry = quadGeometries[ id ]
 
-			if( appearance && transform && visualObject && !tilemap ) {
-				var dimensions        = quadGeometry ? quadGeometry.dimensions : appearance.asset.resource.dimensions,
-					halfTextureWidth  = dimensions[ 0 ] * 0.5,
-					halfTextureHeight = dimensions[ 1 ] * 0.5,
-					minX              = viewFrustum.bottomLeft[ 0 ] - halfTextureWidth,
-					maxX              = viewFrustum.topRight[ 0 ] + halfTextureWidth,
-					minY              = viewFrustum.bottomLeft[ 1 ] - halfTextureHeight,
-					maxY              = viewFrustum.topRight[ 1 ] + halfTextureHeight,
-					curX              = transform.worldTranslation[ 0 ],
-					curY              = transform.worldTranslation[ 1 ]
-
-				if( curX < minX || curX > maxX || curY < minY || curY > maxY ) {
-					return
-				}
-			}
-
 			context.save()
 			{
 				if( transform ) {
@@ -286,8 +277,6 @@ define(
 						var asset   = appearance.asset,
 							texture = asset.resource
 
-//						var performance = window.performance
-
 						if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
 
 						if( asset.type === 'appearance' ) {
@@ -296,7 +285,7 @@ define(
 								quadGeometry.dimensions :
 									texture.dimensions
 
-//							var start = performance.webkitNow()
+//							var start = performance.now()
 
 							// static appearance
 							context.save()
@@ -314,18 +303,18 @@ define(
 							}
 							context.restore()
 
-//							var elapsed = performance.webkitNow() - start
+//							var elapsed = performance.now() - start
 
 						} else if( asset.type === 'font' ) {
-//							var start = performance.webkitNow()
+//							var start = performance.now()
 
 							// text appearance
 							drawText( context, asset, texture, 0, 0, appearance.text, appearance.spacing, appearance.align )
 
-//							var elapsed = performance.webkitNow() - start
+//							var elapsed = performance.now() - start
 
 						} else if( asset.type === '2dTileMap' ) {
-//							var start = performance.webkitNow()
+//							var start = performance.now()
 
                             if( !worldToLocalMatrixCache[ id ] ) {
                                 worldToLocalMatrixCache[ id ] = mat3.create()
@@ -335,7 +324,7 @@ define(
 
 							draw2dTileMap( context, texture, viewFrustum, asset, transform, worldToLocalMatrixCache[ id ] )
 
-//							var elapsed = performance.webkitNow() - start
+//							var elapsed = performance.now() - start
 
 						} else if( asset.type === 'animation' ) {
 							// animated appearance
@@ -364,7 +353,7 @@ define(
 							var frameId     = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
 								frameOffset = asset.frameOffsets[ frameId ]
 
-//							var start = performance.webkitNow()
+//							var start = performance.now()
 
 							context.save()
 							{
@@ -378,7 +367,7 @@ define(
 							}
 							context.restore()
 
-//							var elapsed = performance.webkitNow() - start
+//							var elapsed = performance.now() - start
 
 							var isPlaying = updatePlaying( animationLengthInMs, appearance.offset * animationLengthInMs, appearance.looped )
 
@@ -405,7 +394,7 @@ define(
 							if( totalFramesInQuad > 0 ) {
 								// only draw spriteSheet if we have at least space to draw one tile
 
-//								var start = performance.webkitNow()
+//								var start = performance.now()
 
 								context.save()
 								{
@@ -435,7 +424,7 @@ define(
 								}
 								context.restore()
 
-//								var elapsed = performance.webkitNow() - start
+//								var elapsed = performance.now() - start
 							}
 						}
 
@@ -452,7 +441,7 @@ define(
 			context.restore()
 		}
 
-		var drawDebug = function( context, childrenComponents, debugBoxes, debugCircles, transforms, deltaTimeInMs, id, next ) {
+		var drawDebug = function( context, childrenComponents, debugBoxes, debugCircles, transforms, deltaTimeInMs, id ) {
 			var debugBox    = debugBoxes[ id ],
 				debugCircle = debugCircles[ id ],
 				transform   = transforms[ id ]
@@ -523,18 +512,6 @@ define(
 			return tmpViewFrustum
 		}
 
-		var createRootTransformIds = function( roots, transforms ) {
-			var result = []
-
-			for( var rootId in roots ) {
-				if( !( rootId in transforms ) ) continue
-
-				result.push( rootId )
-			}
-
-			return result
-		}
-
 		var init = function( spell ) {
 			var eventManager = spell.eventManager
 
@@ -566,17 +543,23 @@ define(
 				this
 			)
 
+			eventManager.subscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
+			eventManager.subscribe( Events.SCREEN_ASPECT_RATIO, this.screeAspectRatioHandler )
+
+
 			this.cameraChangedHandler = function( camera, entityId ) {
 				currentCameraId = camera.active ? entityId : null
 			}
 
-			eventManager.subscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
-			eventManager.subscribe( Events.SCREEN_ASPECT_RATIO, this.screeAspectRatioHandler )
 			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 
-//			statisticsManager = spell.statisticsManager
-//
+
+			statisticsManager = spell.statisticsManager
+
+			statisticsManager.addNode( 'compiling entity list', 'spell.system.render' )
+			statisticsManager.addNode( '# entities drawn', 'spell.system.render' )
+
 //			statisticsManager.addNode( 'drawing', 'spell.system.render' )
 //			statisticsManager.addNode( 'sort', 'spell.system.render' )
 //			statisticsManager.addNode( 'platform drawing', 'drawing' )
@@ -591,36 +574,10 @@ define(
 			eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 		}
 
-		var activate = function( spell ) {
-			this.sortedVisualObjectIds = createEntityIdsInDrawOrder(
-				this.childrenComponents,
-				this.visualObjects,
-				createRootTransformIds( this.roots, this.transforms )
-			)
-
-			this.updateSortedVisualObjectIds = _.bind(
-				function() {
-					this.sortedVisualObjectIds = createEntityIdsInDrawOrder(
-						this.childrenComponents,
-						this.visualObjects,
-						createRootTransformIds( this.roots, this.transforms )
-					)
-				},
-				this
-			)
-
-			spell.eventManager.subscribe( Events.ENTITY_CREATED, this.updateSortedVisualObjectIds )
-		}
-
-		var deactivate = function( spell ) {
-			spell.eventManager.unsubscribe( Events.ENTITY_CREATED, this.updateSortedVisualObjectIds )
-		}
-
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var cameras                = this.cameras,
 				context                = this.context,
 				screenSize             = this.screenSize,
-				context                = this.context,
 				entityManager          = spell.entityManager,
 				transforms             = this.transforms,
 				appearances            = this.appearances,
@@ -633,7 +590,6 @@ define(
 				quadGeometries         = this.quadGeometries,
 				visualObjects          = this.visualObjects,
 				rectangles             = this.rectangles,
-				sortedVisualObjectIds  = this.sortedVisualObjectIds,
 				viewFrustum
 
 			var screenAspectRatio = ( this.debugSettings && this.debugSettings.screenAspectRatio ?
@@ -660,9 +616,17 @@ define(
 			// clear color buffer
 			context.clear()
 
-//			var start = performance.webkitNow()
 
-			for( var i = 0, n = sortedVisualObjectIds.length; i < n; i++ ) {
+			var start = performance.now()
+
+			var visibleEntityIdsSorted = createVisibleEntityIdsSorted(
+				entityManager.getEntityIdsByRegion( cameraTransform.translation, effectiveCameraDimensions )
+			)
+
+			spell.statisticsManager.updateNode( 'compiling entity list', performance.now() - start )
+			spell.statisticsManager.updateNode( '# entities drawn', visibleEntityIdsSorted.length )
+
+			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
 				drawVisualObject(
 					entityManager,
 					context,
@@ -678,12 +642,12 @@ define(
 					visualObjects,
 					rectangles,
 					deltaTimeInMs,
-					sortedVisualObjectIds[ i ],
+					visibleEntityIdsSorted[ i ],
 					viewFrustum
 				)
 			}
 
-//			var elapsed = performance.webkitNow() - start
+//			var elapsed = performance.now() - start
 
 //			spell.statisticsManager.updateNode( 'drawing', elapsed )
 
@@ -694,8 +658,8 @@ define(
 				var debugBoxes   = this.debugBoxes,
 					debugCircles = this.debugCircles
 
-				for( var i = 0, n = sortedVisualObjectIds.length; i < n; i++ ) {
-					drawDebug( context, childrenComponents, debugBoxes, debugCircles, transforms )
+				for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
+					drawDebug( context, childrenComponents, debugBoxes, debugCircles, transforms, deltaTimeInMs, visibleEntityIdsSorted[ i ] )
 				}
 			}
 
@@ -760,13 +724,12 @@ define(
 		 */
 
 		var Renderer = function( spell ) {
-			this.configurationManager        = spell.configurationManager
-			this.context                     = spell.renderingContext
-			this.debugFontAsset              = spell.assets[ debugFontAssetId ]
-			this.screenSize                  = spell.configurationManager.currentScreenSize
-			this.debugSettings               = spell.configurationManager.debug ? spell.configurationManager.debug : false
-			this.sortedVisualObjectIds       = []
-			this.updateSortedVisualObjectIds = null
+			this.configurationManager = spell.configurationManager
+			this.context              = spell.renderingContext
+			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
+			this.screenSize           = spell.configurationManager.currentScreenSize
+			this.debugSettings        = spell.configurationManager.debug ? spell.configurationManager.debug : false
+			this.spatialIndex         = null
 
 			var context    = this.context,
 				screenSize = this.screenSize
@@ -796,8 +759,8 @@ define(
 		Renderer.prototype = {
 			init : init,
 			destroy : destroy,
-			activate : activate,
-			deactivate : deactivate,
+			activate : function( spell ) {},
+			deactivate : function( spell ) {},
 			process : process
 		}
 

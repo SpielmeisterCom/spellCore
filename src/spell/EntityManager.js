@@ -11,6 +11,7 @@
 define(
 	'spell/EntityManager',
 	[
+		'spell/data/spatial/QuadTree',
 		'spell/Defines',
 		'spell/shared/util/arrayRemove',
 		'spell/shared/util/create',
@@ -26,6 +27,7 @@ define(
 		'spell/functions'
 	],
 	function(
+		QuadTree,
 		Defines,
 		arrayRemove,
 		create,
@@ -58,7 +60,8 @@ define(
 			STATIC_APPEARANCE_COMPONENT_ID    = Defines.STATIC_APPEARANCE_COMPONENT_ID,
 			ANIMATED_APPEARANCE_COMPONENT_ID  = Defines.ANIMATED_APPEARANCE_COMPONENT_ID,
 			QUAD_GEOMETRY_COMPONENT_ID        = Defines.QUAD_GEOMETRY_COMPONENT_ID,
-			TILEMAP_COMPONENT_ID              = Defines.TILEMAP_COMPONENT_ID
+			TILEMAP_COMPONENT_ID              = Defines.TILEMAP_COMPONENT_ID,
+			VISUAL_OBJECT_COMPONENT_ID        = Defines.VISUAL_OBJECT_COMPONENT_ID
 
 		/**
 		 * Returns an entity id. If no entity id is provided a new one is generated.
@@ -99,7 +102,7 @@ define(
 		 * @param entityId
 		 * @return {*}
 		 */
-		var updateWorldTransform = function( componentMaps, entityId ) {
+		var updateWorldTransform = function( componentMaps, eventManager, spatialIndex, syncSpatialIndex, entityId ) {
 			var transformComponents = componentMaps[ TRANSFORM_COMPONENT_ID ],
 				transform           = transformComponents[ entityId ]
 
@@ -144,12 +147,16 @@ define(
             transform.worldTranslation[ 0 ] = worldMatrix[ 6 ]
             transform.worldTranslation[ 1 ] = worldMatrix[ 7 ]
 
-			// update all childs recursively
-			if( children ) {
-				for( var i = 0, length = children.ids.length; i < length; i++ ) {
-					var childrenEntityId = children.ids[ i ]
+			if( syncSpatialIndex ) {
+				updateSpatialIndex( spatialIndex, componentMaps, entityId )
+			}
 
-					updateWorldTransform( componentMaps, childrenEntityId )
+			// update the children
+			if( children ) {
+				var childrenIds = children.ids
+
+				for( var i = 0, n = childrenIds.length; i < n; i++ ) {
+					updateWorldTransform( componentMaps, eventManager, spatialIndex, syncSpatialIndex, childrenIds[ i ] )
 				}
 			}
 		}
@@ -313,14 +320,6 @@ define(
 				childrenComponents  = componentMaps[ CHILDREN_COMPONENT_ID ],
 				children            = childrenComponents[ parentEntityId ]
 
-			// TODO: Check if this code is needed
-//			if( !children ) {
-//				childrenComponents[ parentEntityId ] = { ids : [ entityId ] }
-//
-//			} else {
-//				childrenComponents[ parentEntityId ].ids.push( entityId )
-//			}
-
 			if( children ) {
 				children.ids.push( entityId )
 			}
@@ -368,6 +367,38 @@ define(
 			}
 		}
 
+		var addToSpatialIndex = function( spatialIndex, componentMaps, dimensions, entityId ) {
+			var visualObject = componentMaps[ VISUAL_OBJECT_COMPONENT_ID ][ entityId ]
+			if( !visualObject ) return
+
+			var childrenComponent = componentMaps[ CHILDREN_COMPONENT_ID ][ entityId ],
+				parentComponent   = componentMaps[ PARENT_COMPONENT_ID ][ entityId ],
+				transform         = componentMaps[ TRANSFORM_COMPONENT_ID ][ entityId ]
+
+			spatialIndex.insert(
+				transform.worldTranslation,
+				dimensions,
+				{
+					id : entityId,
+					parent : parentComponent ? parentComponent.id : 0,
+					children : childrenComponent ? childrenComponent.ids : undefined,
+					layer : visualObject ? visualObject.layer : 0
+				},
+				entityId
+			)
+		}
+
+		var updateSpatialIndex = function( spatialIndex, componentMaps, entityId ) {
+			spatialIndex.remove( entityId )
+
+			addToSpatialIndex(
+				spatialIndex,
+				componentMaps,
+				getEntityDimensions( componentMaps, entityId ),
+				entityId
+			)
+		}
+
 		/**
 		 * Normalizes the provided entity config
 		 *
@@ -405,7 +436,7 @@ define(
 			}
 		}
 
-		var createAdditionalEntityConfig = function( isRoot, parentId, childEntityIds, name, entityTemplateId ) {
+		var createAdditionalEntityConfig = function( isRoot, parentId, name, entityTemplateId ) {
 			var result = {}
 
 			if( isRoot && !parentId ) {
@@ -418,21 +449,15 @@ define(
 				}
 			}
 
-			if( _.size( childEntityIds ) > 0 ) {
-				result[ CHILDREN_COMPONENT_ID ] = {
-					ids : childEntityIds
-				}
-			}
-
 			result[ METADATA_COMPONENT_ID ] = {
-				'name':                 name,
-				'entityTemplateId':     entityTemplateId
+				name : name,
+				entityTemplateId : entityTemplateId
 			}
 
 			return result
 		}
 
-		var createEntity = function( eventManager, componentMaps, templateManager, entityConfig, isRoot ) {
+		var createEntity = function( eventManager, componentMaps, spatialIndex, templateManager, entityConfig, isRoot ) {
 			isRoot       = ( isRoot === true || isRoot === undefined )
 			entityConfig = normalizeEntityConfig( templateManager, entityConfig )
 
@@ -448,37 +473,50 @@ define(
 
 			var entityId = getEntityId( entityConfig.id )
 
-			// creating child entities
-			var childEntityIds = _.map(
-				entityConfig.children,
-				function( entityConfig ) {
-					entityConfig.parentId = entityId
-					return createEntity( eventManager, componentMaps, templateManager, entityConfig, false )
-				}
-			)
-
 			// add additional components which the engine requires
 			_.extend(
 				config,
-				createAdditionalEntityConfig( isRoot, parentId, childEntityIds, entityConfig.name, entityTemplateId )
+				createAdditionalEntityConfig( isRoot, parentId, entityConfig.name, entityTemplateId )
 			)
 
 			// creating the entity
 			var entityComponents = templateManager.createComponents( entityTemplateId, config || {} )
 
 			addComponents( componentMaps, eventManager, entityId, entityComponents )
-
-			if( parentId ) {
-				attachEntityToParent( componentMaps, entityId, parentId )
-			}
-
-			updateWorldTransform( componentMaps, entityId )
+			updateWorldTransform( componentMaps, eventManager, spatialIndex, false, entityId )
 
 			var appearanceTransform = componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ]
 
 			if( appearanceTransform ) {
 				updateAppearanceTransform( appearanceTransform )
 			}
+
+			// creating child entities
+			var childEntityIds = _.map(
+				entityConfig.children,
+				function( entityConfig ) {
+					entityConfig.parentId = entityId
+					return createEntity( eventManager, componentMaps, spatialIndex, templateManager, entityConfig, false )
+				}
+			)
+
+			// adding the descendant entity ids to this entity
+			var childrenComponentConfig = {}
+
+			childrenComponentConfig[ CHILDREN_COMPONENT_ID ] = {
+				ids : childEntityIds
+			}
+
+			addComponents( componentMaps, eventManager, entityId, childrenComponentConfig )
+
+			// updating spatial index
+			addToSpatialIndex(
+				spatialIndex,
+				componentMaps,
+				getEntityDimensions( componentMaps, entityId ),
+				entityId
+			)
+
 
 			eventManager.publish( Events.ENTITY_CREATED, [ entityId, entityComponents ] )
 
@@ -522,9 +560,11 @@ define(
 				tilemaps            = componentMaps[ TILEMAP_COMPONENT_ID ],
 				dimensions          = vec2.create()
 
+			if( quadGeometries &&
+				quadGeometries[ entityId ] &&
+				quadGeometries[ entityId ].dimensions ) {
 
-			if( quadGeometries && quadGeometries[ entityId ] && quadGeometries[ entityId ].dimensions ) {
-				//if a quadGeometry is specified, always take this
+				// if a quadGeometry is specified, always take this
 				vec2.set( quadGeometries[ entityId ].dimensions, dimensions )
 
 			} else if( staticAppearances && staticAppearances[ entityId ] &&
@@ -535,18 +575,24 @@ define(
 				// entity has a static appearance
 				vec2.set( staticAppearances[ entityId ].asset.resource.dimensions, dimensions )
 
-			} else if( animatedAppearances && animatedAppearances[ entityId ] &&
+			} else if( animatedAppearances &&
+				animatedAppearances[ entityId ] &&
 				animatedAppearances[ entityId ].asset &&
 				animatedAppearances[ entityId ].asset.frameDimensions ) {
 
 				// entity has an animated appearance
 				vec2.set( animatedAppearances[ entityId ].asset.frameDimensions, dimensions )
 
-			} else if( tilemaps && tilemaps[ entityId ] && tilemaps[ entityId ].asset ) {
+			} else if( tilemaps &&
+				tilemaps[ entityId ] &&
+				tilemaps[ entityId ].asset ) {
 
-				//entity is an tilemap
+				// entity is a tilemap
 				vec2.set( tilemaps[ entityId ].asset.tilemapDimensions, dimensions )
 				vec2.multiply( dimensions, tilemaps[ entityId ].asset.spriteSheet.frameDimensions, dimensions )
+
+			} else {
+				return
 			}
 
 			// apply scale factor
@@ -568,6 +614,7 @@ define(
 			this.componentMaps   = {}
 			this.eventManager    = eventManager
 			this.templateManager = templateManager
+			this.spatialIndex    = new QuadTree( Math.pow( 2, 20 ) )
 			this.spell           = spell
 
 			this.templateManager.registerComponentTypeAddedCallback(
@@ -656,7 +703,7 @@ define(
 			 * @return {String} the entity id of the newly created entity
 			 */
 			createEntity : function( entityConfig ) {
-				return createEntity( this.eventManager, this.componentMaps, this.templateManager, entityConfig )
+				return createEntity( this.eventManager, this.componentMaps, this.spatialIndex, this.templateManager, entityConfig )
 			},
 
 			/**
@@ -707,10 +754,10 @@ define(
 			 */
 			cloneEntity: function( entityId ) {
 				var entityConfig = {
-					config: assembleEntityInstance( this.componentMaps, entityId )
+					config : assembleEntityInstance( this.componentMaps, entityId )
 				}
 
-				return createEntity( this.eventManager, this.componentMaps, this.templateManager, entityConfig )
+				return createEntity( this.eventManager, this.componentMaps, this.spatialIndex, this.templateManager, entityConfig )
 			},
 
 
@@ -768,6 +815,18 @@ define(
 				}
 
 				return entities
+			},
+
+			/**
+			 * Returns all entities which intersect with the region defined by the position and dimension. The return
+			 * value is an object with the entity ids as keys and additional entity metadata as value.
+			 *
+			 * @param position {Array} the position of the region in world coordinates
+			 * @param dimensions {Array} the dimensions of the region in world coordinates
+			 * @return {Object}
+			 */
+			getEntityIdsByRegion : function( position, dimensions ) {
+				return this.spatialIndex.search( position, dimensions )
 			},
 
 			/**
@@ -920,7 +979,6 @@ define(
 			 */
 			updateComponent : function( entityId, componentId, attributeConfig ) {
 				var component = this.getComponentById( entityId, componentId )
-
 				if( !component ) return false
 
 				this.templateManager.updateComponent( componentId, component, attributeConfig )
@@ -930,8 +988,7 @@ define(
 						attributeConfig.scale ||
 						attributeConfig.rotation ) {
 
-						updateWorldTransform( this.componentMaps, entityId )
-
+						updateWorldTransform( this.componentMaps, this.eventManager, this.spatialIndex, true, entityId )
 					}
 
 				} else if( componentId === APPEARANCE_TRANSFORM_COMPONENT_ID ) {
@@ -941,6 +998,9 @@ define(
 
 						updateAppearanceTransform( this.componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
 					}
+
+				} else if( componentId === VISUAL_OBJECT_COMPONENT_ID ) {
+					updateSpatialIndex( this.spatialIndex, this.componentMaps, entityId )
 				}
 
 				this.eventManager.publish( [ Events.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
@@ -959,7 +1019,7 @@ define(
 			},
 
 			updateWorldTransform : function( entityId ) {
-				updateWorldTransform( this.componentMaps, entityId )
+				updateWorldTransform( this.componentMaps, this.eventManager, this.spatialIndex, true, entityId )
 			},
 
 			updateAppearanceTransform : function( entityId ) {

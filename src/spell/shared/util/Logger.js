@@ -35,12 +35,6 @@ define(
 			}
 		}
 
-		var createTimeStamp = function() {
-			var now = new Date()
-
-			return '[' + now.toDateString() + ' ' + now.toTimeString() + ']'
-		}
-
 		var createMessage = function( level, text ) {
 			return logLevels[ level ] + ' - ' + text
 		}
@@ -122,7 +116,7 @@ define(
 					)
 				}
 
-				platformLog( createTimeStamp() + ' ' + createMessage( level, text ) )
+				platformLog( createMessage( level, text ) )
 			},
 
 			/**
