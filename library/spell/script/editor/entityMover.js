@@ -265,7 +265,7 @@ define("spell/script/editor/entityMover",
 			syncOverlayEntitesWithMatchedEntites.call( this, this.overlayEntityMap, this.matchedEntities)
 		}
 
-		var updateEntityByWorldPosition = function( entityId, cursorPosition ) {
+		var updateEntityByWorldPosition = function( entityManager, entityId, cursorPosition ) {
 
 			if( !this.transforms[ entityId ] ) {
 				//no transform available for this object. This can happen if it was removed during dragging.
@@ -280,7 +280,7 @@ define("spell/script/editor/entityMover",
 			vec2.subtract(this.dragCursorOffset, cursorPosition, distance )
 			vec2.subtract(this.dragEntityOffset, distance, worldPosition)
 
-			updateEntity.call( this, entityId, worldPosition )
+			updateEntity.call( this, entityManager, entityId, worldPosition )
 		}
 
 		var updateEntityByRelativeOffset = function( entityId, offset ) {
@@ -293,7 +293,7 @@ define("spell/script/editor/entityMover",
 			sendTransformToSpellEd.call( this, entityId )
 		}
 
-		var updateEntity = function( entityId, newTranslation ) {
+		var updateEntity = function( entityManager, entityId, newTranslation ) {
 			this.isDirty = true
 
 			var transform           = this.transforms[ entityId ],
@@ -305,6 +305,8 @@ define("spell/script/editor/entityMover",
 			if( overlayEntityId && this.transforms[ overlayEntityId ]) {
 				vec2.set(newTranslation, this.transforms[ overlayEntityId ].translation)
 			}
+
+			entityManager.updateWorldTransform( entityId )
 
 			//if this object has a phyics body, reposition the physics body
 			if ( body && this.spell.box2dWorlds && this.spell.box2dWorlds.main ) {
@@ -409,7 +411,7 @@ define("spell/script/editor/entityMover",
 				}
 			},
 
-			mousedown: function( spell, editorSystem, event ) {
+			pointerDown: function( spell, editorSystem, event ) {
 				if( event.button != 0 ) {
 					return
 				}
@@ -424,16 +426,16 @@ define("spell/script/editor/entityMover",
 				}
 			},
 
-			mouseup: function( spell, editorSystem, event ) {
+			pointerUp: function( spell, editorSystem, event ) {
 				if( event.button == 0 && this.isDragging ) {
 					stopDragging.call( this, this.selectedEntity, event.position )
 				}
 			},
 
-			mousemove: function( spell, editorSystem, event ) {
+			pointerMove: function( spell, editorSystem, event ) {
 
 				if( this.selectedEntity && this.isDragging ) {
-					updateEntityByWorldPosition.call( this, this.selectedEntity, this.editorSystem.cursorWorldPosition )
+					updateEntityByWorldPosition.call( this, spell.entityManager, this.selectedEntity, this.editorSystem.cursorWorldPosition )
 				}
 			},
 
