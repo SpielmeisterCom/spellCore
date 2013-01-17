@@ -844,7 +844,7 @@ define(
 					}
 				}
 
-                this.spatialIndex    = new QuadTree( Math.pow( 2, 20 ) )
+                this.spatialIndex = new QuadTree( Math.pow( 2, 20 ) )
             },
 
 
