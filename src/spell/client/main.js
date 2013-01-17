@@ -86,7 +86,7 @@ define(
 
 			var templateManager = new TemplateManager( spell.assets, moduleLoader )
 
-			var entityManager = new EntityManager( spell, spell.eventManager, templateManager )
+			var entityManager = new EntityManager( spell, configurationManager, spell.eventManager, templateManager )
 
 			var sceneManager = new SceneManager(
 				spell,

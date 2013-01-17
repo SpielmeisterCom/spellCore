@@ -112,6 +112,9 @@ define(
 			},
 			mode : {
 				configurable : true
+			},
+			quadTreeSize : {
+				configurable : true
 			}
 		}
 
@@ -122,6 +125,7 @@ define(
 			screenMode        : 'fixed',
 			screenSize        : [ 300, 200 ],
 			currentScreenSize : [ 300, 200 ],
+			quadTreeSize      : 1048576, // 2^20
 			gameServer        : 'internal',
 			resourceServer    : 'internal',
 			id                : 'spell' // dom node id

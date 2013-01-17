@@ -610,12 +610,13 @@ define(
 		 * public
 		 */
 
-		var EntityManager = function( spell, eventManager, templateManager ) {
-			this.componentMaps   = {}
-			this.eventManager    = eventManager
-			this.templateManager = templateManager
-			this.spatialIndex    = new QuadTree( Math.pow( 2, 20 ) )
-			this.spell           = spell
+		var EntityManager = function( spell, configurationManager, eventManager, templateManager ) {
+			this.configurationManager = configurationManager
+			this.componentMaps        = {}
+			this.eventManager         = eventManager
+			this.templateManager      = templateManager
+			this.spatialIndex         = new QuadTree( this.configurationManager.quadTreeSize )
+			this.spell                = spell
 
 			this.templateManager.registerComponentTypeAddedCallback(
 				_.bind( addComponentType, null, this.componentMaps )
@@ -844,7 +845,7 @@ define(
 					}
 				}
 
-                this.spatialIndex = new QuadTree( Math.pow( 2, 20 ) )
+                this.spatialIndex = new QuadTree( this.configurationManager.quadTreeSize )
             },
 
 
