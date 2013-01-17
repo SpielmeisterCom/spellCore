@@ -11,6 +11,12 @@
 			"doc": "the appearance asset used for rendering text"
 		},
 		{
+			"name": "translationAssetId",
+			"type": "assetId:translation",
+			"default": "translation:spell.Translate",
+			"doc": "the translation asset used for translation"
+		},
+		{
 			"name": "spacing",
 			"type": "integer",
 			"default": 0,
