@@ -217,18 +217,19 @@ define(
 		}
 
 		var addComponents = function( componentMaps, eventManager, entityId, entityComponents ) {
-			_.each(
-				entityComponents,
-				function( component, componentId ) {
-					if( !!componentMaps[ componentId ][ entityId ] ) {
-						throw 'Error: Adding a component to the entity with id \'' + entityId + '\' failed because the entity already has a component named \'' + componentId + '\'. Check with hasComponent first if this entity already has this component.'
-					}
+			var component
 
-					componentMaps[ componentId ][ entityId ] = component
+			for( var componentId in entityComponents ) {
+				component = entityComponents[ componentId ]
 
-					eventManager.publish( [ Events.COMPONENT_CREATED, componentId ], [ component, entityId ] )
+				if( componentMaps[ componentId ][ entityId ] ) {
+					throw 'Error: Adding a component to the entity with id \'' + entityId + '\' failed because the entity already has a component named \'' + componentId + '\'. Check with hasComponent first if this entity already has this component.'
 				}
-			)
+
+				componentMaps[ componentId ][ entityId ] = component
+
+				eventManager.publish( [ Events.COMPONENT_CREATED, componentId ], [ component, entityId ] )
+			}
 		}
 
 		var entityExists = function( componentMaps, entityId ) {
@@ -752,14 +753,9 @@ define(
 			 * @param {Array} entityConfigs
 			 */
 			createEntities : function( entityConfigs ) {
-				var self = this
-
-				_.each(
-					entityConfigs,
-					function( entityConfig ) {
-						self.createEntity( entityConfig )
-					}
-				)
+				for( var i = 0, n = entityConfigs.length; i < n; i++ ) {
+					this.createEntity( entityConfigs[ i ] )
+				}
 			},
 
 			/**
