@@ -85,17 +85,6 @@ define(
 		}
 
 		/**
-		 * Updates the local transformation from a world transformation
-		 *
-		 * @param componentMaps
-		 * @param entityId
-		 * @return {*}
-		 */
-		var updateLocalTransform = function( componentMaps, entityId ) {
-
-		}
-
-		/**
 		 * Updates the world transformation from a local transformation
 		 *
 		 * @param componentMaps
