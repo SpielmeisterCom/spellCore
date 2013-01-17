@@ -167,6 +167,49 @@ define(
 			)
 		}
 
+		var updateVisualObjectR = function( childrenComponents, visualObjectComponents, parentWorldOpacity, entityId ) {
+			var visualObjectComponent = visualObjectComponents[ entityId ],
+				worldOpacity          = 1.0
+
+			if( visualObjectComponent ) {
+				worldOpacity = visualObjectComponent.opacity * parentWorldOpacity
+				visualObjectComponent.worldOpacity = worldOpacity
+			}
+
+			var childrenComponent = childrenComponents[ entityId ]
+
+			if( childrenComponent ) {
+				var childrenIds = childrenComponent.ids
+
+				for( var i = 0, n = childrenIds.length; i < n; i++ ) {
+					updateVisualObjectR( childrenComponents, visualObjectComponents, worldOpacity, childrenIds[ i ] )
+				}
+			}
+		}
+
+		var updateVisualObject = function( componentMaps, entityId ) {
+			// getting the parent's "world opacity"
+			var parentComponent        = componentMaps[ PARENT_COMPONENT_ID ][ entityId ],
+				visualObjectComponents = componentMaps[ VISUAL_OBJECT_COMPONENT_ID ],
+				parentWorldOpacity     = 1.0
+
+			if( parentComponent ) {
+				var parentVisualObject = visualObjectComponents[ parentComponent.id ]
+
+				if( parentVisualObject ) {
+					parentWorldOpacity = parentVisualObject.worldOpacity
+				}
+			}
+
+			// propagate the change towards the leafs
+			updateVisualObjectR(
+				componentMaps[ CHILDREN_COMPONENT_ID ],
+				visualObjectComponents,
+				parentWorldOpacity,
+				entityId
+			)
+		}
+
 		var addComponentType = function( componentMaps, componentId ) {
 			if( componentMaps[ componentId ] ) return
 
@@ -693,7 +736,12 @@ define(
 			 * @return {String} the entity id of the newly created entity
 			 */
 			createEntity : function( entityConfig ) {
-				return createEntity( this.eventManager, this.componentMaps, this.spatialIndex, this.templateManager, entityConfig )
+				var entityId = createEntity( this.eventManager, this.componentMaps, this.spatialIndex, this.templateManager, entityConfig )
+
+				// HACK: updateVisualObject requires the complete ECS to be completely instantiated, because it propagates information towards the leafs.
+				updateVisualObject( this.componentMaps, entityId )
+
+				return entityId
 			},
 
 			/**
@@ -993,6 +1041,7 @@ define(
 
 				} else if( componentId === VISUAL_OBJECT_COMPONENT_ID ) {
 					updateSpatialIndex( this.spatialIndex, this.componentMaps, entityId )
+					updateVisualObject( this.componentMaps, entityId )
 				}
 
 				this.eventManager.publish( [ Events.COMPONENT_UPDATED, componentId ], [ component, entityId ] )

@@ -267,10 +267,10 @@ define(
 				}
 
 				if( visualObject ) {
-					var visualObjectOpacity = visualObject.opacity
+					var worldOpacity = visualObject.worldOpacity
 
-					if( visualObjectOpacity !== 1.0 ) {
-						context.setGlobalAlpha( visualObjectOpacity )
+					if( worldOpacity < 1.0 ) {
+						context.setGlobalAlpha( worldOpacity )
 					}
 
 					if( appearance ) {

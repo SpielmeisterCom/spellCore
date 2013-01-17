@@ -15,7 +15,14 @@
 			"name": "opacity",
 			"type": "number",
 			"default": 1,
-			"doc": "the opacity that the entity is drawn with"
+			"doc": "the entities opacity"
+		},
+		{
+			"name": "worldOpacity",
+			"engineInternal": true,
+			"type": "number",
+			"default": 1,
+			"doc": "the resulting opacity that the entity is drawn with"
 		}
 	],
 	"version": 1
