@@ -282,7 +282,7 @@ define(
 		}
 
 		var Physics = function( spell ) {
-			this.debug = !!spell.configurationManager.debug
+			this.debug = spell.configurationManager.getValue( 'debug' )
 			this.entityCreatedHandler
 			this.entityDestroyHandler
 			this.world

@@ -146,7 +146,7 @@ define(
 		var nativeTouchHandlerImpl = function( callback, eventMappings, container, configurationManager, event ) {
 			var eventType   = event.type,
 				button      = 0,
-				screenSize  = configurationManager.currentScreenSize,
+				screenSize  = configurationManager.getValue( 'currentScreenSize' ),
 				offset      = getOffset( container )
 
 			event.preventDefault()
@@ -176,7 +176,7 @@ define(
 			var eventType   = event.type,
 				button      = event.button,
 				pointerId   = event.pointerId !== undefined ? event.pointerId :  1,
-				screenSize  = configurationManager.currentScreenSize,
+				screenSize  = configurationManager.getValue( 'currentScreenSize' ),
 				offset      = getOffset( container ),
 				positionX   = event.pageX - offset[ 0 ],
 				positionY   = event.pageY - offset[ 1 ]

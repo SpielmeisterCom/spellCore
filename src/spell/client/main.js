@@ -61,13 +61,17 @@ define(
 
 			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
 				spell.eventManager,
-				configurationManager.id,
-				configurationManager.currentScreenSize[ 0 ],
-				configurationManager.currentScreenSize[ 1 ],
-				configurationManager.renderingBackEnd
+				configurationManager.getValue( 'id' ),
+				configurationManager.getValue( 'currentScreenSize' )[ 0 ],
+				configurationManager.getValue( 'currentScreenSize' )[ 1 ],
+				configurationManager.getValue( 'renderingBackEnd' )
 			)
 
-			PlatformKit.registerOnScreenResize( spell.eventManager, configurationManager.id, configurationManager.screenSize )
+			PlatformKit.registerOnScreenResize(
+				spell.eventManager,
+				configurationManager.getValue( 'id' ),
+				configurationManager.getValue( 'screenSize' )
+			)
 
 			spell.logger.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
 
@@ -75,12 +79,19 @@ define(
 
 			var storage = PlatformKit.createPersistentStorage()
 
-			var resourceLoader = new ResourceLoader( spell, spell.eventManager, renderingContext, audioContext, configurationManager.resourceServer, configurationManager.baseUrlPrefix )
+			var resourceLoader = new ResourceLoader(
+				spell,
+				spell.eventManager,
+				renderingContext,
+				audioContext,
+				configurationManager.getValue( 'resourceServer' ),
+				configurationManager.getValue( 'baseUrlPrefix' )
+			)
 
 			if( cacheContent ) resourceLoader.setCache( cacheContent )
 
 
-			var isModeDevelopment = configurationManager.mode !== 'deployed'
+			var isModeDevelopment = configurationManager.getValue( 'mode' ) !== 'deployed'
 
 			var moduleLoader = createModuleLoader( resourceLoader, isModeDevelopment )
 

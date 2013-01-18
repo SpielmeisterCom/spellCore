@@ -648,7 +648,7 @@ define(
 			this.componentMaps        = {}
 			this.eventManager         = eventManager
 			this.templateManager      = templateManager
-			this.spatialIndex         = new QuadTree( this.configurationManager.quadTreeSize )
+			this.spatialIndex         = new QuadTree( this.configurationManager.getValue( 'quadTreeSize' ) )
 			this.spell                = spell
 
 			this.templateManager.registerComponentTypeAddedCallback(
@@ -878,7 +878,7 @@ define(
 					}
 				}
 
-                this.spatialIndex = new QuadTree( this.configurationManager.quadTreeSize )
+                this.spatialIndex = new QuadTree( this.configurationManager.getValue( 'quadTreeSize' ) )
             },
 
 
@@ -998,14 +998,13 @@ define(
 			 * Updates the attributes of a component. Returns true when successful, false otherwise.
 			 *
 			 * Example usage:
-			 *     //update a component of an entity
+			 *     // update a component of an entity
 			 *     spell.entityManager.updateComponent(
 			 *         entityId,
-			 *         "spell.component.2d.graphics.apperance",
+			 *         "spell.component.2d.graphics.appearance",
 			 *         {
-			 *             "assetId": "appearance:library.identifier.of.my.static.appearance"
+			 *             assetId : "appearance:library.identifier.of.my.static.appearance"
 			 *         }
-			 *
 			 *     )
 			 *
 			 * @param {String} entityId the id of the entity which the component belongs to
@@ -1031,6 +1030,59 @@ define(
 					if( attributeConfig.translation ||
 						attributeConfig.scale ||
 						attributeConfig.rotation ) {
+
+						updateAppearanceTransform( this.componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
+					}
+
+				} else if( componentId === VISUAL_OBJECT_COMPONENT_ID ) {
+					updateSpatialIndex( this.spatialIndex, this.componentMaps, entityId )
+					updateVisualObject( this.componentMaps, entityId )
+				}
+
+				this.eventManager.publish( [ Events.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
+
+				return true
+			},
+
+			/**
+			 * Updates one attribute of a component. Returns true when successful, false otherwise.
+			 *
+			 * Example usage:
+			 *     // update a specific attribute of a component of an entity
+			 *     spell.entityManager.updateComponentAttribute(
+			 *         entityId,
+			 *         "spell.component.2d.transform",
+			 *         "translation",
+			 *         [ 10, 10 ]
+			 *     )
+			 *
+			 * @param {String} entityId the id of the entity which the component belongs to
+			 * @param {String} componentId the library path of the component
+			 * @param {String} attributeId the id of the attribute
+			 * @param {Object} value the value of the attribute
+			 * @return {Boolean} true if the component could be found, false otherwise
+			 */
+			updateComponentAttribute : function( entityId, componentId, attributeId, value ) {
+				var component = this.getComponentById( entityId, componentId )
+				if( !component ) return false
+
+				var attribute = component[ attributeId ]
+				if( attribute === undefined ) return false
+
+				this.templateManager.updateComponentAttribute( componentId, attributeId, component, value )
+
+				if( componentId === TRANSFORM_COMPONENT_ID ) {
+					if( attributeId === 'translation' ||
+						attributeId === 'scale' ||
+						attributeId === 'rotation' ) {
+
+						updateWorldTransform( this.componentMaps, this.eventManager, this.spatialIndex, true, entityId )
+					}
+
+				} else if( componentId === APPEARANCE_TRANSFORM_COMPONENT_ID ) {
+					if( attributeId === 'translation' ||
+						attributeId === 'scale' ||
+						attributeId === 'rotation' ) {
 
 						updateAppearanceTransform( this.componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
 					}

@@ -47,12 +47,7 @@ define(
 			'CREATE_SCENE',
 			'DESTROY_SCENE',
 			'AVAILABLE_SCREEN_SIZE_CHANGED',
-			'SCREEN_RESIZE',
-
-			// DEVELOPMENT
-			'DRAW_COORDINATE_GRID',
-			'DRAW_TITLE_SAFE_OUTLINE',
-			'SCREEN_ASPECT_RATIO'
+			'SCREEN_RESIZE'
 		] )
 
 		Events.getNameById = function( id ) {

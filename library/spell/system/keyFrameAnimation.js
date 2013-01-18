@@ -72,24 +72,14 @@ define(
 				isInInterval( offsetInMs, 0, animationLengthInMs )
 		}
 
-		var setValue = function( component, attributeId, value ) {
-			var attribute = component[ attributeId ]
-
-			if( _.isArray( attribute ) ) {
-				vec2.set( value, attribute )
-
-			} else {
-				component[ attributeId ] = value
-			}
-		}
-
 		var lerp = function( a, b, t ) {
 			return a + ( b - a ) * t
 		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var entityManager      = this.entityManager,
-				keyFrameAnimations = this.keyFrameAnimations
+				keyFrameAnimations = this.keyFrameAnimations,
+				visibleEntities    = spell.visibleEntities
 
 			for( var id in keyFrameAnimations ) {
 				var keyFrameAnimation = keyFrameAnimations[ id ]
@@ -113,6 +103,14 @@ define(
 				keyFrameAnimation.offset  = offset
 				keyFrameAnimation.playing = updatePlaying( lengthInMs, rawOffset, keyFrameAnimation.looped )
 
+				if( !visibleEntities[ id ] ) {
+					// HACK: If an entity is not visible do not bother updating its components. This will inevitable lead
+					// to visual artifacts when the bound of the entity is smaller than the space covered by the key
+					// frame animation. As the time of this writing this is not the case. The real solution is to
+					// compute the bounds of entities properly.
+					continue
+				}
+
 				for( var componentId in animate ) {
 					var componentAnimation = animate[ componentId ],
 						component          = entityManager.getComponentById( id, componentId )
@@ -128,14 +126,14 @@ define(
 
 						if( keyFrameIdA < 0 ) {
 							// set to first key frame value
-							setValue( component, attributeId, keyFrames[ 0 ].value )
+							entityManager.updateComponentAttribute( id, componentId, attributeId, keyFrames[ 0 ].value )
 
 							continue
 						}
 
 						if( keyFrameIdA === undefined ) {
 							// set to last key frame value
-							setValue( component, attributeId, keyFrames[ keyFrames.length - 1 ].value )
+							entityManager.updateComponentAttribute( id, componentId, attributeId, keyFrames[ keyFrames.length - 1 ].value )
 
 							continue
 						}
@@ -145,16 +143,25 @@ define(
 							keyFrameB   = keyFrames[ keyFrameIdB ]
 
 						// interpolate between key frame A and B
-						var attribute       = component[ attributeId ],
-							attributeOffset = offset - keyFrameA.time,
+						var attributeOffset = offset - keyFrameA.time,
 							easingFunction  = getEasingFunction( keyFrameB.interpolation ),
 							t               = easingFunction( attributeOffset / ( keyFrameB.time - keyFrameA.time ) )
 
-						if( _.isArray( attribute ) ) {
-							vec2.lerp( keyFrameA.value, keyFrameB.value, t, attribute )
+						if( _.isArray( component[ attributeId ] ) ) {
+							entityManager.updateComponentAttribute(
+								id,
+								componentId,
+								attributeId,
+								vec2.lerp( keyFrameA.value, keyFrameB.value, t, component[ attributeId ] )
+							)
 
 						} else {
-							component[ attributeId ] = lerp( keyFrameA.value, keyFrameB.value, t )
+							entityManager.updateComponentAttribute(
+								id,
+								componentId,
+								attributeId,
+								lerp( keyFrameA.value, keyFrameB.value, t )
+							)
 						}
 					}
 				}
@@ -162,8 +169,6 @@ define(
 				if( keyFrameAnimation.playing === false ) {
 					entityManager.triggerEvent( id, 'animationEnd', [ 'keyFrameAnimation', keyFrameAnimation ] )
 				}
-
-				entityManager.updateWorldTransform( id )
 			}
 		}
 

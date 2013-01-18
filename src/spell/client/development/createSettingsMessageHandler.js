@@ -1,40 +1,26 @@
 define(
 	'spell/client/development/createSettingsMessageHandler',
 	[
-		'spell/client/development/createMessageDispatcher',
-		'spell/Events'
+		'spell/client/development/createMessageDispatcher'
 	],
 	function(
-		createMessageDispatcher,
-		Events
+		createMessageDispatcher
 	) {
 		'use strict'
 
 
-		var addDebugFlag = function( configurationManager, name, value ) {
-			if( !configurationManager.debug ) {
-				configurationManager.debug = {}
-			}
-
-			configurationManager.debug[ name ] = value
-		}
-
 		return function( spell ) {
-			return createMessageDispatcher(
-				{
-					'drawCoordinateGrid' : function( payload ) {
-						addDebugFlag( spell.configurationManager, 'drawCoordinateGrid', payload )
-					},
-					'drawTitleSafeOutline' : function( payload ) {
-						addDebugFlag( spell.configurationManager, 'drawTitleSafeOutline', payload )
-					},
-					'simulateScreenAspectRatio' : function( payload ) {
-						addDebugFlag( spell.configurationManager, 'screenAspectRatio', payload.aspectRatio )
-
-						spell.eventManager.publish( Events.SCREEN_ASPECT_RATIO, [ payload.aspectRatio ] )
-					}
+			return createMessageDispatcher( {
+				drawCoordinateGrid : function( payload ) {
+					spell.configurationManager.setValue( 'drawCoordinateGrid', payload )
+				},
+				drawTitleSafeOutline : function( payload ) {
+					spell.configurationManager.setValue( 'drawTitleSafeOutline', payload )
+				},
+				simulateScreenAspectRatio : function( payload ) {
+					spell.configurationManager.setValue( 'screenAspectRatio', payload.aspectRatio )
 				}
-			)
+			} )
 		}
 	}
 )

@@ -100,6 +100,24 @@ define(
 			return true
 		}
 
+		/**
+		 * Sets the attribute of a component to the specified value.
+		 *
+		 * @param component
+		 * @param attributeId
+		 * @param value
+		 */
+		var setAttribute = function( component, attributeId, value ) {
+			// TODO: Unfortunately there is no generic copy operator in javascript.
+			if( _.isObject( value ) ||
+				_.isArray( value ) ) {
+				_.extend( component[ attributeId ], value )
+
+			} else {
+				component[ attributeId ] = value
+			}
+		}
+
 		var createComponentPrototype = function( componentTemplate ) {
 			return _.reduce(
 				componentTemplate.attributes,
@@ -280,10 +298,24 @@ define(
 			},
 
 			updateComponent : function( componentId, component, attributeConfig ) {
-				updateComponent( component, attributeConfig )
+				for( var attributeId in attributeConfig ) {
+					setAttribute( component, attributeId, attributeConfig[ attributeId ] )
+				}
 
 				if( this.componentsWithAssets[ componentId ] ) {
 					var assetIdChanged = !!attributeConfig[ 'assetId' ]
+
+					if( assetIdChanged ) {
+						injectAsset( this.assets, this.moduleLoader, this.templates[ componentId ], component )
+					}
+				}
+			},
+
+			updateComponentAttribute : function( componentId, attributeId, component, value ) {
+				setAttribute( component, attributeId, value )
+
+				if( this.componentsWithAssets[ componentId ] ) {
+					var assetIdChanged = attributeId === 'assetId'
 
 					if( assetIdChanged ) {
 						injectAsset( this.assets, this.moduleLoader, this.templates[ componentId ], component )

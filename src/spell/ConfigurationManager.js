@@ -29,6 +29,12 @@ define(
 		 * private
 		 */
 
+		var createScreenSize = function( availableScreenSize, aspectRatio ) {
+			return aspectRatio ?
+				createIncludedRectangle( availableScreenSize, aspectRatio, true ) :
+				availableScreenSize
+		}
+
 		/*
 		 * Generates a structure holding server host configuration information
 		 *
@@ -111,6 +117,7 @@ define(
 				configurable : true
 			},
 			mode : {
+				validValues : [ 'deployed', 'development_embedded', 'development_standalone' ],
 				configurable : true
 			},
 			quadTreeSize : {
@@ -197,43 +204,71 @@ define(
 			return config
 		}
 
-
 		/*
 		 * public
 		 */
 
 		var ConfigurationManager = function( eventManager, loaderConfig, projectConfig ) {
-			loaderConfig = loaderConfig || {}
-			projectConfig = projectConfig || {}
+			this.config = {}
+			this.eventManager = eventManager
 
-			var config = _.extend( projectConfig, loaderConfig )
-
-			_.extend( this, createConfiguration( config, defaultOptions, validOptions ) )
+			_.extend(
+				this.config,
+				createConfiguration(
+					_.extend(
+						loaderConfig || {},
+						projectConfig || {}
+					),
+					defaultOptions,
+					validOptions
+				)
+			)
 
 			eventManager.subscribe(
 				[ Events.AVAILABLE_SCREEN_SIZE_CHANGED ],
 				_.bind(
-					function( size ) {
-						var screenMode = this.screenMode || 'fit',
-							screenSize = screenMode === 'fixed' ? this.screenSize : undefined
+					function( availableScreenSize ) {
+						var screenMode           = this.config.screenMode || 'fixed',
+							aspectRatioOverwrite = this.config.debug && this.config.screenAspectRatio
 
-						if( screenMode === 'fit' ) {
-							this.currentScreenSize = size
+						if( aspectRatioOverwrite ) {
+							this.config.currentScreenSize = createScreenSize( availableScreenSize, this.config.screenAspectRatio )
+
+						} else if( screenMode === 'fit' ) {
+							this.config.currentScreenSize = createScreenSize( availableScreenSize, availableScreenSize[ 0 ] / availableScreenSize[ 1 ] )
 
 						} else if( screenMode === 'fixed' ) {
-							if( !screenSize ) throw 'Error: Missing config option \'screenSize\'. Could not set screen size.'
-
-							this.currentScreenSize = screenSize
+							this.config.currentScreenSize = this.config.screenSize
 
 						} else {
 							throw 'Error: Screen mode \'' + screenMode + '\' is not supported.'
 						}
 
-						eventManager.publish( Events.SCREEN_RESIZE, [ this.currentScreenSize ] )
+						eventManager.publish( Events.SCREEN_RESIZE, [ this.config.currentScreenSize ] )
 					},
 					this
 				)
 			)
+		}
+
+		ConfigurationManager.prototype = {
+			setValue : function( name, value ) {
+				if( name === 'screenAspectRatio' ) {
+					this.config.currentScreenSize = createScreenSize(
+						PlatformKit.getAvailableScreenSize(
+							this.getValue( 'id' )
+						),
+						value
+					)
+
+					this.eventManager.publish( Events.SCREEN_RESIZE, [ this.config.currentScreenSize ] )
+				}
+
+				this.config[ name ] = value
+			},
+			getValue : function( name ) {
+				return this.config[ name ]
+			}
 		}
 
 		return ConfigurationManager

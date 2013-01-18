@@ -11,7 +11,6 @@ define(
 		'spell/client/2d/graphics/drawTitleSafeOutline',
 		'spell/client/util/createComprisedRectangle',
 		'spell/client/util/createIncludedRectangle',
-		'spell/data/spatial/QuadTree',
 		'spell/Defines',
 		'spell/Events',
 		'spell/shared/util/platform/PlatformKit',
@@ -33,7 +32,6 @@ define(
 		drawTitleSafeOutline,
 		createComprisedRectangle,
 		createIncludedRectangle,
-		QuadTree,
 		Defines,
 		Events,
 		PlatformKit,
@@ -47,10 +45,6 @@ define(
 		'use strict'
 
 
-		/**
-		 * private
-		 */
-
 		var tmpVec2           = vec2.create(),
 			tmpVec2_1         = vec2.create(),
 			tmpMat3           = mat3.identity(),
@@ -59,8 +53,7 @@ define(
 			debugFontAssetId  = 'font:spell.OpenSans14px',
 			drawDebugShapes   = true,
 			defaultDimensions = vec2.create( [ 1, 1 ] ),
-			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
-			currentCameraId
+			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() }
 
 //		var statisticsManager,
 //			performance = window.performance
@@ -483,12 +476,6 @@ define(
 			context.setViewMatrix( tmpMat3 )
 		}
 
-		var createScreenSize = function( availableScreenSize, aspectRatio ) {
-			return aspectRatio ?
-				createIncludedRectangle( availableScreenSize, aspectRatio, true ) :
-				availableScreenSize
-		}
-
 		var initColorBuffer = function( context, screenDimensions ) {
 			context.resizeColorBuffer( screenDimensions[ 0 ], screenDimensions[ 1 ] )
 			context.viewport( 0, 0, screenDimensions[ 0 ], screenDimensions [ 1 ] )
@@ -513,43 +500,25 @@ define(
 		}
 
 		var init = function( spell ) {
-			var eventManager = spell.eventManager
+			var eventManager = this.eventManager
 
 			this.screenResizeHandler = _.bind(
 				function( size ) {
-					var aspectRatio = ( this.debugSettings && this.debugSettings.screenAspectRatio ?
-						this.debugSettings.screenAspectRatio :
-						size[ 0 ] / size[ 1 ]
-					)
-
-					this.screenSize = createScreenSize( size, aspectRatio )
-
-					initColorBuffer( this.context, this.screenSize )
-				},
-				this
-			)
-
-			this.screeAspectRatioHandler = _.bind(
-				function( aspectRatio ) {
-					this.screenSize = createScreenSize(
-						PlatformKit.getAvailableScreenSize(
-							this.configurationManager.id
-						),
-						aspectRatio
-					)
-
-					initColorBuffer( this.context, this.screenSize )
+					this.screenSize = size
+					initColorBuffer( this.context, size )
 				},
 				this
 			)
 
 			eventManager.subscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
-			eventManager.subscribe( Events.SCREEN_ASPECT_RATIO, this.screeAspectRatioHandler )
 
 
-			this.cameraChangedHandler = function( camera, entityId ) {
-				currentCameraId = camera.active ? entityId : null
-			}
+			this.cameraChangedHandler = _.bind(
+				function( camera, entityId ) {
+					this.currentCameraId = camera.active ? entityId : undefined
+				},
+				this
+			)
 
 			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
@@ -566,17 +535,15 @@ define(
 		}
 
 		var destroy = function( spell ) {
-			var eventManager = spell.eventManager
+			var eventManager = this.eventManager
 
 			eventManager.unsubscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
-			eventManager.unsubscribe( Events.SCREEN_ASPECT_RATIO, this.screeAspectRatioHandler )
 			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 			eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
-			var cameras                = this.cameras,
-				context                = this.context,
+			var context                = this.context,
 				screenSize             = this.screenSize,
 				entityManager          = spell.entityManager,
 				transforms             = this.transforms,
@@ -592,19 +559,20 @@ define(
 				rectangles             = this.rectangles,
 				viewFrustum
 
-			var screenAspectRatio = ( this.debugSettings && this.debugSettings.screenAspectRatio ?
-				this.debugSettings.screenAspectRatio :
-				( this.screenSize[ 0 ] / this.screenSize[ 1 ] )
-			)
+			// clear color buffer
+			context.clear()
 
 			// set the camera
-			var camera          = cameras[ currentCameraId ],
-				cameraTransform = this.transforms[ currentCameraId ]
+			var currentCameraId = this.currentCameraId,
+				camera          = this.cameras[ currentCameraId ],
+				cameraTransform = transforms[ currentCameraId ]
 
 			if( camera && cameraTransform ) {
+				var aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
+
 				var effectiveCameraDimensions = vec2.multiply(
 					cameraTransform.scale,
-					createComprisedRectangle( [ camera.width, camera.height ] , screenAspectRatio )
+					createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
 				)
 
 				if( effectiveCameraDimensions ) {
@@ -613,18 +581,8 @@ define(
 				}
 			}
 
-			// clear color buffer
-			context.clear()
 
-
-//			var start = performance.now()
-
-			var visibleEntityIdsSorted = createVisibleEntityIdsSorted(
-				entityManager.getEntityIdsByRegion( cameraTransform.translation, effectiveCameraDimensions )
-			)
-
-//			spell.statisticsManager.updateNode( 'compiling entity list', performance.now() - start )
-//			spell.statisticsManager.updateNode( '# entities drawn', visibleEntityIdsSorted.length )
+			var visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.visibleEntities )
 
 			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
 				drawVisualObject(
@@ -700,17 +658,17 @@ define(
 				context.restore()
 			}
 
-			if( this.debugSettings &&
+			if( this.isDevelopment &&
 				effectiveCameraDimensions &&
 				cameraTransform ) {
 
 				context.save()
 				{
-					if( this.debugSettings.drawCoordinateGrid ) {
+					if( this.configurationManager.getValue( 'drawCoordinateGrid' ) ) {
 						drawCoordinateGrid( context, this.debugFontAsset, screenSize, effectiveCameraDimensions, cameraTransform )
 					}
 
-					if( this.debugSettings.drawTitleSafeOutline ) {
+					if( this.configurationManager.getValue( 'drawTitleSafeOutline' ) ) {
 						drawTitleSafeOutline( context, screenSize, [ camera.width, camera.height ], cameraTransform )
 					}
 				}
@@ -719,44 +677,24 @@ define(
 		}
 
 
-		/**
-		 * public
-		 */
-
-		var Renderer = function( spell ) {
+		var Render = function( spell ) {
 			this.configurationManager = spell.configurationManager
 			this.context              = spell.renderingContext
+			this.eventManager         = spell.eventManager
 			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
-			this.screenSize           = spell.configurationManager.currentScreenSize
-			this.debugSettings        = spell.configurationManager.debug ? spell.configurationManager.debug : false
-			this.spatialIndex         = null
-
-			var context    = this.context,
-				screenSize = this.screenSize
-
-			context.setClearColor( clearColor )
+			this.screenSize           = spell.configurationManager.getValue( 'currentScreenSize' )
+			this.isDevelopment        = spell.configurationManager.getValue( 'mode' ) !== 'deployed'
+			this.currentCameraId      = undefined
 
 			// world to view matrix
-			mat3.ortho( 0, screenSize[ 0 ], 0, screenSize[ 1 ], tmpMat3 )
+			mat3.ortho( 0, this.screenSize[ 0 ], 0, this.screenSize[ 1 ], tmpMat3 )
+			this.context.setViewMatrix( tmpMat3 )
 
-			context.setViewMatrix( tmpMat3 )
-
-
-			if( this.debugSettings &&
-				this.debugSettings.screenAspectRatio ) {
-
-				this.screenSize = createScreenSize(
-					PlatformKit.getAvailableScreenSize(
-						this.configurationManager.id
-					),
-					this.debugSettings.screenAspectRatio
-				)
-			}
-
+			this.context.setClearColor( clearColor )
 			initColorBuffer( this.context, this.screenSize )
 		}
 
-		Renderer.prototype = {
+		Render.prototype = {
 			init : init,
 			destroy : destroy,
 			activate : function( spell ) {},
@@ -764,6 +702,6 @@ define(
 			process : process
 		}
 
-		return Renderer
+		return Render
 	}
 )
