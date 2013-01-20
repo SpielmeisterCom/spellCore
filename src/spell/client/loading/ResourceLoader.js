@@ -62,7 +62,6 @@ define(
 				omitCache          : config.omitCache,
 				onLoadingCompleted : config.onLoadingCompleted,
 				resources          : resources,
-				resourceIndex      : 0,
 				resourcesTotal     : resources.length,
 				resourcesCompleted : 0,
 				type               : config.type
@@ -140,107 +139,46 @@ define(
 			return loaderFactory( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 		}
 
-		var startLoadingResource = function( cache, omitCache, eventManager, resourceBundles, resourceBundle, resourceTypes, host, resourceName ) {
-			console.log( 'resourceBundle.id: ' + resourceBundle.id + ' -> ' + resourceName )
-
-			if( !omitCache ) {
-				var cacheEntry = cache[ resourceName ]
-
-				if( cacheEntry ) {
-					var nextResourceName = resourceBundle.resources[ resourceBundle.resourceIndex++ ]
-
-					if( nextResourceName ) {
-						startLoadingResource( cache, omitCache, eventManager, resourceBundles, resourceBundle, resourceTypes, host, nextResourceName )
-					}
-
-					onLoadCallback( eventManager, cache, _.identity, resourceBundles, resourceBundle, resourceName, cacheEntry )
-
-					return
-				}
-			}
-
-			var resourceType  = getResourceType( resourceTypes, resourceName, resourceBundle.type ),
-				processOnLoad = resourceBundle.processOnLoad || resourceType.processOnLoad
-
-			if( !resourceType ) {
-				throw 'Error: Unable to load resource of type \'' + resourceBundle.type + '\'.'
-			}
-
-			var loader = createLoader(
-				host,
-				resourceType.factory,
-				resourceBundle.baseUrl,
-				resourceName,
-				// TODO: inject startLoadingResource call for next resource before calling onLoadCallback
-//				_.bind( onLoadCallback, null, eventManager, cache, processOnLoad, resourceBundles, resourceBundle, resourceName ),
-				function( loadedResource ) {
-					debugger
-
-					var nextResourceName = resourceBundle.resources[ resourceBundle.resourceIndex++ ]
-
-					if( nextResourceName ) {
-						startLoadingResource( cache, omitCache, eventManager, resourceBundles, resourceBundle, resourceTypes, host, nextResourceName )
-					}
-
-					onLoadCallback( eventManager, cache, processOnLoad, resourceBundles, resourceBundle, resourceName, loadedResource  )
-				},
-				_.bind( onErrorCallback, null, eventManager, cache, resourceBundles, resourceBundle, resourceName ),
-				_.bind( onTimedOutCallback, null, eventManager, cache, resourceBundles, resourceBundle, resourceName )
-			)
-
-			if( !loader ) {
-				throw 'Could not create a loader for resource \'' + resourceName + '\'.'
-			}
-
-			loader.start()
-		}
-
 		var startLoadingResourceBundle = function( cache, eventManager, resourceTypes, host, resourceBundles, resourceBundle ) {
 			var omitCache = resourceBundle.omitCache
 
-//			_.each(
-//				resourceBundle.resources,
-//				function( resourceName ) {
-//					if( !omitCache ) {
-//						var cacheEntry = cache[ resourceName ]
-//
-//						if( cacheEntry ) {
-//							onLoadCallback( eventManager, cache, _.identity, resourceBundles, resourceBundle, resourceName, cacheEntry )
-//
-//							return
-//						}
-//					}
-//
-//					var resourceType  = getResourceType( resourceTypes, resourceName, resourceBundle.type ),
-//						processOnLoad = resourceBundle.processOnLoad || resourceType.processOnLoad
-//
-//					if( !resourceType ) {
-//						throw 'Error: Unable to load resource of type \'' + resourceBundle.type + '\'.'
-//					}
-//
-//					var loader = createLoader(
-//						host,
-//						resourceType.factory,
-//						resourceBundle.baseUrl,
-//						resourceName,
-//						_.bind( onLoadCallback, null, eventManager, cache, processOnLoad, resourceBundles, resourceBundle, resourceName ),
-//						_.bind( onErrorCallback, null, eventManager, cache, resourceBundles, resourceBundle, resourceName ),
-//						_.bind( onTimedOutCallback, null, eventManager, cache, resourceBundles, resourceBundle, resourceName )
-//					)
-//
-//					if( !loader ) {
-//						throw 'Could not create a loader for resource \'' + resourceName + '\'.'
-//					}
-//
-//					loader.start()
-//				}
-//			)
+			_.each(
+				resourceBundle.resources,
+				function( resourceName ) {
+					if( !omitCache ) {
+						var cacheEntry = cache[ resourceName ]
 
-			debugger
+						if( cacheEntry ) {
+							onLoadCallback( eventManager, cache, _.identity, resourceBundles, resourceBundle, resourceName, cacheEntry )
 
-			var resourceName = resourceBundle.resources[ resourceBundle.resourceIndex++ ]
+							return
+						}
+					}
 
-			startLoadingResource( cache, omitCache, eventManager, resourceBundles, resourceBundle, resourceTypes, host, resourceName )
+					var resourceType  = getResourceType( resourceTypes, resourceName, resourceBundle.type ),
+						processOnLoad = resourceBundle.processOnLoad || resourceType.processOnLoad
+
+					if( !resourceType ) {
+						throw 'Error: Unable to load resource of type \'' + resourceBundle.type + '\'.'
+					}
+
+					var loader = createLoader(
+						host,
+						resourceType.factory,
+						resourceBundle.baseUrl,
+						resourceName,
+						_.bind( onLoadCallback, null, eventManager, cache, processOnLoad, resourceBundles, resourceBundle, resourceName ),
+						_.bind( onErrorCallback, null, eventManager, cache, resourceBundles, resourceBundle, resourceName ),
+						_.bind( onTimedOutCallback, null, eventManager, cache, resourceBundles, resourceBundle, resourceName )
+					)
+
+					if( !loader ) {
+						throw 'Could not create a loader for resource \'' + resourceName + '\'.'
+					}
+
+					loader.start()
+				}
+			)
 		}
 
 		var normalizeConfig = function( baseUrlPrefix, config ) {
