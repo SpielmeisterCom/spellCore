@@ -340,9 +340,9 @@ define(
 			// rotating the image so that it is not upside down
 			mat3.translate( tmpMatrix, destinationPosition )
 			mat3.rotate( tmpMatrix, Math.PI )
-			mat3.scale( tmpMatrix, [ -1, 1 ] )
+			mat3.scale( tmpMatrix, [ -1.0, 1.0 ] )
 			mat3.scale( tmpMatrix, destinationDimensions )
-			mat3.translate( tmpMatrix, [ 0, -1 ] )
+			mat3.translate( tmpMatrix, [ 0.0, -1.0 ] )
 
 			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
@@ -378,9 +378,9 @@ define(
 			// rotating the image so that it is not upside down
 			mat3.translate( tmpMatrix, destinationPosition )
 			mat3.rotate( tmpMatrix, Math.PI )
-			mat3.scale( tmpMatrix, [ -1, 1 ] )
+			mat3.scale( tmpMatrix, [ -1.0, 1.0 ] )
 			mat3.scale( tmpMatrix, destinationDimensions )
-			mat3.translate( tmpMatrix, [ 0, -1 ] )
+			mat3.translate( tmpMatrix, [ 0.0, -1.0 ] )
 
 			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 

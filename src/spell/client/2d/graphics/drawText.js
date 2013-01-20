@@ -69,7 +69,7 @@ define(
 					width += charData.width + spacing
 				}
 
-				return width / 2
+				return width * 0.5
 			}
 		}
 

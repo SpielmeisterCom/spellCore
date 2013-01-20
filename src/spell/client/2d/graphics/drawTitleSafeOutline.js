@@ -16,8 +16,7 @@ define(
 
 
 		var tmpMat3  = mat3.identity(),
-			tmp      = vec2.create(),
-			invScale = vec2.create()
+			tmp      = vec2.create()
 
 		var drawRect = function( context, dx, dy, width, height, lineWidth ) {
 			if( !lineWidth || lineWidth < 0 ) {

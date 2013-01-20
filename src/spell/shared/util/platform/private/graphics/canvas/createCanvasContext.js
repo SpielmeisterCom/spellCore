@@ -54,18 +54,18 @@ define(
 			if( i + 1 === numIterations ) {
 				var tc = endTexCoord % 1
 
-				return tc === 0 ? 1 : tc
+				return tc === 0.0 ? 1.0 : tc
 			}
 
 			return 1
 		}
 
 		var normalizeStartTexCoord = function( tc ) {
-			if( tc < 0 ) {
-				tc += 1
+			if( tc < 0.0 ) {
+				tc += 1.0
 			}
 
-			return modulo( tc, 1 )
+			return modulo( tc, 1.0 )
 		}
 
 		/**
@@ -95,12 +95,12 @@ define(
 
 			for( var y = 0,
 				 fromTexCoordY = startTexCoordY,
-				 untilTexCoordY = 0,
-				 texCoordRangeY = 0,
-				 scaledTexCoordRangeY = 0,
-				 scaledTexCoordRangeX = 0,
-				 destinationPositionY = 0,
-				 coveredTexCoordY = 0;
+				 untilTexCoordY = 0.0,
+				 texCoordRangeY = 0.0,
+				 scaledTexCoordRangeY = 0.0,
+				 scaledTexCoordRangeX = 0.0,
+				 destinationPositionY = 0.0,
+				 coveredTexCoordY = 0.0;
 				 y < numIterationsY;
 				 y++ ) {
 
@@ -111,10 +111,10 @@ define(
 
 				for( var x = 0,
 					 fromTexCoordX = startTexCoordX,
-					 untilTexCoordX = 0,
-					 texCoordRangeX = 0,
-					 destinationPositionX = 0,
-					 coveredTexCoordX = 0;
+					 untilTexCoordX = 0.0,
+					 texCoordRangeX = 0.0,
+					 destinationPositionX = 0.0,
+					 coveredTexCoordX = 0.0;
 					 x < numIterationsX;
 					 x++ ) {
 
@@ -188,21 +188,21 @@ define(
 		}
 
 		var initWrapperContext = function() {
-			viewport( 0, 0, canvas.width, canvas.height )
+			viewport( 0.0, 0.0, canvas.width, canvas.height )
 
 			// world space to view space matrix
 			var cameraWidth  = canvas.width,
 				cameraHeight = canvas.height
 
 			mat3.ortho(
-				-cameraWidth / 2,
-				cameraWidth / 2,
-				-cameraHeight / 2,
-				cameraHeight / 2,
+				-cameraWidth * 0.5,
+				cameraWidth * 0.5,
+				-cameraHeight * 0.5,
+				cameraHeight * 0.5,
 				worldToView
 			)
 
-			mat3.translate( worldToView, [ -cameraWidth / 2, -cameraHeight / 2 ] ) // WATCH OUT: apply inverse translation for camera position
+			mat3.translate( worldToView, [ -cameraWidth * 0.5, -cameraHeight * 0.5 ] ) // WATCH OUT: apply inverse translation for camera position
 
 			updateWorldToScreen( viewToScreen, worldToView )
 		}
@@ -318,11 +318,11 @@ define(
 			context.save()
 			{
 				// reset transformation to identity
-				context.setTransform( 1, 0, 0, 1, 0, 0 )
+				context.setTransform( 1.0, 0.0, 0.0, 1.0, 0.0, 0.0 )
 
 				context.globalAlpha = 1.0
 				context.fillStyle = clearColor
-				context.fillRect( 0, 0, canvas.width, canvas.height )
+				context.fillRect( 0.0, 0.0, canvas.width, canvas.height )
 			}
 			context.restore()
 		}
@@ -349,13 +349,13 @@ define(
 					// rotating the image so that it is not upside down
 					context.translate( destinationPosition[ 0 ], destinationPosition[ 1 ] )
 					context.rotate( Math.PI )
-					context.scale( -1, 1 )
-					context.translate( 0, -destinationDimensions[ 1 ] )
+					context.scale( -1.0, 1.0 )
+					context.translate( 0.0, -destinationDimensions[ 1 ] )
 
 					context.drawImage(
 						texture.privateImageResource,
-						0,
-						0,
+						0.0,
+						0.0,
 						destinationDimensions[ 0 ],
 						destinationDimensions[ 1 ]
 					)
@@ -366,17 +366,17 @@ define(
 
 					// Compensating for the lack of negative scales support in mapTexture by letting canvas do the work.
 					// Macgyver would have been proud.
-					var xAxisInverted = textureMatrix[ 0 ] < 0,
-						yAxisInverted = textureMatrix[ 4 ] < 0
+					var xAxisInverted = textureMatrix[ 0 ] < 0.0,
+						yAxisInverted = textureMatrix[ 4 ] < 0.0
 
 					context.scale(
-						xAxisInverted ? 1 : -1,
-						yAxisInverted ? -1 : 1
+						xAxisInverted ? 1.0 : -1.0,
+						yAxisInverted ? -1.0 : 1.0
 					)
 
 					context.translate(
-						xAxisInverted ? -destinationDimensions[ 0 ] : 0,
-						yAxisInverted ? 0 : -destinationDimensions[ 1 ]
+						xAxisInverted ? -destinationDimensions[ 0 ] : 0.0,
+						yAxisInverted ? 0.0 : -destinationDimensions[ 1 ]
 					)
 
 					mapTexture( context, texture, textureMatrix, destinationDimensions )
@@ -407,7 +407,7 @@ define(
 				context.translate( destinationPosition[ 0 ], destinationPosition[ 1 ] )
 				context.rotate( Math.PI )
 				context.scale( negMagicScale, magicScale )
-				context.translate( 0, -destinationDimensions[ 1 ] )
+				context.translate( 0.0, -destinationDimensions[ 1 ] )
 
 				context.drawImage(
 					texture.privateImageResource,
@@ -523,10 +523,10 @@ define(
 				// rotating the image so that it is not upside down
 				context.translate( dx, dy )
 				context.rotate( Math.PI )
-				context.scale( -1, 1 )
-				context.translate( 0, -dh )
+				context.scale( -1.0, 1.0 )
+				context.translate( 0.0, -dh )
 
-				context.fillRect( 0, 0, dw, dh )
+				context.fillRect( 0.0, 0.0, dw, dh )
 			}
 			context.restore()
 		}

@@ -49,10 +49,10 @@ define(
 			tmpVec2_1         = vec2.create(),
 			tmpMat3           = mat3.identity(),
 			clearColor        = vec4.create( [ 0, 0, 0, 1 ] ),
-			markerColor       = vec4.create( [ 0.45, 0.45, 0.45, 1 ] ),
+			markerColor       = vec4.create( [ 0.45, 0.45, 0.45, 1.0 ] ),
 			debugFontAssetId  = 'font:spell.OpenSans14px',
 			drawDebugShapes   = true,
-			defaultDimensions = vec2.create( [ 1, 1 ] ),
+			defaultDimensions = vec2.create( [ 1.0, 1.0 ] ),
 			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() }
 
 //		var statisticsManager,
@@ -127,7 +127,7 @@ define(
 				offsetInMs = Math.floor( numFrames * frameDuration * offset ) + deltaTimeInMs * replaySpeed
 
 			if( offsetInMs > animationLengthInMs ) {
-				if( !loop ) return 1.0
+				if( !loop ) return 1
 
 				offsetInMs %= animationLengthInMs
 			}
@@ -302,7 +302,7 @@ define(
 //							var start = performance.now()
 
 							// text appearance
-							drawText( context, asset, texture, 0, 0, appearance.text, appearance.spacing, appearance.align )
+							drawText( context, asset, texture, 0.0, 0.0, appearance.text, appearance.spacing, appearance.align )
 
 //							var elapsed = performance.now() - start
 
@@ -376,7 +376,7 @@ define(
 							var frames            = appearance.drawAllFrames ? asset.frames : appearance.frames,
 								frameDimensions   = asset.frameDimensions,
 								frameOffsets      = asset.frameOffsets,
-								frameOffset       = null,
+								frameOffset       = undefined,
 								quadDimensions    = quadGeometry ? quadGeometry.dimensions :  [ ( frames.length -0 ) * frameDimensions[ 0 ], frameDimensions[ 1 ] ],
 								numFramesInQuad   = [
 									Math.floor( quadDimensions[ 0 ] / frameDimensions[ 0 ] ),
@@ -623,9 +623,9 @@ define(
 
 			// clear unsafe area
 			if( camera && camera.clearUnsafeArea && cameraTransform ) {
-				var cameraDimensions       = [ camera.width, camera.height ],
-					scaledCameraDimensions = vec2.multiply( cameraDimensions, cameraTransform.scale, tmpVec2 ),
-					cameraAspectRatio      = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
+				var cameraDimensions             = [ camera.width, camera.height ],
+					scaledCameraDimensions       = vec2.multiply( cameraDimensions, cameraTransform.scale, tmpVec2 ),
+					cameraAspectRatio            = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
 					effectiveTitleSafeDimensions = createIncludedRectangle( screenSize, cameraAspectRatio, true )
 
 				vec2.scale(
@@ -687,7 +687,7 @@ define(
 			this.currentCameraId      = undefined
 
 			// world to view matrix
-			mat3.ortho( 0, this.screenSize[ 0 ], 0, this.screenSize[ 1 ], tmpMat3 )
+			mat3.ortho( 0.0, this.screenSize[ 0 ], 0.0, this.screenSize[ 1 ], tmpMat3 )
 			this.context.setViewMatrix( tmpMat3 )
 
 			this.context.setClearColor( clearColor )
