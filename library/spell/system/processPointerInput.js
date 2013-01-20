@@ -12,8 +12,6 @@ define(
 	) {
 		'use strict'
 
-		var registeredEventHandlerMap = {}
-
 		/**
 		 * Creates an instance of the system.
 		 *
@@ -34,7 +32,7 @@ define(
 			)
 		}
 
-		var processEvent = function( entityManager, pointedEntityMap, renderingContext, transforms, inputEvent ) {
+		var processEvent = function( entityManager, pointedEntityMap, renderingContext, eventHandlers, transforms, inputEvent ) {
 			if( inputEvent.type !== 'pointerDown' &&
 				inputEvent.type !== 'pointerMove' &&
 				inputEvent.type !== 'pointerUp' &&
@@ -43,9 +41,16 @@ define(
 				return
 			}
 
-			var cursorWorldPosition = renderingContext.transformScreenToWorld( inputEvent.position )
+            var cursorWorldPosition = renderingContext.transformScreenToWorld( inputEvent.position )
 
-            for( var entityId in transforms ) {
+            //TODO: only check visible objects
+            for( var entityId in eventHandlers ) {
+                var transform = transforms[ entityId ]
+
+                if( !transform ) {
+                    continue
+                }
+
 				if( pointedEntityMap[ entityId ] === undefined ) {
 					pointedEntityMap[ entityId ] = false
 				}
@@ -62,31 +67,32 @@ define(
 				var entityDimensions = entityManager.getEntityDimensions( entityId )
 
 				if( entityDimensions &&
-					isPointWithinEntity( entityDimensions, transforms[ entityId ], cursorWorldPosition ) ) {
+					isPointWithinEntity( entityDimensions, transform, cursorWorldPosition ) ) {
 
-					if( inputEvent.type === 'pointerDown') {
-						entityManager.triggerEvent( entityId, 'pointerDown' )
+                    if( pointedEntityMap[ entityId ] === false ) {
+                        entityManager.triggerEvent( entityId, 'pointerOver' )
+                    }
 
-					} else if( inputEvent.type === 'pointerUp' || inputEvent.type === 'pointerCancel' ) {
-						entityManager.triggerEvent( entityId, 'pointerUp' )
+                    if( inputEvent.type === 'pointerUp' ) {
+                        pointedEntityMap[ entityId ] = false
+                        entityManager.triggerEvent( entityId, 'pointerUp' )
 
-                        if( pointedEntityMap[ entityId ] !== false ) {
-                            entityManager.triggerEvent( entityId, 'pointerOut' )
-                            pointedEntityMap[ entityId ] = false
-                        }
+                        //TODO: only fire pointerOut for devices that don't support hover status
+                        entityManager.triggerEvent( entityId, 'pointerOut' )
+
+
+                    } else if( inputEvent.type === 'pointerDown') {
+                        pointedEntityMap[ entityId ] = inputEvent.pointerId
+                        entityManager.triggerEvent( entityId, 'pointerDown' )
 
 					} else if ( inputEvent.type === 'pointerMove' ) {
-						entityManager.triggerEvent( entityId, 'pointerMove' )
+                        pointedEntityMap[ entityId ] = inputEvent.pointerId
+                        entityManager.triggerEvent( entityId, 'pointerMove' )
 					}
 
-					if( pointedEntityMap[ entityId ] === false ) {
-						pointedEntityMap[ entityId ] = inputEvent.pointerId
-						entityManager.triggerEvent( entityId, 'pointerOver' )
-					}
 
 				} else {
-
-					if( pointedEntityMap[ entityId ] === inputEvent.pointerId ) {
+                    if( pointedEntityMap[ entityId ] === inputEvent.pointerId ) {
                         //pointer moved out of the entity
 						pointedEntityMap[ entityId ] = false
 						entityManager.triggerEvent( entityId, 'pointerOut' )
@@ -148,10 +154,11 @@ define(
 					inputEvents      = spell.inputManager.getInputEvents(),
 					pointedEntityMap = this.pointedEntityMap,
 					renderingContext = spell.renderingContext,
-					transforms       = this.transforms
+					transforms       = this.transforms,
+                    eventHandlers    = this.eventHandlers
 
 				for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
-					processEvent( entityManager, pointedEntityMap, renderingContext, transforms, inputEvents[ i ] )
+					processEvent( entityManager, pointedEntityMap, renderingContext, eventHandlers, transforms, inputEvents[ i ] )
 				}
 			}
 		}
