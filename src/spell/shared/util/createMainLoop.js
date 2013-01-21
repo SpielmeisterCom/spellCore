@@ -131,9 +131,9 @@ define(
 				if( this.timeSinceLastPerfPrintInMs > PERFORMANCE_PRINT_INTERVAL_IN_MS ) {
 					this.timeSinceLastPerfPrintInMs -= PERFORMANCE_PRINT_INTERVAL_IN_MS
 
-					console.log(
-						createMetricsMessage( statisticsManager.getMetrics( PERFORMANCE_PRINT_INTERVAL_IN_MS ) )
-					)
+//					console.log(
+//						createMetricsMessage( statisticsManager.getMetrics( PERFORMANCE_PRINT_INTERVAL_IN_MS ) )
+//					)
 				}
 
 				this.timeSinceLastPerfPrintInMs += elapsedTimeInMs
