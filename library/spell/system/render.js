@@ -540,6 +540,8 @@ define(
 			eventManager.unsubscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
 			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 			eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+
+			this.context.clear()
 		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
