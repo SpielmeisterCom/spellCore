@@ -4,10 +4,10 @@ define(
 		'use strict'
 
 
-		return function( resourceLoader, asset ) {
+		return function( libraryManager, asset ) {
 			if( !asset.resourceId ) return
 
-			var resource = resourceLoader.get( asset.resourceId )
+			var resource = libraryManager.get( asset.resourceId )
 			if( !resource ) return
 
 			asset.resource = resource

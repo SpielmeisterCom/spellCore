@@ -10,7 +10,7 @@ define(
 		'spell/ConfigurationManager',
 		'spell/EventManager',
 		'spell/InputManager',
-		'spell/client/loading/ResourceLoader',
+		'spell/LibraryManager',
 		'spell/shared/util/createModuleLoader',
 		'spell/StatisticsManager',
 		'spell/shared/util/Logger',
@@ -30,7 +30,7 @@ define(
 		ConfigurationManager,
 		EventManager,
 		InputManager,
-		ResourceLoader,
+		LibraryManager,
 		createModuleLoader,
 		StatisticsManager,
 		Logger,
@@ -79,7 +79,7 @@ define(
 
 			var storage = PlatformKit.createPersistentStorage()
 
-			var resourceLoader = new ResourceLoader(
+			var libraryManager = new LibraryManager(
 				spell,
 				spell.eventManager,
 				renderingContext,
@@ -88,12 +88,12 @@ define(
 				configurationManager.getValue( 'baseUrlPrefix' )
 			)
 
-			if( cacheContent ) resourceLoader.setCache( cacheContent )
+			if( cacheContent ) libraryManager.setCache( cacheContent )
 
 
 			var isModeDevelopment = configurationManager.getValue( 'mode' ) !== 'deployed'
 
-			var moduleLoader = createModuleLoader( resourceLoader, isModeDevelopment )
+			var moduleLoader = createModuleLoader( libraryManager, isModeDevelopment )
 
 			var templateManager = new TemplateManager( spell.assets, moduleLoader )
 
@@ -115,7 +115,7 @@ define(
 					configurationManager : configurationManager,
 					renderingContext     : renderingContext,
 					audioContext         : audioContext,
-					resourceLoader       : resourceLoader,
+					libraryManager       : libraryManager,
 					moduleLoader         : moduleLoader,
 					templateManager      : templateManager,
 					entityManager        : entityManager,

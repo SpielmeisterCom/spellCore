@@ -1,5 +1,5 @@
 define(
-	'spell/client/loading/ResourceLoader',
+	'spell/LibraryManager',
 	[
 		'spell/shared/util/platform/PlatformKit',
 		'spell/Events',
@@ -203,7 +203,7 @@ define(
 		 * public
 		 */
 
-		var ResourceLoader = function( spell, eventManager, renderingContext, soundContext, hostConfig, baseUrlPrefix ) {
+		var LibraryManager = function( spell, eventManager, renderingContext, soundContext, hostConfig, baseUrlPrefix ) {
 			this.eventManager     = eventManager
 			this.loadingProcesses = {}
 			this.host             = hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host
@@ -216,7 +216,7 @@ define(
 			}
 		}
 
-		ResourceLoader.prototype = {
+		LibraryManager.prototype = {
 			get : function( libraryPath ) {
 				var cache = this.cache
 
@@ -259,6 +259,6 @@ define(
 			}
 		}
 
-		return ResourceLoader
+		return LibraryManager
 	}
 )

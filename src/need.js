@@ -26,13 +26,13 @@
 		return request
 	}
 
-	var loadModule = function( name, baseUrl, resourceLoader ) {
+	var loadModule = function( name, baseUrl, libraryManager ) {
 		var scriptName = name + '.js',
 			cachedEntry,
 			moduleSource
 
-		if( resourceLoader ) {
-			cachedEntry = resourceLoader.get( scriptName )
+		if( libraryManager ) {
+			cachedEntry = libraryManager.get( scriptName )
 		}
 
 		if( cachedEntry ) {
@@ -55,7 +55,7 @@
 	var createModule = function( name, config ) {
 		config = normalizeConfig( config )
 
-		var module = loadModule( name, config.baseUrl, config.resourceLoader )
+		var module = loadModule( name, config.baseUrl, config.libraryManager )
 
 		if( !module ) throw 'Error: Could not load module \'' + name + '\'.'
 

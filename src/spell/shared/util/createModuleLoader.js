@@ -11,11 +11,11 @@ define(
 		'use strict'
 
 
-		return function( resourceLoader, isModeDevelopment ) {
+		return function( libraryManager, isModeDevelopment ) {
 			return {
 				require : function( moduleId ) {
 					var config = {
-						resourceLoader : isModeDevelopment ? resourceLoader : undefined,
+						libraryManager : isModeDevelopment ? libraryManager : undefined,
 						hashModuleId   : hashModuleId,
 						loadingAllowed : isModeDevelopment
 					}

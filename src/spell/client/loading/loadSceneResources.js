@@ -123,7 +123,7 @@ define(
 
 		return function( spell, sceneId, next, progressCallback ) {
 			var eventManager     = spell.eventManager,
-				resourceLoader   = spell.resourceLoader,
+				libraryManager   = spell.libraryManager,
 				resources        = spell.resources,
 				templateManager  = spell.templateManager
 
@@ -154,7 +154,7 @@ define(
 
 						updateAssets( spell.assets, library.asset )
 
-						resourceLoader.load(
+						libraryManager.load(
 							createFilesToLoad( library.asset ),
 							{
 								name : resourceBundleName,
@@ -173,7 +173,7 @@ define(
 						var assets = spell.assets
 
 						for( var assetId in assets ) {
-							injectResource( resourceLoader, assets[ assetId ] )
+							injectResource( libraryManager, assets[ assetId ] )
 						}
 					}
 
@@ -191,7 +191,7 @@ define(
 				// start loading the required library records
 				var scene = spell.scenes[ sceneId ]
 
-				resourceLoader.load(
+				libraryManager.load(
 					libraryIdsToJsonFilenames( scene.libraryIds ),
 					{
 						name : libraryBundleName
@@ -200,7 +200,7 @@ define(
 			} )
 
 			// load scene library record
-			resourceLoader.load(
+			libraryManager.load(
 				libraryIdsToJsonFilenames( [ sceneId ] ),
 				{
 					name : sceneId

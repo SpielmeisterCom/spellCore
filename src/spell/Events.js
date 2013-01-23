@@ -36,7 +36,7 @@ define(
 			'SUBSCRIBE',
 			'UNSUBSCRIBE',
 
-			// ResourceLoader
+			// LibraryManager
 			'RESOURCE_PROGRESS',
 			'RESOURCE_LOADING_COMPLETED',
 			'RESOURCE_ERROR',

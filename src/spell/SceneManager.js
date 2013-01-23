@@ -69,7 +69,7 @@ define(
 						// free resources
 //						if( !this.spell.configurationManager.getValue( 'platform.hasPlentyRAM' ) ) {
 						if( true ) {
-							this.spell.resourceLoader.free()
+							this.spell.libraryManager.free()
 						}
 					}
 

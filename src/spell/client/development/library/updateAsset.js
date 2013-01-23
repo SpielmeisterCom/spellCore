@@ -30,7 +30,7 @@ define(
 
 
 		var updateResourcesAndAssets = function( spell, assetId, asset ) {
-			injectResource( spell.resourceLoader, asset )
+			injectResource( spell.libraryManager, asset )
 			spell.entityManager.updateAssetReferences( assetId, asset )
 		}
 
@@ -54,7 +54,7 @@ define(
 
 				if( filesToLoad.length > 0 ) {
 					// when an asset references an external resource trigger loading it
-					spell.resourceLoader.load(
+					spell.libraryManager.load(
 						filesToLoad,
 						asset.resourceId,
 						{
