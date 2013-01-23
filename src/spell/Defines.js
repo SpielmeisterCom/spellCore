@@ -23,6 +23,7 @@ define(
 			PHYSICS_CIRCLE_SHAPE_COMPONENT_ID         : 'spell.component.physics.shape.circle',
 			PHYSICS_CONVEX_POLYGON_SHAPE_COMPONENT_ID : 'spell.component.physics.shape.convexPolygon',
 			PHYSICS_JNRPLAYER_SHAPE_COMPONENT_ID      : 'spell.component.physics.shape.jumpAndRunPlayer',
+			KEY_FRAME_ANIMATION_COMPONENT_ID          : 'spell.component.animation.keyFrameAnimation',
 			SOUND_EMITTER_COMPONENT_ID                : 'spell.component.audio.soundEmitter',
 			VISUAL_OBJECT_COMPONENT_ID                : 'spell.component.visualObject'
 		}
