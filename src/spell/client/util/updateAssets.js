@@ -140,16 +140,6 @@ define(
 			}
 		}
 
-		var injectResource = function( asset, resources, resourceId ) {
-			if( !asset.resourceId ) return
-
-			var resource = resources[ asset.resourceId ]
-
-			if( !resource ) throw 'Error: Could not resolve resource id \'' + asset.resourceId + '\'.'
-
-			asset.resource = resource
-		}
-
 		var addResourceId = function( asset, assetDefinition ) {
 			var file = assetDefinition.file
 

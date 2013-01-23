@@ -4,12 +4,10 @@ define(
 		'use strict'
 
 
-		return function( resources, asset ) {
+		return function( resourceLoader, asset ) {
 			if( !asset.resourceId ) return
 
-			var resource = resources[ asset.resourceId ]
-
-//			if( !resource ) throw 'Error: Could not resolve resource id \'' + asset.resourceId + '\'.'
+			var resource = resourceLoader.get( asset.resourceId )
 			if( !resource ) return
 
 			asset.resource = resource

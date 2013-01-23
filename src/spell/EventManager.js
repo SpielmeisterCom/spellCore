@@ -82,13 +82,17 @@ define(
 			unsubscribe: function( scope, subscriber ) {
 				scope = wrapArray( scope )
 
-				forestMultiMap.remove(
-					this.subscribers,
-					scope,
-					subscriber
-				)
+				forestMultiMap.remove( this.subscribers, scope, subscriber )
 
 				this.publish( Events.UNSUBSCRIBE, [ scope, subscriber ] )
+			},
+
+			unsubscribeAll: function( scope ) {
+				scope = wrapArray( scope )
+
+				forestMultiMap.remove( this.subscribers, scope )
+
+				this.publish( Events.UNSUBSCRIBE, [ scope ] )
 			},
 
 			publish: function( scope, eventArgs ) {

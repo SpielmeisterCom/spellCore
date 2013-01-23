@@ -76,9 +76,14 @@ define(
 			) {
 				var node = getNode( data, key )
 
-				node.elements = _.filter( node.elements, function( element ) {
-					return element !== elementToRemove
-				} )
+				if( elementToRemove === undefined ) {
+					node.elements.length = 0
+
+				} else {
+					node.elements = _.filter( node.elements, function( element ) {
+						return element !== elementToRemove
+					} )
+				}
 			},
 
 			get: function(

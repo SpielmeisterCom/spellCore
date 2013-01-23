@@ -24,6 +24,7 @@ define(
 		'spell/shared/util/platform/private/storage/PersistentStorage',
 		'spell/shared/util/platform/private/system/features',
 		'spell/shared/util/platform/private/Window',
+		'spell/shared/util/platform/private/getPlatformInfo',
         'spell/shared/util/platform/private/graphics/Viewporter'
 	],
 	function(
@@ -46,6 +47,7 @@ define(
 		PersistentStorage,
 		features,
 		Window,
+		getPlatformInfo,
         Viewporter
 	) {
 		'use strict'
@@ -53,10 +55,6 @@ define(
 
 		var getHost = function() {
 			return createHost()
-		}
-
-		var getPlatformInfo = function() {
-			return 'html5'
 		}
 
 		var createInput = function( configurationManager, renderingContext ) {

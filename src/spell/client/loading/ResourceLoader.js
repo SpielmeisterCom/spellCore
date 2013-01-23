@@ -19,12 +19,11 @@ define(
 		 * private
 		 */
 
-		var BASE_URL     = 'library',
-			nextBundleId = 0
+		var BASE_URL             = 'library',
+			nextLoadingProcessId = 0
 
-
-		var createBundleId = function() {
-			return nextBundleId++
+		var createLoadingProcessId = function() {
+			return nextLoadingProcessId++
 		}
 
 		var resourceJsonDecoder = function( resource ) {
@@ -39,98 +38,103 @@ define(
 			return audioContext.createSound( resource )
 		}
 
-		var getResourceType = function( resourceTypes, resourceName, type ) {
-			var type = type === 'auto' ?
-				_.last( resourceName.split( '.' ) ) :
-				type
+		var createResourceTypes = function( renderingContext, soundContext ) {
+			var imageType = {
+				factory       : PlatformKit.createImageLoader,
+				processOnLoad : _.bind( resourceImageDecoder, null, renderingContext )
+			}
 
-			for( var i = 0, numEntries = resourceTypes.length; i < numEntries; i++ ) {
-				var resourceType = resourceTypes[ i ]
+			var soundType = {
+				factory       : PlatformKit.createSoundLoader,
+				processOnLoad : _.bind( resourceSoundDecoder, null, soundContext )
+			}
 
-				if( _.contains( resourceType.types, type ) ) {
-					return resourceType
-				}
+			var textType = {
+				factory       : PlatformKit.createTextLoader,
+				processOnLoad : resourceJsonDecoder
+			}
+
+			return {
+				jpeg : imageType,
+				png  : imageType,
+				mp3  : soundType,
+				wav  : soundType,
+				ogg  : soundType,
+				json : textType
 			}
 		}
 
-		var createResourceBundle = function( config, id, name, resources ) {
+		var getResourceType = function( resourceTypes, type, libraryPath ) {
+			if( type === 'auto' ) {
+				type = _.last( libraryPath.split( '.' ) )
+			}
+
+			return resourceTypes[ type ]
+		}
+
+		var createLoadingProcess = function( id, libraryPaths, config ) {
 			return {
+				id                 : id,
+				libraryPaths       : libraryPaths,
+				numCompleted       : 0,
+				name               : config.name,
+				type               : config.type,
 				processOnLoad      : config.processOnLoad,
 				baseUrl            : config.baseUrl,
-				id                 : id,
-				name               : name,
 				omitCache          : config.omitCache,
 				onLoadingCompleted : config.onLoadingCompleted,
-				resources          : resources,
-				resourcesTotal     : resources.length,
-				resourcesCompleted : 0,
-				type               : config.type
+				isMetaDataLoad     : config.isMetaDataLoad
 			}
 		}
 
-		/*
-		 * Returns true if a resource bundle with the provided name exists, false otherwise.
-		 *
-		 * @param resourceBundles
-		 * @param name
-		 */
-		var resourceBundleExists = function( resourceBundles, name ) {
-			if( !name ) return false
+		var updateProgress = function( eventManager, cache, loadingProcesses, loadingProcess ) {
+			loadingProcess.numCompleted++
 
-			return _.any(
-				resourceBundles,
-				function( resourceBundle ) {
-					return resourceBundle.name === name
-				}
+			var libraryPaths    = loadingProcess.libraryPaths,
+				numLibraryPaths = libraryPaths.length,
+				progress        = loadingProcess.numCompleted / numLibraryPaths
+
+			eventManager.publish(
+				[ Events.RESOURCE_PROGRESS, loadingProcess.name ],
+				[ progress, loadingProcess.numCompleted, numLibraryPaths ]
 			)
-		}
 
-		var updateProgress = function( eventManager, cache, resourceBundles, resourceBundle ) {
-			resourceBundle.resourcesCompleted++
+			if( loadingProcess.numCompleted === numLibraryPaths ) {
+				var loadedLibraryRecords = _.pick( cache, libraryPaths )
 
-			var name = resourceBundle.name
-
-			if( name ) {
-				var progress = resourceBundle.resourcesCompleted / resourceBundle.resourcesTotal
-
-				eventManager.publish(
-					[ Events.RESOURCE_PROGRESS, resourceBundle.name ],
-					[ progress, resourceBundle.resourcesCompleted, resourceBundle.resourcesTotal ]
-				)
-			}
-
-			if( resourceBundle.resourcesCompleted === resourceBundle.resourcesTotal ) {
-				if( name ) {
+				if( loadingProcess.name ) {
 					eventManager.publish(
-						[ Events.RESOURCE_LOADING_COMPLETED, name ],
-						[ _.pick( cache, resourceBundle.resources ) ]
+						[ Events.RESOURCE_LOADING_COMPLETED, loadingProcess.name ],
+						[ loadedLibraryRecords ]
 					)
 				}
 
-				var onLoadingCompleted = resourceBundle.onLoadingCompleted
+				var onLoadingCompleted = loadingProcess.onLoadingCompleted
 
-				if( onLoadingCompleted ) onLoadingCompleted()
+				if( onLoadingCompleted ) {
+					onLoadingCompleted( loadedLibraryRecords )
+				}
 
-				delete resourceBundles[ resourceBundle.id ]
+				delete loadingProcesses[ loadingProcess.id ]
 			}
 		}
 
-		var onLoadCallback = function( eventManager, cache, processOnLoad, resourceBundles, resourceBundle, resourceName, loadedResource ) {
+		var onLoadCallback = function( eventManager, cache, processOnLoad, loadingProcesses, loadingProcess, libraryPath, loadedResource ) {
 			if( !loadedResource ) {
-				throw 'Error: Resource \'' + resourceName + '\' from resource bundle \'' + resourceBundle.id + '\' is undefined or empty on loading completed.'
+				throw 'Error: Resource "' + libraryPath + '" from loading process "' + loadingProcess.id + '" is undefined or empty on loading completed.'
 			}
 
-			cache[ resourceName ] = processOnLoad( loadedResource )
+			cache[ libraryPath ] = processOnLoad( loadedResource )
 
-			updateProgress( eventManager, cache, resourceBundles, resourceBundle )
+			updateProgress( eventManager, cache, loadingProcesses, loadingProcess )
 		}
 
-		var onErrorCallback = function( eventManager, cache, resourceBundles, resourceBundle, resourceName ) {
-			throw 'Error: Loading resource \'' + resourceName + '\' failed.'
+		var onErrorCallback = function( eventManager, cache, loadingProcesses, loadingProcess, resourceName ) {
+			throw 'Error: Loading resource "' + resourceName + '" failed.'
 		}
 
-		var onTimedOutCallback = function( eventManager, cache, resourceBundles, resourceBundle, resourceName ) {
-			throw 'Error: Loading resource \'' + resourceName + '\' timed out.'
+		var onTimedOutCallback = function( eventManager, cache, loadingProcesses, loadingProcess, resourceName ) {
+			throw 'Error: Loading resource "' + resourceName + '" timed out.'
 		}
 
 		var createLoader = function( host, loaderFactory, baseUrl, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
@@ -139,56 +143,58 @@ define(
 			return loaderFactory( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 		}
 
-		var startLoadingResourceBundle = function( cache, eventManager, resourceTypes, host, resourceBundles, resourceBundle ) {
-			var omitCache = resourceBundle.omitCache
+		var startLoadingProcess = function( cache, eventManager, resourceTypes, host, loadingProcesses, loadingProcess ) {
+			var omitCache    = loadingProcess.omitCache,
+				libraryPaths = loadingProcess.libraryPaths
 
-			_.each(
-				resourceBundle.resources,
-				function( resourceName ) {
-					if( !omitCache ) {
-						var cacheEntry = cache[ resourceName ]
+			for( var i = 0, n = libraryPaths.length; i < n; i++ ) {
+				var libraryPath = libraryPaths[ i ]
 
-						if( cacheEntry ) {
-							onLoadCallback( eventManager, cache, _.identity, resourceBundles, resourceBundle, resourceName, cacheEntry )
+				if( !omitCache ) {
+					var cachedEntry = cache[ libraryPath ]
 
-							return
-						}
+					if( cachedEntry ) {
+						onLoadCallback( eventManager, cache, _.identity, loadingProcesses, loadingProcess, libraryPath, cachedEntry )
+
+						continue
 					}
-
-					var resourceType  = getResourceType( resourceTypes, resourceName, resourceBundle.type ),
-						processOnLoad = resourceBundle.processOnLoad || resourceType.processOnLoad
-
-					if( !resourceType ) {
-						throw 'Error: Unable to load resource of type \'' + resourceBundle.type + '\'.'
-					}
-
-					var loader = createLoader(
-						host,
-						resourceType.factory,
-						resourceBundle.baseUrl,
-						resourceName,
-						_.bind( onLoadCallback, null, eventManager, cache, processOnLoad, resourceBundles, resourceBundle, resourceName ),
-						_.bind( onErrorCallback, null, eventManager, cache, resourceBundles, resourceBundle, resourceName ),
-						_.bind( onTimedOutCallback, null, eventManager, cache, resourceBundles, resourceBundle, resourceName )
-					)
-
-					if( !loader ) {
-						throw 'Could not create a loader for resource \'' + resourceName + '\'.'
-					}
-
-					loader.start()
 				}
-			)
+
+				var resourceType  = getResourceType( resourceTypes, loadingProcess.type, libraryPath )
+
+				if( !resourceType ) {
+					throw 'Error: Unable to load resource of type "' + loadingProcess.type + '".'
+				}
+
+				var processOnLoad = loadingProcess.processOnLoad || resourceType.processOnLoad
+
+				var loader = createLoader(
+					host,
+					resourceType.factory,
+					loadingProcess.baseUrl,
+					libraryPath,
+					_.bind( onLoadCallback, null, eventManager, cache, processOnLoad, loadingProcesses, loadingProcess, libraryPath ),
+					_.bind( onErrorCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
+					_.bind( onTimedOutCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath )
+				)
+
+				if( !loader ) {
+					throw 'Could not create a loader for resource "' + libraryPath + '".'
+				}
+
+				loader.start()
+			}
 		}
 
-		var normalizeConfig = function( baseUrlPrefix, config ) {
+		var createConfig = function( baseUrlPrefix, config ) {
 			return {
 				processOnLoad      : _.isFunction( config.processOnLoad ) ? config.processOnLoad : undefined,
 				baseUrl            : config.baseUrl ? config.baseUrl : baseUrlPrefix + BASE_URL,
 				name               : config.name,
 				omitCache          : !!config.omitCache,
 				onLoadingCompleted : config.onLoadingCompleted,
-				type               : config.type ? config.type : 'auto'
+				type               : config.type ? config.type : 'auto',
+				isMetaDataLoad     : config.isMetaDataLoad !== undefined ? config.isMetaDataLoad : true
 			}
 		}
 
@@ -198,90 +204,58 @@ define(
 		 */
 
 		var ResourceLoader = function( spell, eventManager, renderingContext, soundContext, hostConfig, baseUrlPrefix ) {
-			this.eventManager    = eventManager
-			this.resourceBundles = {}
-			this.cache           = {}
-			this.host            = ( hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host )
-			this.baseUrlPrefix   = baseUrlPrefix
+			this.eventManager     = eventManager
+			this.loadingProcesses = {}
+			this.host             = hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host
+			this.baseUrlPrefix    = baseUrlPrefix
+			this.resourceTypes    = createResourceTypes( renderingContext, soundContext )
 
-			this.resourceTypes = [
-				{
-					factory       : PlatformKit.createImageLoader,
-					processOnLoad : _.bind( resourceImageDecoder, null, renderingContext ),
-					types         : [ 'jpeg', 'png' ]
-				},
-				{
-					factory       : PlatformKit.createTextLoader,
-					processOnLoad : resourceJsonDecoder,
-					types         : [ 'json' ]
-				},
-				{
-					factory       : PlatformKit.createSoundLoader,
-					processOnLoad :  _.bind( resourceSoundDecoder, null, soundContext ),
-					types         : [ 'mp3', 'wav', 'ogg' ]
-				}
-			]
-		}
-
-		var load = function( cache, eventManager, host, resourceBundles, resourceTypes, resourcesToLoad, name, config ) {
-			var id             = createBundleId(),
-				resourceBundle = createResourceBundle( config, id, name, resourcesToLoad )
-
-			resourceBundles[ id ] = resourceBundle
-
-			startLoadingResourceBundle( cache, eventManager, resourceTypes, host, resourceBundles, resourceBundle )
+			this.cache = {
+				metaData : {},
+				resource : {}
+			}
 		}
 
 		ResourceLoader.prototype = {
-			getCache: function() {
-				return this.cache
+			get : function( libraryPath ) {
+				var cache = this.cache
+
+				return cache.metaData[ libraryPath ] || cache.resource[ libraryPath ]
 			},
 
-			setCache: function( content ) {
-				this.cache = content
+			setCache : function( content ) {
+				_.extend( this.cache.metaData, content )
 			},
 
-			load: function( resourcesToLoad ) {
-				var numArguments = arguments.length,
-					config       = {},
-					name
+			free : function() {
+				this.cache.resource = {}
+			},
 
-				if( numArguments > 2 ) {
-					// ( resourcesToLoad : String, name : String, config : Object )
-					name   = arguments[ 1 ]
-					config = arguments[ 2 ]
-
-				} else if( numArguments > 1 ) {
-					var arg1 = arguments[ 1 ]
-
-					if( _.isObject( arg1 ) ) {
-						// ( resourcesToLoad : String, config : Object )
-						config = arg1
-
-					} else {
-						// ( resourcesToLoad : String, name : String )
-						name = arg1
-					}
+			load : function( libraryPaths, config ) {
+				if( libraryPaths.length === 0 ) {
+					throw 'Error: No library paths provided.'
 				}
 
-				if( _.size( resourcesToLoad ) === 0 ) {
-					throw 'Error: The resource bundle \'' + name + '\' contains no resources.'
-				}
+				var id = createLoadingProcessId()
 
-				if( name && resourceBundleExists( this.resourceBundles, name ) ) {
-					throw 'Error: A resource bundle with the \'' + name + '\' already exists.'
-				}
-
-				load(
-					this.cache,
-					this.eventManager,
-					this.host,
-					this.resourceBundles,
-					this.resourceTypes,
-					resourcesToLoad,
-					name,
-					normalizeConfig( this.baseUrlPrefix, config )
+				var loadingProcess = createLoadingProcess(
+					id,
+					libraryPaths,
+					createConfig( this.baseUrlPrefix, config )
 				)
+
+				startLoadingProcess(
+					loadingProcess.isMetaDataLoad ? this.cache.metaData : this.cache.resource,
+					this.eventManager,
+					this.resourceTypes,
+					this.host,
+					this.loadingProcesses,
+					loadingProcess
+				)
+
+				this.loadingProcesses[ id ] = loadingProcess
+
+				return id
 			}
 		}
 

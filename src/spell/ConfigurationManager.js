@@ -196,8 +196,6 @@ define(
 				{}
 			)
 
-			config.platform = PlatformKit.getPlatformInfo()
-
 			// initialize currentScreenSize with screenSize
 			vec2.set( config.screenSize, config.currentScreenSize )
 
@@ -223,6 +221,11 @@ define(
 					validOptions
 				)
 			)
+
+			var platformInfo = PlatformKit.getPlatformInfo()
+
+			this.setValue( 'platform.id', platformInfo.id )
+			this.setValue( 'platform.hasPlentyRAM', platformInfo.hasPlentyRAM )
 
 			eventManager.subscribe(
 				[ Events.AVAILABLE_SCREEN_SIZE_CHANGED ],

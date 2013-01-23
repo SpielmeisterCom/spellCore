@@ -15,10 +15,6 @@
 			config.baseUrl = BASE_URL
 		}
 
-		if( !config.cache ) {
-			config.cache = {}
-		}
-
 		return config
 	}
 
@@ -30,10 +26,14 @@
 		return request
 	}
 
-	var loadModule = function( name, baseUrl, cache ) {
-		var scriptName  = name + '.js',
-			cachedEntry = cache[ scriptName ],
+	var loadModule = function( name, baseUrl, resourceLoader ) {
+		var scriptName = name + '.js',
+			cachedEntry,
 			moduleSource
+
+		if( resourceLoader ) {
+			cachedEntry = resourceLoader.get( scriptName )
+		}
 
 		if( cachedEntry ) {
 			moduleSource = cachedEntry
@@ -55,7 +55,7 @@
 	var createModule = function( name, config ) {
 		config = normalizeConfig( config )
 
-		var module = loadModule( name, config.baseUrl, config.cache )
+		var module = loadModule( name, config.baseUrl, config.resourceLoader )
 
 		if( !module ) throw 'Error: Could not load module \'' + name + '\'.'
 

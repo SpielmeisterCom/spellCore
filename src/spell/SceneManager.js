@@ -50,14 +50,27 @@ define(
 		}
 
 		SceneManager.prototype = {
-			startScene : function( sceneId, sceneData ) {
+			startScene : function( nextSceneId, sceneData, freeResources ) {
 				var preNextFrame = function() {
 					if( this.activeScene ) {
 						this.mainLoop.setRenderCallback()
 						this.mainLoop.setUpdateCallback()
 						this.activeScene.destroy()
 						this.entityManager.reset()
-						this.activeScene = null
+						this.activeScene = undefined
+
+						// clear asset map
+						var assets = spell.assets
+
+						for( var id in assets ) {
+							delete assets[ id ]
+						}
+
+						// free resources
+//						if( !this.spell.configurationManager.getValue( 'platform.hasPlentyRAM' ) ) {
+						if( true ) {
+							this.spell.resourceLoader.free()
+						}
 					}
 
 					var onProgress = this.sendMessageToEditor ?
@@ -69,7 +82,7 @@ define(
 
 					loadSceneResources(
 						this.spell,
-						sceneId,
+						nextSceneId,
 						_.bind(
 							postLoadedResources,
 							this,
@@ -78,10 +91,11 @@ define(
 							this.templateManager,
 							this.statisticsManager,
 							this.isModeDevelopment,
-							sceneId,
+							nextSceneId,
 							sceneData
 						),
-						onProgress
+						onProgress,
+						freeResources
 					)
 				}
 

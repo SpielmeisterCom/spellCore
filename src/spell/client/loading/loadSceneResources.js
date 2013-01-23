@@ -48,7 +48,7 @@ define(
 		var groupByType = function( libraryRecords ) {
 			return _.reduce(
 				libraryRecords,
-				function( memo, value, key ) {
+				function( memo, value ) {
 					var type = value.type
 
 					if( memo[ type ] ) {
@@ -64,16 +64,12 @@ define(
 			)
 		}
 
-		var addIdAsKey = function( libraryRecords ) {
-			return _.reduce(
-				libraryRecords,
-				function( memo, libraryRecord ) {
-					memo[ createId( libraryRecord.namespace, libraryRecord.name ) ] = libraryRecord
+		var addIdAsKey = function( result, libraryRecords ) {
+			for( var id in libraryRecords ) {
+				var libraryRecord = libraryRecords[ id ]
 
-					return memo
-				},
-				{}
-			)
+				result[ createId( libraryRecord.namespace, libraryRecord.name ) ] = libraryRecord
+			}
 		}
 
 		var createLoadingProgress = function( eventManager, progressCallback ) {
@@ -88,7 +84,7 @@ define(
 				this.progressHandler  = function( portion, progress, numCompleted, numTotal ) {
 					this.progress += portion / numTotal
 
-					var currentProgress = mathUtil.roundToResolution( this.progress, 0.05 )
+					var currentProgress = mathUtil.roundToResolution( this.progress, 0.01 )
 
 					if( currentProgress <= this.lastSendProgress ) return
 
@@ -110,14 +106,14 @@ define(
 					this.progressCallback( 1 )
 				},
 				destroy : function() {
-					var eventManager = this.eventManager
+					var bundles      = this.bundles,
+						eventManager = this.eventManager
 
-					_.each(
-						this.bundles,
-						function( handler, name ) {
-							eventManager.unsubscribe( [ Events.RESOURCE_PROGRESS, name ], handler )
-						}
-					)
+					for( var name in bundles ) {
+						var handler = bundles[ name ]
+
+						eventManager.unsubscribe( [ Events.RESOURCE_PROGRESS, name ], handler )
+					}
 				}
 			}
 
@@ -137,16 +133,15 @@ define(
 			var loadingProgress = createLoadingProgress( eventManager, progressCallback )
 
 			loadingProgress.addBundle( sceneId, 0.1 )
-			loadingProgress.addBundle( libraryBundleName, 0.45 )
-			loadingProgress.addBundle( resourceBundleName, 0.45 )
+			loadingProgress.addBundle( libraryBundleName, 0.2 )
+			loadingProgress.addBundle( resourceBundleName, 0.7 )
 
 
 			eventManager.waitFor(
 				[ Events.RESOURCE_LOADING_COMPLETED, sceneId ],
 				function( loadedRecords ) {
 					addNamespaceAndName( loadedRecords )
-
-					_.extend( spell.scenes, addIdAsKey( loadedRecords ) )
+					addIdAsKey( spell.scenes, loadedRecords )
 				}
 
 			).resume( function() {
@@ -161,7 +156,10 @@ define(
 
 						resourceLoader.load(
 							createFilesToLoad( library.asset ),
-							resourceBundleName
+							{
+								name : resourceBundleName,
+								isMetaDataLoad : false
+							}
 						)
 
 						addTemplates( templateManager, library.component )
@@ -172,15 +170,21 @@ define(
 				).and(
 					[ Events.RESOURCE_LOADING_COMPLETED, resourceBundleName ],
 					function( loadedResources ) {
-						_.each(
-							spell.assets,
-							_.bind( injectResource, null, loadedResources )
-						)
+						var assets = spell.assets
+
+						for( var assetId in assets ) {
+							injectResource( resourceLoader, assets[ assetId ] )
+						}
 					}
 
 				).resume( function() {
 					loadingProgress.complete()
 					loadingProgress.destroy()
+
+					eventManager.unsubscribeAll( [ Events.RESOURCE_LOADING_COMPLETED, sceneId ] )
+					eventManager.unsubscribeAll( [ Events.RESOURCE_LOADING_COMPLETED, libraryBundleName ] )
+					eventManager.unsubscribeAll( [ Events.RESOURCE_LOADING_COMPLETED, resourceBundleName ] )
+
 					next()
 				} )
 
@@ -189,14 +193,18 @@ define(
 
 				resourceLoader.load(
 					libraryIdsToJsonFilenames( scene.libraryIds ),
-					libraryBundleName
+					{
+						name : libraryBundleName
+					}
 				)
 			} )
 
 			// load scene library record
 			resourceLoader.load(
 				libraryIdsToJsonFilenames( [ sceneId ] ),
-				sceneId
+				{
+					name : sceneId
+				}
 			)
 		}
 	}

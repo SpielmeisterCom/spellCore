@@ -116,7 +116,6 @@ define(
 					renderingContext     : renderingContext,
 					audioContext         : audioContext,
 					resourceLoader       : resourceLoader,
-					resources            : resourceLoader.getCache(),
 					moduleLoader         : moduleLoader,
 					templateManager      : templateManager,
 					entityManager        : entityManager,
