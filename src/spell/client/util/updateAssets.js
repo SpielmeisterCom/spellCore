@@ -33,9 +33,9 @@ define(
 			]
 		}
 
-		var createTilemapAsset = function( assets, asset ) {
+		var createTilemapAsset = function( assetManager, asset ) {
 			var spriteSheetAssetId = asset.assetId,
-				spriteSheetAsset   = assets[ spriteSheetAssetId ]
+				spriteSheetAsset   = assetManager.get( spriteSheetAssetId )
 
 			if( !spriteSheetAsset ) throw 'Error: Could not find asset with id \'' + spriteSheetAssetId + '\'.'
 
@@ -49,9 +49,9 @@ define(
 			}
 		}
 
-		var createAnimationAsset = function( assets, asset ) {
+		var createAnimationAsset = function( assetManager, asset ) {
 			var spriteSheetAssetId = asset.assetId,
-				spriteSheetAsset   = assets[ spriteSheetAssetId ]
+				spriteSheetAsset   = assetManager.get( spriteSheetAssetId )
 
 			if( !spriteSheetAsset ) throw 'Error: Could not find asset with id \'' + spriteSheetAssetId + '\'.'
 
@@ -153,12 +153,12 @@ define(
 		 * public
 		 */
 
-		return function( assets, newAssetDefinitions, overwriteExisting ) {
+		return function( assetManager, newAssetDefinitions, overwriteExisting ) {
 			var filteredAssetDefinitions = !overwriteExisting ?
 				_.filter(
 					newAssetDefinitions,
 					function( assetDefinition ) {
-						return !assets[ createAssetId( assetDefinition.subtype, assetDefinition.namespace, assetDefinition.name ) ]
+						return !assetManager.has( createAssetId( assetDefinition.subtype, assetDefinition.namespace, assetDefinition.name ) )
 					}
 				) :
 				newAssetDefinitions
@@ -195,11 +195,11 @@ define(
 
 					addResourceId( asset, assetDefinition )
 
-					if (asset) {
-						asset.assetId  = assetId
+					if( asset ) {
+						asset.assetId = assetId
 					}
 
-					assets[ assetId ] = asset
+					assetManager.add( assetId, asset )
 				}
 			)
 
@@ -210,10 +210,30 @@ define(
 					var type = assetDefinition.subtype
 
 					if( type === 'animation' ) {
-						assets[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = createAnimationAsset( assets, assetDefinition )
+						assetManager.add(
+							createAssetId(
+								type,
+								assetDefinition.namespace,
+								assetDefinition.name
+							),
+							createAnimationAsset(
+								assetManager,
+								assetDefinition
+							)
+						)
 
 					} else if ( type === '2dTileMap') {
-						assets[ createAssetId( type, assetDefinition.namespace, assetDefinition.name ) ] = createTilemapAsset( assets, assetDefinition )
+						assetManager.add(
+							createAssetId(
+								type,
+								assetDefinition.namespace,
+								assetDefinition.name
+							),
+							createTilemapAsset(
+								assetManager,
+								assetDefinition
+							)
+						)
 					}
 				}
 			)

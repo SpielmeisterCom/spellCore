@@ -7,6 +7,7 @@ define(
 		'spell/EntityManager',
 		'spell/SceneManager',
 		'spell/shared/util/template/TemplateManager',
+		'spell/AssetManager',
 		'spell/ConfigurationManager',
 		'spell/EventManager',
 		'spell/InputManager',
@@ -27,6 +28,7 @@ define(
 		EntityManager,
 		SceneManager,
 		TemplateManager,
+		AssetManager,
 		ConfigurationManager,
 		EventManager,
 		InputManager,
@@ -80,7 +82,6 @@ define(
 			var storage = PlatformKit.createPersistentStorage()
 
 			var libraryManager = new LibraryManager(
-				spell,
 				spell.eventManager,
 				renderingContext,
 				audioContext,
@@ -90,12 +91,13 @@ define(
 
 			if( cacheContent ) libraryManager.setCache( cacheContent )
 
+			var assetManager = new AssetManager( libraryManager )
 
 			var isModeDevelopment = configurationManager.getValue( 'mode' ) !== 'deployed'
 
 			var moduleLoader = createModuleLoader( libraryManager, isModeDevelopment )
 
-			var templateManager = new TemplateManager( spell.assets, moduleLoader )
+			var templateManager = new TemplateManager( assetManager, moduleLoader )
 
 			var entityManager = new EntityManager( spell, configurationManager, spell.eventManager, templateManager )
 
@@ -112,6 +114,7 @@ define(
 			_.extend(
 				spell,
 				{
+					assetManager         : assetManager,
 					configurationManager : configurationManager,
 					renderingContext     : renderingContext,
 					audioContext         : audioContext,
@@ -138,7 +141,6 @@ define(
 
 		var init = function( loaderConfig ) {
 			var spell             = {},
-				assets            = {},
 				scenes            = {},
 				logger            = new Logger(),
 				eventManager      = new EventManager(),
@@ -150,7 +152,6 @@ define(
 			_.extend(
 				spell,
 				{
-					assets            : assets,
 					eventManager      : eventManager,
 					loaderConfig      : loaderConfig,
 					logger            : logger,

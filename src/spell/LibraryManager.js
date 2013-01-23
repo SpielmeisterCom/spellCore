@@ -203,7 +203,7 @@ define(
 		 * public
 		 */
 
-		var LibraryManager = function( spell, eventManager, renderingContext, soundContext, hostConfig, baseUrlPrefix ) {
+		var LibraryManager = function( eventManager, renderingContext, soundContext, hostConfig, baseUrlPrefix ) {
 			this.eventManager     = eventManager
 			this.loadingProcesses = {}
 			this.host             = hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host

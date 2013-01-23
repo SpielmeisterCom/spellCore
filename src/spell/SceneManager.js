@@ -19,7 +19,7 @@ define(
 			var sceneConfig = spell.scenes[ sceneId ]
 
 			if( !sceneConfig ) {
-				throw 'Error: Could not find scene configuration for scene \'' + sceneId + '\'.'
+				throw 'Error: Could not find scene configuration for scene "' + sceneId + '".'
 			}
 
 			var scene = new Scene( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneConfig, sceneData )
@@ -52,6 +52,8 @@ define(
 		SceneManager.prototype = {
 			startScene : function( nextSceneId, sceneData, freeResources ) {
 				var preNextFrame = function() {
+					var spell = this.spell
+
 					if( this.activeScene ) {
 						this.mainLoop.setRenderCallback()
 						this.mainLoop.setUpdateCallback()
@@ -59,17 +61,12 @@ define(
 						this.entityManager.reset()
 						this.activeScene = undefined
 
-						// clear asset map
-						var assets = spell.assets
-
-						for( var id in assets ) {
-							delete assets[ id ]
-						}
+						spell.assetManager.free()
 
 						// free resources
-//						if( !this.spell.configurationManager.getValue( 'platform.hasPlentyRAM' ) ) {
+//						if( !spell.configurationManager.getValue( 'platform.hasPlentyRAM' ) ) {
 						if( true ) {
-							this.spell.libraryManager.free()
+							spell.libraryManager.free()
 						}
 					}
 
@@ -81,12 +78,12 @@ define(
 					this.loadingPending = true
 
 					loadSceneResources(
-						this.spell,
+						spell,
 						nextSceneId,
 						_.bind(
 							postLoadedResources,
 							this,
-							this.spell,
+							spell,
 							this.entityManager,
 							this.templateManager,
 							this.statisticsManager,
@@ -107,13 +104,15 @@ define(
 					return
 				}
 
-				for( var i=0; i < this.cmdQueue.length; i++) {
-					var cmd = this.cmdQueue[ i ]
+				var cmdQueue = this.cmdQueue
+
+				for( var i = 0; i < cmdQueue.length; i++ ) {
+					var cmd = cmdQueue[ i ]
 
 					this.activeScene[ cmd.fn ].apply( this.activeScene, cmd.args )
 				}
 
-				this.cmdQueue.length = 0
+				cmdQueue.length = 0
 			},
 
 			addSystem : function( systemId, executionGroupId, index, systemConfig ) {

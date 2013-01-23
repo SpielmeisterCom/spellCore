@@ -122,10 +122,11 @@ define(
 
 
 		return function( spell, sceneId, next, progressCallback ) {
-			var eventManager     = spell.eventManager,
-				libraryManager   = spell.libraryManager,
-				resources        = spell.resources,
-				templateManager  = spell.templateManager
+			var assetManager    = spell.assetManager,
+				eventManager    = spell.eventManager,
+				libraryManager  = spell.libraryManager,
+				resources       = spell.resources,
+				templateManager = spell.templateManager
 
 			var libraryBundleName  = sceneId + '-library',
 				resourceBundleName = sceneId + '-resources'
@@ -152,7 +153,7 @@ define(
 
 						var library = groupByType( loadedRecords )
 
-						updateAssets( spell.assets, library.asset )
+						updateAssets( assetManager, library.asset )
 
 						libraryManager.load(
 							createFilesToLoad( library.asset ),
@@ -169,13 +170,7 @@ define(
 
 				).and(
 					[ Events.RESOURCE_LOADING_COMPLETED, resourceBundleName ],
-					function( loadedResources ) {
-						var assets = spell.assets
-
-						for( var assetId in assets ) {
-							injectResource( libraryManager, assets[ assetId ] )
-						}
-					}
+					_.bind( assetManager.injectResources, assetManager )
 
 				).resume( function() {
 					loadingProgress.complete()

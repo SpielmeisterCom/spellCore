@@ -35,7 +35,8 @@ define(
 		}
 
 		return function( spell, payload ) {
-			var definition      = payload.definition,
+			var assetManager    = spell.assetManager,
+				definition      = payload.definition,
 				id              = createId( definition.namespace, definition.name ),
 				assetId         = createAssetId( definition.subtype, id ),
 				libraryFilePath = createLibraryFilePathFromId( id )
@@ -45,9 +46,9 @@ define(
 			loadedAssets[ libraryFilePath ] = definition
 			addNamespaceAndName( loadedAssets )
 
-			updateAssets( spell.assets, loadedAssets )
+			updateAssets( assetManager, loadedAssets )
 
-			var asset = spell.assets[ assetId ]
+			var asset = assetManager.get( assetId )
 
 			if( asset.resourceId ) {
 				var filesToLoad = createFilesToLoad( loadedAssets )

@@ -152,14 +152,14 @@ define(
 			)
 		}
 
-		var addTemplate = function( assets, moduleLoader, onComponentTypeAdded, templates, componentsWithAssets, entityPrototypes, definition, overwrite ) {
+		var addTemplate = function( assetManager, moduleLoader, onComponentTypeAdded, templates, componentsWithAssets, entityPrototypes, definition, overwrite ) {
 			var templateId = createName( definition.namespace, definition.name ),
 				type       = definition.type
 
 			templates[ templateId ] = definition
 
 			if( type === TemplateTypes.ENTITY ) {
-				entityPrototypes[ templateId ] = createComponents( assets, moduleLoader, templates, definition.config, null, templateId, false )
+				entityPrototypes[ templateId ] = createComponents( assetManager, moduleLoader, templates, definition.config, null, templateId, false )
 
 			} else if( type === TemplateTypes.COMPONENT ) {
 				var hasAssetId = hasAssetIdAttribute( definition.attributes )
@@ -189,16 +189,16 @@ define(
 		 * This function dereferences asset ids. If a component with an asset id attribute is found the reference is resolved and a additional asset attribute
 		 * is added to the component instance.
 		 *
-		 * @param assets
+		 * @param assetManager
 		 * @param componentTemplate
 		 * @param component
 		 * @return {*}
 		 */
-		var injectAsset = function( assets, moduleLoader, componentTemplate, component ) {
+		var injectAsset = function( assetManager, moduleLoader, componentTemplate, component ) {
 			var assetId = component.assetId
 			if( !assetId ) return
 
-			var asset = assets[ assetId ]
+			var asset = assetManager.get( assetId )
 
 			if( !asset &&
 				stringUtil.startsWith( assetId, 'script:' ) ) {
@@ -217,7 +217,7 @@ define(
 			return component
 		}
 
-		var createComponents = function( assets, moduleLoader, templates, componentConfig, entityPrototype, entityTemplateId, injectAssets ) {
+		var createComponents = function( assetManager, moduleLoader, templates, componentConfig, entityPrototype, entityTemplateId, injectAssets ) {
 			if( injectAssets === undefined ) injectAssets = true
 
 			var entity = applyComponentConfig(
@@ -244,7 +244,7 @@ define(
 					)
 
 					entity[ componentId ] = hasAssetIdAttribute( componentTemplate.attributes ) && injectAssets ?
-						injectAsset( assets, moduleLoader, componentTemplate, updatedComponent ) :
+						injectAsset( assetManager, moduleLoader, componentTemplate, updatedComponent ) :
 						updatedComponent
 				}
 			)
@@ -257,8 +257,8 @@ define(
 		 * public
 		 */
 
-		var TemplateManager = function( assets, moduleLoader ) {
-			this.assets           = assets
+		var TemplateManager = function( assetManager, moduleLoader ) {
+			this.assetManager     = assetManager
 			this.moduleLoader     = moduleLoader
 			this.templates        = {}
 			this.entityPrototypes = {}
@@ -274,7 +274,7 @@ define(
 				}
 
 				addTemplate(
-					this.assets,
+					this.assetManager,
 					this.moduleLoader,
 					this.onComponentTypeAdded,
 					this.templates,
@@ -294,7 +294,7 @@ define(
 					if( !entityPrototype ) throw 'Error: Could not find entity prototype for template id \'' + entityTemplateId + '\'.'
 				}
 
-				return createComponents( this.assets, this.moduleLoader, this.templates, config, entityPrototype, entityTemplateId )
+				return createComponents( this.assetManager, this.moduleLoader, this.templates, config, entityPrototype, entityTemplateId )
 			},
 
 			updateComponent : function( componentId, component, attributeConfig ) {
@@ -306,7 +306,7 @@ define(
 					var assetIdChanged = !!attributeConfig[ 'assetId' ]
 
 					if( assetIdChanged ) {
-						injectAsset( this.assets, this.moduleLoader, this.templates[ componentId ], component )
+						injectAsset( this.assetManager, this.moduleLoader, this.templates[ componentId ], component )
 					}
 				}
 			},
@@ -318,7 +318,7 @@ define(
 					var assetIdChanged = attributeId === 'assetId'
 
 					if( assetIdChanged ) {
-						injectAsset( this.assets, this.moduleLoader, this.templates[ componentId ], component )
+						injectAsset( this.assetManager, this.moduleLoader, this.templates[ componentId ], component )
 					}
 				}
 			},

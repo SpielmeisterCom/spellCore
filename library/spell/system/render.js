@@ -683,7 +683,7 @@ define(
 			this.configurationManager = spell.configurationManager
 			this.context              = spell.renderingContext
 			this.eventManager         = spell.eventManager
-			this.debugFontAsset       = spell.assets[ debugFontAssetId ]
+			this.debugFontAsset       = spell.assetManager.get( debugFontAssetId )
 			this.screenSize           = spell.configurationManager.getValue( 'currentScreenSize' )
 			this.isDevelopment        = spell.configurationManager.getValue( 'mode' ) !== 'deployed'
 			this.currentCameraId      = undefined
