@@ -92,30 +92,30 @@ define(
 
 			var libraryPaths    = loadingProcess.libraryPaths,
 				numLibraryPaths = libraryPaths.length,
-				progress        = loadingProcess.numCompleted / numLibraryPaths
+				progress        = loadingProcess.numCompleted / numLibraryPaths,
+				name            = loadingProcess.name
 
 			eventManager.publish(
-				[ Events.RESOURCE_PROGRESS, loadingProcess.name ],
+				[ Events.RESOURCE_PROGRESS, name ],
 				[ progress, loadingProcess.numCompleted, numLibraryPaths ]
 			)
 
 			if( loadingProcess.numCompleted === numLibraryPaths ) {
-				var loadedLibraryRecords = _.pick( cache, libraryPaths )
-
-				if( loadingProcess.name ) {
-					eventManager.publish(
-						[ Events.RESOURCE_LOADING_COMPLETED, loadingProcess.name ],
-						[ loadedLibraryRecords ]
-					)
-				}
-
-				var onLoadingCompleted = loadingProcess.onLoadingCompleted
+				var loadedLibraryRecords = _.pick( cache, libraryPaths ),
+					onLoadingCompleted   = loadingProcess.onLoadingCompleted
 
 				if( onLoadingCompleted ) {
 					onLoadingCompleted( loadedLibraryRecords )
 				}
 
 				delete loadingProcesses[ loadingProcess.id ]
+
+				if( name ) {
+					eventManager.publish(
+						[ Events.RESOURCE_LOADING_COMPLETED, name ],
+						[ loadedLibraryRecords ]
+					)
+				}
 			}
 		}
 
@@ -244,6 +244,8 @@ define(
 					createConfig( this.baseUrlPrefix, config )
 				)
 
+				this.loadingProcesses[ id ] = loadingProcess
+
 				startLoadingProcess(
 					loadingProcess.isMetaDataLoad ? this.cache.metaData : this.cache.resource,
 					this.eventManager,
@@ -252,8 +254,6 @@ define(
 					this.loadingProcesses,
 					loadingProcess
 				)
-
-				this.loadingProcesses[ id ] = loadingProcess
 
 				return id
 			}
