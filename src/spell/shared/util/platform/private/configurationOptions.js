@@ -1,12 +1,14 @@
 define(
-	"spell/shared/util/platform/private/configurationOptions",
+	'spell/shared/util/platform/private/configurationOptions',
 	[
-		"spell/shared/util/platform/private/graphics/RenderingFactory"
+		'spell/shared/util/platform/private/graphics/RenderingFactory',
+		'spell/shared/util/platform/private/sound/AudioFactory'
 	],
 	function(
-		RenderingFactory
+		RenderingFactory,
+		AudioFactory
 	) {
-		"use strict"
+		'use strict'
 
 
 		var extractRenderingBackEnd = function( validValues, value ) {
@@ -15,6 +17,17 @@ define(
 
 			} else if( value === 'canvas-2d' ) {
 				return RenderingFactory.BACK_END_CANVAS
+			}
+
+			return false
+		}
+
+		var extractAudioBackEnd = function( validValues, value ) {
+			if( value === 'webAudio' ) {
+				return AudioFactory.BACK_END_WEB_AUDIO
+
+			} else if( value === 'html5Audio' ) {
+				return AudioFactory.BACK_END_HTML5_AUDIO
 			}
 
 			return false
@@ -29,6 +42,11 @@ define(
 				configurable : true,
 				extractor    : extractRenderingBackEnd
 			},
+			audioBackEnd : {
+				validValues  : [ 'webAudio', 'html5Audio' ],
+				configurable : true,
+				extractor    : extractAudioBackEnd
+			},
 			baseUrlPrefix : {
 				configurable : false
 			}
@@ -39,6 +57,7 @@ define(
 		 */
 		var defaultOptions = {
 			renderingBackEnd : 'canvas-2d',
+			audioBackEnd : 'html5Audio',
 			baseUrlPrefix : ''
 		}
 

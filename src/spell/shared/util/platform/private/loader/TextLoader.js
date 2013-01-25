@@ -30,7 +30,7 @@ define(
 				return
 			}
 
-			this.onLoadCallback( response )
+			this.onLoadCallback( this.postProcess ? this.postProcess( response ) : response )
 		}
 
 		var onError = function( event ) {
@@ -51,7 +51,8 @@ define(
 		 * public
 		 */
 
-		var TextLoader = function( resourcePath, resourceName, onLoadCallback, onErrorCallback ) {
+		var TextLoader = function( postProcess, resourcePath, resourceName, onLoadCallback, onErrorCallback ) {
+			this.postProcess     = postProcess
 			this.resourcePath    = resourcePath
 			this.resourceName    = resourceName
 			this.onLoadCallback  = onLoadCallback
@@ -60,10 +61,10 @@ define(
 		}
 
 		TextLoader.prototype = {
-			start: function() {
-				var url = this.resourcePath + '/' + this.resourceName
+			start : function() {
+				var url     = this.resourcePath + '/' + this.resourceName,
+					request = new XMLHttpRequest()
 
-				var request = new XMLHttpRequest()
 				request.onload             = _.bind( onLoad, this, request )
 				request.onreadystatechange = _.bind( onReadyStateChange, this, request )
 				request.onerror            = _.bind( onError, this )

@@ -30,46 +30,27 @@ define(
 			return PlatformKit.jsonCoder.decode( resource )
 		}
 
-		var resourceImageDecoder = function( renderingContext, resource ) {
-			return renderingContext.createTexture( resource )
-		}
-
-		var resourceSoundDecoder = function( audioContext, resource ) {
-			return audioContext.createSound( resource )
-		}
-
-		var createResourceTypes = function( renderingContext, soundContext ) {
-			var imageType = {
-				factory       : PlatformKit.createImageLoader,
-				processOnLoad : _.bind( resourceImageDecoder, null, renderingContext )
-			}
-
-			var soundType = {
-				factory       : PlatformKit.createSoundLoader,
-				processOnLoad : _.bind( resourceSoundDecoder, null, soundContext )
-			}
-
-			var textType = {
-				factory       : PlatformKit.createTextLoader,
-				processOnLoad : resourceJsonDecoder
-			}
+		var createResourceTypeToLoaderFactory = function( renderingContext, soundContext ) {
+			var createTexture = _.bind( PlatformKit.createImageLoader, null, renderingContext ),
+				createSound   = _.bind( PlatformKit.createSoundLoader, null, soundContext ),
+				createText    = _.bind( PlatformKit.createTextLoader, null, resourceJsonDecoder )
 
 			return {
-				jpeg : imageType,
-				png  : imageType,
-				mp3  : soundType,
-				wav  : soundType,
-				ogg  : soundType,
-				json : textType
+				jpeg : createTexture,
+				png  : createTexture,
+				mp3  : createSound,
+				wav  : createSound,
+				ogg  : createSound,
+				json : createText
 			}
 		}
 
-		var getResourceType = function( resourceTypes, type, libraryPath ) {
+		var getLoaderFactory = function( resourceTypeToLoaderFactory, type, libraryPath ) {
 			if( type === 'auto' ) {
 				type = _.last( libraryPath.split( '.' ) )
 			}
 
-			return resourceTypes[ type ]
+			return resourceTypeToLoaderFactory[ type ]
 		}
 
 		var createLoadingProcess = function( id, libraryPaths, config ) {
@@ -79,7 +60,6 @@ define(
 				numCompleted       : 0,
 				name               : config.name,
 				type               : config.type,
-				processOnLoad      : config.processOnLoad,
 				baseUrl            : config.baseUrl,
 				omitCache          : config.omitCache,
 				onLoadingCompleted : config.onLoadingCompleted,
@@ -119,12 +99,12 @@ define(
 			}
 		}
 
-		var onLoadCallback = function( eventManager, cache, processOnLoad, loadingProcesses, loadingProcess, libraryPath, loadedResource ) {
+		var onLoadCallback = function( eventManager, cache, loadingProcesses, loadingProcess, libraryPath, loadedResource ) {
 			if( !loadedResource ) {
 				throw 'Error: Resource "' + libraryPath + '" from loading process "' + loadingProcess.id + '" is undefined or empty on loading completed.'
 			}
 
-			cache[ libraryPath ] = processOnLoad( loadedResource )
+			cache[ libraryPath ] = loadedResource
 
 			updateProgress( eventManager, cache, loadingProcesses, loadingProcess )
 		}
@@ -137,13 +117,7 @@ define(
 			throw 'Error: Loading resource "' + resourceName + '" timed out.'
 		}
 
-		var createLoader = function( host, loaderFactory, baseUrl, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-			var resourcePath = baseUrl
-
-			return loaderFactory( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
-		}
-
-		var startLoadingProcess = function( cache, eventManager, resourceTypes, host, loadingProcesses, loadingProcess ) {
+		var startLoadingProcess = function( cache, eventManager, resourceTypeToLoaderFactory, loadingProcesses, loadingProcess ) {
 			var omitCache    = loadingProcess.omitCache,
 				libraryPaths = loadingProcess.libraryPaths
 
@@ -154,26 +128,22 @@ define(
 					var cachedEntry = cache[ libraryPath ]
 
 					if( cachedEntry ) {
-						onLoadCallback( eventManager, cache, _.identity, loadingProcesses, loadingProcess, libraryPath, cachedEntry )
+						onLoadCallback( eventManager, cache, loadingProcesses, loadingProcess, libraryPath, cachedEntry )
 
 						continue
 					}
 				}
 
-				var resourceType  = getResourceType( resourceTypes, loadingProcess.type, libraryPath )
+				var loaderFactory = getLoaderFactory( resourceTypeToLoaderFactory, loadingProcess.type, libraryPath )
 
-				if( !resourceType ) {
+				if( !loaderFactory ) {
 					throw 'Error: Unable to load resource of type "' + loadingProcess.type + '".'
 				}
 
-				var processOnLoad = loadingProcess.processOnLoad || resourceType.processOnLoad
-
-				var loader = createLoader(
-					host,
-					resourceType.factory,
+				var loader = loaderFactory(
 					loadingProcess.baseUrl,
 					libraryPath,
-					_.bind( onLoadCallback, null, eventManager, cache, processOnLoad, loadingProcesses, loadingProcess, libraryPath ),
+					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
 					_.bind( onErrorCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
 					_.bind( onTimedOutCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath )
 				)
@@ -188,7 +158,6 @@ define(
 
 		var createConfig = function( baseUrlPrefix, config ) {
 			return {
-				processOnLoad      : _.isFunction( config.processOnLoad ) ? config.processOnLoad : undefined,
 				baseUrl            : config.baseUrl ? config.baseUrl : baseUrlPrefix + BASE_URL,
 				name               : config.name,
 				omitCache          : !!config.omitCache,
@@ -204,11 +173,11 @@ define(
 		 */
 
 		var LibraryManager = function( eventManager, renderingContext, soundContext, hostConfig, baseUrlPrefix ) {
-			this.eventManager     = eventManager
-			this.loadingProcesses = {}
-			this.host             = hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host
-			this.baseUrlPrefix    = baseUrlPrefix
-			this.resourceTypes    = createResourceTypes( renderingContext, soundContext )
+			this.eventManager                = eventManager
+			this.loadingProcesses            = {}
+			this.host                        = hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host
+			this.baseUrlPrefix               = baseUrlPrefix
+			this.resourceTypeToLoaderFactory = createResourceTypeToLoaderFactory( renderingContext, soundContext )
 
 			this.cache = {
 				metaData : {},
@@ -249,8 +218,7 @@ define(
 				startLoadingProcess(
 					loadingProcess.isMetaDataLoad ? this.cache.metaData : this.cache.resource,
 					this.eventManager,
-					this.resourceTypes,
-					this.host,
+					this.resourceTypeToLoaderFactory,
 					this.loadingProcesses,
 					loadingProcess
 				)

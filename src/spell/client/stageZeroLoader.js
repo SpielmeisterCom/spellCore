@@ -89,9 +89,21 @@ if( !window.console ) {
 		return false
 	}
 
+	var isWebAudioSupported = function() {
+		if( !window.webkitAudioContext ) return false
+
+		try {
+			var test = new webkitAudioContext()
+
+			return true
+
+		} catch ( e ) {
+			return false
+		}
+	}
+
 	var isHtml5Capable = function() {
-		return isHtml5AudioSupported() &&
-			isCanvasCapable()
+		return isCanvasCapable() && ( isWebAudioSupported() || isHtml5AudioSupported() )
 	}
 
 	var isCanvasCapable = function() {
@@ -155,11 +167,16 @@ if( !window.console ) {
 			}
 		}
 
-		if( config.platform === 'html5' &&
-			!config.renderingBackEnd &&
-			isWebGlCapable() ) {
+		if( config.platform === 'html5' ) {
+			if( !config.renderingBackEnd &&
+				isWebGlCapable() ) {
 
-			config.renderingBackEnd = 'webgl'
+				config.renderingBackEnd = 'webgl'
+			}
+
+			if( !config.audioBackEnd ) {
+				config.audioBackEnd = isWebAudioSupported() ? 'webAudio' : 'html5Audio'
+			}
 		}
 
 		if( !config.verbose ) {

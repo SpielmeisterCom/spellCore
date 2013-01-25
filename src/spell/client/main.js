@@ -77,7 +77,9 @@ define(
 
 			spell.logger.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
 
-			var audioContext = PlatformKit.AudioFactory.createAudioContext()
+			var audioContext = PlatformKit.AudioFactory.createAudioContext(
+				configurationManager.getValue( 'audioBackEnd' )
+			)
 
 			var storage = PlatformKit.createPersistentStorage()
 

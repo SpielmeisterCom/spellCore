@@ -152,16 +152,16 @@ define(
 				return new PersistentStorage()
 			},
 
-			createImageLoader : function( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-				return new ImageLoader( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
+			createImageLoader : function( renderingContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+				return new ImageLoader( renderingContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			createSoundLoader : function( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-				return new SoundLoader( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
+			createSoundLoader : function( audioContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+				return new SoundLoader( audioContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			createTextLoader : function( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-				return new TextLoader( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
+			createTextLoader : function( postProcess, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+				return new TextLoader( postProcess, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			}
 		}
 	}

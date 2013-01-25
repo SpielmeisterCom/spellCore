@@ -1,17 +1,18 @@
 define(
-	'spell/shared/util/platform/private/sound/webkitAudio/createWebKitAudioContext',
+	'spell/shared/util/platform/private/sound/webAudio/createWebAudioContext',
 	[
+		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
+
 		'spell/functions'
 	],
 	function(
+		createFixedSoundFileSrc,
+
 		_
-		) {
+	) {
 		'use strict'
 
 
-		/*
-		 * private
-		 */
 		var context,
 			sourcesNodes = {},
 			isMutedValue = false,
@@ -38,7 +39,7 @@ define(
 		 * @param loop
 		 */
 		var play = function( audioResource, id, volume, loop ) {
-			id     = id ? id : "tmp_sound_" + soundCounter++
+			id     = id ? id : 'tmp_sound_' + soundCounter++
 			loop   = !!loop
 			volume = volume ? volume : 1
 
@@ -97,23 +98,6 @@ define(
 			delete sourcesNodes[ id ]
 		}
 
-		/*
-		 * Returns a audio context. Once a context has been created additional calls to this method return the same context instance.
-		 *
-		 * @param sound - the audio element
-		 */
-		var createAudioContext = function() {
-			if( context !== undefined ) return context
-
-
-			context = new webkitAudioContext()
-
-			if( context === null ) return null
-
-
-			return createWrapperContext()
-		}
-
 		/**
 		 * Looks through the sourcesNodes and cleans up finished nodes
 		 */
@@ -145,6 +129,34 @@ define(
 			return isMutedValue
 		}
 
+		var loadBuffer = function( src, onLoadCallback ) {
+			if( !src ) {
+				throw 'Error: No src provided.'
+			}
+
+			if( !onLoadCallback ) {
+				throw 'Error: No onLoadCallback provided.'
+			}
+
+			var request = new XMLHttpRequest()
+
+			request.open( 'GET', createFixedSoundFileSrc( src ), true )
+			request.responseType = 'arraybuffer'
+
+			request.onload = function() {
+				context.decodeAudioData(
+					request.response,
+					onLoadCallback
+				)
+			}
+
+			request.onError = function() {
+				throw 'Error: Could not load sound resource "' + config.resource + '".'
+			}
+
+			request.send()
+		}
+
 		/*
 		 * Creates a wrapper context from the backend context.
 		 */
@@ -160,32 +172,42 @@ define(
 				mute        : mute,
 				createSound : createSound,
 				stopAll     : stopAll,
-				resumeAll   : resumeAll
+				resumeAll   : resumeAll,
+				loadBuffer  : loadBuffer
 			}
 		}
 
 		/*
-		 * public
+		 * Returns a audio context. Once a context has been created additional calls to this method return the same context instance.
+		 *
+		 * @param sound - the audio element
 		 */
+		var createAudioContext = function() {
+			if( context ) return context
+
+			context = new webkitAudioContext()
+
+			return createWrapperContext()
+		}
 
 		/*
 		 * Returns instance of audio class
 		 *
 		 * @param audioBuffer
 		 */
-		var createSound = function( audioBuffer ) {
+		var createSound = function( buffer ) {
 			return {
 				/*
 				 * Public
 				 */
-				duration : audioBuffer.duration,
+				duration : buffer.duration,
 
 				/*
 				 * Private
 				 *
 				 * This is an implementation detail of the class. If you write code that depends on this you better know what you are doing.
 				 */
-				privateAudioResource : audioBuffer
+				privateAudioResource : buffer
 			}
 		}
 

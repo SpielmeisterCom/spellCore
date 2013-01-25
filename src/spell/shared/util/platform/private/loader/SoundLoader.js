@@ -1,60 +1,45 @@
 define(
-	"spell/shared/util/platform/private/loader/SoundLoader",
+	'spell/shared/util/platform/private/loader/SoundLoader',
 	[
-		"spell/shared/util/platform/private/sound/SoundManager",
-		"spell/Events",
-
 		'spell/functions'
 	],
 	function(
-		SoundManager,
-		Events,
-
 		_
-		) {
-		"use strict"
+	) {
+		'use strict'
 
 		/*
 		 * private
 		 */
 
-		var onLoad = function( sound ) {
+		var onLoad = function( buffer ) {
 			if( this.loaded === true ) return
 			this.loaded = true
-			this.onLoadCallback( sound )
+
+			// TODO: free SoundLoader retained js objects
+
+			this.onLoadCallback( this.audioContext.createSound( buffer ) )
 		}
 
 		/*
 		 * public
 		 */
 
-		var SoundLoader = function( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-			this.resourcePath       = resourcePath
-			this.resourceName       = resourceName
-			this.onLoadCallback     = onLoadCallback
-			this.onErrorCallback    = onErrorCallback
-			this.loaded             = false
+		var SoundLoader = function( audioContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+			this.audioContext    = audioContext
+			this.resourcePath    = resourcePath
+			this.resourceName    = resourceName
+			this.onLoadCallback  = onLoadCallback
+			this.onErrorCallback = onErrorCallback
+			this.loaded          = false
 		}
 
 		SoundLoader.prototype = {
-			start: function() {
-				var src          = this.resourcePath + '/' + this.resourceName,
-					soundManager = new SoundManager(),
-					playableExt  = soundManager.detectExtension()
-				//TODO: refactor soundmanager
-
-				var parts = src.split( '.')
-				parts.pop()
-				parts.push( playableExt )
-
-				src = parts.join( '.' )
-
-				soundManager.createAudio({
-					id: src,
-					resource: src,
-					onloadeddata: _.bind( onLoad, this)
-				})
-
+			start : function() {
+				this.audioContext.loadBuffer(
+					this.resourcePath + '/' + this.resourceName,
+					_.bind( onLoad, this )
+				)
 			}
 		}
 

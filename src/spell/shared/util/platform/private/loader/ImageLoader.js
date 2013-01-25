@@ -1,7 +1,7 @@
 define(
-	"spell/shared/util/platform/private/loader/ImageLoader",
+	'spell/shared/util/platform/private/loader/ImageLoader',
 	[
-		"spell/Events",
+		'spell/Events',
 
 		'spell/functions'
 	],
@@ -10,7 +10,7 @@ define(
 
 		_
 	) {
-		"use strict"
+		'use strict'
 
 
 		/*
@@ -25,11 +25,10 @@ define(
 
 		var onLoad = function( image ) {
 			if( this.loaded === true ) return
-
 			this.loaded = true
 
 			free( image )
-			this.onLoadCallback( image )
+			this.onLoadCallback( this.renderingContext.createTexture( image ) )
 		}
 
 		var onError = function( image, event ) {
@@ -38,7 +37,7 @@ define(
 		}
 
 		var onReadyStateChange = function( image ) {
-			if( image.readyState === "complete" ) {
+			if( image.readyState === 'complete' ) {
 				image.onload( image )
 			}
 		}
@@ -48,12 +47,13 @@ define(
 		 * public
 		 */
 
-		var ImageLoader = function( resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-			this.resourcePath    = resourcePath
-			this.resourceName    = resourceName
-			this.onLoadCallback  = onLoadCallback
-			this.onErrorCallback = onErrorCallback
-			this.loaded          = false
+		var ImageLoader = function( renderingContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+			this.renderingContext = renderingContext
+			this.resourcePath     = resourcePath
+			this.resourceName     = resourceName
+			this.onLoadCallback   = onLoadCallback
+			this.onErrorCallback  = onErrorCallback
+			this.loaded           = false
 		}
 
 		ImageLoader.prototype = {
