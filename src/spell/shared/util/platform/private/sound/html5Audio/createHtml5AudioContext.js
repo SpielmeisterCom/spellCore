@@ -12,12 +12,14 @@ define(
 	) {
 		'use strict'
 
-		/*
-		 * private
-		 */
-		var audioElements  = {},
-			isMutedValue   = false,
-			soundIdCounter = 0
+
+		var audioElements = {},
+			isMutedValue  = false,
+			nextSoundId   = 0
+
+		var createSoundId = function() {
+			return nextSoundId++
+		}
 
 		var create = function( id, audioResource ) {
 			var audio
@@ -41,7 +43,13 @@ define(
 		}
 
 		var removeCallback = function() {
-			destroy( this )
+			this.removeEventListener( 'ended', removeCallback, false )
+			this.removeEventListener( 'ended', loopCallback, false )
+			this.pause()
+
+			console.log( 'destroying ' + this.id )
+
+			delete audioElements[ this.id ]
 		}
 
 		/**
@@ -53,7 +61,7 @@ define(
 		 */
 		var play = function( audioResource, id, volume, loop ) {
 			if( !id ) {
-				id = "tmp_sound_" + soundIdCounter++
+				id = createSoundId()
 			}
 
 			var audioElement
@@ -75,8 +83,6 @@ define(
 				mute( id )
 			}
 
-			console.log( audioElement )
-
 			audioElement.play()
 		}
 
@@ -96,7 +102,7 @@ define(
 			var audioElement = audioElements[ id ]
 			if( !audioElement ) return
 
-//			audioElement.currentTime = 0
+			audioElement.currentTime = 0
 			audioElement.pause()
 		}
 
@@ -110,8 +116,6 @@ define(
 		}
 
 		var setLoop = function( id, loop ) {
-			console.log( 'setLoop ' + id + ' -> ' + loop )
-
 			var audioElement = audioElements[ id ]
 			if( !audioElement ) return
 
@@ -146,20 +150,67 @@ define(
 			return isMutedValue
 		}
 
-		var destroy = function( audioElement ) {
-			audioElement.removeEventListener( 'ended', removeCallback, false )
-			audioElement.removeEventListener( 'ended', loopCallback, false )
-			audioElement.pause()
+		var tick = function() {}
 
-			console.log( 'destroying ' + audioElement.id )
+		var onError = function() {
+			throw 'Error: Could not load sound resource "' + this.src + '".'
+		}
 
-			delete audioElements[ audioElement.id ]
+		var loadBuffer = function( src, onLoadCallback ) {
+			if( !src ) {
+				throw 'Error: No src provided.'
+			}
 
-			console.log( '# audioElements: ' + _.size( audioElements ) )
+			if( !onLoadCallback ) {
+				throw 'Error: No onLoadCallback provided.'
+			}
+
+			var audioElement = new Audio()
+
+			var canPlayThroughCallback = function() {
+				this.removeEventListener( 'canplaythrough', canPlayThroughCallback, false )
+				this.removeEventListener( 'error', onError, false )
+
+				this.currentTime = 0
+				this.pause()
+
+				onLoadCallback( this )
+			}
+
+			audioElement.addEventListener( 'canplaythrough', canPlayThroughCallback, false )
+			audioElement.addEventListener( 'error', onError, false )
+
+			audioElement.playing = false
+			audioElement.src = createFixedSoundFileSrc( src )
+
+			// old WebKit
+			audioElement.autobuffer = 'auto'
+
+			// new WebKit
+			audioElement.preload = 'auto'
+			audioElement.load()
+			audioElement.play()
+			audioElement.volume = 0
+		}
+
+		var createSound = function( buffer ) {
+			return {
+				/*
+				 * Public
+				 */
+				duration : buffer.duration,
+
+				/*
+				 * Private
+				 *
+				 * This is an implementation detail of the class. If you write code that depends on this you better know what you are doing.
+				 */
+				privateAudioResource : buffer
+			}
 		}
 
 		/*
-		 * Returns a audio context. Once a context has been created additional calls to this method return the same context instance.
+		 * Returns an audio context. Once a context has been created additional calls to this method return the same instance.
 		 *
 		 * @param sound - the audio element
 		 */
@@ -171,52 +222,8 @@ define(
 			return createWrapperContext()
 		}
 
-		var tick = function() {}
-
-		var loadBuffer = function( src, onLoadCallback ) {
-			if( !src ) {
-				throw 'Error: No src provided.'
-			}
-
-			if( !onLoadCallback ) {
-				throw 'Error: No onLoadCallback provided.'
-			}
-
-			var audio = new Audio()
-
-			var canPlayThroughCallback = function() {
-				audio.removeEventListener( 'canplaythrough', canPlayThroughCallback, false )
-				audio.currentTime = 0
-				audio.pause()
-
-				onLoadCallback( audio )
-			}
-
-			audio.addEventListener( 'canplaythrough', canPlayThroughCallback, false )
-
-			audio.addEventListener(
-				'error',
-				function() {
-					throw 'Error: Could not load sound resource "' + audio.src + '".'
-				},
-				false
-			)
-
-			audio.playing = false
-			audio.src = createFixedSoundFileSrc( src )
-
-			// old WebKit
-			audio.autobuffer = 'auto'
-
-			// new WebKit
-			audio.preload = 'auto'
-			audio.load()
-			audio.play()
-			audio.volume = 0
-		}
-
 		/*
-		 * Creates a wrapper context from the backend context.
+		 * Creates a wrapper context for the back-end context.
 		 */
 		var createWrapperContext = function() {
 			return {
@@ -232,31 +239,6 @@ define(
 				stopAll     : stopAll,
 				resumeAll   : resumeAll,
 				loadBuffer  : loadBuffer
-			}
-		}
-
-		/*
-		 * public
-		 */
-
-		/*
-		 * Returns instance of audio class
-		 *
-		 * @param audio
-		 */
-		var createSound = function( buffer ) {
-			return {
-				/*
-				 * Public
-				 */
-				duration : buffer.duration,
-
-				/*
-				 * Private
-				 *
-				 * This is an implementation detail of the class. If you write code that depends on this you better know what you are doing.
-				 */
-				privateAudioResource : buffer
 			}
 		}
 

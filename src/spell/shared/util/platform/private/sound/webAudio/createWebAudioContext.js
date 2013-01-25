@@ -14,9 +14,13 @@ define(
 
 
 		var context,
-			sourcesNodes = {},
+			sourceNodes  = {},
 			isMutedValue = false,
-			soundCounter = 0
+			nextSoundId  = 0
+
+		var createSoundId = function() {
+			return nextSoundId++
+		}
 
 		var create = function( id, audioResource ) {
 			var gainNode   = context.createGainNode(),
@@ -27,7 +31,7 @@ define(
 			sourceNode.connect( gainNode )
 			gainNode.connect( context.destination )
 
-			sourcesNodes[id] = sourceNode
+			sourceNodes[ id ] = sourceNode
 			return sourceNode
 		}
 
@@ -39,12 +43,12 @@ define(
 		 * @param loop
 		 */
 		var play = function( audioResource, id, volume, loop ) {
-			id     = id ? id : 'tmp_sound_' + soundCounter++
+			id     = id ? id : createSoundId()
 			loop   = !!loop
 			volume = volume ? volume : 1
 
-			var sourceNode = _.has( sourcesNodes, id ) ?
-				sourcesNodes[ id ] :
+			var sourceNode = _.has( sourceNodes, id ) ?
+				sourceNodes[ id ] :
 				create( id, audioResource )
 
 			setLoop( id, loop )
@@ -58,52 +62,52 @@ define(
 		}
 
 		var stopAll = function() {
-			_.each( sourcesNodes, function( value, key ) {
+			_.each( sourceNodes, function( value, key ) {
 				mute( key )
 			} )
 		}
 
 		var resumeAll = function() {
-			_.each( sourcesNodes, function( value, key ) {
+			_.each( sourceNodes, function( value, key ) {
 				setVolume( key, 1 )
 			} )
 		}
 
 		var stop = function( id ) {
-			var sourceNode = sourcesNodes[ id ]
+			var sourceNode = sourceNodes[ id ]
 			if( sourceNode ) sourceNode.noteOff(0)
 		}
 
 		var setVolume = function ( id, volume ) {
 			volume = !isNaN( volume ) ? volume : 1
-			var sourceNode = sourcesNodes[ id ]
+			var sourceNode = sourceNodes[ id ]
 			if( sourceNode ) sourceNode.gain.value = volume
 		}
 
 		var setLoop = function( id, loop ) {
 			loop = !!loop
-			var sourceNode = sourcesNodes[ id ]
+			var sourceNode = sourceNodes[ id ]
 			if( sourceNode ) sourceNode.loop = loop
 		}
 
 		var mute = function( id ) {
-			var sourceNode = sourcesNodes[ id ]
+			var sourceNode = sourceNodes[ id ]
 			if( sourceNode ) sourceNode.gain.value = 0
 		}
 
 		var destroy = function( id ) {
 			stop( id )
 
-			sourcesNodes[ id ] = null
-			delete sourcesNodes[ id ]
+			sourceNodes[ id ] = null
+			delete sourceNodes[ id ]
 		}
 
 		/**
-		 * Looks through the sourcesNodes and cleans up finished nodes
+		 * Looks through the sourceNodes and cleans up finished nodes
 		 */
 		var tick = function() {
-			for( var id in sourcesNodes ) {
-				var sourceNode = sourcesNodes[ id ]
+			for( var id in sourceNodes ) {
+				var sourceNode = sourceNodes[ id ]
 
 				if( sourceNode.playbackState === sourceNode.FINISHED_STATE ) {
 					destroy( id )
@@ -113,11 +117,11 @@ define(
 
 		var setMute = function( isMute ) {
 			if( isMute === true ) {
-				_.each( sourcesNodes, function( value, key ) {
+				_.each( sourceNodes, function( value, key ) {
 					mute( key )
 				} )
 			} else {
-				_.each( sourcesNodes, function( value, key ) {
+				_.each( sourceNodes, function( value, key ) {
 					setVolume( key, 1 )
 				} )
 			}
