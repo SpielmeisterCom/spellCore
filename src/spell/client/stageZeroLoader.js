@@ -175,7 +175,11 @@ if( !window.console ) {
 			}
 
 			if( !config.audioBackEnd ) {
-				config.audioBackEnd = isWebAudioSupported() ? 'webAudio' : 'html5Audio'
+				config.audioBackEnd = isWebAudioSupported() ?
+					'web' :
+					isHtml5AudioSupported() ?
+						'html5' :
+						'dummy'
 			}
 		}
 

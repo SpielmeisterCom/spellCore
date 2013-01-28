@@ -81,6 +81,8 @@ define(
 				configurationManager.getValue( 'audioBackEnd' )
 			)
 
+			spell.logger.debug( 'created audio context (' + audioContext.getConfiguration().type + ')' )
+
 			var storage = PlatformKit.createPersistentStorage()
 
 			var libraryManager = new LibraryManager(

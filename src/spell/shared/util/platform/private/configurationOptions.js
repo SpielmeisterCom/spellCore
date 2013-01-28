@@ -12,22 +12,25 @@ define(
 
 
 		var extractRenderingBackEnd = function( validValues, value ) {
-			if( value === 'webgl' ) {
-				return RenderingFactory.BACK_END_WEBGL
-
-			} else if( value === 'canvas-2d' ) {
+			if( value === 'canvas-2d' ) {
 				return RenderingFactory.BACK_END_CANVAS
+
+			} else if( value === 'webgl' ) {
+				return RenderingFactory.BACK_END_WEBGL
 			}
 
 			return false
 		}
 
 		var extractAudioBackEnd = function( validValues, value ) {
-			if( value === 'webAudio' ) {
-				return AudioFactory.BACK_END_WEB_AUDIO
+			if( value === 'dummy' ) {
+				return AudioFactory.BACK_END_DUMMY_AUDIO
 
-			} else if( value === 'html5Audio' ) {
+			} else if( value === 'html5' ) {
 				return AudioFactory.BACK_END_HTML5_AUDIO
+
+			} else if( value === 'web' ) {
+				return AudioFactory.BACK_END_WEB_AUDIO
 			}
 
 			return false
@@ -38,12 +41,12 @@ define(
 		 */
 		var validOptions = {
 			renderingBackEnd : {
-				validValues  : [ 'webgl', 'canvas-2d' ],
+				validValues  : [ 'canvas-2d', 'webgl' ],
 				configurable : true,
 				extractor    : extractRenderingBackEnd
 			},
 			audioBackEnd : {
-				validValues  : [ 'webAudio', 'html5Audio' ],
+				validValues  : [ 'dummy', 'html5', 'web' ],
 				configurable : true,
 				extractor    : extractAudioBackEnd
 			},
@@ -57,7 +60,7 @@ define(
 		 */
 		var defaultOptions = {
 			renderingBackEnd : 'canvas-2d',
-			audioBackEnd : 'html5Audio',
+			audioBackEnd : 'html5',
 			baseUrlPrefix : ''
 		}
 

@@ -227,18 +227,19 @@ define(
 		 */
 		var createWrapperContext = function() {
 			return {
-				tick        : tick,
-				play        : play,
-				setLoop     : setLoop,
-				setVolume   : setVolume,
-				setAllMuted : setMute,
-				isAllMuted  : isMuted,
-				stop        : stop,
-				mute        : mute,
-				createSound : createSound,
-				stopAll     : stopAll,
-				resumeAll   : resumeAll,
-				loadBuffer  : loadBuffer
+				tick             : tick,
+				play             : play,
+				setLoop          : setLoop,
+				setVolume        : setVolume,
+				setAllMuted      : setMute,
+				isAllMuted       : isMuted,
+				stop             : stop,
+				mute             : mute,
+				createSound      : createSound,
+				stopAll          : stopAll,
+				resumeAll        : resumeAll,
+				loadBuffer       : loadBuffer,
+				getConfiguration : function() { return { type : 'html5' } }
 			}
 		}
 
