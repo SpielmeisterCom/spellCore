@@ -1,14 +1,10 @@
 define(
 	'spell/shared/util/platform/private/sound/html5Audio/createHtml5AudioContext',
 	[
-		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
-
-		'spell/functions'
+		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc'
 	],
 	function(
-		createFixedSoundFileSrc,
-
-		_
+		createFixedSoundFileSrc
 	) {
 		'use strict'
 
@@ -37,17 +33,21 @@ define(
 			return audio
 		}
 
-		var loopCallback = function() {
-			this.currentTime = 0
-			this.play()
+		var loopCallback = function( event ) {
+			var currentTarget = event.currentTarget
+
+			currentTarget.currentTime = 0
+			currentTarget.play()
 		}
 
-		var removeCallback = function() {
-			this.removeEventListener( 'ended', removeCallback, false )
-			this.removeEventListener( 'ended', loopCallback, false )
-			this.pause()
+		var removeCallback = function( event ) {
+			var currentTarget = event.currentTarget
 
-			delete audioElements[ this.id ]
+			currentTarget.removeEventListener( 'ended', removeCallback, true )
+			currentTarget.removeEventListener( 'ended', loopCallback, true )
+			currentTarget.pause()
+
+			delete audioElements[ currentTarget.id ]
 		}
 
 		/**
@@ -118,12 +118,12 @@ define(
 			audioElement.loop = loop
 
 			if( loop ) {
-				audioElement.addEventListener( 'ended', loopCallback, false )
-				audioElement.removeEventListener( 'ended', removeCallback, false )
+				audioElement.addEventListener( 'ended', loopCallback, true )
+				audioElement.removeEventListener( 'ended', removeCallback, true )
 
 			} else {
-				audioElement.addEventListener( 'ended', removeCallback, false )
-				audioElement.removeEventListener( 'ended', loopCallback, false )
+				audioElement.addEventListener( 'ended', removeCallback, true )
+				audioElement.removeEventListener( 'ended', loopCallback, true )
 			}
 		}
 
@@ -148,8 +148,8 @@ define(
 
 		var tick = function() {}
 
-		var onError = function() {
-			throw 'Error: Could not load sound resource "' + this.src + '".'
+		var onError = function( event ) {
+			throw 'Error: Could not load sound resource "' + event.currentTarget.src + '".'
 		}
 
 		var loadBuffer = function( src, onLoadCallback ) {
@@ -163,18 +163,20 @@ define(
 
 			var audioElement = new Audio()
 
-			var canPlayThroughCallback = function() {
-				this.removeEventListener( 'canplaythrough', canPlayThroughCallback, false )
-				this.removeEventListener( 'error', onError, false )
+			var canPlayThroughCallback = function( event ) {
+				var currentTarget = event.currentTarget
 
-				this.currentTime = 0
-				this.pause()
+				currentTarget.removeEventListener( 'canplaythrough', canPlayThroughCallback, true )
+				currentTarget.removeEventListener( 'error', onError, true )
 
-				onLoadCallback( this )
+				currentTarget.currentTime = 0
+				currentTarget.pause()
+
+				onLoadCallback( currentTarget )
 			}
 
-			audioElement.addEventListener( 'canplaythrough', canPlayThroughCallback, false )
-			audioElement.addEventListener( 'error', onError, false )
+			audioElement.addEventListener( 'canplaythrough', canPlayThroughCallback, true )
+			audioElement.addEventListener( 'error', onError, true )
 
 			audioElement.playing = false
 			audioElement.src = createFixedSoundFileSrc( src )
