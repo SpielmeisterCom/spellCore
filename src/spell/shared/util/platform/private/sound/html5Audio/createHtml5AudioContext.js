@@ -1,10 +1,14 @@
 define(
 	'spell/shared/util/platform/private/sound/html5Audio/createHtml5AudioContext',
 	[
-		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc'
+		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
+
+		'spell/functions'
 	],
 	function(
-		createFixedSoundFileSrc
+		createFixedSoundFileSrc,
+
+		_
 	) {
 		'use strict'
 
@@ -33,21 +37,17 @@ define(
 			return audio
 		}
 
-		var loopCallback = function( event ) {
-			var currentTarget = event.currentTarget
-
-			currentTarget.currentTime = 0
-			currentTarget.play()
+		var loopCallback = function() {
+			this.currentTime = 0
+			this.play()
 		}
 
-		var removeCallback = function( event ) {
-			var currentTarget = event.currentTarget
+		var removeCallback = function() {
+			this.removeEventListener( 'ended', removeCallback, true )
+			this.removeEventListener( 'ended', loopCallback, true )
+			this.pause()
 
-			currentTarget.removeEventListener( 'ended', removeCallback, true )
-			currentTarget.removeEventListener( 'ended', loopCallback, true )
-			currentTarget.pause()
-
-			delete audioElements[ currentTarget.id ]
+			delete audioElements[ this.id ]
 		}
 
 		/**
@@ -163,16 +163,14 @@ define(
 
 			var audioElement = new Audio()
 
-			var canPlayThroughCallback = function( event ) {
-				var currentTarget = event.currentTarget
+			var canPlayThroughCallback = function() {
+				audioElement.removeEventListener( 'canplaythrough', canPlayThroughCallback, true )
+				audioElement.removeEventListener( 'error', onError, true )
 
-				currentTarget.removeEventListener( 'canplaythrough', canPlayThroughCallback, true )
-				currentTarget.removeEventListener( 'error', onError, true )
+				audioElement.currentTime = 0
+				audioElement.pause()
 
-				currentTarget.currentTime = 0
-				currentTarget.pause()
-
-				onLoadCallback( currentTarget )
+				onLoadCallback( audioElement )
 			}
 
 			audioElement.addEventListener( 'canplaythrough', canPlayThroughCallback, true )
