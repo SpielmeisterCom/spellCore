@@ -24,13 +24,13 @@ define(
 		var create = function( id, audioResource ) {
 			var audio
 
-//			if( audioResource.privateAudioResource.cloneNode ) {
-//				audio = audioResource.privateAudioResource.cloneNode( true )
-//
-//			} else {
+			if( audioResource.privateAudioResource.cloneNode ) {
+				audio = audioResource.privateAudioResource.cloneNode( true )
+
+			} else {
 				audio = new Audio()
 				audio.src = audioResource.privateAudioResource.src
-//			}
+			}
 
 			audio.id = id
 
