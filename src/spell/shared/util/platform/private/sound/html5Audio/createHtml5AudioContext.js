@@ -47,8 +47,6 @@ define(
 			this.removeEventListener( 'ended', loopCallback, false )
 			this.pause()
 
-			console.log( 'destroying ' + this.id )
-
 			delete audioElements[ this.id ]
 		}
 
@@ -73,8 +71,6 @@ define(
 				audioElement = create( id, audioResource )
 				audioElements[ id ] = audioElement
 			}
-
-			console.log( 'created ' + audioElement.id )
 
 			setLoop( id, loop )
 			setVolume( id, volume )
