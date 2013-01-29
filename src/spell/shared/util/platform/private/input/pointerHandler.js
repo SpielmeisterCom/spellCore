@@ -80,10 +80,17 @@
 define(
 	'spell/shared/util/platform/private/input/pointerHandler',
 	[
+		'spell/shared/util/platform/private/input/supportedPointerApi',
+
 		'spell/functions'
 	],
-	function( _ ) {
-		"use strict";
+	function(
+		supportedPointerApi,
+
+		_
+	) {
+		'use strict'
+
 
 		var nativeHandler = null
 		var registeredEvents = [ ]
@@ -106,10 +113,6 @@ define(
 			'mousemove'         : 'pointerMove',
 			'mousedown'         : 'pointerDown',
 			'mouseup'           : 'pointerUp'
-		}
-
-		var hasTouchSupport = function() {
-			return ( 'ontouchstart' in window ) || ( window.DocumentTouch && document instanceof DocumentTouch ) || typeof(ejecta) !== 'undefined'
 		}
 
 		var emitSpellPointerEvent = function( callback, eventType, pointerId, button, positionX, positionY ) {
@@ -201,25 +204,26 @@ define(
 		}
 
 		var registerListener = function( el, container, configurationManager, callback ) {
-			if ( window.navigator.pointerEnabled ) {
+			if( supportedPointerApi.hasPointerApi() ) {
 				nativeHandler = _.bind( nativePointerHandlerImpl, this, callback, eventMappings, container, configurationManager )
 				registeredEvents = [
 					'pointermove', 'pointerup', 'pointerdown', 'pointercancel'
 				]
 
-			} else if ( window.navigator.msPointerEnabled ) {
+			} else if( supportedPointerApi.hasMicrosoftPointerApi() ) {
 				nativeHandler = _.bind( nativePointerHandlerImpl, this, callback, eventMappings, container, configurationManager )
 				registeredEvents = [
 					'MSPointerMove', 'MSPointerUp', 'MSPointerDown', 'MSPointerCancel'
 				]
 
-			} else if ( hasTouchSupport() ) {
+			} else if( supportedPointerApi.hasWebkitTouchApi() ) {
 				nativeHandler = _.bind( nativeTouchHandlerImpl, this, callback, eventMappings, container, configurationManager )
 				registeredEvents = [
 					'touchstart', 'touchmove', 'touchend', 'touchcancel'
 				]
 
 			} else {
+				// use generic mouse events as input source
 				nativeHandler = _.bind( nativePointerHandlerImpl, this, callback, eventMappings, container, configurationManager )
 				registeredEvents = [
 					'mousemove', 'mousedown', 'mouseup'
