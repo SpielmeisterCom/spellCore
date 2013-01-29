@@ -11,9 +11,9 @@ define(
 
 		return {
 			hasTouchSupport : function() {
-				return supportedPointerApi.hasPointerApi() ||
-					supportedPointerApi.hasMicrosoftPointerApi() ||
-					supportedPointerApi.hasWebkitTouchApi()
+				return supportedPointerApi.hasWebkitTouchApi() ||
+                       supportedPointerApi.hasPointerTouchApi()
+
 			}
 		}
 	}
