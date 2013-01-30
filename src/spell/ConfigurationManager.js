@@ -232,16 +232,26 @@ define(
 				_.bind(
 					function( availableScreenSize ) {
 						var screenMode           = this.config.screenMode || 'fixed',
-							aspectRatioOverwrite = this.config.debug && this.config.screenAspectRatio
+							aspectRatioOverwrite = this.config.debug && this.config.screenAspectRatio,
+							screenSize           = this.config.screenSize
 
 						if( aspectRatioOverwrite ) {
 							this.config.currentScreenSize = createScreenSize( availableScreenSize, this.config.screenAspectRatio )
 
 						} else if( screenMode === 'fit' ) {
-							this.config.currentScreenSize = createScreenSize( availableScreenSize, availableScreenSize[ 0 ] / availableScreenSize[ 1 ] )
+							// set the screen size up to the limits provided by the "screenSize" configuration option
+							var clampedAvailableScreenSize = [
+								mathUtil.clamp( availableScreenSize[ 0 ], 0, screenSize[ 0 ] ),
+								mathUtil.clamp( availableScreenSize[ 1 ], 0, screenSize[ 1 ] )
+							]
+
+							this.config.currentScreenSize = createScreenSize(
+								clampedAvailableScreenSize,
+								screenSize[ 0 ] / screenSize[ 1 ]
+							)
 
 						} else if( screenMode === 'fixed' ) {
-							this.config.currentScreenSize = this.config.screenSize
+							this.config.currentScreenSize = screenSize
 
 						} else {
 							throw 'Error: Screen mode \'' + screenMode + '\' is not supported.'
