@@ -1,14 +1,10 @@
 define(
 	'spell/shared/util/platform/private/sound/html5Audio/createHtml5AudioContext',
 	[
-		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
-
-		'spell/functions'
+		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc'
 	],
 	function(
-		createFixedSoundFileSrc,
-
-		_
+		createFixedSoundFileSrc
 	) {
 		'use strict'
 
@@ -164,13 +160,13 @@ define(
 			var audioElement = new Audio()
 
 			var canPlayThroughCallback = function() {
-				audioElement.removeEventListener( 'canplaythrough', canPlayThroughCallback, true )
-				audioElement.removeEventListener( 'error', onError, true )
+				this.removeEventListener( 'canplaythrough', canPlayThroughCallback, true )
+				this.removeEventListener( 'error', onError, true )
 
-				audioElement.currentTime = 0
-				audioElement.pause()
+				this.currentTime = 0
+				this.pause()
 
-				onLoadCallback( audioElement )
+				onLoadCallback( this )
 			}
 
 			audioElement.addEventListener( 'canplaythrough', canPlayThroughCallback, true )
