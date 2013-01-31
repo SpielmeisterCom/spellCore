@@ -809,15 +809,15 @@ define(
 			 * Returns an array of ids of entities which have the requested name.
 			 *
 			 * @param {String} name the name of the entity
-			 * @param {String} entityId the scope of the search is limited to this entity and its descendants
+			 * @param {String} scopeEntityId the scope of the search is limited to this entity and its descendants
 			 * @return {Array}
 			 */
-			getEntityIdsByName : function( name, entityId ) {
+			getEntityIdsByName : function( name, scopeEntityId ) {
 				var metaDataComponents = this.componentMaps[ METADATA_COMPONENT_ID ],
 					resultIds          = []
 
-				var ids = entityId ?
-					getEntityCompositeIds( this.componentMaps[ CHILDREN_COMPONENT_ID ], entityId, [] ) :
+				var ids = scopeEntityId ?
+					getEntityCompositeIds( this.componentMaps[ CHILDREN_COMPONENT_ID ], scopeEntityId, [] ) :
 					_.keys( metaDataComponents )
 
 				for( var i = 0, numIds = ids.length; i < numIds; i++ ) {
@@ -838,7 +838,7 @@ define(
 			 * @return {Object}
 			 */
 			getEntitiesByName : function( name ) {
-				var ids = this.getEntityIdsByName( name )
+				var ids = this.getEntityIdsByName( name, undefined )
 
 				var entities = {}
 
@@ -978,12 +978,12 @@ define(
 			 *
 			 * @param {String} componentId the requested component id
 			 * @param {String} name the requested entity name
-			 * @param {String} entityId the scope of the search is limited to this entity and its descendants
+			 * @param {String} scopeEntityId the scope of the search is limited to this entity and its descendants
 			 * @return {Object}
 			 */
-			getComponentsByName : function( componentId, name, entityId ) {
+			getComponentsByName : function( componentId, name, scopeEntityId ) {
 				var componentMap = this.getComponentMapById( componentId ),
-					ids          = this.getEntityIdsByName( name, entityId )
+					ids          = this.getEntityIdsByName( name, scopeEntityId )
 
 				if( ids.length === 0 ||
 					!componentMap ) {
