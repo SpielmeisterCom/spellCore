@@ -943,6 +943,7 @@ define(
 
 				addComponents(
 					this.componentMaps,
+					this.eventManager,
 					entityId,
 					this.templateManager.createComponents( null, componentConfigs )
 				)
