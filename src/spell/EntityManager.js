@@ -876,6 +876,9 @@ define(
 					for( var entityId in components ) {
 						removeComponents( eventManager, componentMaps, entityId )
 					}
+
+					// explicitly resetting component map for good measure
+					componentMaps[ componentId ] = {}
 				}
 
                 this.spatialIndex = new QuadTree( this.configurationManager.getValue( 'quadTreeSize' ) )
