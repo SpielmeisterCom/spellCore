@@ -9,8 +9,8 @@ define(
 		'use strict'
 
 
-		var createGetParameters = function( parameters ) {
-			return '?' + _.map(
+		var createParameters = function( parameters ) {
+			return _.map(
 				parameters,
 				function( value, key ) {
 					return key + '=' + encodeURIComponent( value )
@@ -22,7 +22,7 @@ define(
 			var request = new XMLHttpRequest()
 
 			if( method == 'GET' ) {
-				url += createGetParameters( parameters )
+				url += '?' + createParameters( parameters )
 			}
 
 			if( 'withCredentials' in request ) {
@@ -84,7 +84,13 @@ define(
 
 			var request = createCorsRequest( method, url, onLoad, onError, parameters )
 
-			request.send( method === 'POST' ? parameters : null )
+			if( method === 'POST' ) {
+				request.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' )
+				request.send( createParameters( parameters ) )
+
+			} else {
+				request.send()
+			}
 		}
 
 		return performHttpRequest
