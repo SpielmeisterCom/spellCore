@@ -122,11 +122,12 @@ define(
 
 
 		return function( spell, sceneId, next, progressCallback ) {
-			var assetManager    = spell.assetManager,
-				eventManager    = spell.eventManager,
-				libraryManager  = spell.libraryManager,
-				resources       = spell.resources,
-				templateManager = spell.templateManager
+			var assetManager         = spell.assetManager,
+				configurationManager = spell.configurationManager,
+				eventManager         = spell.eventManager,
+				libraryManager       = spell.libraryManager,
+				resources            = spell.resources,
+				templateManager      = spell.templateManager
 
 			var libraryBundleName  = sceneId + '-library',
 				resourceBundleName = sceneId + '-resources'
@@ -156,7 +157,7 @@ define(
 						updateAssets( assetManager, library.asset )
 
 						libraryManager.load(
-							createFilesToLoad( library.asset ),
+							createFilesToLoad( configurationManager, library.asset ),
 							{
 								name : resourceBundleName,
 								isMetaDataLoad : false

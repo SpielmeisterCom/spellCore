@@ -35,11 +35,12 @@ define(
 		}
 
 		return function( spell, payload ) {
-			var assetManager    = spell.assetManager,
-				definition      = payload.definition,
-				id              = createId( definition.namespace, definition.name ),
-				assetId         = createAssetId( definition.subtype, id ),
-				libraryFilePath = createLibraryFilePathFromId( id )
+			var assetManager         = spell.assetManager,
+				configurationManager = spell.configurationManager,
+				definition           = payload.definition,
+				id                   = createId( definition.namespace, definition.name ),
+				assetId              = createAssetId( definition.subtype, id ),
+				libraryFilePath      = createLibraryFilePathFromId( id )
 
 			var loadedAssets = {}
 
@@ -51,7 +52,7 @@ define(
 			var asset = assetManager.get( assetId )
 
 			if( asset && asset.resourceId ) {
-				var filesToLoad = createFilesToLoad( loadedAssets )
+				var filesToLoad = createFilesToLoad( configurationManager, loadedAssets )
 
 				if( filesToLoad.length > 0 ) {
 					// when an asset references an external resource trigger loading it

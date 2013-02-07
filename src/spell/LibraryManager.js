@@ -47,7 +47,12 @@ define(
 
 		var getLoaderFactory = function( resourceTypeToLoaderFactory, type, libraryPath ) {
 			if( type === 'auto' ) {
-				type = _.last( libraryPath.split( '.' ) )
+				if( _.isObject( libraryPath ) ) {
+					type = _.last( libraryPath.libraryPath.split( '.' ) )
+
+				} else {
+					type = _.last( libraryPath.split( '.' ) )
+				}
 			}
 
 			return resourceTypeToLoaderFactory[ type ]
@@ -81,8 +86,22 @@ define(
 			)
 
 			if( loadingProcess.numCompleted === numLibraryPaths ) {
-				var loadedLibraryRecords = _.pick( cache, libraryPaths ),
-					onLoadingCompleted   = loadingProcess.onLoadingCompleted
+				var loadedLibraryRecords = _.reduce(
+					libraryPaths,
+					function( memo, value ) {
+						if( _.isObject( value ) ) {
+							memo[ value.libraryPath ] = cache[ value.libraryPath ]
+
+						} else {
+							memo[ value ] = cache[ value ]
+						}
+
+						return memo
+					},
+					{}
+				)
+
+				var onLoadingCompleted   = loadingProcess.onLoadingCompleted
 
 				if( onLoadingCompleted ) {
 					onLoadingCompleted( loadedLibraryRecords )
@@ -122,7 +141,16 @@ define(
 				libraryPaths = loadingProcess.libraryPaths
 
 			for( var i = 0, n = libraryPaths.length; i < n; i++ ) {
-				var libraryPath = libraryPaths[ i ]
+				var libraryPath = libraryPaths[ i ],
+					libraryPathUrlUsedForLoading
+
+				if( _.isObject( libraryPath ) ) {
+					libraryPath = libraryPaths[ i ].libraryPath
+					libraryPathUrlUsedForLoading = libraryPaths[ i ].libraryPathUrlUsedForLoading
+
+				} else {
+					libraryPathUrlUsedForLoading = libraryPath
+				}
 
 				if( !omitCache ) {
 					var cachedEntry = cache[ libraryPath ]
@@ -142,7 +170,7 @@ define(
 
 				var loader = loaderFactory(
 					loadingProcess.baseUrl,
-					libraryPath,
+					libraryPathUrlUsedForLoading,
 					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
 					_.bind( onErrorCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
 					_.bind( onTimedOutCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath )
@@ -201,6 +229,8 @@ define(
 			},
 
 			load : function( libraryPaths, config ) {
+				// TODO: work on a list of assets/libraryRecords and call their getLibraryResourcePaths() methods to determine
+				// the required resources instead of a list of libraryPaths
 				if( libraryPaths.length === 0 ) {
 					throw 'Error: No library paths provided.'
 				}

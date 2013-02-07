@@ -13,14 +13,32 @@ define(
 		'use strict'
 
 
-		return function( assets ) {
+		return function( configurationManager, assets ) {
+			var currentLanguage = configurationManager.getValue( 'currentLanguage' )
+
 			return _.unique(
 				_.reduce(
 					assets,
 					function( memo, asset ) {
-						return asset.file ?
-							memo.concat( createLibraryFilePath( asset.namespace, asset.file ) ) :
-							memo
+						if( !asset.file ) return memo
+
+						var libraryFilePath
+
+						if( !asset.localized ) {
+							libraryFilePath = createLibraryFilePath( asset.namespace, asset.file )
+
+						} else {
+							var fileName          = asset.file,
+								fileExtension     = fileName.substr( fileName.lastIndexOf( '.' ) + 1 ),
+								localizedFileName = asset.name + '.' + currentLanguage + '.' + fileExtension
+
+							libraryFilePath = {
+								libraryPath : createLibraryFilePath( asset.namespace, asset.file ),
+								libraryPathUrlUsedForLoading : createLibraryFilePath( asset.namespace, localizedFileName )
+							}
+						}
+
+						return memo.concat( libraryFilePath )
 					},
 					[]
 				)
