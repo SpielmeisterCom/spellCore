@@ -122,6 +122,9 @@ define(
 			},
 			quadTreeSize : {
 				configurable : true
+			},
+			projectId : {
+				configurable : true
 			}
 		}
 
@@ -135,6 +138,7 @@ define(
 			quadTreeSize      : 1048576, // 2^20
 			gameServer        : 'internal',
 			resourceServer    : 'internal',
+			projectId         : '',
 			id                : 'spell' // dom node id
 		}
 
