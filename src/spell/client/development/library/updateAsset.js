@@ -50,7 +50,7 @@ define(
 
 			var asset = assetManager.get( assetId )
 
-			if( asset.resourceId ) {
+			if( asset && asset.resourceId ) {
 				var filesToLoad = createFilesToLoad( loadedAssets )
 
 				if( filesToLoad.length > 0 ) {
@@ -64,9 +64,9 @@ define(
 						}
 					)
 				}
-			}
 
-			updateResourcesAndAssets( spell, assetId, asset )
+				updateResourcesAndAssets( spell, assetId, asset )
+			}
 
 			spell.eventManager.publish(
 				[ Events.ASSET_UPDATED, definition.subtype ],
