@@ -13,7 +13,6 @@
 		{
 			"name": "translationAssetId",
 			"type": "assetId:translation",
-			"default": "translation:spell.Translate",
 			"doc": "the translation asset used for translation"
 		},
 		{
@@ -32,13 +31,19 @@
 				]
 			},
 			"default": "left",
-			"doc": "the text align that is used"
+			"doc": "the alignment that is used"
 		},
 		{
 			"name": "text",
 			"type": "string",
 			"default": "blank",
-			"doc": "the text string that is displayed"
+			"doc": "the text string that is used for looking up the translation text"
+		},
+		{
+			"name": "renderText",
+			"type": "string",
+			"engineInternal": true,
+			"doc": "the text string that is used for rendering"
 		}
 	],
 	"version": 1

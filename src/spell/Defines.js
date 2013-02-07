@@ -14,6 +14,7 @@ define(
 			APPEARANCE_TRANSFORM_COMPONENT_ID         : 'spell.component.2d.graphics.appearanceTransform',
 			CAMERA_COMPONENT_ID                       : 'spell.component.2d.graphics.camera',
 			STATIC_APPEARANCE_COMPONENT_ID            : 'spell.component.2d.graphics.appearance',
+			TEXT_APPEARANCE_COMPONENT_ID              : 'spell.component.2d.graphics.textAppearance',
 			ANIMATED_APPEARANCE_COMPONENT_ID          : 'spell.component.2d.graphics.animatedAppearance',
 			QUAD_GEOMETRY_COMPONENT_ID                : 'spell.component.2d.graphics.geometry.quad',
 			TILEMAP_COMPONENT_ID                      : 'spell.component.2d.graphics.tilemap',

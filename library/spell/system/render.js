@@ -11,6 +11,7 @@ define(
 		'spell/client/2d/graphics/drawTitleSafeOutline',
 		'spell/client/util/createComprisedRectangle',
 		'spell/client/util/createIncludedRectangle',
+		'spell/shared/util/createLibraryFilePathFromId',
 		'spell/Defines',
 		'spell/Events',
 		'spell/shared/util/platform/PlatformKit',
@@ -32,6 +33,7 @@ define(
 		drawTitleSafeOutline,
 		createComprisedRectangle,
 		createIncludedRectangle,
+		createLibraryFilePathFromId,
 		Defines,
 		Events,
 		PlatformKit,
@@ -57,6 +59,22 @@ define(
 
 //		var statisticsManager,
 //			performance = window.performance
+
+		var translateTextAppearance = function( libraryManager, currentLanguage, textAppearance ) {
+			var translationAssetId = textAppearance.translationAssetId
+			if( !translationAssetId ) return
+
+			var translation = libraryManager.get( createLibraryFilePathFromId( translationAssetId ) )
+			if( !translation ) return
+
+			var translatedText = translation.config[ textAppearance.text ]
+			if( !translatedText ) return
+
+			var text = translatedText[ currentLanguage ]
+			if( !text ) return
+
+			textAppearance.renderText = text
+		}
 
 		var layerCompareFunction = function( a, b ) {
 			return a.layer - b.layer
@@ -302,7 +320,16 @@ define(
 //							var start = performance.now()
 
 							// text appearance
-							drawText( context, asset, texture, 0.0, 0.0, appearance.text, appearance.spacing, appearance.align )
+							drawText(
+								context,
+								asset,
+								texture,
+								0.0,
+								0.0,
+								appearance.renderText || appearance.text,
+								appearance.spacing,
+								appearance.align
+							)
 
 //							var elapsed = performance.now() - start
 
@@ -524,6 +551,17 @@ define(
 			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 
 
+			// HACK: textAppearances should get translated when they are created or when the current language is changed
+			this.translateTextAppearanceHandler = _.bind(
+				translateTextAppearance,
+				null,
+				spell.libraryManager,
+				spell.configurationManager.getValue( 'currentLanguage' )
+			)
+
+			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
+
+
 //			statisticsManager = spell.statisticsManager
 //
 //			statisticsManager.addNode( 'compiling entity list', 'spell.system.render' )
@@ -540,6 +578,7 @@ define(
 			eventManager.unsubscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
 			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 			eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
 
 			this.context.clear()
 		}
