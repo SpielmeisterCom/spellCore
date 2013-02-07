@@ -16,6 +16,14 @@ define(
 		) {
 		'use strict'
 
+		var getBrowser = function() {
+			var N= navigator.appName, ua= navigator.userAgent, tem;
+			var M= ua.match(/(opera|chrome|safari|firefox|msie)\/?\s*(\.?\d+(\.\d+)*)/i);
+			if(M && (tem= ua.match(/version\/([\.\d]+)/i))!= null) M[2]= tem[1];
+			M= M? [M[1], M[2]]: [N, navigator.appVersion, '-?'];
+
+			return M;
+		}
 
 		var initData = function( spell, sceneConfig ) {
 			var storage   = spell.storage,
@@ -26,11 +34,18 @@ define(
 			storage.set( 'clientId', clientId )
 
 			return {
-				UUID      : clientId,
+				screenHeight    : screen.height,
+				screenWidth     : screen.width,
+				screenColorDepth: screen.colorDepth,
+				renderingBackEnd: '',
+				uuid      : clientId,
 				scene_id  : sceneId,
-				project_id: projectId,
+				projectId : projectId,
 				platform  : navigator.platform,
-				user_agent: navigator.userAgent
+				browser   : getBrowser()[0],
+				browserVersion : getBrowser()[1],
+				userAgent : navigator.userAgent,
+				language  : navigator.language || navigator.browserLanguage
 			}
 		}
 
