@@ -153,6 +153,12 @@ if( !window.console ) {
 		return swfobject.hasFlashPlayerVersion( MIN_FLASH_PLAYER_VERSION )
 	}
 
+	var detectBrowserLanguage = function() {
+		var language = navigator.language || navigator.userLanguage
+
+		return language.split( "-" ).shift().toLowerCase()
+	}
+
 	var setDefaults = function( config ) {
 		if( !config.id ) {
 			config.id = 'spell'
@@ -189,6 +195,10 @@ if( !window.console ) {
 
 		if( !config.mode ) {
 			config.mode = MODE.DEPLOYED
+		}
+
+		if( !config.currentLanguage ) {
+			config.currentLanguage = detectBrowserLanguage()
 		}
 	}
 
