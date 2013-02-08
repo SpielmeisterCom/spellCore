@@ -154,7 +154,7 @@ if( !window.console ) {
 	}
 
 	var detectBrowserLanguage = function() {
-		var language = navigator.language || navigator.userLanguage
+		var language = navigator.language || navigator.userLanguage || ""
 
 		return language.split( "-" ).shift().toLowerCase()
 	}
