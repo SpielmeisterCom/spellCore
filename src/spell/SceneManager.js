@@ -119,7 +119,8 @@ define(
 										startSceneId : startSceneId,
 										initialConfig : initialConfig
 									}
-								)
+								),
+								onProgress
 							)
 
 						} else {
