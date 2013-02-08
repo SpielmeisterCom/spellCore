@@ -11,7 +11,7 @@ define(
 		sendLogRequest,
 		UUID,
 		createId
-		) {
+	) {
 		'use strict'
 
 
@@ -22,25 +22,24 @@ define(
 				storage              = spell.storage,
 				configurationManager = spell.configurationManager,
 				sceneId              = createId( sceneConfig.namespace, sceneConfig.name ),
-				clientId             = !storage.get( 'clientId' ) ? UUID.generate() : storage.get( 'clientId' ),
-				runtime              = platformDetails.getRuntime()
+				clientId             = !storage.get( 'clientId' ) ? UUID.generate() : storage.get( 'clientId' )
 
 			storage.set( 'clientId', clientId )
 
 			return {
-				renderingBackEnd: renderingContext.getConfiguration().type,
-				renderingInfo   : renderingContext.getConfiguration().info,
-				averageFrameTime: spell.statisticsManager.getAverageTickTime(),
-				uuid            : clientId,
-				scene_id        : sceneId,
-				projectId       : configurationManager.getValue( 'projectId' ),
-				platformId      : platformDetails.platformId,
-				screenHeight    : platformDetails.getScreenHeight(),
-				screenWidth     : platformDetails.getScreenWidth(),
-				screenColorDepth: platformDetails.getColorDepth(),
-				runtime         : runtime.name,
-				runtimeVersion  : runtime.version,
-				language        : configurationManager.getValue( 'currentLanguage' )
+				renderingBackEnd : renderingContext.getConfiguration().type,
+				renderingInfo    : renderingContext.getConfiguration().info,
+				averageFrameTime : spell.statisticsManager.getAverageTickTime(),
+				uuid             : clientId,
+				scene_id         : sceneId,
+				projectId        : configurationManager.getValue( 'projectId' ),
+				screenHeight     : platformDetails.getScreenHeight(),
+				screenWidth      : platformDetails.getScreenWidth(),
+				screenColorDepth : platformDetails.getColorDepth(),
+				os               : platformDetails.getOS(),
+				platform         : platformDetails.getPlatform(),
+				platformAdapter  : platformDetails.getPlatformAdapter(),
+				language         : configurationManager.getValue( 'currentLanguage' )
 			}
 		}
 
