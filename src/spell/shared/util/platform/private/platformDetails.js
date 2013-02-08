@@ -35,6 +35,8 @@ define(
 				return screen.colorDepth
 			},
 			getRuntime: function() {
+				var browser = getBrowser()
+
 				return {
 					version: browser[1],
 					name   : browser[0]
