@@ -126,6 +126,9 @@ define(
 			projectId : {
 				configurable : true
 			},
+			supportedLanguages : {
+				configurable : true
+			},
 			defaultLanguage : {
 				configurable : true
 			},
@@ -209,10 +212,9 @@ define(
 			// initialize default values
 			vec2.set( config.screenSize, config.currentScreenSize )
 
-			if( !config.currentLanguage ) {
+			if( !_.contains( config.supportedLanguages, config.currentLanguage ) ) {
 				config.currentLanguage = config.defaultLanguage
 			}
-
 
 			return config
 		}
