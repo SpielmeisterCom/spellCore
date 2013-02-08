@@ -189,8 +189,14 @@ define(
 					} else if( type === 'keyToActionMap' ) {
 						asset = createKeyToActionMapAsset( assetDefinition )
 
-					} else if( type === "keyFrameAnimation" ) {
+					} else if( type === 'keyFrameAnimation' ) {
 						asset = createKeyFrameAnimationAsset( assetDefinition )
+
+					} else if( type === 'translation' ) {
+						asset = {
+							config : assetDefinition.config,
+							type : type
+						}
 					}
 
 					addResourceId( asset, assetDefinition )
