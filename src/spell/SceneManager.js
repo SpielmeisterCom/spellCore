@@ -25,7 +25,7 @@ define(
 			var scene = new Scene( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneConfig, sceneData )
 
 
-			scene.init( sceneConfig, sceneData )
+			scene.init()
 
 			this.mainLoop.setRenderCallback( _.bind( scene.render, scene ) )
 			this.mainLoop.setUpdateCallback( _.bind( scene.update, scene ) )

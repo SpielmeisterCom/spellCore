@@ -196,8 +196,10 @@ define(
 			update: function( timeInMs, deltaTimeInMs ) {
 				invoke( this.executionGroups.update, 'process', this.statisticsManager, true, [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
-			init: function( sceneConfig, sceneData ) {
-				var spell = this.spell
+			init: function() {
+				var spell       = this.spell,
+					sceneConfig = this.sceneConfig,
+					sceneData   = this.sceneData
 
 				this.statisticsManager.init()
 
@@ -246,9 +248,10 @@ define(
 				invoke( executionGroups.render, 'activate', this.statisticsManager, true, [ spell, sceneConfig, sceneData ] )
 				invoke( executionGroups.update, 'activate', this.statisticsManager, true, [ spell, sceneConfig, sceneData ] )
 			},
-			destroy: function( sceneConfig ) {
+			destroy: function() {
 				var executionGroups = this.executionGroups,
-					spell           = this.spell
+					spell           = this.spell,
+					sceneConfig     = this.sceneConfig
 
 				// deactivating systems
 				invoke( executionGroups.render, 'deactivate', this.statisticsManager, true, [ spell, sceneConfig ] )
