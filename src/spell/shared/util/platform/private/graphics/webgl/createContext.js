@@ -9,8 +9,6 @@ define(
 		"use strict"
 
 
-		var gl
-
 		/*
 		 * Returns a rendering context. Performs some probing to account for different runtime environments.
 		 *
