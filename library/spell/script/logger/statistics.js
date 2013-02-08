@@ -18,7 +18,8 @@ define(
 		var platformDetails = PlatformKit.platformDetails
 
 		var initData = function( spell, sceneConfig ) {
-			var storage              = spell.storage,
+			var renderingContext     = spell.renderingContext,
+				storage              = spell.storage,
 				configurationManager = spell.configurationManager,
 				sceneId              = createId( sceneConfig.namespace, sceneConfig.name ),
 				clientId             = !storage.get( 'clientId' ) ? UUID.generate() : storage.get( 'clientId' ),
@@ -27,7 +28,8 @@ define(
 			storage.set( 'clientId', clientId )
 
 			return {
-				renderingBackEnd: '',
+				renderingBackEnd: renderingContext.getConfiguration().type,
+				renderingInfo   : renderingContext.getConfiguration().info,
 				averageFrameTime: spell.statisticsManager.getAverageTickTime(),
 				uuid            : clientId,
 				scene_id        : sceneId,
