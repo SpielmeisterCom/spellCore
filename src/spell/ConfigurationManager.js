@@ -237,10 +237,10 @@ define(
 				)
 			)
 
-			var platformInfo = PlatformKit.getPlatformInfo()
+			var platformDetails = PlatformKit.platformDetails
 
-			this.setValue( 'platform.id', platformInfo.id )
-			this.setValue( 'platform.hasPlentyRAM', platformInfo.hasPlentyRAM )
+			this.setValue( 'platform.id', platformDetails.platformId )
+			this.setValue( 'platform.hasPlentyRAM', platformDetails.hasPlentyRAM() )
 
 			eventManager.subscribe(
 				[ Events.AVAILABLE_SCREEN_SIZE_CHANGED ],

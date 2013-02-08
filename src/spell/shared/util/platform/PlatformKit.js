@@ -22,9 +22,8 @@ define(
 		'spell/shared/util/platform/private/Input',
 		'spell/shared/util/platform/private/configurationOptions',
 		'spell/shared/util/platform/private/storage/PersistentStorage',
-		'spell/shared/util/platform/private/system/features',
 		'spell/shared/util/platform/private/Window',
-		'spell/shared/util/platform/private/getPlatformInfo',
+		'spell/shared/util/platform/private/platformDetails',
         'spell/shared/util/platform/private/graphics/Viewporter'
 	],
 	function(
@@ -45,9 +44,8 @@ define(
 		Input,
 		configurationOptions,
 		PersistentStorage,
-		features,
 		Window,
-		getPlatformInfo,
+		platformDetails,
         Viewporter
 	) {
 		'use strict'
@@ -118,7 +116,7 @@ define(
 			/*
 			 *
 			 */
-			getPlatformInfo : getPlatformInfo,
+			platformDetails : platformDetails,
 
 			/*
 			 *
@@ -129,11 +127,6 @@ define(
 			 *
 			 */
 			createInput : createInput,
-
-			/*
-			 *
-			 */
-			features : features,
 
 			/*
 			 *

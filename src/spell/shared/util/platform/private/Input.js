@@ -1,22 +1,14 @@
 define(
 	'spell/shared/util/platform/private/Input',
 	[
-		'spell/shared/util/platform/private/system/features',
-
 		'spell/shared/util/platform/private/input/keyHandler',
 		'spell/shared/util/platform/private/input/pointerHandler',
-		'spell/shared/util/platform/private/input/mousewheelHandler',
-
-		'spell/functions'
+		'spell/shared/util/platform/private/input/mousewheelHandler'
 	],
 	function(
-		features,
-
 		keyHandler,
 		pointerHandler,
-		mousewheelHandler,
-
-		_
+		mousewheelHandler
 	) {
 		'use strict'
 
