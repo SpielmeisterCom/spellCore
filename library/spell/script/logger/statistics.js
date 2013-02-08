@@ -1,51 +1,43 @@
 define(
 	'spell/script/logger/statistics',
 	[
+		'spell/shared/util/platform/PlatformKit',
 		'spell/script/logger/sendLogRequest',
 		'spell/math/random/UUID',
-		'spell/shared/util/createId',
-
-		'spell/functions'
+		'spell/shared/util/createId'
 	],
 	function(
+		PlatformKit,
 		sendLogRequest,
 		UUID,
-		createId,
-
-		_
+		createId
 		) {
 		'use strict'
 
-		var getBrowser = function() {
-			var N= navigator.appName, ua= navigator.userAgent, tem;
-			var M= ua.match(/(opera|chrome|safari|firefox|msie)\/?\s*(\.?\d+(\.\d+)*)/i);
-			if(M && (tem= ua.match(/version\/([\.\d]+)/i))!= null) M[2]= tem[1];
-			M= M? [M[1], M[2]]: [N, navigator.appVersion, '-?'];
 
-			return M;
-		}
+		var platformDetails = PlatformKit.platformDetails
 
 		var initData = function( spell, sceneConfig ) {
-			var storage   = spell.storage,
-				projectId = spell.configurationManager.getValue( 'projectId' ),
-				sceneId   = createId( sceneConfig.namespace, sceneConfig.name ),
-				clientId  = !storage.get( 'clientId' ) ? UUID.generate() : storage.get( 'clientId' )
+			var storage              = spell.storage,
+				configurationManager = spell.configurationManager,
+				sceneId              = createId( sceneConfig.namespace, sceneConfig.name ),
+				clientId             = !storage.get( 'clientId' ) ? UUID.generate() : storage.get( 'clientId' ),
+				runtime              = platformDetails.getRuntime()
 
 			storage.set( 'clientId', clientId )
 
 			return {
-				screenHeight    : screen.height,
-				screenWidth     : screen.width,
-				screenColorDepth: screen.colorDepth,
 				renderingBackEnd: '',
-				uuid      : clientId,
-				scene_id  : sceneId,
-				projectId : projectId,
-				platform  : navigator.platform,
-				browser   : getBrowser()[0],
-				browserVersion : getBrowser()[1],
-				userAgent : navigator.userAgent,
-				language  : navigator.language || navigator.browserLanguage
+				uuid            : clientId,
+				scene_id        : sceneId,
+				projectId       : configurationManager.getValue( 'projectId' ),
+				platformId      : platformDetails.platformId,
+				screenHeight    : platformDetails.getScreenHeight(),
+				screenWidth     : platformDetails.getScreenWidth(),
+				screenColorDepth: platformDetails.getColorDepth(),
+				runtime         : runtime.name,
+				runtimeVersion  : runtime.version,
+				language        : configurationManager.getValue( 'currentLanguage' )
 			}
 		}
 
