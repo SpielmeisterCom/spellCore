@@ -15,14 +15,14 @@ define(
 		'use strict'
 
 
-		var postLoadedResources = function( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneId, sceneData ) {
+		var postLoadedResources = function( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneId, initialConfig ) {
 			var sceneConfig = spell.scenes[ sceneId ]
 
 			if( !sceneConfig ) {
 				throw 'Error: Could not find scene configuration for scene "' + sceneId + '".'
 			}
 
-			var scene = new Scene( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneConfig, sceneData )
+			var scene = new Scene( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneConfig, initialConfig )
 
 
 			scene.init()
@@ -50,7 +50,7 @@ define(
 		}
 
 		SceneManager.prototype = {
-			startScene : function( nextSceneId, sceneData, freeResources ) {
+			startScene : function( startSceneId, initialConfig, showLoadingScene, freeMemory ) {
 				var preNextFrame = function() {
 					var spell = this.spell
 
@@ -61,11 +61,10 @@ define(
 						this.entityManager.reset()
 						this.activeScene = undefined
 
-						spell.assetManager.free()
+						if( freeMemory &&
+							!spell.configurationManager.getValue( 'platform.hasPlentyRAM' ) ) {
 
-						// free resources
-//						if( !spell.configurationManager.getValue( 'platform.hasPlentyRAM' ) ) {
-						if( true ) {
+							spell.assetManager.free()
 							spell.libraryManager.free()
 						}
 
@@ -79,23 +78,70 @@ define(
 					this.cmdQueue = []
 					this.loadingPending = true
 
-					loadSceneResources(
-						spell,
-						nextSceneId,
-						_.bind(
-							postLoadedResources,
+
+					// check if library dependencies of next scene are already available
+					var nextScene = spell.scenes[ startSceneId ]
+
+					if( nextScene &&
+						spell.libraryManager.isAvailable( nextScene.libraryIds ) ) {
+
+						// perform direct transition
+						postLoadedResources.call(
 							this,
 							spell,
 							this.entityManager,
 							this.templateManager,
 							this.statisticsManager,
 							this.isModeDevelopment,
-							nextSceneId,
-							sceneData
-						),
-						onProgress,
-						freeResources
-					)
+							startSceneId,
+							initialConfig
+						)
+
+					} else {
+						var loadingSceneId = spell.configurationManager.getValue( 'loadingScene' )
+
+						if( showLoadingScene &&
+							loadingSceneId ) {
+
+							loadSceneResources(
+								spell,
+								loadingSceneId,
+								_.bind(
+									postLoadedResources,
+									this,
+									spell,
+									this.entityManager,
+									this.templateManager,
+									this.statisticsManager,
+									this.isModeDevelopment,
+									loadingSceneId,
+									{
+										startSceneId : startSceneId,
+										initialConfig : initialConfig
+									}
+								)
+							)
+
+						} else {
+							// load library dependencies first
+							loadSceneResources(
+								spell,
+								startSceneId,
+								_.bind(
+									postLoadedResources,
+									this,
+									spell,
+									this.entityManager,
+									this.templateManager,
+									this.statisticsManager,
+									this.isModeDevelopment,
+									startSceneId,
+									initialConfig
+								),
+								onProgress
+							)
+						}
+					}
 				}
 
 				this.mainLoop.setPreNextFrame( _.bind( preNextFrame, this ) )

@@ -139,7 +139,7 @@ define(
 			inputManager.init()
 			spell.inputManager = inputManager
 
-			spell.sceneManager.startScene( spell.runtimeModule.startScene )
+			spell.sceneManager.startScene( spell.runtimeModule.startScene, {}, true )
 			spell.mainLoop.run()
 		}
 

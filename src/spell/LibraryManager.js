@@ -1,12 +1,16 @@
 define(
 	'spell/LibraryManager',
 	[
+		'spell/shared/util/createLibraryFilePath',
+		'spell/shared/util/createLibraryFilePathFromId',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/Events',
 
 		'spell/functions'
 	],
 	function(
+		createLibraryFilePath,
+		createLibraryFilePathFromId,
 		PlatformKit,
 		Events,
 
@@ -101,7 +105,7 @@ define(
 					{}
 				)
 
-				var onLoadingCompleted   = loadingProcess.onLoadingCompleted
+				var onLoadingCompleted = loadingProcess.onLoadingCompleted
 
 				if( onLoadingCompleted ) {
 					onLoadingCompleted( loadedLibraryRecords )
@@ -222,6 +226,24 @@ define(
 
 			setCache : function( content ) {
 				_.extend( this.cache.metaData, content )
+			},
+
+			isAvailable : function( libraryIds ) {
+				var cache = this.cache
+
+				for( var i = 0, n = libraryIds.length, entry; i < n; i++ ) {
+					entry = cache.metaData[ createLibraryFilePathFromId( libraryIds[ i ] ) ]
+
+					if( !entry ) return false
+
+					if( entry.file &&
+						!cache.resource[ createLibraryFilePath( entry.namespace, entry.file ) ] ) {
+
+						return false
+					}
+				}
+
+				return true
 			},
 
 			free : function() {

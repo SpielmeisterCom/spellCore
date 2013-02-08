@@ -177,7 +177,7 @@ define(
 		 * public
 		 */
 
-		var Scene = function( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneConfig, sceneData ) {
+		var Scene = function( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneConfig, initialConfig ) {
 			this.spell             = spell
 			this.entityManager     = entityManager
 			this.templateManager   = templateManager
@@ -185,7 +185,7 @@ define(
 			this.isModeDevelopment = isModeDevelopment
 			this.executionGroups   = { render : null, update : null }
 			this.sceneConfig       = sceneConfig
-			this.sceneData         = sceneData
+			this.initialConfig     = initialConfig
 			this.script            = null
 		}
 
@@ -197,9 +197,9 @@ define(
 				invoke( this.executionGroups.update, 'process', this.statisticsManager, true, [ this.spell, timeInMs, deltaTimeInMs ] )
 			},
 			init: function() {
-				var spell       = this.spell,
-					sceneConfig = this.sceneConfig,
-					sceneData   = this.sceneData
+				var spell         = this.spell,
+					sceneConfig   = this.sceneConfig,
+					initialConfig = this.initialConfig
 
 				this.statisticsManager.init()
 
@@ -235,18 +235,18 @@ define(
 
 
 				// initializing systems
-				invoke( executionGroups.render, 'init', this.statisticsManager, false, [ spell, sceneConfig, sceneData ] )
-				invoke( executionGroups.update, 'init', this.statisticsManager, false, [ spell, sceneConfig, sceneData ] )
+				invoke( executionGroups.render, 'init', this.statisticsManager, false, [ spell, sceneConfig, initialConfig ] )
+				invoke( executionGroups.update, 'init', this.statisticsManager, false, [ spell, sceneConfig, initialConfig ] )
 
 				// initializing scene
 				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
 
 				this.script = spell.moduleLoader.require( moduleId )
-				this.script.init( spell, sceneConfig, sceneData )
+				this.script.init( spell, sceneConfig, initialConfig )
 
 				// activating systems
-				invoke( executionGroups.render, 'activate', this.statisticsManager, true, [ spell, sceneConfig, sceneData ] )
-				invoke( executionGroups.update, 'activate', this.statisticsManager, true, [ spell, sceneConfig, sceneData ] )
+				invoke( executionGroups.render, 'activate', this.statisticsManager, true, [ spell, sceneConfig, initialConfig ] )
+				invoke( executionGroups.update, 'activate', this.statisticsManager, true, [ spell, sceneConfig, initialConfig ] )
 			},
 			destroy: function() {
 				var executionGroups = this.executionGroups,
@@ -383,7 +383,7 @@ define(
 
 				if( changedActive ) {
 					if( systemConfig.active ) {
-						system.prototype.activate.call( system, this.spell, this.sceneConfig, this.sceneData )
+						system.prototype.activate.call( system, this.spell, this.sceneConfig, this.initialConfig )
 
 					} else {
 						system.prototype.deactivate.call( system, this.spell, this.sceneConfig )

@@ -134,6 +134,9 @@ define(
 			},
 			currentLanguage : {
 				configurable : true
+			},
+			loadingScene : {
+				configurable : true
 			}
 		}
 

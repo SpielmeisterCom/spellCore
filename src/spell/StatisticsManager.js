@@ -151,7 +151,7 @@ define(
 				return this.tree
 			},
 			getAverageTickTime : function() {
-				return this.totalTickTimeInMs / this.numTicks
+				return Math.round( this.totalTickTimeInMs / this.numTicks )
 			},
 			reset : function() {
 				this.totalTickTimeInMs = 0
