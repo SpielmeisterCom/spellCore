@@ -68,6 +68,8 @@ define(
 						if( true ) {
 							spell.libraryManager.free()
 						}
+
+						spell.statisticsManager.reset()
 					}
 
 					var onProgress = this.sendMessageToEditor ?

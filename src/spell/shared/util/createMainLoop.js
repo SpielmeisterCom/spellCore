@@ -98,7 +98,7 @@ define(
 					elapsedTimeInMs    = Math.min( timer.getElapsedTime(), MAX_ELAPSED_TIME_IN_MS )
 
 				this.totalStopWatch.start()
-				statisticsManager.startTick( localTimeInMs )
+				statisticsManager.startTick( localTimeInMs, elapsedTimeInMs )
 
 				if( this.update ) {
 					this.stopWatch.start()

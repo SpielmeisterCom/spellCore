@@ -87,27 +87,28 @@ define(
 			metrics[ 3 ] = createStandardDeviation( mean, values ).toFixed( 2 )
 		}
 
-		var createNumValuesInPeriod = function( timestamps, periodInMs ) {
-			if( !periodInMs ) periodInMs = 0
+		var incrementNode = function( node ) {
+			var values = node.values
 
-			var numTimestamps = timestamps.length,
-				earliest      = timestamps[ numTimestamps - 1 ] - periodInMs
+			values.shift()
+			values.push( 0 )
+		}
 
-			for( var i = timestamps.length - 1; i >= 0; i-- ) {
-				var current = timestamps[ i ]
+		var resetNode = function( node ) {
+			var values = node.values
 
-				if( current <= earliest ) {
-					return numTimestamps - i
-				}
+			for( var i = 0, n = values.length; i < n; i++ ) {
+				values[ i ] = 0
 			}
-
-			return numTimestamps
 		}
 
 
 		var StatisticsManager = function() {
 			this.tree = null
 			this.timestamps = createBuffer( NUM_VALUES )
+
+			this.totalTickTimeInMs = 0
+			this.numTicks = 0
 		}
 
 		StatisticsManager.prototype = {
@@ -127,21 +128,16 @@ define(
 			/*
 			 * call this method to signal the beginning of a new measurement period
 			 */
-			startTick : function( timestamp ) {
+			startTick : function( timestamp, elapsedTimeInMs ) {
+				this.totalTickTimeInMs += elapsedTimeInMs
+				this.numTicks++
+
 				var timestamps = this.timestamps
 
 				timestamps.shift()
 				timestamps.push( timestamp )
 
-				eachNode(
-					this.tree,
-					function( node ) {
-						var values = node.values
-
-						values.shift()
-						values.push( 0 )
-					}
-				)
+				eachNode( this.tree, incrementNode )
 			},
 			updateNode : function( id, value ) {
 				var node = getNode( this.tree, id )
@@ -153,6 +149,15 @@ define(
 				eachNode( this.tree, updateNodeMetrics )
 
 				return this.tree
+			},
+			getAverageTickTime : function() {
+				return this.totalTickTimeInMs / this.numTicks
+			},
+			reset : function() {
+				this.totalTickTimeInMs = 0
+				this.numTicks = 0
+
+				eachNode( this.tree, resetNode )
 			}
 		}
 
