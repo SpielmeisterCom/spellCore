@@ -573,7 +573,8 @@ define(
 			return {
 				type   : 'canvas-2d',
 				width  : canvas.width,
-				height : canvas.height
+				height : canvas.height,
+				info   : ''
 			}
 		}
 

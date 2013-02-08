@@ -542,10 +542,16 @@ define(
 		 * Returns an object describing the current configuration of the rendering backend.
 		 */
 		var getConfiguration = function() {
+			var info = gl.getParameter( gl.VENDOR ) + ';' +
+				gl.getParameter( gl.RENDERER ) + ';' +
+				gl.getParameter( gl.VERSION ) + ';' +
+				gl.getParameter( gl.SHADING_LANGUAGE_VERSION )
+
 			return {
 				type   : 'webgl',
 				width  : gl.canvas.width,
-				height : gl.canvas.height
+				height : gl.canvas.height,
+				info   : info
 			}
 		}
 
