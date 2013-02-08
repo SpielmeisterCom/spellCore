@@ -1,15 +1,11 @@
 define(
 	'spell/script/logger/sendLogRequest',
 	[
-		'spell/shared/util/platform/PlatformKit',
-
-		'spell/functions'
+		'spell/shared/util/platform/PlatformKit'
 	],
 	function(
-		PlatformKit,
-
-		_
-		) {
+		PlatformKit
+	) {
 		'use strict'
 
 
@@ -18,7 +14,7 @@ define(
 				'POST',
 				url,
 				function() {},
-				null,
+				function() {},
 				data
 			)
 		}
