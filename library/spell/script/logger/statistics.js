@@ -28,6 +28,7 @@ define(
 
 			return {
 				renderingBackEnd: '',
+				averageFrameTime: spell.statisticsManager.getAverageTickTime(),
 				uuid            : clientId,
 				scene_id        : sceneId,
 				projectId       : configurationManager.getValue( 'projectId' ),
