@@ -59,7 +59,7 @@ define(
 			this.updateIntervalInMs  = updateIntervalInMs || UPDATE_INTERVAL_IN_MS
 			this.render              = null
 			this.update              = null
-			this.preNextFrame        = null
+			this.preNextFrame        = []
 			this.accumulatedTimeInMs = this.updateIntervalInMs
 
 			// Until the proper remote game time is computed local time will have to do.
@@ -80,12 +80,11 @@ define(
 				this.update = f
 			},
 			setPreNextFrame: function( f ) {
-				this.preNextFrame = f
+				this.preNextFrame.push( f )
 			},
 			callEveryFrame : function( currentTimeInMs ) {
-				if( this.preNextFrame ) {
-					this.preNextFrame()
-					this.preNextFrame = null
+				if( this.preNextFrame.length > 0 ) {
+					this.preNextFrame.pop()()
 				}
 
 				var statisticsManager = this.statisticsManager,

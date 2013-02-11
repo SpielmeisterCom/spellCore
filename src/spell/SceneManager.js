@@ -51,7 +51,7 @@ define(
 
 		SceneManager.prototype = {
 			startScene : function( startSceneId, initialConfig, showLoadingScene, freeMemory ) {
-				var preNextFrame = function() {
+				var preNextFrameCallback = function() {
 					var spell = this.spell
 
 					if( this.activeScene ) {
@@ -145,7 +145,7 @@ define(
 					}
 				}
 
-				this.mainLoop.setPreNextFrame( _.bind( preNextFrame, this ) )
+				this.mainLoop.setPreNextFrame( _.bind( preNextFrameCallback, this ) )
 			},
 
 			processCmdQueue : function() {
