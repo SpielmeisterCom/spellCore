@@ -135,8 +135,8 @@ define(
 			var loadingProgress = createLoadingProgress( eventManager, progressCallback )
 
 			loadingProgress.addBundle( sceneId, 0.1 )
-			loadingProgress.addBundle( libraryBundleName, 0.2 )
-			loadingProgress.addBundle( resourceBundleName, 0.7 )
+			loadingProgress.addBundle( libraryBundleName, 0.1 )
+			loadingProgress.addBundle( resourceBundleName, 0.8 )
 
 
 			eventManager.waitFor(
