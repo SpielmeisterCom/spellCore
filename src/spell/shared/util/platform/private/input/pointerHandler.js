@@ -95,33 +95,33 @@ define(
 		var nativeHandler = null
 		var registeredEvents = [ ]
 		var eventMappings = {
-			'pointermove'       : 'pointerMove',
-			'pointerup'         : 'pointerUp',
-			'pointerdown'       : 'pointerDown',
-			'pointercancel'     : 'pointerCancel',
+			pointermove     : 'pointerMove',
+			pointerup       : 'pointerUp',
+			pointerdown     : 'pointerDown',
+			pointercancel   : 'pointerCancel',
 
-			'MSPointerMove'     : 'pointerMove',
-			'MSPointerUp'       : 'pointerUp',
-			'MSPointerDown'     : 'pointerDown',
-			'MSPointerCancel'   : 'pointerCancel',
+			MSPointerMove   : 'pointerMove',
+			MSPointerUp     : 'pointerUp',
+			MSPointerDown   : 'pointerDown',
+			MSPointerCancel : 'pointerCancel',
 
-			'touchstart'        : 'pointerDown',
-			'touchmove'         : 'pointerMove',
-			'touchend'          : 'pointerUp',
-			'touchcancel'       : 'pointerCancel',
+			touchstart      : 'pointerDown',
+			touchmove       : 'pointerMove',
+			touchend        : 'pointerUp',
+			touchcancel     : 'pointerCancel',
 
-			'mousemove'         : 'pointerMove',
-			'mousedown'         : 'pointerDown',
-			'mouseup'           : 'pointerUp'
+			mousemove       : 'pointerMove',
+			mousedown       : 'pointerDown',
+			mouseup         : 'pointerUp'
 		}
 
 		var emitSpellPointerEvent = function( callback, eventType, pointerId, button, positionX, positionY ) {
-			callback({
-				type :      eventType,
+			callback( {
+				type      : eventType,
 				pointerId : pointerId,
-				button :    button, // 0=left button, 1=middle button if present, 2=right button
-				position :  [ positionX, positionY ] //position of the pointer in screen coordinates (origin top left!)
-			})
+				button    : button, // 0=left button, 1=middle button if present, 2=right button
+				position  : [ positionX, positionY ] // position of the pointer in screen coordinates (origin top left!)
+			} )
 		}
 
 		function getOffset( element ) {
@@ -147,10 +147,10 @@ define(
 		}
 
 		var nativeTouchHandlerImpl = function( callback, eventMappings, container, configurationManager, event ) {
-			var eventType   = event.type,
-				button      = 0,
-				screenSize  = configurationManager.getValue( 'currentScreenSize' ),
-				offset      = getOffset( container )
+			var eventType  = event.type,
+				button     = 0,
+				screenSize = configurationManager.getValue( 'currentScreenSize' ),
+				offset     = getOffset( container )
 
 			event.preventDefault()
 
@@ -159,14 +159,14 @@ define(
 			}
 
 			for( var i = 0, length = event.changedTouches.length; i < length; i++ ) {
-				var touch       = event.changedTouches[ i ],
-					pointerId   = touch.identifier,
-					positionX   = touch.pageX - offset[ 0 ],
-					positionY   = touch.pageY - offset[ 1 ]
+				var touch     = event.changedTouches[ i ],
+					pointerId = touch.identifier,
+					positionX = touch.pageX - offset[ 0 ],
+					positionY = touch.pageY - offset[ 1 ]
 
 				// if the event missed the display it gets ignored
 				if( positionX < 0 || positionX > screenSize[ 0 ] ||
-					positionY < 0 || positionY > screenSize [ 1 ]) {
+					positionY < 0 || positionY > screenSize [ 1 ] ) {
 
 					continue
 				}
@@ -176,23 +176,23 @@ define(
 		}
 
 		var nativePointerHandlerImpl = function( callback, eventMappings, container, configurationManager, event ) {
-			var eventType   = event.type,
-				button      = event.button,
-				pointerId   = event.pointerId !== undefined ? event.pointerId :  1,
-				screenSize  = configurationManager.getValue( 'currentScreenSize' ),
-				offset      = getOffset( container ),
-				positionX   = event.pageX - offset[ 0 ],
-				positionY   = event.pageY - offset[ 1 ]
+			var eventType  = event.type,
+				button     = event.button,
+				pointerId  = event.pointerId !== undefined ? event.pointerId :  1,
+				screenSize = configurationManager.getValue( 'currentScreenSize' ),
+				offset     = getOffset( container ),
+				positionX  = event.pageX - offset[ 0 ],
+				positionY  = event.pageY - offset[ 1 ]
 
 			// if the event missed the display it gets ignored
 			if( positionX < 0 || positionX > screenSize[ 0 ] ||
-				positionY < 0 || positionY > screenSize [ 1 ]) {
+				positionY < 0 || positionY > screenSize [ 1 ] ) {
 
 				return
 			}
 
 			if( button > 0 ) {
-				//only prevent default for non left click buttons
+				// only prevent default for non left click buttons
 				event.preventDefault()
 			}
 
@@ -230,19 +230,15 @@ define(
 				]
 			}
 
-			for ( var i in registeredEvents ) {
-				var eventName = registeredEvents[ i ]
-				el.addEventListener( eventName, nativeHandler, true )
+			for( var i in registeredEvents ) {
+				el.addEventListener( registeredEvents[ i ], nativeHandler, true )
 			}
-
 		}
 
 		var removeListener = function( el ) {
 			if( nativeHandler !== null ) {
-
-				for ( var i in registeredEvents ) {
-					var eventName = registeredEvents[ i ]
-					el.removeEventListener( eventName, nativeHandler )
+				for( var i in registeredEvents ) {
+					el.removeEventListener( registeredEvents[ i ], nativeHandler )
 				}
 				registeredEvents.length = 0
 				nativeHandler = null
@@ -250,8 +246,8 @@ define(
 		}
 
 		return {
-			registerListener: registerListener,
-			removeListener: removeListener
+			registerListener : registerListener,
+			removeListener : removeListener
 		}
 	}
 )
