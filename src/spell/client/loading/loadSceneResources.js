@@ -167,6 +167,8 @@ define(
 						addTemplates( templateManager, library.component )
 						addTemplates( templateManager, library.entityTemplate )
 						addTemplates( templateManager, library.system )
+
+						addIdAsKey( spell.scenes, library.scene )
 					}
 
 				).and(
