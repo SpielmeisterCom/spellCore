@@ -183,7 +183,7 @@ if( !window.console ) {
 			if( !config.audioBackEnd ) {
 				config.audioBackEnd = isWebAudioSupported() ?
 					'web' :
-					isHtml5AudioSupported() ?
+					isHtml5AudioSupported() && !supportsOnlySingleChannelAudio() ?
 						'html5' :
 						'dummy'
 			}
@@ -215,6 +215,11 @@ if( !window.console ) {
 		}
 
 		return false
+	}
+
+	var supportsOnlySingleChannelAudio = function() {
+		//TODO: should be refactored. Maybe check ipad/iphone also
+		return navigator.userAgent.indexOf( "Windows Phone 8" ) > -1
 	}
 
 	var process = function( spellObject, config, onInitialized, debugMessageCallback ) {
