@@ -178,7 +178,7 @@ define(
 		var nativePointerHandlerImpl = function( callback, eventMappings, container, configurationManager, event ) {
 			var eventType  = event.type,
 				button     = event.button,
-				pointerId  = event.pointerId !== undefined ? event.pointerId :  1,
+				pointerId  = typeof event.pointerId != "undefined" ? event.pointerId :  1,
 				screenSize = configurationManager.getValue( 'currentScreenSize' ),
 				offset     = getOffset( container ),
 				positionX  = event.pageX - offset[ 0 ],

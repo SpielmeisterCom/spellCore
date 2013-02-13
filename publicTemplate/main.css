@@ -1,7 +1,13 @@
+html {
+    overflow: hidden;
+    -ms-content-zooming: none;
+    -ms-touch-action: none;
+}
+
 body {
 	margin: 0px;
 	padding: 0px;
-    background-color: #444444;
+    background-color: #000;
 }
 
 #spell-screen {
