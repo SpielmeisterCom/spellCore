@@ -77,6 +77,9 @@ if( !window.console ) {
 
 		var supportedFormats = [ 'audio/ogg; codecs="vorbis"', 'audio/mpeg' ]
 
+
+		if( supportsOnlySingleChannelAudio() ) return false
+
 		for( var i = 0; i < supportedFormats.length; i++ ) {
 			try {
 				if( '' != elem.canPlayType( supportedFormats[ i ] ).replace( /^no$/,'' ) ) {
@@ -103,7 +106,7 @@ if( !window.console ) {
 	}
 
 	var isHtml5Capable = function() {
-		return isCanvasCapable() && ( isWebAudioSupported() || isHtml5AudioSupported() )
+		return isCanvasCapable()
 	}
 
 	var isCanvasCapable = function() {
@@ -183,7 +186,7 @@ if( !window.console ) {
 			if( !config.audioBackEnd ) {
 				config.audioBackEnd = isWebAudioSupported() ?
 					'web' :
-					isHtml5AudioSupported() && !supportsOnlySingleChannelAudio() ?
+					isHtml5AudioSupported() ?
 						'html5' :
 						'dummy'
 			}
@@ -218,7 +221,6 @@ if( !window.console ) {
 	}
 
 	var supportsOnlySingleChannelAudio = function() {
-		//TODO: should be refactored. Maybe check ipad/iphone also
 		return navigator.userAgent.indexOf( "Windows Phone 8" ) > -1
 	}
 
