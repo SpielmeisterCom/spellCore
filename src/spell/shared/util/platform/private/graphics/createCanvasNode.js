@@ -1,12 +1,16 @@
 define(
 	'spell/shared/util/platform/private/graphics/createCanvasNode',
 	function() {
+		'use strict'
+
+
 		return function( id, width, height ) {
             var canvas
 
             if ( window && window.canvas ) {
-                //if a global canvas element was specified, use this (for Ejecta/CocoonJS style environments)
+                // if a global canvas element was specified, use this (for Ejecta/CocoonJS style environments)
                 canvas = window.canvas
+
             } else {
                 canvas = document.createElement( 'canvas' )
             }
