@@ -47,12 +47,16 @@ define(
 			logInitScene: function( spell, host, sceneConfig ) {
 				var data = initData( spell, sceneConfig )
 
-				sendLogRequest( host + '/scene/init', data )
+				data.logType = "sceneInit"
+
+				sendLogRequest( host + '/api/v1', data )
 			},
 			logDestroyScene: function( spell, host, sceneConfig ) {
 				var data = initData( spell, sceneConfig )
 
-				sendLogRequest( host + '/scene/destroy', data )
+				data.logType = "sceneDestroy"
+
+				sendLogRequest( host + '/api/v1', data )
 			}
 		}
 	}
