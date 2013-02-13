@@ -1,16 +1,20 @@
 define(
 	'spell/shared/util/platform/private/platformDetails',
 	[
-		'spell/shared/util/platform/private/input/supportedPointerApi'
+		'spell/shared/util/platform/private/input/supportedPointerApi',
+		'spell/shared/util/platform/private/isHtml5Ejecta'
 	],
 	function(
-		supportedPointerApi
+		supportedPointerApi,
+		isHtml5Ejecta
 	) {
 		'use strict'
 
 
 		return {
-			hasPlentyRAM : function() { return true },
+			hasPlentyRAM : function() {
+                return !isHtml5Ejecta()
+            },
 			hasTouchSupport : function() {
 				return supportedPointerApi.hasWebkitTouchApi() ||
 					supportedPointerApi.hasPointerTouchApi()
