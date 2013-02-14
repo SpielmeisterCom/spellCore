@@ -9,9 +9,12 @@ define(
 		'use strict'
 
 
-		var audioElements = {},
-			isMutedValue  = false,
-			nextSoundId   = 0
+		var MAX_NUM_CHANNELS = 16 // the maximum amount of concurrently playing audio elements
+
+		var audioElements   = {},
+			isMutedValue    = false,
+			nextSoundId     = 0,
+			numFreeChannels = MAX_NUM_CHANNELS
 
 		var createSoundId = function() {
 			return nextSoundId++
@@ -39,12 +42,20 @@ define(
 		}
 
 		var removeCallback = function() {
-			this.removeEventListener( 'ended', removeCallback, true )
-			this.removeEventListener( 'ended', loopCallback, true )
-			this.pause()
-
-			delete audioElements[ this.id ]
+			free( this )
 		}
+
+		var free = function( audioElement ) {
+			audioElement.pause()
+
+			audioElement.removeEventListener( 'ended', removeCallback, true )
+			audioElement.removeEventListener( 'ended', loopCallback, true )
+
+			numFreeChannels++
+
+			delete audioElements[ audioElement.id ]
+		}
+
 
 		/**
 		 *
@@ -56,6 +67,14 @@ define(
 		var play = function( audioResource, id, volume, loop ) {
 			if( !id ) {
 				id = createSoundId()
+			}
+
+			if( numFreeChannels > 0 ) {
+				numFreeChannels--
+
+			} else {
+				// when no free channel exists omit playing
+				return id
 			}
 
 			var audioElement
@@ -94,8 +113,7 @@ define(
 			var audioElement = audioElements[ id ]
 			if( !audioElement ) return
 
-			audioElement.currentTime = 0
-			audioElement.pause()
+			free( audioElement )
 		}
 
 		var setVolume = function ( id, volume ) {
