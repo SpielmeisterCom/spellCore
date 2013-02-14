@@ -42,8 +42,6 @@ define(
 				isAllMuted       : isAllMuted,
 				stop             : dummy,
 				mute             : dummy,
-				stopAll          : dummy,
-				resumeAll        : dummy,
 				createSound      : createSound,
 				loadBuffer       : loadBuffer,
 				getConfiguration : function() { return { type : 'dummy' } }

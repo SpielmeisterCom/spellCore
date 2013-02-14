@@ -61,18 +61,6 @@ define(
 			}
 		}
 
-		var stopAll = function() {
-			_.each( sourceNodes, function( value, key ) {
-				mute( key )
-			} )
-		}
-
-		var resumeAll = function() {
-			_.each( sourceNodes, function( value, key ) {
-				setVolume( key, 1 )
-			} )
-		}
-
 		var stop = function( id ) {
 			var sourceNode = sourceNodes[ id ]
 			if( sourceNode ) sourceNode.noteOff(0)
@@ -175,8 +163,6 @@ define(
 				stop             : stop,
 				mute             : mute,
 				createSound      : createSound,
-				stopAll          : stopAll,
-				resumeAll        : resumeAll,
 				loadBuffer       : loadBuffer,
 				getConfiguration : function() { return { type : 'web' } }
 			}

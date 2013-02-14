@@ -228,8 +228,6 @@ define(
 				stop             : stop,
 				mute             : mute,
 				createSound      : createSound,
-				stopAll          : stopAll,
-				resumeAll        : resumeAll,
 				loadBuffer       : loadBuffer,
 				getConfiguration : function() { return { type : 'html5' } }
 			}
