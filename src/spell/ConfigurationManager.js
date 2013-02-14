@@ -233,7 +233,7 @@ define(
 			_.extend(
 				this.config,
 				createConfiguration(
-					_.extend(
+					_.defaults(
 						loaderConfig || {},
 						projectConfig || {}
 					),
