@@ -129,18 +129,15 @@ define(
 			var audioElement = audioElements[ id ]
 			if( !audioElement ) return
 
-			if( audioElement.loop !== undefined ) {
-				audioElement.loop = loop
+			audioElement.loop = loop
+
+			if( loop ) {
+				audioElement.addEventListener( 'ended', loopCallback, true )
+				audioElement.removeEventListener( 'ended', removeCallback, true )
 
 			} else {
-				if( loop ) {
-					audioElement.addEventListener( 'ended', loopCallback, true )
-					audioElement.removeEventListener( 'ended', removeCallback, true )
-
-				} else {
-					audioElement.addEventListener( 'ended', removeCallback, true )
-					audioElement.removeEventListener( 'ended', loopCallback, true )
-				}
+				audioElement.addEventListener( 'ended', removeCallback, true )
+				audioElement.removeEventListener( 'ended', loopCallback, true )
 			}
 		}
 
