@@ -69,32 +69,31 @@ define(
 				id = createSoundId()
 			}
 
-			if( numFreeChannels > 0 ) {
+			var audioElement = audioElements[ id ]
+
+			if( !audioElement &&
+				numFreeChannels > 0 ) {
+
+				// when a free channel exists play the sound
+
 				numFreeChannels--
 
-			} else {
-				// when no free channel exists omit playing
-				return id
-			}
-
-			var audioElement
-
-			if( audioElements[ id ] ) {
-				audioElement = audioElements[ id ]
-
-			} else {
 				audioElement = create( id, audioResource )
 				audioElements[ id ] = audioElement
 			}
 
-			setLoop( id, loop )
-			setVolume( id, volume )
+			if( audioElement ) {
+				setLoop( id, loop )
+				setVolume( id, volume )
 
-			if( isMuted() ) {
-				mute( id )
+				if( isMuted() ) {
+					mute( id )
+				}
+
+				audioElement.play()
 			}
 
-			audioElement.play()
+			return id
 		}
 
 		var stopAll = function() {
