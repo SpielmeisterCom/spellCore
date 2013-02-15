@@ -221,7 +221,7 @@ if( !window.console ) {
 	}
 
 	var supportsOnlySingleChannelAudio = function() {
-		return navigator.userAgent.indexOf( "Windows Phone 8" ) > -1
+		return navigator.userAgent.indexOf( 'IEMobile/9.0' ) > -1 || navigator.userAgent.indexOf( 'IEMobile/10.0' ) > -1
 	}
 
 	var process = function( spellObject, config, onInitialized, debugMessageCallback ) {
