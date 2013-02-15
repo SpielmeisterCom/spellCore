@@ -30,6 +30,7 @@ define(
 
 			} else if( typeof XDomainRequest !== 'undefined' ) {
 				request = new XDomainRequest()
+				request.onprogress = function() {}
 				request.open( method, url )
 
 			} else {
@@ -85,7 +86,7 @@ define(
 			var request = createCorsRequest( method, url, onLoad, onError, parameters )
 
 			if( method === 'POST' ) {
-				request.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' )
+				if( request.setRequestHeader ) request.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' )
 				request.send( createParameters( parameters ) )
 
 			} else {
