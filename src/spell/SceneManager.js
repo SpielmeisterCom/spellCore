@@ -49,7 +49,9 @@ define(
 		}
 
 		SceneManager.prototype = {
-			startScene : function( startSceneId, initialConfig, showLoadingScene, freeMemory ) {
+			startScene : function( startSceneId, initialConfig, showLoadingScene ) {
+				var freeMemory = showLoadingScene
+
 				var preNextFrameCallback = function() {
 					var spell = this.spell
 
