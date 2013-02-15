@@ -106,7 +106,7 @@ if( !window.console ) {
 	}
 
 	var isHtml5Capable = function() {
-		return isCanvasCapable()
+		return isCanvasCapable() && navigator.userAgent.indexOf( "MSIE 9.0" ) == -1
 	}
 
 	var isCanvasCapable = function() {
