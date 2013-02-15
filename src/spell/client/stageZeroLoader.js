@@ -352,7 +352,7 @@ if( !window.console ) {
 
 			} else {
 				var message = 'Your browser does not meet the minimum requirements in order to run SpellJS. :('
-				document.getElementById( config.id ).innerHTML = '<p>' + message + '</p>'
+				document.getElementById( config.id ).innerHTML = '<p style="color: #FFFFFF">' + message + '</p>'
 			}
 		},
 		setCache : function( cachedContent ) {
