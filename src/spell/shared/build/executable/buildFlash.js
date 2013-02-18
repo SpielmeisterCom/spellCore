@@ -199,13 +199,6 @@ define(
 			}
 
 
-			// copy flash dom shim
-			copyFile(
-				path.join( spellCorePath, 'src/spell/client/flashDomShim.js' ),
-				path.join( deployFlashPath, 'domShim.js' )
-			)
-
-
 			// reading engine source file
 			var spellEngineSourceFilePath = path.join( spellCorePath, 'build/spell.common.js' )
 
