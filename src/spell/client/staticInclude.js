@@ -27,6 +27,7 @@ define(
 		'spell/shared/Easing',
 		'spell/shared/util/createEntityEach',
 		'spell/shared/util/input/keyCodes',
+		'spell/shared/util/translate',
 		'spell/client/util/createComprisedRectangle',
 		'spell/client/util/createIncludedRectangle',
 		'spell/recursiveFunctions'

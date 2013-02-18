@@ -11,9 +11,9 @@ define(
 		'spell/client/2d/graphics/drawTitleSafeOutline',
 		'spell/client/util/createComprisedRectangle',
 		'spell/client/util/createIncludedRectangle',
-		'spell/shared/util/createLibraryFilePathFromId',
 		'spell/Defines',
 		'spell/Events',
+		'spell/shared/util/translate',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/math/vec2',
@@ -33,9 +33,9 @@ define(
 		drawTitleSafeOutline,
 		createComprisedRectangle,
 		createIncludedRectangle,
-		createLibraryFilePathFromId,
 		Defines,
 		Events,
+		translate,
 		PlatformKit,
 
 		vec2,
@@ -61,16 +61,7 @@ define(
 //			performance = window.performance
 
 		var translateTextAppearance = function( libraryManager, currentLanguage, textAppearance ) {
-			var translationAssetId = textAppearance.translationAssetId
-			if( !translationAssetId ) return
-
-			var translation = libraryManager.get( createLibraryFilePathFromId( translationAssetId ) )
-			if( !translation ) return
-
-			var translatedText = translation.config[ textAppearance.text ]
-			if( !translatedText ) return
-
-			var text = translatedText[ currentLanguage ]
+			var text = translate( libraryManager, currentLanguage, textAppearance.translationAssetId, textAppearance.text )
 			if( !text ) return
 
 			textAppearance.renderText = text
