@@ -19,23 +19,9 @@ define(
 		}
 
 		var createCorsRequest = function( method, url, onLoad, onError, parameters ) {
-			var request = new XMLHttpRequest()
-
-			if( method == 'GET' ) {
-				url += '?' + createParameters( parameters )
-			}
-
-			if( 'withCredentials' in request ) {
-				request.open( method, url, true )
-
-			} else if( typeof XDomainRequest !== 'undefined' ) {
-				request = new XDomainRequest()
-				request.onprogress = function() {}
-				request.open( method, url )
-
-			} else {
-				return
-			}
+			var request = typeof XDomainRequest !== 'undefined' ?
+                new XDomainRequest() :
+                new XMLHttpRequest()
 
 			request.onreadystatechange = function() {
 				if( this.readyState == 4 &&
@@ -45,11 +31,19 @@ define(
 				}
 			}
 
+            if( _.size( parameters ) > 0 &&
+                method == 'GET' ) {
+
+                url += '?' + createParameters( parameters )
+            }
+
 			if( onError ) {
 				request.onerror = function( event ) {
 					onError( 'Error while accessing ' + url, event )
 				}
 			}
+
+            request.open( method, url )
 
 			return request
 		}
@@ -86,7 +80,10 @@ define(
 			var request = createCorsRequest( method, url, onLoad, onError, parameters )
 
 			if( method === 'POST' ) {
-				if( request.setRequestHeader ) request.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' )
+				if( request.setRequestHeader ) {
+					request.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' )
+				}
+				
 				request.send( createParameters( parameters ) )
 
 			} else {
