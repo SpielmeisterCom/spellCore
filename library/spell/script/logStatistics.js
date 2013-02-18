@@ -1,27 +1,32 @@
 define(
-	'spell/script/logger/statistics',
+	'spell/script/logStatistics',
 	[
 		'spell/shared/util/platform/PlatformKit',
-		'spell/script/logger/sendLogRequest',
-		'spell/math/random/UUID',
-		'spell/shared/util/createId'
+		'spell/math/random/UUID'
 	],
 	function(
 		PlatformKit,
-		sendLogRequest,
-		UUID,
-		createId
+		UUID
 	) {
 		'use strict'
 
 
+		var sendLogRequest = function( url, data ) {
+			PlatformKit.network.performHttpRequest(
+				'POST',
+				url,
+				function() {},
+				function() {},
+				data
+			)
+		}
+
 		var platformDetails = PlatformKit.platformDetails
 
-		var initData = function( spell, sceneConfig ) {
+		var createMessage = function( spell, sceneId, type ) {
 			var renderingContext     = spell.renderingContext,
-				storage              = spell.storage,
 				configurationManager = spell.configurationManager,
-				sceneId              = createId( sceneConfig.namespace, sceneConfig.name ),
+				storage              = spell.storage,
 				clientId             = !storage.get( 'clientId' ) ? UUID.generate() : storage.get( 'clientId' )
 
 			storage.set( 'clientId', clientId )
@@ -39,25 +44,16 @@ define(
 				os               : platformDetails.getOS(),
 				platform         : platformDetails.getPlatform(),
 				platformAdapter  : platformDetails.getPlatformAdapter(),
-				language         : configurationManager.getValue( 'currentLanguage' )
+				language         : configurationManager.getValue( 'currentLanguage' ),
+				logType          : type
 			}
 		}
 
-		return {
-			logInitScene: function( spell, host, sceneConfig ) {
-				var data = initData( spell, sceneConfig )
-
-				data.logType = "sceneInit"
-
-				sendLogRequest( host + '/api/v1', data )
-			},
-			logDestroyScene: function( spell, host, sceneConfig ) {
-				var data = initData( spell, sceneConfig )
-
-				data.logType = "sceneDestroy"
-
-				sendLogRequest( host + '/api/v1', data )
-			}
+		return function( spell, sceneId, url, messageType ) {
+			sendLogRequest(
+				url,
+				createMessage( spell, sceneId, messageType )
+			)
 		}
 	}
 )
