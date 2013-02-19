@@ -40,6 +40,11 @@ define(
 
 			// canvas-2d
 			if( requestedBackEnd === undefined ? true : ( requestedBackEnd === BACK_END_CANVAS ) ) {
+				// HACK: disable default canvas scaling behaviour on html5-ejecta
+				if( canvas.scalingMode ) {
+					canvas.scalingMode = 'none'
+				}
+
 				context = createCanvasContext( canvas )
 
 				if( context ) return context
