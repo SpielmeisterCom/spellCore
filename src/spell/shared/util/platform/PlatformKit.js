@@ -60,7 +60,7 @@ define(
 		}
 
         var registerOnScreenResize = function( eventManager, id, initialScreenSize ) {
-			initViewport( eventManager, id )
+			initViewport( eventManager, id, initialScreenSize )
         }
 
 		return {

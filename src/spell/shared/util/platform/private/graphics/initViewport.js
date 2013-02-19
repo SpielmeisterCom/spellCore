@@ -68,10 +68,16 @@ define(
 		 * @param eventManager the event manager
 		 * @param id the id of the spell container div
 		 */
-		return function( eventManager, id ) {
+		return function( eventManager, id, initialScreenSize ) {
 			var performScreenResize = function() {
-				window.scrollTo( 0, 0 )
-				eventManager.publish( Events.AVAILABLE_SCREEN_SIZE_CHANGED, [ getAvailableScreenSize( id ) ] )
+				if( window.scrollTo ) {
+					window.scrollTo( 0, 0 )
+				}
+
+				eventManager.publish(
+					Events.AVAILABLE_SCREEN_SIZE_CHANGED,
+					[ id ? getAvailableScreenSize( id ) : initialScreenSize ]
+				)
 			}
 
 			var deviceClass = getDeviceClass( navigator.userAgent )
