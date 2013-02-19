@@ -24,7 +24,7 @@ define(
 		'spell/shared/util/platform/private/storage/PersistentStorage',
 		'spell/shared/util/platform/private/Window',
 		'spell/shared/util/platform/private/platformDetails',
-        'spell/shared/util/platform/private/graphics/Viewporter'
+		'spell/shared/util/platform/private/graphics/initViewport'
 	],
 	function(
 		Box2D,
@@ -46,7 +46,7 @@ define(
 		PersistentStorage,
 		Window,
 		platformDetails,
-        Viewporter
+		initViewport
 	) {
 		'use strict'
 
@@ -60,8 +60,7 @@ define(
 		}
 
         var registerOnScreenResize = function( eventManager, id, initialScreenSize ) {
-			var viewporter = new Viewporter( eventManager, id )
-			viewporter.renderViewport()
+			initViewport( eventManager, id )
         }
 
 		return {
