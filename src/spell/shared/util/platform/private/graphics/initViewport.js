@@ -69,9 +69,6 @@ define(
 		 * @param id the id of the spell container div
 		 */
 		return function( eventManager, id ) {
-
-			alert( navigator.userAgent )
-
 			var performScreenResize = function() {
 				window.scrollTo( 0, 0 )
 				eventManager.publish( Events.AVAILABLE_SCREEN_SIZE_CHANGED, [ getAvailableScreenSize( id ) ] )
