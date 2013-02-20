@@ -23,7 +23,7 @@ define(
 
 		var platformDetails = PlatformKit.platformDetails
 
-		var createMessage = function( spell, sceneId, type ) {
+		var createMessage = function( spell, sceneId, type, payload ) {
 			var renderingContext     = spell.renderingContext,
 				configurationManager = spell.configurationManager,
 				storage              = spell.storage,
@@ -42,6 +42,7 @@ define(
 				screenWidth      : platformDetails.getScreenWidth(),
 				screenColorDepth : platformDetails.getColorDepth(),
 				os               : platformDetails.getOS(),
+				payload          : payload,
 				platform         : platformDetails.getPlatform(),
 				platformAdapter  : platformDetails.getPlatformAdapter(),
 				language         : configurationManager.getValue( 'currentLanguage' ),
@@ -49,10 +50,10 @@ define(
 			}
 		}
 
-		return function( spell, sceneId, url, messageType ) {
+		return function( spell, sceneId, url, messageType, payload ) {
 			sendLogRequest(
 				url,
-				createMessage( spell, sceneId, messageType )
+				createMessage( spell, sceneId, messageType, payload )
 			)
 		}
 	}
