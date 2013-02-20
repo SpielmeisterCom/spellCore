@@ -161,10 +161,6 @@ define(
 
 		var tick = function() {}
 
-		var onError = function( event ) {
-			throw 'Error: Could not load sound resource "' + event.currentTarget.src + '".'
-		}
-
 		var loadBuffer = function( src, onLoadCallback ) {
 			if( !src ) {
 				throw 'Error: No src provided.'
@@ -176,30 +172,21 @@ define(
 
 			var audioElement = new Audio()
 
-			var canPlayThroughCallback = function() {
-				this.removeEventListener( 'canplaythrough', canPlayThroughCallback, true )
-				this.removeEventListener( 'error', onError, true )
-
-				this.currentTime = 0
-				this.pause()
-
-				onLoadCallback( this )
-			}
-
-			audioElement.addEventListener( 'canplaythrough', canPlayThroughCallback, true )
-			audioElement.addEventListener( 'error', onError, true )
-
-			audioElement.playing = false
 			audioElement.src = createFixedSoundFileSrc( src )
 
-			// old WebKit
-			audioElement.autobuffer = 'auto'
+			// old webkit
+			if( audioElement.autobuffer ) {
+				audioElement.autobuffer = 'auto'
+			}
 
-			// new WebKit
-			audioElement.preload = 'auto'
+			// new webkit
+			if( audioElement.preload ) {
+				audioElement.preload = 'auto'
+			}
+
 			audioElement.load()
-			audioElement.play()
-			audioElement.volume = 0
+
+			onLoadCallback( audioElement )
 		}
 
 		var createSound = function( buffer ) {
