@@ -116,7 +116,18 @@ if( !window.console ) {
 	}
 
 	var isHtml5Capable = function() {
-		return isCanvasCapable() && navigator.userAgent.indexOf( "MSIE 9.0" ) == -1
+		return isAtLeastBrowser( 'Firefox', 18 ) ||
+			isAtLeastBrowser( 'Chrome', 22 ) ||
+			( isCanvasCapable() && navigator.userAgent.indexOf( 'MSIE 9.0' ) == -1 )
+	}
+
+	var isAtLeastBrowser = function( name, minimumVersion ) {
+		var match = navigator.userAgent.match( new RegExp( '.*' + name + '\\/(\\d+)' ) )
+		if( !match ) return false
+
+		var version = parseInt( match[ 1 ], 10 )
+
+		return version >= minimumVersion
 	}
 
 	var isCanvasCapable = function() {
@@ -126,18 +137,7 @@ if( !window.console ) {
 			canvasElement.getContext( '2d' )
 	}
 
-	var isWebGlIncapableFirefox = function() {
-		var match = navigator.userAgent.match( /.*Firefox\/(\d+)/ )
-		if( !match ) return false
-
-		var version = parseInt( match[ 1 ], 10 )
-
-		return version < MIN_FIREFOX_VERSION_FOR_WEBGL
-	}
-
 	var isWebGlCapable = function() {
-		if( isWebGlIncapableFirefox() ) return false
-
 		var gl,
 			contextNames = [ 'webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl' ],
 			attributes   = { alpha: false },
@@ -167,9 +167,9 @@ if( !window.console ) {
 	}
 
 	var detectBrowserLanguage = function() {
-		var language = navigator.language || navigator.userLanguage || ""
+		var language = navigator.language || navigator.userLanguage || ''
 
-		return language.split( "-" ).shift().toLowerCase()
+		return language.split( '-' ).shift().toLowerCase()
 	}
 
 	var setDefaults = function( config ) {
@@ -231,7 +231,8 @@ if( !window.console ) {
 	}
 
 	var supportsOnlySingleChannelAudio = function() {
-		return navigator.userAgent.indexOf( 'IEMobile/9.0' ) > -1 || navigator.userAgent.indexOf( 'IEMobile/10.0' ) > -1
+		return navigator.userAgent.indexOf( 'IEMobile/9.0' ) > -1 ||
+			navigator.userAgent.indexOf( 'IEMobile/10.0' ) > -1
 	}
 
 	var process = function( spellObject, config, onInitialized, debugMessageCallback ) {
