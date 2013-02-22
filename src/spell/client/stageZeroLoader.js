@@ -116,16 +116,19 @@ if( !window.console ) {
 	}
 
 	var isHtml5Capable = function() {
-		return isAtLeastBrowser( 'Firefox', 18 ) ||
-			isAtLeastBrowser( 'Chrome', 22 ) ||
+		return isAtLeastBrowser( 'Chrome', 22 ) ||
+			isAtLeastBrowser( 'Firefox', 18 ) ||
 			isAtLeastBrowser( 'Safari', 6 ) ||
-			( isCanvasCapable() && navigator.userAgent.indexOf( 'MSIE 9.0' ) == -1 )
+			isAtLeastBrowser( 'IE', 10 ) ||
+			isCanvasCapable()
 	}
 
 	var isAtLeastBrowser = function( name, minimumVersion ) {
 		var match = name === 'Safari' ?
-			navigator.userAgent.match( /.*Version\/(\d+).*Safari/ ) :
-			navigator.userAgent.match( new RegExp( '.*' + name + '\\/(\\d+)' ) )
+				navigator.userAgent.match( /.*Version\/(\d+).*Safari/ ) :
+				name === 'IE' ?
+					navigator.userAgent.match( /.*MSIE (\d+)/ ) :
+					navigator.userAgent.match( new RegExp( '.*' + name + '\\/(\\d+)' ) )
 
 		if( !match ) return false
 
