@@ -118,11 +118,15 @@ if( !window.console ) {
 	var isHtml5Capable = function() {
 		return isAtLeastBrowser( 'Firefox', 18 ) ||
 			isAtLeastBrowser( 'Chrome', 22 ) ||
+			isAtLeastBrowser( 'Safari', 6 ) ||
 			( isCanvasCapable() && navigator.userAgent.indexOf( 'MSIE 9.0' ) == -1 )
 	}
 
 	var isAtLeastBrowser = function( name, minimumVersion ) {
-		var match = navigator.userAgent.match( new RegExp( '.*' + name + '\\/(\\d+)' ) )
+		var match = name === 'Safari' ?
+			navigator.userAgent.match( /.*Version\/(\d+).*Safari/ ) :
+			navigator.userAgent.match( new RegExp( '.*' + name + '\\/(\\d+)' ) )
+
 		if( !match ) return false
 
 		var version = parseInt( match[ 1 ], 10 )
