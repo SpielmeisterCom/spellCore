@@ -20,8 +20,9 @@
 
 	var createRequest = function( url ) {
 		var request = new XMLHttpRequest()
+
 		request.open( 'GET', url, false )
-		request.send( null )
+		request.send()
 
 		return request
 	}

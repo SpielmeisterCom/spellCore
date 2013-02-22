@@ -69,7 +69,7 @@ define(
 				request.onreadystatechange = _.bind( onReadyStateChange, this, request )
 				request.onerror            = _.bind( onError, this )
 				request.open( 'GET', url, true )
-				request.send( null )
+				request.send()
 			}
 		}
 
