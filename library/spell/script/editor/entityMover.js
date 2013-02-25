@@ -288,13 +288,13 @@ define(
 			updateEntity.call( this, entityManager, entityId, worldPosition )
 		}
 
-		var updateEntityByRelativeOffset = function( entityId, offset ) {
+		var updateEntityByRelativeOffset = function( entityManager, entityId, offset ) {
 			var transform           = this.transforms[ entityId ],
 				currentTranslation  = transform.translation
 
 			vec2.add(currentTranslation, offset, currentTranslation)
 
-			updateEntity.call(this, entityId, currentTranslation)
+			updateEntity.call(this, entityManager, entityId, currentTranslation)
 			sendTransformToSpellEd.call( this, entityId )
 		}
 
@@ -395,7 +395,7 @@ define(
 				this.appearances            = editorSystem.appearances
 				this.animatedAppearances    = editorSystem.animatedAppearances
 				this.editorConfigurations   = editorSystem.editorConfigurations
-				this.metadata                  = editorSystem.metadata
+				this.metadata               = editorSystem.metadata
 			},
 
 			activate: function( spell, editorSystem, event ) {
@@ -445,7 +445,8 @@ define(
 			},
 
 			keyDown: function( spell, editorSystem, event ) {
-				var movementAllowed = this.editorSystem.prototype.isMoveable.call( this.editorSystem, this.selectedEntity )
+				var movementAllowed = this.editorSystem.prototype.isMoveable.call( this.editorSystem, this.selectedEntity ),
+					entityManager   = spell.entityManager
 
 				if(event.keyCode == 27 && this.selectedEntity ) {
 					//ESC cancels selection
@@ -457,19 +458,19 @@ define(
 
 				} else if( event.keyCode == 37 && this.selectedEntity && movementAllowed ) {
 					//Left arrow moves the selected entity one pixel to the left
-					updateEntityByRelativeOffset.call( this, this.selectedEntity, [-1, 0])
+					updateEntityByRelativeOffset.call( this, entityManager, this.selectedEntity, [-1, 0])
 
 				} else if( event.keyCode == 38 && this.selectedEntity && movementAllowed ) {
 					//top arrow moves the selected entity one pixel up
-					updateEntityByRelativeOffset.call( this, this.selectedEntity, [0, 1])
+					updateEntityByRelativeOffset.call( this, entityManager, this.selectedEntity, [0, 1])
 
 				} else if( event.keyCode == 39 && this.selectedEntity && movementAllowed ) {
 					//right arrow moves the selected entity one pixel to the right
-					updateEntityByRelativeOffset.call( this, this.selectedEntity, [1, 0])
+					updateEntityByRelativeOffset.call( this, entityManager, this.selectedEntity, [1, 0])
 
 				} else if( event.keyCode == 40 && this.selectedEntity && movementAllowed ) {
 					//down arrow moves the selected entity one pixel down
-					updateEntityByRelativeOffset.call( this, this.selectedEntity, [0, -1])
+					updateEntityByRelativeOffset.call( this, entityManager, this.selectedEntity, [0, -1])
 
 				}
 			},
