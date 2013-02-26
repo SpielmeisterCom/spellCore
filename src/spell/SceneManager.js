@@ -59,7 +59,7 @@ define(
 						this.mainLoop.setRenderCallback()
 						this.mainLoop.setUpdateCallback()
 						this.activeScene.destroy()
-						this.entityManager.reset()
+						this.entityManager.init()
 						this.activeScene = undefined
 
 						if( freeMemory &&

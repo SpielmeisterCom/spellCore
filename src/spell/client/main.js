@@ -105,6 +105,8 @@ define(
 
 			var entityManager = new EntityManager( spell, configurationManager, spell.eventManager, templateManager )
 
+			entityManager.init()
+
 			var sceneManager = new SceneManager(
 				spell,
 				entityManager,

@@ -645,8 +645,8 @@ define(
 			this.componentMaps        = {}
 			this.eventManager         = eventManager
 			this.templateManager      = templateManager
-			this.spatialIndex         = new QuadTree( this.configurationManager.getValue( 'quadTreeSize' ) )
 			this.spell                = spell
+			this.spatialIndex         = undefined
 
 			this.templateManager.registerComponentTypeAddedCallback(
 				_.bind( addComponentType, null, this.componentMaps )
@@ -885,7 +885,7 @@ define(
 			/**
 			 * Resets the entity manager. Removes all entity instances in the process.
 			 */
-			reset : function() {
+			init : function() {
 				var componentMaps = this.componentMaps,
 					eventManager  = this.eventManager
 
