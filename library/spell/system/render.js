@@ -113,7 +113,7 @@ define(
 
 				childrenIds = visibleEntity.children
 
-				if( childrenIds ) {
+				if( childrenIds && childrenIds.length > 0 ) {
 					createEntityIdsInDrawOrder( visibleEntities, childrenIds, result )
 				}
 			}
