@@ -446,7 +446,8 @@ define(
 
 			keyDown: function( spell, editorSystem, event ) {
 				var movementAllowed = this.editorSystem.prototype.isMoveable.call( this.editorSystem, this.selectedEntity ),
-					entityManager   = spell.entityManager
+					entityManager   = spell.entityManager,
+					canMoveEntity   = this.selectedEntity && movementAllowed && this.editorSystem.commandMode === true
 
 				if(event.keyCode == 27 && this.selectedEntity ) {
 					//ESC cancels selection
@@ -456,19 +457,19 @@ define(
 					//TAB toggles through selected entity
 					toggleThroughMatchedEntites.call(this, this.matchedEntities, this.selectedEntity )
 
-				} else if( event.keyCode == 37 && this.selectedEntity && movementAllowed ) {
+				} else if( event.keyCode == 37 && canMoveEntity ) {
 					//Left arrow moves the selected entity one pixel to the left
 					updateEntityByRelativeOffset.call( this, entityManager, this.selectedEntity, [-1, 0])
 
-				} else if( event.keyCode == 38 && this.selectedEntity && movementAllowed ) {
+				} else if( event.keyCode == 38 && canMoveEntity ) {
 					//top arrow moves the selected entity one pixel up
 					updateEntityByRelativeOffset.call( this, entityManager, this.selectedEntity, [0, 1])
 
-				} else if( event.keyCode == 39 && this.selectedEntity && movementAllowed ) {
+				} else if( event.keyCode == 39 && canMoveEntity ) {
 					//right arrow moves the selected entity one pixel to the right
 					updateEntityByRelativeOffset.call( this, entityManager, this.selectedEntity, [1, 0])
 
-				} else if( event.keyCode == 40 && this.selectedEntity && movementAllowed ) {
+				} else if( event.keyCode == 40 && canMoveEntity ) {
 					//down arrow moves the selected entity one pixel down
 					updateEntityByRelativeOffset.call( this, entityManager, this.selectedEntity, [0, -1])
 
