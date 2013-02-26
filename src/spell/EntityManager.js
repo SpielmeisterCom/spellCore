@@ -469,9 +469,7 @@ define(
 			}
 		}
 
-		var createAdditionalEntityConfig = function( isRoot, parentId, name, entityTemplateId ) {
-			var result = {}
-
+		var addAdditionalEntityConfig = function( result, isRoot, parentId, name, entityTemplateId ) {
 			if( isRoot && !parentId ) {
 				result[ ROOT_COMPONENT_ID ] = {}
 			}
@@ -491,26 +489,25 @@ define(
 		}
 
 		var createEntity = function( eventManager, componentMaps, spatialIndex, templateManager, entityConfig, isRoot ) {
-			isRoot       = ( isRoot === true || isRoot === undefined )
 			entityConfig = normalizeEntityConfig( templateManager, entityConfig )
 
 			if( !entityConfig ) throw 'Error: Supplied invalid arguments.'
 
-			var entityTemplateId = entityConfig.entityTemplateId,
-				config           = entityConfig.config || {},
-				parentId         = entityConfig.parentId
+			var entityTemplateId   = entityConfig.entityTemplateId,
+				config             = entityConfig.config || {},
+				parentId           = entityConfig.parentId
 
 			if( !entityTemplateId && !config ) {
 				throw 'Error: Supplied invalid arguments.'
 			}
 
+			isRoot = isRoot === true ||
+				( isRoot === undefined && !parentId )
+
 			var entityId = getEntityId( entityConfig.id )
 
 			// add additional components which the engine requires
-			_.extend(
-				config,
-				createAdditionalEntityConfig( isRoot, parentId, entityConfig.name, entityTemplateId )
-			)
+			addAdditionalEntityConfig( config, isRoot, parentId, entityConfig.name, entityTemplateId )
 
 			// creating the entity
 			var entityComponents = templateManager.createComponents( entityTemplateId, config || {} )
@@ -741,6 +738,28 @@ define(
 
 				// HACK: updateVisualObject requires the complete ECS to be completely instantiated, because it propagates information towards the leafs.
 				updateVisualObject( this.componentMaps, entityId )
+
+				// adding the entity id to its parent's children component
+				var parentComponent = this.componentMaps[ PARENT_COMPONENT_ID ][ entityId ]
+
+				if( parentComponent ) {
+					var parentId                = parentComponent.id,
+						childrenComponents      = this.componentMaps[ CHILDREN_COMPONENT_ID ],
+						parentChildrenComponent = childrenComponents[ parentId ]
+
+					if( parentChildrenComponent ) {
+						parentChildrenComponent.ids.push( entityId )
+
+						this.eventManager.publish( [ Events.COMPONENT_UPDATED, CHILDREN_COMPONENT_ID ], [ parentChildrenComponent, entityId ] )
+
+					} else {
+						parentChildrenComponent = { ids : [ entityId ] }
+
+						childrenComponents[ parentId ] = parentChildrenComponent
+
+						this.eventManager.publish( [ Events.COMPONENT_CREATED, CHILDREN_COMPONENT_ID ], [ parentChildrenComponent, entityId ] )
+					}
+				}
 
 				return entityId
 			},
