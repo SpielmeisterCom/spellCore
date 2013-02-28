@@ -50,7 +50,6 @@ define(
 			 * @param {Object} [spell] The spell object.
 			 */
 			init: function( spell ) {
-				this.spell = spell
 				entityLookupMap = {}
 			},
 
