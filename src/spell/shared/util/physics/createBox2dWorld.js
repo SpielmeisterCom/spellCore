@@ -18,14 +18,11 @@ define(
 			createB2World      = Box2D.Dynamics.createB2World,
 			b2Body             = Box2D.Dynamics.b2Body,
 			createB2BodyDef    = Box2D.Dynamics.createB2BodyDef,
-			createB2FilterData = Box2D.Dynamics.createB2FilterData
+			createB2FilterData = Box2D.Dynamics.createB2FilterData,
+			idToBody           = {}
 
 		var getBodyById = function( entityId ) {
-			for( var body = this.rawWorld.GetBodyList(); body; body = body.GetNext() ) {
-				if( body.GetUserData() == entityId + '' ) {
-					return body
-				}
-			}
+			return idToBody[ entityId ]
 		}
 
 		var applyForce = function( entityId, force, point ) {
@@ -136,7 +133,7 @@ define(
 		var createBodyDef = function( entityId, body, transform ) {
 			var translation = transform.translation,
 				bodyDef     = createB2BodyDef(),
-				type        = getBodyType( body.type),
+				type        = getBodyType( body.type ),
 				scale       = this.scale
 
 			if( type === undefined ) return
@@ -149,12 +146,18 @@ define(
 			bodyDef.angle         = transform.rotation
 			bodyDef.userData      = entityId
 
-			return this.rawWorld.CreateBody( bodyDef )
+			var body = this.rawWorld.CreateBody( bodyDef )
+
+			idToBody[ entityId ] = body
+
+			return body
 		}
 
 		var destroyBody = function( entityId ) {
 			var body = this.getBodyById( entityId )
 			if( !body ) return
+
+			delete idToBody[ entityId ]
 
 			this.rawWorld.DestroyBody( body )
 		}
