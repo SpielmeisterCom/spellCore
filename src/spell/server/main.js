@@ -1,9 +1,7 @@
 define(
 	'spell/server/main',
 	[
-		'spell/server/build/createServer',
 		'spell/server/util/createMainLoop',
-		'spell/server/util/connect/extDirect',
 		'spell/shared/util/template/TemplateManager',
 		'spell/shared/util/networkProtocol',
 		'spell/shared/util/network/Messages',
@@ -21,9 +19,7 @@ define(
 		'spell/functions'
 	],
 	function(
-		createBuildServer,
 		createMainLoop,
-		extDirect,
 		TemplateManager,
 		networkProtocol,
 		Messages,
@@ -85,18 +81,6 @@ define(
 			return connect()
 				.use( connect.favicon() )
 				.use( connect.logger( 'dev' ) )
-				.use(
-					cors( {
-						origins: [ 'http://localhost:3000', 'http://localhost:8080' ]
-					} )
-				)
-				.use(
-					extDirect(
-						'http://localhost:8080/router/',
-						'SpellBuild',
-						createBuildServer( spellCorePath, projectsPath )
-					)
-				)
 				.listen( port )
 		}
 

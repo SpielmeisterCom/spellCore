@@ -1,8 +1,6 @@
 define(
 	'spell/cli/developmentTool',
 	[
-		'spell/server/main',
-
 		'spell/shared/build/executeCreateDeployBuild',
 		'spell/shared/build/exportDeploymentArchive',
 		'spell/shared/build/isDevEnvironment',
@@ -16,8 +14,6 @@ define(
 		'spell/functions'
 	],
 	function(
-		serverMain,
-
 		executeCreateDeployBuild,
 		exportDeploymentArchive,
 		isDevEnvironment,
@@ -148,23 +144,6 @@ define(
 				)
 			}
 
-			var startServerCommand = function( cwd, command ) {
-				var errors = [],
-					projectsPath = path.resolve( cwd + ( command.projectsRoot ? '/' + command.projectsRoot : '' ) )
-
-				if( !fs.existsSync( projectsPath ) ) {
-					errors.push( 'Error: No valid projects directory supplied. Unable to start build server. ' +
-						'See \'' + executableName + ' start-server --help\'.' )
-				}
-
-				if( errors.length > 0 ) {
-					printErrors( errors )
-
-				} else {
-					serverMain( spellCorePath, projectsPath, command.port )
-				}
-			}
-
 			var initCommand = function( spellCorePath, cwd, isDevEnvironment, command ) {
 				var projectPath = path.resolve( command.directory || cwd )
 
@@ -216,14 +195,6 @@ define(
 				.option( '-d, --debug' )
 				.description( 'build for a specific target [html5 (default)]' )
 				.action( _.bind( buildCommand, this, cwd ) )
-
-			commander
-				.command( 'start-server' )
-				.option( '-u, --user [username]', 'the user the server drops it\'s privileges to' )
-				.option( '-p, --port [port number]', 'the port the server runs on' )
-				.option( '-r, --projects-root [directory]', 'The path to the projects directory that contains the project directories. The default is the current working directory.' )
-				.description( 'start the dev server - run with superuser privileges to enable flash target support' )
-				.action( _.bind( startServerCommand, this, cwd ) )
 
 			commander
 				.command( 'init' )
