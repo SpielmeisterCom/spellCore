@@ -161,11 +161,9 @@ define(
 			_.each(
 				fileNames,
 				function( fileName ) {
-					var projectDirectoryFilePath = projectPath + '/' + publicDirName + '/' + fileName
-
 					copyFile(
-						spellCorePath + '/publicTemplate/' + fileName,
-						projectDirectoryFilePath
+						path.join( spellCorePath , 'publicTemplate' , fileName ),
+						path.join( projectPath, publicDirName, fileName )
 					)
 				}
 			)
@@ -180,13 +178,13 @@ define(
 
 			copyFile(
 				path.join( spellCorePath, 'build', engineIncludeFilename ),
-				html5OutputPath + '/spell.js'
+				path.join( html5OutputPath, 'spell.js' )
 			)
 
 			// copying stage zero loader
 			copyFile(
-				spellCorePath + '/src/spell/client/stageZeroLoader.js',
-				outputPath + '/spell.js'
+				path.join( spellCorePath, 'build', 'spell.loader.js' ),
+				path.join( outputPath, 'spell.js' )
 			)
 
 			return errors

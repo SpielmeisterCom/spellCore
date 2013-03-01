@@ -3,6 +3,7 @@ SPELL_COMMON_OPTIONS = -s src -m spell/client/main -i spell/client/runtimeModule
 SPELL_COMMON_BUILD = build/spell.common.js
 SPELL_HTML5_OPTIONS = -s src -m spell/client/main -i spell/client/runtimeModule,spell/shared/util/platform/private -e spell/shared/util/platform/private
 SPELL_HTML5_BUILD = build/spell.html5.js
+SPELL_UTIL_OPTIONS = -s src -m spell/server/build/dependencies -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util"
 SPELL_UTIL_INCLUDE_BUILD = build/spell.util.js
 SPELL_ENGINE_INCLUDE_DEV_BUILD = build/spell.dev.js
 SPELL_ENGINE_INCLUDE_DEPLOY_BUILD = build/spell.deploy.js
@@ -14,11 +15,6 @@ dev : $(SPELL_ENGINE_INCLUDE_DEV_BUILD) $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
 .PHONY: deploy
 deploy: $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
 	rm $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
-
-.PHONY: util
-util:
-	node tools/n.js -s src -m "spell/server/build/dependencies" -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util" > $(SPELL_UTIL_INCLUDE_BUILD)
-
 
 .PHONY: $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
 $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD): $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
@@ -35,6 +31,8 @@ libs:
 	mkdir -p build
 	node tools/n.js $(SPELL_COMMON_OPTIONS) > $(SPELL_COMMON_BUILD)
 	node tools/n.js $(SPELL_HTML5_OPTIONS) > $(SPELL_HTML5_BUILD)
+	node tools/n.js $(SPELL_UTIL_OPTIONS) > $(SPELL_UTIL_INCLUDE_BUILD)
+	cp src/spell/client/stageZeroLoader.js build/spell.loader.js
 
 .PHONY: clean
 clean:
