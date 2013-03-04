@@ -10,11 +10,12 @@ define(
 		'spell/script/editor/entityMover',
 		'spell/script/editor/selectedEntityHighlighter',
 		'spell/script/editor/entityRemover',
-
+        
 		'spell/script/editor/tilemapEditor',
 
 		'spell/math/vec2',
 		'spell/math/mat3',
+        'spell/shared/util/create',
 		'spell/functions'
 	],
 	function(
@@ -26,16 +27,18 @@ define(
 
 		vec2,
 		mat3,
+
+        create,
 		_
 		) {
 		'use strict'
 
 		var PLUGIN_MANIFEST = {
-			'cameraMover':                  cameraMover,
-			'entityMover':                  entityMover,
-			'entityRemover':                entityRemover,
-			'selectedEntityHighlighter':    selectedEntityHighlighter,
-			'tilemapEditor':                tilemapEditor
+		    'cameraMover':                  cameraMover,
+	        'entityMover':                  entityMover,
+	        'entityRemover':                entityRemover,
+	        'selectedEntityHighlighter':    selectedEntityHighlighter,
+	        'tilemapEditor':                tilemapEditor
 		};
 
 
@@ -98,7 +101,7 @@ define(
 					continue
 				}
 
-				var	fn                  = pluginInstance.__proto__[ functionName ]
+				var	fn                  = pluginInstance.prototype[ functionName ]
 
 				if ( fn ) {
 					fn.apply( pluginInstance, args )
@@ -219,7 +222,7 @@ define(
 			 * @param {Object} [spell] The spell object.
 			 */
 			init: function( spell ) {
-				this.blacklistedPlugins = this.config.deactivatedPlugins
+			    this.blacklistedPlugins = this.config.deactivatedPlugins
 
 				if (this.config.selectedEntityId) {
 					this.selectedEntity     = this.config.selectedEntityId
@@ -234,7 +237,7 @@ define(
 					}
 
 					var pluginConstructor = PLUGIN_MANIFEST[ pluginName ],
-						pluginInstance = new pluginConstructor( spell, this )
+						pluginInstance = create(pluginConstructor, [ spell, this ], { })
 
 					this.plugins[ pluginName ] = pluginInstance
 
