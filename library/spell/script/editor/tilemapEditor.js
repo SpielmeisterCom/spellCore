@@ -123,7 +123,7 @@ define(
 				mathUtil.isPointInRect( worldPosition, tilemapTranslation, tilemapDimensions[ 0 ], tilemapDimensions[ 1 ], 0 )
 			) {
 
-                mat3.inverse(worldToLocalMatrix, tilemapTransform.worldMatrix, worldToLocalMatrix )
+                mat3.inverse(tilemapTransform.worldMatrix, worldToLocalMatrix )
 
                 //convert worldposition to coordinates which are local to the tilemaps origin
 				mat3.multiplyVec2(worldToLocalMatrix, worldPosition, tmpVec2)
