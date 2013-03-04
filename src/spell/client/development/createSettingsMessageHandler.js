@@ -17,6 +17,9 @@ define(
 				drawTitleSafeOutline : function( payload ) {
 					spell.configurationManager.setValue( 'drawTitleSafeOutline', payload )
 				},
+				setScreenMode : function( payload ) {
+					spell.configurationManager.setValue( 'screenMode', payload )
+				},
 				simulateScreenAspectRatio : function( payload ) {
 					spell.configurationManager.setValue( 'screenAspectRatio', payload.aspectRatio )
 				}

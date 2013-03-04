@@ -90,7 +90,7 @@ define(
 			 * option "screenSize" is ignored. If set to "fixed" the option "screenSize" is used to determine the used screen size. The default is "fit".
 			 */
 			screenMode : {
-				validValues : [ 'fit', 'fixed' ],
+				validValues : [ 'fill', 'fit', 'fixed' ],
 				configurable : true,
 				extractor : extractDefault
 			},
@@ -252,7 +252,7 @@ define(
 				_.bind(
 					function( availableScreenSize ) {
 						var screenMode           = this.config.screenMode || 'fixed',
-							aspectRatioOverwrite = this.config.debug && this.config.screenAspectRatio,
+							aspectRatioOverwrite = this.config.screenAspectRatio > 0 ,
 							screenSize           = this.config.screenSize
 
 						if( aspectRatioOverwrite ) {
@@ -273,6 +273,9 @@ define(
 						} else if( screenMode === 'fixed' ) {
 							this.config.currentScreenSize = screenSize
 
+						} else if( screenMode === 'fill' ) {
+							this.config.currentScreenSize = [ availableScreenSize[ 0 ], availableScreenSize[ 1 ] ]
+
 						} else {
 							throw 'Error: Screen mode \'' + screenMode + '\' is not supported.'
 						}
@@ -286,18 +289,16 @@ define(
 
 		ConfigurationManager.prototype = {
 			setValue : function( name, value ) {
-				if( name === 'screenAspectRatio' ) {
-					this.config.currentScreenSize = createScreenSize(
-						PlatformKit.getAvailableScreenSize(
-							this.getValue( 'id' )
-						),
-						value
-					)
-
-					this.eventManager.publish( Events.SCREEN_RESIZE, [ this.config.currentScreenSize ] )
-				}
-
 				this.config[ name ] = value
+
+				if( name === 'screenAspectRatio' ||
+					name === 'screenMode' ) {
+
+					this.eventManager.publish(
+						Events.AVAILABLE_SCREEN_SIZE_CHANGED,
+						[ PlatformKit.getAvailableScreenSize( this.getValue( 'id' ) ) ]
+					)
+				}
 			},
 			getValue : function( name ) {
 				return this.config[ name ]
