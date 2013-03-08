@@ -3,7 +3,7 @@ define(
 	[
 		'spell/Defines',
 		'spell/Events',
-		'spell/client/util/createIncludedRectangle',
+		'spell/client/util/createComprisedRectangle',
 		'spell/math/util',
 		'spell/math/vec2',
 
@@ -12,7 +12,7 @@ define(
 	function(
 		Defines,
 		Events,
-		createIncludedRectangle,
+		createComprisedRectangle,
 		mathUtil,
 		vec2,
 
@@ -20,8 +20,6 @@ define(
 	) {
 		'use strict'
 
-
-		var tmpVec2 = vec2.create()
 
 		var isPointWithinEntity = function ( entityDimensions, transform, worldPosition ) {
 			return mathUtil.isPointInRect(
@@ -33,14 +31,14 @@ define(
 			)
 		}
 
-		var transformScreenToUI = function( camera, offset, cursorPosition ) {
+		var transformScreenToUI = function( screenSize, effectiveCameraDimensions, cursorPosition ) {
 			return [
-				cursorPosition[ 0 ] - camera.width * 0.5 - offset[ 0 ],
-				( cursorPosition[ 1 ] - camera.height * 0.5 ) * -1 - offset[ 1 ]
+				( cursorPosition[ 0 ] / screenSize[ 0 ] - 0.5 ) * effectiveCameraDimensions[ 0 ],
+				( cursorPosition[ 1 ] / screenSize[ 1 ] - 0.5 ) * -effectiveCameraDimensions[ 1 ]
 			]
 		}
 
-		var processEvent = function( entityManager, camera, offset, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvent ) {
+		var processEvent = function( entityManager, screenSize, effectiveCameraDimensions, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvent ) {
 			if( inputEvent.type !== 'pointerDown' &&
 				inputEvent.type !== 'pointerMove' &&
 				inputEvent.type !== 'pointerUp' &&
@@ -51,7 +49,7 @@ define(
 
 			var cursorScreenPosition = inputEvent.position,
             	cursorWorldPosition  = renderingContext.transformScreenToWorld( cursorScreenPosition ),
-				cursorUIPosition     = transformScreenToUI( camera, offset, cursorScreenPosition )
+				cursorUIPosition     = transformScreenToUI( screenSize, effectiveCameraDimensions, cursorScreenPosition )
 
             // TODO: only check visible objects
             for( var entityId in eventHandlers ) {
@@ -222,22 +220,15 @@ define(
 					cameraTransform  = this.transforms[ this.currentCameraId ],
 					screenSize       = this.screenSize
 
-				var cameraDimensions             = [ camera.width, camera.height ],
-					scaledCameraDimensions       = vec2.multiply( cameraDimensions, cameraTransform.scale, tmpVec2 ),
-					cameraAspectRatio            = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
-					effectiveTitleSafeDimensions = createIncludedRectangle( screenSize, cameraAspectRatio, true )
+				var aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
 
-				// tmpVec2 := offset
-				vec2.scale(
-					vec2.subtract( screenSize, effectiveTitleSafeDimensions, tmpVec2 ),
-					0.5
+				var effectiveCameraDimensions = vec2.multiply(
+					cameraTransform.scale,
+					createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
 				)
 
-				tmpVec2[ 0 ] = Math.round( tmpVec2[ 0 ] )
-				tmpVec2[ 1 ] = Math.round( tmpVec2[ 1 ] )
-
 				for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
-					processEvent( entityManager, camera, tmpVec2, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvents[ i ] )
+					processEvent( entityManager, screenSize, effectiveCameraDimensions, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvents[ i ] )
 				}
 			}
 		}
