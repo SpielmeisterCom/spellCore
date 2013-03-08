@@ -9,6 +9,14 @@
 		{
 			"name": "eventHandlers",
 			"componentId": "spell.component.eventHandlers"
+		},
+		{
+			"name": "visualObjects",
+			"componentId": "spell.component.visualObject"
+		},
+		{
+			"name": "cameras",
+			"componentId": "spell.component.2d.graphics.camera"
 		}
 	],
 	"config": [

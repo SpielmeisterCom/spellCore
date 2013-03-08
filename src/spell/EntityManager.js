@@ -219,6 +219,7 @@ define(
 		var addComponents = function( componentMaps, eventManager, entityId, entityComponents ) {
 			var component
 
+			// creating the components
 			for( var componentId in entityComponents ) {
 				component = entityComponents[ componentId ]
 
@@ -227,6 +228,11 @@ define(
 				}
 
 				componentMaps[ componentId ][ entityId ] = component
+			}
+
+			// triggering "component created" events
+			for( var componentId in entityComponents ) {
+				component = entityComponents[ componentId ]
 
 				eventManager.publish( [ Events.COMPONENT_CREATED, componentId ], [ component, entityId ] )
 			}
@@ -402,7 +408,11 @@ define(
 
 		var addToSpatialIndex = function( spatialIndex, componentMaps, dimensions, entityId ) {
 			var visualObject = componentMaps[ VISUAL_OBJECT_COMPONENT_ID ][ entityId ]
-			if( !visualObject ) return
+
+			if( !visualObject ||
+				visualObject.group === 'ui' ) {
+				return
+			}
 
 			var childrenComponent = componentMaps[ CHILDREN_COMPONENT_ID ][ entityId ],
 				parentComponent   = componentMaps[ PARENT_COMPONENT_ID ][ entityId ],
@@ -548,6 +558,7 @@ define(
 			)
 
 
+			_.extend( entityComponents, childrenComponentConfig )
 			eventManager.publish( Events.ENTITY_CREATED, [ entityId, entityComponents ] )
 
 			return entityId

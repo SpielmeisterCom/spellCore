@@ -23,6 +23,14 @@
 			"type": "number",
 			"default": 1,
 			"doc": "the resulting opacity that the entity is drawn with"
+		},
+		{
+			"name": "group",
+			"type": {
+				"name": "enum",
+				"values": [ "world", "ui" ]
+			},
+			"default": "world"
 		}
 	],
 	"version": 1

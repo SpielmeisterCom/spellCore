@@ -1,26 +1,21 @@
 define(
 	'spell/system/processPointerInput',
 	[
+		'spell/Defines',
+		'spell/Events',
 		'spell/math/util',
 
 		'spell/functions'
 	],
 	function(
+		Defines,
+		Events,
 		mathUtil,
 
 		_
 	) {
 		'use strict'
 
-		/**
-		 * Creates an instance of the system.
-		 *
-		 * @constructor
-		 * @param {Object} [spell] The spell object.
-		 */
-		var processPointerInput = function( spell ) {
-
-		}
 
 		var isPointWithinEntity = function ( entityDimensions, transform, worldPosition ) {
 			return mathUtil.isPointInRect(
@@ -28,34 +23,50 @@ define(
 				transform.worldTranslation,
 				entityDimensions[ 0 ],
 				entityDimensions[ 1 ],
-				transform.rotation //TODO: should be worldRotation
+				transform.rotation // TODO: should be worldRotation
 			)
 		}
 
-		var processEvent = function( entityManager, pointedEntityMap, renderingContext, eventHandlers, transforms, inputEvent ) {
+		var transformScreenToUI = function( camera, cursorPosition ) {
+			return [
+				cursorPosition[ 0 ] - camera.width * 0.5,
+				( cursorPosition[ 1 ] - camera.height * 0.5 ) * -1
+			]
+		}
+
+		var processEvent = function( entityManager, currentCamera, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvent ) {
 			if( inputEvent.type !== 'pointerDown' &&
 				inputEvent.type !== 'pointerMove' &&
 				inputEvent.type !== 'pointerUp' &&
-				inputEvent.type !== 'pointerCancel') {
+				inputEvent.type !== 'pointerCancel' ) {
 
 				return
 			}
 
-            var cursorWorldPosition = renderingContext.transformScreenToWorld( inputEvent.position )
+			var cursorScreenPosition = inputEvent.position,
+            	cursorWorldPosition  = renderingContext.transformScreenToWorld( cursorScreenPosition ),
+				cursorUIPosition     = transformScreenToUI( currentCamera, cursorScreenPosition )
 
-            //TODO: only check visible objects
+            // TODO: only check visible objects
             for( var entityId in eventHandlers ) {
-                var transform = transforms[ entityId ]
+                var transform    = transforms[ entityId ],
+					visualObject = visualObjects[ entityId ]
 
-                if( !transform ) {
+                if( !transform ||
+					!visualObject ) {
+
                     continue
                 }
+
+				var isInUIGroup = visualObject.group === 'ui'
 
 				if( pointedEntityMap[ entityId ] === undefined ) {
 					pointedEntityMap[ entityId ] = false
 				}
 
-                if( inputEvent.type === 'pointerCancel' && pointedEntityMap[ entityId ] === inputEvent.pointerId ) {
+                if( inputEvent.type === 'pointerCancel' &&
+					pointedEntityMap[ entityId ] === inputEvent.pointerId ) {
+
                     entityManager.triggerEvent( entityId, 'pointerCancel' )
                     entityManager.triggerEvent( entityId, 'pointerUp' )
                     entityManager.triggerEvent( entityId, 'pointerOut' )
@@ -66,8 +77,14 @@ define(
 
 				var entityDimensions = entityManager.getEntityDimensions( entityId )
 
+				var isEntityHit = isPointWithinEntity(
+					entityDimensions,
+					transform,
+					isInUIGroup ? cursorUIPosition : cursorWorldPosition
+				)
+
 				if( entityDimensions &&
-					isPointWithinEntity( entityDimensions, transform, cursorWorldPosition ) ) {
+					isEntityHit ) {
 
                     if( pointedEntityMap[ entityId ] === false ) {
                         entityManager.triggerEvent( entityId, 'pointerOver' )
@@ -77,28 +94,37 @@ define(
                         pointedEntityMap[ entityId ] = false
                         entityManager.triggerEvent( entityId, 'pointerUp' )
 
-                        //TODO: only fire pointerOut for devices that don't support hover status
+                        // TODO: only fire pointerOut for devices that don't support hover status
                         entityManager.triggerEvent( entityId, 'pointerOut' )
 
 
-                    } else if( inputEvent.type === 'pointerDown') {
+                    } else if( inputEvent.type === 'pointerDown' ) {
                         pointedEntityMap[ entityId ] = inputEvent.pointerId
                         entityManager.triggerEvent( entityId, 'pointerDown' )
 
-					} else if ( inputEvent.type === 'pointerMove' ) {
+					} else if( inputEvent.type === 'pointerMove' ) {
                         pointedEntityMap[ entityId ] = inputEvent.pointerId
                         entityManager.triggerEvent( entityId, 'pointerMove' )
 					}
 
-
-				} else {
-                    if( pointedEntityMap[ entityId ] === inputEvent.pointerId ) {
-                        //pointer moved out of the entity
-						pointedEntityMap[ entityId ] = false
-						entityManager.triggerEvent( entityId, 'pointerOut' )
-					}
+				} else if( pointedEntityMap[ entityId ] === inputEvent.pointerId ) {
+					// pointer moved out of the entity
+					pointedEntityMap[ entityId ] = false
+					entityManager.triggerEvent( entityId, 'pointerOut' )
 				}
 			}
+		}
+
+
+		/**
+		 * Creates an instance of the system.
+		 *
+		 * @constructor
+		 * @param {Object} [spell] The spell object.
+		 */
+		var processPointerInput = function( spell ) {
+			this.cameraChangedHandler
+			this.currentCameraId
 		}
 
 		processPointerInput.prototype = {
@@ -113,6 +139,19 @@ define(
 				 * @type {Object}
 				 */
 				this.pointedEntityMap = {}
+
+
+				var eventManager = spell.eventManager
+
+				this.cameraChangedHandler = _.bind(
+					function( camera, entityId ) {
+						this.currentCameraId = camera.active ? entityId : undefined
+					},
+					this
+				)
+
+				eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+				eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 			},
 
 			/**
@@ -121,7 +160,10 @@ define(
 		 	 * @param {Object} [spell] The spell object.
 			 */
 			destroy: function( spell ) {
+				var eventManager = spell.eventManager
 
+				eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+				eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 			},
 
 			/**
@@ -155,10 +197,12 @@ define(
 					pointedEntityMap = this.pointedEntityMap,
 					renderingContext = spell.renderingContext,
 					transforms       = this.transforms,
-                    eventHandlers    = this.eventHandlers
+                    eventHandlers    = this.eventHandlers,
+					visualObjects    = this.visualObjects,
+					currentCamera    = this.cameras[ this.currentCameraId ]
 
 				for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
-					processEvent( entityManager, pointedEntityMap, renderingContext, eventHandlers, transforms, inputEvents[ i ] )
+					processEvent( entityManager, currentCamera, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvents[ i ] )
 				}
 			}
 		}

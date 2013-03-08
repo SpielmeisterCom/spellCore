@@ -41,6 +41,32 @@ define(
 
 			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+
+
+			this.visualObjectCreatedHandler = _.bind(
+				function( entityId, entity ) {
+					var visualObject = entity[ Defines.VISUAL_OBJECT_COMPONENT_ID ]
+
+					if( !visualObject ||
+						visualObject.group !== 'ui' ) {
+
+						return
+					}
+
+					var childrenComponent = entity[ Defines.CHILDREN_COMPONENT_ID ],
+						parentComponent   = entity[ Defines.PARENT_COMPONENT_ID ]
+
+					this.visibleEntitiesUI[ entityId ] = {
+						children : childrenComponent ? childrenComponent.ids : [],
+						layer : visualObject.layer,
+						id : entityId,
+						parent : parentComponent ? parentComponent.id : 0
+					}
+				},
+				this
+			)
+
+			eventManager.subscribe( [ Events.ENTITY_CREATED, Defines.VISUAL_OBJECT_COMPONENT_ID ], this.visualObjectCreatedHandler )
 		}
 
 		var destroy = function( spell ) {
@@ -49,6 +75,7 @@ define(
 			eventManager.unsubscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
 			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 			eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+			eventManager.unsubscribe( [ Events.ENTITY_CREATED, Defines.VISUAL_OBJECT_COMPONENT_ID ], this.visualObjectCreatedHandler )
 		}
 
 
@@ -66,7 +93,8 @@ define(
 					createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
 				)
 
-				spell.visibleEntities = spell.entityManager.getEntityIdsByRegion( transform.translation, effectiveCameraDimensions )
+				spell.visibleEntitiesWorld = spell.entityManager.getEntityIdsByRegion( transform.translation, effectiveCameraDimensions )
+				spell.visibleEntitiesUI = this.visibleEntitiesUI
 			}
 		}
 
@@ -79,12 +107,14 @@ define(
 		 * @constructor
 		 */
 		var Visibility = function( spell ) {
-			this.configurationManager = spell.configurationManager
-			this.eventManager         = spell.eventManager
-			this.screenSize           = spell.configurationManager.getValue( 'currentScreenSize' )
-			this.currentCameraId      = undefined
-			this.screenResizeHandler  = undefined
-			this.cameraChangedHandler = undefined
+			this.configurationManager       = spell.configurationManager
+			this.eventManager               = spell.eventManager
+			this.screenSize                 = spell.configurationManager.getValue( 'currentScreenSize' )
+			this.currentCameraId            = undefined
+			this.screenResizeHandler        = undefined
+			this.cameraChangedHandler       = undefined
+			this.visualObjectCreatedHandler = undefined
+			this.visibleEntitiesUI          = {}
 		}
 
 		Visibility.prototype = {

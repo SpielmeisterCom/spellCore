@@ -73,6 +73,7 @@ define(
 
 		var getRootEntities = function( entities ) {
 			var result = []
+
 			for( var id in entities ) {
 				if( entities[ id ].parent === 0 ) {
 					result.push( id )
@@ -599,23 +600,55 @@ define(
 				camera          = this.cameras[ currentCameraId ],
 				cameraTransform = transforms[ currentCameraId ]
 
-			if( camera && cameraTransform ) {
-				var aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
+			context.save()
+			{
+				if( camera && cameraTransform ) {
+					var aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
 
-				var effectiveCameraDimensions = vec2.multiply(
-					cameraTransform.scale,
-					createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
-				)
+					var effectiveCameraDimensions = vec2.multiply(
+						cameraTransform.scale,
+						createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
+					)
 
-				if( effectiveCameraDimensions ) {
-					setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
-					viewFrustum = createViewFrustum( effectiveCameraDimensions, cameraTransform.translation )
+					if( effectiveCameraDimensions ) {
+						setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
+						viewFrustum = createViewFrustum( effectiveCameraDimensions, cameraTransform.translation )
+					}
+				}
+
+
+				// draw visual objects in world group
+				var visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.visibleEntitiesWorld )
+
+				for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
+					drawVisualObject(
+						entityManager,
+						context,
+						transforms,
+						appearances,
+						appearanceTransforms,
+						animatedAppearances,
+						textAppearances,
+						tilemaps,
+						spriteSheetAppearances,
+						childrenComponents,
+						quadGeometries,
+						visualObjects,
+						rectangles,
+						deltaTimeInMs,
+						visibleEntityIdsSorted[ i ],
+						viewFrustum
+					)
 				}
 			}
+			context.restore()
 
 
-			var visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.visibleEntities )
+			setCamera( context, effectiveCameraDimensions, [ 0, 0 ] )
 
+			visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.visibleEntitiesUI )
+
+			// draw visual objects in ui group
 			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
 				drawVisualObject(
 					entityManager,
@@ -637,10 +670,15 @@ define(
 				)
 			}
 
+
 //			var elapsed = performance.now() - start
 
 //			spell.statisticsManager.updateNode( 'drawing', elapsed )
 
+
+			if( effectiveCameraDimensions ) {
+				setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
+			}
 
 			if( this.config.debug &&
 				drawDebugShapes ) {
