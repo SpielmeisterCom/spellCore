@@ -3,19 +3,25 @@ define(
 	[
 		'spell/Defines',
 		'spell/Events',
+		'spell/client/util/createIncludedRectangle',
 		'spell/math/util',
+		'spell/math/vec2',
 
 		'spell/functions'
 	],
 	function(
 		Defines,
 		Events,
+		createIncludedRectangle,
 		mathUtil,
+		vec2,
 
 		_
 	) {
 		'use strict'
 
+
+		var tmpVec2 = vec2.create()
 
 		var isPointWithinEntity = function ( entityDimensions, transform, worldPosition ) {
 			return mathUtil.isPointInRect(
@@ -27,14 +33,14 @@ define(
 			)
 		}
 
-		var transformScreenToUI = function( camera, cursorPosition ) {
+		var transformScreenToUI = function( camera, offset, cursorPosition ) {
 			return [
-				cursorPosition[ 0 ] - camera.width * 0.5,
-				( cursorPosition[ 1 ] - camera.height * 0.5 ) * -1
+				cursorPosition[ 0 ] - camera.width * 0.5 - offset[ 0 ],
+				( cursorPosition[ 1 ] - camera.height * 0.5 ) * -1 - offset[ 1 ]
 			]
 		}
 
-		var processEvent = function( entityManager, currentCamera, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvent ) {
+		var processEvent = function( entityManager, camera, offset, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvent ) {
 			if( inputEvent.type !== 'pointerDown' &&
 				inputEvent.type !== 'pointerMove' &&
 				inputEvent.type !== 'pointerUp' &&
@@ -45,7 +51,7 @@ define(
 
 			var cursorScreenPosition = inputEvent.position,
             	cursorWorldPosition  = renderingContext.transformScreenToWorld( cursorScreenPosition ),
-				cursorUIPosition     = transformScreenToUI( currentCamera, cursorScreenPosition )
+				cursorUIPosition     = transformScreenToUI( camera, offset, cursorScreenPosition )
 
             // TODO: only check visible objects
             for( var entityId in eventHandlers ) {
@@ -123,6 +129,8 @@ define(
 		 * @param {Object} [spell] The spell object.
 		 */
 		var processPointerInput = function( spell ) {
+			this.screenSize           = spell.configurationManager.getValue( 'currentScreenSize' )
+			this.screenResizeHandler
 			this.cameraChangedHandler
 			this.currentCameraId
 		}
@@ -152,6 +160,16 @@ define(
 
 				eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 				eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+
+
+				this.screenResizeHandler = _.bind(
+					function( size ) {
+						this.screenSize = size
+					},
+					this
+				)
+
+				eventManager.subscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
 			},
 
 			/**
@@ -164,6 +182,7 @@ define(
 
 				eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 				eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+				eventManager.unsubscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
 			},
 
 			/**
@@ -199,10 +218,26 @@ define(
 					transforms       = this.transforms,
                     eventHandlers    = this.eventHandlers,
 					visualObjects    = this.visualObjects,
-					currentCamera    = this.cameras[ this.currentCameraId ]
+					camera           = this.cameras[ this.currentCameraId ],
+					cameraTransform  = this.transforms[ this.currentCameraId ],
+					screenSize       = this.screenSize
+
+				var cameraDimensions             = [ camera.width, camera.height ],
+					scaledCameraDimensions       = vec2.multiply( cameraDimensions, cameraTransform.scale, tmpVec2 ),
+					cameraAspectRatio            = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
+					effectiveTitleSafeDimensions = createIncludedRectangle( screenSize, cameraAspectRatio, true )
+
+				// tmpVec2 := offset
+				vec2.scale(
+					vec2.subtract( screenSize, effectiveTitleSafeDimensions, tmpVec2 ),
+					0.5
+				)
+
+				tmpVec2[ 0 ] = Math.round( tmpVec2[ 0 ] )
+				tmpVec2[ 1 ] = Math.round( tmpVec2[ 1 ] )
 
 				for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
-					processEvent( entityManager, currentCamera, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvents[ i ] )
+					processEvent( entityManager, camera, tmpVec2, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvents[ i ] )
 				}
 			}
 		}
