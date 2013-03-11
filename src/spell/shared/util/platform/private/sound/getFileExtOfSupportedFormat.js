@@ -4,24 +4,24 @@ define(
 		'use strict'
 
 
-		var fileExtensionToMimeTypes = {
-			ogg : [
-				'audio/ogg; codecs=vorbis'
-			],
-			mp3 : [
-				'audio/mpeg; codecs="mp3"',
-				'audio/mpeg',
-				'audio/mp3',
-				'audio/MPA',
-				'audio/mpa-robust'
-			],
-			wav : [
-				'audio/wav; codecs="1"',
-				'audio/wav',
-				'audio/wave',
-				'audio/x-wav'
-			]
-		}
+		var fileExtensionToMimeTypes = [
+			{
+				fileExtension : 'ogg',
+				mimeTypes : [
+					'audio/ogg; codecs=vorbis'
+				]
+			},
+			{
+				fileExtension : 'mp3',
+				mimeTypes : [
+					'audio/mpeg; codecs="mp3"',
+					'audio/mpeg',
+					'audio/mp3',
+					'audio/MPA',
+					'audio/mpa-robust'
+				]
+			}
+		]
 
 		var fileExtOfSupportedFormat
 
@@ -30,13 +30,12 @@ define(
 
 			var probe = new Audio()
 
-			for( var fileExtension in fileExtensionToMimeTypes ) {
-				var mimeTypes = fileExtensionToMimeTypes[ fileExtension ]
+			for( var i = 0, n = fileExtensionToMimeTypes.length; i < n; i++ ) {
+				var fileExtension = fileExtensionToMimeTypes[ i ].fileExtension,
+					mimeTypes     = fileExtensionToMimeTypes[ i ].mimeTypes
 
-				for( var i = 0, n = mimeTypes.length, mimeType; i < n; i++ ) {
-					mimeType = mimeTypes[ i ]
-
-					if( probe.canPlayType( mimeTypes[ i ] ) ) {
+				for( var j = 0, m = mimeTypes.length; j < m; j++ ) {
+					if( probe.canPlayType( mimeTypes[ j ] ) ) {
 						fileExtOfSupportedFormat = fileExtension
 
 						return fileExtension
