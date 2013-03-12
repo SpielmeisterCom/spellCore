@@ -20,10 +20,14 @@ define(
 			return nextSoundId++
 		}
 
+		var isCocoonJS = typeof( CocoonJS ) === 'object'
+
+
 		var create = function( id, audioResource ) {
 			var audio
 
-			if( audioResource.privateAudioResource.cloneNode ) {
+			if( !isCocoonJS &&
+				audioResource.privateAudioResource.cloneNode ) {
 				audio = audioResource.privateAudioResource.cloneNode( true )
 
 			} else {
@@ -32,6 +36,7 @@ define(
 			}
 
 			audio.id = id
+			audio.playing = false
 
 			return audio
 		}
@@ -90,7 +95,10 @@ define(
 					mute( id )
 				}
 
-				audioElement.play()
+				if( !audioElement.playing ) {
+					audioElement.playing = true
+					audioElement.play()
+				}
 			}
 
 			return id
