@@ -219,10 +219,6 @@ define(
 		 * @param sound - the audio element
 		 */
 		var createAudioContext = function() {
-			var context = new Audio()
-
-			if( !context ) return null
-
 			return createWrapperContext()
 		}
 
