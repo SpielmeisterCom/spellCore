@@ -48,7 +48,7 @@ define(
 					var visualObject = entity[ Defines.VISUAL_OBJECT_COMPONENT_ID ]
 
 					if( !visualObject ||
-						visualObject.group === 'world' ) {
+						visualObject.pass === 'world' ) {
 
 						return
 					}
@@ -63,11 +63,11 @@ define(
 						parent : parentComponent ? parentComponent.id : 0
 					}
 
-					if( visualObject.group === 'ui' ) {
-						this.visibleEntitiesUI[ entityId ] = entityInfo
+					if( visualObject.pass === 'ui' ) {
+						this.uiPassEntities[ entityId ] = entityInfo
 
-					} else if( visualObject.group === 'background' ) {
-						this.visibleEntitiesBackground[ entityId ] = entityInfo
+					} else if( visualObject.pass === 'background' ) {
+						this.backgroundPassEntities[ entityId ] = entityInfo
 					}
 				},
 				this
@@ -100,9 +100,9 @@ define(
 					createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
 				)
 
-				spell.visibleEntitiesWorld = spell.entityManager.getEntityIdsByRegion( transform.translation, effectiveCameraDimensions )
-				spell.visibleEntitiesUI = this.visibleEntitiesUI
-				spell.visibleEntitiesBackground = this.visibleEntitiesBackground
+				spell.worldPassEntities = spell.entityManager.getEntityIdsByRegion( transform.translation, effectiveCameraDimensions )
+				spell.uiPassEntities = this.uiPassEntities
+				spell.backgroundPassEntities = this.backgroundPassEntities
 			}
 		}
 
@@ -122,8 +122,8 @@ define(
 			this.screenResizeHandler        = undefined
 			this.cameraChangedHandler       = undefined
 			this.visualObjectCreatedHandler = undefined
-			this.visibleEntitiesUI          = {}
-			this.visibleEntitiesBackground  = {}
+			this.uiPassEntities             = {}
+			this.backgroundPassEntities     = {}
 		}
 
 		Visibility.prototype = {

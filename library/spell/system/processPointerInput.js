@@ -62,7 +62,7 @@ define(
                     continue
                 }
 
-				var isInUIGroup = visualObject.group === 'ui'
+				var isInUIPass = visualObject.pass === 'ui'
 
 				if( pointedEntityMap[ entityId ] === undefined ) {
 					pointedEntityMap[ entityId ] = false
@@ -84,7 +84,7 @@ define(
 				var isEntityHit = isPointWithinEntity(
 					entityDimensions,
 					transform,
-					isInUIGroup ? cursorUIPosition : cursorWorldPosition
+					isInUIPass ? cursorUIPosition : cursorWorldPosition
 				)
 
 				if( entityDimensions &&

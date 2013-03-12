@@ -621,10 +621,10 @@ define(
 			viewFrustum = createViewFrustum( effectiveCameraDimensions, cameraTransform.translation )
 
 
-			// draw visual objects in background group
+			// draw visual objects in background pass
 			setCamera( context, effectiveCameraDimensions, [ 0, 0 ] )
 
-			var visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.visibleEntitiesBackground )
+			var visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.backgroundPassEntities )
 
 			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
 				drawVisualObject(
@@ -648,12 +648,12 @@ define(
 			}
 
 
-			// draw visual objects in world group
+			// draw visual objects in world pass
 			context.save()
 			{
 				setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
 
-				visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.visibleEntitiesWorld )
+				visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.worldPassEntities )
 
 				for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
 					drawVisualObject(
@@ -679,10 +679,10 @@ define(
 			context.restore()
 
 
-			// draw visual objects in ui group
+			// draw visual objects in ui pass
 			setCamera( context, effectiveCameraDimensions, [ 0, 0 ] )
 
-			visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.visibleEntitiesUI )
+			visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.uiPassEntities )
 
 			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
 				drawVisualObject(

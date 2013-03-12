@@ -25,12 +25,13 @@
 			"doc": "the resulting opacity that the entity is drawn with"
 		},
 		{
-			"name": "group",
+			"name": "pass",
 			"type": {
 				"name": "enum",
 				"values": [ "background", "world", "ui" ]
 			},
-			"default": "world"
+			"default": "world",
+			"doc": "The pass in which the entity is rendered. The order from back to front is background, world, ui."
 		}
 	],
 	"version": 1
