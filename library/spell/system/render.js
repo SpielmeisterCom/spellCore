@@ -71,11 +71,17 @@ define(
 			return a.layer - b.layer
 		}
 
+		/**
+		 * Returns an array of root entity ids. "root" in this context means an entity which has a parent which is not in the set of entities.
+		 *
+		 * @param entities
+		 * @return {Array}
+		 */
 		var getRootEntities = function( entities ) {
 			var result = []
 
 			for( var id in entities ) {
-				if( entities[ id ].parent === 0 ) {
+				if( !entities[ entities[ id ].parent ] ) {
 					result.push( id )
 				}
 			}
@@ -600,25 +606,54 @@ define(
 				camera          = this.cameras[ currentCameraId ],
 				cameraTransform = transforms[ currentCameraId ]
 
+			if( !camera || !cameraTransform ) {
+				throw 'No valid camera available.'
+			}
+
+
+			var aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
+
+			var effectiveCameraDimensions = vec2.multiply(
+				cameraTransform.scale,
+				createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
+			)
+
+			viewFrustum = createViewFrustum( effectiveCameraDimensions, cameraTransform.translation )
+
+
+			// draw visual objects in background group
+			setCamera( context, effectiveCameraDimensions, [ 0, 0 ] )
+
+			var visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.visibleEntitiesBackground )
+
+			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
+				drawVisualObject(
+					entityManager,
+					context,
+					transforms,
+					appearances,
+					appearanceTransforms,
+					animatedAppearances,
+					textAppearances,
+					tilemaps,
+					spriteSheetAppearances,
+					childrenComponents,
+					quadGeometries,
+					visualObjects,
+					rectangles,
+					deltaTimeInMs,
+					visibleEntityIdsSorted[ i ],
+					viewFrustum
+				)
+			}
+
+
+			// draw visual objects in world group
 			context.save()
 			{
-				if( camera && cameraTransform ) {
-					var aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
+				setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
 
-					var effectiveCameraDimensions = vec2.multiply(
-						cameraTransform.scale,
-						createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
-					)
-
-					if( effectiveCameraDimensions ) {
-						setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
-						viewFrustum = createViewFrustum( effectiveCameraDimensions, cameraTransform.translation )
-					}
-				}
-
-
-				// draw visual objects in world group
-				var visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.visibleEntitiesWorld )
+				visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.visibleEntitiesWorld )
 
 				for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
 					drawVisualObject(
@@ -644,11 +679,11 @@ define(
 			context.restore()
 
 
+			// draw visual objects in ui group
 			setCamera( context, effectiveCameraDimensions, [ 0, 0 ] )
 
 			visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.visibleEntitiesUI )
 
-			// draw visual objects in ui group
 			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
 				drawVisualObject(
 					entityManager,

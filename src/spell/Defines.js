@@ -18,6 +18,7 @@ define(
 			ANIMATED_APPEARANCE_COMPONENT_ID          : 'spell.component.2d.graphics.animatedAppearance',
 			QUAD_GEOMETRY_COMPONENT_ID                : 'spell.component.2d.graphics.geometry.quad',
 			TILEMAP_COMPONENT_ID                      : 'spell.component.2d.graphics.tilemap',
+			PARALLAX_COMPONENT_ID                     : 'spell.component.2d.graphics.parallax',
 			PHYSICS_BODY_COMPONENT_ID                 : 'spell.component.physics.body',
 			PHYSICS_FIXTURE_COMPONENT_ID              : 'spell.component.physics.fixture',
 			PHYSICS_BOX_SHAPE_COMPONENT_ID            : 'spell.component.physics.shape.box',

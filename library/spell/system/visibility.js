@@ -48,7 +48,7 @@ define(
 					var visualObject = entity[ Defines.VISUAL_OBJECT_COMPONENT_ID ]
 
 					if( !visualObject ||
-						visualObject.group !== 'ui' ) {
+						visualObject.group === 'world' ) {
 
 						return
 					}
@@ -56,11 +56,18 @@ define(
 					var childrenComponent = entity[ Defines.CHILDREN_COMPONENT_ID ],
 						parentComponent   = entity[ Defines.PARENT_COMPONENT_ID ]
 
-					this.visibleEntitiesUI[ entityId ] = {
+					var entityInfo = {
 						children : childrenComponent ? childrenComponent.ids : [],
 						layer : visualObject.layer,
 						id : entityId,
 						parent : parentComponent ? parentComponent.id : 0
+					}
+
+					if( visualObject.group === 'ui' ) {
+						this.visibleEntitiesUI[ entityId ] = entityInfo
+
+					} else if( visualObject.group === 'background' ) {
+						this.visibleEntitiesBackground[ entityId ] = entityInfo
 					}
 				},
 				this
@@ -95,6 +102,7 @@ define(
 
 				spell.visibleEntitiesWorld = spell.entityManager.getEntityIdsByRegion( transform.translation, effectiveCameraDimensions )
 				spell.visibleEntitiesUI = this.visibleEntitiesUI
+				spell.visibleEntitiesBackground = this.visibleEntitiesBackground
 			}
 		}
 
@@ -115,6 +123,7 @@ define(
 			this.cameraChangedHandler       = undefined
 			this.visualObjectCreatedHandler = undefined
 			this.visibleEntitiesUI          = {}
+			this.visibleEntitiesBackground  = {}
 		}
 
 		Visibility.prototype = {

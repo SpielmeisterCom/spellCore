@@ -6,9 +6,13 @@
 define(
 	'spell/system/parallax',
 	[
+		'spell/Defines',
+		'spell/Events',
 		'spell/math/vec2'
 	],
 	function(
+		Defines,
+		Events,
 		vec2
 	) {
 		'use strict'
@@ -95,9 +99,9 @@ define(
 					appearanceTransforms = this.appearanceTransforms
 
 				for( var entityId in parallaxComponents ) {
-					var parallax            = parallaxComponents[ entityId ],
-						layerQuad           = quads[ entityId ],
-						layerTransform      = transforms[ entityId ],
+					var parallax              = parallaxComponents[ entityId ],
+						layerQuad             = quads[ entityId ],
+						layerTransform        = transforms[ entityId ],
 						refEntityTranslation  = transforms[ lookupEntityId( entityManager, parallax.refEntityName ) ].translation,
 						appearanceTranslation = appearanceTransforms[ entityId ].translation
 
@@ -105,25 +109,12 @@ define(
 						throw 'could not get a valid parallax configuration for entity id ' + entityId
 					}
 
-					var offsetToRefEntity     = parallax.offsetToRefEntity,
-						layerTranslation      = layerTransform.translation
-
-					// if configured: stick the parallax layer to the current camera position (plus specified offsetToCamera)
-					if( parallax.stickToRefX ) {
-						layerTranslation[ 0 ] = refEntityTranslation[ 0 ] + offsetToRefEntity[ 0 ]
-					}
-
-					if( parallax.stickToRefY ) {
-						layerTranslation[ 1 ] = refEntityTranslation[ 1 ] + offsetToRefEntity[ 1 ]
-                    }
-
-
 					// set the texture coordinates to the new position, according to speed, camera position and texture offset
 					vec2.multiply( refEntityTranslation, parallax.moveSpeed, appearanceTranslation )
 					vec2.divide( appearanceTranslation, layerQuad.dimensions, appearanceTranslation )
 					vec2.add( appearanceTranslation, parallax.textureOffset, appearanceTranslation )
 
-					// clamp x,y values if we don't want to repeat the texture
+					// clamp x, y values if we don't want to repeat the texture
 					if( !parallax.repeatX ) {
 						if( appearanceTranslation[ 0 ] < 0 ) {
 							appearanceTranslation[ 0 ] = 0
@@ -145,7 +136,6 @@ define(
 					}
 
 					entityManager.updateAppearanceTransform( entityId )
-					entityManager.updateWorldTransform( entityId )
 				}
 			}
 		}

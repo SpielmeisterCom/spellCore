@@ -28,7 +28,7 @@
 			"name": "group",
 			"type": {
 				"name": "enum",
-				"values": [ "world", "ui" ]
+				"values": [ "background", "world", "ui" ]
 			},
 			"default": "world"
 		}

@@ -410,7 +410,9 @@ define(
 			var visualObject = componentMaps[ VISUAL_OBJECT_COMPONENT_ID ][ entityId ]
 
 			if( !visualObject ||
-				visualObject.group === 'ui' ) {
+				visualObject.group === 'ui' ||
+				visualObject.group === 'background' ) {
+
 				return
 			}
 
