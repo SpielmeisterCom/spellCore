@@ -1,9 +1,11 @@
 define(
 	'spell/shared/util/platform/private/sound/html5Audio/createHtml5AudioContext',
 	[
+		'spell/shared/util/platform/private/isHtml5CocoonJS',
 		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc'
 	],
 	function(
+		isHtml5CocoonJS,
 		createFixedSoundFileSrc
 	) {
 		'use strict'
@@ -20,13 +22,10 @@ define(
 			return nextSoundId++
 		}
 
-		var isCocoonJS = typeof( CocoonJS ) === 'object'
-
-
 		var create = function( id, audioResource ) {
 			var audio
 
-			if( !isCocoonJS &&
+			if( !isHtml5CocoonJS() &&
 				audioResource.privateAudioResource.cloneNode ) {
 				audio = audioResource.privateAudioResource.cloneNode( true )
 

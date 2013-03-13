@@ -22,7 +22,7 @@ define(
 		'spell/shared/util/platform/private/Input',
 		'spell/shared/util/platform/private/configurationOptions',
 		'spell/shared/util/platform/private/storage/PersistentStorage',
-		'spell/shared/util/platform/private/openUrl',
+		'spell/shared/util/platform/private/openURL',
 		'spell/shared/util/platform/private/platformDetails',
 		'spell/shared/util/platform/private/graphics/initViewport'
 	],
@@ -44,7 +44,7 @@ define(
 		Input,
 		configurationOptions,
 		PersistentStorage,
-		openUrl,
+		openURL,
 		platformDetails,
 		initViewport
 	) {
@@ -137,7 +137,7 @@ define(
 			 */
 			registerOnScreenResize : registerOnScreenResize,
 
-			openUrl : openUrl,
+			openURL : openURL,
 
 			createPersistentStorage : function() {
 				return new PersistentStorage()
