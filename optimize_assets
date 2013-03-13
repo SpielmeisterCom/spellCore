@@ -1,0 +1,23 @@
+#!/bin/sh
+
+PROJECT=$1
+PROJ_DIR=../../projects/$1/library
+
+if [ -z $PROJECT ]
+then
+	echo Usage: $0 project
+	exit
+fi
+
+FILES=$(find $PROJ_DIR -name "*.png")
+
+for FILE in $FILES; do
+	echo Optimizing $FILE ...
+	optipng -force -o7 $FILE && advpng -z4 '%(file)s' $FILE && pngcrush -rem gAMA -rem alla -rem cHRM -rem iCCP -rem sRGB -rem time '$FILE' '$FILE.bak' && mv '$FILE.bak' '$FILE'
+done
+
+
+
+
+
+
