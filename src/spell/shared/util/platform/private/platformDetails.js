@@ -2,10 +2,12 @@ define(
 	'spell/shared/util/platform/private/platformDetails',
 	[
 		'spell/shared/util/platform/private/input/supportedPointerApi',
+		'spell/shared/util/platform/private/isHtml5CocoonJS',
 		'spell/shared/util/platform/private/isHtml5Ejecta'
 	],
 	function(
 		supportedPointerApi,
+		isHtml5CocoonJS,
 		isHtml5Ejecta
 	) {
 		'use strict'
@@ -13,7 +15,7 @@ define(
 
 		return {
 			hasPlentyRAM : function() {
-                return !isHtml5Ejecta()
+                return !isHtml5CocoonJS() && !isHtml5Ejecta()
             },
 			hasTouchSupport : function() {
 				return supportedPointerApi.hasWebkitTouchApi() ||
@@ -29,13 +31,20 @@ define(
 				return 'html5'
 			},
 			getPlatform : function() {
-				return navigator.userAgent
+				return isHtml5CocoonJS() ?
+					'CocoonJS' :
+					isHtml5Ejecta() ?
+						'Ejecta' :
+						navigator.userAgent
 			},
 			getScreenHeight: function() {
 				return screen.height
 			},
 			getScreenWidth: function() {
 				return screen.width
+			},
+			isMobileDevice: function() {
+				return isHtml5CocoonJS() || isHtml5Ejecta()
 			}
 		}
 	}

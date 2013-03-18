@@ -244,7 +244,7 @@ define(
 
 			var platformDetails = PlatformKit.platformDetails
 
-			this.setValue( 'platform.id', platformDetails.platformId )
+			this.setValue( 'platform.id', platformDetails.getPlatform() )
 			this.setValue( 'platform.hasPlentyRAM', platformDetails.hasPlentyRAM() )
 
 			eventManager.subscribe(
