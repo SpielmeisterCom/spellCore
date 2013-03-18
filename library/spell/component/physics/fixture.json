@@ -4,7 +4,7 @@
 	"readonly": true,
 	"title": "Physics Fixture",
 	"doc": "",
-    "icon": "/images/icons/component.png",
+    "icon": "/resources/images/icons/component.png",
     "attributes": [
 		{
 			"name": "density",

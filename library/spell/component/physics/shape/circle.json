@@ -4,7 +4,7 @@
 	"readonly": true,
 	"title": "Physics Shape - Circle",
 	"doc": "",
-    "icon": "/images/icons/component_physics_circle.png",
+    "icon": "/resources/images/icons/component_physics_circle.png",
 	"attributes": [
 		{
 			"name": "radius",

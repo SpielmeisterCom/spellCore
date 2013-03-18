@@ -3,7 +3,7 @@
 	"readonly": true,
 	"title": "Visual Object",
 	"doc": "the visual representation of an entity",
-    "icon": "/images/icons/component_visualobject.png",
+    "icon": "/resources/images/icons/component_visualobject.png",
 	"attributes": [
 		{
 			"name": "layer",
@@ -25,13 +25,12 @@
 			"doc": "the resulting opacity that the entity is drawn with"
 		},
 		{
-			"name": "pass",
+			"name": "group",
 			"type": {
 				"name": "enum",
-				"values": [ "background", "world", "ui" ]
+				"values": [ "world", "ui" ]
 			},
-			"default": "world",
-			"doc": "The pass in which the entity is rendered. The order from back to front is background, world, ui."
+			"default": "world"
 		}
 	],
 	"version": 1
