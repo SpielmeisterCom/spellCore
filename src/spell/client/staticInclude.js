@@ -30,7 +30,8 @@ define(
 		'spell/shared/util/translate',
 		'spell/client/util/createComprisedRectangle',
 		'spell/client/util/createIncludedRectangle',
-		'spell/recursiveFunctions'
+		'spell/recursiveFunctions',
+		'spell/stringUtil'
 	],
 	function() {
 		return undefined

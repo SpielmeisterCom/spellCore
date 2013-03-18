@@ -24,7 +24,8 @@ define(
 		'spell/shared/util/platform/private/storage/PersistentStorage',
 		'spell/shared/util/platform/private/openURL',
 		'spell/shared/util/platform/private/platformDetails',
-		'spell/shared/util/platform/private/graphics/initViewport'
+		'spell/shared/util/platform/private/graphics/initViewport',
+		'spell/shared/util/platform/private/advertisement'
 	],
 	function(
 		Box2D,
@@ -46,7 +47,8 @@ define(
 		PersistentStorage,
 		openURL,
 		platformDetails,
-		initViewport
+		initViewport,
+		advertisement
 	) {
 		'use strict'
 
@@ -153,6 +155,14 @@ define(
 
 			createTextLoader : function( postProcess, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 				return new TextLoader( postProcess, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
+			},
+
+			showAdBanner : function() {
+				return advertisement.showAdBanner
+			},
+
+			hideAdBanner : function() {
+				return advertisement.hideAdBanner
 			}
 		}
 	}
