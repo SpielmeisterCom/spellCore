@@ -157,13 +157,9 @@ define(
 				return new TextLoader( postProcess, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			showAdBanner : function() {
-				return advertisement.showAdBanner
-			},
+			showAdBanner : advertisement.showAdBanner,
 
-			hideAdBanner : function() {
-				return advertisement.hideAdBanner
-			}
+			hideAdBanner : advertisement.hideAdBanner
 		}
 	}
 )
