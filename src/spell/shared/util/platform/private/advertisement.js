@@ -13,9 +13,10 @@ define(
 			showAdBanner : function() {
 				if( !isHtml5CocoonJS ) return
 
-				CocoonJS.Ad.preloadBanner()
 				CocoonJS.Ad.setBannerLayout( CocoonJS.Ad.BannerLayout.TOP_CENTER )
-				CocoonJS.Ad.showBanner()
+				CocoonJS.Ad.showFullScreen()
+
+				CocoonJS.Ad.preloadFullScreen()
 			},
 
 			hideAdBanner : function() {
