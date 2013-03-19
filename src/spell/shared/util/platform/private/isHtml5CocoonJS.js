@@ -4,10 +4,6 @@ define(
 		'use strict'
 
 
-		var isHtml5CocoonJS = typeof( CocoonJS ) === 'object'
-
-		return function() {
-			return isHtml5CocoonJS
-		}
+		return typeof( CocoonJS ) === 'object'
 	}
 )

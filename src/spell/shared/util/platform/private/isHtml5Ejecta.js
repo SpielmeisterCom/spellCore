@@ -4,10 +4,6 @@ define(
 		'use strict'
 
 
-		var isHtml5Ejecta = typeof( ejecta ) !== 'undefined'
-
-		return function() {
-			return isHtml5Ejecta
-		}
+		return typeof( ejecta ) !== 'undefined'
 	}
 )

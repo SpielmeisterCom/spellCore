@@ -12,10 +12,10 @@ define(
 
 
 		return function( url, message ) {
-			if( isHtml5Ejecta() ) {
+			if( isHtml5Ejecta ) {
 				ejecta.openURL( url, message )
 
-			} else if( isHtml5CocoonJS() ) {
+			} else if( isHtml5CocoonJS ) {
 				CocoonJS.App.openURL( url )
 
 			} else {

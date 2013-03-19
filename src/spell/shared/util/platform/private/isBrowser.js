@@ -1,9 +1,9 @@
 define(
-	"spell/shared/util/platform/private/isBrowser",
+	'spell/shared/util/platform/private/isBrowser',
 	function() {
-		"use strict"
+		'use strict'
 
 
-		return !!( typeof window !== "undefined" && navigator && document )
+		return !!( typeof window !== 'undefined' && navigator && document )
 	}
 )

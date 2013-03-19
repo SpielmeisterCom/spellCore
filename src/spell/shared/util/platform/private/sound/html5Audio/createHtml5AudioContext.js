@@ -25,7 +25,7 @@ define(
 		var create = function( id, audioResource ) {
 			var audio
 
-			if( !isHtml5CocoonJS() &&
+			if( !isHtml5CocoonJS &&
 				audioResource.privateAudioResource.cloneNode ) {
 				audio = audioResource.privateAudioResource.cloneNode( true )
 

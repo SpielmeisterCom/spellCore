@@ -23,7 +23,7 @@ define(
 			hasWebkitTouchApi : function() {
 				return ( 'ontouchstart' in window ) || // webkit
 					( window.DocumentTouch && document instanceof DocumentTouch ) || // Firefox Mobile
-					isHtml5Ejecta()
+					isHtml5Ejecta
 			}
 		}
 	}

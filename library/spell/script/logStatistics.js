@@ -40,7 +40,7 @@ define(
 				projectId        : configurationManager.getValue( 'projectId' ),
 				screenHeight     : platformDetails.getScreenHeight(),
 				screenWidth      : platformDetails.getScreenWidth(),
-				screenColorDepth : platformDetails.getColorDepth(),
+				device           : platformDetails.getDevice(),
 				os               : platformDetails.getOS(),
 				payload          : payload,
 				platform         : platformDetails.getPlatform(),
