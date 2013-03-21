@@ -27,26 +27,33 @@ define(
 
 					return userAgentParts[ 0 ] + ' ' + userAgentParts[ 1 ].trim()
 
+				} else if( isHtml5Ejecta ) {
+					return 'iOS ' + navigator.userAgent.match( /[\.\d]+$/ )[ 0 ]
+
 				} else {
 					return navigator.platform
 				}
 			},
 			getPlatformAdapter : function() {
 				return isHtml5CocoonJS ?
-					'CocoonJS' :
+					'cocoonjs' :
 					isHtml5Ejecta ?
-						'Ejecta' :
+						'ejecta' :
 						'html5'
 			},
 			getPlatform : function() {
 				return isHtml5CocoonJS ?
 					navigator.appVersion :
-					navigator.userAgent
+					isHtml5Ejecta ?
+						'Ejecta ' + navigator.appVersion :
+						navigator.userAgent
 			},
 			getDevice : function() {
 				return isHtml5CocoonJS ?
 					navigator.platform :
-					'unknown'
+					isHtml5Ejecta ?
+						navigator.userAgent.split( ',' )[ 0 ] :
+						'unknown'
 			},
 			getScreenHeight: function() {
 				return screen.height
