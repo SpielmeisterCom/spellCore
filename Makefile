@@ -7,6 +7,7 @@ SPELL_UTIL_OPTIONS = -s src -m spell/server/build/dependencies -i "fs,mkdirp,pat
 SPELL_UTIL_INCLUDE_BUILD = build/spell.util.js
 SPELL_ENGINE_INCLUDE_DEV_BUILD = build/spell.dev.js
 SPELL_ENGINE_INCLUDE_DEPLOY_BUILD = build/spell.deploy.js
+NODE_PATH = ../nodejs/node
 
 
 .PHONY: dev
@@ -19,7 +20,7 @@ deploy: $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
 .PHONY: $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
 $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD): $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
 	# build engine include for deployment mode
-	node tools/n.js mangle $(SPELL_ENGINE_INCLUDE_DEV_BUILD) -n > $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
+	$(NODE_PATH) tools/n.js mangle $(SPELL_ENGINE_INCLUDE_DEV_BUILD) -n > $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
 
 .PHONY: $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
 $(SPELL_ENGINE_INCLUDE_DEV_BUILD): libs
@@ -29,9 +30,9 @@ $(SPELL_ENGINE_INCLUDE_DEV_BUILD): libs
 
 libs:
 	mkdir -p build
-	node tools/n.js $(SPELL_COMMON_OPTIONS) > $(SPELL_COMMON_BUILD)
-	node tools/n.js $(SPELL_HTML5_OPTIONS) > $(SPELL_HTML5_BUILD)
-	node tools/n.js $(SPELL_UTIL_OPTIONS) > $(SPELL_UTIL_INCLUDE_BUILD)
+	$(NODE_PATH) tools/n.js $(SPELL_COMMON_OPTIONS) > $(SPELL_COMMON_BUILD)
+	$(NODE_PATH) tools/n.js $(SPELL_HTML5_OPTIONS) > $(SPELL_HTML5_BUILD)
+	$(NODE_PATH) tools/n.js $(SPELL_UTIL_OPTIONS) > $(SPELL_UTIL_INCLUDE_BUILD)
 	cp src/spell/client/stageZeroLoader.js build/spell.loader.js
 
 .PHONY: clean
