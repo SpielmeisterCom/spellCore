@@ -1,21 +1,10 @@
-#!/usr/bin/env node
+#!/bin/sh
 
-var path          = require( 'path' ),
-	requirejs     = require( 'requirejs' ),
-	spellCorePath = path.resolve( process.mainModule.filename , '..' )
+if [ -L $0 ]; then
+	FILE=$(readlink $0)
+else
+	FILE=$0
+fi
 
-requirejs.config( {
-	baseUrl: spellCorePath + '/src',
-	nodeRequire: require
-} )
-
-requirejs(
-	[
-		'spell/cli/developmentTool'
-	],
-	function(
-		developmentTool
-	) {
-		developmentTool( process.argv, process.cwd(), spellCorePath )
-	}
-)
+DIRNAME=$(dirname $FILE)
+$DIRNAME/../nodejs/node $DIRNAME/spelljs.js $*
