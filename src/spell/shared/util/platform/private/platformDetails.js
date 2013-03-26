@@ -28,7 +28,7 @@ define(
 					return userAgentParts[ 0 ] + ' ' + userAgentParts[ 1 ].trim()
 
 				} else if( isHtml5Ejecta ) {
-					return 'iOS ' + navigator.userAgent.match( /[\.\d]+$/ )[ 0 ]
+					return 'iOS ' + navigator.userAgent.match( /([\.\d]+)\)$/ )[ 1 ]
 
 				} else {
 					return navigator.platform
@@ -44,15 +44,13 @@ define(
 			getPlatform : function() {
 				return isHtml5CocoonJS ?
 					navigator.appVersion :
-					isHtml5Ejecta ?
-						'Ejecta ' + navigator.appVersion :
-						navigator.userAgent
+					navigator.userAgent
 			},
 			getDevice : function() {
 				return isHtml5CocoonJS ?
 					navigator.platform :
 					isHtml5Ejecta ?
-						navigator.userAgent.split( ',' )[ 0 ] :
+						navigator.userAgent.match( /\((.*);/ )[ 1 ] :
 						'unknown'
 			},
 			getScreenHeight: function() {
