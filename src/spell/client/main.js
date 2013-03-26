@@ -18,6 +18,7 @@ define(
 		'spell/shared/util/physics/createBox2dContext',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
+        'spell/shared/util/translate',
 
 		'spell/functions'
 	],
@@ -39,6 +40,7 @@ define(
 		createBox2dContext,
 		PlatformKit,
 		initDebugEnvironment,
+        translate,
 
 		_,
 
@@ -117,6 +119,13 @@ define(
 				isModeDevelopment
 			)
 
+            var translatePartial = _.bind(
+                translate,
+                null,
+                libraryManager,
+                configurationManager.getValue( 'currentLanguage' )
+            )
+
 			_.extend(
 				spell,
 				{
@@ -132,7 +141,8 @@ define(
 					box2dWorlds          : {},
 					sceneManager         : sceneManager,
 					sendMessageToEditor  : this.sendMessageToEditor,
-					storage              : storage
+					storage              : storage,
+                    translate            : translatePartial
 				}
 			)
 
