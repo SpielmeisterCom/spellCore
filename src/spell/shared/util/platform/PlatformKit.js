@@ -157,9 +157,8 @@ define(
 				return new TextLoader( postProcess, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			showAdBanner : advertisement.showAdBanner,
-
-			hideAdBanner : advertisement.hideAdBanner
+			loadInterstitial : advertisement.loadInterstitial,
+			showInterstitial : advertisement.showInterstitial
 		}
 	}
 )
