@@ -75,7 +75,7 @@ define(
 		 */
 
 		return function( argv, cwd, spellCorePath ) {
-			var executableName  = 'spelljs'
+			var executableName  = 'spellcli'
 
 			var buildTargets = {
 				HTML5 : 'html5',
@@ -186,14 +186,18 @@ define(
 				console.log( 'project path:\t\t' + projectPath )
 			}
 
+            //prepare argv array
+            if( argv.length < 3 ) {
+                argv.push('-h')
+            }
 
-			commander
+            commander
 				.version( '0.0.1' )
 
-			commander
+                commander
 				.command( 'build-deploy [target]' )
 				.option( '-d, --debug' )
-				.description( 'build for a specific target [html5 (default)]' )
+				.description( 'Create a build for a specific target. Available targets: ' + _.values( buildTargets).join(', ') )
 				.action( _.bind( buildCommand, this, cwd ) )
 
 			commander

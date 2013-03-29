@@ -1,6 +1,7 @@
 var path          = require( 'path' ),
-	requirejs     = require( 'requirejs' ),
-	spellCorePath = path.resolve( process.mainModule.filename , '..' )
+	requirejs	= require( 'requirejs' ),
+	define		= requirejs.define,
+	spellCorePath	= path.resolve( process.mainModule.filename , '..' )
 
 requirejs.config( {
 	baseUrl: spellCorePath + '/src',

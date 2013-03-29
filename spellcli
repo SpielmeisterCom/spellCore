@@ -7,4 +7,4 @@ else
 fi
 
 DIRNAME=$(dirname $FILE)
-$DIRNAME/../nodejs/node $DIRNAME/spelljs.js $*
+$DIRNAME/../nodejs/node $DIRNAME/spellcli.js $*
