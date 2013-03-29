@@ -281,7 +281,7 @@ define(
 			// stage zero loader goes to "build/deploy/spell.js"
 			deployFilePaths.push( [
 				path.join( spellCorePath, 'build', 'spell.loader.js' ),
-				path.join( deployPath, 'spell.js' )
+				path.join( deployPath, 'spell.loader.js' )
 			] )
 
 			// remove old library content
