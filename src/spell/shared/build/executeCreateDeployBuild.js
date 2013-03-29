@@ -44,7 +44,7 @@ define(
 
 
 		var LIBRARY_PATH = 'library'
-		var DEPLOY_PATH  = 'build/deploy'
+		var DEPLOY_PATH  = 'build/release'
 
 		var targetToBuilder = {
 			html5 : buildHtml5,
@@ -284,8 +284,8 @@ define(
 				path.join( deployPath, 'spell.loader.js' )
 			] )
 
-			// remove old library content
-			rmdir.sync( deployLibraryPath )
+			// remove complete old deploy directory
+			rmdir.sync( deployPath )
 
 			// copy new library content to destination
 			copyFiles( projectLibraryPath, deployLibraryPath, deployFilePaths )
