@@ -75,7 +75,7 @@ define(
 		 */
 
 		return function( argv, cwd, spellCorePath ) {
-			var executableName  = 'sappre'
+			var executableName  = 'spelljs'
 
 			var buildTargets = {
 				HTML5 : 'html5',
