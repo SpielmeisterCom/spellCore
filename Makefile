@@ -40,9 +40,6 @@ deploy: clean $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD) cli
 	#copy html templates to build directory
 	cp -R htmlTemplate build/
 
-	#cleaning html templates
-	rm build/htmlTemplate/spellEdShim.html
-
 .PHONY: $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
 $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD): $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
 	# build engine include for deployment mode
