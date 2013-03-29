@@ -34,7 +34,9 @@ dev : $(SPELL_ENGINE_INCLUDE_DEV_BUILD) $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
 
 .PHONY: deploy
 deploy: clean $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD) cli
+	# deleting unminified source files
 	rm $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
+
 	cp -R library  build/
 
 	#copy html templates to build directory
@@ -44,6 +46,8 @@ deploy: clean $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD) cli
 $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD): $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
 	# build engine include for deployment mode
 	$(NODE) tools/n.js mangle $(SPELL_ENGINE_INCLUDE_DEV_BUILD) > $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
+	$(NODE) tools/n.js mangle build/spell.loader.js > build/spell.loader.minified.js --no-anonymization
+	mv build/spell.loader.minified.js build/spell.loader.js
 
 .PHONY: $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
 $(SPELL_ENGINE_INCLUDE_DEV_BUILD): libs
