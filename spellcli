@@ -7,4 +7,18 @@ else
 fi
 
 DIRNAME=$(dirname $FILE)
-$DIRNAME/../nodejs/node $DIRNAME/spellcli.js $*
+
+if [ -f $DIRNAME/../nodejs/node ]; then
+	NODE=$DIRNAME/../nodejs/node
+
+elif [ -f $DIRNAME/node ]; then
+	NODE=$DIRNAME/node
+
+elif [ -f $DIRNAME/node.exe ]; then
+	NODE=$DIRNAME/node.exe
+
+else
+	echo Error: Could not find node binary!
+fi
+
+$NODE $DIRNAME/spellcli.js $*
