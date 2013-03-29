@@ -80,7 +80,7 @@ define(
 			}
 
 			var data          = fs.readFileSync( filePath, 'utf-8' ),
-				mangledSource = processSource( data, command.minification, true )
+				mangledSource = processSource( data, command.minification, command.anonymization )
 
 			console.log( mangledSource )
 			process.exit( 0 )
@@ -101,7 +101,8 @@ define(
 				.command( 'mangle [file]' )
 				.description( 'minifies source and anonymizes amd module identifiers in the provided file' )
 				.option( '-n, --no-minification', 'disable the minification' )
-				.action( _.bind( mangle, this, executableName ) )
+                .option( '-a, --no-anonymization', 'disable the module identifier anonymization' )
+                .action( _.bind( mangle, this, executableName ) )
 
 			commander
 				.option( '-s, --source-base <path>', 'the path to the source directory' )
