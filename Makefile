@@ -15,12 +15,12 @@ cli-js:
 	# creating the javascript includes for the command line tool 
 	mkdir -p build
 
-	cat spellcli-deploy-begin.js >build/spellcli.js.tmp
-	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander" >>build/spellcli.js.tmp
-	cat spellcli-deploy-end.js >>build/spellcli.js.tmp
+	cat spellcli-deploy-begin.js >build/spell.cli.js.tmp
+	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander" >>build/spell.cli.js.tmp
+	cat spellcli-deploy-end.js >>build/spell.cli.js.tmp
 
-	$(NODE) tools/n.js mangle build/spellcli.js.tmp >build/spellcli.js --no-anonymization
-	rm build/spellcli.js.tmp
+	$(NODE) tools/n.js mangle build/spell.cli.js.tmp >build/spell.cli.js --no-anonymization
+	rm build/spell.cli.js.tmp
 
 
 .PHONY: cli
