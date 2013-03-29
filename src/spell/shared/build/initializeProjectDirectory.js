@@ -162,7 +162,7 @@ define(
 				fileNames,
 				function( fileName ) {
 					copyFile(
-						path.join( spellCorePath , 'publicTemplate' , fileName ),
+						path.join( spellCorePath , 'htmlTemplate' , fileName ),
 						path.join( projectPath, publicDirName, fileName )
 					)
 				}

@@ -269,12 +269,12 @@ define(
 
 			// public template files go to "build/deploy/*"
 			deployFilePaths.push( [
-				path.join( spellCorePath, 'publicTemplate', 'index.html' ),
+				path.join( spellCorePath, 'htmlTemplate', 'index.html' ),
 				path.join( deployPath, 'index.html' )
 			] )
 
 			deployFilePaths.push( [
-				path.join( spellCorePath, 'publicTemplate', 'main.css' ),
+				path.join( spellCorePath, 'htmlTemplate', 'main.css' ),
 				path.join( deployPath, 'main.css' )
 			] )
 
