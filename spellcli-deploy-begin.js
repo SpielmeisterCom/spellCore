@@ -1,7 +1,8 @@
 var path          = require( 'path' ),
 	requirejs	= require( 'requirejs' ),
 	define		= requirejs.define,
-	spellCorePath	= path.resolve( process.mainModule.filename , '..' )
+	spellCorePath	= path.resolve( process.execPath )
+console.log(requirejs);
 
 requirejs.config( {
 	nodeRequire: require

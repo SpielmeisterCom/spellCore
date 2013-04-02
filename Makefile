@@ -26,8 +26,10 @@ cli-js:
 .PHONY: cli
 cli: cli-js
 	# creating cli executable
-	cp $(NODE_PATH) build
-	cp spellcli build
+	mv build/spell.cli.js ../nodejs-src/lib/_third_party_main.js
+	cd ../nodejs-src && ./configure && make -j4
+	cp ../nodejs-src/out/Release/node build/spellcli
+	strip build/spellcli
 
 .PHONY: dev
 dev : $(SPELL_ENGINE_INCLUDE_DEV_BUILD) $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
