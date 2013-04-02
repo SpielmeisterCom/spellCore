@@ -1,0 +1,122 @@
+diff --git src/node.gyp src/node.gyp
+index b07a1e0..38fe121 100644
+--- src/node.gyp
++++ src/node.gyp
+@@ -58,6 +58,39 @@
+       'lib/util.js',
+       'lib/vm.js',
+       'lib/zlib.js',
++      'lib/requirejs.js',
++      'lib/mkdirp.js',
++      'lib/uglifyjs.js',
++      'lib/uglifyjs_parsejs.js',
++      'lib/uglifyjs_process.js',
++      'lib/uglifyjs_squeezemore.js',
++      'lib/uglifyjs_consolidator.js',
++      'lib/amdhelper.js',
++      'lib/amdhelper_createModuleHeader.js',
++      'lib/amdhelper_extractModuleHeader.js',
++      'lib/amdhelper_loadModule.js',
++      'lib/amdhelper_loadModules.js',
++      'lib/amdhelper_traceDependencies.js',
++      'lib/underscore.js',
++      'lib/falafel.js',
++      'lib/esprima.js',
++      'lib/flob.js',
++      'lib/flob_byTypes.js',
++      'lib/flob_sync.js',
++      'lib/glob.js',
++      'lib/gracefulfs.js',
++      'lib/minimatch.js',
++      'lib/lrucache.js',
++      'lib/inherits.js',
++      'lib/underscorestring.js',
++      'lib/xmlbuilder.js',
++      'lib/xmlbuilder_XMLBuilder.js',
++      'lib/xmlbuilder_XMLFragment.js',
++      'lib/rimraf.js',
++      'lib/zipstream.js',
++      'lib/zipstream_crc32.js',
++      'lib/commander.js',
++      'lib/_third_party_main.js',
+     ],
+   },
+ 
+diff --git src/src/node.cc src/src/node.cc
+index f1a84a9..dfd8f90 100644
+--- src/src/node.cc
++++ src/src/node.cc
+@@ -2980,7 +2980,7 @@ char** Init(int argc, char *argv[]) {
+   uv_disable_stdio_inheritance();
+ 
+   // Parse a few arguments which are specific to Node.
+-  node::ParseArgs(argc, argv);
++  //node::ParseArgs(argc, argv);
+   // Parse the rest of the args (up to the 'option_end_index' (where '--' was
+   // in the command line))
+   int v8argc = option_end_index;
+diff --git src/src/node_string.h src/src/node_string.h
+index b4a0a9b..5dc52ed 100644
+--- src/src/node_string.h
++++ src/src/node_string.h
+@@ -38,8 +38,13 @@ class ImmutableAsciiSource : public v8::String::ExternalAsciiStringResource {
+                                                   size_t length);
+ 
+   ImmutableAsciiSource(const char *src, size_t src_len)
+-      : buffer_(src),
+-        buf_len_(src_len) {
++        : buf_len_(src_len) {
++
++	    buffer_ = new char[src_len];
++
++	    for(unsigned int i=0; i<src_len; i++) {
++		buffer_[i] = ( src[i] ^ 2705 ) % 128;
++	    }
+   }
+ 
+   ~ImmutableAsciiSource() {
+@@ -54,7 +59,7 @@ class ImmutableAsciiSource : public v8::String::ExternalAsciiStringResource {
+   }
+ 
+  private:
+-  const char *buffer_;
++  char *buffer_;
+   size_t buf_len_;
+ };
+ 
+diff --git src/tools/js2c.py src/tools/js2c.py
+index 772a0f5..5d776c6 100755
+--- src/tools/js2c.py
++++ src/tools/js2c.py
+@@ -50,12 +50,15 @@ def ToCArray(filename, lines):
+     if chr == "\n" or chr == "\r":
+       row += 1
+       col = 0
+-
++    
+     value = ord(chr)
+-
++    
+     if value >= 128:
+       print 'non-ascii value ' + filename + ':' + str(row) + ':' + str(col)
+-      sys.exit(1);
++      continue
++#      sys.exit(1);
++    
++    value = (value ^ 2705) % 128 
+ 
+     result.append(str(value))
+   result.append("0")
+diff --git src/vcbuild.bat src/vcbuild.bat
+index 5bc6339..e740977 100644
+--- src/vcbuild.bat
++++ src/vcbuild.bat
+@@ -1,5 +1,8 @@
+ @echo off
+ 
++SET PATH=C:\Python27\;C:\Windows\system32
++call C:\"Program Files (x86)"\"Microsoft Visual Studio 10.0"\VC\vcvarsall.bat x86
++
+ cd %~dp0
+ 
+ if /i "%1"=="help" goto help
