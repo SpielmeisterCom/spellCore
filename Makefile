@@ -9,7 +9,14 @@ SPELL_ENGINE_INCLUDE_DEV_BUILD = build/spell.dev.js
 SPELL_ENGINE_INCLUDE_DEPLOY_BUILD = build/spell.deploy.js
 NODE = ../nodejs/node
 NODE_PATH = $$(../nodejs/node --which)
-SED = sed -i "" -e 
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	SED = sed -i "" -e 
+else
+	SED = sed -i 
+
+endif
 
 .PHONY: cli-js
 cli-js:
