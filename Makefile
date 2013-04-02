@@ -27,8 +27,104 @@ cli-js:
 cli: cli-js
 	# creating cli executable
 	mv build/spell.cli.js ../nodejs-src/lib/_third_party_main.js
+
+	#patch includes in _third_party_main.js
+	sed -i 's/uglify-js/uglifyjs/g' ../nodejs-src/lib/_third_party_main.js  
+
+	#integrate requirejs
+	tail -n +2 ../../node_modules/requirejs/bin/r.js >../nodejs-src/lib/requirejs.js
+
+	#integrate mkdirp
+	cp ../../node_modules/mkdirp/index.js ../nodejs-src/lib/mkdirp.js
+
+	#integrate uglify-js
+	cp ../../node_modules/uglify-js/uglify-js.js ../nodejs-src/lib/uglifyjs.js
+	cp ../../node_modules/uglify-js/lib/process.js ../nodejs-src/lib/uglifyjs_process.js
+	cp ../../node_modules/uglify-js/lib/parse-js.js ../nodejs-src/lib/uglifyjs_parsejs.js
+	cp ../../node_modules/uglify-js/lib/squeeze-more.js ../nodejs-src/lib/uglifyjs_squeezemore.js
+	cp ../../node_modules/uglify-js/lib/consolidator.js ../nodejs-src/lib/uglifyjs_consolidator.js
+	sed -i 's/\.\/lib\/parse-js/uglifyjs_parsejs/g' ../nodejs-src/lib/*.js
+	sed -i 's/\.\/parse-js/uglifyjs_parsejs/g' ../nodejs-src/lib/*.js
+	sed -i 's/\.\/lib\/process/uglifyjs_process/g' ../nodejs-src/lib/*.js
+	sed -i 's/\.\/process/uglifyjs_process/g' ../nodejs-src/lib/*.js
+	sed -i 's/\.\/lib\/squeeze-more/uglifyjs_squeezemore/g' ../nodejs-src/lib/*.js
+	sed -i 's/\.\/squeeze-more/uglifyjs_squeezemore/g' ../nodejs-src/lib/*.js
+	sed -i 's/\.\/lib\/consolidator/uglifyjs_consolidator/g' ../nodejs-src/lib/*.js
+	sed -i 's/\.\/consolidator/uglifyjs_consolidator/g' ../nodejs-src/lib/*.js
+
+	#integrate underscore
+	cp ../../node_modules/underscore/underscore.js ../nodejs-src/lib/underscore.js
+
+	#integrate falafel
+	cp ../../node_modules/falafel/index.js ../nodejs-src/lib/falafel.js
+
+	#integrate esprima
+	cp ../../node_modules/falafel/node_modules/esprima/esprima.js ../nodejs-src/lib/esprima.js
+
+	#integrate amd-helper
+	cp ../../node_modules/amd-helper/lib/index.js ../nodejs-src/lib/amdhelper.js
+	cp ../../node_modules/amd-helper/lib/createModuleHeader.js ../nodejs-src/lib/createModuleHeader.js
+	cp ../../node_modules/amd-helper/lib/extractModuleHeader.js ../nodejs-src/lib/extractModuleHeader.js
+	cp ../../node_modules/amd-helper/lib/loadModule.js ../nodejs-src/lib/loadModule.js
+	cp ../../node_modules/amd-helper/lib/loadModules.js ../nodejs-src/lib/loadModules.js
+	cp ../../node_modules/amd-helper/lib/traceDependencies.js ../nodejs-src/lib/traceDependencies.js
+	sed -i 's/amd-helper/amdhelper/g' ../nodejs-src/lib/*.js
+	sed -i 's/.\/extractModuleHeader/extractModuleHeader/g' ../nodejs-src/lib/*.js
+	sed -i 's/.\/loadModule/loadModule/g' ../nodejs-src/lib/*.js
+	sed -i 's/.\/createModuleHeader/createModuleHeader/g' ../nodejs-src/lib/*.js
+	sed -i 's/.\/traceDependencies/traceDependencies/g' ../nodejs-src/lib/*.js
+
+	#integrate flob
+	cp ../../node_modules/flob/lib/index.js ../nodejs-src/lib/flob.js
+	cp ../../node_modules/flob/lib/byTypes.js ../nodejs-src/lib/flob_byTypes.js
+	cp ../../node_modules/flob/lib/sync.js ../nodejs-src/lib/flob_sync.js
+	sed -i 's/.\/byTypes/flob_byTypes/g' ../nodejs-src/lib/flob.js
+	sed -i 's/.\/sync/flob_sync/g' ../nodejs-src/lib/flob.js
+
+	#integrate glob
+	cp ../../node_modules/glob/glob.js ../nodejs-src/lib/glob.js
+
+	#integrate graceful-fs (dependency for glob)
+	cp ../../node_modules/glob/node_modules/graceful-fs/graceful-fs.js ../nodejs-src/lib/gracefulfs.js
+	sed -i 's/graceful-fs/gracefulfs/g' ../nodejs-src/lib/*.js
+
+	#integrate minimatch (dependency for glob)
+	cp ../../node_modules/glob/node_modules/minimatch/minimatch.js ../nodejs-src/lib/minimatch.js
+
+	#integrate lru-cache (dependency for minimatch)
+	cp ../../node_modules/glob/node_modules/minimatch/node_modules/lru-cache/lib/lru-cache.js ../nodejs-src/lib/lrucache.js
+	sed -i 's/lru-cache/lrucache/g' ../nodejs-src/lib/*.js
+
+	#integrate inherits
+	cp ../../node_modules/glob/node_modules/inherits/inherits.js ../nodejs-src/lib/inherits.js
+
+	#integrate underscore.string
+	cp ../../node_modules/underscore.string/lib/underscore.string.js ../nodejs-src/lib/underscorestring.js
+	sed -i 's/underscore.string/underscorestring/g' ../nodejs-src/lib/*.js
+
+	#integrate xmlbuilder
+	cp ../../node_modules/xmlbuilder/lib/index.js ../nodejs-src/lib/xmlbuilder.js
+	cp ../../node_modules/xmlbuilder/lib/XMLBuilder.js ../nodejs-src/lib/xmlbuilder_XMLBuilder.js
+	cp ../../node_modules/xmlbuilder/lib/XMLFragment.js ../nodejs-src/lib/xmlbuilder_XMLFragment.js
+	sed -i 's/.\/XMLBuilder/xmlbuilder_XMLBuilder/g' ../nodejs-src/lib/xmlbuilder*.js
+	sed -i 's/.\/XMLFragment/xmlbuilder_XMLFragment/g' ../nodejs-src/lib/xmlbuilder*.js
+
+	#integrate rimraf
+	cp ../../node_modules/rimraf/rimraf.js ../nodejs-src/lib/rimraf.js
+
+	#integrate zipstream
+	cp ../../node_modules/zipstream/zipstream.js ../nodejs-src/lib/zipstream.js
+	cp ../../node_modules/zipstream/crc32.js ../nodejs-src/lib/zipstream_crc32.js
+	sed -i 's/.\/crc32/zipstream_crc32/g' ../nodejs-src/lib/zipstream.js
+
+	#integrate commander
+	cp ../../node_modules/commander/lib/commander.js ../nodejs-src/lib/commander.js
+
+	#compile nodejs
 	cd ../nodejs-src && ./configure && make -j4
 	cp ../nodejs-src/out/Release/node build/spellcli
+
+	#strip symbols from new copiled file
 	strip build/spellcli
 
 .PHONY: dev
