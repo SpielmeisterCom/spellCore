@@ -63,16 +63,16 @@ cli: cli-js
 
 	#integrate amd-helper
 	cp ../../node_modules/amd-helper/lib/index.js ../nodejs-src/lib/amdhelper.js
-	cp ../../node_modules/amd-helper/lib/createModuleHeader.js ../nodejs-src/lib/createModuleHeader.js
-	cp ../../node_modules/amd-helper/lib/extractModuleHeader.js ../nodejs-src/lib/extractModuleHeader.js
-	cp ../../node_modules/amd-helper/lib/loadModule.js ../nodejs-src/lib/loadModule.js
-	cp ../../node_modules/amd-helper/lib/loadModules.js ../nodejs-src/lib/loadModules.js
-	cp ../../node_modules/amd-helper/lib/traceDependencies.js ../nodejs-src/lib/traceDependencies.js
+	cp ../../node_modules/amd-helper/lib/createModuleHeader.js ../nodejs-src/lib/amdhelper_createModuleHeader.js
+	cp ../../node_modules/amd-helper/lib/extractModuleHeader.js ../nodejs-src/lib/amdhelper_extractModuleHeader.js
+	cp ../../node_modules/amd-helper/lib/loadModule.js ../nodejs-src/lib/amdhelper_loadModule.js
+	cp ../../node_modules/amd-helper/lib/loadModules.js ../nodejs-src/lib/amdhelper_loadModules.js
+	cp ../../node_modules/amd-helper/lib/traceDependencies.js ../nodejs-src/lib/amdhelper_traceDependencies.js
 	sed -i 's/amd-helper/amdhelper/g' ../nodejs-src/lib/*.js
-	sed -i 's/.\/extractModuleHeader/extractModuleHeader/g' ../nodejs-src/lib/*.js
-	sed -i 's/.\/loadModule/loadModule/g' ../nodejs-src/lib/*.js
-	sed -i 's/.\/createModuleHeader/createModuleHeader/g' ../nodejs-src/lib/*.js
-	sed -i 's/.\/traceDependencies/traceDependencies/g' ../nodejs-src/lib/*.js
+	sed -i 's/.\/extractModuleHeader/amdhelper_extractModuleHeader/g' ../nodejs-src/lib/*.js
+	sed -i 's/.\/loadModule/amdhelper_loadModule/g' ../nodejs-src/lib/*.js
+	sed -i 's/.\/createModuleHeader/amdhelper_createModuleHeader/g' ../nodejs-src/lib/*.js
+	sed -i 's/.\/traceDependencies/amdhelper_traceDependencies/g' ../nodejs-src/lib/*.js
 
 	#integrate flob
 	cp ../../node_modules/flob/lib/index.js ../nodejs-src/lib/flob.js
@@ -126,6 +126,7 @@ cli: cli-js
 
 	#strip symbols from new copiled file
 	strip build/spellcli
+	../upx/upx -9 build/spellcli
 
 .PHONY: dev
 dev : $(SPELL_ENGINE_INCLUDE_DEV_BUILD) $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
