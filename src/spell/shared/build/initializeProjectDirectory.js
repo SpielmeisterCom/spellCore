@@ -184,7 +184,7 @@ define(
 			// copying stage zero loader
 			copyFile(
 				path.join( spellCorePath, 'build', 'spell.loader.js' ),
-				path.join( outputPath, 'spell.js' )
+				path.join( outputPath, 'spell.loader.js' )
 			)
 
 			return errors
