@@ -138,12 +138,15 @@ cli: cli-js
 	cp ../../node_modules/commander/lib/commander.js $(NODE_SRC)/lib/commander.js
 
 	#compile nodejs
-	cd $(NODE_SRC) && make clean && ./configure && make -j4
-	cp $(NODE_SRC)/out/Release/node build/spellcli
-
-	#strip symbols from new copiled file
-	strip build/spellcli
-	../upx/upx -9 build/spellcli
+ifeq ($(UNAME_S),CYGWIN_NT-6.1-WOW64)
+		cd $(NODE_SRC) && ./vcbuild.bat
+		cp $(NODE_SRC)/Release/node.exe build/spellcli.exe
+		../upx/upx -9 build/spellcli.exe
+else
+		cd $(NODE_SRC) && make clean && ./configure && make -j4
+		cp $(NODE_SRC)/out/Release/node build/spellcli
+		../upx/upx -9 build/spellcli
+endif
 
 .PHONY: dev
 dev : $(SPELL_ENGINE_INCLUDE_DEV_BUILD) $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
