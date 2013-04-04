@@ -51,20 +51,6 @@ define(
 			fs.writeFileSync( filePath, content, 'utf-8' )
 		}
 
-		var createSceneList = function( scenes, anonymizeModuleIds ) {
-			return _.map(
-				scenes,
-				function( scene ) {
-					return {
-						entities : scene.entities,
-						name     : scene.name,
-						scriptId : anonymizeModuleIds ? hashModuleId( createModuleId( scene.scriptId ) ) : scene.scriptId,
-						systems  : scene.systems
-					}
-				}
-			)
-		}
-
 		var createDataFileContent = function( dataFileTemplate, scriptSource, cacheContent, projectConfig ) {
 			return _s.sprintf(
 				dataFileTemplate,
