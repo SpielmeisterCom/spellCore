@@ -13,7 +13,8 @@ define(
 		'fs',
 		'flob',
 		'mkdirp',
-		'path'
+		'path',
+		'rimraf'
 	],
 	function(
 		copyFiles,
@@ -28,7 +29,8 @@ define(
 		fs,
 		flob,
 		mkdirp,
-		path
+		path,
+		rmdir
 	) {
 		'use strict'
 
@@ -79,9 +81,12 @@ define(
 				deployHtml5Path   = path.join( deployPath, 'html5' )
 
 
-			// copying all files required by the build to the deployment directory "build/deploy"
+			// remove complete old deploy directory
+			rmdir.sync( deployHtml5Path )
 
-			// write data file to "build/deploy/html5/data.js"
+			// copying all files required by the build to the deployment directory "build/release"
+
+			// write data file to "build/release/html5/data.js"
 			if( !fs.existsSync( deployHtml5Path ) ) {
 				mkdirp.sync( deployHtml5Path )
 			}
@@ -98,7 +103,7 @@ define(
 				)
 			)
 
-			// minified, anonymized engine include goes to "build/deploy/html5/spell.js"
+			// minified, anonymized engine include goes to "build/release/html5/spell.js"
 			var deployFilePaths = []
 
 			deployFilePaths.push( [

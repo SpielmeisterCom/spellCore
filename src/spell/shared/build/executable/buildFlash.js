@@ -10,11 +10,11 @@ define(
 		'mkdirp',
 		'path',
 		'xmlbuilder',
-
 		'os',
+		'rimraf',
 
 		'underscore.string',
-		'spell/functions',
+		'spell/functions'
 	],
 	function(
 		copyFile,
@@ -26,8 +26,8 @@ define(
 		mkdirp,
 		path,
 		xmlbuilder,
-
 		os,
+		rmdir,
 
 		_s,
 		_
@@ -188,6 +188,10 @@ define(
 				tmpPath         = path.join( projectPath, 'build' ),
 				tmpSourcePath   = path.join( tmpPath, 'src/Spielmeister' ),
 				deployFlashPath = path.join( deployPath, 'flash' )
+
+
+			// remove complete old deploy directory
+			rmdir.sync( deployFlashPath )
 
 
 			if( !fs.existsSync( tmpSourcePath ) ) {

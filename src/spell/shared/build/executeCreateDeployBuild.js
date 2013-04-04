@@ -17,8 +17,7 @@ define(
 		'fs',
 		'flob',
 		'mkdirp',
-		'path',
-		'rimraf'
+		'path'
 	],
 	function(
 		copyFiles,
@@ -37,8 +36,7 @@ define(
 		fs,
 		flob,
 		mkdirp,
-		path,
-		rmdir
+		path
 	) {
 		'use strict'
 
@@ -267,7 +265,7 @@ define(
 			// the library files
 			var deployFilePaths = createProjectLibraryFilePaths( projectLibraryPath )
 
-			// public template files go to "build/deploy/*"
+			// public template files go to "build/release/*"
 			deployFilePaths.push( [
 				path.join( spellCorePath, 'htmlTemplate', 'index.html' ),
 				path.join( deployPath, 'index.html' )
@@ -278,14 +276,11 @@ define(
 				path.join( deployPath, 'main.css' )
 			] )
 
-			// stage zero loader goes to "build/deploy/spell.js"
+			// stage zero loader goes to "build/release/spell.js"
 			deployFilePaths.push( [
 				path.join( spellCorePath, 'build', 'spell.loader.js' ),
 				path.join( deployPath, 'spell.loader.js' )
 			] )
-
-			// remove complete old deploy directory
-			rmdir.sync( deployPath )
 
 			// copy new library content to destination
 			copyFiles( projectLibraryPath, deployLibraryPath, deployFilePaths )
