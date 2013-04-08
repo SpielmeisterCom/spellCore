@@ -1,15 +1,17 @@
 define(
 	'spell/script/logStatistics',
 	[
-		'spell/shared/util/platform/PlatformKit',
-		'spell/math/random/UUID'
+		'spell/shared/util/platform/PlatformKit'
 	],
 	function(
-		PlatformKit,
-		UUID
+		PlatformKit
 	) {
 		'use strict'
 
+
+		var platformDetails = PlatformKit.platformDetails
+
+		var rpcBuffer = []
 
 		var sendLogRequest = function( url, data ) {
 			PlatformKit.network.performHttpRequest(
@@ -21,17 +23,11 @@ define(
 			)
 		}
 
-		var platformDetails = PlatformKit.platformDetails
-
-		var createMessage = function( spell, sceneId, type, payload ) {
+		var createLogData = function( spell, sceneId, clientId, payload ) {
 			var renderingContext     = spell.renderingContext,
-				configurationManager = spell.configurationManager,
-				storage              = spell.storage,
-				clientId             = !storage.get( 'clientId' ) ? UUID.generate() : storage.get( 'clientId' )
+				configurationManager = spell.configurationManager
 
-			storage.set( 'clientId', clientId )
-
-			return {
+			return PlatformKit.jsonCoder.encode( {
 				renderingBackEnd : renderingContext.getConfiguration().type,
 				renderingInfo    : renderingContext.getConfiguration().info,
 				averageFrameTime : spell.statisticsManager.getAverageTickTime(),
@@ -45,16 +41,43 @@ define(
 				payload          : payload,
 				platform         : platformDetails.getPlatform(),
 				platformAdapter  : platformDetails.getPlatformAdapter(),
-				language         : configurationManager.getValue( 'currentLanguage' ),
-				logType          : type
+				language         : configurationManager.getValue( 'currentLanguage' )
+			} )
+		}
+
+		var processBuffer = function( spell, clientId, buffer ) {
+			var rpc = buffer.shift()
+
+			while( rpc ) {
+				sendLogRequest(
+					rpc.url,
+					{
+						type : rpc.messageType,
+						data : createLogData( spell, rpc.sceneId, clientId, rpc.payload )
+					}
+				)
+
+				rpc = buffer.shift()
 			}
 		}
 
 		return function( spell, sceneId, url, messageType, payload ) {
-			sendLogRequest(
-				url,
-				createMessage( spell, sceneId, messageType, payload )
-			)
+			var clientId = spell.storage.get( 'clientId' )
+
+			if( !clientId ) {
+				rpcBuffer.push( { sceneId : sceneId, url : url, messageType: messageType, payload : payload } )
+
+			} else {
+				processBuffer( spell, clientId, rpcBuffer )
+
+				sendLogRequest(
+					url,
+					{
+						type : messageType,
+						data : createLogData( spell, sceneId, clientId, payload )
+					}
+				)
+			}
 		}
 	}
 )
