@@ -164,7 +164,7 @@ define(
 			}
 
 			var exportCommand = function( spellCorePath, cwd, command ) {
-				var projectPath = path.resolve( cwd ),
+				var projectPath = path.resolve( command.directory || cwd )
 					errors      = checkProjectPath( projectPath )
 
 				if( errors.length > 0 ) printErrors( errors )
@@ -196,7 +196,7 @@ define(
 
                 commander
 				.command( 'build-deploy [target]' )
-				.option( '-d, --debug' )
+				.option( '--debug' )
 				.description( 'Create a build for a specific target. Available targets: ' + _.values( buildTargets).join(', ') )
 				.action( _.bind( buildCommand, this, cwd ) )
 
@@ -208,6 +208,7 @@ define(
 
 			commander
 				.command( 'export' )
+				.option( '-d, --directory [directory]', 'The path to the project directory which should be initialized. The default is the current working directory.' )
 				.option( '-f, --file [file]', 'the name of the output file' )
 				.description( 'export a deployment ready version into a zip archive' )
 				.action( _.bind( exportCommand, this, spellCorePath, cwd ) )
