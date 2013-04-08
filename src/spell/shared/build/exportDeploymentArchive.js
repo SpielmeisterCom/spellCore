@@ -36,7 +36,7 @@ define(
 				if( isFile( absoluteFilePath ) ) {
 					zip.addFile(
 						fs.createReadStream( absoluteFilePath ),
-						{ name : filePath.replace( /\/build\/deploy/, '' ) },
+						{ name : filePath.replace( /\/build\/release/, '' ) },
 						function() {
 							addFile( zip, rootPath, filePaths )
 						}
@@ -94,7 +94,7 @@ define(
 
 			// create archive
 			var filePaths = flob.sync(
-				projectName + '/build/deploy/**',
+				projectName + '/build/release/**',
 				{
 					cwd : projectsPath
 				}
