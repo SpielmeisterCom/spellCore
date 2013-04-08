@@ -107,16 +107,3 @@ index 772a0f5..5d776c6 100755
  
      result.append(str(value))
    result.append("0")
-diff --git src/vcbuild.bat src/vcbuild.bat
-index 5bc6339..e740977 100644
---- src/vcbuild.bat
-+++ src/vcbuild.bat
-@@ -1,5 +1,8 @@
- @echo off
- 
-+SET PATH=C:\Python27\;C:\Windows\system32
-+call C:\"Program Files (x86)"\"Microsoft Visual Studio 10.0"\VC\vcvarsall.bat x86
-+
- cd %~dp0
- 
- if /i "%1"=="help" goto help

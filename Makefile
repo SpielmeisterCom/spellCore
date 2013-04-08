@@ -13,8 +13,19 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 	SED = sed -i "" -e 
 else
-	SED = sed -i 
+	SED = sed -i
+endif
 
+WINDOWS_ENV = false
+
+ifeq ($(UNAME_S),CYGWIN_NT-6.1-WOW64)
+	WINDOWS_ENV = true
+	VISUAL_STUDIO_PATCH_FILE = nodejs_vs10.patch
+endif
+
+ifeq ($(UNAME_S),CYGWIN_NT-6.2-WOW64)
+	WINDOWS_ENV = true
+	VISUAL_STUDIO_PATCH_FILE = nodejs_vs11.patch
 endif
 
 .PHONY: cli-js
@@ -136,14 +147,16 @@ cli: cli-js
 	cp ../../node_modules/commander/lib/commander.js $(NODE_SRC)/lib/commander.js
 
 	#compile nodejs
-ifeq ($(UNAME_S),CYGWIN_NT-6.1-WOW64)
-		cd $(NODE_SRC) && ./vcbuild.bat
-		cp $(NODE_SRC)/Release/node.exe build/spellcli.exe
-		../upx/upx -9 build/spellcli.exe
+ifeq ($(WINDOWS_ENV),true)
+	cd $(NODE_SRC) && patch -p1 <../../../modules/spellCore/$(VISUAL_STUDIO_PATCH_FILE)
+
+	cd $(NODE_SRC) && ./vcbuild.bat
+	cp $(NODE_SRC)/Release/node.exe build/spellcli.exe
+	../upx/upx -9 build/spellcli.exe
 else
-		cd $(NODE_SRC) && make clean && ./configure && make -j4
-		cp $(NODE_SRC)/out/Release/node build/spellcli
-		../upx/upx -9 build/spellcli
+	cd $(NODE_SRC) && make clean && ./configure && make -j4
+	cp $(NODE_SRC)/out/Release/node build/spellcli
+	../upx/upx -9 build/spellcli
 endif
 
 .PHONY: dev
