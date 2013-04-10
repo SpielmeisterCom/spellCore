@@ -25,7 +25,8 @@ define(
 		'spell/shared/util/platform/private/openURL',
 		'spell/shared/util/platform/private/platformDetails',
 		'spell/shared/util/platform/private/graphics/initViewport',
-		'spell/shared/util/platform/private/advertisement'
+		'spell/shared/util/platform/private/advertisement',
+		'spell/shared/util/platform/private/flurry'
 	],
 	function(
 		Box2D,
@@ -48,7 +49,8 @@ define(
 		openURL,
 		platformDetails,
 		initViewport,
-		advertisement
+		advertisement,
+		flurry
 	) {
 		'use strict'
 
@@ -158,7 +160,9 @@ define(
 			},
 
 			loadInterstitial : advertisement.loadInterstitial,
-			showInterstitial : advertisement.showInterstitial
+			showInterstitial : advertisement.showInterstitial,
+
+			flurry : flurry
 		}
 	}
 )
