@@ -233,6 +233,20 @@ define(
 				return cache.metaData[ libraryPath ] || cache.resource[ libraryPath ]
 			},
 
+			getMetaDataRecordsByType : function( type ) {
+				return _.reduce(
+					this.cache.metaData,
+					function( memo, metaDataRecord, libraryPath ) {
+						if( metaDataRecord.type === type ) {
+							memo[ libraryPath ] = metaDataRecord
+						}
+
+						return memo
+					},
+					{}
+				)
+			},
+
 			setCache : function( content ) {
 				_.extend( this.cache.metaData, content )
 			},
@@ -271,7 +285,7 @@ define(
 				var loadingProcess = createLoadingProcess(
 					id,
 					libraryPaths,
-					createConfig( this.baseUrlPrefix, config, next )
+					createConfig( this.baseUrlPrefix, config || {}, next )
 				)
 
 				this.loadingProcesses[ id ] = loadingProcess

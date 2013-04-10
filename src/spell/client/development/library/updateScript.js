@@ -19,11 +19,9 @@ define(
 		'use strict'
 
 
-		var createAffectedSystems = function( templateManager, dependentModules ) {
-			var systems = templateManager.getTemplatesByType( TemplateTypes.SYSTEM )
-
+		var createAffectedSystems = function( libraryManager, dependentModules ) {
 			return _.reduce(
-				systems,
+				libraryManager.getMetaDataRecordsByType( 'system' ),
 				function( memo, system ) {
 					var systemId       = createId( system.namespace, system.name ),
 						systemModuleId = createModuleId( systemId )
@@ -47,7 +45,7 @@ define(
 			// restart the affected systems
 			var sceneManager = spell.sceneManager,
 				systemIds    = createAffectedSystems(
-					spell.templateManager,
+					spell.libraryManager,
 					PlatformKit.ModuleLoader.createDependentModules( moduleId ).concat( moduleId )
 				)
 
