@@ -7,7 +7,6 @@ define(
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
 		'spell/shared/util/hashModuleId',
-		'spell/shared/util/template/TemplateTypes',
 
 		'amd-helper',
 		'fs',
@@ -23,7 +22,6 @@ define(
 		isDirectory,
 		isFile,
 		hashModuleId,
-		TemplateTypes,
 
 		amdHelper,
 		fs,

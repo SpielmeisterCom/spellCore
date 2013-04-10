@@ -11,7 +11,6 @@ define(
 		'spell/shared/util/createCacheContent',
 		'spell/shared/util/createIdFromLibraryFilePath',
 		'spell/shared/util/hashModuleId',
-		'spell/shared/util/template/TemplateTypes',
 
 		'amd-helper',
 		'fs',
@@ -30,7 +29,6 @@ define(
 		createCacheContent,
 		createIdFromLibraryFilePath,
 		hashModuleId,
-		TemplateTypes,
 
 		amdHelper,
 		fs,

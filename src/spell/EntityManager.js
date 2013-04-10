@@ -18,7 +18,6 @@ define(
 		'spell/shared/util/deepClone',
 		'spell/Events',
 		'spell/shared/util/template/applyComponentConfig',
-		'spell/shared/util/template/TemplateTypes',
 
 		'spell/math/util',
 		'spell/math/mat3',
@@ -34,7 +33,6 @@ define(
 		deepClone,
 		Events,
 		applyComponentConfig,
-		TemplateTypes,
 
 		mathUtil,
 		mat3,
