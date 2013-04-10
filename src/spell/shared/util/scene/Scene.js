@@ -37,6 +37,15 @@ define(
 		 * private
 		 */
 
+		var libraryIdsToJsonFilenames = function( resourceIds ) {
+			return _.map(
+				resourceIds,
+				function( resourceId ) {
+					return resourceId.replace( /\./g, '/' ) + '.json'
+				}
+			)
+		}
+
 		var CAMERA_COMPONENT_ID = Defines.CAMERA_COMPONENT_ID
 
 		var stopWatch = new StopWatch()
@@ -61,10 +70,7 @@ define(
 			}
 		}
 
-		var createSystem = function( spell, entityManager, system, isModeDevelopment, systemConfig ) {
-			var systemId = createId( system.namespace, system.name ),
-				moduleId = createModuleId( systemId )
-
+		var createSystem = function( spell, entityManager, systemId, system, isModeDevelopment, systemConfig ) {
 			var attributes = _.reduce(
 				system.input,
 				function( memo, inputDefinition ) {
@@ -87,7 +93,7 @@ define(
 				}
 			)
 
-			var constructor = spell.moduleLoader.require( moduleId )
+			var constructor = spell.moduleLoader.require( createModuleId( systemId ) )
 
 			// TODO: Fix create. Returned instances do not support prototype chain method look-up. O_o
 			return create( constructor, [ spell ], attributes )
@@ -121,6 +127,7 @@ define(
 						createSystem(
 							spell,
 							entityManager,
+							systemId,
 							systemTemplate,
 							isModeDevelopment,
 							_.defaults(
@@ -296,6 +303,7 @@ define(
 				var newSystem = createSystem(
 					spell,
 					this.entityManager,
+					systemId,
 					this.templateManager.getTemplate( systemId ),
 					this.isModeDevelopment,
 					systemConfig
@@ -313,23 +321,58 @@ define(
 				var executionGroup = this.executionGroups[ executionGroupId ]
 				if( !executionGroup ) return
 
-				var spell = this.spell
+				var spell             = this.spell,
+					isModeDevelopment = this.isModeDevelopment,
+					systemTemplate    = this.templateManager.getTemplate( systemId )
 
-				var system = createSystem(
-					spell,
-					this.entityManager,
-					this.templateManager.getTemplate( systemId ),
-					this.isModeDevelopment,
-					systemConfig
-				)
+				if( !systemTemplate ) {
+					var fileNames = libraryIdsToJsonFilenames( [ systemId ] )
 
-				system.prototype.init.call( system, spell )
+					spell.libraryManager.load(
+						fileNames,
+						{
+							onLoadingCompleted : function( loadedRecords ) {
+								spell.templateManager.add( loadedRecords[ fileNames[ 0 ] ] )
+								systemTemplate = spell.templateManager.getTemplate( systemId )
 
-				if( system.config.active ) {
-					system.prototype.activate.call( system, spell )
+								var system = createSystem(
+									spell,
+									spell.entityManager,
+									systemId,
+									systemTemplate,
+									isModeDevelopment,
+									systemConfig
+								)
+
+								system.prototype.init.call( system, spell )
+
+								if( system.config.active ) {
+									system.prototype.activate.call( system, spell )
+								}
+
+								executionGroup.insert( systemId, system, index )
+							}
+						}
+					)
+
+				} else {
+					var system = createSystem(
+						spell,
+						this.entityManager,
+						systemId,
+						systemTemplate,
+						this.isModeDevelopment,
+						systemConfig
+					)
+
+					system.prototype.init.call( system, spell )
+
+					if( system.config.active ) {
+						system.prototype.activate.call( system, spell )
+					}
+
+					executionGroup.insert( systemId, system, index )
 				}
-
-				executionGroup.insert( systemId, system, index )
 			},
 			removeSystem: function( systemId, executionGroupId ) {
 				var executionGroup = this.executionGroups[ executionGroupId ]

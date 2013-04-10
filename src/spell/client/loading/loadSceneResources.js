@@ -142,7 +142,6 @@ define(
 			eventManager.waitFor(
 				[ Events.RESOURCE_LOADING_COMPLETED, sceneId ],
 				function( loadedRecords ) {
-					addNamespaceAndName( loadedRecords )
 					addIdAsKey( spell.scenes, loadedRecords )
 				}
 
@@ -150,8 +149,6 @@ define(
 				eventManager.waitFor(
 					[ Events.RESOURCE_LOADING_COMPLETED, libraryBundleName ],
 					function( loadedRecords ) {
-						addNamespaceAndName( loadedRecords )
-
 						var library = groupByType( loadedRecords )
 
 						updateAssets( assetManager, library.asset )

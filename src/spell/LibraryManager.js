@@ -1,6 +1,7 @@
 define(
 	'spell/LibraryManager',
 	[
+		'spell/client/loading/addNamespaceAndName',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/createLibraryFilePathFromId',
 		'spell/shared/util/platform/PlatformKit',
@@ -9,6 +10,7 @@ define(
 		'spell/functions'
 	],
 	function(
+		addNamespaceAndName,
 		createLibraryFilePath,
 		createLibraryFilePathFromId,
 		PlatformKit,
@@ -105,10 +107,12 @@ define(
 					{}
 				)
 
-				var onLoadingCompleted = loadingProcess.onLoadingCompleted
+				if( loadingProcess.isMetaDataLoad ) {
+					addNamespaceAndName( loadedLibraryRecords )
+				}
 
-				if( onLoadingCompleted ) {
-					onLoadingCompleted( loadedLibraryRecords )
+				if( loadingProcess.onLoadingCompleted ) {
+					loadingProcess.onLoadingCompleted( loadedLibraryRecords )
 				}
 
 				delete loadingProcesses[ loadingProcess.id ]
