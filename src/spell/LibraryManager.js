@@ -64,12 +64,13 @@ define(
 			return resourceTypeToLoaderFactory[ type ]
 		}
 
-		var createLoadingProcess = function( id, libraryPaths, config ) {
+		var createLoadingProcess = function( id, libraryPaths, config, next ) {
 			return {
 				id                 : id,
 				libraryPaths       : libraryPaths,
 				numCompleted       : 0,
 				name               : config.name,
+				next               : next,
 				type               : config.type,
 				baseUrl            : config.baseUrl,
 				omitCache          : config.omitCache,
@@ -196,11 +197,10 @@ define(
 			}
 		}
 
-		var createConfig = function( baseUrlPrefix, config, next ) {
+		var createConfig = function( baseUrlPrefix, config ) {
 			return {
 				baseUrl            : config.baseUrl ? config.baseUrl : baseUrlPrefix + BASE_URL,
 				name               : config.name,
-				next               : next,
 				omitCache          : !!config.omitCache,
 				onLoadingCompleted : config.onLoadingCompleted,
 				type               : config.type ? config.type : 'auto',
@@ -285,7 +285,8 @@ define(
 				var loadingProcess = createLoadingProcess(
 					id,
 					libraryPaths,
-					createConfig( this.baseUrlPrefix, config || {}, next )
+					createConfig( this.baseUrlPrefix, config || {} ),
+					next
 				)
 
 				this.loadingProcesses[ id ] = loadingProcess
