@@ -123,6 +123,10 @@ define(
 						[ loadedLibraryRecords ]
 					)
 				}
+
+				if( loadingProcess.next ) {
+					loadingProcess.next()
+				}
 			}
 		}
 
@@ -192,10 +196,11 @@ define(
 			}
 		}
 
-		var createConfig = function( baseUrlPrefix, config ) {
+		var createConfig = function( baseUrlPrefix, config, next ) {
 			return {
 				baseUrl            : config.baseUrl ? config.baseUrl : baseUrlPrefix + BASE_URL,
 				name               : config.name,
+				next               : next,
 				omitCache          : !!config.omitCache,
 				onLoadingCompleted : config.onLoadingCompleted,
 				type               : config.type ? config.type : 'auto',
@@ -254,7 +259,7 @@ define(
 				this.cache.resource = {}
 			},
 
-			load : function( libraryPaths, config ) {
+			load : function( libraryPaths, config, next ) {
 				// TODO: work on a list of assets/libraryRecords and call their getLibraryResourcePaths() methods to determine
 				// the required resources instead of a list of libraryPaths
 				if( libraryPaths.length === 0 ) {
@@ -266,7 +271,7 @@ define(
 				var loadingProcess = createLoadingProcess(
 					id,
 					libraryPaths,
-					createConfig( this.baseUrlPrefix, config )
+					createConfig( this.baseUrlPrefix, config, next )
 				)
 
 				this.loadingProcesses[ id ] = loadingProcess

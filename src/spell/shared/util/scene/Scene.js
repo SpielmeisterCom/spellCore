@@ -6,6 +6,8 @@ define(
 		'spell/data/SortedMap',
 		'spell/shared/util/create',
 		'spell/shared/util/createId',
+		'spell/shared/util/createLibraryFilePathFromId',
+		'spell/shared/util/createLibraryFilePathsFromIds',
 		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
 		'spell/shared/util/entityConfig/flatten',
@@ -21,6 +23,8 @@ define(
 		SortedMap,
 		create,
 		createId,
+		createLibraryFilePathFromId,
+		createLibraryFilePathsFromIds,
 		createModuleId,
 		deepClone,
 		flattenEntityConfig,
@@ -32,19 +36,6 @@ define(
 	) {
 		'use strict'
 
-
-		/*
-		 * private
-		 */
-
-		var libraryIdsToJsonFilenames = function( resourceIds ) {
-			return _.map(
-				resourceIds,
-				function( resourceId ) {
-					return resourceId.replace( /\./g, '/' ) + '.json'
-				}
-			)
-		}
 
 		var CAMERA_COMPONENT_ID = Defines.CAMERA_COMPONENT_ID
 
@@ -111,12 +102,12 @@ define(
 			)
 		}
 
-		var createSystems = function( spell, entityManager, templateManager, systems, isModeDevelopment ) {
+		var createSystems = function( spell, entityManager, libraryManager, systems, isModeDevelopment ) {
 			return _.reduce(
 				systems,
 				function( memo, system ) {
 					var systemId       = system.id,
-						systemTemplate = templateManager.getTemplate( systemId )
+						systemTemplate = libraryManager.get( createLibraryFilePathFromId( systemId ) )
 
 					if( !systemTemplate ) {
 						throw 'Error: Could not get template for id \'' + systemId + '\'.'
@@ -180,14 +171,10 @@ define(
 		}
 
 
-		/*
-		 * public
-		 */
-
-		var Scene = function( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneConfig, initialConfig ) {
+		var Scene = function( spell, entityManager, libraryManager, statisticsManager, isModeDevelopment, sceneConfig, initialConfig ) {
 			this.spell             = spell
 			this.entityManager     = entityManager
-			this.templateManager   = templateManager
+			this.libraryManager    = libraryManager
 			this.statisticsManager = statisticsManager
 			this.isModeDevelopment = isModeDevelopment
 			this.executionGroups   = { render : null, update : null }
@@ -217,13 +204,13 @@ define(
 				}
 
 				var entityManager   = this.entityManager,
-					templateManager = this.templateManager,
+					libraryManager  = this.libraryManager,
 					executionGroups = this.executionGroups
 
 				executionGroups.render = createSystems(
 					spell,
 					entityManager,
-					templateManager,
+					libraryManager,
 					sceneConfig.systems.render,
 					this.isModeDevelopment
 				)
@@ -231,7 +218,7 @@ define(
 				executionGroups.update = createSystems(
 					spell,
 					entityManager,
-					templateManager,
+					libraryManager,
 					sceneConfig.systems.update,
 					this.isModeDevelopment
 				)
@@ -304,7 +291,7 @@ define(
 					spell,
 					this.entityManager,
 					systemId,
-					this.templateManager.getTemplate( systemId ),
+					this.libraryManager.get( createLibraryFilePathFromId( systemId ) ),
 					this.isModeDevelopment,
 					systemConfig
 				)
@@ -323,56 +310,30 @@ define(
 
 				var spell             = this.spell,
 					isModeDevelopment = this.isModeDevelopment,
-					systemTemplate    = this.templateManager.getTemplate( systemId )
+					libraryManager    = this.libraryManager
 
-				if( !systemTemplate ) {
-					var fileNames = libraryIdsToJsonFilenames( [ systemId ] )
+				libraryManager.load(
+					createLibraryFilePathsFromIds( [ systemId ] ),
+					undefined,
+					function() {
+						var system = createSystem(
+							spell,
+							spell.entityManager,
+							systemId,
+							libraryManager.get( createLibraryFilePathFromId( systemId ) ),
+							isModeDevelopment,
+							systemConfig
+						)
 
-					spell.libraryManager.load(
-						fileNames,
-						{
-							onLoadingCompleted : function( loadedRecords ) {
-								spell.templateManager.add( loadedRecords[ fileNames[ 0 ] ] )
-								systemTemplate = spell.templateManager.getTemplate( systemId )
+						system.prototype.init.call( system, spell )
 
-								var system = createSystem(
-									spell,
-									spell.entityManager,
-									systemId,
-									systemTemplate,
-									isModeDevelopment,
-									systemConfig
-								)
-
-								system.prototype.init.call( system, spell )
-
-								if( system.config.active ) {
-									system.prototype.activate.call( system, spell )
-								}
-
-								executionGroup.insert( systemId, system, index )
-							}
+						if( system.config.active ) {
+							system.prototype.activate.call( system, spell )
 						}
-					)
 
-				} else {
-					var system = createSystem(
-						spell,
-						this.entityManager,
-						systemId,
-						systemTemplate,
-						this.isModeDevelopment,
-						systemConfig
-					)
-
-					system.prototype.init.call( system, spell )
-
-					if( system.config.active ) {
-						system.prototype.activate.call( system, spell )
+						executionGroup.insert( systemId, system, index )
 					}
-
-					executionGroup.insert( systemId, system, index )
-				}
+				)
 			},
 			removeSystem: function( systemId, executionGroupId ) {
 				var executionGroup = this.executionGroups[ executionGroupId ]

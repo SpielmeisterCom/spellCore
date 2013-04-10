@@ -5,6 +5,7 @@ define(
 		'spell/client/loading/addNamespaceAndName',
 		'spell/client/loading/createFilesToLoad',
 		'spell/client/loading/injectResource',
+		'spell/shared/util/createLibraryFilePathsFromIds',
 		'spell/math/util',
 		'spell/shared/util/createId',
 		'spell/Events',
@@ -17,6 +18,7 @@ define(
 		addNamespaceAndName,
 		createFilesToLoad,
 		injectResource,
+		createLibraryFilePathsFromIds,
 		mathUtil,
 		createId,
 		Events,
@@ -26,15 +28,6 @@ define(
 	) {
 		'use strict'
 
-
-		var libraryIdsToJsonFilenames = function( resourceIds ) {
-			return _.map(
-				resourceIds,
-				function( resourceId ) {
-					return resourceId.replace( /\./g, '/' ) + '.json'
-				}
-			)
-		}
 
 		var addTemplates = function( templateManager, templates ) {
 			_.each(
@@ -187,7 +180,7 @@ define(
 				var scene = spell.scenes[ sceneId ]
 
 				libraryManager.load(
-					libraryIdsToJsonFilenames( scene.libraryIds ),
+					createLibraryFilePathsFromIds( scene.libraryIds ),
 					{
 						name : libraryBundleName
 					}
@@ -196,7 +189,7 @@ define(
 
 			// load scene library record
 			libraryManager.load(
-				libraryIdsToJsonFilenames( [ sceneId ] ),
+				createLibraryFilePathsFromIds( [ sceneId ] ),
 				{
 					name : sceneId
 				}

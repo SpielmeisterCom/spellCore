@@ -113,7 +113,7 @@ define(
 				spell,
 				entityManager,
 				spell.statisticsManager,
-				templateManager,
+				libraryManager,
 				spell.mainLoop,
 				this.sendMessageToEditor,
 				isModeDevelopment

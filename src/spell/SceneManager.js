@@ -15,14 +15,14 @@ define(
 		'use strict'
 
 
-		var postLoadedResources = function( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneId, initialConfig ) {
+		var postLoadedResources = function( spell, entityManager, libraryManager, statisticsManager, isModeDevelopment, sceneId, initialConfig ) {
 			var sceneConfig = spell.scenes[ sceneId ]
 
 			if( !sceneConfig ) {
 				throw 'Error: Could not find scene configuration for scene "' + sceneId + '".'
 			}
 
-			var scene = new Scene( spell, entityManager, templateManager, statisticsManager, isModeDevelopment, sceneConfig, initialConfig )
+			var scene = new Scene( spell, entityManager, libraryManager, statisticsManager, isModeDevelopment, sceneConfig, initialConfig )
 
 			scene.init()
 
@@ -35,14 +35,14 @@ define(
 			this.processCmdQueue()
 		}
 
-		var SceneManager = function( spell, entityManager, statisticsManager, templateManager, mainLoop, sendMessageToEditor, isModeDevelopment ) {
+		var SceneManager = function( spell, entityManager, statisticsManager, libraryManager, mainLoop, sendMessageToEditor, isModeDevelopment ) {
 			this.activeScene
 			this.entityManager       = entityManager
 			this.mainLoop            = mainLoop
 			this.sendMessageToEditor = sendMessageToEditor
 			this.spell               = spell
 			this.statisticsManager   = statisticsManager
-			this.templateManager     = templateManager
+			this.libraryManager      = libraryManager
 			this.isModeDevelopment   = isModeDevelopment
 			this.cmdQueue            = []
 			this.loadingPending      = false
@@ -91,7 +91,7 @@ define(
 							this,
 							spell,
 							this.entityManager,
-							this.templateManager,
+							this.libraryManager,
 							this.statisticsManager,
 							this.isModeDevelopment,
 							startSceneId,
@@ -112,7 +112,7 @@ define(
 									this,
 									spell,
 									this.entityManager,
-									this.templateManager,
+									this.libraryManager,
 									this.statisticsManager,
 									this.isModeDevelopment,
 									loadingSceneId,
@@ -134,7 +134,7 @@ define(
 									this,
 									spell,
 									this.entityManager,
-									this.templateManager,
+									this.libraryManager,
 									this.statisticsManager,
 									this.isModeDevelopment,
 									startSceneId,
