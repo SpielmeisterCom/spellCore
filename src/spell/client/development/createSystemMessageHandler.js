@@ -14,16 +14,16 @@ define(
 		return function( spell ) {
 			return createMessageDispatcher(
 				{
-					'add' : function( payload ) {
+					add : function( payload ) {
 						spell.sceneManager.addSystem( payload.systemId, payload.executionGroupId, payload.index, payload.systemConfig )
 					},
-					'move' : function( payload ) {
+					move : function( payload ) {
 						spell.sceneManager.moveSystem( payload.systemId, payload.srcExecutionGroupId, payload.dstExecutionGroupId, payload.dstIndex )
 					},
-					'remove' : function( payload ) {
+					remove : function( payload ) {
 						spell.sceneManager.removeSystem( payload.systemId, payload.executionGroupId )
 					},
-					'update' : function( payload ) {
+					update : function( payload ) {
 						var definition = payload.definition
 
 						if( !definition.namespace || !definition.name ) {
