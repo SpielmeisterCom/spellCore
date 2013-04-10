@@ -29,10 +29,6 @@ define(
 		 * private
 		 */
 
-		var createName = function(namespace, name) {
-			return (!namespace) ?  name : namespace + '.' + name
-		}
-
 		var isValidComponentTemplate = function( template ) {
 			// check for ambiguous attribute names
 			var attributeNameCounts = _.reduce(
@@ -153,7 +149,7 @@ define(
 		}
 
 		var addTemplate = function( assetManager, moduleLoader, onComponentTypeAdded, templates, componentsWithAssets, entityPrototypes, definition, overwrite ) {
-			var templateId = createName( definition.namespace, definition.name ),
+			var templateId = createId( definition.namespace, definition.name ),
 				type       = definition.type
 
 			templates[ templateId ] = definition
