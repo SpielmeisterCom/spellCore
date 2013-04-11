@@ -794,9 +794,13 @@ define(
 			 * @param {String} entityId the id of the entity to remove
 			 */
 			removeEntity : function( entityId ) {
-				if( !entityId ) throw 'Error: Missing entity id.'
+				if( !entityId ) {
+					return false
+				}
 
 				removeComponents( this.eventManager, this.componentMaps, entityId )
+
+				return true
 			},
 
 			/**
