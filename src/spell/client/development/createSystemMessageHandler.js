@@ -2,11 +2,13 @@ define(
 	'spell/client/development/createSystemMessageHandler',
 	[
 		'spell/client/development/createMessageDispatcher',
-		'spell/shared/util/createId'
+		'spell/shared/util/createId',
+		'spell/shared/util/createLibraryFilePathFromId'
 	],
 	function(
 		createMessageDispatcher,
-		createId
+		createId,
+		createLibraryFilePathFromId
 	) {
 		'use strict'
 
@@ -30,13 +32,15 @@ define(
 							throw 'Error: System definition is missing namespace and or name attribute.'
 						}
 
-						spell.templateManager.add( definition, true )
+						var libraryId = createId( definition.namespace, definition.name )
 
-						spell.sceneManager.restartSystem(
-							createId( definition.namespace, definition.name ),
-							payload.executionGroupId,
-							payload.systemConfig
-						)
+						var metaDataCache = {}
+
+						metaDataCache[ createLibraryFilePathFromId( libraryId ) ] = definition
+
+						spell.libraryManager.addToCache( metaDataCache )
+
+						spell.sceneManager.restartSystem( libraryId, payload.executionGroupId, payload.systemConfig )
 					}
 				}
 			)

@@ -228,7 +228,7 @@ define(
 				)
 			},
 
-			setCache : function( content ) {
+			addToCache : function( content ) {
 				_.extend( this.cache.metaData, content )
 			},
 

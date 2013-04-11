@@ -148,7 +148,7 @@ define(
 			)
 		}
 
-		var addTemplate = function( assetManager, moduleLoader, onComponentTypeAdded, templates, componentsWithAssets, entityPrototypes, definition, overwrite ) {
+		var addTemplate = function( assetManager, moduleLoader, onComponentTypeAdded, templates, componentsWithAssets, entityPrototypes, definition ) {
 			var templateId = createId( definition.namespace, definition.name ),
 				type       = definition.type
 
@@ -264,7 +264,7 @@ define(
 		}
 
 		TemplateManager.prototype = {
-			add : function( definition, overwrite ) {
+			add : function( definition ) {
 				if( !isValidDefinition( definition ) ) {
 					throw 'Error: The format of the supplied template definition is invalid.'
 				}
@@ -276,8 +276,7 @@ define(
 					this.templates,
 					this.componentsWithAssets,
 					this.entityPrototypes,
-					definition,
-					overwrite
+					definition
 				)
 			},
 

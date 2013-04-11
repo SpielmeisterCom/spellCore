@@ -95,7 +95,7 @@ define(
 				configurationManager.getValue( 'baseUrlPrefix' )
 			)
 
-			if( cacheContent ) libraryManager.setCache( cacheContent )
+			if( cacheContent ) libraryManager.addToCache( cacheContent )
 
 			var assetManager = new AssetManager( libraryManager )
 

@@ -368,7 +368,7 @@ if( !window.console ) {
 				document.getElementById( config.id ).innerHTML = '<p style="color: #FFFFFF">' + message + '</p>'
 			}
 		},
-		setCache : function( cachedContent ) {
+		addToCache : function( cachedContent ) {
 			this.cache = cachedContent
 		},
 		setRuntimeModule : function( module ) {
