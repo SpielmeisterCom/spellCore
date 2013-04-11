@@ -21,6 +21,8 @@ define(
 		'use strict'
 
 
+		var currentCameraId
+
 		var isPointWithinEntity = function ( entityDimensions, transform, worldPosition ) {
 			return mathUtil.isPointInRect(
 				worldPosition,
@@ -130,7 +132,6 @@ define(
 			this.screenSize           = spell.configurationManager.getValue( 'currentScreenSize' )
 			this.screenResizeHandler
 			this.cameraChangedHandler
-			this.currentCameraId
 		}
 
 		processPointerInput.prototype = {
@@ -151,7 +152,7 @@ define(
 
 				this.cameraChangedHandler = _.bind(
 					function( camera, entityId ) {
-						this.currentCameraId = camera.active ? entityId : undefined
+						currentCameraId = camera.active ? entityId : undefined
 					},
 					this
 				)
@@ -216,8 +217,8 @@ define(
 					transforms       = this.transforms,
                     eventHandlers    = this.eventHandlers,
 					visualObjects    = this.visualObjects,
-					camera           = this.cameras[ this.currentCameraId ],
-					cameraTransform  = this.transforms[ this.currentCameraId ],
+					camera           = this.cameras[ currentCameraId ],
+					cameraTransform  = this.transforms[ currentCameraId ],
 					screenSize       = this.screenSize
 
 				var aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]

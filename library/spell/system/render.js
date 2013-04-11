@@ -55,7 +55,8 @@ define(
 			debugFontAssetId  = 'font:spell.OpenSans14px',
 			drawDebugShapes   = true,
 			defaultDimensions = vec2.create( [ 1.0, 1.0 ] ),
-			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() }
+			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
+			currentCameraId
 
 //		var statisticsManager,
 //			performance = window.performance
@@ -540,7 +541,7 @@ define(
 
 			this.cameraChangedHandler = _.bind(
 				function( camera, entityId ) {
-					this.currentCameraId = camera.active ? entityId : undefined
+					 currentCameraId = camera.active ? entityId : undefined
 				},
 				this
 			)
@@ -602,8 +603,7 @@ define(
 			context.clear()
 
 			// set the camera
-			var currentCameraId = this.currentCameraId,
-				camera          = this.cameras[ currentCameraId ],
+			var camera          = this.cameras[ currentCameraId ],
 				cameraTransform = transforms[ currentCameraId ]
 
 			if( !camera || !cameraTransform ) {
@@ -615,7 +615,7 @@ define(
 
 			var effectiveCameraDimensions = vec2.multiply(
 				cameraTransform.scale,
-				createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
+				createComprisedRectangle( [ camera.width, camera.height ], aspectRatio )
 			)
 
 			viewFrustum = createViewFrustum( effectiveCameraDimensions, cameraTransform.translation )
@@ -789,7 +789,6 @@ define(
 			this.debugFontAsset       = spell.assetManager.get( debugFontAssetId )
 			this.screenSize           = spell.configurationManager.getValue( 'currentScreenSize' )
 			this.isDevelopment        = spell.configurationManager.getValue( 'mode' ) !== 'deployed'
-			this.currentCameraId      = undefined
 
 			// world to view matrix
 			mat3.ortho( 0.0, this.screenSize[ 0 ], 0.0, this.screenSize[ 1 ], tmpMat3 )
