@@ -947,7 +947,10 @@ define(
 			 * @return {Boolean}
 			 */
 			hasComponent : function( entityId, componentId ) {
-				return !!this.componentMaps[ componentId ][ entityId ]
+				var componentMap = this.componentMaps[ componentId ]
+				if( !componentMap ) return false
+
+				return !!componentMap[ entityId ]
 			},
 
 			/**
