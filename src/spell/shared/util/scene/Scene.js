@@ -296,10 +296,10 @@ define(
 					systemConfig
 				)
 
-				newSystem.prototype.init.call( newSystem, spell )
+				newSystem.prototype.init.call( newSystem, spell, this.sceneConfig, this.initialConfig )
 
 				if( newSystem.config.active ) {
-					newSystem.prototype.activate.call( newSystem, spell )
+					newSystem.prototype.activate.call( newSystem, spell, this.sceneConfig, this.initialConfig )
 				}
 
 				executionGroup.add( systemId, newSystem )
