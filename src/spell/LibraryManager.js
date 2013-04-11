@@ -21,10 +21,6 @@ define(
 		'use strict'
 
 
-		/*
-		 * private
-		 */
-
 		var BASE_URL             = 'library',
 			nextLoadingProcessId = 0
 
@@ -64,18 +60,18 @@ define(
 			return resourceTypeToLoaderFactory[ type ]
 		}
 
-		var createLoadingProcess = function( id, libraryPaths, config, next ) {
+		var createLoadingProcess = function( id, libraryPaths, baseUrlPrefix, config, next ) {
 			return {
 				id                 : id,
 				libraryPaths       : libraryPaths,
 				numCompleted       : 0,
 				name               : config.name,
 				next               : next,
-				type               : config.type,
-				baseUrl            : config.baseUrl,
-				omitCache          : config.omitCache,
+				type               : config.type ? config.type : 'auto',
+				baseUrl            : config.baseUrl ? config.baseUrl : baseUrlPrefix + BASE_URL,
+				omitCache          : !!config.omitCache,
 				onLoadingCompleted : config.onLoadingCompleted,
-				isMetaDataLoad     : config.isMetaDataLoad
+				isMetaDataLoad     : config.isMetaDataLoad !== undefined ? config.isMetaDataLoad : true
 			}
 		}
 
@@ -197,21 +193,6 @@ define(
 			}
 		}
 
-		var createConfig = function( baseUrlPrefix, config ) {
-			return {
-				baseUrl            : config.baseUrl ? config.baseUrl : baseUrlPrefix + BASE_URL,
-				name               : config.name,
-				omitCache          : !!config.omitCache,
-				onLoadingCompleted : config.onLoadingCompleted,
-				type               : config.type ? config.type : 'auto',
-				isMetaDataLoad     : config.isMetaDataLoad !== undefined ? config.isMetaDataLoad : true
-			}
-		}
-
-
-		/*
-		 * public
-		 */
 
 		var LibraryManager = function( eventManager, renderingContext, soundContext, hostConfig, baseUrlPrefix ) {
 			this.eventManager                = eventManager
@@ -285,7 +266,8 @@ define(
 				var loadingProcess = createLoadingProcess(
 					id,
 					libraryPaths,
-					createConfig( this.baseUrlPrefix, config || {} ),
+					this.baseUrlPrefix,
+					config || {},
 					next
 				)
 
