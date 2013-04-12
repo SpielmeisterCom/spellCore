@@ -11,7 +11,7 @@ NODE_PATH = $$(../nodejs/node --which)
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-	SED = sed -i "" -e 
+	SED = sed -i "" -e
 else
 	SED = sed -i
 endif
@@ -30,7 +30,7 @@ endif
 
 .PHONY: cli-js
 cli-js:
-	# creating the javascript includes for the command line tool 
+	# creating the javascript includes for the command line tool
 	mkdir -p build
 
 	cat spellcli-deploy-begin.js >build/spell.cli.js.tmp
@@ -53,7 +53,7 @@ cli: cli-js
 	mv build/spell.cli.js $(NODE_SRC)/lib/_third_party_main.js
 
 	#patch includes in _third_party_main.js
-	$(SED) 's/uglify-js/uglifyjs/g' $(NODE_SRC)/lib/_third_party_main.js  
+	$(SED) 's/uglify-js/uglifyjs/g' $(NODE_SRC)/lib/_third_party_main.js
 
 	#integrate requirejs
 	tail -n +2 ../../node_modules/requirejs/bin/r.js >$(NODE_SRC)/lib/requirejs.js
@@ -87,7 +87,7 @@ cli: cli-js
 
 	#integrate amd-helper
 	cp ../../node_modules/amd-helper/lib/index.js $(NODE_SRC)/lib/amdhelper.js
-	
+
 
 	cp ../../node_modules/amd-helper/lib/createModuleHeader.js $(NODE_SRC)/lib/amdhelper_createModuleHeader.js
 	cp ../../node_modules/amd-helper/lib/extractModuleHeader.js $(NODE_SRC)/lib/amdhelper_extractModuleHeader.js
@@ -172,14 +172,12 @@ deploy: clean $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD) cli
 	#copy html templates to build directory
 	cp -R htmlTemplate build/
 
-.PHONY: $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
 $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD): $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
 	# build engine include for deployment mode
 	$(NODE) tools/n.js mangle $(SPELL_ENGINE_INCLUDE_DEV_BUILD) > $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
 	$(NODE) tools/n.js mangle build/spell.loader.js > build/spell.loader.minified.js --no-anonymization
 	mv build/spell.loader.minified.js build/spell.loader.js
 
-.PHONY: $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
 $(SPELL_ENGINE_INCLUDE_DEV_BUILD): libs
 	# build engine includes for development mode
 	mkdir -p build
