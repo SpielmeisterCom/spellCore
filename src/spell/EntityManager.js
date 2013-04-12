@@ -513,7 +513,7 @@ define(
 			for( var i = 0, id, n = ids.length; i < n; i++ ) {
 				id = ids[ i ]
 
-				if( entityId !== id &&
+				if( entityId != id &&
 					metaDataComponents[ id ].name === name ) {
 
 					return true
