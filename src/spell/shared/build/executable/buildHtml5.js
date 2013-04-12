@@ -87,11 +87,11 @@ define(
 				)
 			)
 
-			// minified, anonymized engine include goes to "build/release/html5/spell.js"
+			// engine include goes to "build/release/html5/spell.js"
 			var deployFilePaths = []
 
 			deployFilePaths.push( [
-				path.join( spellCorePath, 'build/spell.deploy.js' ),
+				path.join( spellCorePath, debug ? 'build/spell.dev.js' : 'build/spell.deploy.js' ),
 				path.join( deployHtml5Path, 'spell.js' )
 			] )
 

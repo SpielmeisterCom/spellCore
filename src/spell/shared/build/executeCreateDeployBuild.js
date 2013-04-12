@@ -110,7 +110,7 @@ define(
 			return projectConfig
 		}
 
-		var createProjectConfig = function( projectConfigRaw, anonymizeModuleIds ) {
+		var createProjectConfig = function( projectConfigRaw ) {
 			var result = _.pick( projectConfigRaw, 'name', 'startScene', 'libraryIds', 'config' )
 
 			result.scenes = createSceneList( projectConfigRaw.scenes )
@@ -213,7 +213,7 @@ define(
 				deployLibraryPath  = path.join( deployPath, LIBRARY_PATH ),
 				projectConfigData  = readProjectConfigFile( projectFilePath ),
 				projectConfigRaw   = parseProjectConfig( projectConfigData, callback ),
-				projectConfig      = createProjectConfig( projectConfigRaw, anonymizeModuleIds )
+				projectConfig      = createProjectConfig( projectConfigRaw )
 
 
 			// loading the library
@@ -237,8 +237,8 @@ define(
 			// generate script source
 			var scriptSource = processSource(
 				_.pluck( scriptModules, 'source' ).join( '\n' ),
-				minify,
-				anonymizeModuleIds
+				!debug, // minify
+				!debug  // anonymizeModuleIds
 			)
 
 			// generate cache content
