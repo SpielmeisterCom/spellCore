@@ -28,7 +28,7 @@ define(
 		return function( arg0, iterator ) {
 			var entityConfigs = _.isArray( arg0 ) ? arg0 : [ arg0 ]
 
-			return walk( entityConfigs, iterator )
+			walk( entityConfigs, iterator )
 		}
 	}
 )

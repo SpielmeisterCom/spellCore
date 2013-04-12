@@ -1,6 +1,8 @@
 define(
 	'spell/shared/util/template/TemplateManager',
 	[
+		'spell/config/entity/createAmbiguousSiblingName',
+		'spell/config/entity/recursiveFind',
 		'spell/shared/util/createId',
 		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
@@ -12,6 +14,8 @@ define(
 		'spell/functions'
 	],
 	function(
+		createAmbiguousSiblingName,
+		recursiveFind,
 		createId,
 		createModuleId,
 		deepClone,
@@ -66,6 +70,13 @@ define(
 				},
 				{}
 			)
+
+			// check for ambiguous sibling names
+			var ambiguousName = recursiveFind( entityTemplate, createAmbiguousSiblingName )
+
+			if( ambiguousName ) {
+				throw 'Error: The entity template "' + createId( entityTemplate.namespace, entityTemplate.name ) + '" contains the ambiguous sibling name "' + ambiguousName + '". Entity siblings must have unique names.'
+			}
 
 			_.each(
 				componentNameCounts,

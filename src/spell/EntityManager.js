@@ -11,6 +11,8 @@
 define(
 	'spell/EntityManager',
 	[
+		'spell/config/entity/createAmbiguousSiblingName',
+		'spell/config/entity/recursiveFind',
 		'spell/data/spatial/QuadTree',
 		'spell/Defines',
 		'spell/shared/util/arrayRemove',
@@ -26,6 +28,8 @@ define(
 		'spell/functions'
 	],
 	function(
+		createAmbiguousSiblingName,
+		recursiveFind,
 		QuadTree,
 		Defines,
 		arrayRemove,
@@ -453,11 +457,23 @@ define(
 		var normalizeEntityConfig = function( templateManager, arg1 ) {
 			if( !arg1 ) return
 
-			var config           = arg1.config || {},
-				children         = arg1.children || [],
-				name             = arg1.name || '',
-				parentId         = arg1.parentId,
-				entityTemplateId = _.isString( arg1 ) ? arg1 : arg1.entityTemplateId
+			var entityTemplateId = _.isString( arg1 ) ? arg1 : arg1.entityTemplateId
+
+			var entityConfig = {
+				children         : arg1.children || [],
+				config           : arg1.config || {},
+				id               : arg1.id ? arg1.id : undefined,
+				parentId         : arg1.parentId,
+				name             : arg1.name || '',
+				entityTemplateId : entityTemplateId
+			}
+
+			// check for ambiguous sibling names
+			var ambiguousName = recursiveFind( entityConfig, createAmbiguousSiblingName )
+
+			if( ambiguousName ) {
+				throw 'Error: The entity configuration contains the ambiguous sibling name "' + ambiguousName + '". Entity siblings must have unique names.'
+			}
 
 			if( entityTemplateId ) {
 				var entityTemplate = templateManager.getTemplate( entityTemplateId )
@@ -466,17 +482,10 @@ define(
 					throw 'Error: Unknown entity template \'' + entityTemplateId + '\'. Could not create entity.'
 				}
 
-				children = applyOverloadedChildrenConfig( entityTemplate.children, children )
+				entityConfig.children = applyOverloadedChildrenConfig( entityTemplate.children, entityConfig.children )
 			}
 
-			return {
-				children         : children,
-				config           : config,
-				id               : arg1.id ? arg1.id : undefined,
-				parentId         : parentId,
-				name             : name,
-				entityTemplateId : entityTemplateId
-			}
+			return entityConfig
 		}
 
 		var addAdditionalEntityConfig = function( result, isRoot, parentId, name, entityTemplateId ) {
@@ -496,6 +505,22 @@ define(
 			}
 
 			return result
+		}
+
+		var isAmbiguousSiblingName = function( componentMaps, ids, entityId, name ) {
+			var metaDataComponents = componentMaps[ METADATA_COMPONENT_ID ]
+
+			for( var i = 0, id, n = ids.length; i < n; i++ ) {
+				id = ids[ i ]
+
+				if( entityId !== id &&
+					metaDataComponents[ id ].name === name ) {
+
+					return true
+				}
+			}
+
+			return false
 		}
 
 		var createEntity = function( eventManager, componentMaps, spatialIndex, templateManager, entityConfig, isRoot ) {
@@ -548,6 +573,28 @@ define(
 			}
 
 			addComponents( componentMaps, eventManager, entityId, childrenComponentConfig )
+
+			// check for validity: is the name unique?
+			if( entityConfig.name ) {
+				var siblingIds
+
+				if( isRoot ) {
+					siblingIds = _.keys( componentMaps[ ROOT_COMPONENT_ID ] )
+
+				} else {
+					var parentChildrenComponent = componentMaps[ CHILDREN_COMPONENT_ID ][ parentId ]
+
+					if( parentChildrenComponent ) {
+						siblingIds = parentChildrenComponent.ids
+					}
+				}
+
+				if( siblingIds &&
+					isAmbiguousSiblingName( componentMaps, siblingIds, entityId, entityConfig.name ) ) {
+
+					throw 'Error: The name "' + entityConfig.name + '" of entity ' + entityId + ' collides with one if its siblings. Entity siblings must have unique names.'
+				}
+			}
 
 			// updating spatial index
 			addToSpatialIndex(
