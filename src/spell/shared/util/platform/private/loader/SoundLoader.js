@@ -25,10 +25,10 @@ define(
 		 * public
 		 */
 
-		var SoundLoader = function( audioContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+		var SoundLoader = function( audioContext, libraryUrl, libraryPath, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 			this.audioContext    = audioContext
-			this.resourcePath    = resourcePath
-			this.resourceName    = resourceName
+			this.libraryUrl      = libraryUrl
+			this.libraryPath     = libraryPath
 			this.onLoadCallback  = onLoadCallback
 			this.onErrorCallback = onErrorCallback
 			this.loaded          = false
@@ -37,7 +37,7 @@ define(
 		SoundLoader.prototype = {
 			start : function() {
 				this.audioContext.loadBuffer(
-					this.resourcePath + '/' + this.resourceName,
+					this.libraryUrl ? this.libraryUrl + '/' + this.libraryPath : this.libraryPath,
 					_.bind( onLoad, this )
 				)
 			}

@@ -35,31 +35,6 @@ define(
 				availableScreenSize
 		}
 
-		/*
-		 * Generates a structure holding server host configuration information
-		 *
-		 * The returned structure looks like this:
-		 * {
-		 * 	host - the host, i.e. "acme.org:8080"
-		 * 	type - This can take the value "internal" (same host as client was delivered from) or "external" (different host that the client was delivered from).
-		 * }
-		 *
-		 * @param validValues
-		 * @param value
-		 */
-		var extractServer = function( validValues, value ) {
-			if( _.indexOf( validValues, '*' ) === -1 ) return false
-
-			// TODO: validate that the value is a valid host
-			var host = ( value === 'internal' ? PlatformKit.getHost() : value )
-			var type = ( value === 'internal' ? 'internal' : 'external' )
-
-			return {
-				host : host,
-				type : type
-			}
-		}
-
 		var extractDefault = function( validValues, value ) {
 			return _.contains( validValues, value ) ? value : false
 		}
@@ -79,8 +54,6 @@ define(
 
 		/**
 		 * These are the platform agnostic options.
-		 *
-		 * gameserver/resourceServer - "internal" means "same as the server that the client was delivered from"; "*" matches any valid host/port combination, i.e. "acme.org:8080"
 		 *
 		 * The property "configurable" controls if the option can be overridden by the environment configuration set up by the stage-0-loader.
 		 */
@@ -102,16 +75,6 @@ define(
 			// The screen size which is currently used.
 			currentScreenSize : {
 				configurable : false
-			},
-			gameServer : {
-				validValues  : [ 'internal', '*' ],
-				configurable : true,
-				extractor    : extractServer
-			},
-			resourceServer : {
-				validValues  : [ 'internal', '*' ],
-				configurable : true,
-				extractor    : extractServer
 			},
 			id : {
 				configurable : true
@@ -148,8 +111,6 @@ define(
 			screenSize        : [ 300, 200 ],
 			currentScreenSize : [ 300, 200 ],
 			quadTreeSize      : 1048576, // 2^20
-			gameServer        : 'internal',
-			resourceServer    : 'internal',
 			projectId         : '',
 			id                : 'spell' // dom node id
 		}

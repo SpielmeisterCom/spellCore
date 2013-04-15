@@ -4,15 +4,15 @@
 
 ( function( document ) {
 	var modules  = {},
-		BASE_URL = 'library'
+		LIBRARY_URL = 'library'
 
 	var normalizeConfig = function( config ) {
 		if( !config ) {
 			config = {}
 		}
 
-		if( !config.baseUrl ) {
-			config.baseUrl = BASE_URL
+		if( !config.libraryUrl ) {
+			config.libraryUrl = LIBRARY_URL
 		}
 
 		return config
@@ -27,7 +27,7 @@
 		return request
 	}
 
-	var loadModule = function( name, baseUrl, libraryManager ) {
+	var loadModule = function( name, libraryUrl, libraryManager ) {
 		var scriptName = name + '.js',
 			cachedEntry,
 			moduleSource
@@ -40,7 +40,7 @@
 			moduleSource = cachedEntry
 
 		} else {
-			var moduleUrl = baseUrl + '/' + scriptName,
+			var moduleUrl = libraryUrl + '/' + scriptName,
 				request   = createRequest( moduleUrl )
 
 			if( request.status !== 200 ) throw 'Error: Loading \'' + moduleUrl + '\' failed.'
@@ -56,7 +56,7 @@
 	var createModule = function( name, config ) {
 		config = normalizeConfig( config )
 
-		var module = loadModule( name, config.baseUrl, config.libraryManager )
+		var module = loadModule( name, config.libraryUrl, config.libraryManager )
 
 		if( !module ) throw 'Error: Could not load module \'' + name + '\'.'
 

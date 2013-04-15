@@ -50,8 +50,8 @@ define(
 				configurable : true,
 				extractor    : extractAudioBackEnd
 			},
-			baseUrlPrefix : {
-				configurable : false
+			libraryUrl : {
+				configurable : true
 			}
 		}
 
@@ -61,7 +61,7 @@ define(
 		var defaultOptions = {
 			renderingBackEnd : 'canvas-2d',
 			audioBackEnd : 'html5',
-			baseUrlPrefix : ''
+			libraryUrl : 'library'
 		}
 
 		return {

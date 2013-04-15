@@ -47,10 +47,10 @@ define(
 		 * public
 		 */
 
-		var ImageLoader = function( renderingContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+		var ImageLoader = function( renderingContext, libraryUrl, libraryPath, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 			this.renderingContext = renderingContext
-			this.resourcePath     = resourcePath
-			this.resourceName     = resourceName
+			this.libraryUrl       = libraryUrl
+			this.libraryPath      = libraryPath
 			this.onLoadCallback   = onLoadCallback
 			this.onErrorCallback  = onErrorCallback
 			this.loaded           = false
@@ -63,7 +63,10 @@ define(
 				image.onload             = _.bind( onLoad, this, image )
 				image.onreadystatechange = _.bind( onReadyStateChange, this, image )
 				image.onerror            = _.bind( onError, this, image )
-				image.src                = this.resourcePath + '/' + this.resourceName
+
+				image.src = this.libraryUrl ?
+					this.libraryUrl + '/' + this.libraryPath :
+					this.libraryPath
 			}
 		}
 

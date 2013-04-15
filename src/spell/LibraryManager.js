@@ -21,8 +21,7 @@ define(
 		'use strict'
 
 
-		var BASE_URL             = 'library',
-			nextLoadingProcessId = 0
+		var nextLoadingProcessId = 0
 
 		var createLoadingProcessId = function() {
 			return nextLoadingProcessId++
@@ -60,7 +59,7 @@ define(
 			return resourceTypeToLoaderFactory[ type ]
 		}
 
-		var createLoadingProcess = function( id, libraryPaths, baseUrlPrefix, config, next ) {
+		var createLoadingProcess = function( id, libraryPaths, libraryUrl, config, next ) {
 			return {
 				id                 : id,
 				libraryPaths       : libraryPaths,
@@ -68,7 +67,7 @@ define(
 				name               : config.name,
 				next               : next,
 				type               : config.type ? config.type : 'auto',
-				baseUrl            : config.baseUrl ? config.baseUrl : baseUrlPrefix + BASE_URL,
+				libraryUrl         : libraryUrl,
 				omitCache          : !!config.omitCache,
 				onLoadingCompleted : config.onLoadingCompleted,
 				isMetaDataLoad     : config.isMetaDataLoad !== undefined ? config.isMetaDataLoad : true
@@ -178,7 +177,7 @@ define(
 				}
 
 				var loader = loaderFactory(
-					loadingProcess.baseUrl,
+					loadingProcess.libraryUrl,
 					libraryPathUrlUsedForLoading,
 					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
 					_.bind( onErrorCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
@@ -194,11 +193,10 @@ define(
 		}
 
 
-		var LibraryManager = function( eventManager, renderingContext, soundContext, hostConfig, baseUrlPrefix ) {
+		var LibraryManager = function( eventManager, renderingContext, soundContext, libraryUrl ) {
 			this.eventManager                = eventManager
 			this.loadingProcesses            = {}
-			this.host                        = hostConfig.type === 'internal' ? '' : 'http://' + hostConfig.host
-			this.baseUrlPrefix               = baseUrlPrefix
+			this.libraryUrl                  = libraryUrl
 			this.resourceTypeToLoaderFactory = createResourceTypeToLoaderFactory( renderingContext, soundContext )
 
 			this.cache = {
@@ -266,7 +264,7 @@ define(
 				var loadingProcess = createLoadingProcess(
 					id,
 					libraryPaths,
-					this.baseUrlPrefix,
+					this.libraryUrl,
 					config || {},
 					next
 				)

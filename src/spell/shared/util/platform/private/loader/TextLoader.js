@@ -51,10 +51,10 @@ define(
 		 * public
 		 */
 
-		var TextLoader = function( postProcess, resourcePath, resourceName, onLoadCallback, onErrorCallback ) {
+		var TextLoader = function( postProcess, libraryUrl, libraryPath, onLoadCallback, onErrorCallback ) {
 			this.postProcess     = postProcess
-			this.resourcePath    = resourcePath
-			this.resourceName    = resourceName
+			this.libraryUrl      = libraryUrl
+			this.libraryPath     = libraryPath
 			this.onLoadCallback  = onLoadCallback
 			this.onErrorCallback = onErrorCallback
 			this.loaded          = false
@@ -62,12 +62,13 @@ define(
 
 		TextLoader.prototype = {
 			start : function() {
-				var url     = this.resourcePath + '/' + this.resourceName,
+				var url     = this.libraryUrl ? this.libraryUrl + '/' + this.libraryPath : this.libraryPath,
 					request = new XMLHttpRequest()
 
 				request.onload             = _.bind( onLoad, this, request )
 				request.onreadystatechange = _.bind( onReadyStateChange, this, request )
 				request.onerror            = _.bind( onError, this )
+
 				request.open( 'GET', url, true )
 				request.send()
 			}

@@ -91,8 +91,7 @@ define(
 				spell.eventManager,
 				renderingContext,
 				audioContext,
-				configurationManager.getValue( 'resourceServer' ),
-				configurationManager.getValue( 'baseUrlPrefix' )
+				configurationManager.getValue( 'libraryUrl' )
 			)
 
 			if( cacheContent ) libraryManager.addToCache( cacheContent )
