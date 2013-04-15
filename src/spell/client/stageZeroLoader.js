@@ -305,7 +305,7 @@ if( !window.console ) {
 		var screenNode      = createChildNode( config.id, config.id + '-screen' )
 		var screenFlashNode = createChildNode( screenNode.id, screenNode.id + '-flash' )
 
-		config.libraryUrl = ''
+		config.libraryUrl = 'library'
 
 		swfobject.embedSWF(
 			'flash/spell.swf',
