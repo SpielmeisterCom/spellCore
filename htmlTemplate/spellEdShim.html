@@ -102,12 +102,12 @@
 				loadJson(
 					'../project.json',
 					function( request ) {
-						sendMessageToEditor(
-							'spell.debug.runtimeModule.start',
-							{
+						spell.sendDebugMessage( {
+							type : 'spell.debug.runtimeModule.start',
+							payload : {
 								runtimeModule : JSON.parse( request.response || request.responseText )
 							}
-						)
+						} )
 					}
 				)
 			}
@@ -118,7 +118,9 @@
 
 			var isDebugMessage = message.type.indexOf( 'spell.debug' ) === 0
 
-			if( isDebugMessage ) spell.sendDebugMessage( message )
+			if( isDebugMessage ) {
+				spell.sendDebugMessage( message )
+			}
 		}
 
 		var registerMessageHandler = function() {
@@ -134,7 +136,11 @@
 			libraryUrl : '../library'
 		}
 
-		spell.start( config, onInitialized, sendMessageToEditor )
+		spell.start(
+			config,
+			onInitialized,
+			isEmbedded ? sendMessageToEditor : undefined
+		)
 	} )()
 </script>
 </body>

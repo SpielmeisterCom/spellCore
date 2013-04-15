@@ -272,7 +272,9 @@ if( !window.console ) {
 
 			var engineInstance = require( 'spell/client/main', config )
 
-			if( isModeDevelopment ) {
+			if( isModeDevelopment &&
+				debugMessageCallback ) {
+
 				addDebugAPI( spellObject, engineInstance, debugMessageCallback )
 			}
 
