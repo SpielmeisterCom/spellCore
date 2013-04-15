@@ -130,7 +130,8 @@
 		var config = {
 			mode : isEmbedded ? 'development_embedded' : 'development_standalone',
 			platform : 'html5',
-			screenMode : 'fit'
+			screenMode : 'fit',
+			libraryUrl : '../library'
 		}
 
 		spell.start( config, onInitialized, sendMessageToEditor )

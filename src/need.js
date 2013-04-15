@@ -3,20 +3,7 @@
  */
 
 ( function( document ) {
-	var modules  = {},
-		LIBRARY_URL = 'library'
-
-	var normalizeConfig = function( config ) {
-		if( !config ) {
-			config = {}
-		}
-
-		if( !config.libraryUrl ) {
-			config.libraryUrl = LIBRARY_URL
-		}
-
-		return config
-	}
+	var modules  = {}
 
 	var createRequest = function( url ) {
 		var request = new XMLHttpRequest()
@@ -40,10 +27,14 @@
 			moduleSource = cachedEntry
 
 		} else {
-			var moduleUrl = libraryUrl + '/' + scriptName,
+			var moduleUrl = libraryUrl ? libraryUrl + '/' + scriptName : scriptName,
 				request   = createRequest( moduleUrl )
 
-			if( request.status !== 200 ) throw 'Error: Loading \'' + moduleUrl + '\' failed.'
+			if( request.status !== 200 &&
+				request.status !== 0 ) {
+
+				throw 'Error: Loading \'' + moduleUrl + '\' failed.'
+			}
 
 			moduleSource = request.responseText
 		}
@@ -54,8 +45,6 @@
 	}
 
 	var createModule = function( name, config ) {
-		config = normalizeConfig( config )
-
 		var module = loadModule( name, config.libraryUrl, config.libraryManager )
 
 		if( !module ) throw 'Error: Could not load module \'' + name + '\'.'
@@ -78,7 +67,7 @@
 				}
 
 				if( !dependencyModule ) {
-					dependencyModule = createModule( dependencyName, args )
+					dependencyModule = createModule( dependencyName, config )
 				}
 
 				if( !dependencyModule.instance ) {
@@ -146,8 +135,6 @@
 
 	var require = function( name, args, config ) {
 		if( !name ) throw 'Error: No module name provided.'
-
-		config = config || {}
 
 		var module = modules[ name ]
 

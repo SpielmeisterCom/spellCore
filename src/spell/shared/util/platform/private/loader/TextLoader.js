@@ -24,7 +24,9 @@ define(
 
 			var response = request.response || request.responseText
 
-			if( request.status !== 200 ) {
+			if( request.status !== 200 &&
+				request.status !== 0 ) {
+
 				onError.call( this, response )
 
 				return

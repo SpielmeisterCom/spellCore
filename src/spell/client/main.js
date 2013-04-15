@@ -100,7 +100,7 @@ define(
 
 			var isModeDevelopment = configurationManager.getValue( 'mode' ) !== 'deployed'
 
-			var moduleLoader = createModuleLoader( libraryManager, isModeDevelopment )
+			var moduleLoader = createModuleLoader( libraryManager, isModeDevelopment, configurationManager.getValue( 'libraryUrl' ) )
 
 			var templateManager = new TemplateManager( assetManager, moduleLoader )
 
