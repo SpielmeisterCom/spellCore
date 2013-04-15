@@ -108,7 +108,7 @@ define(
 
 				if( this.sendMessageToEditor ) {
 					this.sendMessageToEditor(
-						'spell.debug.consoleMessage',
+						'spelled.debug.consoleMessage',
 						{
 							level : logLevels[ level ],
 							text : text
