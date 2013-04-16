@@ -10,17 +10,15 @@ define(
 
 
 		return function( spell, startEngine ) {
-			return createMessageDispatcher(
-				{
-					'start' : function( payload ) {
-						var runtimeModule = payload.runtimeModule
+			return createMessageDispatcher( {
+				start : function( payload ) {
+					var runtimeModule = payload.runtimeModule
 
-						spell.runtimeModule = runtimeModule
+					spell.runtimeModule = runtimeModule
 
-						startEngine( runtimeModule, payload.cacheContent )
-					}
+					startEngine( runtimeModule, payload.cacheContent )
 				}
-			)
+			} )
 		}
 	}
 )

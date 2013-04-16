@@ -18,12 +18,10 @@ define(
 
 
 		return function( spell ) {
-			return createMessageDispatcher(
-				{
-					'updateAsset' : _.bind( updateAsset, null, spell ),
-					'updateScript' : _.bind( updateScript, null, spell )
-				}
-			)
+			return createMessageDispatcher( {
+				updateAsset : _.bind( updateAsset, null, spell ),
+				updateScript : _.bind( updateScript, null, spell )
+			} )
 		}
 	}
 )
