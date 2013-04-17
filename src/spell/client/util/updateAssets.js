@@ -37,7 +37,9 @@ define(
 			var spriteSheetAssetId = asset.assetId,
 				spriteSheetAsset   = assetManager.get( spriteSheetAssetId )
 
-			if( !spriteSheetAsset ) throw 'Error: Could not find asset with id \'' + spriteSheetAssetId + '\'.'
+			if( !spriteSheetAsset ) {
+				return
+			}
 
 			return {
 				type                : asset.subtype,
@@ -53,7 +55,9 @@ define(
 			var spriteSheetAssetId = asset.assetId,
 				spriteSheetAsset   = assetManager.get( spriteSheetAssetId )
 
-			if( !spriteSheetAsset ) throw 'Error: Could not find asset with id \'' + spriteSheetAssetId + '\'.'
+			if( !spriteSheetAsset ) {
+				return
+			}
 
 			var frameWidth      = spriteSheetAsset.config.frameWidth,
 				frameHeight     = spriteSheetAsset.config.frameHeight,
@@ -216,30 +220,32 @@ define(
 					var type = assetDefinition.subtype
 
 					if( type === 'animation' ) {
-						assetManager.add(
-							createAssetId(
-								type,
-								assetDefinition.namespace,
-								assetDefinition.name
-							),
-							createAnimationAsset(
-								assetManager,
-								assetDefinition
+						var animationAsset = createAnimationAsset( assetManager, assetDefinition )
+
+						if( animationAsset ) {
+							assetManager.add(
+								createAssetId(
+									type,
+									assetDefinition.namespace,
+									assetDefinition.name
+								),
+								animationAsset
 							)
-						)
+						}
 
 					} else if ( type === '2dTileMap') {
-						assetManager.add(
-							createAssetId(
-								type,
-								assetDefinition.namespace,
-								assetDefinition.name
-							),
-							createTilemapAsset(
-								assetManager,
-								assetDefinition
+						var tileMapAsset = createTilemapAsset( assetManager, assetDefinition )
+
+						if( tileMapAsset ) {
+							assetManager.add(
+								createAssetId(
+									type,
+									assetDefinition.namespace,
+									assetDefinition.name
+								),
+								tileMapAsset
 							)
-						)
+						}
 					}
 				}
 			)

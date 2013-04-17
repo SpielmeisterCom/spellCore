@@ -9,9 +9,7 @@ define(
 		'spell/shared/util/createId',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/createLibraryFilePathFromId',
-		'spell/Events',
-
-		'spell/functions'
+		'spell/Events'
 	],
 	function(
 		addNamespaceAndName,
@@ -22,9 +20,7 @@ define(
 		createId,
 		createLibraryFilePath,
 		createLibraryFilePathFromId,
-		Events,
-
-		_
+		Events
 	) {
 		'use strict'
 
@@ -39,7 +35,7 @@ define(
 				configurationManager = spell.configurationManager,
 				definition           = payload.definition,
 				id                   = createId( definition.namespace, definition.name ),
-				assetId              = createAssetId( definition.subtype, id ),
+				typedId              = createAssetId( definition.subtype, id ),
 				libraryFilePath      = createLibraryFilePathFromId( id )
 
 			var loadedAssets = {}
@@ -47,32 +43,73 @@ define(
 			loadedAssets[ libraryFilePath ] = definition
 			addNamespaceAndName( loadedAssets )
 
-			updateAssets( assetManager, loadedAssets )
 
-			var asset = assetManager.get( assetId )
+			if( !definition.file &&
+				!definition.assetId ) {
 
-			if( asset && asset.resourceId ) {
-				var filesToLoad = createFilesToLoad( configurationManager, loadedAssets )
+				updateAssets( assetManager, loadedAssets )
 
-				if( filesToLoad.length > 0 ) {
-					// when an asset references an external resource trigger loading it
-					spell.libraryManager.load(
-						filesToLoad,
-						asset.resourceId,
-						{
-							omitCache          : true,
-							onLoadingCompleted : _.bind( updateResourcesAndAssets, null, spell, assetId, asset )
-						}
-					)
-				}
-
-				updateResourcesAndAssets( spell, assetId, asset )
+				spell.eventManager.publish(
+					[ Events.ASSET_UPDATED, definition.subtype ],
+					[ typedId ]
+				)
 			}
 
-			spell.eventManager.publish(
-				[ Events.ASSET_UPDATED, definition.subtype ],
-				[ assetId ]
-			)
+			if( definition.file ) {
+				var asset = assetManager.get( typedId )
+
+				spell.libraryManager.load(
+					createFilesToLoad( configurationManager, loadedAssets ),
+					{
+						isMetaDataLoad     : false,
+						omitCache          : true,
+						onLoadingCompleted : function() {
+							updateResourcesAndAssets( spell, typedId, asset )
+
+							spell.eventManager.publish(
+								[ Events.ASSET_UPDATED, definition.subtype ],
+								[ assetId ]
+							)
+						}
+					}
+				)
+			}
+
+			if( definition.assetId ) {
+				var assetId = definition.assetId
+
+				// load meta data record
+				spell.libraryManager.load(
+					[ createLibraryFilePathFromId( assetId.slice( assetId.indexOf( ':' ) + 1 ) ) ],
+					{
+						omitCache          : true,
+						onLoadingCompleted : function( loadedLibraryRecords ) {
+							updateAssets( assetManager, loadedLibraryRecords )
+
+							// load file
+							spell.libraryManager.load(
+								createFilesToLoad( configurationManager, loadedLibraryRecords ),
+								{
+									isMetaDataLoad     : false,
+									omitCache          : true,
+									onLoadingCompleted : function( loadedFiles ) {
+										updateAssets( assetManager, loadedAssets )
+
+										assetManager.injectResources( loadedFiles )
+
+										spell.entityManager.updateAssetReferences( typedId, assetManager.get( typedId ) )
+
+										spell.eventManager.publish(
+											[ Events.ASSET_UPDATED, definition.subtype ],
+											[ typedId ]
+										)
+									}
+								}
+							)
+						}
+					}
+				)
+			}
 		}
 	}
 )
