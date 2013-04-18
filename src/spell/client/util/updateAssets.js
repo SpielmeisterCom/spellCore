@@ -158,14 +158,14 @@ define(
 		 */
 
 		return function( assetManager, newAssetDefinitions, overwriteExisting ) {
-			var filteredAssetDefinitions = !overwriteExisting ?
+			var filteredAssetDefinitions = overwriteExisting ?
+				newAssetDefinitions :
 				_.filter(
 					newAssetDefinitions,
 					function( assetDefinition ) {
 						return !assetManager.has( createAssetId( assetDefinition.subtype, assetDefinition.namespace, assetDefinition.name ) )
 					}
-				) :
-				newAssetDefinitions
+				)
 
 			// in a first pass all assets which do not depend on other assets are created
 			_.each(

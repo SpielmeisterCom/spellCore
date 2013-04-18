@@ -16,6 +16,22 @@ define(
 			get : function( id ) {
 				return this.assets[ id ]
 			},
+			getLibraryIdByResourceId : function( resourceId ) {
+				var assets = this.assets,
+					ids = []
+
+				for( var id in assets ) {
+					var asset = assets[ id ]
+
+					if( asset.resourceId &&
+						asset.resourceId === resourceId ) {
+
+						ids.push( id.slice( id.indexOf( ':' ) + 1 ) )
+					}
+				}
+
+				return ids
+			},
 			has : function( id ) {
 				return !!this.assets[ id ]
 			},

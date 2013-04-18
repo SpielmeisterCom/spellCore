@@ -1228,6 +1228,30 @@ define(
 			},
 
 			/**
+			 * Refreshes all references to assets that components hold
+			 *
+			 * @param assetManager
+			 */
+			refreshAssetReferences : function( assetManager ) {
+				var componentIds = this.templateManager.getComponentsWithAssets()
+
+				for( var i = 0, numComponentIds = componentIds.length; i < numComponentIds; i++ ) {
+					var componentId  = componentIds[ i ],
+						componentMap = this.componentMaps[ componentId ]
+
+					for( var id in componentMap ) {
+						var component = componentMap[ id ]
+
+						if( component.assetId.slice( 0, component.assetId.indexOf( ':' ) ) === 'script' ) {
+							continue
+						}
+
+						component.asset = assetManager.get( component.assetId )
+					}
+				}
+			},
+
+			/**
 			 * Triggers an event on the specified entity.
 			 *
 			 * @param entityId

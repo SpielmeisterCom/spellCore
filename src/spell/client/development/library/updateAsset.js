@@ -9,7 +9,9 @@ define(
 		'spell/shared/util/createId',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/createLibraryFilePathFromId',
-		'spell/Events'
+		'spell/Events',
+
+		'spell/functions'
 	],
 	function(
 		addNamespaceAndName,
@@ -20,15 +22,12 @@ define(
 		createId,
 		createLibraryFilePath,
 		createLibraryFilePathFromId,
-		Events
+		Events,
+
+		_
 	) {
 		'use strict'
 
-
-		var updateResourcesAndAssets = function( spell, assetId, asset ) {
-			injectResource( spell.libraryManager, asset )
-			spell.entityManager.updateAssetReferences( assetId, asset )
-		}
 
 		return function( spell, payload ) {
 			var assetManager         = spell.assetManager,
@@ -44,10 +43,13 @@ define(
 			addNamespaceAndName( loadedAssets )
 
 
+			// The current state of asset update handling needs to be improved. In order to do that dependencies between assets must be accessible in a
+			// normalized fashion.
+
 			if( !definition.file &&
 				!definition.assetId ) {
 
-				updateAssets( assetManager, loadedAssets )
+				updateAssets( assetManager, loadedAssets, true )
 
 				spell.eventManager.publish(
 					[ Events.ASSET_UPDATED, definition.subtype ],
@@ -56,19 +58,39 @@ define(
 			}
 
 			if( definition.file ) {
-				var asset = assetManager.get( typedId )
-
 				spell.libraryManager.load(
 					createFilesToLoad( configurationManager, loadedAssets ),
 					{
 						isMetaDataLoad     : false,
 						omitCache          : true,
-						onLoadingCompleted : function() {
-							updateResourcesAndAssets( spell, typedId, asset )
+						onLoadingCompleted : function( loadedFiles ) {
+							updateAssets( assetManager, loadedAssets, true )
+
+							spell.libraryManager.addToCache( loadedAssets )
+
+							var libraryIds = assetManager.getLibraryIdByResourceId( createLibraryFilePath( definition.namespace, definition.file ) )
+
+							var assetsToUpdate = _.reduce(
+								libraryIds,
+								function( memo, libraryId ) {
+									var libraryPathJson = createLibraryFilePathFromId( libraryId )
+
+									memo[ libraryPathJson ] = spell.libraryManager.get( libraryPathJson )
+
+									return memo
+								},
+								{}
+							)
+
+							updateAssets( assetManager, assetsToUpdate, true )
+
+							assetManager.injectResources( loadedFiles )
+
+							spell.entityManager.refreshAssetReferences( assetManager )
 
 							spell.eventManager.publish(
 								[ Events.ASSET_UPDATED, definition.subtype ],
-								[ assetId ]
+								[ typedId ]
 							)
 						}
 					}
@@ -93,7 +115,7 @@ define(
 									isMetaDataLoad     : false,
 									omitCache          : true,
 									onLoadingCompleted : function( loadedFiles ) {
-										updateAssets( assetManager, loadedAssets )
+										updateAssets( assetManager, loadedAssets, true )
 
 										assetManager.injectResources( loadedFiles )
 
