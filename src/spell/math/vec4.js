@@ -1,321 +1,544 @@
 /*
- * This class is derived from glmatrix 1.3.7. Original Licence follows:
- *
- * Copyright (c) 2012 Brandon Jones, Colin MacKenzie IV
- *
- * This software is provided 'as-is', without any express or implied
- * warranty. In no event will the authors be held liable for any damages
- * arising from the use of this software.
- *
- * Permission is granted to anyone to use this software for any purpose,
- * including commercial applications, and to alter it and redistribute it
- * freely, subject to the following restrictions:
- *
- * 1. The origin of this software must not be misrepresented; you must not
- * claim that you wrote the original software. If you use this software
- * in a product, an acknowledgment in the product documentation would be
- * appreciated but is not required.
- *
- * 2. Altered source versions must be plainly marked as such, and must not
- * be misrepresented as being the original software.
- *
- * 3. This notice may not be removed or altered from any source
- * distribution.
+ * This file is derived from glMatrix 2.1.0. Original Licence follows:
  */
 
-/**
- * **This class implements high performance 4 dimensional vector math.**
- *
- * Example usage:
- *
- *     var vecA = vec2.{@link #createFrom}(1, 2, 3, 4);
- *     //=> vecA is now a Float32Array with [1,2,3,4]
- *
- *     var vecB = vec2.{@link #create}([3, 4, 5, 6]);
- *     //=> vecB is now a Float32Array with [3,4,5,6], The original array has been converted to a Float32Array.
- *
- *     var vecC = vec2.{@link #add}(vecA, vecB);
- *     //=> vecB = vecC is now [4, 6, 8, 10]. VecB has been overriden because we provided no destination vector as third argument..
- *
- *     var vecD = vec2.{@link #create}();
- *     //=> Allocate a new empty Float32Array with [0, 0, 0, 0]
- *
- *     var vecD = vec2.{@link #add}(vecA, vecB, vecD);
- *     //=> vecA and vecB are not touched, the result is written in vecD = [5,8,11,14]
- *
- * Please note: This object does not hold the vector components itself, it defines helper functions which manipulate
- * highly optimized data structures. This is done for performance reasons. **You need to allocate new vectors
- * with the {@link #create} or {@link #createFrom} function. Don't try to allocate new vectors yourself, always use
- * these function to do so.**
- *
- * *This class is derived from [glMatrix](https://github.com/toji/gl-matrix) 1.3.7 originally written by Brandon Jones
- * and Colin MacKenzie IV. The original BSD licence is included in the source file of this class.*
- *
- * @class spell.math.vec4
- * @singleton
- * @requires Math
- * @requires spell.shared.util.platform.Types
- */
+/* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+
 define(
-	"spell/math/vec4",
+	'spell/math/vec4',
 	[
-		"spell/shared/util/platform/Types"
+		'spell/shared/util/platform/Types',
+		'spell/math/util'
 	],
-	function (Types) {
+	function(
+		Types,
+		mathUtil
+	) {
+		'use strict'
 
-		"use strict";
-		var createFloatArray = Types.createFloatArray;
 
-		// Tweak to your liking
-		var FLOAT_EPSILON = 0.000001;
-
+		/**
+		 * @class spell.math.vec4
+		 * @singleton
+		 * @requires Math
+		 * @requires spell.shared.util.platform.Types
+		 * @requires spell.math.util
+		 */
 		var vec4 = {};
 
 		/**
-		 * Creates a new 4d-vector, initializing it from vec if vec
-		 * is given.
+		 * Creates a new, empty vec4
 		 *
-		 * @param {Array} [vec] the vector's initial contents
-		 * @returns {Float32Array} a new 4d-vector
+		 * @returns {vec4} a new 4D vector
 		 */
-		vec4.create = function (vec) {
-			var dest = createFloatArray(4);
-
-			if (vec) {
-				dest[0] = vec[0];
-				dest[1] = vec[1];
-				dest[2] = vec[2];
-				dest[3] = vec[3];
-			} else {
-				dest[0] = 0;
-				dest[1] = 0;
-				dest[2] = 0;
-				dest[3] = 0;
-			}
-			return dest;
+		vec4.create = function() {
+		    var out = Types.createFloatArray(4);
+		    out[0] = 0;
+		    out[1] = 0;
+		    out[2] = 0;
+		    out[3] = 0;
+		    return out;
 		};
 
 		/**
-		 * Creates a new instance of a 4d-vector, initializing it with the given arguments
+		 * Creates a new vec4 initialized with values from an existing vector
 		 *
-		 * @param {number} x X value
-		 * @param {number} y Y value
-		 * @param {number} z Z value
-		 * @param {number} w W value
-		 * @returns {Float32Array} New 4d-vector
+		 * @param {vec4} a vector to clone
+		 * @returns {vec4} a new 4D vector
 		 */
-		vec4.createFrom = function (x, y, z, w) {
-			var dest = createFloatArray(4);
-
-			dest[0] = x;
-			dest[1] = y;
-			dest[2] = z;
-			dest[3] = w;
-
-			return dest;
+		vec4.clone = function(a) {
+		    var out = Types.createFloatArray(4);
+		    out[0] = a[0];
+		    out[1] = a[1];
+		    out[2] = a[2];
+		    out[3] = a[3];
+		    return out;
 		};
 
 		/**
-		 * Adds the 4d-vector's together. If dest is given, the result
-		 * is stored there. Otherwise, the result is stored in vecB.
+		 * Creates a new vec4 initialized with the given values
 		 *
-		 * @param {Float32Array} vecA the first 4d-vector
-		 * @param {Float32Array} vecB the second 4d-vector
-		 * @param {Float32Array} [dest] the optional receiving 4d-vector
-		 * @returns {Float32Array} dest 4d-vector
+		 * @param {Number} x X component
+		 * @param {Number} y Y component
+		 * @param {Number} z Z component
+		 * @param {Number} w W component
+		 * @returns {vec4} a new 4D vector
 		 */
-		vec4.add = function (vecA, vecB, dest) {
-			if (!dest) dest = vecB;
-			dest[0] = vecA[0] + vecB[0];
-			dest[1] = vecA[1] + vecB[1];
-			dest[2] = vecA[2] + vecB[2];
-			dest[3] = vecA[3] + vecB[3];
-			return dest;
+		vec4.fromValues = function(x, y, z, w) {
+		    var out = Types.createFloatArray(4);
+		    out[0] = x;
+		    out[1] = y;
+		    out[2] = z;
+		    out[3] = w;
+		    return out;
 		};
 
 		/**
-		 * Subtracts vecB from vecA. If dest is given, the result
-		 * is stored there. Otherwise, the result is stored in vecB.
+		 * Copy the values from one vec4 to another
 		 *
-		 * @param {Float32Array} vecA the first 4d-vector
-		 * @param {Float32Array} vecB the second 4d-vector
-		 * @param {Float32Array} [dest] the optional receiving 4d-vector
-		 * @returns {Float32Array} dest 4d-vector
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the source vector
+		 * @returns {vec4} out
 		 */
-		vec4.subtract = function (vecA, vecB, dest) {
-			if (!dest) dest = vecB;
-			dest[0] = vecA[0] - vecB[0];
-			dest[1] = vecA[1] - vecB[1];
-			dest[2] = vecA[2] - vecB[2];
-			dest[3] = vecA[3] - vecB[3];
-			return dest;
+		vec4.copy = function(out, a) {
+		    out[0] = a[0];
+		    out[1] = a[1];
+		    out[2] = a[2];
+		    out[3] = a[3];
+		    return out;
 		};
 
 		/**
-		 * Multiplies vecA with vecB. If dest is given, the result
-		 * is stored there. Otherwise, the result is stored in vecB.
+		 * Set the components of a vec4 to the given values
 		 *
-		 * @param {Float32Array} vecA the first 4d-vector
-		 * @param {Float32Array} vecB the second 4d-vector
-		 * @param {Float32Array} [dest] the optional receiving 4d-vector
-		 * @returns {Float32Array} dest 4d-vector
+		 * @param {vec4} out the receiving vector
+		 * @param {Number} x X component
+		 * @param {Number} y Y component
+		 * @param {Number} z Z component
+		 * @param {Number} w W component
+		 * @returns {vec4} out
 		 */
-		vec4.multiply = function (vecA, vecB, dest) {
-			if (!dest) dest = vecB;
-			dest[0] = vecA[0] * vecB[0];
-			dest[1] = vecA[1] * vecB[1];
-			dest[2] = vecA[2] * vecB[2];
-			dest[3] = vecA[3] * vecB[3];
-			return dest;
+		vec4.set = function(out, x, y, z, w) {
+		    out[0] = x;
+		    out[1] = y;
+		    out[2] = z;
+		    out[3] = w;
+		    return out;
 		};
 
 		/**
-		 * Divides vecA by vecB. If dest is given, the result
-		 * is stored there. Otherwise, the result is stored in vecB.
+		 * Adds two vec4's
 		 *
-		 * @param {Float32Array} vecA the first 4d-vector
-		 * @param {Float32Array} vecB the second 4d-vector
-		 * @param {Float32Array} [dest] the optional receiving 4d-vector
-		 * @returns {Float32Array} dest 4d-vector
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the first operand
+		 * @param {vec4} b the second operand
+		 * @returns {vec4} out
 		 */
-		vec4.divide = function (vecA, vecB, dest) {
-			if (!dest) dest = vecB;
-			dest[0] = vecA[0] / vecB[0];
-			dest[1] = vecA[1] / vecB[1];
-			dest[2] = vecA[2] / vecB[2];
-			dest[3] = vecA[3] / vecB[3];
-			return dest;
+		vec4.add = function(out, a, b) {
+		    out[0] = a[0] + b[0];
+		    out[1] = a[1] + b[1];
+		    out[2] = a[2] + b[2];
+		    out[3] = a[3] + b[3];
+		    return out;
 		};
 
 		/**
-		 * Scales vecA by some scalar number. If dest is given, the result
-		 * is stored there. Otherwise, the result is stored in vecA.
+		 * Subtracts vector b from vector a
 		 *
-		 * This is the same as multiplying each component of vecA
-		 * by the given scalar.
-		 *
-		 * @param {Float32Array} vecA the vector to be scaled
-		 * @param {Number} scalar the amount to scale the vector by
-		 * @param {Float32Array} [dest] the optional receiving vector
-		 * @returns {Float32Array} dest
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the first operand
+		 * @param {vec4} b the second operand
+		 * @returns {vec4} out
 		 */
-		vec4.scale = function (vecA, scalar, dest) {
-			if (!dest) dest = vecA;
-			dest[0] = vecA[0] * scalar;
-			dest[1] = vecA[1] * scalar;
-			dest[2] = vecA[2] * scalar;
-			dest[3] = vecA[3] * scalar;
-			return dest;
+		vec4.subtract = function(out, a, b) {
+		    out[0] = a[0] - b[0];
+		    out[1] = a[1] - b[1];
+		    out[2] = a[2] - b[2];
+		    out[3] = a[3] - b[3];
+		    return out;
 		};
 
 		/**
-		 * Copies the values of one 4d-vector to another
-		 *
-		 * @param {Float32Array} vec 4d-vector containing values to copy
-		 * @param {Float32Array} dest 4d-vector receiving copied values
-		 *
-		 * @returns {Float32Array} dest
+		 * Alias for {@link vec4.subtract}
+		 * @function
 		 */
-		vec4.set = function (vec, dest) {
-			dest[0] = vec[0];
-			dest[1] = vec[1];
-			dest[2] = vec[2];
-			dest[3] = vec[3];
-			return dest;
+		vec4.sub = vec4.subtract;
+
+		/**
+		 * Multiplies two vec4's
+		 *
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the first operand
+		 * @param {vec4} b the second operand
+		 * @returns {vec4} out
+		 */
+		vec4.multiply = function(out, a, b) {
+		    out[0] = a[0] * b[0];
+		    out[1] = a[1] * b[1];
+		    out[2] = a[2] * b[2];
+		    out[3] = a[3] * b[3];
+		    return out;
 		};
 
 		/**
-		 * Compares two vectors for equality within a certain margin of error
-		 *
-		 * @param {Float32Array} a First 4d-vector
-		 * @param {Float32Array} b Second 4d-vector
-		 *
-		 * @returns {Boolean} True if a is equivalent to b
+		 * Alias for {@link vec4.multiply}
+		 * @function
 		 */
-		vec4.equal = function (a, b) {
-			return a === b || (
-				Math.abs(a[0] - b[0]) < FLOAT_EPSILON &&
-					Math.abs(a[1] - b[1]) < FLOAT_EPSILON &&
-					Math.abs(a[2] - b[2]) < FLOAT_EPSILON &&
-					Math.abs(a[3] - b[3]) < FLOAT_EPSILON
-				);
+		vec4.mul = vec4.multiply;
+
+		/**
+		 * Divides two vec4's
+		 *
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the first operand
+		 * @param {vec4} b the second operand
+		 * @returns {vec4} out
+		 */
+		vec4.divide = function(out, a, b) {
+		    out[0] = a[0] / b[0];
+		    out[1] = a[1] / b[1];
+		    out[2] = a[2] / b[2];
+		    out[3] = a[3] / b[3];
+		    return out;
 		};
 
 		/**
-		 * Negates the components of a 4d-vector
-		 *
-		 * @param {Float32Array} vec 4d-vector to negate
-		 * @param {Float32Array} [dest] 4d-vector receiving operation result. If not specified result is written to vec
-		 *
-		 * @returns {Float32Array} dest if specified, vec otherwise
+		 * Alias for {@link vec4.divide}
+		 * @function
 		 */
-		vec4.negate = function (vec, dest) {
-			if (!dest) {
-				dest = vec;
-			}
-			dest[0] = -vec[0];
-			dest[1] = -vec[1];
-			dest[2] = -vec[2];
-			dest[3] = -vec[3];
-			return dest;
+		vec4.div = vec4.divide;
+
+		/**
+		 * Returns the minimum of two vec4's
+		 *
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the first operand
+		 * @param {vec4} b the second operand
+		 * @returns {vec4} out
+		 */
+		vec4.min = function(out, a, b) {
+		    out[0] = Math.min(a[0], b[0]);
+		    out[1] = Math.min(a[1], b[1]);
+		    out[2] = Math.min(a[2], b[2]);
+		    out[3] = Math.min(a[3], b[3]);
+		    return out;
 		};
 
 		/**
-		 * Caclulates the length of a 4d-vector
+		 * Returns the maximum of two vec4's
 		 *
-		 * @param {Float32Array} vec 4d-vector to calculate length of
-		 *
-		 * @returns {Number} Length of 4d-vector
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the first operand
+		 * @param {vec4} b the second operand
+		 * @returns {vec4} out
 		 */
-		vec4.length = function (vec) {
-			var x = vec[0], y = vec[1], z = vec[2], w = vec[3];
-			return Math.sqrt(x * x + y * y + z * z + w * w);
+		vec4.max = function(out, a, b) {
+		    out[0] = Math.max(a[0], b[0]);
+		    out[1] = Math.max(a[1], b[1]);
+		    out[2] = Math.max(a[2], b[2]);
+		    out[3] = Math.max(a[3], b[3]);
+		    return out;
 		};
 
 		/**
-		 * Caclulates the squared length of a 4d-vector
+		 * Scales a vec4 by a scalar number
 		 *
-		 * @param {Float32Array} vec 4d-vector to calculate squared length of
-		 *
-		 * @returns {Number} Squared Length of 4d-vector
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the vector to scale
+		 * @param {Number} b amount to scale the vector by
+		 * @returns {vec4} out
 		 */
-		vec4.squaredLength = function (vec) {
-			var x = vec[0], y = vec[1], z = vec[2], w = vec[3];
-			return x * x + y * y + z * z + w * w;
+		vec4.scale = function(out, a, b) {
+		    out[0] = a[0] * b;
+		    out[1] = a[1] * b;
+		    out[2] = a[2] * b;
+		    out[3] = a[3] * b;
+		    return out;
 		};
 
 		/**
-		 * Performs a linear interpolation between two 4d-vector
+		 * Adds two vec4's after scaling the second operand by a scalar value
 		 *
-		 * @param {Float32Array} vecA First 4d-vector
-		 * @param {Float32Array} vecB Second 4d-vector
-		 * @param {Number} lerp Interpolation amount between the two inputs
-		 * @param {Float32Array} [dest] 4d-vector receiving operation result. If not specified result is written to vecA
-		 *
-		 * @returns {Float32Array} dest if specified, vecA otherwise
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the first operand
+		 * @param {vec4} b the second operand
+		 * @param {Number} scale the amount to scale b by before adding
+		 * @returns {vec4} out
 		 */
-		vec4.lerp = function (vecA, vecB, lerp, dest) {
-			if (!dest) {
-				dest = vecA;
-			}
-			dest[0] = vecA[0] + lerp * (vecB[0] - vecA[0]);
-			dest[1] = vecA[1] + lerp * (vecB[1] - vecA[1]);
-			dest[2] = vecA[2] + lerp * (vecB[2] - vecA[2]);
-			dest[3] = vecA[3] + lerp * (vecB[3] - vecA[3]);
-			return dest;
+		vec4.scaleAndAdd = function(out, a, b, scale) {
+		    out[0] = a[0] + (b[0] * scale);
+		    out[1] = a[1] + (b[1] * scale);
+		    out[2] = a[2] + (b[2] * scale);
+		    out[3] = a[3] + (b[3] * scale);
+		    return out;
 		};
 
 		/**
-		 * Returns a string representation of a 4d-vector
+		 * Calculates the euclidian distance between two vec4's
 		 *
-		 * @param {Float32Array} vec 4d-vector to represent as a string
-		 *
-		 * @returns {String} String representation of 4d-vector
+		 * @param {vec4} a the first operand
+		 * @param {vec4} b the second operand
+		 * @returns {Number} distance between a and b
 		 */
-		vec4.str = function (vec) {
-			return '[' + vec[0] + ', ' + vec[1] + ', ' + vec[2] + ', ' + vec[3] + ']';
+		vec4.distance = function(a, b) {
+		    var x = b[0] - a[0],
+		        y = b[1] - a[1],
+		        z = b[2] - a[2],
+		        w = b[3] - a[3];
+		    return Math.sqrt(x*x + y*y + z*z + w*w);
 		};
 
+		/**
+		 * Alias for {@link vec4.distance}
+		 * @function
+		 */
+		vec4.dist = vec4.distance;
+
+		/**
+		 * Calculates the squared euclidian distance between two vec4's
+		 *
+		 * @param {vec4} a the first operand
+		 * @param {vec4} b the second operand
+		 * @returns {Number} squared distance between a and b
+		 */
+		vec4.squaredDistance = function(a, b) {
+		    var x = b[0] - a[0],
+		        y = b[1] - a[1],
+		        z = b[2] - a[2],
+		        w = b[3] - a[3];
+		    return x*x + y*y + z*z + w*w;
+		};
+
+		/**
+		 * Alias for {@link vec4.squaredDistance}
+		 * @function
+		 */
+		vec4.sqrDist = vec4.squaredDistance;
+
+		/**
+		 * Calculates the length of a vec4
+		 *
+		 * @param {vec4} a vector to calculate length of
+		 * @returns {Number} length of a
+		 */
+		vec4.length = function (a) {
+		    var x = a[0],
+		        y = a[1],
+		        z = a[2],
+		        w = a[3];
+		    return Math.sqrt(x*x + y*y + z*z + w*w);
+		};
+
+		/**
+		 * Alias for {@link vec4.length}
+		 * @function
+		 */
+		vec4.len = vec4.length;
+
+		/**
+		 * Calculates the squared length of a vec4
+		 *
+		 * @param {vec4} a vector to calculate squared length of
+		 * @returns {Number} squared length of a
+		 */
+		vec4.squaredLength = function (a) {
+		    var x = a[0],
+		        y = a[1],
+		        z = a[2],
+		        w = a[3];
+		    return x*x + y*y + z*z + w*w;
+		};
+
+		/**
+		 * Alias for {@link vec4.squaredLength}
+		 * @function
+		 */
+		vec4.sqrLen = vec4.squaredLength;
+
+		/**
+		 * Negates the components of a vec4
+		 *
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a vector to negate
+		 * @returns {vec4} out
+		 */
+		vec4.negate = function(out, a) {
+		    out[0] = -a[0];
+		    out[1] = -a[1];
+		    out[2] = -a[2];
+		    out[3] = -a[3];
+		    return out;
+		};
+
+		/**
+		 * Normalize a vec4
+		 *
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a vector to normalize
+		 * @returns {vec4} out
+		 */
+		vec4.normalize = function(out, a) {
+		    var x = a[0],
+		        y = a[1],
+		        z = a[2],
+		        w = a[3];
+		    var len = x*x + y*y + z*z + w*w;
+		    if (len > 0) {
+		        len = 1 / Math.sqrt(len);
+		        out[0] = a[0] * len;
+		        out[1] = a[1] * len;
+		        out[2] = a[2] * len;
+		        out[3] = a[3] * len;
+		    }
+		    return out;
+		};
+
+		/**
+		 * Calculates the dot product of two vec4's
+		 *
+		 * @param {vec4} a the first operand
+		 * @param {vec4} b the second operand
+		 * @returns {Number} dot product of a and b
+		 */
+		vec4.dot = function (a, b) {
+		    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+		};
+
+		/**
+		 * Performs a linear interpolation between two vec4's
+		 *
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the first operand
+		 * @param {vec4} b the second operand
+		 * @param {Number} t interpolation amount between the two inputs
+		 * @returns {vec4} out
+		 */
+		vec4.lerp = function (out, a, b, t) {
+		    var ax = a[0],
+		        ay = a[1],
+		        az = a[2],
+		        aw = a[3];
+		    out[0] = ax + t * (b[0] - ax);
+		    out[1] = ay + t * (b[1] - ay);
+		    out[2] = az + t * (b[2] - az);
+		    out[3] = aw + t * (b[3] - aw);
+		    return out;
+		};
+
+		/**
+		 * Generates a random vector with the given scale
+		 *
+		 * @param {vec4} out the receiving vector
+		 * @param {Number} [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
+		 * @returns {vec4} out
+		 */
+		vec4.random = function (out, scale) {
+		    scale = scale || 1.0;
+
+		    //TODO: This is a pretty awful way of doing this. Find something better.
+		    out[0] = mathUtil.random();
+		    out[1] = mathUtil.random();
+		    out[2] = mathUtil.random();
+		    out[3] = mathUtil.random();
+		    vec4.normalize(out, out);
+		    vec4.scale(out, out, scale);
+		    return out;
+		};
+
+		/**
+		 * Transforms the vec4 with a mat4.
+		 *
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the vector to transform
+		 * @param {mat4} m matrix to transform with
+		 * @returns {vec4} out
+		 */
+		vec4.transformMat4 = function(out, a, m) {
+		    var x = a[0], y = a[1], z = a[2], w = a[3];
+		    out[0] = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
+		    out[1] = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
+		    out[2] = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
+		    out[3] = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
+		    return out;
+		};
+
+		/**
+		 * Transforms the vec4 with a quat
+		 *
+		 * @param {vec4} out the receiving vector
+		 * @param {vec4} a the vector to transform
+		 * @param {quat} q quaternion to transform with
+		 * @returns {vec4} out
+		 */
+		vec4.transformQuat = function(out, a, q) {
+		    var x = a[0], y = a[1], z = a[2],
+		        qx = q[0], qy = q[1], qz = q[2], qw = q[3],
+
+		        // calculate quat * vec
+		        ix = qw * x + qy * z - qz * y,
+		        iy = qw * y + qz * x - qx * z,
+		        iz = qw * z + qx * y - qy * x,
+		        iw = -qx * x - qy * y - qz * z;
+
+		    // calculate result * inverse quat
+		    out[0] = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+		    out[1] = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+		    out[2] = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+		    return out;
+		};
+
+		/**
+		 * Perform some operation over an array of vec4s.
+		 *
+		 * @param {Array} a the array of vectors to iterate over
+		 * @param {Number} stride Number of elements between the start of each vec4. If 0 assumes tightly packed
+		 * @param {Number} offset Number of elements to skip at the beginning of the array
+		 * @param {Number} count Number of vec2s to iterate over. If 0 iterates over entire array
+		 * @param {Function} fn Function to call for each vector in the array
+		 * @param {Object} [arg] additional argument to pass to fn
+		 * @returns {Array} a
+		 * @function
+		 */
+		vec4.forEach = (function() {
+		    var vec = vec4.create();
+
+		    return function(a, stride, offset, count, fn, arg) {
+		        var i, l;
+		        if(!stride) {
+		            stride = 4;
+		        }
+
+		        if(!offset) {
+		            offset = 0;
+		        }
+
+		        if(count) {
+		            l = Math.min((count * stride) + offset, a.length);
+		        } else {
+		            l = a.length;
+		        }
+
+		        for(i = offset; i < l; i += stride) {
+		            vec[0] = a[i]; vec[1] = a[i+1]; vec[2] = a[i+2]; vec[3] = a[i+3];
+		            fn(vec, vec, arg);
+		            a[i] = vec[0]; a[i+1] = vec[1]; a[i+2] = vec[2]; a[i+3] = vec[3];
+		        }
+
+		        return a;
+		    };
+		})();
+
+		/**
+		 * Returns a string representation of a vector
+		 *
+		 * @param {vec4} vec vector to represent as a string
+		 * @returns {String} string representation of the vector
+		 */
+		vec4.str = function (a) {
+		    return 'vec4(' + a[0] + ', ' + a[1] + ', ' + a[2] + ', ' + a[3] + ')';
+		};
 
 		return vec4;
-	})
+	}
+)

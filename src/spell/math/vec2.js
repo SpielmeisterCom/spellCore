@@ -1,423 +1,532 @@
 /*
- * This class is derived from glmatrix 1.3.7. Original Licence follows:
- *
- * Copyright (c) 2012 Brandon Jones, Colin MacKenzie IV
- *
- * This software is provided 'as-is', without any express or implied
- * warranty. In no event will the authors be held liable for any damages
- * arising from the use of this software.
- *
- * Permission is granted to anyone to use this software for any purpose,
- * including commercial applications, and to alter it and redistribute it
- * freely, subject to the following restrictions:
- *
- * 1. The origin of this software must not be misrepresented; you must not
- * claim that you wrote the original software. If you use this software
- * in a product, an acknowledgment in the product documentation would be
- * appreciated but is not required.
- *
- * 2. Altered source versions must be plainly marked as such, and must not
- * be misrepresented as being the original software.
- *
- * 3. This notice may not be removed or altered from any source
- * distribution.
+ * This file is derived from glMatrix 2.1.0. Original Licence follows:
  */
 
-/**
- * **This class implements high performance 2 dimensional vector math.**
- *
- * Example usage:
- *
- *     var vecA = vec2.{@link #createFrom}(1, 2);
- *     //=> vecA is now a Float32Array with [1,2]
- *
- *     var vecB = vec2.{@link #create}([3, 4]);
- *     //=> vecB is now a Float32Array with [3,4], The original array has been converted to a Float32Array.
- *
- *     var vecC = vec2.{@link #add}(vecA, vecB);
- *     //=> vecB = vecC is now [4, 6]. VecB has been overriden because we provided no destination vector as third argument..
- *
- *     var vecD = vec2.{@link #create}();
- *     //=> Allocate a new empty Float32Array with [0, 0]
- *
- *     var vecD = vec2.{@link #add}(vecA, vecB, vecD);
- *     //=> vecA and vecB are not touched, the result is written in vecD = [5, 8]
- *
- *
- *     // you need to allocate a temporary vec2 if you want to chain vec2 operations
- *     var tmpVec2 = vec2.{@link #create}()
- *
- *     // the result of the scale operation is written to tmpVec2 and is being used
- *     // as second argument for vec2.{@link #subtract}, because vec2.{@link #scale} also returns tmpVec2
- *     // after that positionB - tmpVec2 is written to positionB
- *
- *     vec2.{@link #subtract}(
- *       positionB,
- *       vec2.{@link #scale}( positionA, 0.05, tmpVec2 ),
- *       positionB
- *     )
- *
- *     //=> result is positionB = positionB - scale(positionA, 0.05)
- *
- *
- * Please note: This object does not hold the vector components itself, it defines helper functions which manipulate
- * highly optimized data structures. This is done for performance reasons. **You need to allocate new vectors
- * with the {@link #create} or {@link #createFrom} function. Don't try to allocate new vectors yourself, always use
- * these function to do so.**
- *
- *
- * *This class is derived from [glMatrix](https://github.com/toji/gl-matrix) 1.3.7 originally written by Brandon Jones
- * and Colin MacKenzie IV. The original BSD licence is included in the source file of this class.*
- *
- * @class spell.math.vec2
- * @singleton
- * @requires Math
- * @requires spell.shared.util.platform.Types
- */
+/* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+
 define(
-	"spell/math/vec2",
-	["spell/shared/util/platform/Types"],
-	function (Types) {
-		"use strict"
+	'spell/math/vec2',
+	[
+		'spell/shared/util/platform/Types',
+		'spell/math/util'
+	],
+	function(
+		Types,
+		mathUtil
+	) {
+		'use strict'
 
-		var createFloatArray = Types.createFloatArray;
 
-		// Tweak to your liking
-		var FLOAT_EPSILON = 0.000001;
-
+		/**
+		 * @class spell.math.vec2
+		 * @singleton
+		 * @requires Math
+		 * @requires spell.shared.util.platform.Types
+		 * @requires spell.math.util
+		 */
 		var vec2 = {};
 
 		/**
-		 * Creates a new vec2, initializing it from vec if vec
-		 * is given.
+		 * Creates a new, empty vec2
 		 *
-		 * @param {Array} [vec] Array-like datascructure with the vector's initial contents
-		 * @returns {Float32Array} a new 2D vector
+		 * @returns {vec2} a new 2D vector
 		 */
-		vec2.create = function (vec) {
-			var dest = createFloatArray(2);
-
-			if (vec) {
-				dest[0] = vec[0];
-				dest[1] = vec[1];
-			} else {
-				dest[0] = 0;
-				dest[1] = 0;
-			}
-			return dest;
+		vec2.create = function() {
+		    var out = Types.createFloatArray(2);
+		    out[0] = 0;
+		    out[1] = 0;
+		    return out;
 		};
 
 		/**
-		 * Creates a new instance of a vec2, initializing it with the given arguments
+		 * Creates a new vec2 initialized with values from an existing vector
 		 *
-		 * @param {number} x X value
-		 * @param {number} y Y value
-
-		 * @returns {Float32Array} New vec2
+		 * @param {vec2} a vector to clone
+		 * @returns {vec2} a new 2D vector
 		 */
-		vec2.createFrom = function (x, y) {
-			var dest = createFloatArray(2);
-
-			dest[0] = x;
-			dest[1] = y;
-
-			return dest;
+		vec2.clone = function(a) {
+		    var out = Types.createFloatArray(2);
+		    out[0] = a[0];
+		    out[1] = a[1];
+		    return out;
 		};
 
 		/**
-		 * Adds the vec2's together. If dest is given, the result
-		 * is stored there. Otherwise, the result is stored in vecB.
+		 * Creates a new vec2 initialized with the given values
 		 *
-		 * @param {Float32Array} vecA the first operand
-		 * @param {Float32Array} vecB the second operand
-		 * @param {Float32Array} [dest] the optional receiving vector
-		 * @returns {Float32Array} dest
+		 * @param {Number} x X component
+		 * @param {Number} y Y component
+		 * @returns {vec2} a new 2D vector
 		 */
-		vec2.add = function (vecA, vecB, dest) {
-			if (!dest) dest = vecB;
-			dest[0] = vecA[0] + vecB[0];
-			dest[1] = vecA[1] + vecB[1];
-			return dest;
+		vec2.fromValues = function(x, y) {
+		    var out = Types.createFloatArray(2);
+		    out[0] = x;
+		    out[1] = y;
+		    return out;
 		};
 
 		/**
-		 * Subtracts vecB from vecA. If dest is given, the result
-		 * is stored there. Otherwise, the result is stored in vecB.
+		 * Copy the values from one vec2 to another
 		 *
-		 * @param {Float32Array} vecA the first operand
-		 * @param {Float32Array} vecB the second operand
-		 * @param {Float32Array} [dest] the optional receiving vector
-		 * @returns {Float32Array} dest
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the source vector
+		 * @returns {vec2} out
 		 */
-		vec2.subtract = function (vecA, vecB, dest) {
-			if (!dest) dest = vecB;
-			dest[0] = vecA[0] - vecB[0];
-			dest[1] = vecA[1] - vecB[1];
-			return dest;
+		vec2.copy = function(out, a) {
+		    out[0] = a[0];
+		    out[1] = a[1];
+		    return out;
 		};
 
 		/**
-		 * Multiplies vecA with vecB. If dest is given, the result
-		 * is stored there. Otherwise, the result is stored in vecB.
+		 * Set the components of a vec2 to the given values
 		 *
-		 * @param {Float32Array} vecA the first operand
-		 * @param {Float32Array} vecB the second operand
-		 * @param {Float32Array} [dest] the optional receiving vector
-		 * @returns {Float32Array} dest
+		 * @param {vec2} out the receiving vector
+		 * @param {Number} x X component
+		 * @param {Number} y Y component
+		 * @returns {vec2} out
 		 */
-		vec2.multiply = function (vecA, vecB, dest) {
-			if (!dest) dest = vecB;
-			dest[0] = vecA[0] * vecB[0];
-			dest[1] = vecA[1] * vecB[1];
-			return dest;
+		vec2.set = function(out, x, y) {
+		    out[0] = x;
+		    out[1] = y;
+		    return out;
 		};
 
 		/**
-		 * Divides vecA by vecB. If dest is given, the result
-		 * is stored there. Otherwise, the result is stored in vecB.
+		 * Adds two vec2's
 		 *
-		 * @param {Float32Array} vecA the first operand
-		 * @param {Float32Array} vecB the second operand
-		 * @param {Float32Array} [dest] the optional receiving vector
-		 * @returns {Float32Array} dest
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @returns {vec2} out
 		 */
-		vec2.divide = function (vecA, vecB, dest) {
-			if (!dest) dest = vecB;
-			dest[0] = vecA[0] / vecB[0];
-			dest[1] = vecA[1] / vecB[1];
-			return dest;
+		vec2.add = function(out, a, b) {
+		    out[0] = a[0] + b[0];
+		    out[1] = a[1] + b[1];
+		    return out;
 		};
 
 		/**
-		 * Scales vecA by some scalar number. If dest is given, the result
-		 * is stored there. Otherwise, the result is stored in vecA.
+		 * Subtracts vector b from vector a
 		 *
-		 * This is the same as multiplying each component of vecA
-		 * by the given scalar.
-		 *
-		 * @param {Float32Array} vecA the vector to be scaled
-		 * @param {number} scalar the amount to scale the vector by
-		 * @param {Float32Array} [dest] the optional receiving vector
-		 * @returns {Float32Array} dest
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @returns {vec2} out
 		 */
-		vec2.scale = function (vecA, scalar, dest) {
-			if (!dest) dest = vecA;
-			dest[0] = vecA[0] * scalar;
-			dest[1] = vecA[1] * scalar;
-			return dest;
+		vec2.subtract = function(out, a, b) {
+		    out[0] = a[0] - b[0];
+		    out[1] = a[1] - b[1];
+		    return out;
 		};
 
 		/**
-		 * Calculates the euclidian distance between two vec2
-		 *
-		 * Params:
-		 * @param {Float32Array} vecA First vector
-		 * @param {Float32Array} vecB Second vector
-		 *
-		 * @returns {number} Distance between vecA and vecB
+		 * Alias for {@link vec2.subtract}
+		 * @function
 		 */
-		vec2.dist = function (vecA, vecB) {
-			var x = vecB[0] - vecA[0],
-				y = vecB[1] - vecA[1];
-			return Math.sqrt(x * x + y * y);
+		vec2.sub = vec2.subtract;
+
+		/**
+		 * Multiplies two vec2's
+		 *
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @returns {vec2} out
+		 */
+		vec2.multiply = function(out, a, b) {
+		    out[0] = a[0] * b[0];
+		    out[1] = a[1] * b[1];
+		    return out;
 		};
 
 		/**
-		 * Copies the values of one vec2 to another
-		 *
-		 * @param {Float32Array} vec vec2 containing values to copy
-		 * @param {Float32Array} dest vec2 receiving copied values
-		 *
-		 * @returns {Float32Array} dest
+		 * Alias for {@link vec2.multiply}
+		 * @function
 		 */
-		vec2.set = function (vec, dest) {
-			dest[0] = vec[0];
-			dest[1] = vec[1];
-			return dest;
+		vec2.mul = vec2.multiply;
+
+		/**
+		 * Divides two vec2's
+		 *
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @returns {vec2} out
+		 */
+		vec2.divide = function(out, a, b) {
+		    out[0] = a[0] / b[0];
+		    out[1] = a[1] / b[1];
+		    return out;
 		};
 
 		/**
-		 * Compares two vectors for equality within a certain margin of error
-		 *
-		 * @param {Float32Array} a First vector
-		 * @param {Float32Array} b Second vector
-		 *
-		 * @returns {Boolean} True if a is equivalent to b
+		 * Alias for {@link vec2.divide}
+		 * @function
 		 */
-		vec2.equal = function (a, b) {
-			return a === b || (
-				Math.abs(a[0] - b[0]) < FLOAT_EPSILON &&
-					Math.abs(a[1] - b[1]) < FLOAT_EPSILON
-				);
+		vec2.div = vec2.divide;
+
+		/**
+		 * Returns the minimum of two vec2's
+		 *
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @returns {vec2} out
+		 */
+		vec2.min = function(out, a, b) {
+		    out[0] = Math.min(a[0], b[0]);
+		    out[1] = Math.min(a[1], b[1]);
+		    return out;
 		};
+
+		/**
+		 * Returns the maximum of two vec2's
+		 *
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @returns {vec2} out
+		 */
+		vec2.max = function(out, a, b) {
+		    out[0] = Math.max(a[0], b[0]);
+		    out[1] = Math.max(a[1], b[1]);
+		    return out;
+		};
+
+		/**
+		 * Scales a vec2 by a scalar number
+		 *
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the vector to scale
+		 * @param {Number} b amount to scale the vector by
+		 * @returns {vec2} out
+		 */
+		vec2.scale = function(out, a, b) {
+		    out[0] = a[0] * b;
+		    out[1] = a[1] * b;
+		    return out;
+		};
+
+		/**
+		 * Adds two vec2's after scaling the second operand by a scalar value
+		 *
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @param {Number} scale the amount to scale b by before adding
+		 * @returns {vec2} out
+		 */
+		vec2.scaleAndAdd = function(out, a, b, scale) {
+		    out[0] = a[0] + (b[0] * scale);
+		    out[1] = a[1] + (b[1] * scale);
+		    return out;
+		};
+
+		/**
+		 * Calculates the euclidian distance between two vec2's
+		 *
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @returns {Number} distance between a and b
+		 */
+		vec2.distance = function(a, b) {
+		    var x = b[0] - a[0],
+		        y = b[1] - a[1];
+		    return Math.sqrt(x*x + y*y);
+		};
+
+		/**
+		 * Alias for {@link vec2.distance}
+		 * @function
+		 */
+		vec2.dist = vec2.distance;
+
+		/**
+		 * Calculates the squared euclidian distance between two vec2's
+		 *
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @returns {Number} squared distance between a and b
+		 */
+		vec2.squaredDistance = function(a, b) {
+		    var x = b[0] - a[0],
+		        y = b[1] - a[1];
+		    return x*x + y*y;
+		};
+
+		/**
+		 * Alias for {@link vec2.squaredDistance}
+		 * @function
+		 */
+		vec2.sqrDist = vec2.squaredDistance;
+
+		/**
+		 * Calculates the length of a vec2
+		 *
+		 * @param {vec2} a vector to calculate length of
+		 * @returns {Number} length of a
+		 */
+		vec2.length = function (a) {
+		    var x = a[0],
+		        y = a[1];
+		    return Math.sqrt(x*x + y*y);
+		};
+
+		/**
+		 * Alias for {@link vec2.length}
+		 * @function
+		 */
+		vec2.len = vec2.length;
+
+		/**
+		 * Calculates the squared length of a vec2
+		 *
+		 * @param {vec2} a vector to calculate squared length of
+		 * @returns {Number} squared length of a
+		 */
+		vec2.squaredLength = function (a) {
+		    var x = a[0],
+		        y = a[1];
+		    return x*x + y*y;
+		};
+
+		/**
+		 * Alias for {@link vec2.squaredLength}
+		 * @function
+		 */
+		vec2.sqrLen = vec2.squaredLength;
 
 		/**
 		 * Negates the components of a vec2
 		 *
-		 * @param {Float32Array} vec vec2 to negate
-		 * @param {Float32Array} [dest] vec2 receiving operation result. If not specified result is written to vec
-		 *
-		 * @returns {Float32Array} dest if specified, vec otherwise
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a vector to negate
+		 * @returns {vec2} out
 		 */
-		vec2.negate = function (vec, dest) {
-			if (!dest) {
-				dest = vec;
-			}
-			dest[0] = -vec[0];
-			dest[1] = -vec[1];
-			return dest;
+		vec2.negate = function(out, a) {
+		    out[0] = -a[0];
+		    out[1] = -a[1];
+		    return out;
 		};
 
 		/**
-		 * Normlize a vec2
+		 * Normalize a vec2
 		 *
-		 * @param {Float32Array} vec vec2 to normalize
-		 * @param {Float32Array} [dest] vec2 receiving operation result. If not specified result is written to vec
-		 *
-		 * @returns {Float32Array} dest if specified, vec otherwise
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a vector to normalize
+		 * @returns {vec2} out
 		 */
-		vec2.normalize = function (vec, dest) {
-			if (!dest) {
-				dest = vec;
-			}
-			var mag = vec[0] * vec[0] + vec[1] * vec[1];
-			if (mag > 0) {
-				mag = Math.sqrt(mag);
-				dest[0] = vec[0] / mag;
-				dest[1] = vec[1] / mag;
-			} else {
-				dest[0] = dest[1] = 0;
-			}
-			return dest;
+		vec2.normalize = function(out, a) {
+		    var x = a[0],
+		        y = a[1];
+		    var len = x*x + y*y;
+		    if (len > 0) {
+		        //TODO: evaluate use of glm_invsqrt here?
+		        len = 1 / Math.sqrt(len);
+		        out[0] = a[0] * len;
+		        out[1] = a[1] * len;
+		    }
+		    return out;
 		};
 
 		/**
-		 * Computes the cross product of two vec2's. Note that the cross product must by definition
-		 * produce a 3D vector. If a dest vector is given, it will contain the resultant 3D vector.
-		 * Otherwise, a scalar number will be returned, representing the vector's Z coordinate, since
-		 * its X and Y must always equal 0.
+		 * Calculates the dot product of two vec2's
 		 *
-		 * Examples:
-		 *     var crossResult = vec3.create();
-		 *     vec2.cross([1, 2], [3, 4], crossResult);
-		 *     //=> [0, 0, -2]
-		 *
-		 *     vec2.cross([1, 2], [3, 4]);
-		 *     //=> -2
-		 *
-		 * See [this page](http://stackoverflow.com/questions/243945/calculating-a-2d-vectors-cross-product)
-		 * for some interesting facts.
-		 *
-		 * @param {Float32Array} vecA left operand
-		 * @param {Float32Array} vecB right operand
-		 * @param {Float32Array} [dest] optional vec2 receiving result. If not specified a scalar is returned
-		 *
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @returns {Number} dot product of a and b
 		 */
-		vec2.cross = function (vecA, vecB, dest) {
-			var z = vecA[0] * vecB[1] - vecA[1] * vecB[0];
-			if (!dest) return z;
-			dest[0] = dest[1] = 0;
-			dest[2] = z;
-			return dest;
+		vec2.dot = function (a, b) {
+		    return a[0] * b[0] + a[1] * b[1];
 		};
 
 		/**
-		 * Caclulates the length of a vec2
+		 * Computes the cross product of two vec2's
+		 * Note that the cross product must by definition produce a 3D vector
 		 *
-		 * @param {Float32Array} vec vec2 to calculate length of
-		 *
-		 * @returns {Number} Length of vec
+		 * @param {vec3} out the receiving vector
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @returns {vec3} out
 		 */
-		vec2.length = function (vec) {
-			var x = vec[0], y = vec[1];
-			return Math.sqrt(x * x + y * y);
+		vec2.cross = function(out, a, b) {
+		    var z = a[0] * b[1] - a[1] * b[0];
+		    out[0] = out[1] = 0;
+		    out[2] = z;
+		    return out;
 		};
 
 		/**
-		 * Caclulates the squared length of a vec2
+		 * Performs a linear interpolation between two vec2's
 		 *
-		 * @param {Float32Array} vec vec2 to calculate squared length of
-		 *
-		 * @returns {Number} Squared Length of vec
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the first operand
+		 * @param {vec2} b the second operand
+		 * @param {Number} t interpolation amount between the two inputs
+		 * @returns {vec2} out
 		 */
-		vec2.squaredLength = function (vec) {
-			var x = vec[0], y = vec[1];
-			return x * x + y * y;
+		vec2.lerp = function (out, a, b, t) {
+		    var ax = a[0],
+		        ay = a[1];
+		    out[0] = ax + t * (b[0] - ax);
+		    out[1] = ay + t * (b[1] - ay);
+		    return out;
 		};
 
 		/**
-		 * Caclulates the dot product of two vec2s
+		 * Generates a random vector with the given scale
 		 *
-		 * @param {Float32Array} vecA First operand
-		 * @param {Float32Array} vecB Second operand
-		 *
-		 * @returns {Number} Dot product of vecA and vecB
+		 * @param {vec2} out the receiving vector
+		 * @param {Number} [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
+		 * @returns {vec2} out
 		 */
-		vec2.dot = function (vecA, vecB) {
-			return vecA[0] * vecB[0] + vecA[1] * vecB[1];
+		vec2.random = function (out, scale) {
+		    scale = scale || 1.0;
+		    var r = mathUtil.random() * 2.0 * Math.PI;
+		    out[0] = Math.cos(r) * scale;
+		    out[1] = Math.sin(r) * scale;
+		    return out;
 		};
 
 		/**
-		 * Generates a 2D unit vector pointing from one vector to another
+		 * Transforms the vec2 with a mat2
 		 *
-		 * @param {Float32Array} vecA Origin vec2
-		 * @param {Float32Array} vecB vec2 to point to
-		 * @param {Float32Array} [dest] vec2 receiving operation result. If not specified result is written to vecA
-		 *
-		 * @returns {Float32Array} dest if specified, vecA otherwise
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the vector to transform
+		 * @param {mat2} m matrix to transform with
+		 * @returns {vec2} out
 		 */
-		vec2.direction = function (vecA, vecB, dest) {
-			if (!dest) {
-				dest = vecA;
-			}
-
-			var x = vecA[0] - vecB[0],
-				y = vecA[1] - vecB[1],
-				len = x * x + y * y;
-
-			if (!len) {
-				dest[0] = 0;
-				dest[1] = 0;
-				dest[2] = 0;
-				return dest;
-			}
-
-			len = 1 / Math.sqrt(len);
-			dest[0] = x * len;
-			dest[1] = y * len;
-			return dest;
+		vec2.transformMat2 = function(out, a, m) {
+		    var x = a[0],
+		        y = a[1];
+		    out[0] = m[0] * x + m[2] * y;
+		    out[1] = m[1] * x + m[3] * y;
+		    return out;
 		};
 
 		/**
-		 * Performs a linear interpolation between two vec2
+		 * Transforms the vec2 with a mat2d
 		 *
-		 * @param {Float32Array} vecA First vector
-		 * @param {Float32Array} vecB Second vector
-		 * @param {Number} lerp Interpolation amount between the two inputs
-		 * @param {Float32Array} [dest] vec2 receiving operation result. If not specified result is written to vecA
-		 *
-		 * @returns {Float32Array} dest if specified, vecA otherwise
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the vector to transform
+		 * @param {mat2d} m matrix to transform with
+		 * @returns {vec2} out
 		 */
-		vec2.lerp = function (vecA, vecB, lerp, dest) {
-			if (!dest) {
-				dest = vecA;
-			}
-			dest[0] = vecA[0] + lerp * (vecB[0] - vecA[0]);
-			dest[1] = vecA[1] + lerp * (vecB[1] - vecA[1]);
-			return dest;
+		vec2.transformMat2d = function(out, a, m) {
+		    var x = a[0],
+		        y = a[1];
+		    out[0] = m[0] * x + m[2] * y + m[4];
+		    out[1] = m[1] * x + m[3] * y + m[5];
+		    return out;
 		};
+
+		/**
+		 * Transforms the vec2 with a mat3
+		 * 3rd vector component is implicitly '1'
+		 *
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the vector to transform
+		 * @param {mat3} m matrix to transform with
+		 * @returns {vec2} out
+		 */
+		vec2.transformMat3 = function(out, a, m) {
+		    var x = a[0],
+		        y = a[1];
+		    out[0] = m[0] * x + m[3] * y + m[6];
+		    out[1] = m[1] * x + m[4] * y + m[7];
+		    return out;
+		};
+
+		/**
+		 * Transforms the vec2 with a mat4
+		 * 3rd vector component is implicitly '0'
+		 * 4th vector component is implicitly '1'
+		 *
+		 * @param {vec2} out the receiving vector
+		 * @param {vec2} a the vector to transform
+		 * @param {mat4} m matrix to transform with
+		 * @returns {vec2} out
+		 */
+		vec2.transformMat4 = function(out, a, m) {
+		    var x = a[0],
+		        y = a[1];
+		    out[0] = m[0] * x + m[4] * y + m[12];
+		    out[1] = m[1] * x + m[5] * y + m[13];
+		    return out;
+		};
+
+		/**
+		 * Perform some operation over an array of vec2s.
+		 *
+		 * @param {Array} a the array of vectors to iterate over
+		 * @param {Number} stride Number of elements between the start of each vec2. If 0 assumes tightly packed
+		 * @param {Number} offset Number of elements to skip at the beginning of the array
+		 * @param {Number} count Number of vec2s to iterate over. If 0 iterates over entire array
+		 * @param {Function} fn Function to call for each vector in the array
+		 * @param {Object} [arg] additional argument to pass to fn
+		 * @returns {Array} a
+		 * @function
+		 */
+		vec2.forEach = (function() {
+		    var vec = vec2.create();
+
+		    return function(a, stride, offset, count, fn, arg) {
+		        var i, l;
+		        if(!stride) {
+		            stride = 2;
+		        }
+
+		        if(!offset) {
+		            offset = 0;
+		        }
+
+		        if(count) {
+		            l = Math.min((count * stride) + offset, a.length);
+		        } else {
+		            l = a.length;
+		        }
+
+		        for(i = offset; i < l; i += stride) {
+		            vec[0] = a[i]; vec[1] = a[i+1];
+		            fn(vec, vec, arg);
+		            a[i] = vec[0]; a[i+1] = vec[1];
+		        }
+
+		        return a;
+		    };
+		})();
 
 		/**
 		 * Returns a string representation of a vector
 		 *
-		 * @param {Float32Array} vec Vector to represent as a string
-		 *
-		 * @returns {String} String representation of vec
+		 * @param {vec2} vec vector to represent as a string
+		 * @returns {String} string representation of the vector
 		 */
-		vec2.str = function (vec) {
-			return '[' + vec[0] + ', ' + vec[1] + ']';
+		vec2.str = function (a) {
+		    return 'vec2(' + a[0] + ', ' + a[1] + ')';
 		};
-
 
 		return vec2;
 	}

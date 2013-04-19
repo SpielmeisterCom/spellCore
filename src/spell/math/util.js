@@ -1,5 +1,6 @@
 /**
  * Utility class which implements (high speed) math functions
+ *
  * @singleton
  * @class spell.math.util
  */
@@ -14,12 +15,11 @@ define(
 		'use strict'
 
 
-		var mathUtil = {}
+		var util = {}
 
-		var createFloatArray = Types.createFloatArray
+		util.FLOAT_EPSILON = 0.000001
 
-		// Tweak to your liking
-		var FLOAT_EPSILON = 0.000001
+		util.random = Math.random
 
 		if( Types.hasFloatArraySupport() ) {
 			var y = Types.createFloatArray( 1 )
@@ -35,7 +35,7 @@ define(
 			 * @param {Number} number the number
 			 * @returns {Number} Inverse square root
 			 */
-			mathUtil.invsqrt = function( number ) {
+			util.invsqrt = function( number ) {
 				var x2 = number * 0.5
 				y[ 0 ] = number
 				var threehalfs = 1.5
@@ -48,19 +48,19 @@ define(
 			}
 
 		} else {
-			mathUtil.invsqrt = function( number ) {
+			util.invsqrt = function( number ) {
 				return 1.0 / Math.sqrt( number )
 			}
 		}
 
-		mathUtil.clamp = function( value, lowerBound, upperBound ) {
+		util.clamp = function( value, lowerBound, upperBound ) {
 			if ( value < lowerBound) return lowerBound
 			if ( value > upperBound) return upperBound
 
 			return value
 		}
 
-		mathUtil.isInInterval = function( value, lowerBound, upperBound ) {
+		util.isInInterval = function( value, lowerBound, upperBound ) {
 			return ( value >= lowerBound && value <= upperBound )
 		}
 
@@ -71,7 +71,7 @@ define(
 		 * @param divisor
 		 * @return {*}
 		 */
-		mathUtil.modulo = function( dividend, divisor ) {
+		util.modulo = function( dividend, divisor ) {
 			var tmp = dividend % divisor
 
 			return tmp < 0 ?
@@ -79,7 +79,7 @@ define(
 				tmp
 		}
 
-		mathUtil.sign = function( value ) {
+		util.sign = function( value ) {
 			return value >= 0 ? 1 : -1
 		}
 
@@ -90,7 +90,7 @@ define(
 		 * @param resolution
 		 * @return {*}
 		 */
-		mathUtil.roundToResolution = function( value, resolution ) {
+		util.roundToResolution = function( value, resolution ) {
 			if( !resolution ) resolution = 0.5
 
 			var rest = value % resolution
@@ -107,7 +107,7 @@ define(
 		 * @param rectRotation Number Rotation in radians
 		 * @return {Boolean}
 		 */
-		mathUtil.isPointInRect = function( point, rectOrigin, rectWidth, rectHeight, rectRotation ) {
+		util.isPointInRect = function( point, rectOrigin, rectWidth, rectHeight, rectRotation ) {
 			var tmp     = rectRotation, /** Math.PI / 180,*/
 				c       = Math.cos( tmp ),
 				s       = Math.sin( tmp ),
@@ -123,6 +123,6 @@ define(
 			return leftX <= rotatedX && rotatedX <= rightX && topY <= rotatedY && rotatedY <= bottomY
 		}
 
-		return mathUtil
+		return util
 	}
 )
