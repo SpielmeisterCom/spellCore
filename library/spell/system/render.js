@@ -251,7 +251,7 @@ define(
 			context,
 			transforms,
 			appearances,
-			appearanceTransforms,
+			textureMatrices,
 			animatedAppearances,
 			textAppearances,
 			tilemaps,
@@ -290,9 +290,9 @@ define(
 						if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
 
 						if( asset.type === 'appearance' ) {
-							var appearanceTransform = appearanceTransforms[ id ],
+							var textureMatrix  = textureMatrices[ id ],
 								quadDimensions = quadGeometry ?
-								quadGeometry.dimensions :
+									quadGeometry.dimensions :
 									texture.dimensions
 
 //							var start = performance.now()
@@ -300,15 +300,13 @@ define(
 							// static appearance
 							context.save()
 							{
-								var textureMatrix = appearanceTransform && !appearanceTransform.isIdentity ?
-									appearanceTransform.matrix :
-									undefined
-
 								context.drawTexture(
 									texture,
 									vec2.scale( quadDimensions, -0.5, tmpVec2 ),
 									quadDimensions,
-									textureMatrix
+									textureMatrix && !textureMatrix.isIdentity ?
+										textureMatrix.matrix :
+										undefined
 								)
 							}
 							context.restore()
@@ -588,7 +586,7 @@ define(
 				entityManager          = spell.entityManager,
 				transforms             = this.transforms,
 				appearances            = this.appearances,
-				appearanceTransforms   = this.appearanceTransforms,
+				textureMatrices        = this.textureMatrices,
 				animatedAppearances    = this.animatedAppearances,
 				textAppearances        = this.textAppearances,
 				tilemaps               = this.tilemaps,
@@ -632,7 +630,7 @@ define(
 					context,
 					transforms,
 					appearances,
-					appearanceTransforms,
+					textureMatrices,
 					animatedAppearances,
 					textAppearances,
 					tilemaps,
@@ -661,7 +659,7 @@ define(
 						context,
 						transforms,
 						appearances,
-						appearanceTransforms,
+						textureMatrices,
 						animatedAppearances,
 						textAppearances,
 						tilemaps,
@@ -690,7 +688,7 @@ define(
 					context,
 					transforms,
 					appearances,
-					appearanceTransforms,
+					textureMatrices,
 					animatedAppearances,
 					textAppearances,
 					tilemaps,

@@ -1,8 +1,8 @@
 {
 	"type": "component",
 	"readonly": true,
-	"title": "2D Appearance Transformation",
-	"doc": "describes a texture transformation which should be applied to any appearances this entity has",
+	"title": "2D Texture Matrix",
+	"doc": "the texture matrix by which the appearance coordinates are transformed by",
 	"icon": "/resources/images/icons/component_2d_transform.png",
 	"attributes": [
 		{

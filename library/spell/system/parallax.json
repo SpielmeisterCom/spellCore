@@ -11,8 +11,8 @@
             "componentId": "spell.component.2d.transform"
         },
         {
-            "name": "appearanceTransforms",
-            "componentId": "spell.component.2d.graphics.appearanceTransform"
+            "name": "textureMatrices",
+            "componentId": "spell.component.2d.graphics.textureMatrix"
         },
         {
             "name": "quads",

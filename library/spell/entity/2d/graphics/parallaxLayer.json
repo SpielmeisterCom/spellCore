@@ -13,7 +13,7 @@
             "isRemovable": false,
             "isCloneable": false
         },
-        "spell.component.2d.graphics.appearanceTransform": {},
+        "spell.component.2d.graphics.textureMatrix": {},
         "spell.component.2d.graphics.geometry.quad": {
             "dimensions": [
                 1024,

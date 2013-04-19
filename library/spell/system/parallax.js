@@ -96,14 +96,14 @@ define(
 					parallaxComponents   = this.parallaxComponents,
 					quads                = this.quads,
 					transforms           = this.transforms,
-					appearanceTransforms = this.appearanceTransforms
+					textureMatrices      = this.textureMatrices
 
 				for( var entityId in parallaxComponents ) {
 					var parallax              = parallaxComponents[ entityId ],
 						layerQuad             = quads[ entityId ],
 						layerTransform        = transforms[ entityId ],
 						refEntityTranslation  = transforms[ lookupEntityId( entityManager, parallax.refEntityName ) ].translation,
-						appearanceTranslation = appearanceTransforms[ entityId ].translation
+						appearanceTranslation = textureMatrices[ entityId ].translation
 
 					if( !layerTransform || !refEntityTranslation || !layerQuad ) {
 						throw 'could not get a valid parallax configuration for entity id ' + entityId
@@ -135,7 +135,7 @@ define(
 						}
 					}
 
-					entityManager.updateAppearanceTransform( entityId )
+					entityManager.updateTextureMatrix( entityId )
 				}
 			}
 		}

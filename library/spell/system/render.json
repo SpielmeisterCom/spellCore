@@ -3,8 +3,8 @@
 	"readonly": true,
 	"input": [
 		{
-			"name": "appearanceTransforms",
-			"componentId": "spell.component.2d.graphics.appearanceTransform"
+			"name": "textureMatrices",
+			"componentId": "spell.component.2d.graphics.textureMatrix"
 		},
 		{
 			"name": "transforms",

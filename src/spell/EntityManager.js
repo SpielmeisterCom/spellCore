@@ -57,7 +57,7 @@ define(
 			PARENT_COMPONENT_ID               = Defines.PARENT_COMPONENT_ID,
 			METADATA_COMPONENT_ID             = Defines.METADATA_COMPONENT_ID,
 			TRANSFORM_COMPONENT_ID            = Defines.TRANSFORM_COMPONENT_ID,
-			APPEARANCE_TRANSFORM_COMPONENT_ID = Defines.APPEARANCE_TRANSFORM_COMPONENT_ID,
+			TEXTURE_MATRIX_COMPONENT_ID       = Defines.TEXTURE_MATRIX_COMPONENT_ID,
 			EVENT_HANDLERS_COMPONENT_ID       = Defines.EVENT_HANDLERS_COMPONENT_ID,
 			STATIC_APPEARANCE_COMPONENT_ID    = Defines.STATIC_APPEARANCE_COMPONENT_ID,
 			ANIMATED_APPEARANCE_COMPONENT_ID  = Defines.ANIMATED_APPEARANCE_COMPONENT_ID,
@@ -152,16 +152,16 @@ define(
 			}
 		}
 
-		var updateAppearanceTransform = function( appearanceTransform ) {
-			var matrix      = appearanceTransform.matrix,
-				translation = appearanceTransform.translation,
-				scale       = appearanceTransform.scale
+		var updateTextureMatrix = function( textureMatrix ) {
+			var matrix      = textureMatrix.matrix,
+				translation = textureMatrix.translation,
+				scale       = textureMatrix.scale
 
 			mat3.identity( matrix )
 			mat3.translate( matrix, translation )
 			mat3.scale( matrix, scale )
 
-			appearanceTransform.isIdentity = (
+			textureMatrix.isIdentity = (
 				translation[ 0 ] === 0 &&
 				translation[ 1 ] === 0 &&
 				scale[ 0 ] === 1 &&
@@ -550,10 +550,10 @@ define(
 			addComponents( componentMaps, eventManager, entityId, entityComponents )
 			updateWorldTransform( componentMaps, eventManager, spatialIndex, false, entityId )
 
-			var appearanceTransform = componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ]
+			var textureMatrix = componentMaps[ TEXTURE_MATRIX_COMPONENT_ID ][ entityId ]
 
-			if( appearanceTransform ) {
-				updateAppearanceTransform( appearanceTransform )
+			if( textureMatrix ) {
+				updateTextureMatrix( textureMatrix )
 			}
 
 			// creating child entities
@@ -1114,12 +1114,12 @@ define(
 						updateWorldTransform( this.componentMaps, this.eventManager, this.spatialIndex, true, entityId )
 					}
 
-				} else if( componentId === APPEARANCE_TRANSFORM_COMPONENT_ID ) {
+				} else if( componentId === TEXTURE_MATRIX_COMPONENT_ID ) {
 					if( attributeConfig.translation ||
 						attributeConfig.scale ||
 						attributeConfig.rotation ) {
 
-						updateAppearanceTransform( this.componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
+						updateTextureMatrix( this.componentMaps[ TEXTURE_MATRIX_COMPONENT_ID ][ entityId ] )
 					}
 
 				} else if( componentId === VISUAL_OBJECT_COMPONENT_ID ) {
@@ -1167,12 +1167,12 @@ define(
 						updateWorldTransform( this.componentMaps, this.eventManager, this.spatialIndex, true, entityId )
 					}
 
-				} else if( componentId === APPEARANCE_TRANSFORM_COMPONENT_ID ) {
+				} else if( componentId === TEXTURE_MATRIX_COMPONENT_ID ) {
 					if( attributeId === 'translation' ||
 						attributeId === 'scale' ||
 						attributeId === 'rotation' ) {
 
-						updateAppearanceTransform( this.componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
+						updateTextureMatrix( this.componentMaps[ TEXTURE_MATRIX_COMPONENT_ID ][ entityId ] )
 					}
 
 				} else if( componentId === VISUAL_OBJECT_COMPONENT_ID ) {
@@ -1199,8 +1199,8 @@ define(
 				updateWorldTransform( this.componentMaps, this.eventManager, this.spatialIndex, true, entityId )
 			},
 
-			updateAppearanceTransform : function( entityId ) {
-				updateAppearanceTransform( this.componentMaps[ APPEARANCE_TRANSFORM_COMPONENT_ID ][ entityId ] )
+			updateTextureMatrix : function( entityId ) {
+				updateTextureMatrix( this.componentMaps[ TEXTURE_MATRIX_COMPONENT_ID ][ entityId ] )
 			},
 
 			/**

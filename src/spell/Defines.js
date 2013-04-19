@@ -11,7 +11,7 @@ define(
 			METADATA_COMPONENT_ID                     : 'spell.component.entityMetaData',
 			EVENT_HANDLERS_COMPONENT_ID               : 'spell.component.eventHandlers',
 			TRANSFORM_COMPONENT_ID                    : 'spell.component.2d.transform',
-			APPEARANCE_TRANSFORM_COMPONENT_ID         : 'spell.component.2d.graphics.appearanceTransform',
+			TEXTURE_MATRIX_COMPONENT_ID               : 'spell.component.2d.graphics.textureMatrix',
 			CAMERA_COMPONENT_ID                       : 'spell.component.2d.graphics.camera',
 			STATIC_APPEARANCE_COMPONENT_ID            : 'spell.component.2d.graphics.appearance',
 			TEXT_APPEARANCE_COMPONENT_ID              : 'spell.component.2d.graphics.textAppearance',
