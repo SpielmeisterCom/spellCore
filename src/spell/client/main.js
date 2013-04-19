@@ -171,6 +171,7 @@ define(
 					loaderConfig      : loaderConfig,
 					logger            : logger,
 					mainLoop          : mainLoop,
+					registerTimer     : PlatformKit.registerTimer,
 					runtimeModule     : undefined,
 					scenes            : scenes,
 					statisticsManager : statisticsManager
