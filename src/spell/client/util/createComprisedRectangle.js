@@ -13,8 +13,6 @@ define(
 		 *   => [ 160, 90 ]
 		 */
 		return function( dimensions, requestedAspectRatio, round ) {
-			round = !!round
-
 			var width              = dimensions[ 0 ],
 				height             = dimensions[ 1 ],
 				currentAspectRatio = width / height
