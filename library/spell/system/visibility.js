@@ -1,7 +1,7 @@
 define(
 	'spell/system/visibility',
 	[
-		'spell/client/util/createComprisedRectangle',
+		'spell/client/util/createEffectiveCameraDimensions',
 		'spell/Defines',
 		'spell/Events',
 		'spell/math/vec2',
@@ -9,7 +9,7 @@ define(
 		'spell/functions'
 	],
 	function(
-		createComprisedRectangle,
+		createEffectiveCameraDimensions,
 		Defines,
 		Events,
 		vec2,
@@ -91,20 +91,17 @@ define(
 				camera          = this.cameras[ currentCameraId ],
 				transform       = this.transforms[ currentCameraId ]
 
-			if( camera && transform ) {
-				var screenSize  = this.screenSize,
-					aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
-
-				var effectiveCameraDimensions = vec2.multiply(
-					vec2.create(),
-					transform.scale,
-					createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
-				)
-
-				spell.worldPassEntities = spell.entityManager.getEntityIdsByRegion( transform.translation, effectiveCameraDimensions )
-				spell.uiPassEntities = this.uiPassEntities
-				spell.backgroundPassEntities = this.backgroundPassEntities
+			if( !camera || !transform ) {
+				return
 			}
+
+			var screenSize                = this.screenSize,
+				aspectRatio               = screenSize[ 0 ] / screenSize[ 1 ],
+				effectiveCameraDimensions = createEffectiveCameraDimensions( camera.width, camera.height, transform.scale, aspectRatio )
+
+			spell.worldPassEntities = spell.entityManager.getEntityIdsByRegion( transform.translation, effectiveCameraDimensions )
+			spell.uiPassEntities = this.uiPassEntities
+			spell.backgroundPassEntities = this.backgroundPassEntities
 		}
 
 		/**

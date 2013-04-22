@@ -9,7 +9,7 @@ define(
 		'spell/client/2d/graphics/drawShape',
 		'spell/client/2d/graphics/drawText',
 		'spell/client/2d/graphics/drawTitleSafeOutline',
-		'spell/client/util/createComprisedRectangle',
+		'spell/client/util/createEffectiveCameraDimensions',
 		'spell/client/util/createIncludedRectangle',
 		'spell/Defines',
 		'spell/Events',
@@ -32,7 +32,7 @@ define(
 		drawShape,
 		drawText,
 		drawTitleSafeOutline,
-		createComprisedRectangle,
+		createEffectiveCameraDimensions,
 		createIncludedRectangle,
 		Defines,
 		Events,
@@ -612,13 +612,8 @@ define(
 			}
 
 
-			var aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
-
-			var effectiveCameraDimensions = vec2.multiply(
-				vec2.create(),
-				cameraTransform.scale,
-				createComprisedRectangle( [ camera.width, camera.height ], aspectRatio )
-			)
+			var aspectRatio               = screenSize[ 0 ] / screenSize[ 1 ],
+				effectiveCameraDimensions = createEffectiveCameraDimensions( camera.width, camera.height, cameraTransform.scale, aspectRatio )
 
 			viewFrustum = createViewFrustum( effectiveCameraDimensions, cameraTransform.translation )
 

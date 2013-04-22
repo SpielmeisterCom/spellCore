@@ -3,7 +3,7 @@ define(
 	[
 		'spell/Defines',
 		'spell/Events',
-		'spell/client/util/createComprisedRectangle',
+		'spell/client/util/createEffectiveCameraDimensions',
 		'spell/math/util',
 		'spell/math/vec2',
 
@@ -12,7 +12,7 @@ define(
 	function(
 		Defines,
 		Events,
-		createComprisedRectangle,
+		createEffectiveCameraDimensions,
 		mathUtil,
 		vec2,
 
@@ -221,13 +221,8 @@ define(
 					cameraTransform  = this.transforms[ currentCameraId ],
 					screenSize       = this.screenSize
 
-				var aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
-
-				var effectiveCameraDimensions = vec2.multiply(
-					vec2.create(),
-					cameraTransform.scale,
-					createComprisedRectangle( [ camera.width, camera.height ], aspectRatio )
-				)
+				var aspectRatio               = screenSize[ 0 ] / screenSize[ 1 ],
+					effectiveCameraDimensions = createEffectiveCameraDimensions( camera.width, camera.height, cameraTransform.scale, aspectRatio )
 
 				for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
 					processEvent( entityManager, screenSize, effectiveCameraDimensions, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvents[ i ] )
