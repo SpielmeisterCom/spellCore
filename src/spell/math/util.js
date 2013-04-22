@@ -140,16 +140,6 @@ define(
 			return out
 		}
 
-		util.mat3MultiplyVec2 = function( out, a, v ) {
-			var x = v[ 0 ],
-				y = v[ 1 ]
-
-			out[ 0 ] = x * a[ 0 ] + y * a[ 3 ] + a[ 6 ]
-			out[ 1 ] = x * a[ 1 ] + y * a[ 4 ] + a[ 7 ]
-
-			return out
-		}
-
 		return util
 	}
 )

@@ -265,7 +265,7 @@ define(
 		 * public
 		 */
 		var transformScreenToWorld = function( vec ) {
-			return mathUtil.mat3MultiplyVec2( vec2.create(), screenToWorld, vec )
+			return vec2.transformMat3( vec2.create(), vec, screenToWorld )
 		}
 
 		var setColor = function( vec ) {

@@ -268,7 +268,7 @@ define(
 
 			worldPosition[ 1 ] = gl.canvas.height - worldPosition[ 1 ]
 
-			mathUtil.mat3MultiplyVec2( worldPosition, screenToWorld, worldPosition )
+			vec2.transformMat3( worldPosition, worldPosition, screenToWorld )
 
 			return worldPosition
 		}

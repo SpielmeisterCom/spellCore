@@ -165,10 +165,10 @@ define(
 		var transformTo2dTileMapCoordinates = function( worldToLocalMatrix, tilemapDimensions, frameDimensions, maxTileMapY, point ) {
 			var transformedPoint = vec2.divide(
 				tmpVec2,
-				mathUtil.mat3MultiplyVec2(
+				vec2.transformMat3(
 					tmpVec2,
-					worldToLocalMatrix,
-					point
+					point,
+					worldToLocalMatrix
 				),
 				frameDimensions
 			)
