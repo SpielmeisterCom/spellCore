@@ -110,9 +110,9 @@ define(
 					}
 
 					// set the texture coordinates to the new position, according to speed, camera position and texture offset
-					vec2.multiply( refEntityTranslation, parallax.moveSpeed, appearanceTranslation )
-					vec2.divide( appearanceTranslation, layerQuad.dimensions, appearanceTranslation )
-					vec2.add( appearanceTranslation, parallax.textureOffset, appearanceTranslation )
+					vec2.multiply( appearanceTranslation, refEntityTranslation, parallax.moveSpeed )
+					vec2.divide( appearanceTranslation, appearanceTranslation, layerQuad.dimensions )
+					vec2.add( appearanceTranslation, appearanceTranslation, parallax.textureOffset )
 
 					// clamp x, y values if we don't want to repeat the texture
 					if( !parallax.repeatX ) {

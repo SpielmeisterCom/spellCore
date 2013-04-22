@@ -3,20 +3,23 @@ define(
 	[
 		'spell/client/util/createIncludedRectangle',
 
+		'spell/math/util',
 		'spell/math/mat3',
 		'spell/math/vec2'
 	],
 	function(
 		createIncludedRectangle,
 
+
+		mathUtil,
 		mat3,
 		vec2
 	) {
 		'use strict'
 
 
-		var tmpMat3  = mat3.identity(),
-			tmp      = vec2.create()
+		var tmpMat3 = mat3.identity( mat3.create() ),
+			tmp     = vec2.create()
 
 		var drawRect = function( context, dx, dy, width, height, lineWidth ) {
 			if( !lineWidth || lineWidth < 0 ) {
@@ -42,20 +45,21 @@ define(
 		return function( context, screenSize, cameraDimensions, cameraTransform ) {
 			var scale                     = cameraTransform.scale,
 				color                     = [ 1, 0, 1, 1 ],
-				scaledCameraDimensions    = vec2.multiply( cameraDimensions, scale, tmp ),
+				scaledCameraDimensions    = vec2.multiply( tmp, cameraDimensions, scale ),
 				cameraAspectRatio         = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
 				effectiveCameraDimensions = createIncludedRectangle( screenSize, cameraAspectRatio )
 
 			var translation = vec2.scale(
-				vec2.subtract( screenSize, effectiveCameraDimensions, tmp ),
+				tmp,
+				vec2.subtract( tmp, screenSize, effectiveCameraDimensions ),
 				0.5
 			)
 
 			context.save()
 			{
 				// world to view matrix
-				mat3.ortho( 0, screenSize[ 0 ], 0, screenSize[ 1 ], tmpMat3 )
-				mat3.translate( tmpMat3, translation )
+				mathUtil.mat3Ortho( tmpMat3, 0, screenSize[ 0 ], 0, screenSize[ 1 ] )
+				mat3.translate( tmpMat3, tmpMat3, translation )
 
 				context.setViewMatrix( tmpMat3 )
 

@@ -123,6 +123,33 @@ define(
 			return leftX <= rotatedX && rotatedX <= rightX && topY <= rotatedY && rotatedY <= bottomY
 		}
 
+		util.mat3Ortho = function( out, left, right, bottom, top ) {
+			var rl = ( right - left ),
+				tb = ( top - bottom )
+
+			out[ 0 ] = 2 / rl
+			out[ 1 ] = 0
+			out[ 2 ] = 0
+			out[ 3 ] = 0
+			out[ 4 ] = 2 / tb
+			out[ 5 ] = 0
+			out[ 6 ] = -( left + right ) / rl
+			out[ 7 ] = -( top + bottom ) / tb
+			out[ 8 ] = 1
+
+			return out
+		}
+
+		util.mat3MultiplyVec2 = function( out, a, v ) {
+			var x = v[ 0 ],
+				y = v[ 1 ]
+
+			out[ 0 ] = x * a[ 0 ] + y * a[ 3 ] + a[ 6 ]
+			out[ 1 ] = x * a[ 1 ] + y * a[ 4 ] + a[ 7 ]
+
+			return out
+		}
+
 		return util
 	}
 )

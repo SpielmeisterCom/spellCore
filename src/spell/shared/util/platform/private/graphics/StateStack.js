@@ -65,8 +65,8 @@ define(
 			target.lineColor[ 2 ] = source.lineColor[ 2 ]
 			target.lineColor[ 3 ] = source.lineColor[ 3 ]
 
-			mat3.set( source.matrix, target.matrix )
-			mat3.set( source.viewMatrix, target.viewMatrix )
+			mat3.copy( target.matrix, source.matrix )
+			mat3.copy( target.viewMatrix, source.viewMatrix )
 		}
 
 

@@ -8,6 +8,7 @@ define(
 		'spell/shared/util/color',
 		'spell/shared/util/platform/private/nativeType/createFloatArray',
 
+		'spell/math/util',
 		'spell/math/vec2',
 		'spell/math/vec3',
 		'spell/math/mat3',
@@ -22,6 +23,7 @@ define(
 		color,
 		createFloatArray,
 
+		mathUtil,
 		vec2,
 		vec3,
 		mat3,
@@ -76,12 +78,12 @@ define(
 		 * @param matrix
 		 */
 		var createScreenSpaceShimMatrix = function( width, height, matrix ) {
-			mat3.ortho(
+			mathUtil.mat3Ortho(
+				matrix,
 				0,
 				width,
 				0,
-				height,
-				matrix
+				height
 			)
 
 			return matrix
@@ -262,11 +264,11 @@ define(
 		var transformScreenToWorld = function( vec ) {
 			// transform vec to a gl-like origin (bottom left)
 			// use worldPosition as temp because we need to allocate it anyway
-			var worldPosition = vec2.create( vec )
+			var worldPosition = vec2.clone( vec )
 
 			worldPosition[ 1 ] = gl.canvas.height - worldPosition[ 1 ]
 
-			mat3.multiplyVec2( screenToWorld, worldPosition, worldPosition )
+			mathUtil.mat3MultiplyVec2( worldPosition, screenToWorld, worldPosition )
 
 			return worldPosition
 		}
@@ -300,15 +302,15 @@ define(
 		}
 
 		var scale = function( vec ) {
-			mat3.scale( currentState.matrix, vec )
+			mat3.scale( currentState.matrix, currentState.matrix, vec )
 		}
 
 		var translate = function( vec ) {
-			mat3.translate( currentState.matrix, vec )
+			mat3.translate( currentState.matrix, currentState.matrix, vec )
 		}
 
 		var rotate = function( u ) {
-			mat3.rotate( currentState.matrix, u )
+			mat3.rotate( currentState.matrix, currentState.matrix, u )
 		}
 
 		/*
@@ -335,14 +337,14 @@ define(
 			gl.uniform1i( shaderProgram.uTexture0, 0 )
 
 			// setting up transformation
-			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
+			mat3.multiply( tmpMatrix, worldToScreen, currentState.matrix )
 
 			// rotating the image so that it is not upside down
-			mat3.translate( tmpMatrix, destinationPosition )
-			mat3.rotate( tmpMatrix, Math.PI )
-			mat3.scale( tmpMatrix, [ -1.0, 1.0 ] )
-			mat3.scale( tmpMatrix, destinationDimensions )
-			mat3.translate( tmpMatrix, [ 0.0, -1.0 ] )
+			mat3.translate( tmpMatrix, tmpMatrix, destinationPosition )
+			mat3.rotate( tmpMatrix, tmpMatrix, Math.PI )
+			mat3.scale( tmpMatrix, tmpMatrix, [ -1.0, 1.0 ] )
+			mat3.scale( tmpMatrix, tmpMatrix, destinationDimensions )
+			mat3.translate( tmpMatrix, tmpMatrix, [ 0.0, -1.0 ] )
 
 			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
@@ -373,14 +375,14 @@ define(
 			gl.uniform1i( shaderProgram.uTexture0, 0 )
 
 			// setting up transformation
-			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
+			mat3.multiply( tmpMatrix, worldToScreen, currentState.matrix )
 
 			// rotating the image so that it is not upside down
-			mat3.translate( tmpMatrix, destinationPosition )
-			mat3.rotate( tmpMatrix, Math.PI )
-			mat3.scale( tmpMatrix, [ -1.0, 1.0 ] )
-			mat3.scale( tmpMatrix, destinationDimensions )
-			mat3.translate( tmpMatrix, [ 0.0, -1.0 ] )
+			mat3.translate( tmpMatrix, tmpMatrix, destinationPosition )
+			mat3.rotate( tmpMatrix, tmpMatrix, Math.PI )
+			mat3.scale( tmpMatrix, tmpMatrix, [ -1.0, 1.0 ] )
+			mat3.scale( tmpMatrix, tmpMatrix, destinationDimensions )
+			mat3.translate( tmpMatrix, tmpMatrix, [ 0.0, -1.0 ] )
 
 			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
@@ -415,11 +417,11 @@ define(
 			gl.uniform4fv( shaderProgram.uGlobalColor, currentState.lineColor )
 
 			// setting up transformation
-			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
+			mat3.multiply( tmpMatrix, worldToScreen, currentState.matrix )
 
 			// correcting position
-			mat3.translate( tmpMatrix, [ dx, dy ] )
-			mat3.scale( tmpMatrix, [ dw, dh ] )
+			mat3.translate( tmpMatrix, tmpMatrix, [ dx, dy ] )
+			mat3.scale( tmpMatrix, tmpMatrix, [ dw, dh ] )
 
 			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
@@ -441,11 +443,11 @@ define(
 			gl.uniform4fv( shaderProgram.uGlobalColor, currentState.lineColor )
 
 			// setting up transformation
-			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
+			mat3.multiply( tmpMatrix, worldToScreen, currentState.matrix )
 
 			// correcting position
-			mat3.translate( tmpMatrix, [ dx, dy ] )
-			mat3.scale( tmpMatrix, [ radius, radius ] )
+			mat3.translate( tmpMatrix, tmpMatrix, [ dx, dy ] )
+			mat3.scale( tmpMatrix, tmpMatrix, [ radius, radius ] )
 
 			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
@@ -467,7 +469,7 @@ define(
 			gl.uniform4fv( shaderProgram.uGlobalColor, currentState.lineColor )
 
 			// setting up transformation
-			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
+			mat3.multiply( tmpMatrix, worldToScreen, currentState.matrix )
 
 			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
@@ -493,11 +495,11 @@ define(
 			gl.uniform4fv( shaderProgram.uGlobalColor, currentState.color )
 
 			// setting up transformation
-			mat3.multiply( worldToScreen, currentState.matrix, tmpMatrix )
+			mat3.multiply( tmpMatrix, worldToScreen, currentState.matrix )
 
 			// correcting position
-			mat3.translate( tmpMatrix, [ dx, dy ] )
-			mat3.scale( tmpMatrix, [ dw, dh ] )
+			mat3.translate( tmpMatrix, tmpMatrix, [ dx, dy ] )
+			mat3.scale( tmpMatrix, tmpMatrix, [ dw, dh ] )
 
 			gl.uniformMatrix3fv( shaderProgram.uModelViewMatrix, false, tmpMatrix )
 
@@ -509,24 +511,24 @@ define(
 			gl.canvas.height = height
 
 			createViewToScreenMatrix( width, height, viewToScreen )
-			mat3.multiply( viewToScreen, worldToView, worldToScreen )
+			mat3.multiply( worldToScreen, viewToScreen, worldToView )
 		}
 
 		var transform = function( matrix ) {
-			mat3.multiply( currentState.matrix, matrix )
+			mat3.multiply( currentState.matrix, currentState.matrix, matrix )
 		}
 
 		var setTransform = function( matrix ) {
-			mat3.set( matrix, currentState.matrix )
+			mat3.copy( currentState.matrix, matrix )
 		}
 
 		var setViewMatrix = function( matrix ) {
-			mat3.set( matrix, currentState.viewMatrix )
+			mat3.copy( currentState.viewMatrix, matrix )
 
-			mat3.set( matrix, worldToView )
+			mat3.copy( worldToView, matrix )
 			createViewToScreenMatrix( gl.canvas.width, gl.canvas.height, viewToScreen )
-			mat3.multiply( viewToScreen, worldToView, worldToScreen )
-			mat3.inverse( worldToScreen, screenToWorld )
+			mat3.multiply( worldToScreen, viewToScreen, worldToView )
+			mat3.invert( screenToWorld, worldToScreen )
 		}
 
 		var viewport = function( shaderProgram, x, y, width, height ) {

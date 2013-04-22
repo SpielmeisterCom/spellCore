@@ -172,8 +172,8 @@ define(
 		}
 
 		var updateWorldToScreen = function( viewToScreen, worldToView ) {
-			mat3.multiply( viewToScreen, worldToView, worldToScreen )
-			mat3.inverse( worldToScreen, screenToWorld )
+			mat3.multiply( worldToScreen, viewToScreen, worldToView )
+			mat3.invert( screenToWorld, worldToScreen )
 
 			pixelScale = Math.abs( 1 / worldToScreen[ 0 ] )
 
@@ -194,15 +194,15 @@ define(
 			var cameraWidth  = canvas.width,
 				cameraHeight = canvas.height
 
-			mat3.ortho(
+			mathUtil.mat3Ortho(
+				worldToView,
 				-cameraWidth * 0.5,
 				cameraWidth * 0.5,
 				-cameraHeight * 0.5,
-				cameraHeight * 0.5,
-				worldToView
+				cameraHeight * 0.5
 			)
 
-			mat3.translate( worldToView, [ -cameraWidth * 0.5, -cameraHeight * 0.5 ] ) // WATCH OUT: apply inverse translation for camera position
+			mat3.translate( worldToView, worldToView, [ -cameraWidth * 0.5, -cameraHeight * 0.5 ] ) // WATCH OUT: apply inverse translation for camera position
 
 			updateWorldToScreen( viewToScreen, worldToView )
 		}
@@ -265,7 +265,7 @@ define(
 		 * public
 		 */
 		var transformScreenToWorld = function( vec ) {
-			return mat3.multiplyVec2( screenToWorld, vec, vec2.create() )
+			return mathUtil.mat3MultiplyVec2( vec2.create(), screenToWorld, vec )
 		}
 
 		var setColor = function( vec ) {
@@ -300,11 +300,11 @@ define(
 		}
 
 		var scale = function( vec ) {
-			mat3.scale( currentState.matrix, vec )
+			mat3.scale( currentState.matrix, currentState.matrix, vec )
 		}
 
 		var translate = function( vec ) {
-			mat3.translate( currentState.matrix, vec )
+			mat3.translate( currentState.matrix, currentState.matrix, vec )
 		}
 
 		var rotate = function( u ) {
@@ -537,16 +537,16 @@ define(
 		}
 
 		var transform = function( matrix ) {
-			mat3.multiply( currentState.matrix, matrix )
+			mat3.multiply( matrix, currentState.matrix )
 		}
 
 		var setTransform = function( matrix ) {
-			mat3.set( matrix, currentState.matrix )
+			mat3.copy( currentState.matrix, matrix )
 		}
 
 		var setViewMatrix = function( matrix ) {
-			mat3.set( matrix, currentState.viewMatrix )
-			mat3.set( matrix, worldToView )
+			mat3.copy( currentState.viewMatrix, matrix )
+			mat3.copy( worldToView, matrix )
 
 			updateWorldToScreen( viewToScreen, worldToView )
 		}

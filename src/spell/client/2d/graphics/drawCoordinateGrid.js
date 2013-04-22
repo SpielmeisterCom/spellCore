@@ -3,6 +3,7 @@ define(
 	[
 		'spell/client/2d/graphics/drawText',
 
+		'spell/math/util',
 		'spell/math/vec2',
 		'spell/math/vec4',
 		'spell/math/mat3'
@@ -10,6 +11,7 @@ define(
 	function(
 		drawText,
 
+		mathUtil,
 		vec2,
 		vec4,
 		mat3
@@ -17,13 +19,13 @@ define(
 		'use strict'
 
 
-		var tmpMat3         = mat3.identity(),
+		var tmpMat3         = mat3.identity( mat3.create() ),
 			invScale        = vec2.create(),
 			lineOpacity     = 0.5,
-			paleLineColor   = vec4.create( [ 0.4, 0.4, 0.4, lineOpacity ] ),
-			brightLineColor = vec4.create( [ 0.7, 0.7, 0.7, lineOpacity ] ),
-			XAxisColor      = vec4.create( [ 0.0, 0.0, 0.7, lineOpacity ] ),
-			YAxisColor      = vec4.create( [ 0.0, 0.7, 0.0, lineOpacity ] )
+			paleLineColor   = vec4.fromValues( 0.4, 0.4, 0.4, lineOpacity ),
+			brightLineColor = vec4.fromValues( 0.7, 0.7, 0.7, lineOpacity ),
+			XAxisColor      = vec4.fromValues( 0.0, 0.0, 0.7, lineOpacity ),
+			YAxisColor      = vec4.fromValues( 0.0, 0.7, 0.0, lineOpacity )
 
 		var computeGridLineStepSize = function( s ) {
 		    var log = Math.log( s ) / Math.log( 10 )
@@ -118,12 +120,12 @@ define(
 				worldToScreenTranslation = [ -minX, -minY ],
 				fontTexture  = fontAsset.resource
 
-			vec2.divide( screenSize, cameraDimensions, invScale )
+			vec2.divide( invScale, screenSize, cameraDimensions )
 
 			context.save()
 			{
 				// world to view matrix
-				mat3.ortho( 0, screenSize[ 0 ], 0, screenSize[ 1 ], tmpMat3 )
+				mathUtil.mat3Ortho( tmpMat3, 0, screenSize[ 0 ], 0, screenSize[ 1 ] )
 
 				context.setViewMatrix( tmpMat3 )
 

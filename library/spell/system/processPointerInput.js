@@ -224,8 +224,9 @@ define(
 				var aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
 
 				var effectiveCameraDimensions = vec2.multiply(
+					vec2.create(),
 					cameraTransform.scale,
-					createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
+					createComprisedRectangle( [ camera.width, camera.height ], aspectRatio )
 				)
 
 				for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {

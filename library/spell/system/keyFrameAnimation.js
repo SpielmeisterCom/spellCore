@@ -153,7 +153,7 @@ define(
 								id,
 								componentId,
 								attributeId,
-								vec2.lerp( keyFrameA.value, keyFrameB.value, t, component[ attributeId ] )
+								vec2.lerp( component[ attributeId ], keyFrameA.value, keyFrameB.value, t )
 							)
 
 						} else {

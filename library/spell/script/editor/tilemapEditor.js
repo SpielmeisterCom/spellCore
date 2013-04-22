@@ -123,10 +123,10 @@ define(
 				mathUtil.isPointInRect( worldPosition, tilemapTranslation, tilemapDimensions[ 0 ], tilemapDimensions[ 1 ], 0 )
 			) {
 
-                mat3.inverse(tilemapTransform.worldMatrix, worldToLocalMatrix )
+                mat3.invert( worldToLocalMatrix, tilemapTransform.worldMatrix )
 
                 //convert worldposition to coordinates which are local to the tilemaps origin
-				mat3.multiplyVec2(worldToLocalMatrix, worldPosition, tmpVec2)
+				mathUtil.mat3MultiplyVec2( tmpVec2, worldToLocalMatrix, worldPosition )
 
 				if ( entityManager.hasComponent(entityId, 'spell.component.2d.graphics.shape.rectangle') ) {
 					entityManager.removeComponent(entityId, 'spell.component.2d.graphics.shape.rectangle')
@@ -139,7 +139,7 @@ define(
 				//transform the grid aligned local coordinates to world coordinates again
 				tmpVec2[ 0 ] = offsetX * frameDimensions[ 0 ] + frameDimensions[ 0 ] / 2
 				tmpVec2[ 1 ] = offsetY * frameDimensions[ 1 ] + frameDimensions[ 1 ] / 2
-				mat3.multiplyVec2(tilemapTransform.worldMatrix, tmpVec2, tmpVec2)
+				mathUtil.mat3MultiplyVec2( tmpVec2, tilemapTransform.worldMatrix, tmpVec2 )
 
 				entityManager.updateComponent( entityId, 'spell.component.2d.transform', {
 					translation: tmpVec2

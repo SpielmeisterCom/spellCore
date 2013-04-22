@@ -174,7 +174,7 @@ define(
 			)
 
 			// initialize default values
-			vec2.set( config.screenSize, config.currentScreenSize )
+			vec2.copy( config.currentScreenSize, config.screenSize )
 
 			if( !_.contains( config.supportedLanguages, config.currentLanguage ) ) {
 				config.currentLanguage = config.defaultLanguage

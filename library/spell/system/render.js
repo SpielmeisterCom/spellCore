@@ -16,6 +16,7 @@ define(
 		'spell/shared/util/translate',
 		'spell/shared/util/platform/PlatformKit',
 
+		'spell/math/util',
 		'spell/math/vec2',
 		'spell/math/vec4',
 		'spell/math/mat3',
@@ -38,6 +39,7 @@ define(
 		translate,
 		PlatformKit,
 
+		mathUtil,
 		vec2,
 		vec4,
 		mat3,
@@ -49,12 +51,12 @@ define(
 
 		var tmpVec2           = vec2.create(),
 			tmpVec2_1         = vec2.create(),
-			tmpMat3           = mat3.identity(),
-			clearColor        = vec4.create( [ 0, 0, 0, 1 ] ),
-			markerColor       = vec4.create( [ 0.45, 0.45, 0.45, 1.0 ] ),
+			tmpMat3           = mat3.identity( mat3.create() ),
+			clearColor        = vec4.fromValues( 0, 0, 0, 1 ),
+			markerColor       = vec4.fromValues( 0.45, 0.45, 0.45, 1.0 ),
 			debugFontAssetId  = 'font:spell.OpenSans14px',
 			drawDebugShapes   = true,
-			defaultDimensions = vec2.create( [ 1.0, 1.0 ] ),
+			defaultDimensions = vec2.fromValues( 1.0, 1.0 ),
 			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
 			currentCameraId
 
@@ -162,17 +164,18 @@ define(
 
 		var transformTo2dTileMapCoordinates = function( worldToLocalMatrix, tilemapDimensions, frameDimensions, maxTileMapY, point ) {
 			var transformedPoint = vec2.divide(
-				mat3.multiplyVec2(
+				tmpVec2,
+				mathUtil.mat3MultiplyVec2(
+					tmpVec2,
 					worldToLocalMatrix,
-					point,
-					tmpVec2
+					point
 				),
-				frameDimensions,
-				tmpVec2
+				frameDimensions
 			)
 
 			vec2.add(
-				vec2.scale( tilemapDimensions, 0.5, tmpVec2_1 ),
+				transformedPoint,
+				vec2.scale( tmpVec2_1, tilemapDimensions, 0.5 ),
 				transformedPoint
 			)
 
@@ -220,7 +223,7 @@ define(
 			{
 				context.scale( frameDimensions )
 
-				for( var y = minTileSectionMapY; y <= maxTileMapSectionY ; y++ ) {
+				for( var y = minTileSectionMapY; y <= maxTileMapSectionY; y++ ) {
 					var tilemapRow = tilemapData[ y ]
 					if( !tilemapRow ) continue
 
@@ -302,7 +305,7 @@ define(
 							{
 								context.drawTexture(
 									texture,
-									vec2.scale( quadDimensions, -0.5, tmpVec2 ),
+									vec2.scale( tmpVec2, quadDimensions, -0.5 ),
 									quadDimensions,
 									textureMatrix && !textureMatrix.isIdentity ?
 										textureMatrix.matrix :
@@ -335,7 +338,7 @@ define(
 
                             if( !worldToLocalMatrixCache[ id ] ) {
                                 worldToLocalMatrixCache[ id ] = mat3.create()
-                                mat3.inverse( transform.worldMatrix, worldToLocalMatrixCache[ id ] )
+                                mat3.invert( worldToLocalMatrixCache[ id ], transform.worldMatrix )
 
                             }
 
@@ -378,7 +381,7 @@ define(
 									texture,
 									frameOffset,
 									assetFrameDimensions,
-									vec2.scale( quadDimensions, -0.5, tmpVec2 ),
+									vec2.scale( tmpVec2, quadDimensions, -0.5 ),
 									quadDimensions
 								)
 							}
@@ -492,10 +495,10 @@ define(
 			var halfWidth  = cameraDimensions[ 0 ] * 0.5,
 				halfHeight = cameraDimensions[ 1 ] * 0.5
 
-			mat3.ortho( -halfWidth, halfWidth, -halfHeight, halfHeight, tmpMat3 )
+			mathUtil.mat3Ortho( tmpMat3, -halfWidth, halfWidth, -halfHeight, halfHeight )
 
 			// translating with the inverse camera position
-			mat3.translate( tmpMat3, vec2.negate( position, tmpVec2 ) )
+			mat3.translate( tmpMat3, tmpMat3, vec2.negate( tmpVec2, position ) )
 
 			context.setViewMatrix( tmpMat3 )
 		}
@@ -506,18 +509,18 @@ define(
 		}
 
 		var createViewFrustum = function( cameraDimensions, cameraTranslation ) {
-			var halfCameraDimensions = vec2.scale( cameraDimensions, 0.5, tmpVec2 )
+			var halfCameraDimensions = vec2.scale( tmpVec2, cameraDimensions, 0.5 )
 
 			vec2.subtract(
+				tmpViewFrustum.bottomLeft,
 				cameraTranslation,
-				halfCameraDimensions,
-				tmpViewFrustum.bottomLeft
+				halfCameraDimensions
 			)
 
 			vec2.add(
+				tmpViewFrustum.topRight,
 				cameraTranslation,
-				halfCameraDimensions,
-				tmpViewFrustum.topRight
+				halfCameraDimensions
 			)
 
 			return tmpViewFrustum
@@ -612,6 +615,7 @@ define(
 			var aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
 
 			var effectiveCameraDimensions = vec2.multiply(
+				vec2.create(),
 				cameraTransform.scale,
 				createComprisedRectangle( [ camera.width, camera.height ], aspectRatio )
 			)
@@ -727,12 +731,13 @@ define(
 			// clear unsafe area
 			if( camera && camera.clearUnsafeArea && cameraTransform ) {
 				var cameraDimensions             = [ camera.width, camera.height ],
-					scaledCameraDimensions       = vec2.multiply( cameraDimensions, cameraTransform.scale, tmpVec2 ),
+					scaledCameraDimensions       = vec2.multiply( tmpVec2, cameraDimensions, cameraTransform.scale ),
 					cameraAspectRatio            = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
 					effectiveTitleSafeDimensions = createIncludedRectangle( screenSize, cameraAspectRatio, true )
 
 				vec2.scale(
-					vec2.subtract( screenSize, effectiveTitleSafeDimensions, tmpVec2 ),
+					vec2.create(),
+					vec2.subtract( tmpVec2, screenSize, effectiveTitleSafeDimensions ),
 					0.5
 				)
 
@@ -744,7 +749,7 @@ define(
 				context.save()
 				{
 					// world to view matrix
-					mat3.ortho( 0, screenSize[ 0 ], 0, screenSize[ 1 ], tmpMat3 )
+					mathUtil.mat3Ortho( tmpMat3, 0, screenSize[ 0 ], 0, screenSize[ 1 ] )
 					context.setViewMatrix( tmpMat3 )
 
 					context.setColor( clearColor )
@@ -789,7 +794,7 @@ define(
 			this.isDevelopment        = spell.configurationManager.getValue( 'mode' ) !== 'deployed'
 
 			// world to view matrix
-			mat3.ortho( 0.0, this.screenSize[ 0 ], 0.0, this.screenSize[ 1 ], tmpMat3 )
+			mathUtil.mat3Ortho( tmpMat3, 0.0, this.screenSize[ 0 ], 0.0, this.screenSize[ 1 ] )
 			this.context.setViewMatrix( tmpMat3 )
 
 			this.context.setClearColor( clearColor )

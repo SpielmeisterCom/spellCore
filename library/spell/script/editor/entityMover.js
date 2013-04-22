@@ -60,7 +60,7 @@ define(
 					//bypass updateComponent mechanic for updating the transform component on purpose
 					//don't to this within normal systems
 					var transformOverlay = this.transforms[ overlayEntityId ]
-					vec2.set( transform.worldTranslation, transformOverlay.translation )
+					vec2.copy( transformOverlay.translation, transform.worldTranslation )
 					transformOverlay.rotation = 0
 
 					var text, color, lineWidth
@@ -243,12 +243,12 @@ define(
 
 			if(!this.dragCursorOffset) {
 				this.dragCursorOffset = vec2.create()
-				vec2.set(this.editorSystem.cursorWorldPosition, this.dragCursorOffset)
+				vec2.copy( this.dragCursorOffset, this.editorSystem.cursorWorldPosition )
 			}
 
 			if(!this.dragEntityOffset && transform) {
 				this.dragEntityOffset = vec2.create()
-				vec2.set(transform.translation, this.dragEntityOffset)
+				vec2.copy( this.dragEntityOffset, transform.translation )
 			}
 		}
 
@@ -282,8 +282,8 @@ define(
 				distance         = vec2.create( ),
 				worldPosition    = transform.translation
 
-			vec2.subtract(this.dragCursorOffset, cursorPosition, distance )
-			vec2.subtract(this.dragEntityOffset, distance, worldPosition)
+			vec2.subtract( distance, this.dragCursorOffset, cursorPosition )
+			vec2.subtract( worldPosition, this.dragEntityOffset, distance )
 
 			updateEntity.call( this, entityManager, entityId, worldPosition )
 		}
@@ -292,7 +292,7 @@ define(
 			var transform           = this.transforms[ entityId ],
 				currentTranslation  = transform.translation
 
-			vec2.add(currentTranslation, offset, currentTranslation)
+			vec2.add( currentTranslation, currentTranslation, offset )
 
 			updateEntity.call(this, entityManager, entityId, currentTranslation)
 			sendTransformToSpellEd.call( this, entityId )
@@ -305,10 +305,10 @@ define(
 				overlayEntityId     = this.overlayEntityMap[ entityId ],
 				body                = this.bodies[ entityId ]
 
-			vec2.set(newTranslation, transform.translation)
+			vec2.copy( transform.translation, newTranslation )
 
 			if( overlayEntityId && this.transforms[ overlayEntityId ]) {
-				vec2.set(newTranslation, this.transforms[ overlayEntityId ].translation)
+				vec2.copy( this.transforms[ overlayEntityId ].translation, newTranslation )
 			}
 
 			entityManager.updateWorldTransform( entityId )

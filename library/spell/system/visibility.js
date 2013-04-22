@@ -96,6 +96,7 @@ define(
 					aspectRatio = screenSize[ 0 ] / screenSize[ 1 ]
 
 				var effectiveCameraDimensions = vec2.multiply(
+					vec2.create(),
 					transform.scale,
 					createComprisedRectangle( [ camera.width, camera.height ] , aspectRatio )
 				)

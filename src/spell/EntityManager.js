@@ -110,9 +110,9 @@ define(
 
 			// set new localToWorldMatrix
 			mat3.identity( localMatrix )
-			mat3.translate( localMatrix, transform.translation )
-			mat3.rotate( localMatrix, transform.rotation )
-			mat3.scale( localMatrix, transform.scale )
+			mat3.translate( localMatrix, localMatrix, transform.translation )
+			mat3.rotate( localMatrix, localMatrix, transform.rotation )
+			mat3.scale( localMatrix, localMatrix, transform.scale )
 
 			// search for next parent with a transform component
 			while( parent = parentComponents[ parentEntityId ] ) {
@@ -128,11 +128,11 @@ define(
 
 			if( parentMatrix ) {
 				// multiply parent's localToWorldMatrix with ours
-				mat3.multiply( parentMatrix, localMatrix, worldMatrix )
+				mat3.multiply( worldMatrix, parentMatrix, localMatrix )
 
 			} else {
 				// if this entity has no parent, the localToWorld Matrix equals the localMatrix
-				mat3.set( localMatrix, worldMatrix )
+				mat3.copy( worldMatrix, localMatrix )
 			}
 
             transform.worldTranslation[ 0 ] = worldMatrix[ 6 ]
@@ -158,8 +158,8 @@ define(
 				scale       = textureMatrix.scale
 
 			mat3.identity( matrix )
-			mat3.translate( matrix, translation )
-			mat3.scale( matrix, scale )
+			mat3.translate( matrix, matrix, translation )
+			mat3.scale( matrix, matrix, scale )
 
 			textureMatrix.isIdentity = (
 				translation[ 0 ] === 0 &&
@@ -653,7 +653,7 @@ define(
 				quadGeometries[ entityId ].dimensions ) {
 
 				// if a quadGeometry is specified, always take this
-				vec2.set( quadGeometries[ entityId ].dimensions, dimensions )
+				vec2.copy( dimensions, quadGeometries[ entityId ].dimensions )
 
 			} else if( staticAppearances && staticAppearances[ entityId ] &&
 				staticAppearances[ entityId ].asset &&
@@ -661,7 +661,7 @@ define(
 				staticAppearances[ entityId ].asset.resource.dimensions ) {
 
 				// entity has a static appearance
-				vec2.set( staticAppearances[ entityId ].asset.resource.dimensions, dimensions )
+				vec2.copy( dimensions, staticAppearances[ entityId ].asset.resource.dimensions )
 
 			} else if( animatedAppearances &&
 				animatedAppearances[ entityId ] &&
@@ -669,15 +669,15 @@ define(
 				animatedAppearances[ entityId ].asset.frameDimensions ) {
 
 				// entity has an animated appearance
-				vec2.set( animatedAppearances[ entityId ].asset.frameDimensions, dimensions )
+				vec2.copy( dimensions, animatedAppearances[ entityId ].asset.frameDimensions )
 
 			} else if( tilemaps &&
 				tilemaps[ entityId ] &&
 				tilemaps[ entityId ].asset ) {
 
 				// entity is a tilemap
-				vec2.set( tilemaps[ entityId ].asset.tilemapDimensions, dimensions )
-				vec2.multiply( dimensions, tilemaps[ entityId ].asset.spriteSheet.frameDimensions, dimensions )
+				vec2.copy( dimensions, tilemaps[ entityId ].asset.tilemapDimensions )
+				vec2.multiply( dimensions, dimensions, tilemaps[ entityId ].asset.spriteSheet.frameDimensions )
 
 			} else {
 				return
@@ -688,7 +688,7 @@ define(
 
                 //TODO: using the worldScale would be more correct here, but as we don't want to calculate it
                 //only for this test, use the local scale
-				//vec2.multiply( dimensions, transforms[ entityId ].scale, dimensions )
+				//vec2.multiply( dimensions, dimensions, transforms[ entityId ].scale )
 			}
 
 			return dimensions

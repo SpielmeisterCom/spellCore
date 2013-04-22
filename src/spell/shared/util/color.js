@@ -33,7 +33,7 @@ define(
 
 		var createRandom = function() {
 			var primaryColorIndex = Math.round( Math.random() * 3 )
-			var colorVec = vec3.create( [ 0.8, 0.8, 0.8 ] )
+			var colorVec = vec3.fromValues( 0.8, 0.8, 0.8 )
 
 			for( var i = 0; i < colorVec.length; i++ ) {
 				if ( i === primaryColorIndex ) {
