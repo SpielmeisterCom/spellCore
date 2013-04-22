@@ -13,6 +13,11 @@ define(
 			},
 			create : function( length ) {
 				return new arrayType( length )
+			},
+			fromValues : function( values ) {
+				return isSupported ?
+					new arrayType( values ) :
+					values.slice( 0 )
 			}
 		}
 	}

@@ -5,7 +5,7 @@ define(
 
 
 		var isSupported = typeof( Int8Array ) !== 'undefined',
-			arrayType   = isSupported ? Int32Array : Array
+			arrayType   = isSupported ? Int8Array : Array
 
 		return {
 			isSupported : function() {
@@ -13,6 +13,11 @@ define(
 			},
 			create : function( length ) {
 				return new arrayType( length )
+			},
+			fromValues : function( values ) {
+				return isSupported ?
+					new arrayType( values ) :
+					values.slice( 0 )
 			}
 		}
 	}
