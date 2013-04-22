@@ -23,7 +23,7 @@ define(
 
 		if( Types.hasFloatArraySupport() ) {
 			var y = Types.createFloatArray( 1 )
-			var i = Types.createIntegerArray( y.buffer )
+			var i = Types.Int32Array.create( y.buffer )
 
 			/**
 			 * Fast way to calculate the inverse square root,

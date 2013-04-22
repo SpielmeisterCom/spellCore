@@ -509,7 +509,7 @@ define(
 		    //    http://jsperf.com/typed-array-access-speed
 		    //    http://jsperf.com/conversion-of-3x3-matrix-to-quaternion
 
-		    var s_iNext = (typeof(Int8Array) !== 'undefined' ? new Int8Array([1,2,0]) : [1,2,0]);
+		    var s_iNext = Types.Int8Array.create( [ 1, 2, 0 ] )
 
 		    return function(out, m) {
 		        // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
