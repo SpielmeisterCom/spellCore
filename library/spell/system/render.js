@@ -724,14 +724,17 @@ define(
 			}
 
 			// clear unsafe area
-			if( camera && camera.clearUnsafeArea && cameraTransform ) {
+			if( camera &&
+				camera.clearUnsafeArea &&
+				cameraTransform ) {
+
 				var cameraDimensions             = [ camera.width, camera.height ],
 					scaledCameraDimensions       = vec2.multiply( tmpVec2, cameraDimensions, cameraTransform.scale ),
 					cameraAspectRatio            = scaledCameraDimensions[ 0 ] / scaledCameraDimensions[ 1 ],
 					effectiveTitleSafeDimensions = createIncludedRectangle( screenSize, cameraAspectRatio, true )
 
 				vec2.scale(
-					vec2.create(),
+					tmpVec2,
 					vec2.subtract( tmpVec2, screenSize, effectiveTitleSafeDimensions ),
 					0.5
 				)
