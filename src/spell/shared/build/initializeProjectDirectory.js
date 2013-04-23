@@ -174,16 +174,17 @@ define(
 				fs.mkdirSync( html5OutputPath )
 			}
 
-			var engineIncludeFilename = isDevEnvironment ? 'spell.dev.js' : 'spell.deploy.js'
+			var engineIncludeFilename = isDevEnvironment ? 'spell.dev.js' : 'spell.deploy.js',
+				buildDir              = isDevEnvironment ? 'build' : ''
 
 			copyFile(
-				path.join( spellCorePath, 'build', engineIncludeFilename ),
+				path.join( spellCorePath, buildDir, engineIncludeFilename ),
 				path.join( html5OutputPath, 'spell.js' )
 			)
 
 			// copying stage zero loader
 			copyFile(
-				path.join( spellCorePath, 'build', 'spell.loader.js' ),
+				path.join( spellCorePath, buildDir, 'spell.loader.js' ),
 				path.join( outputPath, 'spell.loader.js' )
 			)
 

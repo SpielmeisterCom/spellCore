@@ -4,6 +4,7 @@ define(
 		'spell/shared/build/copyFiles',
 		'spell/shared/util/createModuleId',
 		'spell/shared/build/processSource',
+		'spell/shared/build/isDevEnvironment',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
 		'spell/shared/build/executable/buildHtml5',
@@ -22,6 +23,7 @@ define(
 		copyFiles,
 		createModuleId,
 		processSource,
+		isDevEnvironment,
 		isDirectory,
 		isFile,
 		buildHtml5,
@@ -261,7 +263,8 @@ define(
 			// copy common files
 
 			// the library files
-			var deployFilePaths = createProjectLibraryFilePaths( projectLibraryPath )
+			var deployFilePaths = createProjectLibraryFilePaths( projectLibraryPath),
+				buildDir        = isDevEnvironment( spellCorePath ) ? 'build' : ''
 
 			// public template files go to "build/release/*"
 			deployFilePaths.push( [
@@ -276,7 +279,7 @@ define(
 
 			// stage zero loader goes to "build/release/spell.js"
 			deployFilePaths.push( [
-				path.join( spellCorePath, 'build', 'spell.loader.js' ),
+				path.join( spellCorePath, buildDir, 'spell.loader.js' ),
 				path.join( deployPath, 'spell.loader.js' )
 			] )
 

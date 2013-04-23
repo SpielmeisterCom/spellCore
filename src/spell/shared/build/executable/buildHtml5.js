@@ -4,6 +4,7 @@ define(
 		'spell/shared/build/copyFiles',
 		'spell/shared/util/createModuleId',
 		'spell/shared/build/processSource',
+		'spell/shared/build/isDevEnvironment',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
 		'spell/shared/util/hashModuleId',
@@ -19,6 +20,7 @@ define(
 		copyFiles,
 		createModuleId,
 		processSource,
+		isDevEnvironment,
 		isDirectory,
 		isFile,
 		hashModuleId,
@@ -88,10 +90,11 @@ define(
 			)
 
 			// engine include goes to "build/release/html5/spell.js"
-			var deployFilePaths = []
+			var deployFilePaths = [],
+				buildDir        = isDevEnvironment( spellCorePath ) ? 'build' : ''
 
 			deployFilePaths.push( [
-				path.join( spellCorePath, debug ? 'build/spell.dev.js' : 'build/spell.deploy.js' ),
+				path.join( spellCorePath, debug ? path.join( buildDir, 'spell.dev.js' ) : path.join( buildDir, 'spell.deploy.js' ) ),
 				path.join( deployHtml5Path, 'spell.js' )
 			] )
 
