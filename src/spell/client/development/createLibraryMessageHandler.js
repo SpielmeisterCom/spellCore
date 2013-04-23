@@ -3,6 +3,7 @@ define(
 	[
 		'spell/client/development/createMessageDispatcher',
 		'spell/client/development/library/updateAsset',
+		'spell/client/development/library/updateEntityTemplate',
 		'spell/client/development/library/updateScript',
 
 		'spell/functions'
@@ -10,6 +11,7 @@ define(
 	function(
 		createMessageDispatcher,
 		updateAsset,
+		updateEntityTemplate,
 		updateScript,
 
 		_
@@ -20,6 +22,7 @@ define(
 		return function( spell ) {
 			return createMessageDispatcher( {
 				updateAsset : _.bind( updateAsset, null, spell ),
+				updateEntityTemplate : _.bind( updateEntityTemplate, null, spell ),
 				updateScript : _.bind( updateScript, null, spell )
 			} )
 		}
