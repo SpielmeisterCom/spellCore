@@ -1,16 +1,11 @@
 define(
 	'spell/client/development/library/updateEntityTemplate',
-	[
-		'spell/functions'
-	],
-	function(
-		_
-	) {
+	function() {
 		'use strict'
 
 
 		return function( spell, payload ) {
-
+			spell.entityManager.updateEntityTemplate( payload.definition )
 		}
 	}
 )

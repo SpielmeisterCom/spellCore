@@ -17,6 +17,7 @@ define(
 		'spell/Defines',
 		'spell/shared/util/arrayRemove',
 		'spell/shared/util/create',
+		'spell/shared/util/createId',
 		'spell/shared/util/deepClone',
 		'spell/Events',
 		'spell/shared/util/template/applyComponentConfig',
@@ -34,6 +35,7 @@ define(
 		Defines,
 		arrayRemove,
 		create,
+		createId,
 		deepClone,
 		Events,
 		applyComponentConfig,
@@ -1268,6 +1270,40 @@ define(
 				if( !eventHandler ) return
 
 				eventHandler.apply( null, [ this.spell, entityId ].concat( eventArguments ) )
+			},
+
+			updateEntityTemplate : function( definition ) {
+				var entityTemplateId = createId( definition.namespace, definition.name )
+
+				// update template manager
+				this.templateManager.add( definition )
+
+				// get ids of entities which are based on this entity template
+				var ids = _.reduce(
+					this.componentMaps[ METADATA_COMPONENT_ID ],
+					function( memo, component, entityId ) {
+						if( component.entityTemplateId === entityTemplateId ) {
+							memo.push( entityId )
+						}
+
+						return memo
+					},
+					[]
+				)
+
+				for( var i = 0, id, n = ids.length; i < n; i++ ) {
+					id = ids[ i ]
+
+					// remove entities
+					this.removeEntity( id )
+					this.spatialIndex.remove( id )
+
+					// recreate entities while using old ids
+					this.createEntity( {
+						entityTemplateId : entityTemplateId,
+						id : id
+					} )
+				}
 			}
 		}
 
