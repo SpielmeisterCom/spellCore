@@ -3,13 +3,12 @@
 	"readonly": true,
 	"engineInternal": true,
 	"title": "Parent Entity",
-	"doc": "This component holds references to the parent entity of this entity.",
+	"doc": "This component hold the id of the parent entity of this entity.",
 	"attributes": [
 		{
 			"name": "id",
 			"doc": "entityId of the parent of this entity",
-			"type": "string",
-			"default": []
+			"type": "string"
 		}
 	],
 	"version": 1

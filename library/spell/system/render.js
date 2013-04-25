@@ -143,7 +143,7 @@ define(
 
 		var createOffset = function( deltaTimeInMs, offset, replaySpeed, numFrames, frameDuration, loop ) {
 			var animationLengthInMs = numFrames * frameDuration,
-				offsetInMs = Math.floor( numFrames * frameDuration * offset ) + deltaTimeInMs * replaySpeed
+				offsetInMs          = Math.floor( animationLengthInMs * offset ) + deltaTimeInMs * replaySpeed
 
 			if( offsetInMs > animationLengthInMs ) {
 				if( !loop ) return 1
