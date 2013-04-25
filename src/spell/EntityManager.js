@@ -254,7 +254,18 @@ define(
 
 		var removeComponents = function( eventManager, componentMaps, entityId, entityComponentId ) {
 			var childrenComponent = componentMaps[ CHILDREN_COMPONENT_ID ][ entityId ],
+				parentComponent   = componentMaps[ PARENT_COMPONENT_ID ][ entityId ],
 				removedEntity     = true
+
+			if( parentComponent ) {
+				var parentChildrenComponent =  componentMaps[ CHILDREN_COMPONENT_ID ][ parentComponent.id ]
+
+				if( parentChildrenComponent ) {
+					var parentChildrenIds = parentChildrenComponent.ids
+
+					parentChildrenIds.splice( parentChildrenIds.indexOf( entityId ), 1 )
+				}
+			}
 
 			if( entityComponentId ) {
 				// remove a single component from the entity
