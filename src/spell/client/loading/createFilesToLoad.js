@@ -24,10 +24,7 @@ define(
 
 						var libraryFilePath
 
-						if( !asset.localized ) {
-							libraryFilePath = createLibraryFilePath( asset.namespace, asset.file )
-
-						} else {
+						if( asset.config && asset.config.localized ) {
 							var fileName          = asset.file,
 								fileExtension     = fileName.substr( fileName.lastIndexOf( '.' ) + 1 ),
 								localizedFileName = asset.name + '.' + currentLanguage + '.' + fileExtension
@@ -36,6 +33,9 @@ define(
 								libraryPath : createLibraryFilePath( asset.namespace, asset.file ),
 								libraryPathUrlUsedForLoading : createLibraryFilePath( asset.namespace, localizedFileName )
 							}
+
+						} else {
+							libraryFilePath = createLibraryFilePath( asset.namespace, asset.file )
 						}
 
 						return memo.concat( libraryFilePath )
