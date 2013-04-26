@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/entityConfig/flatten',
+	'spell/config/entity/flatten',
 	[
 		'spell/functions'
 	],

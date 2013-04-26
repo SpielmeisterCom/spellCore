@@ -3,6 +3,7 @@ define(
 	[
 		'spell/Events',
 		'spell/Defines',
+		'spell/config/entity/flatten',
 		'spell/data/SortedMap',
 		'spell/shared/util/create',
 		'spell/shared/util/createId',
@@ -10,7 +11,6 @@ define(
 		'spell/shared/util/createLibraryFilePathsFromIds',
 		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
-		'spell/shared/util/entityConfig/flatten',
 		'spell/shared/util/StopWatch',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/Types',
@@ -20,6 +20,7 @@ define(
 	function(
 		Events,
 		Defines,
+		flattenEntityConfig,
 		SortedMap,
 		create,
 		createId,
@@ -27,7 +28,6 @@ define(
 		createLibraryFilePathsFromIds,
 		createModuleId,
 		deepClone,
-		flattenEntityConfig,
 		StopWatch,
 		PlatformKit,
 		Types,
