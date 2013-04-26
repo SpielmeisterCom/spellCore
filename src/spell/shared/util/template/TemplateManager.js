@@ -333,36 +333,8 @@ define(
 				return _.keys( this.componentsWithAssets )
 			},
 
-			hasTemplate : function( templateId ) {
-				return !!getTemplate( this.templates, templateId )
-			},
-
 			getTemplate : function( templateId ) {
 				return getTemplate( this.templates, templateId )
-			},
-
-			getTemplateIds : function( templateType ) {
-				if( !_.contains( TemplateTypes, templateType ) ) throw 'Error: Template type \'' + templateType + '\' is not supported.'
-
-				return _.reduce(
-					this.templates,
-					function( memo, template, templateId ) {
-						return template.type === templateType ? memo.concat( templateId ) : memo
-					},
-					[]
-				)
-			},
-
-			getTemplatesByType : function( templateType ) {
-				return _.reduce(
-					this.templates,
-					function( memo, template ) {
-						return templateType === template.type ?
-							memo.concat( template ) :
-							memo
-					},
-					[]
-				)
 			},
 
 			/**
