@@ -29,10 +29,6 @@ define(
 		'use strict'
 
 
-		/*
-		 * private
-		 */
-
 		var isValidComponentTemplate = function( template ) {
 			// check for ambiguous attribute names
 			var attributeNameCounts = _.reduce(
@@ -159,16 +155,13 @@ define(
 			)
 		}
 
-		var addTemplate = function( assetManager, moduleLoader, onComponentTypeAdded, templates, componentsWithAssets, entityPrototypes, definition ) {
+		var addTemplate = function( assetManager, moduleLoader, onComponentTypeAdded, templates, componentsWithAssets, definition ) {
 			var templateId = createId( definition.namespace, definition.name ),
 				type       = definition.type
 
 			templates[ templateId ] = definition
 
-			if( type === TemplateTypes.ENTITY ) {
-				entityPrototypes[ templateId ] = createComponents( assetManager, moduleLoader, templates, definition.config, null, templateId, false )
-
-			} else if( type === TemplateTypes.COMPONENT ) {
+			if( type === TemplateTypes.COMPONENT ) {
 				var hasAssetId = hasAssetIdAttribute( definition.attributes )
 
 				if( hasAssetId ) componentsWithAssets[ templateId ] = true
@@ -224,11 +217,11 @@ define(
 			return component
 		}
 
-		var createComponents = function( assetManager, moduleLoader, templates, componentConfig, entityPrototype, entityTemplateId, injectAssets ) {
+		var createComponents = function( assetManager, moduleLoader, templates, componentConfig, entityTemplateId, entityTemplate, injectAssets ) {
 			if( injectAssets === undefined ) injectAssets = true
 
 			var entity = applyComponentConfig(
-				entityPrototype ? deepClone( entityPrototype ) : {},
+				entityTemplate ? deepClone( entityTemplate.config ) : {},
 				componentConfig
 			)
 
@@ -260,15 +253,10 @@ define(
 		}
 
 
-		/*
-		 * public
-		 */
-
 		var TemplateManager = function( assetManager, moduleLoader ) {
-			this.assetManager     = assetManager
-			this.moduleLoader     = moduleLoader
-			this.templates        = {}
-			this.entityPrototypes = {}
+			this.assetManager = assetManager
+			this.moduleLoader = moduleLoader
+			this.templates    = {}
 
 			// map of components which have an asset id
 			this.componentsWithAssets = {}
@@ -286,21 +274,14 @@ define(
 					this.onComponentTypeAdded,
 					this.templates,
 					this.componentsWithAssets,
-					this.entityPrototypes,
 					definition
 				)
 			},
 
 			createComponents : function( entityTemplateId, config ) {
-				var entityPrototype
+				var entityTemplate = getTemplate( this.templates, entityTemplateId, TemplateTypes.ENTITY )
 
-				if( entityTemplateId ) {
-					entityPrototype = this.entityPrototypes[ entityTemplateId ]
-
-					if( !entityPrototype ) throw 'Error: Could not find entity prototype for template id \'' + entityTemplateId + '\'.'
-				}
-
-				return createComponents( this.assetManager, this.moduleLoader, this.templates, config, entityPrototype, entityTemplateId )
+				return createComponents( this.assetManager, this.moduleLoader, this.templates, config, entityTemplateId, entityTemplate )
 			},
 
 			updateComponent : function( componentId, component, attributeConfig ) {
