@@ -7,6 +7,7 @@ define(
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/initializeProjectDirectory',
 		'spell/shared/build/isFile',
+		'spell/shared/Configuration',
 
 		'commander',
 		'fs',
@@ -20,6 +21,7 @@ define(
 		isDirectory,
 		initializeProjectDirectory,
 		isFile,
+		Configuration,
 
 		commander,
 		fs,
@@ -192,7 +194,7 @@ define(
             }
 
             commander
-				.version( '0.0.1' )
+				.version( Configuration.version )
 
                 commander
 				.command( 'build-deploy [target]' )
