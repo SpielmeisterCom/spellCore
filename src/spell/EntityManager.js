@@ -21,7 +21,7 @@ define(
 		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
 		'spell/Events',
-		'spell/shared/util/template/applyComponentConfig',
+		'spell/config/entity/applyComponentConfig',
 		'spell/stringUtil',
 
 		'spell/math/util',
