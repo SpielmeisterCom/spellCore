@@ -18,9 +18,11 @@ define(
 		'spell/shared/util/arrayRemove',
 		'spell/shared/util/create',
 		'spell/shared/util/createId',
+		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
 		'spell/Events',
 		'spell/shared/util/template/applyComponentConfig',
+		'spell/stringUtil',
 
 		'spell/math/util',
 		'spell/math/mat3',
@@ -36,9 +38,11 @@ define(
 		arrayRemove,
 		create,
 		createId,
+		createModuleId,
 		deepClone,
 		Events,
 		applyComponentConfig,
+		stringUtil,
 
 		mathUtil,
 		mat3,
@@ -66,6 +70,28 @@ define(
 			QUAD_GEOMETRY_COMPONENT_ID        = Defines.QUAD_GEOMETRY_COMPONENT_ID,
 			TILEMAP_COMPONENT_ID              = Defines.TILEMAP_COMPONENT_ID,
 			VISUAL_OBJECT_COMPONENT_ID        = Defines.VISUAL_OBJECT_COMPONENT_ID
+
+		var isValidComponentDefinition = function( template ) {
+			// check for ambiguous attribute names
+			var attributeNameCounts = _.reduce(
+				template.attributes,
+				function( memo, attributeConfig ) {
+					var attributeName = attributeConfig.name
+
+					memo[ attributeName ] = memo[ attributeName ] ?
+						memo[ attributeName ] + 1 :
+						1
+
+					return memo
+				},
+				{}
+			)
+
+			return !_.any(
+				attributeNameCounts,
+				function( iter ) { return iter > 1 }
+			)
+		}
 
 		/**
 		 * Returns an entity id. If no entity id is provided a new one is generated.
@@ -212,12 +238,6 @@ define(
 				parentWorldOpacity,
 				entityId
 			)
-		}
-
-		var addComponentType = function( componentMaps, componentId ) {
-			if( componentMaps[ componentId ] ) return
-
-			componentMaps[ componentId ] = {}
 		}
 
 		var addComponents = function( componentMaps, eventManager, entityId, entityComponents ) {
@@ -462,12 +482,12 @@ define(
 		/**
 		 * Normalizes the provided entity config
 		 *
-		 * @param templateManager
+		 * @param libraryManager
 		 * @param arg1 can be either an entity template id or a entity config
 		 * @private
 		 * @return {*}
 		 */
-		var normalizeEntityConfig = function( templateManager, arg1 ) {
+		var normalizeEntityConfig = function( libraryManager, arg1 ) {
 			if( !arg1 ) return
 
 			var entityTemplateId = _.isString( arg1 ) ? arg1 : arg1.entityTemplateId
@@ -489,7 +509,7 @@ define(
 			}
 
 			if( entityTemplateId ) {
-				var entityTemplate = templateManager.getTemplate( entityTemplateId )
+				var entityTemplate = libraryManager.getByLibraryId( entityTemplateId )
 
 				if( !entityTemplate ) {
 					throw 'Error: Unknown entity template \'' + entityTemplateId + '\'. Could not create entity.'
@@ -536,8 +556,116 @@ define(
 			return false
 		}
 
-		var createEntity = function( eventManager, componentMaps, spatialIndex, templateManager, entityConfig, isRoot ) {
-			entityConfig = normalizeEntityConfig( templateManager, entityConfig )
+		var createComponentPrototype = function( componentTemplate ) {
+			return _.reduce(
+				componentTemplate.attributes,
+				function( memo, attributeConfig ) {
+					memo[ attributeConfig.name ] = _.clone( attributeConfig[ 'default' ] )
+
+					return memo
+				},
+				{}
+			)
+		}
+
+		var updateComponent = function( component, attributeConfig ) {
+			if( attributeConfig === undefined ) {
+				return component
+
+			} else {
+				return _.extend( component, attributeConfig )
+			}
+		}
+
+		var hasAssetIdAttribute = function( attributeConfig ) {
+			return !!_.find(
+				attributeConfig,
+				function( attribute ) {
+					var type = attribute.type
+
+					if( !_.isString( type ) ) return false
+
+					return attribute.type.indexOf( 'assetId:' ) === 0
+				}
+			)
+		}
+
+		/**
+		 * This function dereferences asset ids. If a component with an asset id attribute is found the reference is resolved and a additional asset attribute
+		 * is added to the component instance.
+		 *
+		 * @param assetManager
+		 * @param component
+		 * @return {*}
+		 */
+		var injectAsset = function( assetManager, moduleLoader, component ) {
+			var assetId = component.assetId
+			if( !assetId ) return
+
+			var asset = assetManager.get( assetId )
+
+			if( !asset &&
+				stringUtil.startsWith( assetId, 'script:' ) ) {
+
+				var libraryId = assetId.substr( 7 )
+
+				asset = moduleLoader.require( createModuleId( libraryId ) )
+			}
+
+			if( !asset ) {
+				throw 'Error: Could not resolve asset id \'' + assetId + '\' to asset instance. Please make sure that the asset id is valid.'
+			}
+
+			component.asset = asset
+
+			return component
+		}
+
+		var createComponentsTM = function( assetManager, libraryManager, moduleLoader, componentConfig, entityTemplateId, entityTemplate, injectAssets ) {
+			if( injectAssets === undefined ) injectAssets = true
+
+			var entity = applyComponentConfig(
+				entityTemplate ? deepClone( entityTemplate.config ) : {},
+				componentConfig
+			)
+
+			_.each(
+				entity,
+				function( attributeConfig, componentId ) {
+					var componentTemplate = libraryManager.getByLibraryId( componentId )
+
+					if( !componentTemplate ) {
+						throw 'Error: Could not find component template \'' + componentId +
+							( entityTemplateId ?
+								'\' referenced in entity template \'' + entityTemplateId + '\'.' :
+								'\'.'
+							)
+					}
+
+					var updatedComponent = updateComponent(
+						createComponentPrototype( componentTemplate ),
+						attributeConfig
+					)
+
+					entity[ componentId ] = hasAssetIdAttribute( componentTemplate.attributes ) && injectAssets ?
+						injectAsset( assetManager, moduleLoader, updatedComponent ) :
+						updatedComponent
+				}
+			)
+
+			return entity
+		}
+
+		var createComponents = function( assetManager, libraryManager, moduleLoader, entityTemplateId, config ) {
+			var entityTemplate = entityTemplateId ?
+				libraryManager.getByLibraryId( entityTemplateId ) :
+				undefined
+
+			return createComponentsTM( assetManager, libraryManager, moduleLoader, config, entityTemplateId, entityTemplate )
+		}
+
+		var createEntity = function( assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig, isRoot ) {
+			entityConfig = normalizeEntityConfig( libraryManager, entityConfig )
 
 			if( !entityConfig ) throw 'Error: Supplied invalid arguments.'
 
@@ -558,7 +686,7 @@ define(
 			addAdditionalEntityConfig( config, isRoot, parentId, entityConfig.name, entityTemplateId )
 
 			// creating the entity
-			var entityComponents = templateManager.createComponents( entityTemplateId, config || {} )
+			var entityComponents = createComponents( assetManager, libraryManager, moduleLoader, entityTemplateId, config || {} )
 
 			addComponents( componentMaps, eventManager, entityId, entityComponents )
 			updateWorldTransform( componentMaps, eventManager, spatialIndex, false, entityId )
@@ -574,7 +702,7 @@ define(
 				entityConfig.children,
 				function( entityConfig ) {
 					entityConfig.parentId = entityId
-					return createEntity( eventManager, componentMaps, spatialIndex, templateManager, entityConfig, false )
+					return createEntity( assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig, false )
 				}
 			)
 
@@ -707,21 +835,64 @@ define(
 			return dimensions
 		}
 
+		/**
+		 * Sets the attribute of a component to the specified value.
+		 *
+		 * @param component
+		 * @param attributeId
+		 * @param value
+		 */
+		var setAttribute = function( component, attributeId, value ) {
+			// TODO: Unfortunately there is no generic copy operator in javascript.
+			if( _.isObject( value ) ||
+				_.isArray( value ) ) {
+				_.extend( component[ attributeId ], value )
+
+			} else {
+				component[ attributeId ] = value
+			}
+		}
+
+		var updateComponentAttributeTM = function( assetManager, moduleLoader, componentsWithAssets, componentId, attributeId, component, value ) {
+			setAttribute( component, attributeId, value )
+
+			if( componentsWithAssets[ componentId ] ) {
+				var assetIdChanged = attributeId === 'assetId'
+
+				if( assetIdChanged ) {
+					injectAsset( assetManager, moduleLoader, component )
+				}
+			}
+		}
+
+		var updateComponentTM = function( assetManager, moduleLoader, componentsWithAssets, componentId, component, attributeConfig ) {
+			for( var attributeId in attributeConfig ) {
+				setAttribute( component, attributeId, attributeConfig[ attributeId ] )
+			}
+
+			if( componentsWithAssets[ componentId ] ) {
+				var assetIdChanged = !!attributeConfig[ 'assetId' ]
+
+				if( assetIdChanged ) {
+					injectAsset( assetManager, moduleLoader, component )
+				}
+			}
+		}
+
 		/*
 		 * public
 		 */
 
-		var EntityManager = function( spell, configurationManager, eventManager, templateManager ) {
+		var EntityManager = function( spell, configurationManager, assetManager, eventManager, libraryManager, moduleLoader ) {
 			this.configurationManager = configurationManager
 			this.componentMaps        = {}
+			this.assetManager         = assetManager
 			this.eventManager         = eventManager
-			this.templateManager      = templateManager
+			this.libraryManager       = libraryManager
+			this.moduleLoader         = moduleLoader
 			this.spell                = spell
 			this.spatialIndex         = undefined
-
-			this.templateManager.registerComponentTypeAddedCallback(
-				_.bind( addComponentType, null, this.componentMaps )
-			)
+			this.componentsWithAssets = {}
 		}
 
 		EntityManager.prototype = {
@@ -805,7 +976,7 @@ define(
 			 * @return {String} the entity id of the newly created entity
 			 */
 			createEntity : function( entityConfig ) {
-				var entityId = createEntity( this.eventManager, this.componentMaps, this.spatialIndex, this.templateManager, entityConfig )
+				var entityId = createEntity( this.assetManager, this.eventManager, this.libraryManager, this.moduleLoader, this.componentMaps, this.spatialIndex, entityConfig )
 
 				// HACK: updateVisualObject requires the complete ECS to be completely instantiated, because it propagates information towards the leafs.
 				updateVisualObject( this.componentMaps, entityId )
@@ -885,7 +1056,7 @@ define(
 					config : assembleEntityInstance( this.componentMaps, entityId )
 				}
 
-				return createEntity( this.eventManager, this.componentMaps, this.spatialIndex, this.templateManager, entityConfig )
+				return createEntity( this.assetManager, this.eventManager, this.libraryManager, this.moduleLoader, this.componentMaps, this.spatialIndex, entityConfig )
 			},
 
 
@@ -1034,7 +1205,7 @@ define(
 			 * @param {String} componentId the library path of the component to add
 			 * @param {Object} attributeConfig the attribute configuration of the component
 			 */
-			addComponent : function( entityId, componentId, attributeConfig ) {
+			addComponent : function( libraryManager, entityId, componentId, attributeConfig ) {
 				if( !entityId ) throw 'Error: Missing entity id.'
 				if( !componentId ) throw 'Error: Missing component id.'
 
@@ -1045,7 +1216,7 @@ define(
 					this.componentMaps,
 					this.eventManager,
 					entityId,
-					this.templateManager.createComponents( null, componentConfigs )
+					createComponents( this.assetManager, this.libraryManager, this.moduleLoader, null, componentConfigs )
 				)
 			},
 
@@ -1117,7 +1288,7 @@ define(
 				var component = this.getComponentById( entityId, componentId )
 				if( !component ) return false
 
-				this.templateManager.updateComponent( componentId, component, attributeConfig )
+				updateComponentTM( this.assetManager, this.moduleLoader, this.componentsWithAssets, componentId, component, attributeConfig )
 
 				if( componentId === TRANSFORM_COMPONENT_ID ) {
 					if( attributeConfig.translation ||
@@ -1170,7 +1341,7 @@ define(
 				var attribute = component[ attributeId ]
 				if( attribute === undefined ) return false
 
-				this.templateManager.updateComponentAttribute( componentId, attributeId, component, value )
+				updateComponentAttributeTM( this.assetManager, this.moduleLoader, this.componentsWithAssets, componentId, attributeId, component, value )
 
 				if( componentId === TRANSFORM_COMPONENT_ID ) {
 					if( attributeId === 'translation' ||
@@ -1224,11 +1395,10 @@ define(
 			 * @private
 			 */
 			updateAssetReferences : function( assetId, asset ) {
-				var componentIds = this.templateManager.getComponentsWithAssets()
+				var componentMaps = this.componentMaps
 
-				for( var i = 0, numComponentIds = componentIds.length; i < numComponentIds; i++ ) {
-					var componentId  = componentIds[ i ],
-						componentMap = this.componentMaps[ componentId ]
+				for( var componentId in this.componentsWithAssets ) {
+					var componentMap = componentMaps[ componentId ]
 
 					for( var id in componentMap ) {
 						var component = componentMap[ id ]
@@ -1246,11 +1416,10 @@ define(
 			 * @param assetManager
 			 */
 			refreshAssetReferences : function( assetManager ) {
-				var componentIds = this.templateManager.getComponentsWithAssets()
+				var componentMaps = this.componentMaps
 
-				for( var i = 0, numComponentIds = componentIds.length; i < numComponentIds; i++ ) {
-					var componentId  = componentIds[ i ],
-						componentMap = this.componentMaps[ componentId ]
+				for( var componentId in this.componentsWithAssets ) {
+					var componentMap = componentMaps[ componentId ]
 
 					for( var id in componentMap ) {
 						var component = componentMap[ id ]
@@ -1283,11 +1452,8 @@ define(
 				eventHandler.apply( null, [ this.spell, entityId ].concat( eventArguments ) )
 			},
 
-			updateEntityTemplate : function( definition ) {
-				var entityTemplateId = createId( definition.namespace, definition.name )
-
-				// update template manager
-				this.templateManager.add( definition )
+			updateEntityTemplate : function( entityDefinition ) {
+				var entityTemplateId = createId( entityDefinition.namespace, entityDefinition.name )
 
 				// get ids of entities which are based on this entity template
 				var ids = _.reduce(
@@ -1314,6 +1480,25 @@ define(
 						entityTemplateId : entityTemplateId,
 						id : id
 					} )
+				}
+			},
+
+			registerComponent : function( componentDefinition ) {
+				var componentId = createId( componentDefinition.namespace, componentDefinition.name )
+
+				if( !isValidComponentDefinition( componentDefinition ) ) {
+					throw 'Error: The format of the supplied component definition "' + componentId + '" is invalid.'
+				}
+
+				if( !this.componentMaps[ componentId ] ) {
+					this.componentMaps[ componentId ] = {}
+				}
+
+				if( hasAssetIdAttribute( componentDefinition.attributes ) ) {
+					this.componentsWithAssets[ componentId ] = true
+
+				} else {
+					delete this.componentsWithAssets[ componentId ]
 				}
 			}
 		}

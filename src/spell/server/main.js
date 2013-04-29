@@ -2,7 +2,6 @@ define(
 	'spell/server/main',
 	[
 		'spell/server/util/createMainLoop',
-		'spell/shared/util/template/TemplateManager',
 		'spell/shared/util/networkProtocol',
 		'spell/shared/util/network/Messages',
 		'spell/EventManager',
@@ -20,7 +19,6 @@ define(
 	],
 	function(
 		createMainLoop,
-		TemplateManager,
 		networkProtocol,
 		Messages,
 		EventManager,

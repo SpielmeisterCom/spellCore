@@ -120,7 +120,7 @@ define(
 				eventManager         = spell.eventManager,
 				libraryManager       = spell.libraryManager,
 				resources            = spell.resources,
-				templateManager      = spell.templateManager
+				entityManager        = spell.entityManager
 
 			var libraryBundleName  = sceneId + '-library',
 				resourceBundleName = sceneId + '-resources'
@@ -154,8 +154,10 @@ define(
 							}
 						)
 
-						addTemplates( templateManager, library.component )
-						addTemplates( templateManager, library.entityTemplate )
+						_.each(
+							library.component,
+							_.bind( entityManager.registerComponent, entityManager )
+						)
 
 						addIdAsKey( spell.scenes, library.scene )
 					}

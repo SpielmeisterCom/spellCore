@@ -6,7 +6,6 @@ define(
 		'spell/shared/util/createMainLoop',
 		'spell/EntityManager',
 		'spell/SceneManager',
-		'spell/shared/util/template/TemplateManager',
 		'spell/AssetManager',
 		'spell/ConfigurationManager',
 		'spell/EventManager',
@@ -28,7 +27,6 @@ define(
 		createMainLoop,
 		EntityManager,
 		SceneManager,
-		TemplateManager,
 		AssetManager,
 		ConfigurationManager,
 		EventManager,
@@ -102,9 +100,7 @@ define(
 
 			var moduleLoader = createModuleLoader( libraryManager, isModeDevelopment, configurationManager.getValue( 'libraryUrl' ) )
 
-			var templateManager = new TemplateManager( assetManager, moduleLoader )
-
-			var entityManager = new EntityManager( spell, configurationManager, spell.eventManager, templateManager )
+			var entityManager = new EntityManager( spell, configurationManager, assetManager, spell.eventManager, libraryManager, moduleLoader )
 
 			entityManager.init()
 
@@ -134,7 +130,6 @@ define(
 					audioContext         : audioContext,
 					libraryManager       : libraryManager,
 					moduleLoader         : moduleLoader,
-					templateManager      : templateManager,
 					entityManager        : entityManager,
 					box2dContext         : createBox2dContext(),
 					box2dWorlds          : {},

@@ -3,7 +3,6 @@ define(
 	[
 		'spell/shared/util/createId',
 		'spell/shared/util/createModuleId',
-		'spell/shared/util/template/TemplateTypes',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'
@@ -11,7 +10,6 @@ define(
 	function(
 		createId,
 		createModuleId,
-		TemplateTypes,
 		PlatformKit,
 
 		_

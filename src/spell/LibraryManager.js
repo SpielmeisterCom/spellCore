@@ -212,6 +212,10 @@ define(
 				return cache.metaData[ libraryPath ] || cache.resource[ libraryPath ]
 			},
 
+			getByLibraryId : function( libraryId ) {
+				return this.get( createLibraryFilePathFromId( libraryId ) )
+			},
+
 			getMetaDataRecordsByType : function( type ) {
 				return _.reduce(
 					this.cache.metaData,
