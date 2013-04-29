@@ -21,7 +21,7 @@ define(
 		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
 		'spell/Events',
-		'spell/config/entity/applyComponentConfig',
+		'spell/config/entity/applyEntityConfig',
 		'spell/stringUtil',
 
 		'spell/math/util',
@@ -41,7 +41,7 @@ define(
 		createModuleId,
 		deepClone,
 		Events,
-		applyComponentConfig,
+		applyEntityConfig,
 		stringUtil,
 
 		mathUtil,
@@ -342,7 +342,7 @@ define(
 						entityTemplateChildConfig.children = mergeOverloadedChildren( entityTemplateChildConfig.children, overloadedChildConfig.children )
 						entityTemplateChildConfig.id       = overloadedChildConfig.id
 
-						entityTemplateChildConfig.config = applyComponentConfig( entityTemplateChildConfig.config, overloadedChildConfig.config )
+						applyEntityConfig( entityTemplateChildConfig.config, overloadedChildConfig.config )
 
 					} else {
 						memo.push( overloadedChildConfig )
@@ -379,7 +379,7 @@ define(
 					continue
 				}
 
-				entityTemplateChild.config = applyComponentConfig( entityTemplateChild.config, overloadedChild.config )
+				applyEntityConfig( entityTemplateChild.config, overloadedChild.config )
 
 				if( overloadedChild.id ) {
 					entityTemplateChild.id = overloadedChild.id
@@ -624,7 +624,7 @@ define(
 		var createComponentsTM = function( assetManager, libraryManager, moduleLoader, componentConfig, entityTemplateId, entityTemplate, injectAssets ) {
 			if( injectAssets === undefined ) injectAssets = true
 
-			var entity = applyComponentConfig(
+			var entity = applyEntityConfig(
 				entityTemplate ? deepClone( entityTemplate.config ) : {},
 				componentConfig
 			)
