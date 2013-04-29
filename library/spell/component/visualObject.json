@@ -25,10 +25,10 @@
 			"doc": "the resulting opacity that the entity is drawn with"
 		},
 		{
-			"name": "group",
+			"name": "pass",
 			"type": {
 				"name": "enum",
-				"values": [ "world", "ui" ]
+				"values": [ "background", "ui", "world" ]
 			},
 			"default": "world"
 		}
