@@ -556,16 +556,15 @@ define(
 			return false
 		}
 
-		var createComponent = function( componentTemplate ) {
-			return _.reduce(
-				componentTemplate.attributes,
-				function( memo, attributeConfig ) {
-					memo[ attributeConfig.name ] = _.clone( attributeConfig[ 'default' ] )
+		var createComponent = function( componentDefinition ) {
+			var attributes = componentDefinition.attributes,
+				result     = {}
 
-					return memo
-				},
-				{}
-			)
+			for( var i = 0, n = attributes.length, attributeConfig; i < n; i++ ) {
+				attributeConfig = attributes[ i ]
+
+				result[ attributeConfig.name ] = _.clone( attributeConfig[ 'default' ] )
+			}
 		}
 
 		var updateComponent = function( component, attributeConfig ) {
@@ -632,22 +631,21 @@ define(
 			_.each(
 				entity,
 				function( attributeConfig, componentId ) {
-					var componentTemplate = libraryManager.getByLibraryId( componentId )
+					var componentDefinition = libraryManager.getByLibraryId( componentId )
 
-					if( !componentTemplate ) {
-						throw 'Error: Could not find component template \'' + componentId +
-							( entityTemplateId ?
-								'\' referenced in entity template \'' + entityTemplateId + '\'.' :
-								'\'.'
-							)
+					if( !componentDefinition ) {
+						throw 'Error: Could not find component definition "' + componentId +
+							entityTemplateId ?
+								'" referenced in entity template "' + entityTemplateId + '".' :
+								'".'
 					}
 
 					var updatedComponent = updateComponent(
-						createComponent( componentTemplate ),
+						createComponent( componentDefinition ),
 						attributeConfig
 					)
 
-					entity[ componentId ] = hasAssetIdAttribute( componentTemplate.attributes ) && injectAssets ?
+					entity[ componentId ] = hasAssetIdAttribute( componentDefinition.attributes ) && injectAssets ?
 						injectAsset( assetManager, moduleLoader, updatedComponent ) :
 						updatedComponent
 				}
