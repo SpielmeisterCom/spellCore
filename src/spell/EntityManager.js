@@ -556,7 +556,7 @@ define(
 			return false
 		}
 
-		var createComponentPrototype = function( componentTemplate ) {
+		var createComponent = function( componentTemplate ) {
 			return _.reduce(
 				componentTemplate.attributes,
 				function( memo, attributeConfig ) {
@@ -643,7 +643,7 @@ define(
 					}
 
 					var updatedComponent = updateComponent(
-						createComponentPrototype( componentTemplate ),
+						createComponent( componentTemplate ),
 						attributeConfig
 					)
 
