@@ -37,10 +37,6 @@ define(
 		'use strict'
 
 
-		/*
-		 * private
-		 */
-
 		var moduleDefinitionFileTemplate = [
 			'package Spielmeister {',
 			'%3$s',
@@ -105,66 +101,76 @@ define(
 			fs.writeFileSync( filePath, data )
 		}
 
-		var writeCompilerConfigFile = function( projectPath, spellFlashPath, flexSdkPath, compilerConfigFilePath, outputFilePath, anonymizeModuleIds, debug ) {
-			var doc = xmlbuilder.create()
+		var writeCompilerConfigFile = function( projectPath, spellFlashPath, flexSdkPath, componentTypeClasses, compilerConfigFilePath, outputFilePath, anonymizeModuleIds, debug ) {
+			var root = xmlbuilder.create().begin( 'flex-config' )
 
-			doc.begin( 'flex-config' )
-				.ele( 'compiler' )
-					.ele( 'source-path' )
-						.ele( 'path-element' )
-							.txt( spellFlashPath + '/src' )
-						.up()
-						.ele( 'path-element' )
-							.txt( spellFlashPath + '/lib/AS3WebSocket/src' )
-						.up()
-						.ele( 'path-element' )
-							.txt( spellFlashPath + '/lib/Coral/src' )
-						.up()
-						.ele( 'path-element' )
-							.txt( spellFlashPath + '/lib/Box2D/Source' )
-						.up()
-						.ele( 'path-element' )
-							.txt( projectPath + '/build/src' )
-						.up()
-					.up()
-					.ele( 'library-path' )
-						.ele( 'path-element' )
-							.txt( spellFlashPath + '/lib/AS3WebSocket/lib/as3corelib.swc' )
-						.up()
-					.up()
-					.ele( 'external-library-path' )
-						.ele( 'path-element' )
-                            .txt( flexSdkPath + '/frameworks/libs/player/11.1/playerglobal.swc' )
-						.up()
-					.up()
-					.ele( 'debug' )
-						.txt( debug.toString() )
-					.up()
-					.ele( 'define' )
-						.ele( 'name' )
-							.txt( 'CONFIG::anonymizeModuleIds' )
-						.up()
-						.ele( 'value' )
-							.txt( anonymizeModuleIds.toString() )
-						.up()
-					.up()
-				.up()
-				.ele( 'file-specs' )
+			root.ele( 'compiler' )
+				.ele( 'source-path' )
 					.ele( 'path-element' )
-						.txt( spellFlashPath + '/src/Spielmeister/SpellMain.as' )
+						.txt( spellFlashPath + '/src' )
+					.up()
+					.ele( 'path-element' )
+						.txt( spellFlashPath + '/lib/AS3WebSocket/src' )
+					.up()
+					.ele( 'path-element' )
+						.txt( spellFlashPath + '/lib/Coral/src' )
+					.up()
+					.ele( 'path-element' )
+						.txt( spellFlashPath + '/lib/Box2D/Source' )
+					.up()
+					.ele( 'path-element' )
+						.txt( projectPath + '/build/src' )
 					.up()
 				.up()
-				.ele( 'warnings' )
-					.txt( 'false' )
+				.ele( 'library-path' )
+					.ele( 'path-element' )
+						.txt( spellFlashPath + '/lib/AS3WebSocket/lib/as3corelib.swc' )
+					.up()
 				.up()
-				.ele( 'output' )
-					.txt( outputFilePath )
+				.ele( 'external-library-path' )
+					.ele( 'path-element' )
+						.txt( flexSdkPath + '/frameworks/libs/player/11.1/playerglobal.swc' )
+					.up()
+				.up()
+				.ele( 'debug' )
+					.txt( debug.toString() )
+				.up()
+				.ele( 'define' )
+					.ele( 'name' )
+						.txt( 'CONFIG::anonymizeModuleIds' )
+					.up()
+					.ele( 'value' )
+						.txt( anonymizeModuleIds.toString() )
+					.up()
+				.up()
+			.up()
+			.ele( 'file-specs' )
+				.ele( 'path-element' )
+					.txt( spellFlashPath + '/src/Spielmeister/SpellMain.as' )
+				.up()
+			.up()
+
+			var includes = root.ele( 'includes' )
+
+			_.each(
+				componentTypeClasses,
+				function( componentTypeClass ) {
+					includes.ele( 'symbol' )
+						.txt( componentTypeClass )
+				}
+			)
+
+			root.ele( 'warnings' )
+				.txt( 'false' )
+			.up()
+			.ele( 'output' )
+				.txt( outputFilePath )
 
 			if( fs.existsSync( compilerConfigFilePath ) ) {
 				fs.unlinkSync( compilerConfigFilePath )
 			}
 
-			fs.writeFileSync( compilerConfigFilePath, doc.toString( { pretty : true } ), 'utf-8' )
+			fs.writeFileSync( compilerConfigFilePath, root.toString( { pretty : true } ), 'utf-8' )
 		}
 
 		var compile = function( flexSdkPath, configFilePath, next ) {
@@ -178,10 +184,15 @@ define(
 			)
 		}
 
+		var createComponentTypeClasses = function( componentScripts ) {
+			return _.map(
+				_.keys( componentScripts ),
+				function( libraryPath ) {
+					return 'Spielmeister.ComponentType.' + libraryPath.replace( /\//g, '.' )
+				}
+			)
+		}
 
-		/*
-		 * public
-		 */
 
 		return function( spellCorePath, projectPath, projectLibraryPath, deployPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
 			var errors          = [],
@@ -249,13 +260,23 @@ define(
 			// TODO: remove generated source files from previous run
 
 			// TODO: write component type class files
+			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
 
 			// create config and compile
 			var flexSdkPath            = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
 				compilerConfigFilePath = path.join( tmpPath, 'compile-config.xml' ),
 				outputFilePath         = path.join( deployFlashPath, 'spell.swf' )
 
-			writeCompilerConfigFile( projectPath, spellFlashPath, flexSdkPath, compilerConfigFilePath, outputFilePath, anonymizeModuleIds, debug )
+			writeCompilerConfigFile(
+				projectPath,
+				spellFlashPath,
+				flexSdkPath,
+				createComponentTypeClasses( componentScripts ),
+				compilerConfigFilePath,
+				outputFilePath,
+				anonymizeModuleIds,
+				debug
+			)
 
 			var onCompilingCompleted = function( errors, stderr, stdout ) {
 				// TODO: parse stderr to get to the real compiler errors
