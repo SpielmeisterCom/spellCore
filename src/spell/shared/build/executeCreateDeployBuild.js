@@ -7,6 +7,7 @@ define(
 		'spell/shared/build/isDevEnvironment',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
+		'spell/shared/build/loadAssociatedScriptModules',
 		'spell/shared/build/executable/buildHtml5',
 		'spell/shared/build/executable/buildFlash',
 		'spell/shared/util/createCacheContent',
@@ -26,6 +27,7 @@ define(
 		isDevEnvironment,
 		isDirectory,
 		isFile,
+		loadAssociatedScriptModules,
 		buildHtml5,
 		buildFlash,
 		createCacheContent,
@@ -175,25 +177,6 @@ define(
 			)
 		}
 
-		var loadAssociatedScriptModules = function( projectLibraryPath, libraryRecords ) {
-			return _.reduce(
-				libraryRecords,
-				function( memo, libraryRecord ) {
-					var id             = createIdFromLibraryFilePath( libraryRecord.filePath ),
-						moduleId       = createModuleId( id ),
-						moduleFilePath = path.join( projectLibraryPath, moduleId + '.js' ),
-						module         = amdHelper.loadModule( moduleFilePath )
-
-					if( module ) {
-						memo[ module.name ] = module
-					}
-
-					return memo
-				},
-				{}
-			)
-		}
-
 		var createProjectLibraryFilePaths = function( projectLibraryPath ) {
 			var filePaths = _.filter(
 				flob.sync( '**/*', { cwd : projectLibraryPath } ),
@@ -228,10 +211,8 @@ define(
 			if( _.size( errors ) > 0 ) callback( errors )
 
 			// load all scripts
-			var scriptModules = loadScriptModules( projectLibraryPath, library.script )
-
-			scriptModules = _.extend(
-				scriptModules,
+			var scriptModules = _.extend(
+				loadScriptModules( projectLibraryPath, library.script ),
 				loadAssociatedScriptModules( projectLibraryPath, library.scene ),
 				loadAssociatedScriptModules( projectLibraryPath, library.system )
 			)

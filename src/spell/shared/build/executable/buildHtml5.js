@@ -7,6 +7,7 @@ define(
 		'spell/shared/build/isDevEnvironment',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
+		'spell/shared/build/loadAssociatedScriptModules',
 		'spell/shared/util/hashModuleId',
 
 		'amd-helper',
@@ -23,6 +24,7 @@ define(
 		isDevEnvironment,
 		isDirectory,
 		isFile,
+		loadAssociatedScriptModules,
 		hashModuleId,
 
 		amdHelper,
@@ -69,6 +71,15 @@ define(
 
 			// remove complete old deploy directory
 			rmdir.sync( deployHtml5Path )
+
+			// add component scripts to scriptSource
+			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
+
+			scriptSource += processSource(
+				_.pluck( componentScripts, 'source' ).join( '\n' ),
+				!debug, // minify
+				!debug  // anonymizeModuleIds
+			)
 
 			// copying all files required by the build to the deployment directory "build/release"
 

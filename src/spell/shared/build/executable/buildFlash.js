@@ -3,6 +3,7 @@ define(
 	[
 		'spell/shared/build/copyFile',
 		'spell/shared/build/isFile',
+		'spell/shared/build/loadAssociatedScriptModules',
 		'spell/shared/build/processSource',
 
 		'child_process',
@@ -19,6 +20,7 @@ define(
 	function(
 		copyFile,
 		isFile,
+		loadAssociatedScriptModules,
 		processSource,
 
 		child_process,
@@ -243,6 +245,10 @@ define(
 					JSON.stringify( projectConfig )
 				)
 			)
+
+			// TODO: remove generated source files from previous run
+
+			// TODO: write component type class files
 
 			// create config and compile
 			var flexSdkPath            = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
