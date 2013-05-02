@@ -26,7 +26,8 @@ define(
 		'spell/shared/util/platform/private/platformDetails',
 		'spell/shared/util/platform/private/graphics/initViewport',
 		'spell/shared/util/platform/private/advertisement',
-		'spell/shared/util/platform/private/flurry'
+		'spell/shared/util/platform/private/flurry',
+		'spell/shared/util/platform/private/createComponentType'
 	],
 	function(
 		Box2D,
@@ -50,7 +51,8 @@ define(
 		platformDetails,
 		initViewport,
 		advertisement,
-		flurry
+		flurry,
+		createComponentType
 	) {
 		'use strict'
 
@@ -162,7 +164,9 @@ define(
 			loadInterstitial : advertisement.loadInterstitial,
 			showInterstitial : advertisement.showInterstitial,
 
-			flurry : flurry
+			flurry : flurry,
+
+			createComponentType : createComponentType
 		}
 	}
 )

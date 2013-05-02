@@ -23,6 +23,8 @@ define(
 		'spell/Events',
 		'spell/data/entity/applyEntityConfig',
 		'spell/stringUtil',
+		'spell/shared/util/platform/PlatformKit',
+		'spell/data/component/init',
 
 		'spell/math/util',
 		'spell/math/mat3',
@@ -43,6 +45,8 @@ define(
 		Events,
 		applyEntityConfig,
 		stringUtil,
+		PlatformKit,
+		initComponent,
 
 		mathUtil,
 		mat3,
@@ -57,19 +61,20 @@ define(
 		 * private
 		 */
 
-		var nextEntityId                      = 1,
-			ROOT_COMPONENT_ID                 = Defines.ROOT_COMPONENT_ID,
-			CHILDREN_COMPONENT_ID             = Defines.CHILDREN_COMPONENT_ID,
-			PARENT_COMPONENT_ID               = Defines.PARENT_COMPONENT_ID,
-			METADATA_COMPONENT_ID             = Defines.METADATA_COMPONENT_ID,
-			TRANSFORM_COMPONENT_ID            = Defines.TRANSFORM_COMPONENT_ID,
-			TEXTURE_MATRIX_COMPONENT_ID       = Defines.TEXTURE_MATRIX_COMPONENT_ID,
-			EVENT_HANDLERS_COMPONENT_ID       = Defines.EVENT_HANDLERS_COMPONENT_ID,
-			STATIC_APPEARANCE_COMPONENT_ID    = Defines.STATIC_APPEARANCE_COMPONENT_ID,
-			ANIMATED_APPEARANCE_COMPONENT_ID  = Defines.ANIMATED_APPEARANCE_COMPONENT_ID,
-			QUAD_GEOMETRY_COMPONENT_ID        = Defines.QUAD_GEOMETRY_COMPONENT_ID,
-			TILEMAP_COMPONENT_ID              = Defines.TILEMAP_COMPONENT_ID,
-			VISUAL_OBJECT_COMPONENT_ID        = Defines.VISUAL_OBJECT_COMPONENT_ID
+		var nextEntityId                     = 1,
+			createComponentType              = PlatformKit.createComponentType,
+			ROOT_COMPONENT_ID                = Defines.ROOT_COMPONENT_ID,
+			CHILDREN_COMPONENT_ID            = Defines.CHILDREN_COMPONENT_ID,
+			PARENT_COMPONENT_ID              = Defines.PARENT_COMPONENT_ID,
+			METADATA_COMPONENT_ID            = Defines.METADATA_COMPONENT_ID,
+			TRANSFORM_COMPONENT_ID           = Defines.TRANSFORM_COMPONENT_ID,
+			TEXTURE_MATRIX_COMPONENT_ID      = Defines.TEXTURE_MATRIX_COMPONENT_ID,
+			EVENT_HANDLERS_COMPONENT_ID      = Defines.EVENT_HANDLERS_COMPONENT_ID,
+			STATIC_APPEARANCE_COMPONENT_ID   = Defines.STATIC_APPEARANCE_COMPONENT_ID,
+			ANIMATED_APPEARANCE_COMPONENT_ID = Defines.ANIMATED_APPEARANCE_COMPONENT_ID,
+			QUAD_GEOMETRY_COMPONENT_ID       = Defines.QUAD_GEOMETRY_COMPONENT_ID,
+			TILEMAP_COMPONENT_ID             = Defines.TILEMAP_COMPONENT_ID,
+			VISUAL_OBJECT_COMPONENT_ID       = Defines.VISUAL_OBJECT_COMPONENT_ID
 
 		var isValidComponentDefinition = function( template ) {
 			// check for ambiguous attribute names
@@ -556,15 +561,15 @@ define(
 			return false
 		}
 
-		var createComponent = function( componentDefinition ) {
-			var attributes = componentDefinition.attributes,
-				result     = {}
+		var createComponent = function( spell, moduleLoader, componentDefinition, componentId ) {
+			// try component type first
+			try {
+				var component = createComponentType( moduleLoader, componentId, spell )
 
-			for( var i = 0, n = attributes.length, attributeConfig; i < n; i++ ) {
-				attributeConfig = attributes[ i ]
+			} catch( exception ) {}
 
-				result[ attributeConfig.name ] = _.clone( attributeConfig[ 'default' ] )
-			}
+			// fall back to regular object component when no component type is available
+			return initComponent( component || {}, componentDefinition )
 		}
 
 		var updateComponent = function( component, attributeConfig ) {
@@ -620,7 +625,7 @@ define(
 			return component
 		}
 
-		var createComponentsTM = function( assetManager, libraryManager, moduleLoader, componentConfig, entityTemplateId, entityTemplate, injectAssets ) {
+		var createComponentsTM = function( spell, assetManager, libraryManager, moduleLoader, componentConfig, entityTemplateId, entityTemplate, injectAssets ) {
 			if( injectAssets === undefined ) injectAssets = true
 
 			var entity = applyEntityConfig(
@@ -641,7 +646,7 @@ define(
 					}
 
 					var updatedComponent = updateComponent(
-						createComponent( componentDefinition ),
+						createComponent( spell, moduleLoader, componentDefinition, componentId ),
 						attributeConfig
 					)
 
@@ -654,15 +659,15 @@ define(
 			return entity
 		}
 
-		var createComponents = function( assetManager, libraryManager, moduleLoader, entityTemplateId, config ) {
+		var createComponents = function( spell, assetManager, libraryManager, moduleLoader, entityTemplateId, config ) {
 			var entityTemplate = entityTemplateId ?
 				libraryManager.getByLibraryId( entityTemplateId ) :
 				undefined
 
-			return createComponentsTM( assetManager, libraryManager, moduleLoader, config, entityTemplateId, entityTemplate )
+			return createComponentsTM( spell, assetManager, libraryManager, moduleLoader, config, entityTemplateId, entityTemplate )
 		}
 
-		var createEntity = function( assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig, isRoot ) {
+		var createEntity = function( spell, assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig, isRoot ) {
 			entityConfig = normalizeEntityConfig( libraryManager, entityConfig )
 
 			if( !entityConfig ) throw 'Error: Supplied invalid arguments.'
@@ -684,7 +689,7 @@ define(
 			addAdditionalEntityConfig( config, isRoot, parentId, entityConfig.name, entityTemplateId )
 
 			// creating the entity
-			var entityComponents = createComponents( assetManager, libraryManager, moduleLoader, entityTemplateId, config || {} )
+			var entityComponents = createComponents( spell, assetManager, libraryManager, moduleLoader, entityTemplateId, config || {} )
 
 			addComponents( componentMaps, eventManager, entityId, entityComponents )
 			updateWorldTransform( componentMaps, eventManager, spatialIndex, false, entityId )
@@ -700,7 +705,7 @@ define(
 				entityConfig.children,
 				function( entityConfig ) {
 					entityConfig.parentId = entityId
-					return createEntity( assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig, false )
+					return createEntity( spell, assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig, false )
 				}
 			)
 
@@ -974,7 +979,7 @@ define(
 			 * @return {String} the entity id of the newly created entity
 			 */
 			createEntity : function( entityConfig ) {
-				var entityId = createEntity( this.assetManager, this.eventManager, this.libraryManager, this.moduleLoader, this.componentMaps, this.spatialIndex, entityConfig )
+				var entityId = createEntity( this.spell, this.assetManager, this.eventManager, this.libraryManager, this.moduleLoader, this.componentMaps, this.spatialIndex, entityConfig )
 
 				// HACK: updateVisualObject requires the complete ECS to be completely instantiated, because it propagates information towards the leafs.
 				updateVisualObject( this.componentMaps, entityId )
@@ -1054,7 +1059,7 @@ define(
 					config : assembleEntityInstance( this.componentMaps, entityId )
 				}
 
-				return createEntity( this.assetManager, this.eventManager, this.libraryManager, this.moduleLoader, this.componentMaps, this.spatialIndex, entityConfig )
+				return createEntity( this.spell, this.assetManager, this.eventManager, this.libraryManager, this.moduleLoader, this.componentMaps, this.spatialIndex, entityConfig )
 			},
 
 
