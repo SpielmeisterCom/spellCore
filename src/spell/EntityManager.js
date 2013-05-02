@@ -11,8 +11,8 @@
 define(
 	'spell/EntityManager',
 	[
-		'spell/config/entity/createAmbiguousSiblingName',
-		'spell/config/entity/recursiveFind',
+		'spell/data/entity/createAmbiguousSiblingName',
+		'spell/data/entity/recursiveFind',
 		'spell/data/spatial/QuadTree',
 		'spell/Defines',
 		'spell/shared/util/arrayRemove',
@@ -21,7 +21,7 @@ define(
 		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
 		'spell/Events',
-		'spell/config/entity/applyEntityConfig',
+		'spell/data/entity/applyEntityConfig',
 		'spell/stringUtil',
 
 		'spell/math/util',

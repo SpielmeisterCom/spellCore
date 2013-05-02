@@ -3,7 +3,7 @@ define(
 	[
 		'spell/Events',
 		'spell/Defines',
-		'spell/config/entity/flatten',
+		'spell/data/entity/flatten',
 		'spell/data/SortedMap',
 		'spell/shared/util/create',
 		'spell/shared/util/createId',

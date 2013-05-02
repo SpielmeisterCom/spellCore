@@ -1,5 +1,5 @@
 define(
-	'spell/config/entity/applyEntityConfig',
+	'spell/data/entity/applyEntityConfig',
 	[
 		'spell/shared/util/deepClone',
 

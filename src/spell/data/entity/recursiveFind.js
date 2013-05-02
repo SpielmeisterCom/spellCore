@@ -1,5 +1,5 @@
 define(
-	'spell/config/entity/recursiveFind',
+	'spell/data/entity/recursiveFind',
 	[
 		'spell/functions'
 	],

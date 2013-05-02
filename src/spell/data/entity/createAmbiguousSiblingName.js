@@ -1,5 +1,5 @@
 define(
-	'spell/config/entity/createAmbiguousSiblingName',
+	'spell/data/entity/createAmbiguousSiblingName',
 	function() {
 		'use strict'
 

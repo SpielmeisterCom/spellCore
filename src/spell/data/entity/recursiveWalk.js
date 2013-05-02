@@ -1,5 +1,5 @@
 define(
-	'spell/config/entity/recursiveWalk',
+	'spell/data/entity/recursiveWalk',
 	[
 		'spell/functions'
 	],
