@@ -418,12 +418,16 @@ define(
 			// TODO: write component type class files
 			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
 
+			console.log( 'generating AS3 classes...' )
+
 			createComponentTypeClassFiles( tmpSourcePath, library.component, componentScripts )
 
 
 			// create config and compile
 			var flexSdkPath    = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
 				outputFilePath = path.join( deployFlashPath, 'spell.swf' )
+
+			console.log( 'compiling...' )
 
 			writeCompilerConfigFile(
 				projectPath,
