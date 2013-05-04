@@ -1,6 +1,10 @@
 define(
 	'spell/shared/build/executable/buildFlash',
 	[
+		'spell/shared/build/ast/createAST',
+		'spell/shared/build/ast/createComponentTypeDefinition',
+		'spell/shared/build/ast/createSource',
+		'spell/shared/build/ast/isAmdHeader',
 		'spell/shared/build/copyFile',
 		'spell/shared/build/isFile',
 		'spell/shared/build/loadAssociatedScriptModules',
@@ -13,11 +17,16 @@ define(
 		'xmlbuilder',
 		'os',
 		'rimraf',
+		'uglify-js',
 
 		'underscore.string',
 		'spell/functions'
 	],
 	function(
+		createAST,
+		createComponentTypeDefinition,
+		createSource,
+		isAmdHeader,
 		copyFile,
 		isFile,
 		loadAssociatedScriptModules,
@@ -30,6 +39,7 @@ define(
 		xmlbuilder,
 		os,
 		rmdir,
+		uglify,
 
 		_s,
 		_
@@ -47,7 +57,8 @@ define(
 			'			%2$s',
 			'		}',
 			'	}',
-			'}'
+			'}',
+			''
 		].join( '\n' )
 
 		var applicationDataFileTemplate = [
@@ -64,8 +75,44 @@ define(
 			'			return this.runtimeModule',
 			'		}',
 			'	}',
+			'}',
+			''
+		].join( '\n' )
+
+		var componentTypeClassFileTemplate = [
+			'package %1$s {',
+			'',
+			'	public class %2$s {',
+			'		%3$s',
+			'',
+			'		public function %2$s( spell : Object ) {',
+			'			%4$s',
+			'		}',
+			'',
+			'		%5$s',
+			'	}',
+			'}',
+			''
+		].join( '\n' )
+
+		var classPropertyTemplate = [
+			'public function %1$s %2$s(%3$s)%4$s {',
+			'	%5$s',
 			'}'
 		].join( '\n' )
+
+		var attributeTypeToAS3ClassName = {
+			number : 'Number',
+			integer : 'Number',
+			'enum' : 'String',
+			boolean : 'Boolean',
+			vec2 : 'Array',
+			vec3 : 'Array'
+		}
+
+		var getAS3ClassNameFromAttributeType = function( x ) {
+			return attributeTypeToAS3ClassName[ _.isObject( x ) ? x.name : x ]
+		}
 
 		var createModuleDefinitionFileTemplate = function( className, indentedSource, debug ) {
 			return _s.sprintf(
@@ -166,10 +213,6 @@ define(
 			.ele( 'output' )
 				.txt( outputFilePath )
 
-			if( fs.existsSync( compilerConfigFilePath ) ) {
-				fs.unlinkSync( compilerConfigFilePath )
-			}
-
 			fs.writeFileSync( compilerConfigFilePath, root.toString( { pretty : true } ), 'utf-8' )
 		}
 
@@ -184,32 +227,147 @@ define(
 			)
 		}
 
-		var createComponentTypeClasses = function( componentScripts ) {
+		var createComponentTypeClassName = function( libraryPath ) {
+			return 'Spielmeister.ComponentType.' + libraryPath.replace( /\//g, '.' )
+		}
+
+		var createComponentTypeClassNames = function( componentScripts ) {
 			return _.map(
 				_.keys( componentScripts ),
-				function( libraryPath ) {
-					return 'Spielmeister.ComponentType.' + libraryPath.replace( /\//g, '.' )
+				createComponentTypeClassName
+			)
+		}
+
+		var createAS3ClassProperty = function( attributeDefinition, property ) {
+			var propertyClassName = getAS3ClassNameFromAttributeType( attributeDefinition.type ),
+				isGetter          = property.type === 'get'
+
+			return _s.sprintf(
+				classPropertyTemplate,
+				property.type,
+				property.name,
+				isGetter ? '' : ' ' + property.valueName + ' : ' + propertyClassName + ' ',
+				isGetter ? ' : ' + propertyClassName : '',
+				property.source.replace( /\n/g, '\n\t' )
+			).replace( /\n/g, '\n\t\t' )
+		}
+
+		var createAS3ClassGetterSetters = function( componentDefinition, properties ) {
+			return _.map(
+				properties,
+				function( property ) {
+					var attributeDefinition = _.find(
+						componentDefinition.attributes,
+						function( attribute ) {
+							return attribute.name === property.name
+						}
+					)
+
+					if( !attributeDefinition ) {
+						throw 'Could not find attribute definition.'
+					}
+
+					return createAS3ClassProperty( attributeDefinition, property )
+				}
+			).join( '\n\n\t\t' )
+		}
+
+		var createAS3ClassProperties = function( componentDefinition, properties ) {
+			return _.reduce(
+				properties,
+				function( memo, property ) {
+					if( property.type === 'set' ) {
+						return memo
+					}
+
+					var attributeDefinition = _.find(
+						componentDefinition.attributes,
+						function( attribute ) {
+							return attribute.name === property.name
+						}
+					)
+
+					if( !attributeDefinition ) {
+						throw 'Could not find attribute definition.'
+					}
+
+					return memo.concat(
+						'private var _' + attributeDefinition.name + ' : ' + getAS3ClassNameFromAttributeType( attributeDefinition.type )
+					)
+				},
+				[]
+			).join( '\n\t\t' )
+		}
+
+		var createComponentTypeAS3Class = function( componentDefinition, componentTypeDefinition ) {
+			return _s.sprintf(
+				componentTypeClassFileTemplate,
+				componentTypeDefinition.className.substring( 0, componentTypeDefinition.className.lastIndexOf( '.' ) ),
+				componentTypeDefinition.typeName,
+				createAS3ClassProperties( componentDefinition, componentTypeDefinition.properties ),
+				componentTypeDefinition.constructorSource.replace( /\n/g, '\n\t\t\t' ),
+				createAS3ClassGetterSetters( componentDefinition, componentTypeDefinition.properties )
+			)
+		}
+
+		var createComponentTypeClassFiles = function( tmpSourcePath, components, componentScripts ) {
+			_.each(
+				componentScripts,
+				function( componentScript, key ) {
+					var componentTypeClassName = createComponentTypeClassName( key )
+
+					var componentTypeDefinition = createComponentTypeDefinition( componentScript.source, componentTypeClassName )
+
+					var component = _.find(
+						components,
+						function( component ) {
+							return component.filePath === key + '.json'
+						}
+					)
+
+					if( !component ) {
+						throw 'Could not find component definition for component script "' + key + '".'
+					}
+
+					var source = createComponentTypeAS3Class( component.content, componentTypeDefinition )
+
+					var filePath   = path.join( tmpSourcePath, componentTypeClassName.replace( /\./g, '/' ) + '.as' ),
+						outputPath = path.dirname( filePath )
+
+					if( !fs.existsSync( outputPath ) ) {
+						mkdirp.sync( outputPath )
+					}
+
+					writeFile( filePath, source )
 				}
 			)
 		}
 
 
 		return function( spellCorePath, projectPath, projectLibraryPath, deployPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
-			var errors          = [],
-				spellEnginePath = path.resolve( spellCorePath, '../..' ),
-				spellFlashPath  = path.join( spellEnginePath, 'modules/spellFlash' ),
-				tmpPath         = path.join( projectPath, 'build' ),
-				tmpSourcePath   = path.join( tmpPath, 'src/Spielmeister' ),
-				deployFlashPath = path.join( deployPath, 'flash' )
+			var errors                  = [],
+				spellEnginePath         = path.resolve( spellCorePath, '../..' ),
+				spellFlashPath          = path.join( spellEnginePath, 'modules/spellFlash' ),
+				tmpPath                 = path.join( projectPath, 'build' ),
+				tmpSourcePath           = path.join( tmpPath, 'src' ),
+				spielmeisterPackagePath = path.join( tmpSourcePath, 'Spielmeister' ),
+				deployFlashPath         = path.join( deployPath, 'flash' ),
+				compilerConfigFilePath  = path.join( tmpPath, 'compile-config.xml' )
 
+
+			// remove build files from previous run
+			rmdir.sync( spielmeisterPackagePath )
+
+			if( !fs.existsSync( spielmeisterPackagePath ) ) {
+				mkdirp.sync( spielmeisterPackagePath )
+			}
+
+			if( fs.existsSync( compilerConfigFilePath ) ) {
+				fs.unlinkSync( compilerConfigFilePath )
+			}
 
 			// remove complete old deploy directory
 			rmdir.sync( deployFlashPath )
-
-
-			if( !fs.existsSync( tmpSourcePath ) ) {
-				mkdirp.sync( tmpSourcePath )
-			}
 
 			if( !fs.existsSync( deployFlashPath ) ) {
 				fs.mkdirSync( deployFlashPath )
@@ -225,7 +383,7 @@ define(
 			}
 
 			// write engine source wrapper class file
-			var engineSourceFilePath = path.join( tmpSourcePath, 'SpellEngine.as' ),
+			var engineSourceFilePath = path.join( spielmeisterPackagePath, 'SpellEngine.as' ),
 				engineSource         = fs.readFileSync( spellEngineSourceFilePath ).toString( 'utf-8' )
 
 			writeFile(
@@ -239,7 +397,7 @@ define(
 
 			// write script modules source wrapper class file
 			writeFile(
-				path.join( tmpSourcePath, 'ScriptModules.as' ),
+				path.join( spielmeisterPackagePath, 'ScriptModules.as' ),
 				createModuleDefinitionWrapperClass(
 					'ScriptModules',
 					scriptSource,
@@ -249,7 +407,7 @@ define(
 
 			// write application data class file
 			writeFile(
-				path.join( tmpSourcePath, 'ApplicationData.as' ),
+				path.join( spielmeisterPackagePath, 'ApplicationData.as' ),
 				_s.sprintf(
 					applicationDataFileTemplate,
 					JSON.stringify( cacheContent ),
@@ -257,21 +415,21 @@ define(
 				)
 			)
 
-			// TODO: remove generated source files from previous run
-
 			// TODO: write component type class files
 			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
 
+			createComponentTypeClassFiles( tmpSourcePath, library.component, componentScripts )
+
+
 			// create config and compile
-			var flexSdkPath            = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
-				compilerConfigFilePath = path.join( tmpPath, 'compile-config.xml' ),
-				outputFilePath         = path.join( deployFlashPath, 'spell.swf' )
+			var flexSdkPath    = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
+				outputFilePath = path.join( deployFlashPath, 'spell.swf' )
 
 			writeCompilerConfigFile(
 				projectPath,
 				spellFlashPath,
 				flexSdkPath,
-				createComponentTypeClasses( componentScripts ),
+				createComponentTypeClassNames( componentScripts ),
 				compilerConfigFilePath,
 				outputFilePath,
 				anonymizeModuleIds,
