@@ -136,6 +136,11 @@
 			libraryUrl : '../library'
 		}
 
+        var renderingBackEnd = getParam( 'renderingBackEnd' )
+        if( renderingBackEnd ) {
+            config.renderingBackEnd = renderingBackEnd
+        }
+
 		spell.start(
 			config,
 			onInitialized,
