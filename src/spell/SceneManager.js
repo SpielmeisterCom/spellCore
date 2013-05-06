@@ -33,6 +33,10 @@ define(
 
 			this.loadingPending = false
 			this.processCmdQueue()
+
+			if( spell.sendMessageToEditor ) {
+				spell.sendMessageToEditor( 'spelled.debug.executingScene', sceneId )
+			}
 		}
 
 		var SceneManager = function( spell, entityManager, statisticsManager, libraryManager, mainLoop, sendMessageToEditor, isModeDevelopment ) {
