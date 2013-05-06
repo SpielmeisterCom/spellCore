@@ -79,12 +79,6 @@ cli: cli-js
 	#integrate underscore
 	cp ../../node_modules/underscore/underscore.js $(NODE_SRC)/lib/underscore.js
 
-	#integrate falafel
-	cp ../../node_modules/falafel/index.js $(NODE_SRC)/lib/falafel.js
-
-	#integrate esprima
-	cp ../../node_modules/falafel/node_modules/esprima/esprima.js $(NODE_SRC)/lib/esprima.js
-
 	#integrate amd-helper
 	cp ../../node_modules/amd-helper/lib/index.js $(NODE_SRC)/lib/amdhelper.js
 
