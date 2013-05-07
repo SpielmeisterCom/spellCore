@@ -73,7 +73,7 @@ define(
 			// add component scripts to scriptSource
 			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
 
-			scriptSource += processSource(
+			scriptSource += '\n' + processSource(
 				_.pluck( componentScripts, 'source' ).join( '\n' ),
 				!debug, // minify
 				!debug  // anonymizeModuleIds
