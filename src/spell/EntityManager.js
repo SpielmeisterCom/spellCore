@@ -1208,7 +1208,7 @@ define(
 			 * @param {String} componentId the library path of the component to add
 			 * @param {Object} attributeConfig the attribute configuration of the component
 			 */
-			addComponent : function( libraryManager, entityId, componentId, attributeConfig ) {
+			addComponent : function( entityId, componentId, attributeConfig ) {
 				if( !entityId ) throw 'Error: Missing entity id.'
 				if( !componentId ) throw 'Error: Missing component id.'
 
@@ -1219,7 +1219,7 @@ define(
 					this.componentMaps,
 					this.eventManager,
 					entityId,
-					createComponents( this.assetManager, this.libraryManager, this.moduleLoader, null, componentConfigs )
+					createComponents( this.spell, this.assetManager, this.libraryManager, this.moduleLoader, null, componentConfigs )
 				)
 			},
 
