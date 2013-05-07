@@ -18,6 +18,7 @@ define(
 
 
 		var Box2D                   = PlatformKit.Box2D,
+			b2_staticBody           = Box2D.Dynamics.b2Body.b2_staticBody,
 			createB2Vec2            = Box2D.Common.Math.createB2Vec2,
 			createB2FixtureDef      = Box2D.Dynamics.createB2FixtureDef,
 			createB2ContactListener = Box2D.Dynamics.createB2ContactListener,
@@ -199,24 +200,47 @@ define(
 			rawWorld.ClearForces()
 		}
 
-		var transferState = function( world, worldToPhysicsScale, bodies, transforms ) {
+		var incrementState = function( entityManager, world, invWorldToPhysicsScale, bodies, transforms ) {
 			for( var body = world.GetBodyList(); body; body = body.GetNext() ) {
-				var id = body.GetUserData()
+				if( body.GetType() == b2_staticBody ||
+					!body.IsAwake() ) {
 
+					continue
+				}
+
+				var id = body.GetUserData()
 				if( !id ) continue
 
+				// transfering state to components
 				var position  = body.GetPosition(),
 					transform = transforms[ id ]
 
-				transform.translation[ 0 ] = position.x / worldToPhysicsScale
-				transform.translation[ 1 ] = position.y / worldToPhysicsScale
-				transform.rotation = body.GetAngle()
+				if( !transform ) continue
 
-				var velocityVec2  = body.GetLinearVelocity(),
-					bodyComponent = bodies[ id ]
+				transform.translation[ 0 ] = position.x * invWorldToPhysicsScale
+				transform.translation[ 1 ] = position.y * invWorldToPhysicsScale
+				transform.rotation = body.GetAngle() * 1
 
-				bodyComponent.velocity[ 0 ] = velocityVec2.x / worldToPhysicsScale
-				bodyComponent.velocity[ 1 ] = velocityVec2.y / worldToPhysicsScale
+				entityManager.updateWorldTransform( id )
+
+				// updating velocity
+				var velocity = body.GetLinearVelocity(),
+					bodyComponent = bodies[ id ],
+					maxVelocity   = bodyComponent.maxVelocity
+
+				if( maxVelocity ) {
+					// clamping velocity to range
+					var maxVelocityX = maxVelocity[ 0 ],
+						maxVelocityY = maxVelocity[ 1 ]
+
+					velocity.x = clamp( velocity.x, -maxVelocityX, maxVelocityX )
+					velocity.y = clamp( velocity.y, -maxVelocityY, maxVelocityY )
+
+					body.SetLinearVelocity( velocity )
+				}
+
+				bodyComponent.velocity[ 0 ] = velocity.x * invWorldToPhysicsScale
+				bodyComponent.velocity[ 1 ] = velocity.y * invWorldToPhysicsScale
 			}
 		}
 
@@ -246,17 +270,15 @@ define(
 				this.world = world
 				spell.box2dWorlds.main = world
 			}
-		}
 
-		var activate = function( spell ) {
-			this.entityCreatedHandler = _.bind( createBody, null, spell, this.debug, this.world )
+			this.entityCreatedHandler = _.bind( createBody, null, spell, this.config.debug, this.world )
 			this.entityDestroyHandler = _.bind( this.removedEntitiesQueue.push, this.removedEntitiesQueue )
 
 			spell.eventManager.subscribe( Events.ENTITY_CREATED, this.entityCreatedHandler )
 			spell.eventManager.subscribe( Events.ENTITY_DESTROYED, this.entityDestroyHandler )
 		}
 
-		var deactivate = function( spell ) {
+		var destroy = function( spell ) {
 			spell.eventManager.unsubscribe( Events.ENTITY_CREATED, this.entityCreatedHandler )
 			spell.eventManager.unsubscribe( Events.ENTITY_DESTROYED, this.entityDestroyHandler )
 		}
@@ -274,15 +296,14 @@ define(
 
 			step( rawWorld, deltaTimeInMs )
 
-			transferState( rawWorld, world.scale, this.bodies, transforms )
+			incrementState( spell.entityManager, rawWorld, world.scale, this.bodies, transforms )
 
-			if( this.debug ) {
+			if( this.config.debug ) {
 				updateDebug( rawWorld, this.debugBoxes, this.debugCircles )
 			}
 		}
 
 		var Physics = function( spell ) {
-			this.debug = spell.configurationManager.getValue( 'debug' )
 			this.entityCreatedHandler
 			this.entityDestroyHandler
 			this.world
@@ -291,9 +312,9 @@ define(
 
 		Physics.prototype = {
 			init : init,
-			destroy : function() {},
-			activate : activate,
-			deactivate : deactivate,
+			destroy : destroy,
+			activate : function( spell ) {},
+			deactivate : function( spell ) {},
 			process : process
 		}
 
