@@ -8,7 +8,7 @@ define(
 			var negHalfRadius = radius * -0.5
 
 			context.setLineColor( color )
-			context.drawCircle( negHalfRadius, negHalfRadius, radius, lineWidth )
+			context.drawCircle( 0, 0, radius, lineWidth )
 			context.drawLine( radius, 0, radius * 0.618, 0, lineWidth )
 		}
 	}
