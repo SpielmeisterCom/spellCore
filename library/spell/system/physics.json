@@ -44,6 +44,12 @@
 			"doc": "if active is false the system will be skipped during processing"
 		},
 		{
+			"name": "debug",
+			"type": "boolean",
+			"default": true,
+			"doc": "if true debug information will be processed"
+		},
+		{
 			"name": "gravity",
 			"type": "vec2",
 			"default": [ 0, -10 ],

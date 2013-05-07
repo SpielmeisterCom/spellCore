@@ -3,6 +3,7 @@ define(
 	[
 		'spell/Defines',
 		'spell/Events',
+		'spell/math/util',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'
@@ -10,6 +11,7 @@ define(
 	function(
 		Defines,
 		Events,
+		mathUtil,
 		PlatformKit,
 
 		_
@@ -135,13 +137,9 @@ define(
 			}
 		}
 
-		var destroyBodies = function( world, destroyedEntities ) {
-			for( var i = 0, numDestroyedEntities = destroyedEntities.length; i < numDestroyedEntities; i++ ) {
-				var body = world.getBodyById( destroyedEntities[ i ] )
-
-				if( !body ) continue
-
-				world.DestroyBody( body )
+		var destroyBodies = function( world, entityIds ) {
+			for( var i = 0, numEntityIds = entityIds.length; i < numEntityIds; i++ ) {
+				world.destroyBody( entityIds[ i ] )
 			}
 		}
 
@@ -233,8 +231,8 @@ define(
 					var maxVelocityX = maxVelocity[ 0 ],
 						maxVelocityY = maxVelocity[ 1 ]
 
-					velocity.x = clamp( velocity.x, -maxVelocityX, maxVelocityX )
-					velocity.y = clamp( velocity.y, -maxVelocityY, maxVelocityY )
+					velocity.x = mathUtil.clamp( velocity.x, -maxVelocityX, maxVelocityX )
+					velocity.y = mathUtil.clamp( velocity.y, -maxVelocityY, maxVelocityY )
 
 					body.SetLinearVelocity( velocity )
 				}
