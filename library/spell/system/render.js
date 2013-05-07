@@ -672,6 +672,17 @@ define(
 						viewFrustum
 					)
 				}
+
+				if( this.config.debug &&
+					drawDebugShapes ) {
+
+					var debugBoxes   = this.debugBoxes,
+						debugCircles = this.debugCircles
+
+					for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
+						drawDebug( context, childrenComponents, debugBoxes, debugCircles, transforms, deltaTimeInMs, visibleEntityIdsSorted[ i ] )
+					}
+				}
 			}
 			context.restore()
 
@@ -700,27 +711,6 @@ define(
 					visibleEntityIdsSorted[ i ],
 					viewFrustum
 				)
-			}
-
-
-//			var elapsed = performance.now() - start
-
-//			spell.statisticsManager.updateNode( 'drawing', elapsed )
-
-
-			if( effectiveCameraDimensions ) {
-				setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
-			}
-
-			if( this.config.debug &&
-				drawDebugShapes ) {
-
-				var debugBoxes   = this.debugBoxes,
-					debugCircles = this.debugCircles
-
-				for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
-					drawDebug( context, childrenComponents, debugBoxes, debugCircles, transforms, deltaTimeInMs, visibleEntityIdsSorted[ i ] )
-				}
 			}
 
 			// clear unsafe area
@@ -780,6 +770,10 @@ define(
 				}
 				context.restore()
 			}
+
+//			var elapsed = performance.now() - start
+
+//			spell.statisticsManager.updateNode( 'drawing', elapsed )
 		}
 
 
