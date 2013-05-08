@@ -294,7 +294,7 @@ define(
 
 			step( rawWorld, deltaTimeInMs )
 
-			incrementState( spell.entityManager, rawWorld, world.scale, this.bodies, transforms )
+			incrementState( spell.entityManager, rawWorld, 1 / world.scale, this.bodies, transforms )
 
 			if( this.config.debug ) {
 				updateDebug( rawWorld, this.debugBoxes, this.debugCircles )
