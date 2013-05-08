@@ -81,8 +81,6 @@ cli: cli-js
 
 	#integrate amd-helper
 	cp ../../node_modules/amd-helper/lib/index.js $(NODE_SRC)/lib/amdhelper.js
-
-
 	cp ../../node_modules/amd-helper/lib/createModuleHeader.js $(NODE_SRC)/lib/amdhelper_createModuleHeader.js
 	cp ../../node_modules/amd-helper/lib/extractModuleHeader.js $(NODE_SRC)/lib/amdhelper_extractModuleHeader.js
 	cp ../../node_modules/amd-helper/lib/loadModule.js $(NODE_SRC)/lib/amdhelper_loadModule.js
@@ -93,6 +91,7 @@ cli: cli-js
 	$(SED) 's/.\/loadModule/amdhelper_loadModule/g' $(NODE_SRC)/lib/*.js
 	$(SED) 's/.\/createModuleHeader/amdhelper_createModuleHeader/g' $(NODE_SRC)/lib/*.js
 	$(SED) 's/.\/traceDependencies/amdhelper_traceDependencies/g' $(NODE_SRC)/lib/*.js
+	$(SED) 's/uglify-js/uglifyjs/g' $(NODE_SRC)/lib/*.js
 
 	#integrate flob
 	cp ../../node_modules/flob/lib/index.js $(NODE_SRC)/lib/flob.js
