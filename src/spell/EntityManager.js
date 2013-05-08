@@ -1296,7 +1296,7 @@ define(
 				if( componentId === TRANSFORM_COMPONENT_ID ) {
 					if( attributeConfig.translation ||
 						attributeConfig.scale ||
-						attributeConfig.rotation ) {
+						attributeConfig.rotation !== undefined ) {
 
 						updateWorldTransform( this.componentMaps, this.eventManager, this.spatialIndex, true, entityId )
 					}
