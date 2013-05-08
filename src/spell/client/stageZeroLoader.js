@@ -35,7 +35,6 @@ if( !window.console ) {
 
 ;( function( document ) {
 	var MIN_FLASH_PLAYER_VERSION = '10.1.0',
-		MIN_FIREFOX_VERSION_FOR_WEBGL = 17,
 		DEFAULT_CONTAINER_ID = 'spell',
 		MODE = {
 			DEPLOYED : 'deployed',
