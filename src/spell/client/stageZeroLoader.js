@@ -115,13 +115,16 @@ if( !window.console ) {
 	}
 
 	var isHtml5Capable = function() {
-		return isAtLeastBrowser( 'Chrome', 22 ) ||
-			isAtLeastBrowser( 'Firefox', 18 ) ||
-			isAtLeastBrowser( 'Safari', 6 ) ||
-			isAtLeastBrowser( 'IE', 10 )
+		var notCapable = isLessThanBrowser( 'Chrome', 22 ) ||
+			isLessThanBrowser( 'Firefox', 18 ) ||
+			isLessThanBrowser( 'Safari', 6 ) ||
+			isLessThanBrowser( 'IE', 10 ) ||
+			!isCanvas2dCapable() // all other browsers must at least provide a canvas-2d implementation
+
+		return !notCapable
 	}
 
-	var isAtLeastBrowser = function( name, minimumVersion ) {
+	var isLessThanBrowser = function( name, minimumVersion ) {
 		var match = name === 'Safari' ?
 				navigator.userAgent.match( /.*Version\/(\d+).*Safari/ ) :
 				name === 'IE' ?
@@ -132,7 +135,14 @@ if( !window.console ) {
 
 		var version = parseInt( match[ 1 ], 10 )
 
-		return version >= minimumVersion
+		return version < minimumVersion
+	}
+
+	var isCanvas2dCapable = function() {
+		var canvasElement = document.createElement( 'canvas' )
+
+		return canvasElement.getContext &&
+			canvasElement.getContext( '2d' )
 	}
 
 	var isWebGlCapable = function() {
