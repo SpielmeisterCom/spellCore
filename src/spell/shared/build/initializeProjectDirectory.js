@@ -129,10 +129,13 @@ define(
 			// create project.json
 			if( !isFile( projectFilePath ) ) {
 				var data = {
-					"type"       : "project",
-					"startScene" : "",
-					"scenes"     : [],
-					"version"    : 1
+				    "version": 1,
+				    "config": {
+				        "supportedLanguages": []
+				    },
+				    "startScene": "",
+				    "type": "project",
+				    "scenes": []
 				}
 
 				fs.writeFileSync(
