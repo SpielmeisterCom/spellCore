@@ -713,6 +713,8 @@ define(
 				)
 			}
 
+			setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
+
 			// clear unsafe area
 			if( camera &&
 				camera.clearUnsafeArea &&
