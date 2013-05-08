@@ -118,8 +118,7 @@ if( !window.console ) {
 		return isAtLeastBrowser( 'Chrome', 22 ) ||
 			isAtLeastBrowser( 'Firefox', 18 ) ||
 			isAtLeastBrowser( 'Safari', 6 ) ||
-			isAtLeastBrowser( 'IE', 10 ) ||
-			isCanvasCapable()
+			isAtLeastBrowser( 'IE', 10 )
 	}
 
 	var isAtLeastBrowser = function( name, minimumVersion ) {
@@ -134,13 +133,6 @@ if( !window.console ) {
 		var version = parseInt( match[ 1 ], 10 )
 
 		return version >= minimumVersion
-	}
-
-	var isCanvasCapable = function() {
-		var canvasElement = document.createElement( 'canvas' )
-
-		return canvasElement.getContext &&
-			canvasElement.getContext( '2d' )
 	}
 
 	var isWebGlCapable = function() {
