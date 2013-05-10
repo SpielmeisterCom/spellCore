@@ -563,10 +563,7 @@ define(
 
 		var createComponent = function( spell, moduleLoader, componentDefinition, componentId ) {
 			// try component type first
-			try {
-				var component = createComponentType( moduleLoader, componentId, spell )
-
-			} catch( exception ) {}
+			var component = createComponentType( moduleLoader, spell, componentId )
 
 			// fall back to regular object component when no component type is available
 			return initComponent( component || {}, componentDefinition )

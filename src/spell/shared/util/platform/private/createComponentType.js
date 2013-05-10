@@ -11,12 +11,22 @@ define(
 
 		var componentIdToType = {}
 
-		return function( moduleLoader, componentId, spell ) {
+		return function( moduleLoader, spell, componentId ) {
 			var type = componentIdToType[ componentId ]
 
-			if( !type ) {
-				type = moduleLoader.require( createModuleId( componentId ) )
-				componentIdToType[ componentId ] = type
+			if( type === false ) {
+				return
+
+			} else if( type === undefined ) {
+				try {
+					type = moduleLoader.require( createModuleId( componentId ) )
+					componentIdToType[ componentId ] = type
+
+				} catch( exception ) {
+					componentIdToType[ componentId ] = false
+
+					return
+				}
 			}
 
 			return new type( spell )
