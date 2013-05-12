@@ -31,7 +31,10 @@ define(
 
 			} else if( value === 'web' ) {
 				return AudioFactory.BACK_END_WEB_AUDIO
-			}
+
+			} else if( value === 'native' ) {
+                return AudioFactory.BACK_END_NATIVE_AUDIO
+            }
 
 			return false
 		}
@@ -46,7 +49,7 @@ define(
 				extractor    : extractRenderingBackEnd
 			},
 			audioBackEnd : {
-				validValues  : [ 'dummy', 'html5', 'web' ],
+				validValues  : [ 'dummy', 'html5', 'web', 'native' ],
 				configurable : true,
 				extractor    : extractAudioBackEnd
 			},

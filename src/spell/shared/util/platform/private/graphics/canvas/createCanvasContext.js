@@ -315,7 +315,7 @@ define(
 		 * Clears the color buffer with the clear color
 		 */
 		var clear = function() {
-			context.save()
+ 			context.save()
 			{
 				// reset transformation to identity
 				context.setTransform( 1.0, 0.0, 0.0, 1.0, 0.0, 0.0 )
