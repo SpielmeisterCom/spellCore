@@ -1,11 +1,12 @@
 define(
 	'spell/cli/developmentTool',
 	[
-		'spell/shared/build/executeCreateDeployBuild',
-		'spell/shared/build/exportDeploymentArchive',
+		'spell/shared/build/executeCreateBuild',
+		'spell/shared/build/exportArchive',
 		'spell/shared/build/isDevEnvironment',
 		'spell/shared/build/initializeProjectDirectory',
 		'spell/shared/build/isFile',
+		'spell/shared/build/isDirectory',
 		'spell/shared/Configuration',
 
 		'commander',
@@ -14,11 +15,12 @@ define(
 		'spell/functions'
 	],
 	function(
-		executeCreateDeployBuild,
-		exportDeploymentArchive,
+		executeCreateBuild,
+		exportArchive,
 		isDevEnvironment,
 		initializeProjectDirectory,
 		isFile,
+		isDirectory,
 		Configuration,
 
 		commander,
@@ -69,13 +71,32 @@ define(
 			return []
 		}
 
+		var getSpellCorePath = function( basePath, isDevEnv ) {
+			var spellCorePath = path.join( basePath, 'build', 'spellCore' )
+
+			if( isDevEnv &&
+				isDirectory( spellCorePath ) ) {
+
+				return spellCorePath
+			}
+
+			spellCorePath = path.join( basePath, 'spellCore' )
+
+			if( !isDirectory( spellCorePath ) ) {
+				printErrors( 'Could not locate directory "spellCore".' )
+			}
+
+			return spellCorePath
+		}
+
 
 		/*
 		 * public
 		 */
 
-		return function( argv, cwd, spellCorePath ) {
-			var executableName  = 'spellcli'
+		return function( argv, cwd, basePath, isDevEnv ) {
+			var executableName = 'spellcli',
+				spellCorePath  = getSpellCorePath( basePath, isDevEnv )
 
 			var buildTargets = {
 				HTML5 : 'html5',
@@ -117,8 +138,8 @@ define(
 				}
 
 				// begin building
-				console.log( 'creating deployment build...' )
-				if( debug ) console.log( ' -> debug build is enabled' )
+				console.log( 'building...' )
+				if( debug ) console.log( ' -> debug mode is enabled' )
 
 				var afterAllBuildsCompleted = _.after(
 					targets.length,
@@ -128,9 +149,9 @@ define(
 				_.each(
 					targets,
 					function( target ) {
-						console.log( ' -> creating package for target \'' + target + '\''  )
+						console.log( ' -> creating package for target "' + target + '"'  )
 
-						executeCreateDeployBuild(
+						executeCreateBuild(
 							target,
 							spellCorePath,
 							projectPath,
@@ -147,7 +168,7 @@ define(
 			var initCommand = function( spellCorePath, cwd, isDevEnvironment, command ) {
 				var projectPath = path.resolve( command.directory || cwd )
 
-				errors = initializeProjectDirectory(
+				var errors = initializeProjectDirectory(
 					spellCorePath,
 					createProjectName( projectPath ),
 					projectPath,
@@ -159,12 +180,12 @@ define(
 					printErrors( errors )
 
 				} else {
-					console.log( 'Initialized spell project in \'' + projectPath + '\'' )
+					console.log( 'Initialized project in ' + projectPath )
 				}
 			}
 
 			var exportCommand = function( spellCorePath, cwd, command ) {
-				var projectPath = path.resolve( command.directory || cwd )
+				var projectPath = path.resolve( command.directory || cwd ),
 					errors      = checkProjectPath( projectPath )
 
 				if( errors.length > 0 ) printErrors( errors )
@@ -173,7 +194,7 @@ define(
 					path.resolve( command.file ) :
 					path.resolve( projectPath, 'export.zip' )
 
-				exportDeploymentArchive( spellCorePath, projectPath, outputFilePath, _.bind( onComplete, null, 'export' ) )
+				exportArchive( spellCorePath, projectPath, outputFilePath, _.bind( onComplete, null, 'export' ) )
 			}
 
 			var infoCommand = function( spellCorePath, cwd ) {
@@ -182,29 +203,29 @@ define(
 
 				if( errors.length > 0 ) printErrors( errors )
 
-				console.log( 'spell sdk path:\t\t' + spellCorePath )
-				console.log( 'project path:\t\t' + projectPath )
+				console.log( 'spellCore directory: ' + spellCorePath )
+				console.log( 'project directory: ' + projectPath )
 			}
 
-            //prepare argv array
-            if( argv.length < 3 ) {
-                argv.push('-h')
-            }
+			// prepare argv array
+			if( argv.length < 3 ) {
+				argv.push( '-h' )
+			}
 
-            commander
+			commander
 				.version( Configuration.version )
 
-                commander
-				.command( 'build-deploy [target]' )
+			commander
+				.command( 'build [target]' )
 				.option( '--debug' )
-				.description( 'Create a build for a specific target. Available targets: ' + _.values( buildTargets).join(', ') )
+				.description( 'Create a build for a specific target. Available targets: ' + _.values( buildTargets ).join( ', ' ) )
 				.action( _.bind( buildCommand, this, cwd ) )
 
 			commander
 				.command( 'init' )
 				.option( '-d, --directory [directory]', 'The path to the project directory which should be initialized. The default is the current working directory.' )
 				.description( 'initialize a project directory with project scaffolding' )
-				.action( _.bind( initCommand, this, spellCorePath, cwd, isDevEnvironment( spellCorePath ) ) )
+				.action( _.bind( initCommand, this, spellCorePath, cwd, isDevEnv ) )
 
 			commander
 				.command( 'export' )

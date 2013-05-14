@@ -344,14 +344,14 @@ define(
 		}
 
 
-		return function( spellCorePath, projectPath, projectLibraryPath, deployPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
+		return function( spellCorePath, projectPath, projectLibraryPath, outputPath, outputLibraryPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
 			var errors                  = [],
 				spellEnginePath         = path.resolve( spellCorePath, '../..' ),
 				spellFlashPath          = path.join( spellEnginePath, 'modules/spellFlash' ),
 				tmpPath                 = path.join( projectPath, 'build' ),
 				tmpSourcePath           = path.join( tmpPath, 'src' ),
 				spielmeisterPackagePath = path.join( tmpSourcePath, 'Spielmeister' ),
-				deployFlashPath         = path.join( deployPath, 'flash' ),
+				outputFlashPath         = path.join( outputPath, 'flash' ),
 				compilerConfigFilePath  = path.join( tmpPath, 'compile-config.xml' )
 
 
@@ -366,16 +366,16 @@ define(
 				fs.unlinkSync( compilerConfigFilePath )
 			}
 
-			// remove complete old deploy directory
-			rmdir.sync( deployFlashPath )
+			// remove complete old output directory
+			rmdir.sync( outputFlashPath )
 
-			if( !fs.existsSync( deployFlashPath ) ) {
-				fs.mkdirSync( deployFlashPath )
+			if( !fs.existsSync( outputFlashPath ) ) {
+				fs.mkdirSync( outputFlashPath )
 			}
 
 
 			// reading engine source file
-			var spellEngineSourceFilePath = path.join( spellCorePath, 'build/spell.common.js' )
+			var spellEngineSourceFilePath = path.join( spellCorePath, 'lib', debug ? 'spell.common.js' : 'spell.common.min.js' )
 
 			if( !fs.existsSync( spellEngineSourceFilePath ) ) {
 				errors.push( 'Error: Could not locate engine include file \'' + spellEngineSourceFilePath + '\'.' )
@@ -415,7 +415,6 @@ define(
 				)
 			)
 
-			// TODO: write component type class files
 			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
 
 			console.log( 'generating AS3 classes...' )
@@ -425,7 +424,7 @@ define(
 
 			// create config and compile
 			var flexSdkPath    = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
-				outputFilePath = path.join( deployFlashPath, 'spell.swf' )
+				outputFilePath = path.join( outputFlashPath, 'spell.swf' )
 
 			console.log( 'compiling...' )
 

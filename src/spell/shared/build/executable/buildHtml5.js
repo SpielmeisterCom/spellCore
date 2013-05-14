@@ -61,14 +61,12 @@ define(
 		}
 
 
-		return function( spellCorePath, projectPath, projectLibraryPath, deployPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
-			var errors            = [],
-				deployLibraryPath = path.join( deployPath, 'library' ),
-				deployHtml5Path   = path.join( deployPath, 'html5' )
+		return function( spellCorePath, projectPath, projectLibraryPath, outputPath, outputLibraryPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
+			var outputHtml5Path = path.join( outputPath, 'html5' )
 
-
-			// remove complete old deploy directory
-			rmdir.sync( deployHtml5Path )
+			// clean output directory
+			rmdir.sync( outputHtml5Path )
+			mkdirp.sync( outputHtml5Path )
 
 			// add component scripts to scriptSource
 			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
@@ -79,14 +77,10 @@ define(
 				!debug  // anonymizeModuleIds
 			)
 
-			// copying all files required by the build to the deployment directory "build/release"
+			// copying all files required by the build to the output directory "build/release"
 
-			// write data file to "build/release/html5/data.js"
-			if( !fs.existsSync( deployHtml5Path ) ) {
-				mkdirp.sync( deployHtml5Path )
-			}
-
-			var dataFilePath = path.resolve( deployHtml5Path, 'data.js' )
+			// write data file to "html5/data.js"
+			var dataFilePath = path.resolve( outputHtml5Path, 'data.js' )
 
 			writeFile(
 				dataFilePath,
@@ -98,16 +92,15 @@ define(
 				)
 			)
 
-			// engine include goes to "build/release/html5/spell.js"
-			var deployFilePaths = [],
-				buildDir        = isDevEnvironment( spellCorePath ) ? 'build' : ''
+			// engine include goes to "html5/spell.js"
+			var outputFilePaths = []
 
-			deployFilePaths.push( [
-				path.join( spellCorePath, debug ? path.join( buildDir, 'spell.dev.js' ) : path.join( buildDir, 'spell.deploy.js' ) ),
-				path.join( deployHtml5Path, 'spell.js' )
+			outputFilePaths.push( [
+				path.join( spellCorePath, 'lib', debug ? 'spell.debug.js' : 'spell.release.js' ),
+				path.join( outputHtml5Path, 'spell.js' )
 			] )
 
-			copyFiles( projectLibraryPath, deployLibraryPath, deployFilePaths )
+			copyFiles( projectLibraryPath, outputLibraryPath, outputFilePaths )
 
 			next()
 		}

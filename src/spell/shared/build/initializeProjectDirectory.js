@@ -102,11 +102,11 @@ define(
 		 * public
 		 */
 
-		return function( spellCorePath, projectName, projectPath, projectFilePath, isDevEnvironment ) {
+		return function( spellCorePath, projectName, projectPath, projectFilePath, isDevEnv ) {
 			var errors          = [],
 				publicDirName   = 'public',
-				outputPath      = projectPath + '/' + publicDirName,
-				html5OutputPath = outputPath + '/html5'
+				outputPath      = path.join( projectPath, publicDirName ),
+				html5OutputPath = path.join( outputPath, 'html5' )
 
 			// create directory structure
 			var paths = [
@@ -165,29 +165,25 @@ define(
 				fileNames,
 				function( fileName ) {
 					copyFile(
-						path.join( spellCorePath , 'htmlTemplate' , fileName ),
+						path.join( spellCorePath, 'htmlTemplate', fileName ),
 						path.join( projectPath, publicDirName, fileName )
 					)
 				}
 			)
 
-			// Copying engine include. Depending on the execution environment either the development or deployment version of the engine include is used
-			// for development.
 			if( !fs.existsSync( html5OutputPath ) ) {
 				fs.mkdirSync( html5OutputPath )
 			}
 
-			var engineIncludeFilename = isDevEnvironment ? 'spell.dev.js' : 'spell.deploy.js',
-				buildDir              = isDevEnvironment ? 'build' : ''
-
+			// copying engine library
 			copyFile(
-				path.join( spellCorePath, buildDir, engineIncludeFilename ),
+				path.join( spellCorePath, 'lib', 'spell.release.js' ),
 				path.join( html5OutputPath, 'spell.js' )
 			)
 
 			// copying stage zero loader
 			copyFile(
-				path.join( spellCorePath, buildDir, 'spell.loader.js' ),
+				path.join( spellCorePath, 'lib', 'spell.loader.min.js' ),
 				path.join( outputPath, 'spell.loader.js' )
 			)
 

@@ -1,19 +1,17 @@
 define(
 	'spell/shared/build/isDevEnvironment',
 	[
-		'spell/shared/build/isFile',
+		'spell/shared/build/isDirectory',
 
 		'path'
 	],
 	function(
-		isFile,
+		isDirectory,
 
 		path
 	) {
 		return function( spellCorePath ) {
-			var developmentEngineIncludeFilePath = path.join( spellCorePath, 'build', 'spell.dev.js' )
-
-			return isFile( developmentEngineIncludeFilePath )
+			return isDirectory( path.join( spellCorePath, 'build' ) )
 		}
 	}
 )

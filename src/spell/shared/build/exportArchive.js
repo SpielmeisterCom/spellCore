@@ -1,7 +1,7 @@
 define(
-	'spell/shared/build/exportDeploymentArchive',
+	'spell/shared/build/exportArchive',
 	[
-		'spell/shared/build/executeCreateDeployBuild',
+		'spell/shared/build/executeCreateBuild',
 		'spell/shared/build/isFile',
 
 		'fs',
@@ -11,7 +11,7 @@ define(
 		'zipstream'
 	],
 	function(
-		executeCreateDeployBuild,
+		executeCreateBuild,
 		isFile,
 
 		fs,
@@ -80,8 +80,7 @@ define(
 				mkdirp.sync( outputPath )
 			}
 
-			// create deployment build
-			executeCreateDeployBuild(
+			executeCreateBuild(
 				target,
 				spellCorePath,
 				projectPath,

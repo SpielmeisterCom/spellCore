@@ -1,5 +1,5 @@
 define(
-	'spell/shared/build/executeCreateDeployBuild',
+	'spell/shared/build/executeCreateBuild',
 	[
 		'spell/shared/build/copyFiles',
 		'spell/shared/util/createModuleId',
@@ -42,7 +42,7 @@ define(
 
 
 		var LIBRARY_PATH = 'library'
-		var DEPLOY_PATH  = 'build/release'
+		var OUTPUT_PATH  = 'build/release'
 
 		var targetToBuilder = {
 			html5 : buildHtml5,
@@ -192,8 +192,8 @@ define(
 		return function( target, spellCorePath, projectPath, projectFilePath, minify, anonymizeModuleIds, debug, callback ) {
 			var errors             = [],
 				projectLibraryPath = path.join( projectPath, LIBRARY_PATH ),
-				deployPath         = path.join( projectPath, DEPLOY_PATH ),
-				deployLibraryPath  = path.join( deployPath, LIBRARY_PATH ),
+				outputPath         = path.join( projectPath, OUTPUT_PATH ),
+				outputLibraryPath  = path.join( outputPath, LIBRARY_PATH ),
 				projectConfigData  = readProjectConfigFile( projectFilePath ),
 				projectConfigRaw   = parseProjectConfig( projectConfigData, callback ),
 				projectConfig      = createProjectConfig( projectConfigRaw )
@@ -242,28 +242,27 @@ define(
 			// copy common files
 
 			// the library files
-			var deployFilePaths = createProjectLibraryFilePaths( projectLibraryPath),
-				buildDir        = isDevEnvironment( spellCorePath ) ? 'build' : ''
+			var outputFilePaths = createProjectLibraryFilePaths( projectLibraryPath )
 
 			// public template files go to "build/release/*"
-			deployFilePaths.push( [
+			outputFilePaths.push( [
 				path.join( spellCorePath, 'htmlTemplate', 'index.html' ),
-				path.join( deployPath, 'index.html' )
+				path.join( outputPath, 'index.html' )
 			] )
 
-			deployFilePaths.push( [
+			outputFilePaths.push( [
 				path.join( spellCorePath, 'htmlTemplate', 'main.css' ),
-				path.join( deployPath, 'main.css' )
+				path.join( outputPath, 'main.css' )
 			] )
 
-			// stage zero loader goes to "build/release/spell.js"
-			deployFilePaths.push( [
-				path.join( spellCorePath, buildDir, 'spell.loader.js' ),
-				path.join( deployPath, 'spell.loader.js' )
+			// stage zero loader goes to "build/release/spell.loader.js"
+			outputFilePaths.push( [
+				path.join( spellCorePath, 'lib', debug ? 'spell.loader.js' : 'spell.loader.min.js' ),
+				path.join( outputPath, 'spell.loader.js' )
 			] )
 
 			// copy new library content to destination
-			copyFiles( projectLibraryPath, deployLibraryPath, deployFilePaths )
+			copyFiles( projectLibraryPath, outputLibraryPath, outputFilePaths )
 
 
 			// create build
@@ -277,7 +276,8 @@ define(
 				spellCorePath,
 				projectPath,
 				projectLibraryPath,
-				deployPath,
+				outputPath,
+				outputLibraryPath,
 				projectConfig,
 				library,
 				cacheContent,

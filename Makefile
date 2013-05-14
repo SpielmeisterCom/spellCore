@@ -1,13 +1,20 @@
-NEEDJS_BUILD = src/need.js
-SPELL_COMMON_OPTIONS = -s src -m spell/client/main -i spell/client/runtimeModule,spell/shared/util/platform/private
-SPELL_COMMON_BUILD = build/spell.common.js
-SPELL_HTML5_OPTIONS = -s src -m spell/client/main -i spell/client/runtimeModule,spell/shared/util/platform/private -e spell/shared/util/platform/private
-SPELL_HTML5_BUILD = build/spell.html5.js
-SPELL_ENGINE_INCLUDE_DEV_BUILD = build/spell.dev.js
-SPELL_ENGINE_INCLUDE_DEPLOY_BUILD = build/spell.deploy.js
-NODE = ../nodejs/node
-NODE_SRC = ../nodejs/src
-NODE_PATH = $$(../nodejs/node --which)
+NEEDJS_LIB                  = src/need.js
+SPELL_COMMON_OPTIONS        = -s src -m spell/client/main -i spell/client/runtimeModule,spell/shared/util/platform/private
+SPELL_COMMON_LIB            = build/spellCore/lib/spell.common.js
+SPELL_COMMON_MIN_LIB        = build/spellCore/lib/spell.common.min.js
+SPELL_HTML5_ADAPTER_OPTIONS = -s src -m spell/client/main -i spell/client/runtimeModule,spell/shared/util/platform/private -e spell/shared/util/platform/private
+SPELL_LOADER_LIB            = build/spellCore/lib/spell.loader.js
+SPELL_LOADER_MIN_LIB        = build/spellCore/lib/spell.loader.min.js
+SPELL_HTML5_ADAPTER_LIB     = build/spellCore/lib/spell.html5.js
+SPELL_HTML5_ADAPTER_MIN_LIB = build/spellCore/lib/spell.html5.min.js
+SPELL_ENGINE_DEBUG_LIB      = build/spellCore/lib/spell.debug.js
+SPELL_ENGINE_RELEASE_LIB    = build/spellCore/lib/spell.release.js
+SPELL_CLI_LIB               = build/spellCore/lib/spell.cli.js
+OUT_DIR                     = build/spellCore
+OUT_LIB_DIR                 = $(OUT_DIR)/lib
+NODE                        = ../nodejs/node
+NODE_SRC                    = ../nodejs/src
+NODE_PATH                   = $$(../nodejs/node --which)
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
@@ -28,17 +35,21 @@ ifeq ($(UNAME_S),CYGWIN_NT-6.2-WOW64)
 	VISUAL_STUDIO_PATCH_FILE = nodejs_vs11.patch
 endif
 
+
 .PHONY: cli-js
 cli-js:
 	# creating the javascript includes for the command line tool
 	mkdir -p build
 
-	cat spellcli-deploy-begin.js >build/spell.cli.js.tmp
-	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander" >>build/spell.cli.js.tmp
-	cat spellcli-deploy-end.js >>build/spell.cli.js.tmp
+#	cat spellcli-deploy-begin.js > $(SPELL_CLI_LIB).tmp
+#	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander" >> $(SPELL_CLI_LIB).tmp
+#	cat spellcli-deploy-end.js >> $(SPELL_CLI_LIB).tmp
 
-	$(NODE) tools/n.js mangle build/spell.cli.js.tmp >build/spell.cli.js --no-anonymization
-	rm build/spell.cli.js.tmp
+#	$(NODE) tools/n.js mangle $(SPELL_CLI_LIB).tmp > $(SPELL_CLI_LIB) --no-anonymization
+#	rm $(SPELL_CLI_LIB).tmp
+
+	cat spell.cli.js > $(SPELL_CLI_LIB)
+	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander" >> $(SPELL_CLI_LIB)
 
 
 .PHONY: cli
@@ -50,7 +61,7 @@ cli: cli-js
 	cd $(NODE_SRC) && patch -p1 <../../../modules/spellCore/nodejs_spellCore_integration.patch
 
 	# creating cli executable
-	mv build/spell.cli.js $(NODE_SRC)/lib/_third_party_main.js
+	mv $(SPELL_CLI_LIB) $(NODE_SRC)/lib/_third_party_main.js
 
 	#patch includes in _third_party_main.js
 	$(SED) 's/uglify-js/uglifyjs/g' $(NODE_SRC)/lib/_third_party_main.js
@@ -152,39 +163,70 @@ else
 	../upx/upx -9 build/spellcli
 endif
 
-.PHONY: dev
-dev : $(SPELL_ENGINE_INCLUDE_DEV_BUILD) $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
 
 .PHONY: deploy
-deploy: clean $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD) cli
-	# deleting unminified source files
-	rm $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
+deploy: engine-release cli
 
-	cp -R library  build/
 
-	#copy html templates to build directory
-	cp -R htmlTemplate build/
+.PHONY: engine-debug
+engine-debug: clean $(SPELL_ENGINE_DEBUG_LIB) $(SPELL_ENGINE_RELEASE_LIB) additional-dependencies
 
-$(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD): $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
-	# build engine include for deployment mode
-	$(NODE) tools/n.js mangle $(SPELL_ENGINE_INCLUDE_DEV_BUILD) > $(SPELL_ENGINE_INCLUDE_DEPLOY_BUILD)
-	$(NODE) tools/n.js mangle build/spell.loader.js > build/spell.loader.minified.js --no-anonymization
-	mv build/spell.loader.minified.js build/spell.loader.js
 
-$(SPELL_ENGINE_INCLUDE_DEV_BUILD): libs
-	# build engine includes for development mode
-	mkdir -p build
-	cat $(NEEDJS_BUILD) $(SPELL_COMMON_BUILD) $(SPELL_HTML5_BUILD) > $(SPELL_ENGINE_INCLUDE_DEV_BUILD)
+.PHONY: engine-release
+engine-release: clean $(SPELL_ENGINE_RELEASE_LIB) additional-dependencies
+	# deleting unminified files
+	rm -f $(SPELL_COMMON_LIB) $(SPELL_HTML5_ADAPTER_LIB) $(SPELL_LOADER_LIB) $(SPELL_ENGINE_DEBUG_LIB)
 
-libs:
-	mkdir -p build
-	$(NODE) tools/n.js $(SPELL_COMMON_OPTIONS) > $(SPELL_COMMON_BUILD)
-	$(NODE) tools/n.js $(SPELL_HTML5_OPTIONS) > $(SPELL_HTML5_BUILD)
-	cp src/spell/client/stageZeroLoader.js build/spell.loader.js
+
+.PHONY: additional-dependencies
+additional-dependencies:
+	# copy additional dependencies to output directory
+	cp -R library $(OUT_DIR)
+	cp -R htmlTemplate $(OUT_DIR)
+
+
+$(SPELL_ENGINE_DEBUG_LIB): $(SPELL_COMMON_LIB) $(SPELL_HTML5_ADAPTER_LIB) $(SPELL_LOADER_LIB)
+	# build engine library for debug mode
+	cat $(NEEDJS_LIB) $(SPELL_COMMON_LIB) $(SPELL_HTML5_ADAPTER_LIB) > $(SPELL_ENGINE_DEBUG_LIB)
+
+
+$(SPELL_ENGINE_RELEASE_LIB): $(SPELL_COMMON_MIN_LIB) $(SPELL_HTML5_ADAPTER_MIN_LIB) $(SPELL_LOADER_MIN_LIB)
+	# build engine library for release mode
+	$(NODE) tools/n.js mangle $(NEEDJS_LIB) > $(SPELL_ENGINE_RELEASE_LIB)
+	cat $(SPELL_COMMON_MIN_LIB) $(SPELL_HTML5_ADAPTER_MIN_LIB) >> $(SPELL_ENGINE_RELEASE_LIB)
+
+
+$(SPELL_COMMON_LIB):
+	mkdir -p $(OUT_LIB_DIR)
+	$(NODE) tools/n.js $(SPELL_COMMON_OPTIONS) > $(SPELL_COMMON_LIB)
+
+
+$(SPELL_COMMON_MIN_LIB): $(SPELL_COMMON_LIB)
+	$(NODE) tools/n.js mangle $(SPELL_COMMON_LIB) > $(SPELL_COMMON_MIN_LIB)
+
+
+$(SPELL_HTML5_ADAPTER_LIB):
+	mkdir -p $(OUT_LIB_DIR)
+	$(NODE) tools/n.js $(SPELL_HTML5_ADAPTER_OPTIONS) > $(SPELL_HTML5_ADAPTER_LIB)
+
+
+$(SPELL_HTML5_ADAPTER_MIN_LIB): $(SPELL_HTML5_ADAPTER_LIB)
+	$(NODE) tools/n.js mangle $(SPELL_HTML5_ADAPTER_LIB) > $(SPELL_HTML5_ADAPTER_MIN_LIB)
+
+
+$(SPELL_LOADER_LIB):
+	mkdir -p $(OUT_LIB_DIR)
+	cp src/spell/client/stageZeroLoader.js $(SPELL_LOADER_LIB)
+
+
+$(SPELL_LOADER_MIN_LIB): $(SPELL_LOADER_LIB)
+	$(NODE) tools/n.js mangle $(SPELL_LOADER_LIB) > $(SPELL_LOADER_MIN_LIB) --no-anonymization
+
 
 .PHONY: clean
 clean:
 	rm -rf build/*
+
 
 .PHONY: docs
 docs:
@@ -192,4 +234,3 @@ docs:
 	cp docs/css/*.css docs/generated/resources/css
 	cp docs/images/* docs/generated/resources/images
 	cp docs/favicon.ico docs/generated/favicon.ico
-
