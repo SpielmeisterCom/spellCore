@@ -5,6 +5,7 @@ define(
 		'spell/shared/build/ast/createComponentTypeDefinition',
 		'spell/shared/build/ast/createSource',
 		'spell/shared/build/ast/isAmdHeader',
+		'spell/shared/build/createDebugPath',
 		'spell/shared/build/copyFile',
 		'spell/shared/build/isFile',
 		'spell/shared/build/loadAssociatedScriptModules',
@@ -27,6 +28,7 @@ define(
 		createComponentTypeDefinition,
 		createSource,
 		isAmdHeader,
+		createDebugPath,
 		copyFile,
 		isFile,
 		loadAssociatedScriptModules,
@@ -216,11 +218,9 @@ define(
 			fs.writeFileSync( compilerConfigFilePath, root.toString( { pretty : true } ), 'utf-8' )
 		}
 
-		var compile = function( flexSdkPath, configFilePath, next ) {
-			var executablePath = path.join( flexSdkPath, os.platform() == 'win32' ? 'bin/mxmlc.bat' : 'bin/mxmlc' )
-
+		var compile = function( compilerExecutablePath, configFilePath, next ) {
 			child_process.execFile(
-				executablePath,
+				compilerExecutablePath,
 				[ '-load-config', configFilePath ],
 				{},
 				next
@@ -346,21 +346,24 @@ define(
 
 		return function( spellCorePath, projectPath, projectLibraryPath, outputPath, outputLibraryPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
 			var errors                  = [],
-				spellEnginePath         = path.resolve( spellCorePath, '../..' ),
+				spellEnginePath         = path.resolve( spellCorePath, '../../../..' ),
 				spellFlashPath          = path.join( spellEnginePath, 'modules/spellFlash' ),
 				tmpPath                 = path.join( projectPath, 'build' ),
 				tmpSourcePath           = path.join( tmpPath, 'src' ),
 				spielmeisterPackagePath = path.join( tmpSourcePath, 'Spielmeister' ),
 				outputFlashPath         = path.join( outputPath, 'flash' ),
-				compilerConfigFilePath  = path.join( tmpPath, 'compile-config.xml' )
+				compilerConfigFilePath  = path.join( tmpPath, 'compile-config.xml' ),
+				flexSdkPath             = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
+				compilerExecutablePath  = path.join( flexSdkPath, os.platform() == 'win32' ? 'bin/mxmlc.bat' : 'bin/mxmlc' )
 
+			if( !fs.existsSync( compilerExecutablePath ) ) {
+				console.error( 'Could not find compiler executable "' + compilerExecutablePath + '".' )
+				process.exit( 1 )
+			}
 
 			// remove build files from previous run
 			rmdir.sync( spielmeisterPackagePath )
-
-			if( !fs.existsSync( spielmeisterPackagePath ) ) {
-				mkdirp.sync( spielmeisterPackagePath )
-			}
+			mkdirp.sync( spielmeisterPackagePath )
 
 			if( fs.existsSync( compilerConfigFilePath ) ) {
 				fs.unlinkSync( compilerConfigFilePath )
@@ -368,14 +371,10 @@ define(
 
 			// remove complete old output directory
 			rmdir.sync( outputFlashPath )
-
-			if( !fs.existsSync( outputFlashPath ) ) {
-				fs.mkdirSync( outputFlashPath )
-			}
-
+			mkdirp.sync( outputFlashPath )
 
 			// reading engine source file
-			var spellEngineSourceFilePath = path.join( spellCorePath, 'lib', debug ? 'spell.common.js' : 'spell.common.min.js' )
+			var spellEngineSourceFilePath = createDebugPath( debug, 'spell.common.js', 'spell.common.min.js', path.join( spellCorePath, 'lib' ) )
 
 			if( !fs.existsSync( spellEngineSourceFilePath ) ) {
 				errors.push( 'Error: Could not locate engine include file \'' + spellEngineSourceFilePath + '\'.' )
@@ -423,8 +422,7 @@ define(
 
 
 			// create config and compile
-			var flexSdkPath    = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
-				outputFilePath = path.join( outputFlashPath, 'spell.swf' )
+			var outputFilePath = path.join( outputFlashPath, 'spell.swf' )
 
 			console.log( 'compiling...' )
 
@@ -444,7 +442,7 @@ define(
 				next( stdout )
 			}
 
-			compile( flexSdkPath, compilerConfigFilePath, onCompilingCompleted )
+			compile( compilerExecutablePath, compilerConfigFilePath, onCompilingCompleted )
 		}
 	}
 )
