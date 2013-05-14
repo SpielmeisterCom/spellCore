@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/executeCreateBuild',
 	[
+		'spell/shared/build/createDebugPath',
 		'spell/shared/build/copyFiles',
 		'spell/shared/util/createModuleId',
 		'spell/shared/build/processSource',
@@ -20,6 +21,7 @@ define(
 		'path'
 	],
 	function(
+		createDebugPath,
 		copyFiles,
 		createModuleId,
 		processSource,
@@ -257,7 +259,7 @@ define(
 
 			// stage zero loader goes to "build/release/spell.loader.js"
 			outputFilePaths.push( [
-				path.join( spellCorePath, 'lib', debug ? 'spell.loader.js' : 'spell.loader.min.js' ),
+				createDebugPath( debug, 'spell.loader.js', 'spell.loader.min.js', path.join( spellCorePath, 'lib' ) ),
 				path.join( outputPath, 'spell.loader.js' )
 			] )
 

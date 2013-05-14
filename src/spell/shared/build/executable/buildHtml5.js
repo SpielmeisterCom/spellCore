@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/executable/buildHtml5',
 	[
+		'spell/shared/build/createDebugPath',
 		'spell/shared/build/copyFiles',
 		'spell/shared/util/createModuleId',
 		'spell/shared/build/processSource',
@@ -17,6 +18,7 @@ define(
 		'rimraf'
 	],
 	function(
+		createDebugPath,
 		copyFiles,
 		createModuleId,
 		processSource,
@@ -79,7 +81,7 @@ define(
 
 			// copying all files required by the build to the output directory "build/release"
 
-			// write data file to "html5/data.js"
+			// write data file to "build/release/html5/data.js"
 			var dataFilePath = path.resolve( outputHtml5Path, 'data.js' )
 
 			writeFile(
@@ -92,11 +94,11 @@ define(
 				)
 			)
 
-			// engine include goes to "html5/spell.js"
+			// engine include goes to "build/release/html5/spell.js"
 			var outputFilePaths = []
 
 			outputFilePaths.push( [
-				path.join( spellCorePath, 'lib', debug ? 'spell.debug.js' : 'spell.release.js' ),
+				createDebugPath( debug, 'spell.debug.js', 'spell.release.js', path.join( spellCorePath, 'lib' ) ),
 				path.join( outputHtml5Path, 'spell.js' )
 			] )
 
