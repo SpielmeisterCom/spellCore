@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/initializeProjectDirectory',
 	[
+		'spell/shared/build/createDebugPath',
 		'spell/shared/build/copyFile',
 		'spell/shared/build/isDirectory',
 		'spell/shared/build/isFile',
@@ -14,6 +15,7 @@ define(
 		'spell/functions'
 	],
 	function(
+		createDebugPath,
 		copyFile,
 		isDirectory,
 		isFile,
@@ -177,13 +179,13 @@ define(
 
 			// copying engine library
 			copyFile(
-				path.join( spellCorePath, 'lib', 'spell.release.js' ),
+				createDebugPath( true, 'spell.debug.js', 'spell.release.js', path.join( spellCorePath, 'lib' ) ),
 				path.join( html5OutputPath, 'spell.js' )
 			)
 
 			// copying stage zero loader
 			copyFile(
-				path.join( spellCorePath, 'lib', 'spell.loader.min.js' ),
+				createDebugPath( true, 'spell.loader.js', 'spell.loader.min.js', path.join( spellCorePath, 'lib' ) ),
 				path.join( outputPath, 'spell.loader.js' )
 			)
 

@@ -12,12 +12,12 @@ define(
 
 
 		/**
-		 * Returns the debugPath if debug mode is on and the debug path exists. Otherwise the releasePath is returned.
+		 * Returns the debugPath if tryDebugPath is true and the debug path exists. Otherwise the releasePath is returned.
 		 */
-		return function( isDebug, debugPath, releasePath, basePath ) {
+		return function( tryDebugPath, debugPath, releasePath, basePath ) {
 			var filePath
 
-			if( isDebug ) {
+			if( tryDebugPath ) {
 				filePath = basePath ? path.join( basePath, debugPath ) : debugPath
 
 				if( fs.existsSync( filePath ) ) {
