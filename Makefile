@@ -41,13 +41,6 @@ cli-js:
 	# creating the javascript includes for the command line tool
 	mkdir -p $(OUT_LIB_DIR)
 
-#	cat spellcli-deploy-begin.js > $(SPELL_CLI_LIB).tmp
-#	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander" >> $(SPELL_CLI_LIB).tmp
-#	cat spellcli-deploy-end.js >> $(SPELL_CLI_LIB).tmp
-
-#	$(NODE) tools/n.js mangle $(SPELL_CLI_LIB).tmp > $(SPELL_CLI_LIB) --no-anonymization
-#	rm $(SPELL_CLI_LIB).tmp
-
 	cat spell.cli.js > $(SPELL_CLI_LIB)
 	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander" >> $(SPELL_CLI_LIB)
 
