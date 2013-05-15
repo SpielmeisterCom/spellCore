@@ -114,36 +114,30 @@ define(
 				isModeDevelopment
 			)
 
-            var translatePartial = _.bind(
-                translate,
-                null,
-                libraryManager,
-                configurationManager.getValue( 'currentLanguage' )
-            )
-
-			_.extend(
-				spell,
-				{
-					assetManager         : assetManager,
-					configurationManager : configurationManager,
-					renderingContext     : renderingContext,
-					audioContext         : audioContext,
-					libraryManager       : libraryManager,
-					moduleLoader         : moduleLoader,
-					entityManager        : entityManager,
-					box2dContext         : createBox2dContext(),
-					box2dWorlds          : {},
-					sceneManager         : sceneManager,
-					sendMessageToEditor  : this.sendMessageToEditor,
-					storage              : storage,
-                    translate            : translatePartial
-				}
+			var translatePartial = _.bind(
+				translate,
+				null,
+				libraryManager,
+				configurationManager.getValue( 'currentLanguage' )
 			)
 
-			// the inputManager must be registered after the renderingContext has been assigned to the spell Object
 			var inputManager = new InputManager( configurationManager, renderingContext )
 			inputManager.init()
-			spell.inputManager = inputManager
+
+			spell.assetManager         = assetManager
+			spell.configurationManager = configurationManager
+			spell.renderingContext     = renderingContext
+			spell.audioContext         = audioContext
+			spell.libraryManager       = libraryManager
+			spell.moduleLoader         = moduleLoader
+			spell.entityManager        = entityManager
+			spell.box2dContext         = createBox2dContext()
+			spell.box2dWorlds          = {}
+			spell.sceneManager         = sceneManager
+			spell.sendMessageToEditor  = this.sendMessageToEditor
+			spell.storage              = storage
+			spell.translate            = translatePartial
+			spell.inputManager         = inputManager
 
 			spell.sceneManager.startScene( spell.runtimeModule.startScene, {}, !isModeDevelopment )
 			spell.mainLoop.run()
@@ -151,7 +145,6 @@ define(
 
 		var init = function( loaderConfig ) {
 			var spell             = {},
-				scenes            = {},
 				logger            = new Logger(),
 				eventManager      = new EventManager(),
 				statisticsManager = new StatisticsManager(),
@@ -159,22 +152,16 @@ define(
 
 			statisticsManager.init()
 
-			_.extend(
-				spell,
-				{
-					eventManager      : eventManager,
-					loaderConfig      : loaderConfig,
-					logger            : logger,
-					mainLoop          : mainLoop,
-					registerTimer     : PlatformKit.registerTimer,
-					runtimeModule     : undefined,
-					scenes            : scenes,
-					statisticsManager : statisticsManager
-				}
-			)
+			spell.eventManager      = eventManager
+			spell.loaderConfig      = loaderConfig
+			spell.logger            = logger
+			spell.mainLoop          = mainLoop
+			spell.registerTimer     = PlatformKit.registerTimer
+			spell.runtimeModule     = undefined
+			spell.scenes            = {}
+			spell.statisticsManager = statisticsManager
 
 			this.spell = spell
-
 
 			if( loaderConfig.mode !== 'deployed' ) {
 				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
