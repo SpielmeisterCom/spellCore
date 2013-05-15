@@ -39,7 +39,7 @@ endif
 .PHONY: cli-js
 cli-js:
 	# creating the javascript includes for the command line tool
-	mkdir -p build
+	mkdir -p $(OUT_LIB_DIR)
 
 #	cat spellcli-deploy-begin.js > $(SPELL_CLI_LIB).tmp
 #	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander" >> $(SPELL_CLI_LIB).tmp
