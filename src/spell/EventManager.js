@@ -23,8 +23,8 @@ define(
 		 * private
 		 */
 
-		var wrapArray = function( scope ) {
-			return ( _.isArray( scope ) ? scope : [ scope ] )
+		var wrapArray = function( x ) {
+			return _.isArray( x ) ? x : [ x ]
 		}
 
 		var waitForChainConfig = false

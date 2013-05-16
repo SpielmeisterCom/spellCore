@@ -67,10 +67,9 @@ if( !window.console ) {
 		for( var name in parameters ) {
 			var value = parameters[ name ]
 
-			config[ name ] = ( value === 'false' || value === 'true' ?
+			config[ name ] = value === 'false' || value === 'true' ?
 				value === 'true' :
 				value
-			)
 		}
 	}
 
@@ -371,11 +370,11 @@ if( !window.console ) {
 				document.getElementById( config.id ).innerHTML = '<p style="color: #FFFFFF">' + message + '</p>'
 			}
 		},
-		addToCache : function( cachedContent ) {
-			this.cache = cachedContent
+		addToCache : function( x ) {
+			this.cache = x
 		},
-		setRuntimeModule : function( module ) {
-			this.runtimeModule = module
+		setApplicationModule : function( x ) {
+			this.applicationModule = x
 		}
 	}
 } )( document )
