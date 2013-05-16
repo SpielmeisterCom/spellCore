@@ -105,10 +105,7 @@ define(
 			spell.translate            = translatePartial
 			spell.inputManager         = inputManager
 
-			if( configurationManager.getValue( 'mode' ) !== 'development_embedded' ) {
-				spell.sceneManager.startScene( spell.applicationModule.startScene, {}, !isModeDevelopment )
-			}
-
+			spell.sceneManager.startScene( spell.applicationModule.startScene, {}, !isModeDevelopment )
 			spell.mainLoop.run()
 		}
 
