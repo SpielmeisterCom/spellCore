@@ -1,8 +1,8 @@
 NEEDJS_LIB                  = src/need.js
-SPELL_COMMON_OPTIONS        = -s src -m spell/client/main -i spell/client/runtimeModule,spell/shared/util/platform/private
+SPELL_COMMON_OPTIONS        = -s src -m spell/client/main -i spell/shared/util/platform/private
 SPELL_COMMON_LIB            = build/spellCore/lib/spell.common.js
 SPELL_COMMON_MIN_LIB        = build/spellCore/lib/spell.common.min.js
-SPELL_HTML5_ADAPTER_OPTIONS = -s src -m spell/client/main -i spell/client/runtimeModule,spell/shared/util/platform/private -e spell/shared/util/platform/private
+SPELL_HTML5_ADAPTER_OPTIONS = -s src -m spell/client/main -i spell/shared/util/platform/private -e spell/shared/util/platform/private
 SPELL_LOADER_LIB            = build/spellCore/lib/spell.loader.js
 SPELL_LOADER_MIN_LIB        = build/spellCore/lib/spell.loader.min.js
 SPELL_HTML5_ADAPTER_LIB     = build/spellCore/lib/spell.html5.js
