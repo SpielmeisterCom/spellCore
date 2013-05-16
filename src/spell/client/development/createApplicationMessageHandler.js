@@ -19,8 +19,6 @@ define(
 				 * @param payload
 				 */
 				startApplicationModule : function( payload ) {
-					debugger
-
 					startEngine( payload.applicationModule )
 				},
 
@@ -30,8 +28,6 @@ define(
 				 * @param payload
 				 */
 				setApplicationModule : function( payload ) {
-					debugger
-
 					setApplicationModule( spell, spell.configurationManager, payload.applicationModule )
 				},
 
@@ -41,8 +37,6 @@ define(
 				 * @param payload
 				 */
 				addToCache : function( payload ) {
-					debugger
-
 					spell.libraryManager.addToCache( payload.cacheContent )
 				},
 
@@ -52,8 +46,6 @@ define(
 				 * @param payload
 				 */
 				startScene : function( payload ) {
-					debugger
-
 					spell.sceneManager.startScene( payload.startSceneId, payload.initialConfig, payload.showLoadingScene )
 				}
 			} )
