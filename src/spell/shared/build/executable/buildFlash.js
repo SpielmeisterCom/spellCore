@@ -228,7 +228,17 @@ define(
 		}
 
 		var createComponentTypeClassName = function( libraryPath ) {
-			return 'Spielmeister.ComponentType.' + libraryPath.replace( /\//g, '.' )
+			var componentId = libraryPath.replace( /\//g, '.' ),
+				result      = 'Spielmeister.ComponentType.'
+
+			// transforming ASCII numbers because mxmcl does not like them in namespaces
+			for( var i = 0, n = componentId.length, charCode; i < n; i++ ) {
+				charCode = componentId.charCodeAt( i )
+
+				result += String.fromCharCode( charCode > 47 && charCode < 58 ? charCode + 17 : charCode )
+			}
+
+			return result
 		}
 
 		var createComponentTypeClassNames = function( componentScripts ) {
