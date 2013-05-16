@@ -21,12 +21,12 @@ define(
 		'use strict'
 
 
-		return function( spell, startEngine, setApplicationModule ) {
+		return function( spell, startEngine ) {
 			return createMessageDispatcher( {
 				'spell.debug.component'   : createComponentMessageHandler( spell ),
 				'spell.debug.entity'      : createEntityMessageHandler( spell ),
 				'spell.debug.library'     : createLibraryMessageHandler( spell ),
-				'spell.debug.application' : createApplicationMessageHandler( spell, startEngine, setApplicationModule ),
+				'spell.debug.application' : createApplicationMessageHandler( spell, startEngine ),
 				'spell.debug.settings'    : createSettingsMessageHandler( spell ),
 				'spell.debug.system'      : createSystemMessageHandler( spell )
 			} )

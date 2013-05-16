@@ -1,15 +1,17 @@
 define(
 	'spell/client/development/createApplicationMessageHandler',
 	[
+		'spell/client/setApplicationModule',
 		'spell/client/development/createMessageDispatcher'
 	],
 	function(
+		setApplicationModule,
 		createMessageDispatcher
 	) {
 		'use strict'
 
 
-		return function( spell, startEngine, setApplicationModule ) {
+		return function( spell, startEngine ) {
 			return createMessageDispatcher( {
 				/**
 				 * Starts the application module. Used in standalone development mode.

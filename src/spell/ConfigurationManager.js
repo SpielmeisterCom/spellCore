@@ -186,28 +186,37 @@ define(
 		}
 
 		ConfigurationManager.prototype = {
-			setValue : function( name, value ) {
-				update( this.config, defaultOptions, validOptions, name, value )
+			setValue : function( key, value ) {
+				update( this.config, defaultOptions, validOptions, key, value )
 
-				if( name === 'currentLanguage' &&
+				if( key === 'currentLanguage' &&
 					!_.contains( this.config.supportedLanguages, value ) ) {
 
 					this.config.currentLanguage = value
 
-				} else if( name === 'screenAspectRatio' ||
-					name === 'screenMode' ) {
+				} else if( key === 'screenAspectRatio' ||
+						key === 'screenMode' ) {
 
 					this.eventManager.publish(
 						Events.AVAILABLE_SCREEN_SIZE_CHANGED,
 						[ PlatformKit.getAvailableScreenSize( this.getValue( 'id' ) ) ]
 					)
 
-				} else if( name === 'screenSize' ) {
+				} else if( key === 'screenSize' ) {
 					vec2.copy( this.config.currentScreenSize, value )
 				}
 			},
-			getValue : function( name ) {
-				return this.config[ name ]
+			getValue : function( key ) {
+				return this.config[ key ]
+			},
+			setConfig : function( x ) {
+				var value
+
+				for( var key in x ) {
+					value = x[ key ]
+
+					this.setValue( key, value )
+				}
 			}
 		}
 
