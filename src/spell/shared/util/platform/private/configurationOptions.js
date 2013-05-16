@@ -11,47 +11,25 @@ define(
 		'use strict'
 
 
-		var extractRenderingBackEnd = function( validValues, value ) {
-			if( value === 'canvas-2d' ) {
-				return RenderingFactory.BACK_END_CANVAS
-
-			} else if( value === 'webgl' ) {
-				return RenderingFactory.BACK_END_WEBGL
-			}
-
-			return false
-		}
-
-		var extractAudioBackEnd = function( validValues, value ) {
-			if( value === 'dummy' ) {
-				return AudioFactory.BACK_END_DUMMY_AUDIO
-
-			} else if( value === 'html5' ) {
-				return AudioFactory.BACK_END_HTML5_AUDIO
-
-			} else if( value === 'web' ) {
-				return AudioFactory.BACK_END_WEB_AUDIO
-
-			} else if( value === 'native' ) {
-                return AudioFactory.BACK_END_NATIVE_AUDIO
-            }
-
-			return false
-		}
-
 		/*
 		 * These are the platform specific options.
 		 */
 		var validOptions = {
 			renderingBackEnd : {
-				validValues  : [ 'canvas-2d', 'webgl' ],
-				configurable : true,
-				extractor    : extractRenderingBackEnd
+				validValues  : [
+					RenderingFactory.BACK_END_CANVAS,
+					RenderingFactory.BACK_END_WEBGL
+				],
+				configurable : true
 			},
 			audioBackEnd : {
-				validValues  : [ 'dummy', 'html5', 'web', 'native' ],
-				configurable : true,
-				extractor    : extractAudioBackEnd
+				validValues  : [
+					AudioFactory.BACK_END_DUMMY_AUDIO,
+					AudioFactory.BACK_END_WEB_AUDIO,
+					AudioFactory.BACK_END_HTML5_AUDIO,
+					AudioFactory.BACK_END_NATIVE_AUDIO
+				],
+				configurable : true
 			},
 			libraryUrl : {
 				configurable : true

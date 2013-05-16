@@ -1,20 +1,20 @@
 define(
-	"spell/shared/util/platform/private/graphics/RenderingFactory",
+	'spell/shared/util/platform/private/graphics/RenderingFactory',
 	[
-		"spell/shared/util/platform/private/graphics/canvas/createCanvasContext",
-		"spell/shared/util/platform/private/graphics/webgl/createWebGlContext",
-		"spell/shared/util/platform/private/graphics/createCanvasNode"
+		'spell/shared/util/platform/private/graphics/canvas/createCanvasContext',
+		'spell/shared/util/platform/private/graphics/webgl/createWebGlContext',
+		'spell/shared/util/platform/private/graphics/createCanvasNode'
 	],
 	function(
 		createCanvasContext,
 		createWebGlContext,
 		createCanvasNode
 	) {
-		"use strict"
+		'use strict'
 
 
-		var BACK_END_WEBGL  = 0,
-			BACK_END_CANVAS = 1
+		var BACK_END_CANVAS = 'canvas-2d',
+			BACK_END_WEBGL  = 'webgl'
 
 		/*
 		 * Creates a rendering context
@@ -29,7 +29,7 @@ define(
 			var canvas = createCanvasNode( id, width, height ),
 				context
 
-			if( canvas === null || canvas === undefined ) throw "Could not create canvas node."
+			if( canvas === null || canvas === undefined ) throw 'Could not create canvas node.'
 
 			// webgl
 			if( requestedBackEnd === undefined ? true : ( requestedBackEnd === BACK_END_WEBGL ) ) {
@@ -50,11 +50,11 @@ define(
 				if( context ) return context
 			}
 
-			throw "Could not create a rendering back-end."
+			throw 'Could not create a rendering back-end.'
 		}
 
 		return {
-			BACK_END_WEBGL  : BACK_END_WEBGL,
+			BACK_END_WEBGL : BACK_END_WEBGL,
 			BACK_END_CANVAS : BACK_END_CANVAS,
 			createContext2d : createContext2d
 		}
