@@ -54,7 +54,6 @@ define(
 		 * The property "configurable" controls if the option can be overridden by the environment configuration set up by the stage-0-loader.
 		 */
 		var validOptions = _.extend(
-			PlatformKit.configurationOptions.validOptions,
 			{
 				/**
 				 * The screen mode which the user requested. Can be either "fit" or "fixed". If set to "fit" the maximum available screen area is used and the
@@ -99,14 +98,14 @@ define(
 				loadingScene : {
 					configurable : true
 				}
-			}
+			},
+			PlatformKit.configurationOptions.validOptions
 		)
 
 		/*
 		 * These options are used when they are not overridden by the environment configuration set up by the stage-0-loader.
 		 */
 		var defaultOptions = _.extend(
-			PlatformKit.configurationOptions.defaultOptions,
 			{
 				screenMode              : 'fixed',
 				screenSize              : [ 300, 200 ],
@@ -116,7 +115,8 @@ define(
 				id                      : 'spell', // dom node id
 				'platform.id'           : PlatformKit.platformDetails.getPlatform(),
 				'platform.hasPlentyRAM' : PlatformKit.platformDetails.hasPlentyRAM()
-			}
+			},
+			PlatformKit.configurationOptions.defaultOptions
 		)
 
 		var update = function( config, defaultOptions, validOptions, name, value ) {
