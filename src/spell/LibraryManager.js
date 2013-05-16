@@ -193,11 +193,11 @@ define(
 		}
 
 
-		var LibraryManager = function( eventManager, renderingContext, soundContext, libraryUrl ) {
+		var LibraryManager = function( eventManager, libraryUrl ) {
 			this.eventManager                = eventManager
 			this.loadingProcesses            = {}
 			this.libraryUrl                  = libraryUrl
-			this.resourceTypeToLoaderFactory = createResourceTypeToLoaderFactory( renderingContext, soundContext )
+			this.resourceTypeToLoaderFactory
 
 			this.cache = {
 				metaData : {},
@@ -257,6 +257,10 @@ define(
 			},
 
 			load : function( libraryPaths, config, next ) {
+				if( !this.resourceTypeToLoaderFactory ) {
+					throw 'Error: Library manager is not properly initialized.'
+				}
+
 				// TODO: work on a list of assets/libraryRecords and call their getLibraryResourcePaths() methods to determine
 				// the required resources instead of a list of libraryPaths
 				if( libraryPaths.length === 0 ) {
@@ -284,6 +288,10 @@ define(
 				)
 
 				return id
+			},
+
+			init : function( audioContext, renderingContext ) {
+				this.resourceTypeToLoaderFactory = createResourceTypeToLoaderFactory( renderingContext, audioContext )
 			}
 		}
 

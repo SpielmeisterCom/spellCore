@@ -63,6 +63,35 @@ define(
 				libraryManager.addToCache( cacheContent )
 			}
 
+			// creating rendering context
+			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
+				spell.eventManager,
+				configurationManager.getValue( 'id' ),
+				configurationManager.getValue( 'currentScreenSize' )[ 0 ],
+				configurationManager.getValue( 'currentScreenSize' )[ 1 ],
+				configurationManager.getValue( 'renderingBackEnd' )
+			)
+
+			PlatformKit.registerOnScreenResize(
+				spell.eventManager,
+				configurationManager.getValue( 'id' ),
+				configurationManager.getValue( 'screenSize' )
+			)
+
+			spell.logger.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
+
+
+			// creating audio context
+			var audioContext = PlatformKit.AudioFactory.createAudioContext(
+				configurationManager.getValue( 'audioBackEnd' )
+			)
+
+			spell.logger.debug( 'created audio context (' + audioContext.getConfiguration().type + ')' )
+
+
+			spell.libraryManager.init( audioContext, renderingContext )
+
+
 			var assetManager = new AssetManager( libraryManager )
 
 			var isModeDevelopment = configurationManager.getValue( 'mode' ) !== 'deployed'
@@ -90,15 +119,17 @@ define(
 				configurationManager.getValue( 'currentLanguage' )
 			)
 
-			var inputManager = new InputManager( configurationManager, spell.renderingContext )
+			var inputManager = new InputManager( configurationManager, renderingContext )
 			inputManager.init()
 
+			spell.audioContext         = audioContext
 			spell.assetManager         = assetManager
 			spell.configurationManager = configurationManager
 			spell.moduleLoader         = moduleLoader
 			spell.entityManager        = entityManager
 			spell.box2dContext         = createBox2dContext()
 			spell.box2dWorlds          = {}
+			spell.renderingContext     = renderingContext
 			spell.sceneManager         = sceneManager
 			spell.sendMessageToEditor  = this.sendMessageToEditor
 			spell.translate            = translatePartial
@@ -118,6 +149,24 @@ define(
 				statisticsManager    = new StatisticsManager(),
 				mainLoop             = createMainLoop( eventManager, statisticsManager )
 
+			configurationManager.setConfig( loaderConfig )
+
+			statisticsManager.init()
+
+			spell.applicationModule    = undefined
+			spell.configurationManager = configurationManager
+			spell.eventManager         = eventManager
+			spell.libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ) )
+			spell.loaderConfig         = loaderConfig
+			spell.logger               = logger
+			spell.mainLoop             = mainLoop
+			spell.registerTimer        = PlatformKit.registerTimer
+			spell.scenes               = {}
+			spell.statisticsManager    = statisticsManager
+			spell.storage              = PlatformKit.createPersistentStorage()
+
+			this.spell = spell
+
 			if( loaderConfig.mode !== 'deployed' ) {
 				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
 				initDebugEnvironment( logger )
@@ -127,55 +176,6 @@ define(
 					_.bind( this.start, this )
 				)
 			}
-
-			configurationManager.setConfig( loaderConfig )
-
-			statisticsManager.init()
-
-			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
-				eventManager,
-				configurationManager.getValue( 'id' ),
-				configurationManager.getValue( 'currentScreenSize' )[ 0 ],
-				configurationManager.getValue( 'currentScreenSize' )[ 1 ],
-				configurationManager.getValue( 'renderingBackEnd' )
-			)
-
-			PlatformKit.registerOnScreenResize(
-				eventManager,
-				configurationManager.getValue( 'id' ),
-				configurationManager.getValue( 'screenSize' )
-			)
-
-			logger.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
-
-			var audioContext = PlatformKit.AudioFactory.createAudioContext(
-				configurationManager.getValue( 'audioBackEnd' )
-			)
-
-			logger.debug( 'created audio context (' + audioContext.getConfiguration().type + ')' )
-
-			var libraryManager = new LibraryManager(
-				eventManager,
-				renderingContext,
-				audioContext,
-				configurationManager.getValue( 'libraryUrl' )
-			)
-
-			spell.audioContext         = audioContext
-			spell.applicationModule    = undefined
-			spell.configurationManager = configurationManager
-			spell.eventManager         = eventManager
-			spell.libraryManager       = libraryManager
-			spell.loaderConfig         = loaderConfig
-			spell.logger               = logger
-			spell.mainLoop             = mainLoop
-			spell.registerTimer        = PlatformKit.registerTimer
-			spell.renderingContext     = renderingContext
-			spell.scenes               = {}
-			spell.statisticsManager    = statisticsManager
-			spell.storage              = PlatformKit.createPersistentStorage()
-
-			this.spell = spell
 		}
 
 
