@@ -241,13 +241,6 @@ define(
 			return result
 		}
 
-		var createComponentTypeClassNames = function( componentScripts ) {
-			return _.map(
-				_.keys( componentScripts ),
-				createComponentTypeClassName
-			)
-		}
-
 		var createAS3ClassProperty = function( attributeDefinition, property ) {
 			var propertyClassName = getAS3ClassNameFromAttributeType( attributeDefinition.type ),
 				isGetter          = property.type === 'get'
@@ -320,23 +313,36 @@ define(
 			)
 		}
 
-		var createComponentTypeClassFiles = function( tmpSourcePath, components, componentScripts ) {
-			_.each(
+		var createComponentTypeDefinitions = function( componentScripts ) {
+			return _.reduce(
 				componentScripts,
-				function( componentScript, key ) {
-					var componentTypeClassName = createComponentTypeClassName( key )
+				function( memo, componentScript, libraryPath ) {
+					var componentTypeClassName  = createComponentTypeClassName( libraryPath),
+						componentTypeDefinition = createComponentTypeDefinition( componentScript.source, componentTypeClassName, libraryPath )
 
-					var componentTypeDefinition = createComponentTypeDefinition( componentScript.source, componentTypeClassName )
+					if( componentTypeDefinition.properties.length > 0 ) {
+						memo[ componentTypeClassName ] = componentTypeDefinition
+					}
 
+					return memo
+				},
+				{}
+			)
+		}
+
+		var createComponentTypeClassFiles = function( tmpSourcePath, components, componentTypeDefinitions ) {
+			_.each(
+				componentTypeDefinitions,
+				function( componentTypeDefinition, componentTypeClassName ) {
 					var component = _.find(
 						components,
 						function( component ) {
-							return component.filePath === key + '.json'
+							return component.filePath === componentTypeDefinition.libraryPath + '.json'
 						}
 					)
 
 					if( !component ) {
-						throw 'Could not find component definition for component script "' + key + '".'
+						throw 'Could not find component definition for component script "' + componentTypeDefinition.libraryPath + '".'
 					}
 
 					var source = createComponentTypeAS3Class( component.content, componentTypeDefinition )
@@ -428,7 +434,9 @@ define(
 
 			console.log( 'generating AS3 classes...' )
 
-			createComponentTypeClassFiles( tmpSourcePath, library.component, componentScripts )
+			var componentTypeDefinitions = createComponentTypeDefinitions( componentScripts )
+
+			createComponentTypeClassFiles( tmpSourcePath, library.component, componentTypeDefinitions )
 
 
 			// create config and compile
@@ -440,7 +448,7 @@ define(
 				projectPath,
 				spellFlashPath,
 				flexSdkPath,
-				createComponentTypeClassNames( componentScripts ),
+				_.keys( componentTypeDefinitions ),
 				compilerConfigFilePath,
 				outputFilePath,
 				anonymizeModuleIds,

@@ -112,7 +112,7 @@ define(
 			return _.map( propertyNodes, createPropertyDefinition )
 		}
 
-		return function( source, className ) {
+		return function( source, className, libraryPath ) {
 			var ast = createAST( source )
 
 			var amdHeaderNode  = getAmdHeaderNode( ast ),
@@ -125,6 +125,7 @@ define(
 				className : className,
 				constructorSource : createSourceFromFunctionNode( ctorNode ),
 				typeName : typeName,
+				libraryPath : libraryPath,
 				properties : createPrototypeDefinition( prototypeNode )
 			}
 		}
