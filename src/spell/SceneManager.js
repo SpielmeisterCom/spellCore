@@ -155,7 +155,7 @@ define(
 
 				} else {
 					this.spell.sendMessageToEditor(
-						'spelled.debug.startScene',
+						'spelled.debug.application.startScene',
 						{
 							startSceneId : startSceneId,
 							initialConfig : initialConfig,
