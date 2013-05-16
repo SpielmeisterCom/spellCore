@@ -279,11 +279,11 @@ if( !window.console ) {
 			}
 
 			if( isModeDeployed ) {
-				engineInstance.start( spell.runtimeModule, spell.cache )
+				engineInstance.start( spell.applicationModule, spell.cache )
 			}
 
 			if( onInitialized ) {
-				onInitialized()
+				onInitialized( engineInstance )
 			}
 		}
 

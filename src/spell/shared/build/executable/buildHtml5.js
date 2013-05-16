@@ -40,7 +40,7 @@ define(
 		var dataFileTemplate = [
 			'%1$s;',
 			'spell.addToCache(%2$s);',
-			'spell.setRuntimeModule(%3$s);'
+			'spell.setApplicationModule(%3$s);'
 		].join( '\n' )
 
 

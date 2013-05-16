@@ -92,7 +92,7 @@
 
 		var isEmbedded = isEmbeddedInIFrame()
 
-		var onInitialized = function() {
+		var onInitialized = function( engineInstance ) {
 			if( isEmbedded ) {
 				// embedded mode, wait for messages from the editor
 				sendMessageToEditor( 'spelled.initialized' )
@@ -102,10 +102,10 @@
 				loadJson(
 					'../project.json',
 					function( request ) {
-						spell.sendDebugMessage( {
-							type : 'spell.debug.runtimeModule.start',
+						engineInstance.sendDebugMessage( {
+							type : 'spell.debug.application.startApplicationModule',
 							payload : {
-								runtimeModule : JSON.parse( request.response || request.responseText )
+								applicationModule : JSON.parse( request.response || request.responseText )
 							}
 						} )
 					}
@@ -123,11 +123,7 @@
 			}
 		}
 
-		var registerMessageHandler = function() {
-			addEvent( window, 'message', handleMessageFromEditor )
-		}
-
-		registerMessageHandler()
+		addEvent( window, 'message', handleMessageFromEditor )
 
 		var config = {
 			mode : isEmbedded ? 'development_embedded' : 'development_standalone',

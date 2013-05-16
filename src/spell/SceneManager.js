@@ -33,10 +33,106 @@ define(
 
 			this.loadingPending = false
 			this.processCmdQueue()
+		}
 
-			if( spell.sendMessageToEditor ) {
-				spell.sendMessageToEditor( 'spelled.debug.executingScene', sceneId )
+		var startScene = function( startSceneId, initialConfig, showLoadingScene ) {
+			var freeMemory = showLoadingScene
+
+			var preNextFrameCallback = function() {
+				var spell = this.spell
+
+				if( this.activeScene ) {
+					this.mainLoop.setRenderCallback()
+					this.mainLoop.setUpdateCallback()
+					this.activeScene.destroy()
+					this.entityManager.init()
+					this.activeScene = undefined
+
+					if( freeMemory &&
+						!spell.configurationManager.getValue( 'platform.hasPlentyRAM' ) ) {
+
+						spell.assetManager.free()
+						spell.libraryManager.free()
+					}
+
+					spell.statisticsManager.reset()
+				}
+
+				var onProgress = this.sendMessageToEditor ?
+					_.bind( this.sendMessageToEditor, null, 'spelled.loadingProgress' ) :
+					undefined
+
+				this.cmdQueue = []
+				this.loadingPending = true
+
+
+				// check if library dependencies of next scene are already available
+				var nextScene = spell.scenes[ startSceneId ]
+
+				if( nextScene &&
+					spell.libraryManager.isAvailable( nextScene.libraryIds ) ) {
+
+					// perform direct transition
+					postLoadedResources.call(
+						this,
+						spell,
+						this.entityManager,
+						this.libraryManager,
+						this.statisticsManager,
+						this.isModeDevelopment,
+						startSceneId,
+						initialConfig
+					)
+
+				} else {
+					var loadingSceneId = spell.configurationManager.getValue( 'loadingScene' )
+
+					if( showLoadingScene &&
+						loadingSceneId ) {
+
+						loadSceneResources(
+							spell,
+							loadingSceneId,
+							_.bind(
+								postLoadedResources,
+								this,
+								spell,
+								this.entityManager,
+								this.libraryManager,
+								this.statisticsManager,
+								this.isModeDevelopment,
+								loadingSceneId,
+								{
+									startSceneId : startSceneId,
+									initialConfig : initialConfig
+								}
+							),
+							onProgress
+						)
+
+					} else {
+						// load library dependencies first
+						loadSceneResources(
+							spell,
+							startSceneId,
+							_.bind(
+								postLoadedResources,
+								this,
+								spell,
+								this.entityManager,
+								this.libraryManager,
+								this.statisticsManager,
+								this.isModeDevelopment,
+								startSceneId,
+								initialConfig
+							),
+							onProgress
+						)
+					}
+				}
 			}
+
+			this.mainLoop.setPreNextFrame( _.bind( preNextFrameCallback, this ) )
 		}
 
 		var SceneManager = function( spell, entityManager, statisticsManager, libraryManager, mainLoop, sendMessageToEditor, isModeDevelopment ) {
@@ -53,105 +149,23 @@ define(
 		}
 
 		SceneManager.prototype = {
-			startScene : function( startSceneId, initialConfig, showLoadingScene ) {
-				var freeMemory = showLoadingScene
+			changeScene : function( startSceneId, initialConfig, showLoadingScene ) {
+				if( !this.isModeDevelopment ) {
+					startScene.call( this, startSceneId, initialConfig, showLoadingScene )
 
-				var preNextFrameCallback = function() {
-					var spell = this.spell
-
-					if( this.activeScene ) {
-						this.mainLoop.setRenderCallback()
-						this.mainLoop.setUpdateCallback()
-						this.activeScene.destroy()
-						this.entityManager.init()
-						this.activeScene = undefined
-
-						if( freeMemory &&
-							!spell.configurationManager.getValue( 'platform.hasPlentyRAM' ) ) {
-
-							spell.assetManager.free()
-							spell.libraryManager.free()
+				} else {
+					this.spell.sendMessageToEditor(
+						'spelled.debug.startScene',
+						{
+							startSceneId : startSceneId,
+							initialConfig : initialConfig,
+							showLoadingScene : showLoadingScene
 						}
-
-						spell.statisticsManager.reset()
-					}
-
-					var onProgress = this.sendMessageToEditor ?
-						_.bind( this.sendMessageToEditor, null, 'spelled.loadingProgress' ) :
-						undefined
-
-					this.cmdQueue = []
-					this.loadingPending = true
-
-
-					// check if library dependencies of next scene are already available
-					var nextScene = spell.scenes[ startSceneId ]
-
-					if( nextScene &&
-						spell.libraryManager.isAvailable( nextScene.libraryIds ) ) {
-
-						// perform direct transition
-						postLoadedResources.call(
-							this,
-							spell,
-							this.entityManager,
-							this.libraryManager,
-							this.statisticsManager,
-							this.isModeDevelopment,
-							startSceneId,
-							initialConfig
-						)
-
-					} else {
-						var loadingSceneId = spell.configurationManager.getValue( 'loadingScene' )
-
-						if( showLoadingScene &&
-							loadingSceneId ) {
-
-							loadSceneResources(
-								spell,
-								loadingSceneId,
-								_.bind(
-									postLoadedResources,
-									this,
-									spell,
-									this.entityManager,
-									this.libraryManager,
-									this.statisticsManager,
-									this.isModeDevelopment,
-									loadingSceneId,
-									{
-										startSceneId : startSceneId,
-										initialConfig : initialConfig
-									}
-								),
-								onProgress
-							)
-
-						} else {
-							// load library dependencies first
-							loadSceneResources(
-								spell,
-								startSceneId,
-								_.bind(
-									postLoadedResources,
-									this,
-									spell,
-									this.entityManager,
-									this.libraryManager,
-									this.statisticsManager,
-									this.isModeDevelopment,
-									startSceneId,
-									initialConfig
-								),
-								onProgress
-							)
-						}
-					}
+					)
 				}
-
-				this.mainLoop.setPreNextFrame( _.bind( preNextFrameCallback, this ) )
 			},
+
+			startScene : startScene,
 
 			processCmdQueue : function() {
 				if( this.loadingPending ) {

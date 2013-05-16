@@ -25,10 +25,6 @@ define(
 		'use strict'
 
 
-		/*
-		 * private
-		 */
-
 		var createScreenSize = function( availableScreenSize, aspectRatio ) {
 			return aspectRatio ?
 				createIncludedRectangle( availableScreenSize, aspectRatio, true ) :
@@ -57,156 +53,97 @@ define(
 		 *
 		 * The property "configurable" controls if the option can be overridden by the environment configuration set up by the stage-0-loader.
 		 */
-		var validOptions = {
-			/**
-			 * The screen mode which the user requested. Can be either "fit" or "fixed". If set to "fit" the maximum available screen area is used and the
-			 * option "screenSize" is ignored. If set to "fixed" the option "screenSize" is used to determine the used screen size. The default is "fit".
-			 */
-			screenMode : {
-				validValues : [ 'fill', 'fit', 'fixed' ],
-				configurable : true,
-				extractor : extractDefault
-			},
-			// The screen size which the user requested.
-			screenSize : {
-				configurable : true,
-				extractor : extractVec2
-			},
-			// The screen size which is currently used.
-			currentScreenSize : {
-				configurable : false
-			},
-			id : {
-				configurable : true
-			},
-			mode : {
-				validValues : [ 'deployed', 'development_embedded', 'development_standalone' ],
-				configurable : true
-			},
-			quadTreeSize : {
-				configurable : true
-			},
-			projectId : {
-				configurable : true
-			},
-			supportedLanguages : {
-				configurable : true
-			},
-			defaultLanguage : {
-				configurable : true
-			},
-			currentLanguage : {
-				configurable : true
-			},
-			loadingScene : {
-				configurable : true
+		var validOptions = _.extend(
+			PlatformKit.configurationOptions.validOptions,
+			{
+				/**
+				 * The screen mode which the user requested. Can be either "fit" or "fixed". If set to "fit" the maximum available screen area is used and the
+				 * option "screenSize" is ignored. If set to "fixed" the option "screenSize" is used to determine the used screen size. The default is "fit".
+				 */
+				screenMode : {
+					validValues : [ 'fill', 'fit', 'fixed' ],
+					configurable : true,
+					extractor : extractDefault
+				},
+				// The screen size which the user requested.
+				screenSize : {
+					configurable : true,
+					extractor : extractVec2
+				},
+				// The screen size which is currently used.
+				currentScreenSize : {
+					configurable : false
+				},
+				id : {
+					configurable : true
+				},
+				mode : {
+					validValues : [ 'deployed', 'development_embedded', 'development_standalone' ],
+					configurable : true
+				},
+				quadTreeSize : {
+					configurable : true
+				},
+				projectId : {
+					configurable : true
+				},
+				supportedLanguages : {
+					configurable : true
+				},
+				defaultLanguage : {
+					configurable : true
+				},
+				currentLanguage : {
+					configurable : true
+				},
+				loadingScene : {
+					configurable : true
+				}
 			}
-		}
+		)
 
 		/*
 		 * These options are used when they are not overridden by the environment configuration set up by the stage-0-loader.
 		 */
-		var defaultOptions = {
-			screenMode        : 'fixed',
-			screenSize        : [ 300, 200 ],
-			currentScreenSize : [ 300, 200 ],
-			quadTreeSize      : 1048576, // 2^20
-			projectId         : '',
-			id                : 'spell' // dom node id
-		}
-
-		var createConfiguration = function( parameters, defaultOptions, validOptions ) {
-			if( !defaultOptions ) defaultOptions = {}
-			if( !validOptions ) validOptions = {}
-
-			// PlatformKit.configurationOptions.* holds the platform specific options
-			_.defaults( defaultOptions, PlatformKit.configurationOptions.defaultOptions )
-			_.defaults( validOptions, PlatformKit.configurationOptions.validOptions )
-
-			var suppliedParameters = parameters
-
-			// filter out parameters that are not configurable
-			suppliedParameters = _.reduce(
-				suppliedParameters,
-				function( memo, value, key ) {
-					var option = validOptions[ key ]
-
-					if( option &&
-						!!option.configurable ) {
-
-						memo[ key ] = value
-					}
-
-					return memo
-				},
-				{}
-			)
-
-			_.defaults( suppliedParameters, defaultOptions )
-
-			var config = _.reduce(
-				suppliedParameters,
-				function( memo, optionValue, optionName ) {
-					var option = validOptions[ optionName ],
-						configValue = false
-
-					if( !option ) throw 'Error: Configuration option \'' + optionName + '\' is not supported.'
-
-					if( option.extractor ) {
-						configValue = option.extractor( option.validValues, optionValue )
-
-					} else {
-						configValue = optionValue
-					}
-
-
-					if( configValue !== undefined ) {
-						memo[ optionName ] = configValue
-
-					} else {
-						// use the default value
-						memo[ optionName ] = option.extractor( option.validValues, defaultOptions[ optionName ] )
-					}
-
-					return memo
-				},
-				{}
-			)
-
-			// initialize default values
-			vec2.copy( config.currentScreenSize, config.screenSize )
-
-			if( !_.contains( config.supportedLanguages, config.currentLanguage ) ) {
-				config.currentLanguage = config.defaultLanguage
+		var defaultOptions = _.extend(
+			PlatformKit.configurationOptions.defaultOptions,
+			{
+				screenMode              : 'fixed',
+				screenSize              : [ 300, 200 ],
+				currentScreenSize       : [ 300, 200 ],
+				quadTreeSize            : 1048576, // 2^20
+				projectId               : '',
+				id                      : 'spell', // dom node id
+				'platform.id'           : PlatformKit.platformDetails.getPlatform(),
+				'platform.hasPlentyRAM' : PlatformKit.platformDetails.hasPlentyRAM()
 			}
+		)
 
-			return config
+		var update = function( config, defaultOptions, validOptions, name, value ) {
+			var option = validOptions[ name ]
+
+			if( option ) {
+				if( !option.configurable ) {
+					return config
+				}
+
+				var result = option.extractor ?
+					option.extractor( option.validValues, value ) :
+					value
+
+				config[ name ] = result === undefined ?
+					option.extractor( option.validValues, defaultOptions[ name ] ) :
+					result
+
+			} else {
+				config[ name ] = value
+			}
 		}
 
-		/*
-		 * public
-		 */
 
-		var ConfigurationManager = function( eventManager, loaderConfig, projectConfig ) {
-			this.config = {}
+		var ConfigurationManager = function( eventManager ) {
+			this.config       = defaultOptions
 			this.eventManager = eventManager
-
-			_.extend(
-				this.config,
-				createConfiguration(
-					_.defaults(
-						loaderConfig || {},
-						projectConfig || {}
-					),
-					defaultOptions,
-					validOptions
-				)
-			)
-
-			var platformDetails = PlatformKit.platformDetails
-
-			this.setValue( 'platform.id', platformDetails.getPlatform() )
-			this.setValue( 'platform.hasPlentyRAM', platformDetails.hasPlentyRAM() )
 
 			eventManager.subscribe(
 				[ Events.AVAILABLE_SCREEN_SIZE_CHANGED ],
@@ -250,15 +187,23 @@ define(
 
 		ConfigurationManager.prototype = {
 			setValue : function( name, value ) {
-				this.config[ name ] = value
+				update( this.config, defaultOptions, validOptions, name, value )
 
-				if( name === 'screenAspectRatio' ||
+				if( name === 'currentLanguage' &&
+					!_.contains( this.config.supportedLanguages, value ) ) {
+
+					this.config.currentLanguage = value
+
+				} else if( name === 'screenAspectRatio' ||
 					name === 'screenMode' ) {
 
 					this.eventManager.publish(
 						Events.AVAILABLE_SCREEN_SIZE_CHANGED,
 						[ PlatformKit.getAvailableScreenSize( this.getValue( 'id' ) ) ]
 					)
+
+				} else if( name === 'screenSize' ) {
+					vec2.copy( this.config.currentScreenSize, value )
 				}
 			},
 			getValue : function( name ) {

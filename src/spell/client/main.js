@@ -48,18 +48,29 @@ define(
 		'use strict'
 
 
-		var start = function( runtimeModule, cacheContent ) {
-			var spell = this.spell
-			spell.runtimeModule = runtimeModule
-
-			if( !runtimeModule ) {
-				throw 'Error: No runtime module defined. Please provide a runtime module.'
+		var setApplicationModule = function( spell, configurationManager, applicationModule ) {
+			if( !applicationModule ) {
+				throw 'Error: Missing application module. Please provide a application module.'
 			}
+
+			spell.applicationModule = applicationModule
+
+			_.each(
+				_.extend( applicationModule.config, spell.loaderConfig ),
+				function( value, name ) {
+					configurationManager.setValue( name, value )
+				}
+			)
+		}
+
+		var start = function( applicationModule, cacheContent ) {
+			var spell                = this.spell,
+				configurationManager = spell.configurationManager
+
+			setApplicationModule( spell, configurationManager, applicationModule )
 
 			spell.logger.setSendMessageToEditor( this.sendMessageToEditor )
 			spell.logger.debug( 'client started' )
-
-			var configurationManager = new ConfigurationManager( spell.eventManager, spell.loaderConfig, runtimeModule.config )
 
 			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
 				spell.eventManager,
@@ -83,8 +94,6 @@ define(
 
 			spell.logger.debug( 'created audio context (' + audioContext.getConfiguration().type + ')' )
 
-			var storage = PlatformKit.createPersistentStorage()
-
 			var libraryManager = new LibraryManager(
 				spell.eventManager,
 				renderingContext,
@@ -92,7 +101,9 @@ define(
 				configurationManager.getValue( 'libraryUrl' )
 			)
 
-			if( cacheContent ) libraryManager.addToCache( cacheContent )
+			if( cacheContent ) {
+				libraryManager.addToCache( cacheContent )
+			}
 
 			var assetManager = new AssetManager( libraryManager )
 
@@ -135,31 +146,36 @@ define(
 			spell.box2dWorlds          = {}
 			spell.sceneManager         = sceneManager
 			spell.sendMessageToEditor  = this.sendMessageToEditor
-			spell.storage              = storage
 			spell.translate            = translatePartial
 			spell.inputManager         = inputManager
 
-			spell.sceneManager.startScene( spell.runtimeModule.startScene, {}, !isModeDevelopment )
+			if( configurationManager.getValue( 'mode' ) !== 'development_embedded' ) {
+				spell.sceneManager.startScene( spell.applicationModule.startScene, {}, !isModeDevelopment )
+			}
+
 			spell.mainLoop.run()
 		}
 
 		var init = function( loaderConfig ) {
-			var spell             = {},
-				logger            = new Logger(),
-				eventManager      = new EventManager(),
-				statisticsManager = new StatisticsManager(),
-				mainLoop          = createMainLoop( eventManager, statisticsManager )
+			var spell                = {},
+				logger               = new Logger(),
+				eventManager         = new EventManager(),
+				configurationManager = new ConfigurationManager( eventManager ),
+				statisticsManager    = new StatisticsManager(),
+				mainLoop             = createMainLoop( eventManager, statisticsManager )
 
 			statisticsManager.init()
 
-			spell.eventManager      = eventManager
-			spell.loaderConfig      = loaderConfig
-			spell.logger            = logger
-			spell.mainLoop          = mainLoop
-			spell.registerTimer     = PlatformKit.registerTimer
-			spell.runtimeModule     = undefined
-			spell.scenes            = {}
-			spell.statisticsManager = statisticsManager
+			spell.eventManager         = eventManager
+			spell.configurationManager = configurationManager
+			spell.loaderConfig         = loaderConfig
+			spell.logger               = logger
+			spell.mainLoop             = mainLoop
+			spell.registerTimer        = PlatformKit.registerTimer
+			spell.applicationModule    = undefined
+			spell.scenes               = {}
+			spell.statisticsManager    = statisticsManager
+			spell.storage              = PlatformKit.createPersistentStorage()
 
 			this.spell = spell
 
@@ -169,7 +185,8 @@ define(
 
 				this.debugMessageHandler = createDebugMessageHandler(
 					this.spell,
-					_.bind( this.start, this )
+					_.bind( this.start, this ),
+					setApplicationModule
 				)
 			}
 		}

@@ -5,7 +5,7 @@ define(
 		'spell/client/development/createComponentMessageHandler',
 		'spell/client/development/createEntityMessageHandler',
 		'spell/client/development/createLibraryMessageHandler',
-		'spell/client/development/createRuntimeModuleMessageHandler',
+		'spell/client/development/createApplicationMessageHandler',
 		'spell/client/development/createSettingsMessageHandler',
 		'spell/client/development/createSystemMessageHandler'
 	],
@@ -14,21 +14,21 @@ define(
 		createComponentMessageHandler,
 		createEntityMessageHandler,
 		createLibraryMessageHandler,
-		createRuntimeModuleMessageHandler,
+		createApplicationMessageHandler,
 		createSettingsMessageHandler,
 		createSystemMessageHandler
 	) {
 		'use strict'
 
 
-		return function( spell, startEngine ) {
+		return function( spell, startEngine, setApplicationModule ) {
 			return createMessageDispatcher( {
-				'spell.debug.component'     : createComponentMessageHandler( spell ),
-				'spell.debug.entity'        : createEntityMessageHandler( spell ),
-				'spell.debug.library'       : createLibraryMessageHandler( spell ),
-				'spell.debug.runtimeModule' : createRuntimeModuleMessageHandler( spell, startEngine ),
-				'spell.debug.settings'      : createSettingsMessageHandler( spell ),
-				'spell.debug.system'        : createSystemMessageHandler( spell )
+				'spell.debug.component'   : createComponentMessageHandler( spell ),
+				'spell.debug.entity'      : createEntityMessageHandler( spell ),
+				'spell.debug.library'     : createLibraryMessageHandler( spell ),
+				'spell.debug.application' : createApplicationMessageHandler( spell, startEngine, setApplicationModule ),
+				'spell.debug.settings'    : createSettingsMessageHandler( spell ),
+				'spell.debug.system'      : createSystemMessageHandler( spell )
 			} )
 		}
 	}
