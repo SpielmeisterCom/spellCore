@@ -58,7 +58,6 @@ define(
 			setApplicationModule( spell, configurationManager, applicationModule )
 
 			spell.logger.setSendMessageToEditor( this.sendMessageToEditor )
-			spell.logger.debug( 'client started' )
 
 			if( cacheContent ) {
 				libraryManager.addToCache( cacheContent )
@@ -107,6 +106,8 @@ define(
 
 			spell.sceneManager.startScene( spell.applicationModule.startScene, {}, !isModeDevelopment )
 			spell.mainLoop.run()
+
+			spell.logger.debug( 'client started' )
 		}
 
 		var init = function( loaderConfig ) {
@@ -116,6 +117,16 @@ define(
 				configurationManager = new ConfigurationManager( eventManager ),
 				statisticsManager    = new StatisticsManager(),
 				mainLoop             = createMainLoop( eventManager, statisticsManager )
+
+			if( loaderConfig.mode !== 'deployed' ) {
+				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
+				initDebugEnvironment( logger )
+
+				this.debugMessageHandler = createDebugMessageHandler(
+					spell,
+					_.bind( this.start, this )
+				)
+			}
 
 			configurationManager.setConfig( loaderConfig )
 
@@ -150,7 +161,6 @@ define(
 				configurationManager.getValue( 'libraryUrl' )
 			)
 
-
 			spell.audioContext         = audioContext
 			spell.applicationModule    = undefined
 			spell.configurationManager = configurationManager
@@ -165,18 +175,7 @@ define(
 			spell.statisticsManager    = statisticsManager
 			spell.storage              = PlatformKit.createPersistentStorage()
 
-
 			this.spell = spell
-
-			if( loaderConfig.mode !== 'deployed' ) {
-				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
-				initDebugEnvironment( logger )
-
-				this.debugMessageHandler = createDebugMessageHandler(
-					this.spell,
-					_.bind( this.start, this )
-				)
-			}
 		}
 
 
