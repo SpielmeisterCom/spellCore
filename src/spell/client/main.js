@@ -55,7 +55,13 @@ define(
 				configurationManager = spell.configurationManager,
 				libraryManager       = spell.libraryManager
 
-			setApplicationModule( spell, configurationManager, applicationModule )
+			setApplicationModule(
+                spell,
+                configurationManager,
+                applicationModule,
+                applicationModule.config,
+                spell.loaderConfig
+            )
 
 			spell.logger.setSendMessageToEditor( this.sendMessageToEditor )
 

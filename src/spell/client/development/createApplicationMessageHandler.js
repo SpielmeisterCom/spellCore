@@ -28,7 +28,13 @@ define(
 				 * @param payload
 				 */
 				setApplicationModule : function( payload ) {
-					setApplicationModule( spell, spell.configurationManager, payload.applicationModule )
+                    setApplicationModule(
+                        spell,
+                        spell.configurationManager,
+                        payload.applicationModule,
+                        payload.applicationModule.config,
+                        spell.loaderConfig
+                    )
 				},
 
 				/**
