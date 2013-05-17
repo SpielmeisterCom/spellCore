@@ -1,6 +1,11 @@
 define(
 	'spell/shared/util/platform/private/getAvailableScreenSize',
-	function() {
+    [
+        'spell/shared/util/platform/private/isHtml5Ejecta'
+    ],
+	function(
+        isHtml5Ejecta
+    ) {
 		'use strict'
 
 
@@ -27,6 +32,10 @@ define(
 		}
 
 		return function( id ) {
+            if( isHtml5Ejecta ) {
+                return [ window.innerWidth, window.innerHeight ]
+            }
+
 			if( !id ) {
 				throw 'Missing container id argument. Please call the function with the spell container id.'
 			}
