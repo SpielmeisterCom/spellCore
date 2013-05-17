@@ -31,6 +31,12 @@ define(
 				return this
 		    },
 		    insert : function( key, value, index ) {
+				var foundIndex = this.keys.indexOf( key )
+
+				if( foundIndex !== -1 ) {
+					this.removeByIndex( foundIndex )
+				}
+
 		        this.keys.splice( index, 0, key )
 		        this.values.splice( index, 0, value )
 
