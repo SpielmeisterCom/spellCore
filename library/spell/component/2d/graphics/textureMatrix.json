@@ -3,7 +3,7 @@
 	"readonly": true,
 	"title": "2D Texture Matrix",
 	"doc": "the texture matrix by which the appearance coordinates are transformed by",
-	"icon": "/resources/images/icons/component_2d_transform.png",
+	"icon": "resources/images/icons/component_2d_transform.png",
 	"attributes": [
 		{
 			"name": "translation",

@@ -3,7 +3,7 @@
 	"type": "component",
 	"title": "Key Frame Animation",
 	"doc": "",
-    "icon": "/resources/images/icons/component_animation_keyframeanimation.png",
+    "icon": "resources/images/icons/component_animation_keyframeanimation.png",
 	"attributes": [
 		{
 			"name": "assetId",

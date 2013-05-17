@@ -3,7 +3,7 @@
 	"type": "component",
 	"title": "2D Animated Appearance",
 	"doc": "",
-    "icon": "/resources/images/icons/component_2d_graphics_animatedappearance.png",
+    "icon": "resources/images/icons/component_2d_graphics_animatedappearance.png",
 	"attributes": [
 		{
 			"name": "assetId",

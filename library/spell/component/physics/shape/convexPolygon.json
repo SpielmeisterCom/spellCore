@@ -4,7 +4,7 @@
 	"readonly": true,
 	"title": "Physics Shape - Convex Polygon",
 	"doc": "A convex polygon. The vertices must be in CCW order for a right-handed coordinate system with the z-axis coming out of the screen. ",
-    "icon": "/resources/images/icons/component_physics_box.png",
+    "icon": "resources/images/icons/component_physics_box.png",
     "attributes": [
 		{
 			"name": "vertices",

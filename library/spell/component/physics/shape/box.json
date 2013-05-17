@@ -4,7 +4,7 @@
 	"readonly": true,
 	"title": "Physics Shape - Box",
 	"doc": "",
-    "icon": "/resources/images/icons/component_physics_box.png",
+    "icon": "resources/images/icons/component_physics_box.png",
     "attributes": [
 		{
 			"name": "dimensions",

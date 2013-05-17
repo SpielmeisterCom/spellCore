@@ -3,7 +3,7 @@
 	"type": "component",
 	"title": "Sound",
 	"doc": "",
-	"icon": "/resources/images/icons/asset-sound.png",
+	"icon": "resources/images/icons/asset-sound.png",
 	"attributes": [
 		{
 			"name": "assetId",
