@@ -33,6 +33,10 @@ define(
 
 			this.loadingPending = false
 			this.processCmdQueue()
+
+			if( this.sendMessageToEditor ) {
+				this.sendMessageToEditor( 'spelled.debug.application.sceneStarted', sceneId )
+			}
 		}
 
 		var startScene = function( startSceneId, initialConfig, showLoadingScene ) {
