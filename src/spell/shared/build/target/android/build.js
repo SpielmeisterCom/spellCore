@@ -149,6 +149,8 @@ define(
 					// updating sdk directory
 					var sdkPath = path.join( tmpProjectPath, 'sdk' )
 
+					rmdir.sync( path.join( resourcesPath, 'fonts' ) )
+					rmdir.sync( path.join( resourcesPath, 'images' ) )
 					rmdir.sync( sdkPath )
 					mkdirp.sync( sdkPath )
 
