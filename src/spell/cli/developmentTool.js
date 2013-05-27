@@ -99,8 +99,9 @@ define(
 				spellCorePath  = getSpellCorePath( basePath, isDevEnv )
 
 			var buildTargets = {
-				HTML5 : 'html5',
+				ANDROID : 'android',
 				FLASH : 'flash',
+				HTML5 : 'html5',
 				ALL : 'all'
 			}
 

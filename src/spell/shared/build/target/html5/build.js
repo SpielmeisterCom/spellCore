@@ -1,6 +1,7 @@
 define(
-	'spell/shared/build/executable/buildHtml5',
+	'spell/shared/build/target/html5/build',
 	[
+		'spell/shared/build/createDataFileContent',
 		'spell/shared/build/createDebugPath',
 		'spell/shared/build/copyFiles',
 		'spell/shared/util/createModuleId',
@@ -8,6 +9,7 @@ define(
 		'spell/shared/build/isDevEnvironment',
 		'spell/shared/build/isFile',
 		'spell/shared/build/loadAssociatedScriptModules',
+		'spell/shared/build/writeFile',
 		'spell/shared/util/hashModuleId',
 
 		'amd-helper',
@@ -18,6 +20,7 @@ define(
 		'rimraf'
 	],
 	function(
+		createDataFileContent,
 		createDebugPath,
 		copyFiles,
 		createModuleId,
@@ -25,6 +28,7 @@ define(
 		isDevEnvironment,
 		isFile,
 		loadAssociatedScriptModules,
+		writeFile,
 		hashModuleId,
 
 		amdHelper,
@@ -37,36 +41,10 @@ define(
 		'use strict'
 
 
-		var dataFileTemplate = [
-			'%1$s;',
-			'spell.addToCache(%2$s);',
-			'spell.setApplicationModule(%3$s);'
-		].join( '\n' )
-
-
-		var writeFile = function( filePath, content ) {
-			// delete file if it already exists
-			if( isFile( filePath ) ) {
-				fs.unlinkSync( filePath )
-			}
-
-			fs.writeFileSync( filePath, content, 'utf-8' )
-		}
-
-		var createDataFileContent = function( dataFileTemplate, scriptSource, cacheContent, projectConfig ) {
-			return _s.sprintf(
-				dataFileTemplate,
-				scriptSource,
-				JSON.stringify( cacheContent ),
-				JSON.stringify( projectConfig )
-			)
-		}
-
-
 		return function( spellCorePath, projectPath, projectLibraryPath, outputPath, outputLibraryPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
 			var outputHtml5Path = path.join( outputPath, 'html5' )
 
-			// clean output directory
+			// init output directory
 			rmdir.sync( outputHtml5Path )
 			mkdirp.sync( outputHtml5Path )
 
@@ -86,12 +64,7 @@ define(
 
 			writeFile(
 				dataFilePath,
-				createDataFileContent(
-					dataFileTemplate,
-					scriptSource,
-					cacheContent,
-					projectConfig
-				)
+				createDataFileContent( scriptSource, cacheContent, projectConfig )
 			)
 
 			// engine include goes to "build/release/html5/spell.js"

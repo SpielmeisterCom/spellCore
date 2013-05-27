@@ -2,16 +2,19 @@ define(
 	'spell/shared/build/executeCreateBuild',
 	[
 		'spell/shared/build/createDebugPath',
+		'spell/shared/build/createProjectLibraryFilePaths',
 		'spell/shared/build/copyFiles',
 		'spell/shared/util/createModuleId',
 		'spell/shared/build/processSource',
 		'spell/shared/build/isFile',
 		'spell/shared/build/loadAssociatedScriptModules',
-		'spell/shared/build/executable/buildHtml5',
-		'spell/shared/build/executable/buildFlash',
+		'spell/shared/build/target/android/build',
+		'spell/shared/build/target/flash/build',
+		'spell/shared/build/target/html5/build',
 		'spell/shared/util/createCacheContent',
 		'spell/shared/util/createIdFromLibraryFilePath',
 		'spell/shared/util/hashModuleId',
+		'spell/functions',
 
 		'amd-helper',
 		'fs',
@@ -21,16 +24,19 @@ define(
 	],
 	function(
 		createDebugPath,
+		createProjectLibraryFilePaths,
 		copyFiles,
 		createModuleId,
 		processSource,
 		isFile,
 		loadAssociatedScriptModules,
-		buildHtml5,
+		buildAndroid,
 		buildFlash,
+		buildHtml5,
 		createCacheContent,
 		createIdFromLibraryFilePath,
 		hashModuleId,
+		_,
 
 		amdHelper,
 		fs,
@@ -45,8 +51,9 @@ define(
 		var OUTPUT_PATH  = 'build/release'
 
 		var targetToBuilder = {
-			html5 : buildHtml5,
-			flash : buildFlash
+			android : buildAndroid,
+			flash : buildFlash,
+			html5 : buildHtml5
 		}
 
 
@@ -173,19 +180,6 @@ define(
 				},
 				{}
 			)
-		}
-
-		var createProjectLibraryFilePaths = function( projectLibraryPath ) {
-			var filePaths = _.filter(
-				flob.sync( '**/*', { cwd : projectLibraryPath } ),
-				function( filePath ) {
-					var extension = path.extname( filePath )
-
-					return extension !== '.js' && extension !== '.json'
-				}
-			)
-
-			return filePaths
 		}
 
 

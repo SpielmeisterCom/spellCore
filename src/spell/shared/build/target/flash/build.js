@@ -1,5 +1,5 @@
 define(
-	'spell/shared/build/executable/buildFlash',
+	'spell/shared/build/target/flash/build',
 	[
 		'spell/shared/build/ast/createAST',
 		'spell/shared/build/ast/createComponentTypeDefinition',
@@ -10,6 +10,7 @@ define(
 		'spell/shared/build/isFile',
 		'spell/shared/build/loadAssociatedScriptModules',
 		'spell/shared/build/processSource',
+		'spell/shared/build/writeFile',
 
 		'child_process',
 		'fs',
@@ -33,6 +34,7 @@ define(
 		isFile,
 		loadAssociatedScriptModules,
 		processSource,
+		writeFile,
 
 		child_process,
 		fs,
@@ -139,15 +141,6 @@ define(
 			)
 
 			return createModuleDefinitionFileTemplate( className, indentedSource, debug )
-		}
-
-		var writeFile = function( filePath, data ) {
-			// delete file if it already exists
-			if( isFile( filePath ) ) {
-				fs.unlinkSync( filePath )
-			}
-
-			fs.writeFileSync( filePath, data )
 		}
 
 		var writeCompilerConfigFile = function( projectPath, spellFlashPath, flexSdkPath, componentTypeClasses, compilerConfigFilePath, outputFilePath, anonymizeModuleIds, debug ) {
