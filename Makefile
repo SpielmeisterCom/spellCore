@@ -42,7 +42,7 @@ cli-js:
 	mkdir -p $(OUT_LIB_DIR)
 
 	cat spell.cli.js > $(SPELL_CLI_LIB)
-	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander" >> $(SPELL_CLI_LIB)
+	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander,ff" >> $(SPELL_CLI_LIB)
 
 
 .PHONY: cli
