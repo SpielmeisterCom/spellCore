@@ -578,21 +578,24 @@ document.addEventListener = function(evtName, handler) {
     EVENT_HANDLER[ evtName ] = handler;
 }
 
-var storage = {}
-
 window.localStorage = {
-    setItem: function(item, content) {
-        storage[ item ] = content;
-    },
+	setItem : function( key, value ) {
+		NATIVE.localStorage.setItem( key.toString(), value.toString() )
+	},
+	getItem : function( key ) {
+		return NATIVE.localStorage.getItem( key.toString() || null )
+	},
+	removeItem : function( key ) {
+		NATIVE.localStorage.removeItem( key.toString() )
+	},
+	clear : function() {
+		NATIVE.localStorage.clear()
+	},
+	key : function() {
+		logger.log( 'ERROR: localStorage.key() unimplemented' )
 
-    getItem: function(item) {
-        return storage[ item ];
-    },
-
-    removeItem: function( item ) {
-        delete storage[ item ];
-    }
-
+		return null
+	}
 };
 
 if (!NATIVE.gl.initialized) {
