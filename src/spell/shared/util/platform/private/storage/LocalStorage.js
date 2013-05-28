@@ -9,31 +9,26 @@ define(
 		encodeValue
 	) {
 		'use strict'
-		var PREFIX = "SpellJS-"
 
-		/*
-		 * public
-		 */
+
+		var PREFIX = 'SpellJS-'
+
 		var LocalStorage = function() {
-			var me = this
-
-			me.store = window.localStorage
+			this.store = window.localStorage
 		}
 
 		LocalStorage.prototype = {
-			clear : function( name ){
+			clear : function( name ) {
 				this.store.removeItem( PREFIX + name )
 			},
-			set : function( name, value ){
-				var me = this
+			set : function( name, value ) {
+				this.clear( name )
 
-				me.clear( name )
-
-				if ( typeof value == "undefined" || value === null ) return
-
-				me.store.setItem( PREFIX + name, encodeValue( value ) )
+				if( value ) {
+					this.store.setItem( PREFIX + name, encodeValue( value ) )
+				}
 			},
-			get : function( name ){
+			get : function( name ) {
 				return decodeValue( this.store.getItem( PREFIX + name ) )
 			}
 		}
