@@ -1,7 +1,7 @@
 var EVENT_HANDLER = {},
 	TICK_CALLBACK
 
-window.requestAnimationFrame = function( f ) {
+GLOBAL.requestAnimationFrame = function( f ) {
     TICK_CALLBACK = f
 }
 
@@ -572,10 +572,10 @@ GLOBAL.Image = Image;
 //</XMLHttpRequest>
 
 //pretend that we support HTML5 Pointer API
-window.navigator.pointerEnabled = true;
-window.navigator.maxTouchPoints = 2;
+GLOBAL.navigator.pointerEnabled = true;
+GLOBAL.navigator.maxTouchPoints = 2;
 
-window.addEventListener = function(evtName) {
+GLOBAL.addEventListener = function(evtName) {
     console.log('TODO: implement evtHandler for window ' + evtName);
     //TODO: implement
 }
@@ -585,7 +585,7 @@ document.addEventListener = function(evtName, handler) {
     EVENT_HANDLER[ evtName ] = handler;
 }
 
-window.localStorage = {
+GLOBAL.localStorage = {
 	setItem : function( key, value ) {
 		NATIVE.localStorage.setItem( key.toString(), value.toString() )
 	},
@@ -640,8 +640,8 @@ NATIVE.screen.onResize = function( width, height ) {
 
 	console.log( 'screen size is ' + width + 'x' + height )
 
-	window.innerWidth = width
-	window.innerHeight = height
+	GLOBAL.innerWidth = width
+	GLOBAL.innerHeight = height
 
 	var config = {
 		id :               '',
@@ -657,11 +657,10 @@ NATIVE.screen.onResize = function( width, height ) {
 	var cacheContent,
 		applicationModule
 
-	window.spell = {
+	GLOBAL.spell = {
 		addToCache : function( x ) {
 			cacheContent = x
 		},
-
 		setApplicationModule : function( x ) {
 			applicationModule = x
 		}
@@ -673,7 +672,7 @@ NATIVE.screen.onResize = function( width, height ) {
 		NATIVE.getFileSync( 'resources/spelljs/data.js.mp3' )
 	)
 
-	var engineInstance = window.require( 'spell/client/main', config )
+	var engineInstance = GLOBAL.require( 'spell/client/main', config )
 
 	engineInstance.start( applicationModule, cacheContent )
 
