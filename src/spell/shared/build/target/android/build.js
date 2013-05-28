@@ -170,12 +170,9 @@ define(
 					)
 				},
 				function() {
-					var args = [ 'build', 'native-android' ]
-
-					if( debug ) {
-						args.push( '--debug' )
-						args.push( '--no-compress' )
-					}
+					var args = debug ?
+						[ 'debug', 'native-android' ] :
+						[ 'build', 'native-android' ]
 
 					spawnChildProcess( 'basil', args, { cwd : tmpProjectPath }, f.wait() )
 				},
