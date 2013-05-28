@@ -634,6 +634,9 @@ NATIVE.onRotation = function() {
 NATIVE.screen.onResize = function( width, height ) {
 	console.log( 'New screen size is ' + width + 'x' + height )
 
+	window.innerWidth = width
+	window.innerHeight = height
+
 	var config = {
 		id :               '',
 		platform :         'html5',
@@ -645,19 +648,18 @@ NATIVE.screen.onResize = function( width, height ) {
 		libraryUrl :       'resources/library'
 	}
 
-
-    var cacheContent,
+	var cacheContent,
 		applicationModule
 
-    GLOBAL.spell = window.spell = {
-        addToCache : function( x ) {
+	GLOBAL.spell = window.spell = {
+		addToCache : function( x ) {
 			cacheContent = x
-        },
+		},
 
-        setApplicationModule : function( x ) {
-            applicationModule = x
-        }
-    }
+		setApplicationModule : function( x ) {
+			applicationModule = x
+		}
+	}
 
 	// loading engine library and application module
 	NATIVE.eval(
@@ -665,11 +667,11 @@ NATIVE.screen.onResize = function( width, height ) {
 		NATIVE.getFileSync( 'resources/spelljs/data.js.mp3' )
 	)
 
-    var engineInstance = window.require( 'spell/client/main', config )
+	var engineInstance = window.require( 'spell/client/main', config )
 
-    engineInstance.start( applicationModule, cacheContent )
+	engineInstance.start( applicationModule, cacheContent )
 
-    NATIVE.timer.start(
+	NATIVE.timer.start(
 		function() {
 			NATIVE.timestep.getEvents()
 
