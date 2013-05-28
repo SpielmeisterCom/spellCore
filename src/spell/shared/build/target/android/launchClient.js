@@ -628,8 +628,17 @@ NATIVE.onRotation = function() {
     console.log('rotation');
 }
 
+var started = false
+
 NATIVE.screen.onResize = function( width, height ) {
-	console.log( 'New screen size is ' + width + 'x' + height )
+	if( started ) {
+		return
+
+	} else {
+		started = true
+	}
+
+	console.log( 'screen size is ' + width + 'x' + height )
 
 	window.innerWidth = width
 	window.innerHeight = height
