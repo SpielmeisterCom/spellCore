@@ -1,5 +1,12 @@
-var EVENT_HANDLER = {};
-var TICK_CALLBACK = null;
+var EVENT_HANDLER = {},
+	TICK_CALLBACK
+
+window.requestAnimationFrame = function( f ) {
+    TICK_CALLBACK = f
+}
+
+// this function hides the splash screen (has nothing to do with resource loading)
+NATIVE.doneLoading();
 
 //<CONSOLE>
     GLOBAL.console = jsio('import base', {}).logging.get('console');
@@ -598,31 +605,18 @@ window.localStorage = {
 	}
 };
 
-if (!NATIVE.gl.initialized) {
-    NATIVE.gl.initialized = true;
-
+if( !NATIVE.gl.initialized ) {
+    NATIVE.gl.initialized = true
 }
-
-
-window.requestAnimationFrame = function(cb) {
-    TICK_CALLBACK = cb;
-}
-
-//this function hides the splash screen (has nothing to do with resource loading)
-NATIVE.doneLoading();
 
 
 //NATIVE.timer.stop();
 
 
-/*
- gcapi/src/native/pauseResume.js:NATIVE.events.registerHandler('pause', bind(window, '__fireEvent', 'pagehide'));
- gcapi/src/native/pauseResume.js:NATIVE.events.registerHandler('resume', function() {
- gcapi/src/native/XMLHttpRequest.js:     NATIVE.events.registerHandler('xhr', function(evt) {
- gcapi/src/native/rotation.js:NATIVE.events.registerHandler('rotate', function(evt) {
-
-
- */
+//gcapi/src/native/pauseResume.js:NATIVE.events.registerHandler('pause', bind(window, '__fireEvent', 'pagehide'));
+//gcapi/src/native/pauseResume.js:NATIVE.events.registerHandler('resume', function() {
+//gcapi/src/native/XMLHttpRequest.js:     NATIVE.events.registerHandler('xhr', function(evt) {
+//gcapi/src/native/rotation.js:NATIVE.events.registerHandler('rotate', function(evt) {
 
 
 
@@ -654,7 +648,7 @@ NATIVE.screen.onResize = function( width, height ) {
 	var cacheContent,
 		applicationModule
 
-	GLOBAL.spell = window.spell = {
+	window.spell = {
 		addToCache : function( x ) {
 			cacheContent = x
 		},
