@@ -189,7 +189,12 @@ define(
 			setValue : function( key, value ) {
 				update( this.config, defaultOptions, validOptions, key, value )
 
-				if( key === 'currentLanguage' &&
+				if( key === 'defaultLanguage' &&
+					!this.config.currentLanguage ) {
+
+					this.config.currentLanguage = value
+
+				} else if( key === 'currentLanguage' &&
 					!_.contains( this.config.supportedLanguages, value ) ) {
 
 					this.config.currentLanguage = value
