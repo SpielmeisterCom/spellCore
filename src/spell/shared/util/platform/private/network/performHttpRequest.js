@@ -43,7 +43,7 @@ define(
 				}
 			}
 
-            request.open( method, url )
+            request.open( method, url, true )
 
 			return request
 		}
@@ -83,7 +83,7 @@ define(
 				if( request.setRequestHeader ) {
 					request.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' )
 				}
-				
+
 				request.send( createParameters( parameters ) )
 
 			} else {
