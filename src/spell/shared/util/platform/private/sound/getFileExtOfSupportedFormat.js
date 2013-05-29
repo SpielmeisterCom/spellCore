@@ -1,6 +1,11 @@
 define(
 	'spell/shared/util/platform/private/sound/getFileExtOfSupportedFormat',
-	function() {
+	[
+		'spell/shared/util/platform/private/isGameClosure'
+	],
+	function(
+		isGameClosure
+	) {
 		'use strict'
 
 
@@ -26,7 +31,13 @@ define(
 		var fileExtOfSupportedFormat
 
 		var getFileExtOfSupportedFormat = function() {
-			if( fileExtOfSupportedFormat ) return fileExtOfSupportedFormat
+			if( isGameClosure ) {
+				return 'mp3'
+			}
+
+			if( fileExtOfSupportedFormat ) {
+				return fileExtOfSupportedFormat
+			}
 
 			var probe = new Audio()
 

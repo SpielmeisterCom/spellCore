@@ -1,139 +1,100 @@
 define(
 	'spell/shared/util/platform/private/sound/nativeAudio/createNativeAudioContext',
-	function() {
+	[
+		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc'
+	],
+	function(
+		createFixedSoundFileSrc
+	) {
 		'use strict'
 
-        var audioElements   = {},
-            audioBuffers    = {},
-            audioBuffer     = function( params ) {
-                this.src        = params.src
-                this.onload     = params.onload
-                this.onerror    = params.onerror
-                this.loaded     = false
-            }
-
-        var isMutedValue = false
 
 		var dummy = function() {}
 
-        var createSoundId = function() {
-            return nextSoundId++
-        }
+		var isBackgroundMusic = function( src ) {
+			return src == 'resources/library/superkumba/sounds/KibaKumbaDschungel.mp3' ||
+				src == 'resources/library/superkumba/sounds/KibaKumbaWueste.mp3' ||
+				src == 'resources/library/superkumba/sounds/KibaKumbaHoehle.mp3' ||
+				src == 'resources/library/superkumba/sounds/KibaKumbaArktis.mp3'
+		}
 
-        var registerEvents = function() {
+		// Unfortunately the game closure sound api is missing a "sound identity" concept. Therefore it is not possible to reference a playing sound by anything
+		// but its src attribute value. The src value is not unqiue though.
 
-            //THIS ONE ONLY FIRES IF WE'RE NOT(!) LOADING BACKGROUND MUSIC
-            NATIVE.events.registerHandler('soundLoaded', function(evt) {
+		// HACK: This leaks memory because ids are never removed.
+		var idToUrl = {}
 
-                console.log(' >>>>>>>>>>> finished loading ' + evt.url );
+		var audioBuffers = {}
 
-                var audioBuffer = audioBuffers[ evt.url ]
+		var AudioBuffer = function( src, onload, onerror ) {
+			this.src     = src
+			this.onload  = onload
+			this.onerror = onerror
+			this.loaded  = false
+		}
 
-                if (audioBuffer && !audioBuffer.loaded) {
-
-                    audioBuffer.loaded = true
-                    audioBuffer.onload && audioBuffer.onload( audioBuffer );
-
-                }
-
-            });
-
-            NATIVE.events.registerHandler('soundError', function(evt) {
-
-                console.log(' error loading ' + evt.url );
-
-
-                var audioBuffer = audioBuffers[ evt.url ]
-
-                if (audioBuffer ) {
-
-                    audioBuffer.onerror && audioBuffer.onerror( audioBuffer );
-
-                }
-            });
-
-            NATIVE.events.registerHandler('soundDuration', function(evt) {
-                // only returns the duration for background music and this information is pretty useless for us
-
-                console.log('Got sound duration ' + evt.duration );
-                //evt.duration (in Seconds)
-            });
-        }
+		var isMutedValue = false
 
 		var setAllMuted = function( isMute ) {
 			isMutedValue = isMute
+
+			if( isMutedValue ) {
+				for( var id in idToUrl ) {
+					stop( idToUrl[ id ] )
+				}
+			}
 		}
 
 		var isAllMuted = function() {
 			return isMutedValue
 		}
 
-        var destroy = function( url ) {
-            NATIVE.sound.destroySound( url );
+        var setVolume = function( id, volume ) {
+			var url = idToUrl[ id ]
+			if( !url ) return
+
+			console.log( 'setVolume: ' + id )
+
+            NATIVE.sound.setVolume( url, volume )
         }
 
-        var setVolume = function( url, volume ) {
-            NATIVE.sound.setVolume( url, volume );
-        }
+        var stop = function ( id ) {
+			var url = idToUrl[ id ]
+			if( !url ) return
 
-        var pause = function ( url ) {
-            NATIVE.sound.pauseSound( url );
-        }
+			console.log( 'stop: ' + id )
 
-        var stop = function ( url ) {
-            NATIVE.sound.stopSound( url );
-        }
-
-
-        var seekTo = function( audioResource, seekTo ) {
-//           this._et = t * 1000;
-//            this._startTime = Date.now();
-//            NATIVE.sound.seekTo(this._src, t);
-        }
-
-
-
-        var createFixedSoundFileSrc = function( src ) {
-            var srcParts = src.split( '.' )
-
-            srcParts.pop()
-            srcParts.push( 'mp3' )
-
-            return srcParts.join( '.' )
+            NATIVE.sound.stopSound( url )
         }
 
         var play = function( audioResource, id, volume, loop ) {
-
             var url = audioResource.src
 
-            if (url == "resources/library/superkumba/sounds/KibaKumbaDschungel.mp3"
-                || url == "resources/library/superkumba/sounds/KibaKumbaWueste.mp3"
-                || url == "resources/library/superkumba/sounds/KibaKumbaHoehle.mp3"
-                || url == "resources/library/superkumba/sounds/KibaKumbaArktis.mp3") {
+			if( id ) {
+				console.log( 'play: ' + url + ', ' + id )
 
-                NATIVE.sound.playBackgroundMusic( url, volume, loop );
+				idToUrl[ id ] = url
 
-            } else {
+			} else {
+				console.log( 'play: ' + url + ', anonymous' )
+			}
 
-                NATIVE.sound.playSound(
-                    url,
-                    1,
-                    false
-                );
+			if( isBackgroundMusic( url ) ) {
+				NATIVE.sound.playBackgroundMusic( url, volume, loop )
 
-            }
-
-            return url
+			} else {
+				NATIVE.sound.playSound( url, 1, false )
+			}
         }
 
 		var createSound = function( audioBuffer ) {
-            console.log('Creating sound from buffer ' + audioBuffer.src );
+            console.log( 'Creating sound from buffer ' + audioBuffer.src )
 
             return {
                 /*
                  * Public
                  */
-                duration : 0, //not available
+                duration : 0, // not available
 
                 /*
                  * Private
@@ -154,28 +115,19 @@ define(
 				throw 'Error: No onLoadCallback provided.'
 			}
 
-            src = createFixedSoundFileSrc( src )
+            var fixedSrc = createFixedSoundFileSrc( src )
 
-            var audioBufferEntry = new audioBuffer({
-                src    : src,
-                onload : onLoadCallback
-            })
+            var audioBuffer = new AudioBuffer( fixedSrc, onLoadCallback )
 
-            audioBuffers[ src ] = audioBufferEntry
+            audioBuffers[ fixedSrc ] = audioBuffer
 
-            if (src == "resources/library/superkumba/sounds/KibaKumbaDschungel.mp3"
-                || src == "resources/library/superkumba/sounds/KibaKumbaWueste.mp3"
-                || src == "resources/library/superkumba/sounds/KibaKumbaHoehle.mp3"
-                || src == "resources/library/superkumba/sounds/KibaKumbaArktis.mp3") {
+			if( isBackgroundMusic( fixedSrc ) ) {
+				onLoadCallback( audioBuffer )
 
-                onLoadCallback( audioBufferEntry )
-
-            } else {
-
-                //trigger a load for this sound, this will trigger a sound loaded message in the future which will call the onLoadCallback
-                NATIVE.sound.loadSound( src )
-
-            }
+			} else {
+				// trigger a load for this sound, this will trigger a sound loaded message in the future which will call the onLoadCallback
+				NATIVE.sound.loadSound( fixedSrc )
+			}
 		}
 
 		var createWrapperContext = function() {
@@ -183,10 +135,10 @@ define(
 				tick             : dummy,
 				play             : play,
 				setLoop          : dummy,
-				setVolume        : dummy,
+				setVolume        : setVolume,
 				setAllMuted      : setAllMuted,
 				isAllMuted       : isAllMuted,
-				stop             : dummy,
+				stop             : stop,
 				mute             : dummy,
 				createSound      : createSound,
 				loadBuffer       : loadBuffer,
@@ -194,11 +146,46 @@ define(
 			}
 		}
 
-		/*
-		 * Returns an audio context.
+		/**
+		 * Creates an audio context
+		 *
+		 * @return {Object}
 		 */
 		var createAudioContext = function() {
-            registerEvents();
+			// The "soundLoaded" event is only triggered when loading a sound and not when loading (a.k.a. streaming) background music.
+			NATIVE.events.registerHandler(
+				'soundLoaded',
+				function( event ) {
+					console.log( ' >>>>>>>>>>> finished loading ' + event.url )
+
+					var audioBuffer = audioBuffers[ event.url ]
+
+					if( audioBuffer &&
+						!audioBuffer.loaded ) {
+
+						audioBuffer.loaded = true
+
+						if( audioBuffer.onload ) {
+							audioBuffer.onload( audioBuffer )
+						}
+					}
+				}
+			)
+
+			NATIVE.events.registerHandler(
+				'soundError',
+				function( event ) {
+					console.log( ' error loading ' + event.url )
+
+					var audioBuffer = audioBuffers[ event.url ]
+
+					if( audioBuffer &&
+						audioBuffer.onerror ) {
+
+						audioBuffer.onerror( audioBuffer )
+					}
+				}
+			)
 
 			return createWrapperContext()
 		}
