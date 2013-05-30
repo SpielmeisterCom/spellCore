@@ -53,7 +53,7 @@ define(
 			var url = idToUrl[ id ]
 			if( !url ) return
 
-			console.log( 'setVolume: ' + id )
+//			console.log( 'setVolume: ' + id )
 
             NATIVE.sound.setVolume( url, volume )
         }
@@ -62,7 +62,7 @@ define(
 			var url = idToUrl[ id ]
 			if( !url ) return
 
-			console.log( 'stop: ' + id )
+//			console.log( 'stop: ' + id )
 
             NATIVE.sound.stopSound( url )
         }
@@ -71,12 +71,12 @@ define(
             var url = audioResource.src
 
 			if( id ) {
-				console.log( 'play: ' + url + ', ' + id )
+//				console.log( 'play: ' + url + ', ' + id )
 
 				idToUrl[ id ] = url
 
-			} else {
-				console.log( 'play: ' + url + ', anonymous' )
+//			} else {
+//				console.log( 'play: ' + url + ', anonymous' )
 			}
 
 			if( isBackgroundMusic( url ) ) {
@@ -88,7 +88,7 @@ define(
         }
 
 		var createSound = function( audioBuffer ) {
-            console.log( 'Creating sound from buffer ' + audioBuffer.src )
+//            console.log( 'Creating sound from buffer ' + audioBuffer.src )
 
             return {
                 /*
@@ -156,7 +156,7 @@ define(
 			NATIVE.events.registerHandler(
 				'soundLoaded',
 				function( event ) {
-					console.log( ' >>>>>>>>>>> finished loading ' + event.url )
+//					console.log( ' >>>>>>>>>>> finished loading ' + event.url )
 
 					var audioBuffer = audioBuffers[ event.url ]
 
@@ -175,7 +175,7 @@ define(
 			NATIVE.events.registerHandler(
 				'soundError',
 				function( event ) {
-					console.log( ' error loading ' + event.url )
+//					console.log( ' error loading ' + event.url )
 
 					var audioBuffer = audioBuffers[ event.url ]
 
