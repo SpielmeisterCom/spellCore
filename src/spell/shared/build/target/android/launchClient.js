@@ -5,6 +5,8 @@ GLOBAL.requestAnimationFrame = function( f ) {
     TICK_CALLBACK = f
 }
 
+GLOBAL.open = GLOBAL.open || GLOBAL.setLocation
+
 // this function hides the splash screen (has nothing to do with resource loading)
 NATIVE.doneLoading();
 
