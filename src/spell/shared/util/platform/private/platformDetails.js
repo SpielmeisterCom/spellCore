@@ -3,19 +3,27 @@ define(
 	[
 		'spell/shared/util/platform/private/input/supportedPointerApi',
 		'spell/shared/util/platform/private/isHtml5CocoonJS',
-		'spell/shared/util/platform/private/isHtml5Ejecta'
+		'spell/shared/util/platform/private/isHtml5Ejecta',
+		'spell/shared/util/platform/private/isHtml5GameClosure',
+		'spell/shared/util/platform/private/jsonCoder'
 	],
 	function(
 		supportedPointerApi,
 		isHtml5CocoonJS,
-		isHtml5Ejecta
+		isHtml5Ejecta,
+		isHtml5GameClosure,
+		jsonCoder
 	) {
 		'use strict'
 
 
+		if( isHtml5GameClosure ) {
+			var gameClosureDeviceInfo = jsonCoder.decode( NATIVE.device.native_info )
+		}
+
 		return {
 			hasPlentyRAM : function() {
-                return !isHtml5CocoonJS && !isHtml5Ejecta
+                return !( isHtml5CocoonJS || isHtml5Ejecta || isHtml5GameClosure )
             },
 			hasTouchSupport : function() {
 				return supportedPointerApi.hasWebkitTouchApi() ||
@@ -30,28 +38,31 @@ define(
 				} else if( isHtml5Ejecta ) {
 					return 'iOS ' + navigator.userAgent.match( /([\.\d]+)\)$/ )[ 1 ]
 
-				} else {
+				} else if( isHtml5GameClosure ) {
+					return 'Android ' + gameClosureDeviceInfo.versionRelease
+
+				}else {
 					return navigator.platform
 				}
 			},
 			getPlatformAdapter : function() {
-				return isHtml5CocoonJS ?
-					'cocoonjs' :
-					isHtml5Ejecta ?
-						'ejecta' :
-						'html5'
+				if( isHtml5CocoonJS ) return 'cocoonjs'
+				if( isHtml5Ejecta ) return 'ejecta'
+				if( isHtml5GameClosure ) return 'gameclosure'
+
+				return 'html5'
 			},
 			getPlatform : function() {
-				return isHtml5CocoonJS ?
-					navigator.appVersion :
-					navigator.userAgent
+				if( isHtml5CocoonJS ) return navigator.appVersion
+
+				return navigator.userAgent
 			},
 			getDevice : function() {
-				return isHtml5CocoonJS ?
-					navigator.platform :
-					isHtml5Ejecta ?
-						navigator.userAgent.match( /\((.*);/ )[ 1 ] :
-						'unknown'
+				if( isHtml5CocoonJS ) return navigator.platform
+				if( isHtml5Ejecta ) return navigator.userAgent.match( /\((.*);/ )[ 1 ]
+				if( isHtml5GameClosure ) return gameClosureDeviceInfo.model + ', ' + gameClosureDeviceInfo.manufacturer
+
+				return 'unknown'
 			},
 			getScreenHeight: function() {
 				return screen.height
@@ -60,7 +71,7 @@ define(
 				return screen.width
 			},
 			isMobileDevice: function() {
-				return isHtml5CocoonJS || isHtml5Ejecta
+				return isHtml5CocoonJS || isHtml5Ejecta || isHtml5GameClosure
 			}
 		}
 	}
