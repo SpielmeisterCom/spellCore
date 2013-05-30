@@ -646,25 +646,23 @@ NATIVE.screen.onResize = function( width, height ) {
 	GLOBAL.innerHeight = height
 
 	var config = {
+		audioBackEnd :     'native',
+		currentLanguage :  GLOBAL.navigator.language,
 		id :               '',
+		libraryUrl :       'resources/library',
+		mode :             'deployed',
 		platform :         'html5',
 		renderingBackEnd : 'canvas-2d',
-		audioBackEnd :     'native',
-		verbose :          true,
-		mode :             'deployed',
-		screenSize :        [ width, height ],
-		libraryUrl :       'resources/library'
+		screenSize :       [ width, height ],
+		verbose :          true
 	}
 
-	var cacheContent,
-		applicationModule
-
-	GLOBAL.spell = {
+	var spell = GLOBAL.spell = {
 		addToCache : function( x ) {
-			cacheContent = x
+			this.cacheContent = x
 		},
 		setApplicationModule : function( x ) {
-			applicationModule = x
+			this.applicationModule = x
 		}
 	}
 
@@ -676,7 +674,7 @@ NATIVE.screen.onResize = function( width, height ) {
 
 	var engineInstance = GLOBAL.require( 'spell/client/main', config )
 
-	engineInstance.start( applicationModule, cacheContent )
+	engineInstance.start( spell.applicationModule, spell.cacheContent )
 
 	NATIVE.timer.start(
 		function() {
