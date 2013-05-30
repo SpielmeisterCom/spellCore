@@ -1,11 +1,11 @@
 define(
 	'spell/shared/util/platform/private/getAvailableScreenSize',
     [
-		'spell/shared/util/platform/private/isGameClosure',
+		'spell/shared/util/platform/private/isHtml5GameClosure',
         'spell/shared/util/platform/private/isHtml5Ejecta'
     ],
 	function(
-		isGameClosure,
+		isHtml5GameClosure,
         isHtml5Ejecta
     ) {
 		'use strict'
@@ -34,7 +34,7 @@ define(
 		}
 
 		return function( id ) {
-            if( isGameClosure ||
+            if( isHtml5GameClosure ||
 				isHtml5Ejecta ) {
 
                 return [ window.innerWidth, window.innerHeight ]

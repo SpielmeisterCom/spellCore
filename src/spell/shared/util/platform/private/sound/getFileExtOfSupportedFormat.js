@@ -1,10 +1,10 @@
 define(
 	'spell/shared/util/platform/private/sound/getFileExtOfSupportedFormat',
 	[
-		'spell/shared/util/platform/private/isGameClosure'
+		'spell/shared/util/platform/private/isHtml5GameClosure'
 	],
 	function(
-		isGameClosure
+		isHtml5GameClosure
 	) {
 		'use strict'
 
@@ -31,7 +31,7 @@ define(
 		var fileExtOfSupportedFormat
 
 		var getFileExtOfSupportedFormat = function() {
-			if( isGameClosure ) {
+			if( isHtml5GameClosure ) {
 				return 'mp3'
 			}
 
