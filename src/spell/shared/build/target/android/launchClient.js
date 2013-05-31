@@ -612,9 +612,6 @@ if( !NATIVE.gl.initialized ) {
 }
 
 
-//NATIVE.timer.stop();
-
-
 //gcapi/src/native/pauseResume.js:NATIVE.events.registerHandler('pause', bind(window, '__fireEvent', 'pagehide'));
 //gcapi/src/native/pauseResume.js:NATIVE.events.registerHandler('resume', function() {
 //gcapi/src/native/XMLHttpRequest.js:     NATIVE.events.registerHandler('xhr', function(evt) {
