@@ -1,5 +1,6 @@
 {
 	"version": 1,
+	"readonly": true,
 	"type": "system",
 	"input": [
 		{
