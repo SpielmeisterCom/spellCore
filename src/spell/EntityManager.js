@@ -277,13 +277,14 @@ define(
 			return false
 		}
 
-		var removeComponents = function( eventManager, componentMaps, entityId, entityComponentId ) {
+		var removeComponents = function( eventManager, componentMaps, spatialIndex, entityId, entityComponentId ) {
 			var childrenComponent = componentMaps[ CHILDREN_COMPONENT_ID ][ entityId ],
 				parentComponent   = componentMaps[ PARENT_COMPONENT_ID ][ entityId ],
+				visualObject      = componentMaps[ VISUAL_OBJECT_COMPONENT_ID ][ entityId ],
 				removedEntity     = true
 
 			if( parentComponent ) {
-				var parentChildrenComponent =  componentMaps[ CHILDREN_COMPONENT_ID ][ parentComponent.id ]
+				var parentChildrenComponent = componentMaps[ CHILDREN_COMPONENT_ID ][ parentComponent.id ]
 
 				if( parentChildrenComponent ) {
 					var parentChildrenIds = parentChildrenComponent.ids
@@ -311,6 +312,12 @@ define(
 				}
 			}
 
+			if( entityComponentId === VISUAL_OBJECT_COMPONENT_ID ||
+				visualObject ) {
+
+				spatialIndex.remove( entityId )
+			}
+
 			if( removedEntity ) {
 				eventManager.publish( Events.ENTITY_DESTROYED, entityId )
 
@@ -318,7 +325,7 @@ define(
 					var childrenIds = childrenComponent.ids
 
 					for( var i = 0, n = childrenIds.length; i < n; i++ ) {
-						removeComponents( eventManager, componentMaps, childrenIds[ i ] )
+						removeComponents( eventManager, componentMaps, spatialIndex, childrenIds[ i ] )
 					}
 				}
 			}
@@ -1029,7 +1036,7 @@ define(
 					return false
 				}
 
-				removeComponents( this.eventManager, this.componentMaps, entityId )
+				removeComponents( this.eventManager, this.componentMaps, this.spatialIndex, entityId )
 
 				return true
 			},
@@ -1133,13 +1140,14 @@ define(
 			 */
 			init : function() {
 				var componentMaps = this.componentMaps,
-					eventManager  = this.eventManager
+					eventManager  = this.eventManager,
+					spatialIndex  = this.spatialIndex
 
 				for( var componentId in componentMaps ) {
 					var components = componentMaps[ componentId ]
 
 					for( var entityId in components ) {
-						removeComponents( eventManager, componentMaps, entityId )
+						removeComponents( eventManager, componentMaps, spatialIndex, entityId )
 					}
 
 					// explicitly resetting component map for good measure
@@ -1229,7 +1237,7 @@ define(
 			removeComponent : function( entityId, componentId ) {
 				if( !entityId ) throw 'Error: Missing entity id.'
 
-				removeComponents( this.eventManager, this.componentMaps, entityId, componentId )
+				removeComponents( this.eventManager, this.componentMaps, this.spatialIndex, entityId, componentId )
 			},
 
 			/**
