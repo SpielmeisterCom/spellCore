@@ -1,6 +1,7 @@
 {
 	"version": 1,
 	"type": "component",
+	"readonly": true,
 	"title": "Sound",
 	"doc": "",
 	"icon": "resources/images/icons/asset-sound.png",
