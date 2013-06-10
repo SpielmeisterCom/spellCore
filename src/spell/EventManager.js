@@ -68,49 +68,48 @@ define(
 
 		EventManager.prototype = {
 			subscribe: function( scope, subscriber ) {
-				scope = wrapArray( scope )
+				var wrappedScope = wrapArray( scope )
 
 				forestMultiMap.add(
 					this.subscribers,
-					scope,
+					wrappedScope,
 					subscriber
 				)
 
-				this.publish( Events.SUBSCRIBE, [ scope, subscriber ] )
+				this.publish( Events.SUBSCRIBE, [ wrappedScope, subscriber ] )
 			},
 
 			unsubscribe: function( scope, subscriber ) {
-				scope = wrapArray( scope )
+				var wrappedScope = wrapArray( scope )
 
-				forestMultiMap.remove( this.subscribers, scope, subscriber )
+				forestMultiMap.remove( this.subscribers, wrappedScope, subscriber )
 
-				this.publish( Events.UNSUBSCRIBE, [ scope, subscriber ] )
+				this.publish( Events.UNSUBSCRIBE, [ wrappedScope, subscriber ] )
 			},
 
 			unsubscribeAll: function( scope ) {
-				scope = wrapArray( scope )
+				var wrappedScope = wrapArray( scope )
 
-				forestMultiMap.remove( this.subscribers, scope )
+				forestMultiMap.remove( this.subscribers, wrappedScope )
 
-				this.publish( Events.UNSUBSCRIBE, [ scope ] )
+				this.publish( Events.UNSUBSCRIBE, [ wrappedScope ] )
 			},
 
 			publish: function( scope, eventArgs ) {
-				var subscribersInScope = forestMultiMap.get( this.subscribers, wrapArray( scope ) )
+				var subscribersInScope = forestMultiMap.get( this.subscribers, wrapArray( scope ) ),
+					wrappedEventArgs   = wrapArray( eventArgs )
 
 				_.each( subscribersInScope, function( subscriber ) {
-					subscriber.apply( undefined, wrapArray( eventArgs ) )
+					subscriber.apply( undefined, wrappedEventArgs )
 				} )
 
 				return true
 			},
 
 			waitFor: function( scope, subscriber ) {
-				scope = wrapArray( scope )
-
 				waitForChainConfig = {
 					events : [ {
-						scope      : scope,
+						scope      : wrapArray( scope ),
 						subscriber : subscriber
 					} ]
 				}
@@ -122,10 +121,8 @@ define(
 				// check if pending chain call exists
 				if( !waitForChainConfig ) throw 'A call to the method "and" must be chained to a previous call to "waitFor".'
 
-				scope = wrapArray( scope )
-
 				waitForChainConfig.events.push( {
-					scope      : scope,
+					scope      : wrapArray( scope ),
 					subscriber : subscriber
 				} )
 
