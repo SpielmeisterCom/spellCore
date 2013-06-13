@@ -132,7 +132,9 @@ define(
 					value
 
 				config[ name ] = result === undefined ?
-					option.extractor( option.validValues, defaultOptions[ name ] ) :
+					( option.extractor ?
+						option.extractor( option.validValues, defaultOptions[ name ] ) :
+						result ) :
 					result
 
 			} else {
@@ -149,12 +151,13 @@ define(
 				[ Events.AVAILABLE_SCREEN_SIZE_CHANGED ],
 				_.bind(
 					function( availableScreenSize ) {
-						var screenMode           = this.config.screenMode || 'fixed',
-							aspectRatioOverwrite = this.config.screenAspectRatio > 0 ,
-							screenSize           = this.config.screenSize
+						var config               = this.config,
+							screenMode           = config.screenMode || 'fixed',
+							aspectRatioOverwrite = config.screenAspectRatio > 0 ,
+							screenSize           = config.screenSize
 
 						if( aspectRatioOverwrite ) {
-							this.config.currentScreenSize = createScreenSize( availableScreenSize, this.config.screenAspectRatio )
+							config.currentScreenSize = createScreenSize( availableScreenSize, config.screenAspectRatio )
 
 						} else if( screenMode === 'fit' ) {
 							// set the screen size up to the limits provided by the "screenSize" configuration option
@@ -163,22 +166,22 @@ define(
 								mathUtil.clamp( availableScreenSize[ 1 ], 0, screenSize[ 1 ] )
 							]
 
-							this.config.currentScreenSize = createScreenSize(
+							config.currentScreenSize = createScreenSize(
 								clampedAvailableScreenSize,
 								screenSize[ 0 ] / screenSize[ 1 ]
 							)
 
 						} else if( screenMode === 'fixed' ) {
-							this.config.currentScreenSize = screenSize
+							config.currentScreenSize = screenSize
 
 						} else if( screenMode === 'fill' ) {
-							this.config.currentScreenSize = [ availableScreenSize[ 0 ], availableScreenSize[ 1 ] ]
+							config.currentScreenSize = [ availableScreenSize[ 0 ], availableScreenSize[ 1 ] ]
 
 						} else {
 							throw 'Error: Screen mode \'' + screenMode + '\' is not supported.'
 						}
 
-						eventManager.publish( Events.SCREEN_RESIZE, [ this.config.currentScreenSize ] )
+						eventManager.publish( Events.SCREEN_RESIZE, [ config.currentScreenSize ] )
 					},
 					this
 				)
@@ -187,20 +190,23 @@ define(
 
 		ConfigurationManager.prototype = {
 			setValue : function( key, value ) {
-				update( this.config, defaultOptions, validOptions, key, value )
+				var config = this.config
 
-				if( key === 'defaultLanguage' &&
-					!this.config.currentLanguage ) {
+				if( key === 'defaultLanguage' ) {
+					config.currentLanguage = value
 
-					this.config.currentLanguage = value
+				} else if( key === 'currentLanguage' ) {
+					if( _.contains( config.supportedLanguages, value ) ) {
+						config.currentLanguage = value
+					}
 
-				} else if( key === 'currentLanguage' &&
-					!_.contains( this.config.supportedLanguages, value ) ) {
+					return
+				}
 
-					this.config.currentLanguage = value
+				update( config, defaultOptions, validOptions, key, value )
 
-				} else if( key === 'screenAspectRatio' ||
-						key === 'screenMode' ) {
+				if( key === 'screenAspectRatio' ||
+					key === 'screenMode' ) {
 
 					this.eventManager.publish(
 						Events.AVAILABLE_SCREEN_SIZE_CHANGED,
@@ -208,20 +214,25 @@ define(
 					)
 
 				} else if( key === 'screenSize' ) {
-					vec2.copy( this.config.currentScreenSize, value )
+					vec2.copy( config.currentScreenSize, value )
 				}
 			},
 			getValue : function( key ) {
 				return this.config[ key ]
 			},
 			setConfig : function( x ) {
-				var value
-
 				for( var key in x ) {
-					value = x[ key ]
+					if( key === 'supportedLanguages' || key === 'defaultLanguage' || key === 'currentLanguage' ) {
+						continue
+					}
 
-					this.setValue( key, value )
+					this.setValue( key, x[ key ] )
 				}
+
+				// HACK: these configuration options have dependencies amongst each other and must therefore be processed in the right order
+				if( x.supportedLanguages ) this.setValue( 'supportedLanguages', x.supportedLanguages )
+				if( x.defaultLanguage ) this.setValue( 'defaultLanguage', x.defaultLanguage )
+				if( x.currentLanguage ) this.setValue( 'currentLanguage', x.currentLanguage )
 			}
 		}
 
