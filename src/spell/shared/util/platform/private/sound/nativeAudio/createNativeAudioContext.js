@@ -1,10 +1,12 @@
 define(
 	'spell/shared/util/platform/private/sound/nativeAudio/createNativeAudioContext',
 	[
-		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc'
+		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
+		'spell/shared/util/platform/private/sound/createSoundId'
 	],
 	function(
-		createFixedSoundFileSrc
+		createFixedSoundFileSrc,
+		createSoundId
 	) {
 		'use strict'
 
@@ -38,10 +40,10 @@ define(
 		var setAllMuted = function( isMute ) {
 			isMutedValue = isMute
 
-			if( isMutedValue ) {
-				for( var id in idToUrl ) {
-					stop( idToUrl[ id ] )
-				}
+//			console.log( ' *** setAllMuted: ' + isMutedValue )
+
+			for( var id in idToUrl ) {
+				setVolume( id , isMutedValue ? 0.0 : 1.0 )
 			}
 		}
 
@@ -49,60 +51,64 @@ define(
 			return isMutedValue
 		}
 
-        var setVolume = function( id, volume ) {
+		var setVolume = function( id, volume ) {
 			var url = idToUrl[ id ]
 			if( !url ) return
 
-//			console.log( 'setVolume: ' + id )
+//			console.log( ' *** setVolume: ' + id + ' vol. ' + ( isMutedValue ? 0.0 : 1.0 ) )
 
-            NATIVE.sound.setVolume( url, volume )
-        }
+			NATIVE.sound.setVolume( url, volume )
+		}
 
-        var stop = function ( id ) {
+		var stop = function ( id ) {
 			var url = idToUrl[ id ]
 			if( !url ) return
 
-//			console.log( 'stop: ' + id )
+			delete idToUrl[ id ]
 
-            NATIVE.sound.stopSound( url )
-        }
+//			console.log( ' *** stop: ' + id )
 
-        var play = function( audioResource, id, volume, loop ) {
-            var url = audioResource.src
+			NATIVE.sound.stopSound( url )
+		}
+
+		var play = function( audioResource, id, volume, loop ) {
+			volume = volume | 1.0
+
+			var url = audioResource.src
 
 			if( id ) {
-//				console.log( 'play: ' + url + ', ' + id )
-
 				idToUrl[ id ] = url
-
-//			} else {
-//				console.log( 'play: ' + url + ', anonymous' )
 			}
 
-			if( isBackgroundMusic( url ) ) {
-				NATIVE.sound.playBackgroundMusic( url, volume, loop )
+//			console.log( ' *** play: ' + url + ', ' + ( id ? id : 'anonymous' ) + ', vol: ' + ( isMutedValue ? 0.0 : volume ) )
 
-			} else {
-				NATIVE.sound.playSound( url, 1, false )
-			}
-        }
+			var play = isBackgroundMusic( url ) ?
+				NATIVE.sound.playBackgroundMusic :
+				NATIVE.sound.playSound
+
+			play(
+				url,
+				isMutedValue ? 0.0 : volume,
+				!!loop
+			)
+		}
 
 		var createSound = function( audioBuffer ) {
-//            console.log( 'Creating sound from buffer ' + audioBuffer.src )
+//			console.log( ' *** Creating sound from buffer ' + audioBuffer.src )
 
-            return {
-                /*
-                 * Public
-                 */
-                duration : 0, // not available
+			return {
+				/*
+				 * Public
+				 */
+				duration : 0, // not available
 
-                /*
-                 * Private
-                 *
-                 * This is an implementation detail of the class. If you write code that depends on this you better know what you are doing.
-                 */
-                src : audioBuffer.src
-            }
+				/*
+				 * Private
+				 *
+				 * This is an implementation detail of the class. If you write code that depends on this you better know what you are doing.
+				 */
+				src : audioBuffer.src
+			}
 		}
 
 
@@ -115,11 +121,11 @@ define(
 				throw 'Error: No onLoadCallback provided.'
 			}
 
-            var fixedSrc = createFixedSoundFileSrc( src )
+			var fixedSrc = createFixedSoundFileSrc( src )
 
-            var audioBuffer = new AudioBuffer( fixedSrc, onLoadCallback )
+			var audioBuffer = new AudioBuffer( fixedSrc, onLoadCallback )
 
-            audioBuffers[ fixedSrc ] = audioBuffer
+			audioBuffers[ fixedSrc ] = audioBuffer
 
 			if( isBackgroundMusic( fixedSrc ) ) {
 				onLoadCallback( audioBuffer )
@@ -156,7 +162,7 @@ define(
 			NATIVE.events.registerHandler(
 				'soundLoaded',
 				function( event ) {
-//					console.log( ' >>>>>>>>>>> finished loading ' + event.url )
+//					console.log( ' *** soundLoaded: ' + event.url )
 
 					var audioBuffer = audioBuffers[ event.url ]
 
@@ -175,7 +181,7 @@ define(
 			NATIVE.events.registerHandler(
 				'soundError',
 				function( event ) {
-//					console.log( ' error loading ' + event.url )
+//					console.log( ' *** error loading ' + event.url )
 
 					var audioBuffer = audioBuffers[ event.url ]
 
