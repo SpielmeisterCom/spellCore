@@ -2,11 +2,13 @@ define(
 	'spell/shared/util/platform/private/sound/webAudio/createWebAudioContext',
 	[
 		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
+		'spell/shared/util/platform/private/sound/createSoundId',
 
 		'spell/functions'
 	],
 	function(
 		createFixedSoundFileSrc,
+		createSoundId,
 
 		_
 	) {
@@ -15,12 +17,7 @@ define(
 
 		var context,
 			sourceNodes  = {},
-			isMutedValue = false,
-			nextSoundId  = 0
-
-		var createSoundId = function() {
-			return nextSoundId++
-		}
+			isMutedValue = false
 
 		var create = function( id, audioResource ) {
 			var gainNode   = context.createGainNode(),

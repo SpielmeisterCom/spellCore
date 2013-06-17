@@ -2,11 +2,13 @@ define(
 	'spell/shared/util/platform/private/sound/html5Audio/createHtml5AudioContext',
 	[
 		'spell/shared/util/platform/private/isHtml5CocoonJS',
-		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc'
+		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
+		'spell/shared/util/platform/private/sound/createSoundId'
 	],
 	function(
 		isHtml5CocoonJS,
-		createFixedSoundFileSrc
+		createFixedSoundFileSrc,
+		createSoundId
 	) {
 		'use strict'
 
@@ -15,12 +17,7 @@ define(
 
 		var audioElements   = {},
 			isMutedValue    = false,
-			nextSoundId     = 0,
 			numFreeChannels = MAX_NUM_CHANNELS
-
-		var createSoundId = function() {
-			return nextSoundId++
-		}
 
 		var create = function( id, audioResource ) {
 			var audio
