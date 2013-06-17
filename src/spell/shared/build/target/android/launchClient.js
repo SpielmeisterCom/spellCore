@@ -6,13 +6,10 @@ GLOBAL.requestAnimationFrame = function( f ) {
 }
 
 GLOBAL.open = GLOBAL.open || GLOBAL.setLocation
+GLOBAL.console = jsio( 'import base', {} ).logging.get( 'console' )
 
 // this function hides the splash screen (has nothing to do with resource loading)
 NATIVE.doneLoading();
-
-//<CONSOLE>
-    GLOBAL.console = jsio('import base', {}).logging.get('console');
-//</CONSOLE>
 
 //<CONTEXT2D>
     var createdOnscreenCanvas = false,
@@ -308,7 +305,9 @@ NATIVE.doneLoading();
 
         this.__defineGetter__('height', function() { return this._height; });
 
-        this._resize = function() { console.log('resizing a rendered canvas is not yet implemented!' + ' new size ' + this._width + 'x' + this._height); }
+        this._resize = function() {
+//			console.log('resizing a rendered canvas is not yet implemented!' + ' new size ' + this._width + 'x' + this._height);
+		}
 
         this.getContext = function(which) {
             if (which.toUpperCase() == '2D') {
@@ -411,7 +410,7 @@ var Image = function() {
         }
 
         this._onload = function(width, height, gl_name) {
-            logger.log('onload called with', width, height, gl_name);
+//            logger.log('onload called with', width, height, gl_name);
             this.complete = true;
             this.width = this.originalWidth = width;
             this.height = this.originalHeight = height;
