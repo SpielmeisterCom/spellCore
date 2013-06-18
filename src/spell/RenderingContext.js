@@ -6,7 +6,7 @@
  * + **display-list** - uses flash's display list API *(flash target only)*
  *
  * All drawing methods of the rendering context take the current drawing state into account. The current drawing state consists of the properties *color*,
- * *line color*, *opacity* and *transformation* and *view transformation*. The current state can be pushed and popped to and from the state stack with the
+ * *line color*, *opacity*, *transformation* and *view transformation*. The current state can be pushed and popped to and from the state stack with the
  * methods *save* and *restore* similar to the fixed function OpenGL API or 2d context of the canvas element in HTML5.
  *
  * @class spell.renderingContext
