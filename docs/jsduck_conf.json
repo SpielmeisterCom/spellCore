@@ -1,6 +1,6 @@
 {
 	"--title": "SpellJS documentation",
-	"--comments-url": "http://spelljs.com/auth",
+	"--comments-url": "http://spelljs.com/jsduck/auth",
 	"--comments-domain": "spelljs/1",
 	"--guides": "guides.json",
 	"--welcome": "welcome.html",
