@@ -184,16 +184,16 @@ if( !window.console ) {
 			config.id = 'spell'
 		}
 
-		if( !config.platform ) {
+		if( !config.target ) {
 			if( isHtml5Capable() ) {
-				config.platform = 'html5'
+				config.target = 'html5'
 
 			} else if( isFlashCapable() ) {
-				config.platform = 'flash'
+				config.target = 'flash'
 			}
 		}
 
-		if( config.platform === 'html5' ) {
+		if( config.target === 'html5' ) {
 			if( !config.renderingBackEnd &&
 				isWebGlCapable() ) {
 
@@ -223,12 +223,12 @@ if( !window.console ) {
 	}
 
 	var isBrowserCapable = function( config ) {
-		if( config.platform === 'html5' &&
+		if( config.target === 'html5' &&
 			isHtml5Capable() ) {
 
 			return true
 
-		} else if( config.platform === 'flash' &&
+		} else if( config.target === 'flash' &&
 			isFlashCapable() ) {
 
 			return true
@@ -243,19 +243,19 @@ if( !window.console ) {
 	}
 
 	var process = function( spellObject, config, onInitialized, debugMessageCallback ) {
-		if( !config.platform ) {
-			throw 'Error: Invalid config. Property \'platform\' is not defined.'
+		if( !config.target ) {
+			throw 'Error: Invalid config. Property \'target\' is not defined.'
 		}
 
-		if( config.platform !== 'html5' &&
-			config.platform !== 'flash' ) {
+		if( config.target !== 'html5' &&
+			config.target !== 'flash' ) {
 
-			throw 'Error: Invalid config. Value \'' + config.platform + '\' for property \'platform\' is not supported.'
+			throw 'Error: Invalid config. Value \'' + config.target + '\' for property \'target\' is not supported.'
 		}
 
-		if( config.verbose ) console.log( 'stage-zero-loader: chose ' + config.platform + ' platform' )
+		if( config.verbose ) console.log( 'stage-zero-loader: chose ' + config.target + ' target' )
 
-		if( config.platform === 'html5' ) {
+		if( config.target === 'html5' ) {
 			loadHtml5Executable( config, spellObject, onInitialized, debugMessageCallback )
 
 		} else {
