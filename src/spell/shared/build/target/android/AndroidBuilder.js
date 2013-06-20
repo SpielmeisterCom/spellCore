@@ -1,5 +1,5 @@
 define(
-	'spell/shared/build/target/android/build',
+	'spell/shared/build/target/android/AndroidBuilder',
 	[
 		'spell/shared/build/createDataFileContent',
 		'spell/shared/build/createDebugPath',
@@ -76,20 +76,14 @@ define(
 			return child
 		}
 
-		return function( spellCorePath, projectPath, projectLibraryPath, outputPath, outputLibraryPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
+		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, target, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug ) {
 			var outputAndroidPath = path.join( outputPath, 'android' ),
 				spellEnginePath   = path.resolve( spellCorePath, '../../../..' ),
 				devkitPath        = path.resolve( spellEnginePath, 'modules', 'devkit' )
 
-
-			console.log( 'spellCorePath: ' + spellCorePath )
-			console.log( 'spellEnginePath: ' + spellEnginePath )
-			console.log( 'devkitPath: ' + devkitPath )
-
-
-			// init output directory
-			rmdir.sync( outputAndroidPath )
-			mkdirp.sync( outputAndroidPath )
+//			console.log( 'spellCorePath: ' + spellCorePath )
+//			console.log( 'spellEnginePath: ' + spellEnginePath )
+//			console.log( 'devkitPath: ' + devkitPath )
 
 			// add component scripts to scriptSource
 			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
@@ -102,7 +96,7 @@ define(
 
 			// set up temporary devkit project
 			var projectId      = projectConfig.config.projectId,
-				tmpProjectPath = path.join( projectPath, 'build', 'tmpBasil', projectId ),
+				tmpProjectPath = path.join( projectPath, 'build', 'tmp', 'android', projectId ),
 				resourcesPath  = path.join( tmpProjectPath, 'resources' )
 
 			rmdir.sync( tmpProjectPath )
@@ -178,6 +172,7 @@ define(
 				},
 				function() {
 					// copy generated apk file to output directory
+					mkdirp.sync( outputAndroidPath )
 
 					copyFile(
 						path.join( tmpProjectPath, 'build', 'debug', 'native-android', projectId + '.apk' ),
@@ -186,5 +181,66 @@ define(
 				}
 			)
 		}
+
+		var TARGET_NAME = 'android'
+
+		var FlashBuilder = function(
+			spellCorePath,
+			projectPath,
+			projectLibraryPath,
+			outputPath,
+			target,
+			projectConfig,
+			library,
+			cacheContent,
+			scriptSource,
+			minify,
+			anonymizeModuleIds,
+			debug
+		) {
+			this.spellCorePath      = spellCorePath
+			this.projectPath        = projectPath
+			this.projectLibraryPath = projectLibraryPath
+			this.outputPath         = outputPath
+			this.target             = target
+			this.projectConfig      = projectConfig
+			this.library            = library
+			this.cacheContent       = cacheContent
+			this.scriptSource       = scriptSource
+			this.minify             = minify
+			this.anonymizeModuleIds = anonymizeModuleIds
+			this.debug              = debug
+		}
+
+		FlashBuilder.prototype = {
+			init : function() {},
+			getName : function() {
+				return TARGET_NAME
+			},
+			handlesTarget : function( x ) {
+				return x === 'all' ||
+					x === TARGET_NAME
+			},
+			build : function( next ) {
+				console.log( 'AndroidBuilder.build()' )
+
+				build(
+					this.spellCorePath,
+					this.projectPath,
+					this.projectLibraryPath,
+					this.outputPath,
+					this.target,
+					this.projectConfig,
+					this.library,
+					this.cacheContent,
+					this.scriptSource,
+					this.minify,
+					this.anonymizeModuleIds,
+					this.debug
+				)
+			}
+		}
+
+		return FlashBuilder
 	}
 )

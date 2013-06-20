@@ -1,5 +1,5 @@
 define(
-	'spell/shared/build/target/web/flash/build',
+	'spell/shared/build/target/web/FlashBuilder',
 	[
 		'spell/shared/build/ast/createAST',
 		'spell/shared/build/ast/createComponentTypeDefinition',
@@ -143,7 +143,7 @@ define(
 			return createModuleDefinitionFileTemplate( className, indentedSource, debug )
 		}
 
-		var writeCompilerConfigFile = function( projectPath, spellFlashPath, flexSdkPath, componentTypeClasses, compilerConfigFilePath, outputFilePath, anonymizeModuleIds, debug ) {
+		var writeCompilerConfigFile = function( srcPath, spellFlashPath, flexSdkPath, componentTypeClasses, compilerConfigFilePath, outputFilePath, anonymizeModuleIds, debug ) {
 			var root = xmlbuilder.create().begin( 'flex-config' )
 
 			root.ele( 'compiler' )
@@ -161,7 +161,7 @@ define(
 						.txt( spellFlashPath + '/lib/Box2D/Source' )
 					.up()
 					.ele( 'path-element' )
-						.txt( projectPath + '/build/src' )
+						.txt( srcPath )
 					.up()
 				.up()
 				.ele( 'library-path' )
@@ -353,17 +353,18 @@ define(
 		}
 
 
-		return function( spellCorePath, projectPath, projectLibraryPath, outputPath, outputLibraryPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
-			var errors                  = [],
-				spellEnginePath         = path.resolve( spellCorePath, '../../../..' ),
-				spellFlashPath          = path.join( spellEnginePath, 'modules/spellFlash' ),
-				tmpPath                 = path.join( projectPath, 'build' ),
-				tmpSourcePath           = path.join( tmpPath, 'src' ),
-				spielmeisterPackagePath = path.join( tmpSourcePath, 'Spielmeister' ),
-				outputFlashPath         = path.join( outputPath, 'web', 'flash' ),
-				compilerConfigFilePath  = path.join( tmpPath, 'compile-config.xml' ),
-				flexSdkPath             = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
-				compilerExecutablePath  = path.join( flexSdkPath, os.platform() == 'win32' ? 'bin/mxmlc.bat' : 'bin/mxmlc' )
+		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
+			var errors                   = [],
+				spellEnginePath          = path.resolve( spellCorePath, '../../../..' ),
+				spellFlashPath           = path.join( spellEnginePath, 'modules/spellFlash' ),
+				projectBuildPath         = path.join( projectPath, 'build' ),
+				projectBuildTmpFlashPath = path.join( projectBuildPath, 'tmp', 'flash' ),
+				srcPath                  = path.join( projectBuildTmpFlashPath, 'src' ),
+				spielmeisterPackagePath  = path.join( srcPath, 'Spielmeister' ),
+				outputFlashPath          = path.join( outputPath, 'web', 'flash' ),
+				compilerConfigFilePath   = path.join( projectBuildTmpFlashPath, 'compile-config.xml' ),
+				flexSdkPath              = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
+				compilerExecutablePath   = path.join( flexSdkPath, os.platform() == 'win32' ? 'bin/mxmlc.bat' : 'bin/mxmlc' )
 
 			if( !fs.existsSync( compilerExecutablePath ) ) {
 				console.error( 'Could not find compiler executable "' + compilerExecutablePath + '".' )
@@ -377,10 +378,6 @@ define(
 			if( fs.existsSync( compilerConfigFilePath ) ) {
 				fs.unlinkSync( compilerConfigFilePath )
 			}
-
-			// remove complete old output directory
-			rmdir.sync( outputFlashPath )
-			mkdirp.sync( outputFlashPath )
 
 			// reading engine source file
 			var spellEngineSourceFilePath = createDebugPath( debug, 'spell.common.js', 'spell.common.min.js', path.join( spellCorePath, 'lib' ) )
@@ -429,7 +426,7 @@ define(
 
 			var componentTypeDefinitions = createComponentTypeDefinitions( componentScripts )
 
-			createComponentTypeClassFiles( tmpSourcePath, library.component, componentTypeDefinitions )
+			createComponentTypeClassFiles( srcPath, library.component, componentTypeDefinitions )
 
 
 			// create config and compile
@@ -438,7 +435,7 @@ define(
 			console.log( 'compiling...' )
 
 			writeCompilerConfigFile(
-				projectPath,
+				srcPath,
 				spellFlashPath,
 				flexSdkPath,
 				_.keys( componentTypeDefinitions ),
@@ -450,10 +447,73 @@ define(
 
 			var onCompilingCompleted = function( errors, stderr, stdout ) {
 				// TODO: parse stderr to get to the real compiler errors
-				next( stdout )
+//				next( stdout )
+
+				console.log( stdout )
 			}
 
 			compile( compilerExecutablePath, compilerConfigFilePath, onCompilingCompleted )
 		}
+
+		var TARGET_NAME = 'flash'
+
+		var FlashBuilder = function(
+			spellCorePath,
+			projectPath,
+			projectLibraryPath,
+			outputPath,
+			target,
+			projectConfig,
+			library,
+			cacheContent,
+			scriptSource,
+			minify,
+			anonymizeModuleIds,
+			debug
+		) {
+			this.spellCorePath      = spellCorePath
+			this.projectPath        = projectPath
+			this.projectLibraryPath = projectLibraryPath
+			this.outputPath         = outputPath
+			this.target             = target
+			this.projectConfig      = projectConfig
+			this.library            = library
+			this.cacheContent       = cacheContent
+			this.scriptSource       = scriptSource
+			this.minify             = minify
+			this.anonymizeModuleIds = anonymizeModuleIds
+			this.debug              = debug
+		}
+
+		FlashBuilder.prototype = {
+			init : function() {},
+			getName : function() {
+				return TARGET_NAME
+			},
+			handlesTarget : function( x ) {
+				return x === 'all' ||
+					x === 'web' ||
+					x === TARGET_NAME
+			},
+			build : function( next ) {
+				console.log( 'FlashBuilder.build()' )
+
+				build(
+					this.spellCorePath,
+					this.projectPath,
+					this.projectLibraryPath,
+					this.outputPath,
+					this.projectConfig,
+					this.library,
+					this.cacheContent,
+					this.scriptSource,
+					this.minify,
+					this.anonymizeModuleIds,
+					this.debug
+				)
+			}
+		}
+
+		return FlashBuilder
 	}
 )
