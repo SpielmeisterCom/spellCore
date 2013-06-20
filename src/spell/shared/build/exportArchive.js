@@ -23,10 +23,6 @@ define(
 		'use strict'
 
 
-		/*
-		 * private
-		 */
-
 		var addFile = function( zip, rootPath, filePaths ) {
 			var filePath = filePaths.shift()
 
@@ -51,7 +47,6 @@ define(
 			}
 		}
 
-
 		var createZipFile = function( outputFilePath, rootPath, fileNames ) {
 			var zip = ZipStream.createZip( { level: 1 } ),
 				out = fs.createWriteStream( outputFilePath )
@@ -61,10 +56,6 @@ define(
 			addFile( zip, rootPath, fileNames )
 		}
 
-
-		/*
-		 * public
-		 */
 
 		return function( spellCorePath, projectPath, outputFilePath, next ) {
 			var outputPath         = path.dirname( outputFilePath ),

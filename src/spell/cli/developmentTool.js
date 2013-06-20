@@ -1,6 +1,7 @@
 define(
 	'spell/cli/developmentTool',
 	[
+		'spell/shared/build/cleanDirectory',
 		'spell/shared/build/executeCreateBuild',
 		'spell/shared/build/exportArchive',
 		'spell/shared/build/isDevEnvironment',
@@ -15,6 +16,7 @@ define(
 		'spell/functions'
 	],
 	function(
+		cleanDirectory,
 		executeCreateBuild,
 		exportArchive,
 		isDevEnvironment,
@@ -28,9 +30,8 @@ define(
 		path,
 		_
 	) {
-		/*
-		 * private
-		 */
+		'use strict'
+
 
 		var printErrors = function( errors ) {
 			var tmp = []
@@ -49,7 +50,7 @@ define(
 				process.exit( 0 )
 
 			} else {
-				console.log( action + ' completed' )
+				console.log( action + ' successful' )
 			}
 		}
 
@@ -90,22 +91,22 @@ define(
 		}
 
 
-		/*
-		 * public
-		 */
-
 		return function( argv, cwd, basePath, isDevEnv ) {
-			var executableName = 'spellcli',
-				spellCorePath  = getSpellCorePath( basePath, isDevEnv )
+			var spellCorePath  = getSpellCorePath( basePath, isDevEnv )
 
-			var buildTargets = {
-				ANDROID : 'android',
-				FLASH : 'flash',
-				HTML5 : 'html5',
-				ALL : 'all'
+			var cleanCommand = function( cwd ) {
+				var projectPath = path.resolve( cwd ),
+					errors      = checkProjectPath( projectPath )
+
+				if( errors.length > 0 ) printErrors( errors )
+
+				console.log( 'cleaning...' )
+				cleanDirectory( path.join( projectPath, 'build' ) )
 			}
 
 			var buildCommand = function( cwd, target, command ) {
+				console.log( 'building...' )
+
 				var projectPath        = path.resolve( cwd ),
 					errors             = checkProjectPath( projectPath ),
 					debug              = command.debug || false,
@@ -114,55 +115,21 @@ define(
 
 				if( errors.length > 0 ) printErrors( errors )
 
-				if( !target ) {
-					target = buildTargets.HTML5
-				}
-
-				if( !_.contains( _.values( buildTargets ), target ) ) {
-					errors.push( 'Error: \'' + target + '\' is not a valid target. See \"' + executableName + ' --help\" for usage information.' )
-				}
-
-				if( errors.length > 0 ) printErrors( errors )
-
 				var projectFilePath = createProjectFilePath( projectPath )
 
 				if( !isFile( projectFilePath ) ) {
-					printErrors( 'Error: Missing project file \'' + projectFilePath + '\'.' )
+					printErrors( 'Error: Missing project file "' + projectFilePath + '".' )
 				}
 
-				// figuring out the requested targets
-				if( target === 'all' ) {
-					targets = [ buildTargets.HTML5, buildTargets.FLASH ]
-
-				} else {
-					targets = [ target ]
-				}
-
-				// begin building
-				console.log( 'building...' )
-				if( debug ) console.log( ' -> debug mode is enabled' )
-
-				var afterAllBuildsCompleted = _.after(
-					targets.length,
+				executeCreateBuild(
+					target,
+					spellCorePath,
+					projectPath,
+					projectFilePath,
+					minify,
+					anonymizeModuleIds,
+					debug,
 					_.bind( onComplete, null, 'build' )
-				)
-
-				_.each(
-					targets,
-					function( target ) {
-						console.log( ' -> creating package for target "' + target + '"'  )
-
-						executeCreateBuild(
-							target,
-							spellCorePath,
-							projectPath,
-							projectFilePath,
-							minify,
-							anonymizeModuleIds,
-							debug,
-							afterAllBuildsCompleted
-						)
-					}
 				)
 			}
 
@@ -187,9 +154,14 @@ define(
 
 			var exportCommand = function( spellCorePath, cwd, command ) {
 				var projectPath = path.resolve( command.directory || cwd ),
+					inputPath   = path.join( projectPath, 'build', 'release' ),
 					errors      = checkProjectPath( projectPath )
 
 				if( errors.length > 0 ) printErrors( errors )
+
+				if( !fs.existsSync( inputPath ) ) {
+
+				}
 
 				var outputFilePath = _.isString( command.file ) ?
 					path.resolve( command.file ) :
@@ -217,16 +189,16 @@ define(
 				.version( Configuration.version )
 
 			commander
-				.command( 'build [target]' )
-				.option( '--debug' )
-				.description( 'Create a build for a specific target. Available targets: ' + _.values( buildTargets ).join( ', ' ) )
-				.action( _.bind( buildCommand, this, cwd ) )
+				.command( 'clean' )
+				.description( 'cleans the build directory' )
+				.action( _.bind( cleanCommand, this, cwd ) )
 
 			commander
-				.command( 'init' )
-				.option( '-d, --directory [directory]', 'The path to the project directory which should be initialized. The default is the current working directory.' )
-				.description( 'initialize a project directory with project scaffolding' )
-				.action( _.bind( initCommand, this, spellCorePath, cwd, isDevEnv ) )
+				.command( 'build [target]' )
+				.option( '--debug', 'creates a debug build' )
+				.option( '--release', 'creates a release build' )
+				.description( 'creates a build for a specific target; available targets: web, web-html5, web-flash, android, ios' )
+				.action( _.bind( buildCommand, this, cwd ) )
 
 			commander
 				.command( 'export' )
@@ -239,6 +211,12 @@ define(
 				.command( 'info' )
 				.description( 'print information about current environment' )
 				.action( _.bind( infoCommand, this, spellCorePath, cwd ) )
+
+			commander
+				.command( 'init' )
+				.option( '-d, --directory [directory]', 'The path to the project directory which should be initialized. The default is the current working directory.' )
+				.description( 'initialize a project directory with project scaffolding' )
+				.action( _.bind( initCommand, this, spellCorePath, cwd, isDevEnv ) )
 
 			commander.parse( argv )
 		}

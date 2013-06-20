@@ -1,5 +1,5 @@
 define(
-	'spell/shared/build/target/html5/build',
+	'spell/shared/build/target/web/html5/build',
 	[
 		'spell/shared/build/createDataFileContent',
 		'spell/shared/build/createDebugPath',
@@ -42,7 +42,7 @@ define(
 
 
 		return function( spellCorePath, projectPath, projectLibraryPath, outputPath, outputLibraryPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
-			var outputHtml5Path = path.join( outputPath, 'html5' )
+			var outputHtml5Path = path.join( outputPath, 'web', 'html5' )
 
 			// init output directory
 			rmdir.sync( outputHtml5Path )

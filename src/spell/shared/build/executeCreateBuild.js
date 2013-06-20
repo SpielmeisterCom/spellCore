@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/executeCreateBuild',
 	[
+		'spell/shared/build/cleanDirectory',
 		'spell/shared/build/createDebugPath',
 		'spell/shared/build/createProjectLibraryFilePaths',
 		'spell/shared/build/copyFiles',
@@ -9,8 +10,9 @@ define(
 		'spell/shared/build/isFile',
 		'spell/shared/build/loadAssociatedScriptModules',
 		'spell/shared/build/target/android/build',
-		'spell/shared/build/target/flash/build',
-		'spell/shared/build/target/html5/build',
+		'spell/shared/build/target/web/flash/build',
+		'spell/shared/build/target/web/html5/build',
+		'spell/shared/build/target/web/build',
 		'spell/shared/util/createCacheContent',
 		'spell/shared/util/createIdFromLibraryFilePath',
 		'spell/shared/util/hashModuleId',
@@ -19,10 +21,10 @@ define(
 		'amd-helper',
 		'fs',
 		'flob',
-		'mkdirp',
 		'path'
 	],
 	function(
+		cleanDirectory,
 		createDebugPath,
 		createProjectLibraryFilePaths,
 		copyFiles,
@@ -33,6 +35,7 @@ define(
 		buildAndroid,
 		buildFlash,
 		buildHtml5,
+		buildWeb,
 		createCacheContent,
 		createIdFromLibraryFilePath,
 		hashModuleId,
@@ -41,20 +44,9 @@ define(
 		amdHelper,
 		fs,
 		flob,
-		mkdirp,
 		path
 	) {
 		'use strict'
-
-
-		var LIBRARY_PATH = 'library'
-		var OUTPUT_PATH  = 'build/release'
-
-		var targetToBuilder = {
-			android : buildAndroid,
-			flash : buildFlash,
-			html5 : buildHtml5
-		}
 
 
 		var loadJsonFromPaths = function( result, libraryPath, filePaths ) {
@@ -182,16 +174,77 @@ define(
 			)
 		}
 
+		var buildiOS = function() {}
 
-		return function( target, spellCorePath, projectPath, projectFilePath, minify, anonymizeModuleIds, debug, callback ) {
+		var availableBuildTargets = {
+			android : {
+				name : 'android',
+				build : buildAndroid
+			},
+			ios : {
+				name : 'ios',
+				build : buildiOS
+			},
+			web : {
+				name : 'web',
+				build : buildWeb,
+				subTargets : {
+					flash : {
+						name : 'flash',
+						build : buildFlash
+					},
+					HTML5 : {
+						name : 'html5',
+						build : buildHtml5
+					}
+				}
+			}
+		}
+
+		var createBuildTarget = function( target ) {
+			if( target === 'all' ) {
+				return availableBuildTargets
+
+			} else if( target === availableBuildTargets.web.subTargets.flash.name ) {
+				delete availableBuildTargets.web.subTargets.HTML5
+
+				return availableBuildTargets.web
+
+			} else if( target === availableBuildTargets.web.subTargets.HTML5.name ) {
+				delete availableBuildTargets.web.subTargets.flash
+
+				return availableBuildTargets.web
+			}
+
+			var buildTarget = availableBuildTargets[ target ]
+
+			return buildTarget ? buildTarget : undefined
+		}
+
+
+		return function( target, spellCorePath, projectPath, projectFilePath, minify, anonymizeModuleIds, debug, next ) {
 			var errors             = [],
-				projectLibraryPath = path.join( projectPath, LIBRARY_PATH ),
-				outputPath         = path.join( projectPath, OUTPUT_PATH ),
-				outputLibraryPath  = path.join( outputPath, LIBRARY_PATH ),
+				buildMode          = debug ? 'debug' : 'release',
+				projectLibraryPath = path.join( projectPath, 'library' ),
+				projectBuildPath   = path.join( projectPath, 'build' ),
+				outputPath         = path.join( projectBuildPath, buildMode ),
+				outputLibraryPath  = path.join( outputPath, 'library' ),
 				projectConfigData  = readProjectConfigFile( projectFilePath ),
-				projectConfigRaw   = parseProjectConfig( projectConfigData, callback ),
-				projectConfig      = createProjectConfig( projectConfigRaw )
+				projectConfigRaw   = parseProjectConfig( projectConfigData, next ),
+				projectConfig      = createProjectConfig( projectConfigRaw ),
+				target             = target || availableBuildTargets.web.subTargets.HTML5.name
 
+			// figuring out the request target
+			var buildTarget = createBuildTarget( target )
+
+			if( !buildTarget ) {
+				next( 'Error: Build target "' + target + '" is not supported.' )
+			}
+
+			cleanDirectory( outputPath )
+
+			// begin building
+			console.log( ' -> ' + buildMode + ' mode enabled' )
 
 			// loading the library
 			var library = {}
@@ -200,7 +253,7 @@ define(
 				loadLibrary( projectLibraryPath, library )
 			)
 
-			if( _.size( errors ) > 0 ) callback( errors )
+			if( _.size( errors ) > 0 ) next( errors )
 
 			// load all scripts
 			var scriptModules = _.extend(
@@ -232,55 +285,55 @@ define(
 				)
 			)
 
-
-			// copy common files
-
-			// the library files
-			var outputFilePaths = createProjectLibraryFilePaths( projectLibraryPath )
-
-			// public template files go to "build/release/*"
-			outputFilePaths.push( [
-				path.join( spellCorePath, 'htmlTemplate', 'index.html' ),
-				path.join( outputPath, 'index.html' )
-			] )
-
-			outputFilePaths.push( [
-				path.join( spellCorePath, 'htmlTemplate', 'main.css' ),
-				path.join( outputPath, 'main.css' )
-			] )
-
-			// stage zero loader goes to "build/release/spell.loader.js"
-			outputFilePaths.push( [
-				createDebugPath( debug, 'spell.loader.js', 'spell.loader.min.js', path.join( spellCorePath, 'lib' ) ),
-				path.join( outputPath, 'spell.loader.js' )
-			] )
-
-			// copy new library content to destination
-			copyFiles( projectLibraryPath, outputLibraryPath, outputFilePaths )
-
-
 			// create build
-			var build = targetToBuilder[ target ]
+			console.log( ' -> building target "' + buildTarget.name + '"'  )
 
-			if( !build ) {
-				throw 'The target \'' + target + '\' is not supported.'
+			var afterAllBuildsCompleted = _.after(
+				buildTarget.subTargets ? _.size( buildTarget.subTargets ) : 1,
+				next
+			)
+
+			if( buildTarget.build ) {
+				buildTarget.build(
+					spellCorePath,
+					projectPath,
+					projectLibraryPath,
+					outputPath,
+					outputLibraryPath,
+					projectConfig,
+					library,
+					cacheContent,
+					scriptSource,
+					minify,
+					anonymizeModuleIds,
+					debug,
+					afterAllBuildsCompleted
+				)
 			}
 
-			build(
-				spellCorePath,
-				projectPath,
-				projectLibraryPath,
-				outputPath,
-				outputLibraryPath,
-				projectConfig,
-				library,
-				cacheContent,
-				scriptSource,
-				minify,
-				anonymizeModuleIds,
-				debug,
-				callback
-			)
+			if( buildTarget.subTargets ) {
+				for( var i in buildTarget.subTargets ) {
+					var subTarget = buildTarget.subTargets[ i ]
+
+					console.log( '  -> building sub-target "' + subTarget.name + '"' )
+
+					subTarget.build(
+						spellCorePath,
+						projectPath,
+						projectLibraryPath,
+						outputPath,
+						outputLibraryPath,
+						projectConfig,
+						library,
+						cacheContent,
+						scriptSource,
+						minify,
+						anonymizeModuleIds,
+						debug,
+						afterAllBuildsCompleted
+					)
+				}
+			}
 		}
 	}
 )

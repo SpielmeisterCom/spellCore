@@ -1,5 +1,5 @@
 define(
-	'spell/shared/build/target/flash/build',
+	'spell/shared/build/target/web/flash/build',
 	[
 		'spell/shared/build/ast/createAST',
 		'spell/shared/build/ast/createComponentTypeDefinition',
@@ -360,7 +360,7 @@ define(
 				tmpPath                 = path.join( projectPath, 'build' ),
 				tmpSourcePath           = path.join( tmpPath, 'src' ),
 				spielmeisterPackagePath = path.join( tmpSourcePath, 'Spielmeister' ),
-				outputFlashPath         = path.join( outputPath, 'flash' ),
+				outputFlashPath         = path.join( outputPath, 'web', 'flash' ),
 				compilerConfigFilePath  = path.join( tmpPath, 'compile-config.xml' ),
 				flexSdkPath             = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
 				compilerExecutablePath  = path.join( flexSdkPath, os.platform() == 'win32' ? 'bin/mxmlc.bat' : 'bin/mxmlc' )
