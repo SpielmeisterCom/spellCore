@@ -6,12 +6,13 @@ define(
 		'spell/shared/build/createProjectLibraryFilePaths',
 		'spell/shared/build/copyFile',
 		'spell/shared/build/copyFiles',
-		'spell/shared/util/createModuleId',
 		'spell/shared/build/processSource',
 		'spell/shared/build/isDevEnvironment',
 		'spell/shared/build/isFile',
 		'spell/shared/build/loadAssociatedScriptModules',
 		'spell/shared/build/writeFile',
+		'spell/shared/build/spawnChildProcess',
+		'spell/shared/util/createModuleId',
 		'spell/shared/util/hashModuleId',
 
 		'amd-helper',
@@ -29,12 +30,13 @@ define(
 		createProjectLibraryFilePaths,
 		copyFile,
 		copyFiles,
-		createModuleId,
 		processSource,
 		isDevEnvironment,
 		isFile,
 		loadAssociatedScriptModules,
 		writeFile,
+		spawnChildProcess,
+		createModuleId,
 		hashModuleId,
 
 		amdHelper,
@@ -56,27 +58,7 @@ define(
 			)
 		}
 
-		var spawnChildProcess = function( command, args, options, next ) {
-			var child = child_process.spawn( 'basil', args, options )
-
-			child.stderr.on(
-				'data',
-				function( data ) {
-					process.stdout.write( data )
-				}
-			)
-
-			child.stderr.on(
-				'close',
-				function( code ) {
-					next()
-				}
-			)
-
-			return child
-		}
-
-		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, target, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug ) {
+		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, target, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
 			var outputAndroidPath = path.join( outputPath, 'android' ),
 				spellEnginePath   = path.resolve( spellCorePath, '../../../..' ),
 				devkitPath        = path.resolve( spellEnginePath, 'modules', 'devkit' )
@@ -178,7 +160,8 @@ define(
 						path.join( tmpProjectPath, 'build', 'debug', 'native-android', projectId + '.apk' ),
 						path.join( outputAndroidPath, projectId + '.apk' )
 					)
-				}
+				},
+				next
 			)
 		}
 
@@ -222,7 +205,7 @@ define(
 					x === TARGET_NAME
 			},
 			build : function( next ) {
-				console.log( 'AndroidBuilder.build()' )
+				console.log( 'building for target "' + TARGET_NAME + '"...' )
 
 				build(
 					this.spellCorePath,
@@ -236,7 +219,8 @@ define(
 					this.scriptSource,
 					this.minify,
 					this.anonymizeModuleIds,
-					this.debug
+					this.debug,
+					next
 				)
 			}
 		}

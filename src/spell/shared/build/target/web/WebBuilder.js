@@ -7,6 +7,7 @@ define(
 		'spell/shared/build/createDebugPath',
 		'spell/shared/build/createProjectLibraryFilePaths',
 
+		'ff',
 		'path'
 	],
 	function(
@@ -16,6 +17,7 @@ define(
 		createDebugPath,
 		createProjectLibraryFilePaths,
 
+		ff,
 		path
 	) {
 		'use strict'
@@ -82,7 +84,7 @@ define(
 
 		WebBuilder.prototype = {
 			init : function() {
-				this.subTargetBuilders = [
+				this.builders = [
 					new FlashBuilder(
 						this.spellCorePath,
 						this.projectPath,
@@ -113,7 +115,7 @@ define(
 					)
 				]
 
-				_.invoke( this.subTargetBuilders, 'init' )
+				_.invoke( this.builders, 'init' )
 			},
 			getName : function() {
 				return TARGET_NAME
@@ -122,35 +124,43 @@ define(
 				return x === 'all' ||
 					x === TARGET_NAME ||
 					_.any(
-						this.subTargetBuilders,
+						this.builders,
 						function( builder ) {
 							return builder.handlesTarget( x )
 						}
 					)
 			},
 			build : function( next ) {
-				console.log( 'WebBuilder.build()' )
+				console.log( 'building for target "' + TARGET_NAME + '"...' )
 
 				var target        = this.target,
 					outputWebPath = path.join( this.outputPath, 'web' )
 
-				build(
-					this.projectLibraryPath,
-					this.spellCorePath,
-					outputWebPath,
-					this.debug
-				)
+				var builders = this.builders,
+					f        = ff( this )
+
+				f.next( function() {
+					build(
+						this.projectLibraryPath,
+						this.spellCorePath,
+						outputWebPath,
+						this.debug
+					)
+				} )
 
 				_.each(
-					this.subTargetBuilders,
+					builders,
 					function( builder ) {
-						if( !builder.handlesTarget( target ) ) {
-							return
-						}
+						if( builder.handlesTarget( target ) ) {
 
-						builder.build()
+							f.next( function() {
+								builder.build( f.wait() )
+							} )
+						}
 					}
 				)
+
+				f.onComplete( next )
 			}
 		}
 

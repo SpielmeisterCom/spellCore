@@ -11,6 +11,7 @@ define(
 		'spell/shared/build/loadAssociatedScriptModules',
 		'spell/shared/build/processSource',
 		'spell/shared/build/writeFile',
+		'spell/shared/build/spawnChildProcess',
 
 		'child_process',
 		'fs',
@@ -35,6 +36,7 @@ define(
 		loadAssociatedScriptModules,
 		processSource,
 		writeFile,
+		spawnChildProcess,
 
 		child_process,
 		fs,
@@ -212,7 +214,7 @@ define(
 		}
 
 		var compile = function( compilerExecutablePath, configFilePath, next ) {
-			child_process.execFile(
+			spawnChildProcess(
 				compilerExecutablePath,
 				[ '-load-config', configFilePath ],
 				{},
@@ -447,9 +449,7 @@ define(
 
 			var onCompilingCompleted = function( errors, stderr, stdout ) {
 				// TODO: parse stderr to get to the real compiler errors
-//				next( stdout )
-
-				console.log( stdout )
+				next( errors )
 			}
 
 			compile( compilerExecutablePath, compilerConfigFilePath, onCompilingCompleted )
@@ -496,7 +496,7 @@ define(
 					x === TARGET_NAME
 			},
 			build : function( next ) {
-				console.log( 'FlashBuilder.build()' )
+				console.log( 'building for sub-target "' + TARGET_NAME + '"...' )
 
 				build(
 					this.spellCorePath,
@@ -509,7 +509,8 @@ define(
 					this.scriptSource,
 					this.minify,
 					this.anonymizeModuleIds,
-					this.debug
+					this.debug,
+					next
 				)
 			}
 		}

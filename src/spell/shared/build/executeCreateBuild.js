@@ -17,6 +17,7 @@ define(
 		'spell/functions',
 
 		'amd-helper',
+		'ff',
 		'fs',
 		'flob',
 		'path'
@@ -38,6 +39,7 @@ define(
 		_,
 
 		amdHelper,
+		ff,
 		fs,
 		flob,
 		path
@@ -248,24 +250,21 @@ define(
 
 			var builtSomething = false
 
+			var f = ff( this )
+
 			_.each(
 				builders,
 				function( builder ) {
-					if( !builder.handlesTarget( target ) ) {
-						return
+					if( builder.handlesTarget( target ) ) {
+
+						f.next( function() {
+							builder.build( f.wait() )
+						} )
 					}
-
-					builder.build()
-
-					builtSomething = true
 				}
 			)
 
-			if( !builtSomething ) {
-				next( 'Error: Build target "' + target + '" is not supported.' )
-			}
-
-			next()
+			f.onComplete( next )
 		}
 	}
 )

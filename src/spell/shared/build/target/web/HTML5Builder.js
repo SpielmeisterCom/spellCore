@@ -39,7 +39,7 @@ define(
 		'use strict'
 
 
-		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug ) {
+		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
 			var outputWebPath        = path.join( outputPath, 'web' ),
 				outputWebLibraryPath = path.join( outputWebPath, 'library' ),
 				outputWebHtml5Path   = path.join( outputWebPath, 'html5' )
@@ -73,6 +73,8 @@ define(
 			] )
 
 			copyFiles( projectLibraryPath, outputWebLibraryPath, outputFilePaths )
+
+			next()
 		}
 
 		var TARGET_NAME = 'html5'
@@ -116,7 +118,7 @@ define(
 					x === TARGET_NAME
 			},
 			build : function( next ) {
-				console.log( 'HTML5Builder.build()' )
+				console.log( 'building for sub-target "' + TARGET_NAME + '"...' )
 
 				build(
 					this.spellCorePath,
@@ -129,7 +131,8 @@ define(
 					this.scriptSource,
 					this.minify,
 					this.anonymizeModuleIds,
-					this.debug
+					this.debug,
+					next
 				)
 			}
 		}

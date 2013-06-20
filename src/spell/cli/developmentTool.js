@@ -38,19 +38,21 @@ define(
 			tmp = tmp.concat( errors )
 
 			console.error( tmp.join( '\n' ) )
-			process.exit( 1 )
 		}
 
-		var onComplete = function( action, errors ) {
-			if( errors &&
-				errors.length > 0 ) {
+		var onComplete = function( action, err, result ) {
+			if( err &&
+				err.length > 0 ) {
 
-				printErrors( errors )
+				printErrors( err )
 				console.log( action + ' failed' )
-				process.exit( 0 )
+
+				process.exit( 1 )
 
 			} else {
 				console.log( action + ' successful' )
+
+				process.exit( 0 )
 			}
 		}
 
