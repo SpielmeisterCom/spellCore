@@ -69,7 +69,6 @@ define(
 				projectName        = path.basename( projectPath ),
 				projectFilePath    = path.resolve( projectPath, 'project.json' ),
 				inputPath          = path.join( projectPath, 'build', 'release' ),
-				target             = 'html5',
 				minify             = true,
 				anonymizeModuleIds = true,
 				debug              = false
@@ -83,6 +82,9 @@ define(
 					if( fs.existsSync( inputPath ) ) {
 						return
 					}
+
+					// when no release build artifacts are available build the "html5" target
+					var target = 'html5'
 
 					executeCreateBuild(
 						target,

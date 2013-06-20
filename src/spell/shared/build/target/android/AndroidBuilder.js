@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/target/android/AndroidBuilder',
 	[
+		'spell/shared/build/createBuilderType',
 		'spell/shared/build/createDataFileContent',
 		'spell/shared/build/createDebugPath',
 		'spell/shared/build/createProjectLibraryFilePaths',
@@ -25,6 +26,7 @@ define(
 		'rimraf'
 	],
 	function(
+		createBuilderType,
 		createDataFileContent,
 		createDebugPath,
 		createProjectLibraryFilePaths,
@@ -165,35 +167,8 @@ define(
 			)
 		}
 
-		var TARGET_NAME = 'android'
-
-		var FlashBuilder = function(
-			spellCorePath,
-			projectPath,
-			projectLibraryPath,
-			outputPath,
-			target,
-			projectConfig,
-			library,
-			cacheContent,
-			scriptSource,
-			minify,
-			anonymizeModuleIds,
-			debug
-		) {
-			this.spellCorePath      = spellCorePath
-			this.projectPath        = projectPath
-			this.projectLibraryPath = projectLibraryPath
-			this.outputPath         = outputPath
-			this.target             = target
-			this.projectConfig      = projectConfig
-			this.library            = library
-			this.cacheContent       = cacheContent
-			this.scriptSource       = scriptSource
-			this.minify             = minify
-			this.anonymizeModuleIds = anonymizeModuleIds
-			this.debug              = debug
-		}
+		var TARGET_NAME  = 'android',
+			FlashBuilder = createBuilderType()
 
 		FlashBuilder.prototype = {
 			init : function() {},

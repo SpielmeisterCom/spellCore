@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/target/web/HTML5Builder',
 	[
+		'spell/shared/build/createBuilderType',
 		'spell/shared/build/createDataFileContent',
 		'spell/shared/build/createDebugPath',
 		'spell/shared/build/copyFiles',
@@ -19,6 +20,7 @@ define(
 		'path'
 	],
 	function(
+		createBuilderType,
 		createDataFileContent,
 		createDebugPath,
 		copyFiles,
@@ -77,35 +79,8 @@ define(
 			next()
 		}
 
-		var TARGET_NAME = 'html5'
-
-		var HTML5Builder = function(
-			spellCorePath,
-			projectPath,
-			projectLibraryPath,
-			outputPath,
-			target,
-			projectConfig,
-			library,
-			cacheContent,
-			scriptSource,
-			minify,
-			anonymizeModuleIds,
-			debug
-		) {
-			this.spellCorePath      = spellCorePath
-			this.projectPath        = projectPath
-			this.projectLibraryPath = projectLibraryPath
-			this.outputPath         = outputPath
-			this.target             = target
-			this.projectConfig      = projectConfig
-			this.library            = library
-			this.cacheContent       = cacheContent
-			this.scriptSource       = scriptSource
-			this.minify             = minify
-			this.anonymizeModuleIds = anonymizeModuleIds
-			this.debug              = debug
-		}
+		var TARGET_NAME  = 'html5',
+			HTML5Builder = createBuilderType()
 
 		HTML5Builder.prototype = {
 			init : function() {},

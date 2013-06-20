@@ -2,6 +2,7 @@ define(
 	'spell/shared/build/target/web/FlashBuilder',
 	[
 		'spell/shared/build/ast/createAST',
+		'spell/shared/build/createBuilderType',
 		'spell/shared/build/ast/createComponentTypeDefinition',
 		'spell/shared/build/ast/createSource',
 		'spell/shared/build/ast/isAmdHeader',
@@ -27,6 +28,7 @@ define(
 	],
 	function(
 		createAST,
+		createBuilderType,
 		createComponentTypeDefinition,
 		createSource,
 		isAmdHeader,
@@ -455,35 +457,8 @@ define(
 			compile( compilerExecutablePath, compilerConfigFilePath, onCompilingCompleted )
 		}
 
-		var TARGET_NAME = 'flash'
-
-		var FlashBuilder = function(
-			spellCorePath,
-			projectPath,
-			projectLibraryPath,
-			outputPath,
-			target,
-			projectConfig,
-			library,
-			cacheContent,
-			scriptSource,
-			minify,
-			anonymizeModuleIds,
-			debug
-		) {
-			this.spellCorePath      = spellCorePath
-			this.projectPath        = projectPath
-			this.projectLibraryPath = projectLibraryPath
-			this.outputPath         = outputPath
-			this.target             = target
-			this.projectConfig      = projectConfig
-			this.library            = library
-			this.cacheContent       = cacheContent
-			this.scriptSource       = scriptSource
-			this.minify             = minify
-			this.anonymizeModuleIds = anonymizeModuleIds
-			this.debug              = debug
-		}
+		var TARGET_NAME  = 'flash',
+			FlashBuilder = createBuilderType()
 
 		FlashBuilder.prototype = {
 			init : function() {},

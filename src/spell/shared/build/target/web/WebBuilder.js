@@ -4,6 +4,7 @@ define(
 		'spell/shared/build/target/web/FlashBuilder',
 		'spell/shared/build/target/web/HTML5Builder',
 		'spell/shared/build/copyFiles',
+		'spell/shared/build/createBuilderType',
 		'spell/shared/build/createDebugPath',
 		'spell/shared/build/createProjectLibraryFilePaths',
 
@@ -14,6 +15,7 @@ define(
 		FlashBuilder,
 		HTML5Builder,
 		copyFiles,
+		createBuilderType,
 		createDebugPath,
 		createProjectLibraryFilePaths,
 
@@ -52,35 +54,8 @@ define(
 			copyFiles( projectLibraryPath, outputWebLibraryPath, outputFilePaths )
 		}
 
-		var TARGET_NAME = 'web'
-
-		var WebBuilder = function(
-			spellCorePath,
-			projectPath,
-			projectLibraryPath,
-			outputPath,
-			target,
-			projectConfig,
-			library,
-			cacheContent,
-			scriptSource,
-			minify,
-			anonymizeModuleIds,
-			debug
-		) {
-			this.spellCorePath      = spellCorePath
-			this.projectPath        = projectPath
-			this.projectLibraryPath = projectLibraryPath
-			this.outputPath         = outputPath
-			this.target             = target
-			this.projectConfig      = projectConfig
-			this.library            = library
-			this.cacheContent       = cacheContent
-			this.scriptSource       = scriptSource
-			this.minify             = minify
-			this.anonymizeModuleIds = anonymizeModuleIds
-			this.debug              = debug
-		}
+		var TARGET_NAME = 'web',
+			WebBuilder  = createBuilderType()
 
 		WebBuilder.prototype = {
 			init : function() {
