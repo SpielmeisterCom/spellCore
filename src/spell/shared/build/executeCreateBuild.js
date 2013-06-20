@@ -248,14 +248,14 @@ define(
 				}
 			)
 
-			var builtSomething = false
-
-			var f = ff( this )
+			var foundBuilder = false,
+				f            = ff( this )
 
 			_.each(
 				builders,
 				function( builder ) {
 					if( builder.handlesTarget( target ) ) {
+						foundBuilder = true
 
 						f.next( function() {
 							builder.build( f.wait() )
@@ -263,6 +263,10 @@ define(
 					}
 				}
 			)
+
+			if( !foundBuilder ) {
+				next( 'Error: Build target "' + target + '" is not supported.' )
+			}
 
 			f.onComplete( next )
 		}
