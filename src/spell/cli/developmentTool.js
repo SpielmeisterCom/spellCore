@@ -207,7 +207,7 @@ define(
 
 			commander
 				.command( 'export' )
-				.option( '-d, --directory [directory]', 'The path to the project directory which should be initialized. The default is the current working directory.' )
+				.option( '-d, --directory [directory]', 'The path to the project directory which should be exported. The default is the current working directory.' )
 				.option( '-f, --file [file]', 'the name of the output file' )
 				.description( 'export a deployment ready version into a zip archive' )
 				.action( _.bind( exportCommand, this, spellCorePath, cwd ) )
