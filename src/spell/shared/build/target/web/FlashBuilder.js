@@ -360,11 +360,11 @@ define(
 				spellEnginePath          = path.resolve( spellCorePath, '../../../..' ),
 				spellFlashPath           = path.join( spellEnginePath, 'modules/spellFlash' ),
 				projectBuildPath         = path.join( projectPath, 'build' ),
-				projectBuildTmpFlashPath = path.join( projectBuildPath, 'tmp', 'flash' ),
-				srcPath                  = path.join( projectBuildTmpFlashPath, 'src' ),
+				tmpPath                  = path.join( projectBuildPath, 'tmp', 'web', 'flash' ),
+				srcPath                  = path.join( tmpPath, 'src' ),
 				spielmeisterPackagePath  = path.join( srcPath, 'Spielmeister' ),
 				outputFlashPath          = path.join( outputPath, 'web', 'flash' ),
-				compilerConfigFilePath   = path.join( projectBuildTmpFlashPath, 'compile-config.xml' ),
+				compilerConfigFilePath   = path.join( tmpPath, 'compile-config.xml' ),
 				flexSdkPath              = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
 				compilerExecutablePath   = path.join( flexSdkPath, os.platform() == 'win32' ? 'bin/mxmlc.bat' : 'bin/mxmlc' )
 
