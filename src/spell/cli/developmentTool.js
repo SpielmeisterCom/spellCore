@@ -156,20 +156,22 @@ define(
 
 			var exportCommand = function( spellCorePath, cwd, command ) {
 				var projectPath = path.resolve( command.directory || cwd ),
-					inputPath   = path.join( projectPath, 'build', 'release' ),
 					errors      = checkProjectPath( projectPath )
 
-				if( errors.length > 0 ) printErrors( errors )
-
-				if( !fs.existsSync( inputPath ) ) {
-
+				if( errors.length > 0 ) {
+					printErrors( errors )
 				}
 
 				var outputFilePath = _.isString( command.file ) ?
 					path.resolve( command.file ) :
 					path.resolve( projectPath, 'export.zip' )
 
-				exportArchive( spellCorePath, projectPath, outputFilePath, _.bind( onComplete, null, 'export' ) )
+				exportArchive(
+					spellCorePath,
+					projectPath,
+					outputFilePath,
+					_.bind( onComplete, null, 'export' )
+				)
 			}
 
 			var infoCommand = function( spellCorePath, cwd ) {

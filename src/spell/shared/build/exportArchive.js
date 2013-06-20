@@ -4,6 +4,7 @@ define(
 		'spell/shared/build/executeCreateBuild',
 		'spell/shared/build/isFile',
 
+		'ff',
 		'fs',
 		'flob',
 		'mkdirp',
@@ -14,6 +15,7 @@ define(
 		executeCreateBuild,
 		isFile,
 
+		ff,
 		fs,
 		flob,
 		mkdirp,
@@ -23,7 +25,7 @@ define(
 		'use strict'
 
 
-		var addFile = function( zip, rootPath, filePaths ) {
+		var addFile = function( zip, rootPath, filePaths, next ) {
 			var filePath = filePaths.shift()
 
 			if( filePath ) {
@@ -34,26 +36,30 @@ define(
 						fs.createReadStream( absoluteFilePath ),
 						{ name : filePath.replace( /\/build\/release/, '' ) },
 						function() {
-							addFile( zip, rootPath, filePaths )
+							addFile( zip, rootPath, filePaths, next )
 						}
 					)
 
 				} else {
-					addFile( zip, rootPath, filePaths )
+					addFile( zip, rootPath, filePaths, next )
 				}
 
 			} else {
-				zip.finalize()
+				zip.finalize(
+					function( numBytesWritten ) {
+						next()
+					}
+				)
 			}
 		}
 
-		var createZipFile = function( outputFilePath, rootPath, fileNames ) {
+		var createZipFile = function( outputFilePath, rootPath, fileNames, next ) {
 			var zip = ZipStream.createZip( { level: 1 } ),
 				out = fs.createWriteStream( outputFilePath )
 
 			zip.pipe( out )
 
-			addFile( zip, rootPath, fileNames )
+			addFile( zip, rootPath, fileNames, next )
 		}
 
 
@@ -62,6 +68,7 @@ define(
 				projectsPath       = path.resolve( projectPath, '..' ),
 				projectName        = path.basename( projectPath ),
 				projectFilePath    = path.resolve( projectPath, 'project.json' ),
+				inputPath          = path.join( projectPath, 'build', 'release' ),
 				target             = 'html5',
 				minify             = true,
 				anonymizeModuleIds = true,
@@ -71,26 +78,37 @@ define(
 				mkdirp.sync( outputPath )
 			}
 
-			executeCreateBuild(
-				target,
-				spellCorePath,
-				projectPath,
-				projectFilePath,
-				minify,
-				anonymizeModuleIds,
-				debug,
-				next
-			)
+			var f = ff(
+				function() {
+					if( fs.existsSync( inputPath ) ) {
+						return
+					}
 
-			// create archive
-			var filePaths = flob.sync(
-				projectName + '/build/release/**',
-				{
-					cwd : projectsPath
+					executeCreateBuild(
+						target,
+						spellCorePath,
+						projectPath,
+						projectFilePath,
+						minify,
+						anonymizeModuleIds,
+						debug,
+						f.wait()
+					)
+				},
+				function() {
+					// create archive
+					console.log( 'creating archive "' + outputFilePath + '"...' )
+
+					var filePaths = flob.sync(
+						projectName + '/build/release/**',
+						{
+							cwd : projectsPath
+						}
+					)
+
+					createZipFile( outputFilePath, projectsPath, filePaths, f.wait() )
 				}
-			)
-
-			createZipFile( outputFilePath, projectsPath, filePaths )
+			).onComplete( next )
 		}
 	}
 )
