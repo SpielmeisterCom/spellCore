@@ -647,7 +647,6 @@ NATIVE.screen.onResize = function( width, height ) {
 		id :               '',
 		libraryUrl :       'resources/library',
 		mode :             'deployed',
-		platform :         'html5',
 		renderingBackEnd : 'canvas-2d',
 		screenSize :       [ width, height ],
 		verbose :          true
