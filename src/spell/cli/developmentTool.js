@@ -103,6 +103,7 @@ define(
 				if( errors.length > 0 ) printErrors( errors )
 
 				console.log( 'cleaning...' )
+
 				cleanDirectory( path.join( projectPath, 'build' ) )
 			}
 
