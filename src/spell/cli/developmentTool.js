@@ -100,8 +100,8 @@ define(
 			return spellCorePath
 		}
 
-		var createProjectPath = function( cwd, projectDirectory ) {
-			return path.resolve( projectDirectory || cwd )
+		var createProjectPath = function( cwd, project ) {
+			return path.resolve( project || cwd )
 		}
 
 
@@ -109,7 +109,7 @@ define(
 			var spellCorePath  = getSpellCorePath( basePath, isDevEnv )
 
 			var cleanCommand = function( cwd, command ) {
-				var projectPath = createProjectPath( cwd, command.projectDirectory ),
+				var projectPath = createProjectPath( cwd, command.project ),
 					errors      = checkProjectPath( projectPath )
 
 				if( printErrors( errors ) ) {
@@ -122,7 +122,7 @@ define(
 			}
 
 			var buildCommand = function( cwd, target, command ) {
-				var projectPath        = createProjectPath( cwd, command.projectDirectory ),
+				var projectPath        = createProjectPath( cwd, command.project ),
 					errors             = checkProjectPath( projectPath ),
 					debug              = command.debug || false,
 					minify             = !debug,
@@ -155,7 +155,7 @@ define(
 			}
 
 			var initCommand = function( spellCorePath, cwd, isDevEnvironment, command ) {
-				var projectPath = createProjectPath( cwd, command.projectDirectory )
+				var projectPath = createProjectPath( cwd, command.project )
 
 				var errors = initializeProjectDirectory(
 					spellCorePath,
@@ -174,7 +174,7 @@ define(
 			}
 
 			var exportCommand = function( spellCorePath, cwd, command ) {
-				var projectPath = createProjectPath( cwd, command.projectDirectory ),
+				var projectPath = createProjectPath( cwd, command.project ),
 					errors      = checkProjectPath( projectPath )
 
 				if( printErrors( errors ) ) {
@@ -194,7 +194,7 @@ define(
 			}
 
 			var infoCommand = function( spellCorePath, cwd, command ) {
-				var projectPath = createProjectPath( cwd, command.projectDirectory ),
+				var projectPath = createProjectPath( cwd, command.project ),
 					errors      = checkProjectPath( projectPath )
 
 				if( printErrors( errors ) ) {
@@ -215,35 +215,35 @@ define(
 
 			commander
 				.command( 'clean' )
-				.option( '-p, --project-directory [directory]', 'The path to the project directory. The default is the current working directory.' )
-				.description( 'cleans the build directory' )
+				.option( '-p, --project [directory]', 'The path to the project directory. The default is the current working directory.' )
+				.description( 'Cleans the build directory.' )
 				.action( _.bind( cleanCommand, this, cwd ) )
 
 			commander
 				.command( 'build [target]' )
-				.option( '-p, --project-directory [directory]', 'The path to the project directory. The default is the current working directory.' )
+				.option( '-p, --project [directory]', 'The path to the project directory. The default is the current working directory.' )
 				.option( '-d, --debug', 'creates a debug build' )
 				.option( '-r, --release', 'creates a release build' )
-				.description( 'creates a build for a specific target; available targets: web, web-html5, web-flash, android, ios' )
+				.description( 'Creates a build for a specific target; available targets: web, web-html5, web-flash, android, ios.' )
 				.action( _.bind( buildCommand, this, cwd ) )
 
 			commander
-				.command( 'export' )
-				.option( '-p, --project-directory [directory]', 'The path to the project directory. The default is the current working directory.' )
+				.command( 'export [target]' )
+				.option( '-p, --project [directory]', 'The path to the project directory. The default is the current working directory.' )
 				.option( '-f, --file [file]', 'the name of the output file' )
-				.description( 'export a deployment ready version into a zip archive' )
+				.description( 'Creates a release version of the supplied targets and packages them into a zip archive.' )
 				.action( _.bind( exportCommand, this, spellCorePath, cwd ) )
 
 			commander
 				.command( 'info' )
-				.option( '-p, --project-directory [directory]', 'The path to the project directory. The default is the current working directory.' )
-				.description( 'print information about current environment' )
+				.option( '-p, --project [directory]', 'The path to the project directory. The default is the current working directory.' )
+				.description( 'Prints information about current environment.' )
 				.action( _.bind( infoCommand, this, spellCorePath, cwd ) )
 
 			commander
 				.command( 'init' )
-				.option( '-p, --project-directory [directory]', 'The path to the project directory. The default is the current working directory.' )
-				.description( 'initialize a project directory with project scaffolding' )
+				.option( '-p, --project [directory]', 'The path to the project directory. The default is the current working directory.' )
+				.description( 'Initializes a project directory with project scaffolding.' )
 				.action( _.bind( initCommand, this, spellCorePath, cwd, isDevEnv ) )
 
 			commander.parse( argv )
