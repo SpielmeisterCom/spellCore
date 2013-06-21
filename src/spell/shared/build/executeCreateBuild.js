@@ -172,7 +172,7 @@ define(
 			)
 		}
 
-		return function( target, spellCorePath, projectPath, projectFilePath, minify, anonymizeModuleIds, debug, next ) {
+		return function( spellCorePath, projectPath, projectFilePath, target, minify, anonymizeModuleIds, debug, next ) {
 			var errors             = [],
 				buildMode          = debug ? 'debug' : 'release',
 				projectLibraryPath = path.join( projectPath, 'library' ),

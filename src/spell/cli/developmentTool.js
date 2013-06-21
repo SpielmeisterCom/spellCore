@@ -143,10 +143,10 @@ define(
 				console.log( 'building...' )
 
 				executeCreateBuild(
-					target,
 					spellCorePath,
 					projectPath,
 					projectFilePath,
+					target,
 					minify,
 					anonymizeModuleIds,
 					debug,
@@ -173,7 +173,7 @@ define(
 				}
 			}
 
-			var exportCommand = function( spellCorePath, cwd, command ) {
+			var exportCommand = function( spellCorePath, cwd, target, command ) {
 				var projectPath = createProjectPath( cwd, command.project ),
 					errors      = checkProjectPath( projectPath )
 
@@ -189,6 +189,7 @@ define(
 					spellCorePath,
 					projectPath,
 					outputFilePath,
+					target,
 					_.bind( onComplete, null, 'export' )
 				)
 			}

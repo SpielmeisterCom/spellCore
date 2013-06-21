@@ -1,6 +1,7 @@
 define(
 	'spell/shared/build/exportArchive',
 	[
+		'spell/shared/build/cleanDirectory',
 		'spell/shared/build/executeCreateBuild',
 		'spell/shared/build/isFile',
 
@@ -12,6 +13,7 @@ define(
 		'zipstream'
 	],
 	function(
+		cleanDirectory,
 		executeCreateBuild,
 		isFile,
 
@@ -63,12 +65,13 @@ define(
 		}
 
 
-		return function( spellCorePath, projectPath, outputFilePath, next ) {
+		return function( spellCorePath, projectPath, outputFilePath, target, next ) {
 			var outputPath         = path.dirname( outputFilePath ),
 				projectsPath       = path.resolve( projectPath, '..' ),
 				projectName        = path.basename( projectPath ),
-				projectFilePath    = path.resolve( projectPath, 'project.json' ),
-				inputPath          = path.join( projectPath, 'build', 'release' ),
+				projectFilePath    = path.join( projectPath, 'project.json' ),
+				projectBuildPath   = path.join( projectPath, 'build' ),
+				inputPath          = path.join( projectBuildPath, 'release' ),
 				minify             = true,
 				anonymizeModuleIds = true,
 				debug              = false
@@ -79,18 +82,24 @@ define(
 
 			var f = ff(
 				function() {
-					if( fs.existsSync( inputPath ) ) {
+					if( !target &&
+						fs.existsSync( inputPath ) ) {
+
 						return
 					}
 
-					// when no release build artifacts are available build the "html5" target
-					var target = 'html5'
+					console.log( 'cleaning...' )
+
+					cleanDirectory( projectBuildPath )
+
+
+					console.log( 'building...' )
 
 					executeCreateBuild(
-						target,
 						spellCorePath,
 						projectPath,
 						projectFilePath,
+						target,
 						minify,
 						anonymizeModuleIds,
 						debug,
