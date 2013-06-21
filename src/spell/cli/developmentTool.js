@@ -104,6 +104,10 @@ define(
 			return path.resolve( project || cwd )
 		}
 
+		var logProject = function( projectPath ) {
+			console.log( 'Working on project directory "' + projectPath + '".' )
+		}
+
 
 		return function( argv, cwd, basePath, isDevEnv ) {
 			var spellCorePath  = getSpellCorePath( basePath, isDevEnv )
@@ -116,6 +120,7 @@ define(
 					process.exit( 1 )
 				}
 
+				logProject( projectPath )
 				console.log( 'cleaning...' )
 
 				cleanDirectory( path.join( projectPath, 'build' ) )
@@ -140,6 +145,7 @@ define(
 					process.exit( 1 )
 				}
 
+				logProject( projectPath )
 				console.log( 'building...' )
 
 				executeCreateBuild(
@@ -157,6 +163,8 @@ define(
 			var initCommand = function( spellCorePath, cwd, isDevEnvironment, command ) {
 				var projectPath = createProjectPath( cwd, command.project )
 
+				logProject( projectPath )
+
 				var errors = initializeProjectDirectory(
 					spellCorePath,
 					createProjectName( projectPath ),
@@ -169,7 +177,7 @@ define(
 					process.exit( 1 )
 
 				} else {
-					console.log( 'Initialized project in "' + projectPath + '".' )
+					console.log( 'Initialized project.' )
 				}
 			}
 
@@ -184,6 +192,8 @@ define(
 				var outputFilePath = _.isString( command.file ) ?
 					path.resolve( command.file ) :
 					path.resolve( projectPath, 'export.zip' )
+
+				logProject( projectPath )
 
 				exportArchive(
 					spellCorePath,
