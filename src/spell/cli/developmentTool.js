@@ -34,10 +34,18 @@ define(
 
 
 		var printErrors = function( errors ) {
-			var tmp = []
-			tmp = tmp.concat( errors )
+			if( errors &&
+				errors.length > 0 ) {
 
-			console.error( tmp.join( '\n' ) )
+				var tmp = []
+				tmp = tmp.concat( errors )
+
+				console.error( tmp.join( '\n' ) )
+
+				return true
+			}
+
+			return false
 		}
 
 		var onComplete = function( action, err, result ) {
@@ -92,15 +100,21 @@ define(
 			return spellCorePath
 		}
 
+		var createProjectPath = function( cwd, projectDirectory ) {
+			return path.resolve( projectDirectory || cwd )
+		}
+
 
 		return function( argv, cwd, basePath, isDevEnv ) {
 			var spellCorePath  = getSpellCorePath( basePath, isDevEnv )
 
-			var cleanCommand = function( cwd ) {
-				var projectPath = path.resolve( cwd ),
+			var cleanCommand = function( cwd, command ) {
+				var projectPath = createProjectPath( cwd, command.projectDirectory ),
 					errors      = checkProjectPath( projectPath )
 
-				if( errors.length > 0 ) printErrors( errors )
+				if( printErrors( errors ) ) {
+					process.exit( 1 )
+				}
 
 				console.log( 'cleaning...' )
 
@@ -108,21 +122,25 @@ define(
 			}
 
 			var buildCommand = function( cwd, target, command ) {
-				console.log( 'building...' )
-
-				var projectPath        = path.resolve( cwd ),
+				var projectPath        = createProjectPath( cwd, command.projectDirectory ),
 					errors             = checkProjectPath( projectPath ),
 					debug              = command.debug || false,
 					minify             = !debug,
 					anonymizeModuleIds = true
 
-				if( errors.length > 0 ) printErrors( errors )
+				if( printErrors( errors ) ) {
+					process.exit( 1 )
+				}
 
 				var projectFilePath = createProjectFilePath( projectPath )
 
 				if( !isFile( projectFilePath ) ) {
 					printErrors( 'Error: Missing project file "' + projectFilePath + '".' )
+
+					process.exit( 1 )
 				}
+
+				console.log( 'building...' )
 
 				executeCreateBuild(
 					target,
@@ -137,7 +155,7 @@ define(
 			}
 
 			var initCommand = function( spellCorePath, cwd, isDevEnvironment, command ) {
-				var projectPath = path.resolve( command.directory || cwd )
+				var projectPath = createProjectPath( cwd, command.projectDirectory )
 
 				var errors = initializeProjectDirectory(
 					spellCorePath,
@@ -147,20 +165,20 @@ define(
 					isDevEnvironment
 				)
 
-				if( errors.length > 0 ) {
-					printErrors( errors )
+				if( printErrors( errors ) ) {
+					process.exit( 1 )
 
 				} else {
-					console.log( 'Initialized project in ' + projectPath )
+					console.log( 'Initialized project in "' + projectPath + '".' )
 				}
 			}
 
 			var exportCommand = function( spellCorePath, cwd, command ) {
-				var projectPath = path.resolve( command.directory || cwd ),
+				var projectPath = createProjectPath( cwd, command.projectDirectory ),
 					errors      = checkProjectPath( projectPath )
 
-				if( errors.length > 0 ) {
-					printErrors( errors )
+				if( printErrors( errors ) ) {
+					process.exit( 1 )
 				}
 
 				var outputFilePath = _.isString( command.file ) ?
@@ -175,11 +193,13 @@ define(
 				)
 			}
 
-			var infoCommand = function( spellCorePath, cwd ) {
-				var projectPath = path.resolve( cwd ),
+			var infoCommand = function( spellCorePath, cwd, command ) {
+				var projectPath = createProjectPath( cwd, command.projectDirectory ),
 					errors      = checkProjectPath( projectPath )
 
-				if( errors.length > 0 ) printErrors( errors )
+				if( printErrors( errors ) ) {
+					process.exit( 1 )
+				}
 
 				console.log( 'spellCore directory: ' + spellCorePath )
 				console.log( 'project directory: ' + projectPath )
@@ -195,31 +215,34 @@ define(
 
 			commander
 				.command( 'clean' )
+				.option( '-p, --project-directory [directory]', 'The path to the project directory. The default is the current working directory.' )
 				.description( 'cleans the build directory' )
 				.action( _.bind( cleanCommand, this, cwd ) )
 
 			commander
 				.command( 'build [target]' )
-				.option( '--debug', 'creates a debug build' )
-				.option( '--release', 'creates a release build' )
+				.option( '-p, --project-directory [directory]', 'The path to the project directory. The default is the current working directory.' )
+				.option( '-d, --debug', 'creates a debug build' )
+				.option( '-r, --release', 'creates a release build' )
 				.description( 'creates a build for a specific target; available targets: web, web-html5, web-flash, android, ios' )
 				.action( _.bind( buildCommand, this, cwd ) )
 
 			commander
 				.command( 'export' )
-				.option( '-d, --directory [directory]', 'The path to the project directory which should be exported. The default is the current working directory.' )
+				.option( '-p, --project-directory [directory]', 'The path to the project directory. The default is the current working directory.' )
 				.option( '-f, --file [file]', 'the name of the output file' )
 				.description( 'export a deployment ready version into a zip archive' )
 				.action( _.bind( exportCommand, this, spellCorePath, cwd ) )
 
 			commander
 				.command( 'info' )
+				.option( '-p, --project-directory [directory]', 'The path to the project directory. The default is the current working directory.' )
 				.description( 'print information about current environment' )
 				.action( _.bind( infoCommand, this, spellCorePath, cwd ) )
 
 			commander
 				.command( 'init' )
-				.option( '-d, --directory [directory]', 'The path to the project directory which should be initialized. The default is the current working directory.' )
+				.option( '-p, --project-directory [directory]', 'The path to the project directory. The default is the current working directory.' )
 				.description( 'initialize a project directory with project scaffolding' )
 				.action( _.bind( initCommand, this, spellCorePath, cwd, isDevEnv ) )
 
