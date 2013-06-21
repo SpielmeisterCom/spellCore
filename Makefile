@@ -83,6 +83,9 @@ cli: cli-js
 	#integrate underscore
 	cp ../../node_modules/underscore/underscore.js $(NODE_SRC)/lib/underscore.js
 
+	#integrate ff
+	cp ../../node_modules/ff/lib/ff.js $(NODE_SRC)/lib/ff.js
+
 	#integrate amd-helper
 	cp ../../node_modules/amd-helper/lib/index.js $(NODE_SRC)/lib/amdhelper.js
 	cp ../../node_modules/amd-helper/lib/createModuleHeader.js $(NODE_SRC)/lib/amdhelper_createModuleHeader.js
