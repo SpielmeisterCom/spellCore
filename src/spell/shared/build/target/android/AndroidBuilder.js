@@ -152,7 +152,7 @@ define(
 						[ 'debug', 'native-android' ] :
 						[ 'build', 'native-android' ]
 
-					spawnChildProcess( 'basil', args, { cwd : tmpProjectPath }, f.wait() )
+					spawnChildProcess( 'basil', args, { cwd : tmpProjectPath }, true, f.wait() )
 				},
 				function() {
 					// copy generated apk file to output directory

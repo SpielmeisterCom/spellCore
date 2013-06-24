@@ -48,11 +48,9 @@ define(
 			return false
 		}
 
-		var onComplete = function( action, err, result ) {
-			if( err &&
-				err.length > 0 ) {
-
-				printErrors( err )
+		var onComplete = function( action, error, result ) {
+			if( error ) {
+				printErrors( error )
 				console.log( action + ' failed' )
 
 				process.exit( 1 )

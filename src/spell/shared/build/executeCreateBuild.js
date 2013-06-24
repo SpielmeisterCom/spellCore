@@ -254,13 +254,15 @@ define(
 			_.each(
 				builders,
 				function( builder ) {
-					if( builder.handlesTarget( target ) ) {
-						foundBuilder = true
-
-						f.next( function() {
-							builder.build( f.wait() )
-						} )
+					if( !builder.handlesTarget( target ) ) {
+						return
 					}
+
+					foundBuilder = true
+
+					f.next( function() {
+						builder.build( f.wait() )
+					} )
 				}
 			)
 

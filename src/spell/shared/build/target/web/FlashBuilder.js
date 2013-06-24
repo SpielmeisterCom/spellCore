@@ -15,6 +15,7 @@ define(
 		'spell/shared/build/spawnChildProcess',
 
 		'child_process',
+		'ff',
 		'fs',
 		'mkdirp',
 		'path',
@@ -41,6 +42,7 @@ define(
 		spawnChildProcess,
 
 		child_process,
+		ff,
 		fs,
 		mkdirp,
 		path,
@@ -220,7 +222,14 @@ define(
 				compilerExecutablePath,
 				[ '-load-config', configFilePath ],
 				{},
-				next
+				true,
+				function( error, code ) {
+					if( error ) {
+						next( error )
+					}
+
+					next()
+				}
 			)
 		}
 
@@ -449,12 +458,23 @@ define(
 				debug
 			)
 
-			var onCompilingCompleted = function( errors, stderr, stdout ) {
-				// TODO: parse stderr to get to the real compiler errors
-				next( errors )
-			}
+			compile( compilerExecutablePath, compilerConfigFilePath, next )
+		}
 
-			compile( compilerExecutablePath, compilerConfigFilePath, onCompilingCompleted )
+		var hasJava = function( next ) {
+			var child = spawnChildProcess(
+				'java',
+				[ '-version' ],
+				{},
+				false,
+				function( error, status ) {
+					if( error ) {
+						next( 'Error: Missing a Java Runtime Environment. Please install one.' )
+					}
+
+					next()
+				}
+			)
 		}
 
 		var TARGET_NAME  = 'flash',
@@ -473,20 +493,29 @@ define(
 			build : function( next ) {
 				console.log( 'building for sub-target "' + TARGET_NAME + '"...' )
 
-				build(
-					this.spellCorePath,
-					this.projectPath,
-					this.projectLibraryPath,
-					this.outputPath,
-					this.projectConfig,
-					this.library,
-					this.cacheContent,
-					this.scriptSource,
-					this.minify,
-					this.anonymizeModuleIds,
-					this.debug,
-					next
-				)
+				var f = ff(
+					this,
+					function() {
+						hasJava( f.wait() )
+					},
+					function() {
+						build(
+							this.spellCorePath,
+							this.projectPath,
+							this.projectLibraryPath,
+							this.outputPath,
+							this.projectConfig,
+							this.library,
+							this.cacheContent,
+							this.scriptSource,
+							this.minify,
+							this.anonymizeModuleIds,
+							this.debug,
+							f.wait()
+						)
+					}
+
+				).onComplete( next )
 			}
 		}
 

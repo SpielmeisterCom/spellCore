@@ -9,27 +9,39 @@ define(
 		'use strict'
 
 
-		return function( command, args, options, next ) {
+		return function( command, args, options, redirectStd, next ) {
 			var child = child_process.spawn( command, args, options )
 
-			child.stdout.on(
-				'data',
-				function( data ) {
-					process.stdout.write( data )
-				}
-			)
+			if( redirectStd ) {
+				child.stdout.on(
+					'data',
+					function( data ) {
+						process.stdout.write( data )
+					}
+				)
 
-			child.stderr.on(
-				'data',
-				function( data ) {
-					process.stderr.write( data )
-				}
-			)
+				child.stderr.on(
+					'data',
+					function( data ) {
+						process.stderr.write( data )
+					}
+				)
+			}
 
-			child.stdout.on(
+			var error,
+				status
+
+			child.on(
 				'close',
-				function( code ) {
-					next()
+				function( status ) {
+					next( error, status )
+				}
+			)
+
+			child.on(
+				'error',
+				function( x ) {
+					error = x
 				}
 			)
 
