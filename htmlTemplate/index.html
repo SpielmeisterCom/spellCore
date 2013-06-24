@@ -6,14 +6,27 @@
         <meta http-equiv="X-UA-Compatible" content="IE=10, IE=9" >
 		<meta name="viewport" content="user-scalable=0" />
         <link rel="stylesheet" href="main.css" type="text/css" />
+
+		<!--
+		load the spell loader
+		-->
 		<script type="text/javascript" src="spell.loader.js"></script>
 	</head>
 
 	<body>
+		<!--
+		This div element is used by the spell engine as its container. The default id used for the look-up of the element is "spell". You can use a different
+		id by assigning it as a member of the configuration object which is passed to the spell loader.
+		-->
 		<div id="spell"></div>
 
 		<script type="text/javascript">
-			spell.start()
+			<!--
+			start the spell loader with the supplied config
+			-->
+			var config = {}
+
+			spell.start( config )
 		</script>
 	</body>
 </html>
