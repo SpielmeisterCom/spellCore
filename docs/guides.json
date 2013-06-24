@@ -71,6 +71,11 @@
 					"name": "tutorials_using_console_logging",
 					"title": "Using console logging",
 					"description": "This guide explains the logging functionality provided by the framework."
+				},
+				{
+					"name": "tutorials_project_build_managament",
+					"title": "Project build managament",
+					"description": "This guide explains how to manage project builds."
 				}
 			]
 	},
