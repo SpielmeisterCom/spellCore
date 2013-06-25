@@ -12,12 +12,13 @@ define(
 	) {
 		'use strict'
 
+
 		var preventDefaultHandler = function( event ) {
 			event.preventDefault()
 		}
 
 		var setListener = function( callback ) {
-			//disable context menu on right click
+			// disable context menu on right click
 			document.addEventListener( 'contextmenu', preventDefaultHandler, true )
 
 			keyHandler.registerListener( document, callback )
@@ -25,16 +26,15 @@ define(
 			pointerHandler.registerListener( document, this.container, this.configurationManager, callback )
 		}
 
-		var removeListener = function( ) {
+		var removeListener = function() {
 			keyHandler.removeListener( document )
 			mousewheelHandler.removeListener( document )
 			pointerHandler.removeListener( document )
 		}
 
-
 		var Input = function( configurationManager, renderingContext ) {
 			this.configurationManager = configurationManager
-			this.container = renderingContext.getCanvasElement()
+			this.container            = renderingContext.getCanvasElement()
 		}
 
 		Input.prototype = {
