@@ -50,7 +50,7 @@ cli-js:
 
 
 .PHONY: cli
-cli: cli-js flash
+cli: cli-js flash-target-builder-deps
 	#reseting node src directory
 	cd $(NODE_SRC) && git reset --hard master
 
@@ -168,8 +168,8 @@ endif
 deploy: engine-release cli
 
 
-.PHONY: flash
-flash:
+.PHONY: flash-target-builder-deps
+flash-target-builder-deps:
 	mkdir -p $(FLEX_SDK_OUT_DIR)/bin $(FLEX_SDK_OUT_DIR)/lib
 
 	# 3rd party libraries
