@@ -394,15 +394,15 @@ define(
 			},
 
 			keyDown: function( spell, editorSystem, event ) {
-				var keyCodes        = spell.inputManager.getKeyCodes(),
+				var KEY        = spell.inputManager.KEY,
 					selectedEntityId  = editorSystem.selectedEntity
 
-				if( event.keyCode === keyCodes.SPACE && selectedEntityId !== null && this.tilemaps[ selectedEntityId ] ) {
+				if( event.keyCode === KEY.SPACE && selectedEntityId !== null && this.tilemaps[ selectedEntityId ] ) {
 
 					beginTileEditing.call( this )
 
 				} else if (
-					event.keyCode === keyCodes.ESCAPE &&
+					event.keyCode === KEY.ESCAPE &&
 					(
 						this.state === STATE_SELECT_TILE ||
 						this.state === STATE_READY_TO_DRAW ||

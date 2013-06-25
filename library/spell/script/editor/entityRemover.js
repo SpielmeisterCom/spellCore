@@ -12,7 +12,7 @@ define("spell/script/editor/entityRemover",
 
 		entityRemover.prototype = {
 			keyDown: function( spell, editorSystem, event ) {
-				var keyCodes        = spell.inputManager.getKeyCodes(),
+				var KEY        = spell.inputManager.KEY,
 					selectedEntityId  = editorSystem.selectedEntity
 
 				if( !selectedEntityId ) {
@@ -24,8 +24,8 @@ define("spell/script/editor/entityRemover",
 
 					if( isRemovable &&
 						(
-							event.keyCode === keyCodes.DELETE ||
-							event.keyCode === keyCodes.BACKSPACE
+							event.keyCode === KEY.DELETE ||
+							event.keyCode === KEY.BACKSPACE
 						)
 					) {
 

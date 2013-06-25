@@ -17,10 +17,18 @@ define(
 		'use strict'
 
 
-		var inputEvents = []
+		var inputEvents = [],
+			keyCodePressed = {}
 
-		var pushIntoInputQueue = function( event ) {
+		var processEvent = function( event ) {
 			inputEvents.push( event )
+
+			var type      = event.type,
+				isKeyDown = type == 'keyDown'
+
+			if( isKeyDown || type == 'keyUp' ) {
+				keyCodePressed[ event.keyCode ] = isKeyDown
+			}
 		}
 
 		var createKeyEvent = function( type, keyCode ) {
@@ -42,7 +50,7 @@ define(
 			 * @private
 			 */
 			init : function() {
-				this.nativeInput.setInputEventListener( pushIntoInputQueue )
+				this.nativeInput.setInputEventListener( processEvent )
 			},
 
 			/**
@@ -51,7 +59,7 @@ define(
 			 * @private
 			 */
 			destroy : function() {
-				this.nativeInput.removeInputEventListener ( )
+				this.nativeInput.removeInputEventListener()
 			},
 
 			/**
@@ -70,20 +78,23 @@ define(
 			},
 
 			/**
-			 * Returns a key value list of keyCodes
+			 * Returns true if the key with the given key code is pressed, false otherwise.
 			 *
-			 * The key is a human readable version of the keyCode and the value
-			 * the corresponding keyCode
-			 *
-			 * @return {*}
+			 * @param keyCode
+			 * @return {Boolean}
 			 */
-			getKeyCodes: function() {
-				return keyCodes
+			isKeyPressed : function( keyCode ) {
+				return !!keyCodePressed[ keyCode ]
 			},
 
 			injectKeyEvent : function( type, keyCode ) {
 				inputEvents.push( createKeyEvent( type, keyCode ) )
-			}
+			},
+
+			/**
+			 * Map of supported keys.
+			 */
+			KEY : keyCodes
 		}
 
 		return InputManager
