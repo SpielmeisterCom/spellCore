@@ -226,9 +226,13 @@ define(
 				function( error, code ) {
 					if( error ) {
 						next( error )
-					}
 
-					next()
+					} else if( code !== 0 ) {
+						next( 'Error: Compilation aborted.' )
+
+					} else {
+						next()
+					}
 				}
 			)
 		}
@@ -379,8 +383,7 @@ define(
 				compilerExecutablePath   = path.join( flexSdkPath, 'bin', os.platform() == 'win32' ? 'mxmlc.bat' : 'mxmlc' )
 
 			if( !fs.existsSync( compilerExecutablePath ) ) {
-				console.error( 'Could not find compiler executable "' + compilerExecutablePath + '".' )
-				process.exit( 1 )
+				next( 'Error: Could not find compiler executable "' + compilerExecutablePath + '".' )
 			}
 
 			// remove build files from previous run
