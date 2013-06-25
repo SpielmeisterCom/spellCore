@@ -5,6 +5,10 @@
 ( function( document ) {
 	var modules  = {}
 
+	var createModuleSource = function( scriptName, source ) {
+		return source + '\n//@ sourceURL=' + scriptName
+	}
+
 	var createRequest = function( url ) {
 		var request = new XMLHttpRequest()
 
@@ -17,14 +21,14 @@
 	var loadModule = function( name, libraryUrl, libraryManager ) {
 		var scriptName = name + '.js',
 			cachedEntry,
-			moduleSource
+			source
 
 		if( libraryManager ) {
 			cachedEntry = libraryManager.get( scriptName )
 		}
 
 		if( cachedEntry ) {
-			moduleSource = cachedEntry
+			source = cachedEntry
 
 		} else {
 			var moduleUrl = libraryUrl ? libraryUrl + '/' + scriptName : scriptName,
@@ -36,10 +40,10 @@
 				throw 'Error: Loading \'' + moduleUrl + '\' failed.'
 			}
 
-			moduleSource = request.responseText
+			source = request.responseText
 		}
 
-		eval( moduleSource )
+		eval( createModuleSource( scriptName, source ) )
 
 		return modules[ name ]
 	}
@@ -123,7 +127,7 @@
 		}
 
 		if( typeof( arg1 ) === 'string' ) {
-			eval( arg1 )
+			eval( createModuleSource( name + '.js', arg1 ) )
 
 		} else {
 			modules[ name ] = {
