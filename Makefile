@@ -10,8 +10,12 @@ SPELL_HTML5_ADAPTER_MIN_LIB = build/spellCore/lib/spell.html5.min.js
 SPELL_ENGINE_DEBUG_LIB      = build/spellCore/lib/spell.debug.js
 SPELL_ENGINE_RELEASE_LIB    = build/spellCore/lib/spell.release.js
 SPELL_CLI_LIB               = build/spellCore/lib/spell.cli.js
-OUT_DIR                     = build/spellCore
-OUT_LIB_DIR                 = $(OUT_DIR)/lib
+SPELL_CORE_OUT_DIR          = build/spellCore
+SPELL_CORE_OUT_LIB_DIR      = $(SPELL_CORE_OUT_DIR)/lib
+SPELL_FLASH_DIR             = ../spellFlash
+FLEX_SDK_DIR                = $(SPELL_FLASH_DIR)/vendor/flex_sdk_4.8.0
+SPELL_FLASH_OUT_DIR         = build/spellFlash
+FLEX_SDK_OUT_DIR            = $(SPELL_FLASH_OUT_DIR)/vendor/flex_sdk
 NODE                        = ../nodejs/node
 NODE_SRC                    = ../nodejs/src
 NODE_PATH                   = $$(../nodejs/node --which)
@@ -39,14 +43,14 @@ endif
 .PHONY: cli-js
 cli-js:
 	# creating the javascript includes for the command line tool
-	mkdir -p $(OUT_LIB_DIR)
+	mkdir -p $(SPELL_CORE_OUT_LIB_DIR)
 
 	cat spell.cli.js > $(SPELL_CLI_LIB)
 	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander,ff" >> $(SPELL_CLI_LIB)
 
 
 .PHONY: cli
-cli: cli-js
+cli: cli-js flash
 	#reseting node src directory
 	cd $(NODE_SRC) && git reset --hard master
 
@@ -164,6 +168,29 @@ endif
 deploy: engine-release cli
 
 
+.PHONY: flash
+flash:
+	mkdir -p $(FLEX_SDK_OUT_DIR)/bin $(FLEX_SDK_OUT_DIR)/lib
+
+	# 3rd party libraries
+	cp -R $(SPELL_FLASH_DIR)/lib $(SPELL_FLASH_DIR)/src $(SPELL_FLASH_OUT_DIR)
+
+	# mxmlc and dependencies
+	mkdir -p $(FLEX_SDK_OUT_DIR)/frameworks
+	mkdir -p $(FLEX_SDK_OUT_DIR)/frameworks/libs/player/11.1
+	mkdir -p $(FLEX_SDK_OUT_DIR)/frameworks/themes/Spark
+
+	cp $(FLEX_SDK_DIR)/bin/mxmlc* $(FLEX_SDK_OUT_DIR)/bin
+	cp $(FLEX_SDK_DIR)/frameworks/localFonts.ser $(FLEX_SDK_OUT_DIR)/frameworks
+	cp $(FLEX_SDK_DIR)/frameworks/libs/player/11.1/playerglobal.swc $(FLEX_SDK_OUT_DIR)/frameworks/libs/player/11.1
+	cp $(FLEX_SDK_DIR)/frameworks/themes/Spark/spark.css $(FLEX_SDK_OUT_DIR)/frameworks/themes/Spark
+	cp $(FLEX_SDK_DIR)/lib/asc.jar $(FLEX_SDK_OUT_DIR)/lib
+	cp $(FLEX_SDK_DIR)/lib/fxgutils.jar $(FLEX_SDK_OUT_DIR)/lib
+	cp $(FLEX_SDK_DIR)/lib/mxmlc* $(FLEX_SDK_OUT_DIR)/lib
+	cp $(FLEX_SDK_DIR)/lib/swfutils.jar $(FLEX_SDK_OUT_DIR)/lib
+	cp $(FLEX_SDK_DIR)/lib/velocity-dep-1.4-flex.jar $(FLEX_SDK_OUT_DIR)/lib
+
+
 .PHONY: engine-debug
 engine-debug: clean $(SPELL_ENGINE_DEBUG_LIB) $(SPELL_ENGINE_RELEASE_LIB) additional-dependencies
 
@@ -177,8 +204,8 @@ engine-release: clean $(SPELL_ENGINE_RELEASE_LIB) additional-dependencies
 .PHONY: additional-dependencies
 additional-dependencies:
 	# copy additional dependencies to output directory
-	cp -R library $(OUT_DIR)
-	cp -R htmlTemplate $(OUT_DIR)
+	cp -R library $(SPELL_CORE_OUT_DIR)
+	cp -R htmlTemplate $(SPELL_CORE_OUT_DIR)
 
 
 $(SPELL_ENGINE_DEBUG_LIB): $(SPELL_COMMON_LIB) $(SPELL_HTML5_ADAPTER_LIB) $(SPELL_LOADER_LIB)
@@ -193,7 +220,7 @@ $(SPELL_ENGINE_RELEASE_LIB): $(SPELL_COMMON_MIN_LIB) $(SPELL_HTML5_ADAPTER_MIN_L
 
 
 $(SPELL_COMMON_LIB):
-	mkdir -p $(OUT_LIB_DIR)
+	mkdir -p $(SPELL_CORE_OUT_LIB_DIR)
 	$(NODE) tools/n.js $(SPELL_COMMON_OPTIONS) > $(SPELL_COMMON_LIB)
 
 
@@ -202,7 +229,7 @@ $(SPELL_COMMON_MIN_LIB): $(SPELL_COMMON_LIB)
 
 
 $(SPELL_HTML5_ADAPTER_LIB):
-	mkdir -p $(OUT_LIB_DIR)
+	mkdir -p $(SPELL_CORE_OUT_LIB_DIR)
 	$(NODE) tools/n.js $(SPELL_HTML5_ADAPTER_OPTIONS) > $(SPELL_HTML5_ADAPTER_LIB)
 
 
@@ -211,7 +238,7 @@ $(SPELL_HTML5_ADAPTER_MIN_LIB): $(SPELL_HTML5_ADAPTER_LIB)
 
 
 $(SPELL_LOADER_LIB):
-	mkdir -p $(OUT_LIB_DIR)
+	mkdir -p $(SPELL_CORE_OUT_LIB_DIR)
 	cp src/spell/client/stageZeroLoader.js $(SPELL_LOADER_LIB)
 
 

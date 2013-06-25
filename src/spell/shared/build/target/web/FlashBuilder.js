@@ -368,16 +368,15 @@ define(
 
 		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
 			var errors                   = [],
-				spellEnginePath          = path.resolve( spellCorePath, '../../../..' ),
-				spellFlashPath           = path.join( spellEnginePath, 'modules/spellFlash' ),
 				projectBuildPath         = path.join( projectPath, 'build' ),
 				tmpPath                  = path.join( projectBuildPath, 'tmp', 'web', 'flash' ),
 				srcPath                  = path.join( tmpPath, 'src' ),
 				spielmeisterPackagePath  = path.join( srcPath, 'Spielmeister' ),
 				outputFlashPath          = path.join( outputPath, 'web', 'flash' ),
 				compilerConfigFilePath   = path.join( tmpPath, 'compile-config.xml' ),
-				flexSdkPath              = path.join( spellFlashPath, 'vendor/flex_sdk_4.8.0' ),
-				compilerExecutablePath   = path.join( flexSdkPath, os.platform() == 'win32' ? 'bin/mxmlc.bat' : 'bin/mxmlc' )
+				spellFlashPath           = path.join( spellCorePath, '..', 'spellFlash' ),
+				flexSdkPath              = path.join( spellFlashPath, 'vendor/flex_sdk' ),
+				compilerExecutablePath   = path.join( flexSdkPath, 'bin', os.platform() == 'win32' ? 'mxmlc.bat' : 'mxmlc' )
 
 			if( !fs.existsSync( compilerExecutablePath ) ) {
 				console.error( 'Could not find compiler executable "' + compilerExecutablePath + '".' )
