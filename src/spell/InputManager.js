@@ -8,19 +8,15 @@ define(
 	'spell/InputManager',
 	[
 		'spell/shared/util/platform/PlatformKit',
-		'spell/shared/util/input/keyCodes',
-		'spell/functions'
+		'spell/shared/util/input/keyCodes'
 	],
 	function(
 		PlatformKit,
-		keyCodes,
-	    _
+		keyCodes
 	) {
-		"use strict"
+		'use strict'
 
-		/*
-		 * public
-		 */
+
 		var inputEvents = []
 
 		var pushIntoInputQueue = function( event ) {
@@ -29,13 +25,13 @@ define(
 
 		var createKeyEvent = function( type, keyCode ) {
 			return {
-				type           : type,
-				keyCode        : keyCode
+				type : type,
+				keyCode : keyCode
 			}
 		}
 
 		var InputManager = function( configurationManager, renderingContext ) {
-			this.nativeInput = PlatformKit.createInput( configurationManager, renderingContext )
+			this.nativeInput          = PlatformKit.createInput( configurationManager, renderingContext )
 			this.configurationManager = configurationManager
 		}
 
@@ -46,7 +42,7 @@ define(
 			 * @private
 			 */
 			init : function() {
-                this.nativeInput.setInputEventListener( pushIntoInputQueue )
+				this.nativeInput.setInputEventListener( pushIntoInputQueue )
 			},
 
 			/**
@@ -71,7 +67,6 @@ define(
 			 */
 			clearInputEvents : function() {
 				inputEvents.length = 0
-
 			},
 
 			/**
@@ -85,7 +80,6 @@ define(
 			getKeyCodes: function() {
 				return keyCodes
 			},
-
 
 			injectKeyEvent : function( type, keyCode ) {
 				inputEvents.push( createKeyEvent( type, keyCode ) )
