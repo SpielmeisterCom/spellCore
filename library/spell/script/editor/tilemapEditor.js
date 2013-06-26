@@ -367,11 +367,6 @@ define(
 						)
 					)
 
-					//clear all rects
-					_.each( this.tilemapSelectionMap, function( entityId, frameIndex ) {
-						entityManager.removeComponent( entityId, 'spell.component.2d.graphics.shape.rectangle' )
-					} )
-
 					this.tilemapSelectionHighlighted = null
 					if( matchedEntities.length > 0 ) {
 						this.tilemapSelectionHighlighted = matchedEntities[ 0 ]
