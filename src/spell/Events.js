@@ -41,6 +41,10 @@ define(
 			'RESOURCE_LOADING_COMPLETED',
 			'RESOURCE_ERROR',
 
+			// KEY
+			'KEY_DOWN',
+			'KEY_UP',
+
 			// MISC
 			'RENDER_UPDATE',
 			'LOGIC_UPDATE',

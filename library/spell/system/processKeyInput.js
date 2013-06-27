@@ -9,9 +9,8 @@ define(
 		'use strict'
 
 
-		/**
-		 * private
-		 */
+		var KEY_DOWN = Events.KEY_DOWN,
+			KEY_UP   = Events.KEY_UP
 
 		var updateActors = function( actors, eventManager, entityManager, actorId, actionId, isExecuting ) {
 			for( var id in actors ) {
@@ -63,15 +62,18 @@ define(
 				inputEvents      = spell.inputManager.getInputEvents(),
 				inputDefinitions = this.inputDefinitions
 
-			for( var i = 0, numInputEvents = inputEvents.length; i < numInputEvents; i++ ) {
-				processEvent( eventManager, entityManager, inputEvents[ i ], actors, inputDefinitions )
+			for( var i = 0, n = inputEvents.length, inputEvent; i < n; i++ ) {
+				inputEvent = inputEvents[ i ]
+
+				processEvent( eventManager, entityManager, inputEvent, actors, inputDefinitions )
+
+				eventManager.publish( [
+					inputEvent.type == 'keyDown' ? KEY_DOWN : KEY_UP,
+					inputEvent.keyCode
+				] )
 			}
 		}
 
-
-		/**
-		 * public
-		 */
 
 		var processKeyInput = function( spell ) {}
 
