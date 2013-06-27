@@ -617,14 +617,13 @@ if( !NATIVE.gl.initialized ) {
 //gcapi/src/native/rotation.js:NATIVE.events.registerHandler('rotate', function(evt) {
 
 
-
-NATIVE.onBackButton = function() {
-    console.log('backButton');
-}
-
-NATIVE.onRotation = function() {
-    console.log('rotation');
-}
+//NATIVE.onBackButton = function() {
+//    console.log('backButton');
+//}
+//
+//NATIVE.onRotation = function() {
+//    console.log('rotation');
+//}
 
 var started = false
 
