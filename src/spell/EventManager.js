@@ -138,7 +138,9 @@ define(
 				registerWaitForChain( this, waitForChainConfig )
 
 				waitForChainConfig = false
-			}
+			},
+
+			EVENT : Events
 		}
 
 		return EventManager
