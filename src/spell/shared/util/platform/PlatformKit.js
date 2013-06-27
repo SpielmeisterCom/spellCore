@@ -5,6 +5,7 @@
 define(
 	'spell/shared/util/platform/PlatformKit',
 	[
+		'spell/shared/util/platform/private/Application',
 		'spell/shared/util/platform/private/Box2D',
 		'spell/shared/util/platform/private/callNextFrame',
 		'spell/shared/util/platform/private/createHost',
@@ -30,6 +31,7 @@ define(
 		'spell/shared/util/platform/private/createComponentType'
 	],
 	function(
+		Application,
 		Box2D,
 		callNextFrame,
 		createHost,
@@ -166,7 +168,9 @@ define(
 
 			flurry : flurry,
 
-			createComponentType : createComponentType
+			createComponentType : createComponentType,
+
+			Application : Application
 		}
 	}
 )
