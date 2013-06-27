@@ -85,7 +85,7 @@ define(
 		var createKeyEvent = function( keyCode, type ) {
 			return {
 				keyCode : keyCode,
-				type : type == 'keyup' ? 'keyUp' : 'keyDown'
+				type : type == 'keydown' ? 'keyDown' : 'keyUp'
 			}
 		}
 
