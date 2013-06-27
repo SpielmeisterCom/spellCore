@@ -64,44 +64,70 @@
  *                                        in DOMString modifiersListArg);
  * };
  */
+
 define(
 	'spell/shared/util/platform/private/input/keyHandler',
 	[
+		'spell/shared/util/platform/private/isHtml5GameClosure',
+
 		'spell/functions'
 	],
-	function( _ ) {
-		"use strict";
+	function(
+		isHtml5GameClosure,
 
-		var nativeHandler = null
+		_
+	) {
+		'use strict'
+
+
+		var nativeHandler
+
+		var createKeyEvent = function( keyCode, type ) {
+			return {
+				keyCode : keyCode,
+				type : type == 'keyup' ? 'keyUp' : 'keyDown'
+			}
+		}
 
 		var nativeHandlerImpl = function( callback, event ) {
 			event.preventDefault()
-
-			callback( {
-				type:       ( event.type == 'keyup' ) ? 'keyUp' : 'keyDown',
-				keyCode:    event.keyCode
-			} )
+			callback( createKeyEvent( event.keyCode, event.type ) )
 		}
 
 		var registerListener = function( el, callback ) {
+			if( !el ||
+				!callback ) {
+
+				return
+			}
+
+			if( isHtml5GameClosure ) {
+				NATIVE.events.registerHandler(
+					'keyEvent',
+					function( event ) {
+						callback( createKeyEvent( event.keyCode, event.type ) )
+					}
+				)
+			}
+
 			nativeHandler = _.bind( nativeHandlerImpl, this, callback )
 
-			el.addEventListener( 'keyup',   nativeHandler, true )
+			el.addEventListener( 'keyup', nativeHandler, true )
 			el.addEventListener( 'keydown', nativeHandler, true )
 		}
 
 		var removeListener = function( el ) {
 			if( nativeHandler !== null ) {
-				el.removeEventLister( 'keyup',      nativeHandler )
-				el.removeEventLister( 'keydown',    nativeHandler )
+				el.removeEventLister( 'keyup', nativeHandler )
+				el.removeEventLister( 'keydown', nativeHandler )
 			}
 
 			nativeHandler = null
 		}
 
 		return {
-			registerListener: registerListener,
-			removeListener: removeListener
+			registerListener : registerListener,
+			removeListener : removeListener
 		}
 	}
 )
