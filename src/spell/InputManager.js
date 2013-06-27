@@ -18,7 +18,7 @@ define(
 
 
 		var inputEvents = [],
-			keyCodePressed = {}
+			keyPressed = {}
 
 		var processEvent = function( event ) {
 			inputEvents.push( event )
@@ -27,7 +27,7 @@ define(
 				isKeyDown = type == 'keyDown'
 
 			if( isKeyDown || type == 'keyUp' ) {
-				keyCodePressed[ event.keyCode ] = isKeyDown
+				keyPressed[ event.keyCode ] = isKeyDown
 			}
 		}
 
@@ -84,7 +84,7 @@ define(
 			 * @return {Boolean}
 			 */
 			isKeyPressed : function( keyCode ) {
-				return !!keyCodePressed[ keyCode ]
+				return !!keyPressed[ keyCode ]
 			},
 
 			injectKeyEvent : function( type, keyCode ) {
