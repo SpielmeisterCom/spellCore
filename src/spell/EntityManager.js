@@ -280,7 +280,6 @@ define(
 		var removeComponents = function( eventManager, componentMaps, spatialIndex, entityId, entityComponentId ) {
 			var childrenComponent = componentMaps[ CHILDREN_COMPONENT_ID ][ entityId ],
 				parentComponent   = componentMaps[ PARENT_COMPONENT_ID ][ entityId ],
-				visualObject      = componentMaps[ VISUAL_OBJECT_COMPONENT_ID ][ entityId ],
 				removedEntity     = true
 
 			if( parentComponent ) {
@@ -301,6 +300,10 @@ define(
 					removedEntity = false
 				}
 
+				if( entityComponentId === VISUAL_OBJECT_COMPONENT_ID ) {
+					spatialIndex.remove( entityId )
+				}
+
 			} else {
 				// remove all componentMaps, that is "remove the entity"
 				for( var componentId in componentMaps ) {
@@ -310,10 +313,6 @@ define(
 						delete componentMap[ entityId ]
 					}
 				}
-			}
-
-			if( entityComponentId === VISUAL_OBJECT_COMPONENT_ID ||
-				visualObject ) {
 
 				spatialIndex.remove( entityId )
 			}

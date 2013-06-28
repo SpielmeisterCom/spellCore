@@ -357,7 +357,7 @@ define(
 				var entityManager = spell.entityManager
 
 				if( this.state === STATE_SELECT_TILE ) {
-					//find all entities that match with the current cursor position
+					// find all entities that match with the current cursor position
 					var matchedEntities = _.filter(
 						_.values( this.tilemapSelectionMap ),
 						_.bind(
@@ -365,6 +365,14 @@ define(
 							this,
 							editorSystem.cursorWorldPosition
 						)
+					)
+
+					// clear all rects
+					_.each(
+						this.tilemapSelectionMap,
+						function( entityId, frameIndex ) {
+							entityManager.removeComponent( entityId, 'spell.component.2d.graphics.shape.rectangle' )
+						}
 					)
 
 					this.tilemapSelectionHighlighted = null
