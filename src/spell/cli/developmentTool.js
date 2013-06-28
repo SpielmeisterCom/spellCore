@@ -154,8 +154,9 @@ define(
 				)
 			}
 
-			var initCommand = function( spellCorePath, cwd, isDevEnvironment, command ) {
-				var projectPath = createProjectPath( cwd, command.project )
+			var initCommand = function( spellCorePath, cwd, apiVersion, isDevEnvironment, command ) {
+				var projectPath = createProjectPath( cwd, command.project ),
+					force       = command.force
 
 				logProject( projectPath )
 
@@ -164,6 +165,8 @@ define(
 					createProjectName( projectPath ),
 					projectPath,
 					createProjectFilePath( projectPath ),
+					force,
+					apiVersion,
 					isDevEnvironment,
 					onComplete
 				)
@@ -209,8 +212,10 @@ define(
 				argv.push( '-h' )
 			}
 
+			var apiVersion = Configuration.version
+
 			commander
-				.version( Configuration.version )
+				.version( apiVersion )
 
 			commander
 				.command( 'clean' )
@@ -242,8 +247,9 @@ define(
 			commander
 				.command( 'init' )
 				.option( '-p, --project [directory]', 'The path to the project directory. The default is the current working directory.' )
+				.option( '-f, --force', 'Forces a project initialization.' )
 				.description( 'Initializes a project directory with project scaffolding.' )
-				.action( _.bind( initCommand, this, spellCorePath, cwd, isDevEnv ) )
+				.action( _.bind( initCommand, this, spellCorePath, cwd, apiVersion, isDevEnv ) )
 
 			commander.parse( argv )
 		}

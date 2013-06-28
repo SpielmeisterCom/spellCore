@@ -99,53 +99,127 @@ define(
 			)
 		}
 
+		var createDefaultProjectConfig = function( apiVersion ) {
+			return {
+				"version": 1,
+				"apiVersion": apiVersion,
+				"config": {
+					"supportedLanguages": []
+				},
+				"startScene": "",
+				"type": "project",
+				"scenes": []
+			}
+		}
 
-		/*
-		 * public
-		 */
+		var writeProjectConfigFile = function( projectFilePath, projectConfig ) {
+			fs.writeFileSync(
+				projectFilePath,
+				JSON.stringify( projectConfig, null, '\t' ),
+				'utf-8'
+			)
+		}
 
-		return function( spellCorePath, projectName, projectPath, projectFilePath, isDevEnv, next ) {
-			var errors          = [],
-				publicDirName   = 'public',
+		var readProjectConfigFile = function( projectFilePath ) {
+			return JSON.parse(
+				fs.readFileSync( projectFilePath, 'utf-8' )
+			)
+		}
+
+		var lessVersionString = function( versionA, versionB, next ) {
+			var partsA = versionA.split( '.' ),
+				partsB = versionB.split( '.' )
+
+			for( var i = 0, n = Math.max( partsA.length, partsB.length ), a, b; i < n; i++ ) {
+				a = parseInt( partsA[ i ] || 0, 10 )
+
+				if( _.isNaN( a ) ) {
+					next( 'Error: Version number "' + versionA + '" has invalid syntax.' )
+				}
+
+				b = parseInt( partsB[ i ] || a - 1 , 10 )
+
+				if( _.isNaN( b ) ) {
+					next( 'Error: Version number "' + versionB + '" has invalid syntax.' )
+				}
+
+				if( a < b ) {
+					return true
+				}
+			}
+
+			return false
+		}
+
+		var isInitRequired = function( projectApiVersion, toolApiVersion, next ) {
+			return lessVersionString( projectApiVersion, toolApiVersion, next )
+		}
+
+		var printSuccess = function() {
+			console.log( 'Initializing completed successfully.' )
+		}
+
+		return function( spellCorePath, projectName, projectPath, projectFilePath, force, apiVersion, isDevEnv, next ) {
+			var publicDirName   = 'public',
 				outputPath      = path.join( projectPath, publicDirName ),
 				html5OutputPath = path.join( outputPath, 'html5' )
 
+			if( !isFile( projectFilePath ) ) {
+				// initial creation of project config file
+				writeProjectConfigFile(
+					projectFilePath,
+					createDefaultProjectConfig( apiVersion )
+				)
+
+			} else {
+				// checking project config, updating when necessary
+				var projectConfig = readProjectConfigFile( projectFilePath )
+
+				if( !projectConfig ) {
+					next( 'Error: Unable to read project config file "' + projectFilePath + '".' )
+				}
+
+				var projectApiVersion = projectConfig.apiVersion || '0',
+					initRequired      = isInitRequired( projectApiVersion, apiVersion, next )
+
+				if( !initRequired &&
+					!force ) {
+
+					console.log( 'Initialization not required: project API version "' + projectApiVersion + '" is up-to-date.' )
+
+					printSuccess()
+
+					next()
+				}
+
+				if( force ) {
+					console.log( 'Initialization forced: setting project API version from "' + projectApiVersion + '" to "' + apiVersion + '".' )
+
+				} else if( initRequired ) {
+					console.log( 'Initialization required: updating project API version from "' + projectApiVersion + '" to "' + apiVersion + '".' )
+				}
+
+				projectConfig.apiVersion = apiVersion
+				writeProjectConfigFile( projectFilePath, projectConfig )
+			}
+
 			// create directory structure
-			var paths = [
+			var directories = [
 				publicDirName,
 				'build',
 				path.join( LIBRARY_PATH, projectName )
 			]
 
 			_.each(
-				paths,
-				function( path ) {
-					var fullPath = projectPath + '/' + path
+				directories,
+				function( directory ) {
+					var fullPath = path.join( projectPath, directory )
 
 					if( isDirectory( fullPath ) ) return
 
 					mkdirp.sync( fullPath )
 				}
 			)
-
-			// create project.json
-			if( !isFile( projectFilePath ) ) {
-				var data = {
-				    "version": 1,
-				    "config": {
-				        "supportedLanguages": []
-				    },
-				    "startScene": "",
-				    "type": "project",
-				    "scenes": []
-				}
-
-				fs.writeFileSync(
-					projectFilePath,
-					JSON.stringify( data, null, '\t' ),
-					'utf-8'
-				)
-			}
 
 			var spellCoreLibraryPath = path.join( spellCorePath, LIBRARY_PATH ),
 				projectLibraryPath   = path.join( projectPath, LIBRARY_PATH )
@@ -189,7 +263,7 @@ define(
 				path.join( outputPath, 'spell.loader.js' )
 			)
 
-			console.log( 'Initializing completed successfully.' )
+			printSuccess()
 
 			next()
 		}
