@@ -306,6 +306,8 @@ define(
 
 			} else {
 				// remove all componentMaps, that is "remove the entity"
+				var hasVisualObject = !!componentMaps[ VISUAL_OBJECT_COMPONENT_ID ][ entityId ]
+
 				for( var componentId in componentMaps ) {
 					var componentMap = componentMaps[ componentId ]
 
@@ -314,7 +316,9 @@ define(
 					}
 				}
 
-				spatialIndex.remove( entityId )
+				if( hasVisualObject ) {
+					spatialIndex.remove( entityId )
+				}
 			}
 
 			if( removedEntity ) {
