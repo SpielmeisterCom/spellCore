@@ -104,7 +104,7 @@ define(
 		 * public
 		 */
 
-		return function( spellCorePath, projectName, projectPath, projectFilePath, isDevEnv ) {
+		return function( spellCorePath, projectName, projectPath, projectFilePath, isDevEnv, next ) {
 			var errors          = [],
 				publicDirName   = 'public',
 				outputPath      = path.join( projectPath, publicDirName ),
@@ -189,7 +189,9 @@ define(
 				path.join( outputPath, 'spell.loader.js' )
 			)
 
-			return errors
+			console.log( 'Initializing completed successfully.' )
+
+			next()
 		}
 	}
 )

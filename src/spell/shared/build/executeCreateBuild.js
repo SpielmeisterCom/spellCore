@@ -270,6 +270,10 @@ define(
 				next( 'Error: Build target "' + target + '" is not supported.' )
 			}
 
+			f.next( function() {
+				console.log( 'Building completed successfully.' )
+			} )
+
 			f.onComplete( next )
 		}
 	}

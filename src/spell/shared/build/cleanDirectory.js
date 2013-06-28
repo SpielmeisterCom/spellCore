@@ -14,6 +14,8 @@ define(
 		return function( path ) {
 			rmdir.sync( path )
 			mkdirp.sync( path )
+
+			console.log( 'Cleaning completed successfully.' )
 		}
 	}
 )

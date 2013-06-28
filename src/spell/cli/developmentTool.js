@@ -48,16 +48,12 @@ define(
 			return false
 		}
 
-		var onComplete = function( action, error, result ) {
+		var onComplete = function( error, result ) {
 			if( error ) {
 				printErrors( error )
-				console.log( action + ' failed' )
-
 				process.exit( 1 )
 
 			} else {
-				console.log( action + ' successful' )
-
 				process.exit( 0 )
 			}
 		}
@@ -154,7 +150,7 @@ define(
 					minify,
 					anonymizeModuleIds,
 					debug,
-					_.bind( onComplete, null, 'build' )
+					onComplete
 				)
 			}
 
@@ -163,20 +159,14 @@ define(
 
 				logProject( projectPath )
 
-				var errors = initializeProjectDirectory(
+				initializeProjectDirectory(
 					spellCorePath,
 					createProjectName( projectPath ),
 					projectPath,
 					createProjectFilePath( projectPath ),
-					isDevEnvironment
+					isDevEnvironment,
+					onComplete
 				)
-
-				if( printErrors( errors ) ) {
-					process.exit( 1 )
-
-				} else {
-					console.log( 'Initialized project.' )
-				}
 			}
 
 			var exportCommand = function( spellCorePath, cwd, target, command ) {
@@ -198,7 +188,7 @@ define(
 					projectPath,
 					outputFilePath,
 					target,
-					_.bind( onComplete, null, 'export' )
+					onComplete
 				)
 			}
 

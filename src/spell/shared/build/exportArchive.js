@@ -118,6 +118,9 @@ define(
 					)
 
 					createZipFile( outputFilePath, projectsPath, filePaths, f.wait() )
+				},
+				function() {
+					console.log( 'Exporting completed successfully.' )
 				}
 			).onComplete( next )
 		}
