@@ -159,10 +159,23 @@ define(
 			console.log( 'Initializing completed successfully.' )
 		}
 
+		var createProjectDirectory = function( projectPath, next ) {
+			try {
+				mkdirp.sync( projectPath )
+
+			} catch( e ) {
+				next( e.toString() )
+			}
+		}
+
 		return function( spellCorePath, projectName, projectPath, projectFilePath, force, apiVersion, isDevEnv, next ) {
 			var publicDirName   = 'public',
 				outputPath      = path.join( projectPath, publicDirName ),
 				html5OutputPath = path.join( outputPath, 'html5' )
+
+			if( !isDirectory( projectPath ) ) {
+				createProjectDirectory( projectPath, next )
+			}
 
 			if( !isFile( projectFilePath ) ) {
 				// initial creation of project config file
