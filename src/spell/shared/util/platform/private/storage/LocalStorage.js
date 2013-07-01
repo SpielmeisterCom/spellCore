@@ -22,11 +22,13 @@ define(
 				this.store.removeItem( PREFIX + name )
 			},
 			set : function( name, value ) {
-				this.clear( name )
+				if( value === undefined ||
+					value === null ) {
 
-				if( value ) {
-					this.store.setItem( PREFIX + name, encodeValue( value ) )
+					return
 				}
+
+				this.store.setItem( PREFIX + name, encodeValue( value ) )
 			},
 			get : function( name ) {
 				return decodeValue( this.store.getItem( PREFIX + name ) )
