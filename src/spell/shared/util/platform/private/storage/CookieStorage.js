@@ -10,11 +10,9 @@ define(
 	) {
 		'use strict'
 
+
 		var PREFIX  = "SpellJS-"
 
-		/*
-		 * public
-		 */
 		var CookieStorage = function() {
 			var me = this
 
@@ -26,22 +24,26 @@ define(
 		}
 
 		CookieStorage.prototype = {
-			clear : function( name ){
+			clear : function( name ) {
 				this.clearCookie( name )
 			},
-			set : function( name, value ){
+			set : function( name, value ) {
 				var me = this
 
 				me.clear( name )
 
-				if ( typeof value == "undefined" || value === null ) return
+				if( value === undefined ||
+					value === null ) {
 
-				me.setCookie(name, value)
+					return
+				}
+
+				me.setCookie( name, value )
 			},
-			get : function( name ){
+			get : function( name ) {
 				return decodeValue( this.state[ PREFIX + name ] )
 			},
-			readCookies : function(){
+			readCookies : function() {
 				var cookies = {},
 					c = document.cookie + ";",
 					re = /\s?(.*?)=(.*?);/g,
@@ -50,7 +52,7 @@ define(
 					name,
 					value
 
-				while((matches = re.exec(c)) != null){
+				while((matches = re.exec(c)) != null) {
 					name = matches[1]
 					value = matches[2]
 					if (name && name.substring(0, len) == PREFIX){
@@ -60,7 +62,7 @@ define(
 				return cookies
 			},
 			// private
-			setCookie : function ( name, value ){
+			setCookie : function ( name, value ) {
 				var me     = this,
 					prefix = PREFIX + name
 
@@ -72,8 +74,7 @@ define(
 
 				me.state[ prefix ] = value
 			},
-			// private
-			clearCookie : function( name ){
+			clearCookie : function( name ) {
 				var me     = this,
 					prefix = PREFIX + name
 
