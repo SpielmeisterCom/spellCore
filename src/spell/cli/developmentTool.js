@@ -8,6 +8,7 @@ define(
 		'spell/shared/build/initializeProjectDirectory',
 		'spell/shared/build/isFile',
 		'spell/shared/build/isDirectory',
+		'spell/shared/build/printLicenceInfo',
 		'spell/shared/Configuration',
 
 		'commander',
@@ -23,6 +24,7 @@ define(
 		initializeProjectDirectory,
 		isFile,
 		isDirectory,
+		printLicenceInfo,
 		Configuration,
 
 		commander,
@@ -104,7 +106,7 @@ define(
 
 
 		return function( argv, cwd, basePath, isDevEnv ) {
-			var spellCorePath  = getSpellCorePath( basePath, isDevEnv )
+			var spellCorePath   = getSpellCorePath( basePath, isDevEnv )
 
 			var cleanCommand = function( cwd, command ) {
 				var projectPath = createProjectPath( cwd, command.project ),
@@ -207,6 +209,16 @@ define(
 				console.log( 'project directory: ' + projectPath )
 			}
 
+			var licenceCommand = function( spellCorePath, cwd, isDevEnv, licenceData, command ) {
+				var humanReadable = !command.json
+
+				var licenceFilePath = isDevEnv ?
+					undefined :
+					path.resolve( spellCorePath, '..' )
+
+				printLicenceInfo( isDevEnv, humanReadable, licenceFilePath, licenceData, onComplete )
+			}
+
 			// prepare argv array
 			if( argv.length < 3 ) {
 				argv.push( '-h' )
@@ -250,6 +262,12 @@ define(
 				.option( '-f, --force', 'Forces a project initialization.' )
 				.description( 'Initializes a project directory with project scaffolding.' )
 				.action( _.bind( initCommand, this, spellCorePath, cwd, apiVersion, isDevEnv ) )
+
+			commander
+				.command( 'licence [licence]' )
+				.option( '-j, --json', 'Enables json ouput.' )
+				.description( 'Prints information about active licence.' )
+				.action( _.bind( licenceCommand, this, spellCorePath, cwd, isDevEnv ) )
 
 			commander.parse( argv )
 		}
