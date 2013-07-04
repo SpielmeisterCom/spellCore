@@ -46,7 +46,7 @@ cli-js:
 	mkdir -p $(SPELL_CORE_OUT_LIB_DIR)
 
 	cat spell.cli.js > $(SPELL_CLI_LIB)
-	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander,ff" >> $(SPELL_CLI_LIB)
+	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander,ff,spell-licence" >> $(SPELL_CLI_LIB)
 
 
 .PHONY: cli
@@ -149,6 +149,10 @@ cli: cli-js flash-target-builder-deps
 
 	#integrate commander
 	cp ../../node_modules/commander/lib/commander.js $(NODE_SRC)/lib/commander.js
+
+	#integrate spell-licence
+	cp ../../node_modules/spell-licence/lib/index.js $(NODE_SRC)/lib/spelllicence.js
+	$(SED) 's/spell-licence/spelllicence/g' $(NODE_SRC)/lib/*.js
 
 	#compile nodejs
 ifeq ($(WINDOWS_ENV),true)

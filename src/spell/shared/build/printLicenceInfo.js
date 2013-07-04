@@ -1,38 +1,27 @@
 define(
 	'spell/shared/build/printLicenceInfo',
 	[
-		'spell-licence',
+		'spell/shared/build/hasValidLicence',
 
 		'fs',
-		'spell/functions'
+		'spell-licence'
 	],
 	function(
-		licence,
+		hasValidLicence,
 
 		fs,
-		_
+		licence
 	) {
 		'use strict'
 
 
-		return function( isDevEnv, humanReadable, licenceFilePath, licenceDataBase64, next ) {
-			var licenceData = ''
+		var createStatus = function( publicKey, licenceData ) {
+			return hasValidLicence( publicKey, licenceData ) ? 'valid' : 'invalid'
+		}
 
-			if( licenceDataBase64 ) {
-				licenceData = new Buffer( licenceDataBase64, 'base64' ).toString()
-
-			} else {
-				if( licenceFilePath &&
-					fs.existsSync( licenceFilePath ) ) {
-
-					licenceData = fs.readFileSync( licenceFilePath )
-
-				} else {
-					next( 'Error: Could not open licence file.' )
-				}
-			}
-
-			var payload = licence.createPayload( licenceData )
+		return function( isDevEnv, humanReadable, publicKey, licenceData, next ) {
+			var payload = licence.createPayload( licenceData ),
+				status  = createStatus( publicKey, licenceData )
 
 			if( humanReadable ) {
 				console.log(
@@ -40,12 +29,13 @@ define(
 					'licence id: ' + payload.lid + '\n' +
 					'product id: ' + payload.pid + '\n' +
 					'issue date: ' + payload.isd + '\n' +
-					'validity period: ' + payload.days
+					'validity period: ' + payload.days + '\n' +
+					'status: ' + status
 				)
 
 			} else {
 				var result = {
-					status : 'valid',
+					status : status,
 					payload : licence.createPayload( licenceData )
 				}
 

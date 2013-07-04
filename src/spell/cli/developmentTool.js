@@ -1,9 +1,11 @@
 define(
 	'spell/cli/developmentTool',
 	[
+		'spell/cli/Certificates',
 		'spell/shared/build/cleanDirectory',
 		'spell/shared/build/executeCreateBuild',
 		'spell/shared/build/exportArchive',
+		'spell/shared/build/hasValidLicence',
 		'spell/shared/build/isDevEnvironment',
 		'spell/shared/build/initializeProjectDirectory',
 		'spell/shared/build/isFile',
@@ -14,12 +16,15 @@ define(
 		'commander',
 		'fs',
 		'path',
+		'spell-licence',
 		'spell/functions'
 	],
 	function(
+		Certificates,
 		cleanDirectory,
 		executeCreateBuild,
 		exportArchive,
+		hasValidLicence,
 		isDevEnvironment,
 		initializeProjectDirectory,
 		isFile,
@@ -30,6 +35,7 @@ define(
 		commander,
 		fs,
 		path,
+		licence,
 		_
 	) {
 		'use strict'
@@ -104,9 +110,18 @@ define(
 			console.log( 'Working on project directory "' + projectPath + '".' )
 		}
 
+		var createLicenceData = function( licenceFilePath ) {
+			if( fs.existsSync( licenceFilePath ) ) {
+				return fs.readFileSync( licenceFilePath ).toString()
+			}
+		}
+
 
 		return function( argv, cwd, basePath, isDevEnv ) {
-			var spellCorePath   = getSpellCorePath( basePath, isDevEnv )
+			var spellCorePath        = getSpellCorePath( basePath, isDevEnv ),
+				licenceFilePath      = path.resolve( basePath, 'licence.txt' ),
+				installedLicenceData = createLicenceData( licenceFilePath ),
+				validLicence         = hasValidLicence( Certificates.LICENCE_PUBLIC_KEY, installedLicenceData )
 
 			var cleanCommand = function( cwd, command ) {
 				var projectPath = createProjectPath( cwd, command.project ),
@@ -209,14 +224,20 @@ define(
 				console.log( 'project directory: ' + projectPath )
 			}
 
-			var licenceCommand = function( spellCorePath, cwd, isDevEnv, licenceData, command ) {
+			var licenceCommand = function( spellCorePath, cwd, isDevEnv, installedLicenceData, licenceDataBase64, command ) {
 				var humanReadable = !command.json
 
-				var licenceFilePath = isDevEnv ?
-					undefined :
-					path.resolve( spellCorePath, '..' )
+				var licenceData = licenceDataBase64 ?
+					new Buffer( licenceDataBase64, 'base64' ).toString() :
+					installedLicenceData
 
-				printLicenceInfo( isDevEnv, humanReadable, licenceFilePath, licenceData, onComplete )
+				if( licenceData ) {
+					printLicenceInfo( isDevEnv, humanReadable, Certificates.LICENCE_PUBLIC_KEY, licenceData, onComplete )
+
+				} else {
+					console.log( 'No licence data available.' )
+					onComplete()
+				}
 			}
 
 			// prepare argv array
@@ -267,7 +288,7 @@ define(
 				.command( 'licence [licence]' )
 				.option( '-j, --json', 'Enables json ouput.' )
 				.description( 'Prints information about active licence.' )
-				.action( _.bind( licenceCommand, this, spellCorePath, cwd, isDevEnv ) )
+				.action( _.bind( licenceCommand, this, spellCorePath, cwd, isDevEnv, installedLicenceData ) )
 
 			commander.parse( argv )
 		}
