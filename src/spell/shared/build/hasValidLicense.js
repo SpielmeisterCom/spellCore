@@ -1,26 +1,26 @@
 define(
-	'spell/shared/build/hasValidLicence',
+	'spell/shared/build/hasValidLicense',
 	[
-		'spell-licence'
+		'spell-license'
 	],
 	function(
-		licence
+		license
 	) {
 		'use strict'
 
 
-		return function( publicKey, licenceData ) {
-			if( !licenceData ) {
+		return function( publicKey, licenseData ) {
+			if( !licenseData ) {
 				return false
 			}
 
-			var hasValidSignature = licence.verify( publicKey, licenceData )
+			var hasValidSignature = license.verify( publicKey, licenseData )
 
 			if( !hasValidSignature ) {
 				return
 			}
 
-			var payload = licence.createPayload( licenceData )
+			var payload = license.createPayload( licenseData )
 
 			if( !payload ) {
 				return

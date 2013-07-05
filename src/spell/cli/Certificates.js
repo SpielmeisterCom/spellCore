@@ -5,7 +5,7 @@ define(
 
 
 		return {
-			LICENCE_PUBLIC_KEY : [
+			LICENSE_PUBLIC_KEY : [
 				'-----BEGIN PUBLIC KEY-----',
 				'MIIGRjCCBDkGByqGSM44BAEwggQsAoICAQCZum11ENrvLi0CFYauCbhZ8oNnXUaN',
 				'3dWCmsap3ns2qkVlGpmTaYhvDUjLMTt2+XWnk1SH3IHtJif4h8k9Wnz5y13wsBcO',
