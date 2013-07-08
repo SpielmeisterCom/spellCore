@@ -29,15 +29,6 @@ define(
 		'use strict'
 
 
-		var addTemplates = function( templateManager, templates ) {
-			_.each(
-				templates,
-				function( template ) {
-					templateManager.add( template )
-				}
-			)
-		}
-
 		var groupByType = function( libraryRecords ) {
 			return _.reduce(
 				libraryRecords,
