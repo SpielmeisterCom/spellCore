@@ -20,8 +20,13 @@ define(
 		}
 
 		return function( isDevEnv, humanReadable, publicKey, licenseData, next ) {
-			var payload = license.createPayload( licenseData ),
-				status  = createStatus( publicKey, licenseData )
+			var payload = license.createPayload( licenseData )
+
+			if( !payload ) {
+				next( 'Error: License is corrupted.' )
+			}
+
+			var status = createStatus( publicKey, licenseData )
 
 			if( humanReadable ) {
 				console.log(
