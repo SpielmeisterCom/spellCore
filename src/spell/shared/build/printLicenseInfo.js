@@ -60,6 +60,7 @@ define(
 			} else {
 				var result = {
 					status : status,
+					features : product.features,
 					payload : payload
 				}
 
