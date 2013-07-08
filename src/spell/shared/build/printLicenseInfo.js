@@ -36,7 +36,7 @@ define(
 			} else {
 				var result = {
 					status : status,
-					payload : license.createPayload( licenseData )
+					payload : payload
 				}
 
 				console.log( JSON.stringify( result ) )
