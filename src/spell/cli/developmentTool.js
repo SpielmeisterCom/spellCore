@@ -224,19 +224,38 @@ define(
 				console.log( 'project directory: ' + projectPath )
 			}
 
-			var licenseCommand = function( spellCorePath, cwd, isDevEnv, installedLicenseData, licenseDataBase64, command ) {
-				var humanReadable = !command.json
+			var licenseCommand = function( spellCorePath, cwd, isDevEnv, installedLicenseData, command ) {
+				var humanReadable = !command.json,
+					stdin         = command.stdin
 
-				var licenseData = licenseDataBase64 ?
-					new Buffer( licenseDataBase64, 'base64' ).toString() :
-					installedLicenseData
+				if( stdin ) {
+					var accumulatedChunks = ''
 
-				if( licenseData ) {
-					printLicenseInfo( isDevEnv, humanReadable, Certificates.LICENSE_PUBLIC_KEY, licenseData, onComplete )
+					process.stdin.resume()
+					process.stdin.setEncoding( 'utf8' )
+
+					process.stdin.on(
+						'data',
+						function( chunk ) {
+							accumulatedChunks += chunk
+						}
+					)
+
+					process.stdin.on(
+						'end',
+						function() {
+							printLicenseInfo( isDevEnv, humanReadable, Certificates.LICENSE_PUBLIC_KEY, accumulatedChunks, onComplete )
+						}
+					)
 
 				} else {
-					console.log( 'No license data available.' )
-					onComplete()
+					if( installedLicenseData ) {
+						printLicenseInfo( isDevEnv, humanReadable, Certificates.LICENSE_PUBLIC_KEY, installedLicenseData, onComplete )
+
+					} else {
+						console.log( 'No license data available.' )
+						onComplete()
+					}
 				}
 			}
 
@@ -285,8 +304,9 @@ define(
 				.action( _.bind( initCommand, this, spellCorePath, cwd, apiVersion, isDevEnv ) )
 
 			commander
-				.command( 'license [license]' )
+				.command( 'license' )
 				.option( '-j, --json', 'Enables json ouput.' )
+				.option( '-s, --stdin', 'Read license data from stdin.' )
 				.description( 'Prints information about active license.' )
 				.action( _.bind( licenseCommand, this, spellCorePath, cwd, isDevEnv, installedLicenseData ) )
 
