@@ -4,6 +4,7 @@ define(
 		'spell/client/development/createDebugMessageHandler',
 		'spell/client/staticInclude',
 		'spell/client/setApplicationModule',
+		'spell/client/showSplashScreen',
 		'spell/shared/util/createMainLoop',
 		'spell/EntityManager',
 		'spell/SceneManager',
@@ -26,6 +27,7 @@ define(
 		createDebugMessageHandler,
 		staticInclude,
 		setApplicationModule,
+		showSplashScreen,
 		createMainLoop,
 		EntityManager,
 		SceneManager,
@@ -141,10 +143,15 @@ define(
 			spell.translate            = translatePartial
 			spell.inputManager         = inputManager
 
-			spell.sceneManager.startScene( spell.applicationModule.startScene, {}, !isModeDevelopment )
-			spell.mainLoop.run()
-
 			spell.logger.debug( 'client started' )
+
+			showSplashScreen(
+				spell,
+				function() {
+					spell.sceneManager.startScene( spell.applicationModule.startScene, {}, !isModeDevelopment )
+					spell.mainLoop.run()
+				}
+			)
 		}
 
 		var init = function( loaderConfig ) {
