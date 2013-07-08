@@ -48,7 +48,7 @@ define(
 
 			if( humanReadable ) {
 				console.log(
-					'user name: ' + payload.uid + '\n' +
+					'username: ' + payload.uid + '\n' +
 					'license id: ' + payload.lid + '\n' +
 					'product id: ' + payload.pid + '\n' +
 					'    ' + createFeatureList( product.features ) + '\n' +
