@@ -1,71 +1,53 @@
 define(
 	'spell/shared/build/printLicenseInfo',
 	[
-		'spell/cli/Products',
-		'spell/shared/build/hasValidLicense',
-
-		'fs',
 		'spell-license'
 	],
 	function(
-		Products,
-		hasValidLicense,
-
-		fs,
 		license
 	) {
 		'use strict'
 
 
-		var createStatus = function( publicKey, licenseData ) {
-			return hasValidLicense( publicKey, licenseData ) ? 'valid' : 'invalid'
+		var COLUMN_WIDTH = 25
+
+		var createLine = function( key, value ) {
+			var result    = key + ' : ',
+				numSpaces = Math.max( COLUMN_WIDTH - result.length, 0 )
+
+			for( var i = 0, n = numSpaces; i < n; i++ ) {
+				result += ' '
+			}
+
+			result += value
+
+			return result
 		}
 
 		var createFeatureList = function( features ) {
 			return _.map(
 				features,
 				function( feature ) {
-					return feature.name + ': ' + ( feature.included ? 'yes' : 'no' )
+					return createLine( '  * ' + feature.name, feature.included ? 'yes' : 'no' )
 				}
-
-			). join( ', ' )
+			).join( '\n' )
 		}
 
-		return function( isDevEnv, humanReadable, publicKey, licenseData, next ) {
-			var payload = license.createPayload( licenseData )
+		return function( isDevEnv, humanReadable, licenseInfo, next ) {
+			var payload = licenseInfo.payload
 
-			if( !payload ) {
-				next( 'Error: License is corrupted.' )
-			}
+			var message = humanReadable ?
+				createLine( 'username', payload.uid ) + '\n' +
+				createLine( 'license id', payload.lid ) + '\n' +
+				createLine( 'product id', payload.pid ) + '\n' +
+				createLine( 'product features', '' ) + '\n' +
+				createFeatureList( licenseInfo.productFeatures ) + '\n' +
+				createLine( 'issue date', payload.isd ) + '\n' +
+				createLine( 'validity period (days)', payload.days ) + '\n' +
+				createLine( 'status', licenseInfo.isValid ? 'valid' : 'not valid' )	:
+				JSON.stringify( licenseInfo )
 
-			var status = createStatus( publicKey, licenseData )
-
-			var product = Products[ payload.pid ]
-
-			if( !product ) {
-				next( 'Error: Unknown product id "' + payload.pid + '". License might be corrupted.' )
-			}
-
-			if( humanReadable ) {
-				console.log(
-					'username: ' + payload.uid + '\n' +
-					'license id: ' + payload.lid + '\n' +
-					'product id: ' + payload.pid + '\n' +
-					'    ' + createFeatureList( product.features ) + '\n' +
-					'issue date: ' + payload.isd + '\n' +
-					'validity period: ' + payload.days + '\n' +
-					'status: ' + status
-				)
-
-			} else {
-				var result = {
-					status : status,
-					features : product.features,
-					payload : payload
-				}
-
-				console.log( JSON.stringify( result ) )
-			}
+			console.log( message )
 
 			next()
 		}

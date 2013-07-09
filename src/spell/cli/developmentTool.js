@@ -5,7 +5,6 @@ define(
 		'spell/shared/build/cleanDirectory',
 		'spell/shared/build/executeCreateBuild',
 		'spell/shared/build/exportArchive',
-		'spell/shared/build/hasValidLicense',
 		'spell/shared/build/isDevEnvironment',
 		'spell/shared/build/initializeProjectDirectory',
 		'spell/shared/build/isFile',
@@ -24,7 +23,6 @@ define(
 		cleanDirectory,
 		executeCreateBuild,
 		exportArchive,
-		hasValidLicense,
 		isDevEnvironment,
 		initializeProjectDirectory,
 		isFile,
@@ -110,18 +108,22 @@ define(
 			console.log( 'Working on project directory "' + projectPath + '".' )
 		}
 
-		var createLicenseData = function( licenseFilePath ) {
-			if( fs.existsSync( licenseFilePath ) ) {
-				return fs.readFileSync( licenseFilePath ).toString()
-			}
-		}
-
-
 		return function( argv, cwd, basePath, isDevEnv ) {
-			var spellCorePath        = getSpellCorePath( basePath, isDevEnv ),
-				licenseFilePath      = path.resolve( basePath, 'license.txt' ),
-				installedLicenseData = createLicenseData( licenseFilePath ),
-				validLicense         = hasValidLicense( Certificates.LICENSE_PUBLIC_KEY, installedLicenseData )
+			var spellCorePath       = getSpellCorePath( basePath, isDevEnv ),
+				licenseFilePath     = path.resolve( basePath, 'license.txt' ),
+				hasInstalledLicense = fs.existsSync( licenseFilePath )
+
+			var installedLicenseInfo = hasInstalledLicense ?
+				license.createLicenseInfo( Certificates.LICENSE_PUBLIC_KEY, fs.readFileSync( licenseFilePath ).toString() ) :
+				undefined
+
+			if( installedLicenseInfo &&
+				installedLicenseInfo.error ) {
+
+				printErrors( installedLicenseInfo.error )
+
+				process.exit( 1 )
+			}
 
 			var cleanCommand = function( cwd, command ) {
 				var projectPath = createProjectPath( cwd, command.project ),
@@ -224,7 +226,7 @@ define(
 				console.log( 'project directory: ' + projectPath )
 			}
 
-			var licenseCommand = function( spellCorePath, cwd, isDevEnv, installedLicenseData, command ) {
+			var licenseCommand = function( spellCorePath, cwd, isDevEnv, licenseInfo, command ) {
 				var humanReadable = !command.json,
 					stdin         = command.stdin
 
@@ -244,16 +246,31 @@ define(
 					process.stdin.on(
 						'end',
 						function() {
-							printLicenseInfo( isDevEnv, humanReadable, Certificates.LICENSE_PUBLIC_KEY, accumulatedChunks, onComplete )
+							var suppliedLicenseInfo = license.createLicenseInfo( Certificates.LICENSE_PUBLIC_KEY, accumulatedChunks )
+
+							if( suppliedLicenseInfo &&
+								suppliedLicenseInfo.error ) {
+
+								printErrors( suppliedLicenseInfo.error )
+
+								process.exit( 1 )
+							}
+
+							printLicenseInfo(
+								isDevEnv,
+								humanReadable,
+								licenseInfo,
+								onComplete
+							)
 						}
 					)
 
 				} else {
-					if( installedLicenseData ) {
-						printLicenseInfo( isDevEnv, humanReadable, Certificates.LICENSE_PUBLIC_KEY, installedLicenseData, onComplete )
+					if( licenseInfo ) {
+						printLicenseInfo( isDevEnv, humanReadable, licenseInfo, onComplete )
 
 					} else {
-						console.log( 'No license data available.' )
+						console.log( 'No license available.' )
 						onComplete()
 					}
 				}
@@ -308,7 +325,7 @@ define(
 				.option( '-j, --json', 'Enables json ouput.' )
 				.option( '-s, --stdin', 'Read license data from stdin.' )
 				.description( 'Prints information about active license.' )
-				.action( _.bind( licenseCommand, this, spellCorePath, cwd, isDevEnv, installedLicenseData ) )
+				.action( _.bind( licenseCommand, this, spellCorePath, cwd, isDevEnv, installedLicenseInfo ) )
 
 			commander.parse( argv )
 		}
