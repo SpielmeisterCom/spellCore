@@ -172,7 +172,9 @@ define(
 			)
 		}
 
-		return function( spellCorePath, projectPath, projectFilePath, target, minify, anonymizeModuleIds, debug, next ) {
+		return function( spellCorePath, projectPath, projectFilePath, target, minify, anonymizeModuleIds, debug, forceSplashScreen, next ) {
+			target = target || 'html5'
+
 			var errors             = [],
 				buildMode          = debug ? 'debug' : 'release',
 				projectLibraryPath = path.join( projectPath, 'library' ),
@@ -180,8 +182,12 @@ define(
 				outputPath         = path.join( projectBuildPath, buildMode ),
 				projectConfigData  = readProjectConfigFile( projectFilePath ),
 				projectConfigRaw   = parseProjectConfig( projectConfigData, next ),
-				projectConfig      = createProjectConfig( projectConfigRaw ),
-				target             = target || 'html5'
+				projectConfig      = createProjectConfig( projectConfigRaw )
+
+			// setting up environment config
+			projectConfig.environment = {
+				forceSplashScreen : forceSplashScreen
+			}
 
 			// loading the library
 			var library = {}

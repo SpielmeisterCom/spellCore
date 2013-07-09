@@ -145,13 +145,17 @@ define(
 
 			spell.logger.debug( 'client started' )
 
-			showSplashScreen(
-				spell,
-				function() {
-					spell.sceneManager.startScene( spell.applicationModule.startScene, {}, !isModeDevelopment )
-					spell.mainLoop.run()
-				}
-			)
+			var run = function() {
+				spell.sceneManager.startScene( spell.applicationModule.startScene, {}, !isModeDevelopment )
+				spell.mainLoop.run()
+			}
+
+			if( applicationModule.environment.forceSplashScreen ) {
+				showSplashScreen( spell, run )
+
+			} else {
+				run()
+			}
 		}
 
 		var init = function( loaderConfig ) {

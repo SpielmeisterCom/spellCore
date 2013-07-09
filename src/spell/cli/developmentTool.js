@@ -139,12 +139,23 @@ define(
 				cleanDirectory( path.join( projectPath, 'build' ) )
 			}
 
-			var buildCommand = function( cwd, target, command ) {
+			var buildCommand = function( cwd, installedLicenseInfo, target, command ) {
 				var projectPath        = createProjectPath( cwd, command.project ),
 					errors             = checkProjectPath( projectPath ),
 					debug              = command.debug || false,
 					minify             = !debug,
 					anonymizeModuleIds = true
+
+
+				if( installedLicenseInfo ) {
+					var forceSplashScreen = _.any(
+						installedLicenseInfo.productFeatures,
+						function( feature ) {
+							return feature.name === 'forceSplashScreen' &&
+								feature.included
+						}
+					)
+				}
 
 				if( printErrors( errors ) ) {
 					process.exit( 1 )
@@ -169,6 +180,7 @@ define(
 					minify,
 					anonymizeModuleIds,
 					debug,
+					forceSplashScreen,
 					onComplete
 				)
 			}
@@ -298,7 +310,7 @@ define(
 				.option( '-d, --debug', 'creates a debug build' )
 				.option( '-r, --release', 'creates a release build' )
 				.description( 'Creates a build for a specific target; available targets: web, web-html5, web-flash, android, ios.' )
-				.action( _.bind( buildCommand, this, cwd ) )
+				.action( _.bind( buildCommand, this, cwd, installedLicenseInfo ) )
 
 			commander
 				.command( 'export [target]' )
