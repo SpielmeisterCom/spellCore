@@ -15,6 +15,7 @@ define(
 		'spell/shared/util/platform/private/getAvailableScreenSize',
 		'spell/shared/util/platform/private/ModuleLoader',
 		'spell/shared/util/platform/private/graphics/RenderingFactory',
+		'spell/shared/util/platform/private/graphics/createSplashScreenImage',
 		'spell/shared/util/platform/private/sound/AudioFactory',
 		'spell/shared/util/platform/private/registerTimer',
 		'spell/shared/util/platform/private/loader/ImageLoader',
@@ -41,6 +42,7 @@ define(
 		getAvailableScreenSize,
 		ModuleLoader,
 		RenderingFactory,
+		createSplashScreenImage,
 		AudioFactory,
 		registerTimer,
 		ImageLoader,
@@ -170,7 +172,9 @@ define(
 
 			createComponentType : createComponentType,
 
-			Application : Application
+			Application : Application,
+
+			createSplashScreenImage : createSplashScreenImage
 		}
 	}
 )
