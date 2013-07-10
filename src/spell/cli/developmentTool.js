@@ -155,6 +155,9 @@ define(
 								feature.included
 						}
 					)
+
+				} else {
+					forceSplashScreen = true
 				}
 
 				if( printErrors( errors ) ) {
