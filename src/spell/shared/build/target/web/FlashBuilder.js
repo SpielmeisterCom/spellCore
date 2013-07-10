@@ -175,14 +175,14 @@ define(
 						.txt( spellFlashPath + '/lib/AS3WebSocket/lib/as3corelib.swc' )
 					.up()
 				.up()
-				.ele( 'external-library-path' )
+				.ele( 'library-path' )
 					.ele( 'path-element' )
-						.txt( flexSdkPath + '/frameworks/libs/player/11.1/playerglobal.swc' )
+						.txt( flexSdkPath + '/frameworks/libs/core.swc' )
 					.up()
 				.up()
 				.ele( 'external-library-path' )
 					.ele( 'path-element' )
-						.txt( flexSdkPath + '/frameworks/libs/core.swc' )
+						.txt( flexSdkPath + '/frameworks/libs/player/11.1/playerglobal.swc' )
 					.up()
 				.up()
 				.ele( 'debug' )
@@ -404,8 +404,8 @@ define(
 
 			// copy splash screen image
 			copyFile(
-				"/home/martin/workspace/spellEngine/projects/superkumba/library/spell/splash.png",
-				"/home/martin/workspace/spellEngine/projects/superkumba/build/tmp/web/flash/src/splash.png"
+				path.join( projectPath, "library", "spell", "splash.png" ),
+				path.join( srcPath, "splash.png" )
 			)
 
 			// reading engine source file
