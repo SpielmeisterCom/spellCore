@@ -180,6 +180,11 @@ define(
 						.txt( flexSdkPath + '/frameworks/libs/player/11.1/playerglobal.swc' )
 					.up()
 				.up()
+				.ele( 'external-library-path' )
+					.ele( 'path-element' )
+						.txt( flexSdkPath + '/frameworks/libs/core.swc' )
+					.up()
+				.up()
 				.ele( 'debug' )
 					.txt( debug.toString() )
 				.up()
@@ -210,6 +215,9 @@ define(
 
 			root.ele( 'warnings' )
 				.txt( 'false' )
+			.up()
+			.ele( 'static-link-runtime-shared-libraries' )
+				.txt( true )
 			.up()
 			.ele( 'output' )
 				.txt( outputFilePath )
@@ -393,6 +401,12 @@ define(
 			if( fs.existsSync( compilerConfigFilePath ) ) {
 				fs.unlinkSync( compilerConfigFilePath )
 			}
+
+			// copy splash screen image
+			copyFile(
+				"/home/martin/workspace/spellEngine/projects/superkumba/library/spell/splash.png",
+				"/home/martin/workspace/spellEngine/projects/superkumba/build/tmp/web/flash/src/splash.png"
+			)
 
 			// reading engine source file
 			var spellEngineSourceFilePath = createDebugPath( debug, 'spell.common.js', 'spell.common.min.js', path.join( spellCorePath, 'lib' ) )

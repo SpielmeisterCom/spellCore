@@ -186,6 +186,7 @@ flash-target-builder-deps:
 
 	cp $(FLEX_SDK_DIR)/bin/mxmlc* $(FLEX_SDK_OUT_DIR)/bin
 	cp $(FLEX_SDK_DIR)/frameworks/localFonts.ser $(FLEX_SDK_OUT_DIR)/frameworks
+	cp $(FLEX_SDK_DIR)/frameworks/libs/core.swc $(FLEX_SDK_OUT_DIR)/frameworks/libs
 	cp $(FLEX_SDK_DIR)/frameworks/libs/player/11.1/playerglobal.swc $(FLEX_SDK_OUT_DIR)/frameworks/libs/player/11.1
 	cp $(FLEX_SDK_DIR)/frameworks/themes/Spark/spark.css $(FLEX_SDK_OUT_DIR)/frameworks/themes/Spark
 	cp $(FLEX_SDK_DIR)/lib/asc.jar $(FLEX_SDK_OUT_DIR)/lib
