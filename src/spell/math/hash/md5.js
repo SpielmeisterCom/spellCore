@@ -1,7 +1,7 @@
 define(
-	"spell/shared/math/hash/md5",
+	'spell/math/hash/md5',
 	function() {
-		"use strict"
+		'use strict'
 
 
 		/*
