@@ -232,6 +232,7 @@ define(
 
 			addToCache : function( content ) {
 				_.extend( this.cache.metaData, content )
+				addNamespaceAndName( this.cache.metaData )
 			},
 
 			isAvailable : function( libraryIds ) {
