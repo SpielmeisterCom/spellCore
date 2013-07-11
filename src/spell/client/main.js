@@ -150,7 +150,9 @@ define(
 				spell.mainLoop.run()
 			}
 
-			if( applicationModule.environment.forceSplashScreen ) {
+			if( applicationModule.environment &&
+				applicationModule.environment.forceSplashScreen ) {
+
 				showSplashScreen( spell, run )
 
 			} else {
