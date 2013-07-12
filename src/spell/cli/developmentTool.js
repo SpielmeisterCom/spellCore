@@ -117,14 +117,6 @@ define(
 				license.createLicenseInfo( Certificates.LICENSE_PUBLIC_KEY, fs.readFileSync( licenseFilePath ).toString() ) :
 				undefined
 
-			if( installedLicenseInfo &&
-				installedLicenseInfo.error ) {
-
-				printErrors( installedLicenseInfo.error )
-
-				process.exit( 1 )
-			}
-
 			var cleanCommand = function( cwd, command ) {
 				var projectPath = createProjectPath( cwd, command.project ),
 					errors      = checkProjectPath( projectPath )
@@ -146,6 +138,13 @@ define(
 					minify             = !debug,
 					anonymizeModuleIds = true
 
+				if( installedLicenseInfo &&
+					installedLicenseInfo.error ) {
+
+					printErrors( installedLicenseInfo.error )
+
+					process.exit( 1 )
+				}
 
 				if( installedLicenseInfo ) {
 					var forceSplashScreen = _.any(
@@ -281,6 +280,20 @@ define(
 					)
 
 				} else {
+					if( !licenseInfo ) {
+						printErrors( 'Error: No license installed.' )
+
+						process.exit( 1 )
+					}
+
+					if( licenseInfo &&
+						licenseInfo.error ) {
+
+						printErrors( licenseInfo.error )
+
+						process.exit( 1 )
+					}
+
 					if( licenseInfo ) {
 						printLicenseInfo( isDevEnv, humanReadable, licenseInfo, onComplete )
 
