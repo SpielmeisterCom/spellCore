@@ -59,9 +59,10 @@ define(
 				context.drawTexture( splashTexture, position, splashTexture.dimensions, null )
 
 				PlatformKit.registerTimer( next, 3000 )
-			}
 
-			next()
+			} else {
+				next()
+			}
 		}
 	}
 )
