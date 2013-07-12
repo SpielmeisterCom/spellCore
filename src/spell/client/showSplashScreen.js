@@ -34,28 +34,34 @@ define(
 		}
 
 		return function( spell, next ) {
-			var splashTexture = spell.renderingContext.createTexture( PlatformKit.createSplashScreenImage() ),
-				screenSize    = spell.configurationManager.getValue( 'currentScreenSize' )
+			var splashScreenImage = PlatformKit.createSplashScreenImage()
 
-			var position = vec2.fromValues(
-				Math.round( screenSize[ 0 ] * 0.5 - splashTexture.dimensions[ 0 ] * 0.5 ),
-				Math.round( screenSize[ 1 ] * 0.5 - splashTexture.dimensions[ 1 ] * 0.5 )
-			)
+			if( splashScreenImage ) {
+				var splashTexture = spell.renderingContext.createTexture( splashScreenImage ),
+					screenSize    = spell.configurationManager.getValue( 'currentScreenSize' )
 
-			var context    = spell.renderingContext,
-				tmpMat3    = mat3.create(),
-				clearColor = vec4.fromValues( 0, 0, 0, 1 )
+				var position = vec2.fromValues(
+					Math.round( screenSize[ 0 ] * 0.5 - splashTexture.dimensions[ 0 ] * 0.5 ),
+					Math.round( screenSize[ 1 ] * 0.5 - splashTexture.dimensions[ 1 ] * 0.5 )
+				)
 
-			mathUtil.mat3Ortho( tmpMat3, 0.0, screenSize[ 0 ], 0.0, screenSize[ 1 ] )
+				var context    = spell.renderingContext,
+					tmpMat3    = mat3.create(),
+					clearColor = vec4.fromValues( 0, 0, 0, 1 )
 
-			context.setViewMatrix( tmpMat3 )
-			context.setClearColor( clearColor )
-			context.resizeColorBuffer( screenSize[ 0 ], screenSize[ 1 ] )
-			context.viewport( 0, 0, screenSize[ 0 ], screenSize [ 1 ] )
+				mathUtil.mat3Ortho( tmpMat3, 0.0, screenSize[ 0 ], 0.0, screenSize[ 1 ] )
 
-			context.drawTexture( splashTexture, position, splashTexture.dimensions, null )
+				context.setViewMatrix( tmpMat3 )
+				context.setClearColor( clearColor )
+				context.resizeColorBuffer( screenSize[ 0 ], screenSize[ 1 ] )
+				context.viewport( 0, 0, screenSize[ 0 ], screenSize [ 1 ] )
 
-			PlatformKit.registerTimer( next, 3000 )
+				context.drawTexture( splashTexture, position, splashTexture.dimensions, null )
+
+				PlatformKit.registerTimer( next, 3000 )
+			}
+
+			next()
 		}
 	}
 )
