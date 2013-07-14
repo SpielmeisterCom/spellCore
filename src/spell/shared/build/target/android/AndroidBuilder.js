@@ -141,10 +141,11 @@ define(
                  A package name must be constitued of two Java identifiers.
                  Each identifier allowed characters are: a-z A-Z 0-9 _
                */
-              'package'         : 'com.kaisergames', //namespace,
-              'title'           : 'Jungle Chaos', //title
+              'package'         : 'com.kaisergames.' + projectId, //namespace,
               'activity'        : '.' + projectId + 'Activity',
-              'version'         : '',
+
+              'title'           : 'Jungle Chaos', //title underneath the icon
+              'version'         : '1.0', // is shown in app manager
               'versionCode'     : '1',
 
               'shortname'       : projectId,
@@ -155,7 +156,7 @@ define(
               'orientation'     : 'landscape', //landscape, unspecified
 
               //unused parameters
-              'appid'           : '',
+              'appid'           : 'Jungle Chaos',
               'gameHash'        : '1.0',
               'sdkHash'         : '1.0',
               'androidHash'     : '1.0',
