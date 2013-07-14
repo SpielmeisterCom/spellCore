@@ -14,10 +14,10 @@ define(
 		var dummy = function() {}
 
 		var isBackgroundMusic = function( src ) {
-			return src == 'resources/library/superkumba/sounds/KibaKumbaDschungel.mp3' ||
-				src == 'resources/library/superkumba/sounds/KibaKumbaWueste.mp3' ||
-				src == 'resources/library/superkumba/sounds/KibaKumbaHoehle.mp3' ||
-				src == 'resources/library/superkumba/sounds/KibaKumbaArktis.mp3'
+			return src == 'library/superkumba/sounds/KibaKumbaDschungel.mp3' ||
+				src == 'library/superkumba/sounds/KibaKumbaWueste.mp3' ||
+				src == 'library/superkumba/sounds/KibaKumbaHoehle.mp3' ||
+				src == 'library/superkumba/sounds/KibaKumbaArktis.mp3'
 		}
 
 		// Unfortunately the game closure sound api is missing a "sound identity" concept. Therefore it is not possible to reference a playing sound by anything
