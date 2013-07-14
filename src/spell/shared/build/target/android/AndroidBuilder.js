@@ -56,14 +56,7 @@ define(
 
         var ANDROID_TARGET = 'android-15'
 
-		var writeMetaDataFile = function( destinationPath ) {
-			writeFile(
-				path.join( destinationPath, 'metadata.json' ),
-				JSON.stringify( { sprite : false, package : true } )
-			)
-		}
-
-        function updateActivity(namespace, activity, destDir, next) {
+        var updateActivity = function(namespace, activity, destDir, next) {
             var activityFile = path.join( destDir, 'src/' + namespace.replace(/\./g, '/') + '/' + activity + '.java')
 
             if( fs.existsSync( activityFile ) ) {
@@ -104,11 +97,14 @@ define(
                 androidSdkPath      = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'android-sdk', 'linux-ia32'),
                 JDKPath             = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'jdk', 'linux-ia32'),
                 xslFile             = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'native-android', 'AndroidManifest.xsl'),
-                tealeafPath         = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'native-android', 'TeaLeaf'),
+                tealeafDebugPath    = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'build', 'debug', 'TeaLeaf'),
+                tealeafReleasePath  = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'build', 'release', 'TeaLeaf'),
                 androidTool         = path.resolve( androidSdkPath, 'tools', 'android')
 
 //			console.log( 'spellCorePath: ' + spellCorePath )
 //			console.log( 'spellEnginePath: ' + spellEnginePath )
+
+           // console.log(projectConfig);
 
 			// add component scripts to scriptSource
 			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
@@ -122,14 +118,17 @@ define(
 			// set up temporary android project
 			var projectId      = projectConfig.config.projectId,
 				tmpProjectPath = path.join( projectPath, 'build', 'tmp', 'android', projectId ),
-				resourcesPath  = path.join( tmpProjectPath, 'assets', 'resources' )
+				resourcesPath  = path.join( tmpProjectPath, 'assets', 'resources'),
+                tealeafPath    = path.join( tmpProjectPath, '..', 'TeaLeaf')
 
-			rmdir.sync( tmpProjectPath )
+
+            rmdir.sync( tmpProjectPath )
 			mkdirp.sync( tmpProjectPath )
 
+            // copy the prebuild Tealeaf library into our temp directory
             wrench.copyDirSyncRecursive(
+                debug ? tealeafDebugPath : tealeafReleasePath,
                 tealeafPath,
-                path.join( tmpProjectPath, '..', 'TeaLeaf'),
                 {
                     forceDelete: true,
                     preserveFiles: false,
@@ -144,28 +143,32 @@ define(
                */
               'package'         : 'com.spelljs', //namespace,
               'title'           : '', //title
-              'activity'        : '.defaultActivity',
+              'activity'        : '.' + projectId + 'Activity',
               'version'         : '',
-              'versionCode'     : '0',
-              'gameHash'        : '0.0',
+              'versionCode'     : '1',
+
+              'shortname'       : projectId,
+              'disableLogs'     : debug ? 'false' : 'true',
+              'debuggable'      : debug ? 'true' : 'false',
+              'develop'         : debug ? 'true' : 'false',
+
+              'orientation'     : 'landscape', //landscape, unspecified
+
+              //unused parameters
+              'appid'           : '',
+              'gameHash'        : '1.0',
               'sdkHash'         : '1.0',
               'androidHash'     : '1.0',
-              'develop'         : String(debug),
-              'appid'           : '',
-              'shortname'       : 'tealeafX',
-              'studioName'      : 'Acme Inc.',
+              'studioName'      : '',
               'codeHost'        : '127.0.0.1',
               'tcpHost'         : '127.0.0.1',
               'codePort'        : '80',
               'tcpPort'         : '4747',
-              'entryPoint'      : 'gc.native.launchClient',
+              'entryPoint'      : '',
               'pushUrl'         : 'http://127.0.0.1/push/%s/?device=%s&amp;version=%s',
               'servicesUrl'     : 'http://127.0.0.1',
-              'disableLogs'     : String(!debug),
-              'debuggable'      : 'true', //for release set this to false
               'installShortcut' : 'false',
-              'contactsUrl'     : '',
-              'orientation'    : 'landscape' //landscape, unspecified
+              'contactsUrl'     : ''
             };
 
             var buildOptions = defaultOptions,
@@ -242,6 +245,29 @@ define(
                         tmpProjectPath,
                         f.wait()
                     )
+                },
+                function() {
+                    var srcPath = path.join( projectPath, 'resources', 'android'),
+                        dstPath = path.join( tmpProjectPath, 'res' )
+
+                    console.log( '[spellcli] Copying resources into android project from ' + srcPath + ' to ' + dstPath )
+
+                    if( fs.existsSync( srcPath ) ) {
+
+                        wrench.copyDirSyncRecursive(
+                            srcPath,
+                            dstPath,
+                            {
+                                forceDelete: true,
+                                preserveFiles: false,
+                                inflateSymlinks: false
+                            }
+                        )
+
+                    } else {
+
+                        console.log('[spellcli] WARN the project does not have any android specific resource files')
+                    }
                 },
                 function() {
                     console.log( '[spellcli] Populating the android project with SpellJS project resources' )
