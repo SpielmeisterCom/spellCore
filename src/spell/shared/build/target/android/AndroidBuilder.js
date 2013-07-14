@@ -141,8 +141,8 @@ define(
                  A package name must be constitued of two Java identifiers.
                  Each identifier allowed characters are: a-z A-Z 0-9 _
                */
-              'package'         : 'com.spelljs', //namespace,
-              'title'           : '', //title
+              'package'         : 'com.kaisergames', //namespace,
+              'title'           : 'Jungle Chaos', //title
               'activity'        : '.' + projectId + 'Activity',
               'version'         : '',
               'versionCode'     : '1',
@@ -247,26 +247,63 @@ define(
                     )
                 },
                 function() {
-                    var srcPath = path.join( projectPath, 'resources', 'android'),
-                        dstPath = path.join( tmpProjectPath, 'res' )
+                    console.log( '[spellcli] Copying icon resources into android project' )
 
-                    console.log( '[spellcli] Copying resources into android project from ' + srcPath + ' to ' + dstPath )
+                    var dpi     = [ 'ldpi', 'mdpi', 'hdpi', 'xhdpi' ]
 
-                    if( fs.existsSync( srcPath ) ) {
+                    for( var i = 0; i< dpi.length; i++ ) {
 
-                        wrench.copyDirSyncRecursive(
-                            srcPath,
-                            dstPath,
-                            {
-                                forceDelete: true,
-                                preserveFiles: false,
-                                inflateSymlinks: false
-                            }
-                        )
+                        var key = dpi[ i ],
+                            srcPath = path.join( projectPath, 'resources', 'android', 'drawable-' + key ),
+                            dstPath = path.join( tmpProjectPath, 'res', 'drawable-' + key )
 
-                    } else {
+                        if( fs.existsSync( srcPath ) ) {
 
-                        console.log('[spellcli] WARN the project does not have any android specific resource files')
+                            wrench.copyDirSyncRecursive(
+                                srcPath,
+                                dstPath,
+                                {
+                                    forceDelete: true,
+                                    preserveFiles: false,
+                                    inflateSymlinks: false
+                                }
+                            )
+
+                        } else {
+
+                            console.log('[spellcli] WARN did not find icons in ' + srcPath )
+                        }
+
+                    }
+                },
+                function() {
+                  console.log( '[spellcli] creating assets/resources directory' )
+
+                  mkdirp.sync( resourcesPath )
+                },
+                function() {
+                    console.log( '[spellcli] Copying splash screen resources into android project' )
+
+                    var splashSizes = [ '512', '1024', '2048' ]
+
+                    for( var i = 0; i< splashSizes.length; i++ ) {
+
+                        var key = splashSizes[ i ],
+                            srcPath = path.join( projectPath, 'resources', 'android', 'splash-' + key + '.png' ),
+                            dstPath = path.join( resourcesPath, 'splash-' + key + '.png' )
+
+                        if( fs.existsSync( srcPath ) ) {
+
+                            copyFile(
+                                srcPath,
+                                dstPath
+                            )
+
+                        } else {
+
+                            console.log('[spellcli] WARN did not find splash screen ' + srcPath )
+                        }
+
                     }
                 },
                 function() {
@@ -275,10 +312,6 @@ define(
                     // copy project library directory
                     var libraryResourcesPath    = path.join( resourcesPath, 'library'),
                         spelljsResourcesPath    = path.join( resourcesPath, 'spelljs' )
-
-
-                    //copy stage-zero loader for libtealeaf
-                    mkdirp.sync( resourcesPath )
 
                     copyFile(
                         path.join( spellEnginePath, 'modules', 'spellAndroid', 'launchClient.js' ),
