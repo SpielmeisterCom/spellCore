@@ -94,8 +94,7 @@ define(
         }
 
 		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, target, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
-			var outputAndroidPath   = path.join( outputPath, 'android' ),
-				spellEnginePath     = path.resolve( spellCorePath, '../../../..' ),
+			var spellEnginePath     = path.resolve( spellCorePath, '../../../..' ),
                 androidSdkPath      = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'android-sdk', os.platform() == 'darwin' ? 'osx-ia32' : 'linux-ia32'),
                 JDKPath             = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'jdk', os.platform() == 'darwin' ? 'osx-x64' : 'linux-ia32'),
                 xslFile             = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'native-android', 'AndroidManifest.xsl'),
@@ -119,11 +118,16 @@ define(
 			var projectId      = projectConfig.config.projectId,
 				tmpProjectPath = path.join( projectPath, 'build', 'tmp', 'android', projectId ),
 				resourcesPath  = path.join( tmpProjectPath, 'assets', 'resources'),
-                tealeafPath    = path.join( tmpProjectPath, '..', 'TeaLeaf')
+                tealeafPath    = path.join( tmpProjectPath, '..', 'TeaLeaf'),
+                outputPath     = path.join( outputPath, 'android' )
 
-
+            console.log( '[spellcli] Cleaning ' + tmpProjectPath )
             rmdir.sync( tmpProjectPath )
-			mkdirp.sync( tmpProjectPath )
+            mkdirp.sync( tmpProjectPath )
+
+            console.log( '[spellcli] Cleaning ' + outputPath )
+            rmdir.sync( outputPath )
+            mkdirp.sync( outputPath )
 
             // copy the prebuild Tealeaf library into our temp directory
             wrench.copyDirSyncRecursive(
@@ -356,20 +360,18 @@ define(
                 function() {
                     //sign apk file, if we have keys a and doing a release build
 
-                    f.wait()
                 },
 				function() {
-					// copy generated apk file to output directory
+                    var apkFileName         = name + '-debug.apk',
+                        apkPath             = path.join( tmpProjectPath, 'bin', apkFileName ),
+                        outputFile          = path.join( outputPath, apkFileName )
 
-/*					mkdirp.sync( outputAndroidPath )
+                    console.log( '[spellcli] Copying ' + apkPath + ' into ' + outputFile )
 
 					copyFile(
-						path.join( tmpProjectPath, 'build', 'debug', 'native-android', projectId + '.apk' ),
-						path.join( outputAndroidPath, projectId + '.apk' )
+                        apkPath,
+                        outputFile
 					)
-
-					*/
-
 				},
 				next
 			)
