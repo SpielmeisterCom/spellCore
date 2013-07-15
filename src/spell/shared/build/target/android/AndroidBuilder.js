@@ -360,9 +360,14 @@ define(
                 function() {
                     //sign apk file, if we have keys a and doing a release build
 
+                    var unsignedReleaseApkFile = path.join( tmpProjectPath, 'bin', name + '-release-unsigned.apk' )
+
+                    console.log( '[spellcli] Signing ' + unsignedReleaseApkFile )
+
+
                 },
 				function() {
-                    var apkFileName         = name + '-debug.apk',
+                    var apkFileName         = name + '-' + ( (debug) ? 'debug' : 'release-unsigned' ) + '.apk',
                         apkPath             = path.join( tmpProjectPath, 'bin', apkFileName ),
                         outputFile          = path.join( outputPath, apkFileName )
 
