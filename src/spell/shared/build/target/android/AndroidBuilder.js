@@ -94,15 +94,17 @@ define(
         }
 
 		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, target, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
-			var projectId           = projectConfig.config.projectId,
-                spellEnginePath     = path.resolve( spellCorePath, '../../../..' ),
-                androidSdkPath      = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'android-sdk', os.platform() == 'darwin' ? 'osx-ia32' : 'linux-ia32'),
-                JDKPath             = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'jdk', os.platform() == 'darwin' ? 'osx-x64' : 'linux-ia32'),
-                xslFile             = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'native-android', 'AndroidManifest.xsl'),
-                tealeafDebugPath    = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'build', 'debug', 'TeaLeaf'),
-                tealeafReleasePath  = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'build', 'release', 'TeaLeaf'),
-                androidTool         = path.resolve( androidSdkPath, 'tools', 'android'),
-                zipalignTool        = path.resolve( androidSdkPath, 'tools', 'zipalign'),
+			var projectId               = projectConfig.config.projectId,
+                androidBuildSettings    = projectConfig.config.android || {},
+                hasSigningSettings      = androidBuildSettings.signingKeyStore && androidBuildSettings.signingKeyStorePass && androidBuildSettings.signingKeyAlias && androidBuildSettings.signingKeyPass,
+                spellEnginePath         = path.resolve( spellCorePath, '../../../..' ),
+                androidSdkPath          = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'android-sdk', os.platform() == 'darwin' ? 'osx-ia32' : 'linux-ia32'),
+                JDKPath                 = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'jdk', os.platform() == 'darwin' ? 'osx-x64' : 'linux-ia32'),
+                xslFile                 = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'native-android', 'AndroidManifest.xsl'),
+                tealeafDebugPath        = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'build', 'debug', 'TeaLeaf'),
+                tealeafReleasePath      = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'build', 'release', 'TeaLeaf'),
+                androidTool             = path.resolve( androidSdkPath, 'tools', 'android'),
+                zipalignTool            = path.resolve( androidSdkPath, 'tools', 'zipalign'),
                 buildOptions = {
                 /*
                  A package name must be constitued of two Java identifiers.
@@ -140,11 +142,6 @@ define(
                 },
                 name                = buildOptions[ 'shortname' ],
                 activity            = ( buildOptions[ 'activity' ].substring(0, 1) == '.' ) ? buildOptions[ 'activity' ].substring( 1 ) : buildOptions[ 'activity' ]
-
-            var androidSigningKey           = 'kibakumbajunglechaos',
-                androidSigningKeyPass       = 'DidverjUk7',
-                androidSigningKeyStore      = '/home/julian/workspace/spellEngine/projects/superkumba/resources/android/kibakumbajunglechaos.keystore',
-                androidSigningKeyStorePass  = 'DidverjUk7'
 
             // add component scripts to scriptSource
 			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
@@ -362,20 +359,22 @@ define(
                     )
 				},
                 function() {
-                    if( !debug ) {
-                        console.log( '[spellcli] Signing ' + unsignedReleaseApkFile )
+                    if( !debug && hasSigningSettings ) {
+                        var keyStorePath = path.resolve( projectPath, androidBuildSettings.signingKeyStore )
+
+                        console.log( '[spellcli] Signing ' + unsignedReleaseApkFile + ' with key ' + androidBuildSettings.signingKeyAlias + ' from keyStore ' + keyStorePath )
 
                         spawnChildProcess(
                             'jarsigner',
                             [
                                 '-sigalg',      'MD5withRSA',
                                 '-digestalg',   'SHA1',
-                                '-keystore',    androidSigningKeyStore,
-                                '-storepass',   androidSigningKeyStorePass,
-                                '-keypass',     androidSigningKeyPass,
+                                '-keystore',    keyStorePath,
+                                '-storepass',   androidBuildSettings.signingKeyStorePass,
+                                '-keypass',     androidBuildSettings.signingKeyPass,
                                 '-signedjar',   unalignedReleaseApkFile,
                                 unsignedReleaseApkFile,
-                                androidSigningKey
+                                androidBuildSettings.signingKeyAlias
                             ],
                             {
                                 cwd : tmpProjectPath,
@@ -387,8 +386,8 @@ define(
                     }
                 },
                 function() {
-                    if( !debug ) {
-                        console.log( '[spellcli] Aligning signed unaligned apk file ' + unalignedReleaseApkFile + ' and save it as ' + signedReleaseApkFile)
+                    if( !debug && hasSigningSettings ) {
+                        console.log( '[spellcli] Aligning signed unaligned apk file ' + unalignedReleaseApkFile + ' and save it as ' + signedReleaseApkFile )
 
                         spawnChildProcess(
                             zipalignTool,
