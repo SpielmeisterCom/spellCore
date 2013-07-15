@@ -24,6 +24,7 @@ define(
 		'mkdirp',
 		'path',
 		'rimraf',
+        'os',
         'wrench'
 	],
 	function(
@@ -50,6 +51,7 @@ define(
 		mkdirp,
 		path,
 		rmdir,
+        os,
         wrench
 	) {
 		'use strict'
@@ -94,8 +96,8 @@ define(
 		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, target, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
 			var outputAndroidPath   = path.join( outputPath, 'android' ),
 				spellEnginePath     = path.resolve( spellCorePath, '../../../..' ),
-                androidSdkPath      = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'android-sdk', 'linux-ia32'),
-                JDKPath             = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'jdk', 'linux-ia32'),
+                androidSdkPath      = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'android-sdk', os.platform() == 'darwin' ? 'osx-ia32' : 'linux-ia32'),
+                JDKPath             = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'jdk', os.platform() == 'darwin' ? 'osx-x64' : 'linux-ia32'),
                 xslFile             = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'native-android', 'AndroidManifest.xsl'),
                 tealeafDebugPath    = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'build', 'debug', 'TeaLeaf'),
                 tealeafReleasePath  = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'build', 'release', 'TeaLeaf'),
@@ -103,8 +105,6 @@ define(
 
 //			console.log( 'spellCorePath: ' + spellCorePath )
 //			console.log( 'spellEnginePath: ' + spellEnginePath )
-
-           // console.log(projectConfig);
 
 			// add component scripts to scriptSource
 			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
