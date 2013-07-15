@@ -360,11 +360,41 @@ define(
                 function() {
                     //sign apk file, if we have keys a and doing a release build
 
-                    var unsignedReleaseApkFile = path.join( tmpProjectPath, 'bin', name + '-release-unsigned.apk' )
+                    var unsignedReleaseApkFile  = path.join( tmpProjectPath, 'bin', name + '-release-unsigned.apk'),
+                        unalignedReleaseApkFile = path.join( tmpProjectPath, 'bin', name + '-release-signed-unaligned.apk')
 
                     console.log( '[spellcli] Signing ' + unsignedReleaseApkFile )
 
+                    var androidSigningKey           = 'kibakumbajunglechaos',
+                        androidSigningKeyPass       = 'DidverjUk7',
+                        androidSigningKeyStore      = '/home/julian/workspace/spellEngine/modules/spellAndroid/kibakumbajunglechaos.keystore',
+                        androidSigningKeyStorePass  = 'DidverjUk7'
 
+                    var nextCb = f.wait()
+
+                    spawnChildProcess(
+                        'jarsigner',
+                        [
+                            '-sigalg',      'MD5withRSA',
+                            '-digestalg',   'SHA1',
+                            '-keystore',    androidSigningKeyStore,
+                            '-storepass',   androidSigningKeyStorePass,
+                            '-keypass',     androidSigningKeyPass,
+                            '-signedjar',   unalignedReleaseApkFile,
+                            unsignedReleaseApkFile,
+                            androidSigningKey
+                        ],
+                        {
+                            cwd : tmpProjectPath,
+                            env : { JAVA_HOME: JDKPath }
+                        },
+                        true,
+                        function() {
+                            console.log( '[spellcli] Aligning signed unaligned apk file ' + unalignedReleaseApkFile )
+
+                            nextCb()
+                        }
+                    )
                 },
 				function() {
                     var apkFileName         = name + '-' + ( (debug) ? 'debug' : 'release-unsigned' ) + '.apk',
