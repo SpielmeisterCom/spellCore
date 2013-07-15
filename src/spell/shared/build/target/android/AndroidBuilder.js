@@ -141,6 +141,11 @@ define(
                 name                = buildOptions[ 'shortname' ],
                 activity            = ( buildOptions[ 'activity' ].substring(0, 1) == '.' ) ? buildOptions[ 'activity' ].substring( 1 ) : buildOptions[ 'activity' ]
 
+            var androidSigningKey           = 'kibakumbajunglechaos',
+                androidSigningKeyPass       = 'DidverjUk7',
+                androidSigningKeyStore      = '/home/julian/workspace/spellEngine/projects/superkumba/resources/android/kibakumbajunglechaos.keystore',
+                androidSigningKeyStorePass  = 'DidverjUk7'
+
             // add component scripts to scriptSource
 			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
 
@@ -360,13 +365,6 @@ define(
                     //sign apk file, if we have keys a and doing a release build
                     console.log( '[spellcli] Signing ' + unsignedReleaseApkFile )
 
-                    var androidSigningKey           = 'kibakumbajunglechaos',
-                        androidSigningKeyPass       = 'DidverjUk7',
-                        androidSigningKeyStore      = '/home/julian/workspace/spellEngine/projects/superkumba/resources/android/kibakumbajunglechaos.keystore',
-                        androidSigningKeyStorePass  = 'DidverjUk7'
-
-                    var nextCb = f.wait()
-
                     spawnChildProcess(
                         'jarsigner',
                         [
@@ -384,33 +382,35 @@ define(
                             env : { JAVA_HOME: JDKPath }
                         },
                         true,
-                        function() {
-                            console.log( '[spellcli] Aligning signed unaligned apk file ' + unalignedReleaseApkFile + ' and save it as ' + signedReleaseApkFile)
-
-                            spawnChildProcess(
-                                zipalignTool,
-                                [
-                                    '-f', '-v', '4', unalignedReleaseApkFile, signedReleaseApkFile
-                                ],
-                                {
-                                    cwd : tmpProjectPath,
-                                    env : { JAVA_HOME: JDKPath }
-                                },
-                                true,
-                                nextCb()
-                            )
-                        }
+                        f.wait()
                     )
+                },
+                function() {
+                    if( !debug ) {
+                        console.log( '[spellcli] Aligning signed unaligned apk file ' + unalignedReleaseApkFile + ' and save it as ' + signedReleaseApkFile)
+
+                        spawnChildProcess(
+                            zipalignTool,
+                            [
+                                '-f', '-v', '4', unalignedReleaseApkFile, signedReleaseApkFile
+                            ],
+                            {
+                                cwd : tmpProjectPath,
+                                env : { JAVA_HOME: JDKPath }
+                            },
+                            true,
+                            f.wait()
+                        )
+                    }
                 },
 				function() {
                     var apkFileName         = debug ? unsignedDebugApkFile : signedReleaseApkFile,
-                        apkPath             = path.join( tmpProjectPath, 'bin', apkFileName ),
-                        outputFile          = path.join( outputPath, apkFileName )
+                        outputFile          = path.join( outputPath, path.basename( apkFileName ) )
 
-                    console.log( '[spellcli] Copying ' + apkPath + ' into ' + outputFile )
+                    console.log( '[spellcli] Copying ' + apkFileName + ' into ' + outputFile )
 
 					copyFile(
-                        apkPath,
+                        apkFileName,
                         outputFile
 					)
 				},
