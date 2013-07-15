@@ -94,18 +94,54 @@ define(
         }
 
 		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, target, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
-			var spellEnginePath     = path.resolve( spellCorePath, '../../../..' ),
+			var projectId           = projectConfig.config.projectId,
+                spellEnginePath     = path.resolve( spellCorePath, '../../../..' ),
                 androidSdkPath      = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'android-sdk', os.platform() == 'darwin' ? 'osx-ia32' : 'linux-ia32'),
                 JDKPath             = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'jdk', os.platform() == 'darwin' ? 'osx-x64' : 'linux-ia32'),
                 xslFile             = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'native-android', 'AndroidManifest.xsl'),
                 tealeafDebugPath    = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'build', 'debug', 'TeaLeaf'),
                 tealeafReleasePath  = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'build', 'release', 'TeaLeaf'),
-                androidTool         = path.resolve( androidSdkPath, 'tools', 'android')
+                androidTool         = path.resolve( androidSdkPath, 'tools', 'android'),
+                zipalignTool        = path.resolve( androidSdkPath, 'tools', 'zipalign'),
+                buildOptions = {
+                /*
+                 A package name must be constitued of two Java identifiers.
+                 Each identifier allowed characters are: a-z A-Z 0-9 _
+                 */
+                'package'         : 'com.kaisergames.' + projectId, //namespace,
+                'activity'        : '.' + projectId + 'Activity',
 
-//			console.log( 'spellCorePath: ' + spellCorePath )
-//			console.log( 'spellEnginePath: ' + spellEnginePath )
+                'title'           : 'Jungle Chaos', //title underneath the icon
+                'version'         : '1.0', // is shown in app manager
+                'versionCode'     : '1',
 
-			// add component scripts to scriptSource
+                'shortname'       : projectId,
+                'disableLogs'     : debug ? 'false' : 'true',
+                'debuggable'      : debug ? 'true' : 'false',
+                'develop'         : debug ? 'true' : 'false',
+
+                'orientation'     : 'landscape', //landscape, unspecified
+
+                //unused parameters
+                'appid'           : 'Jungle Chaos',
+                'gameHash'        : '1.0',
+                'sdkHash'         : '1.0',
+                'androidHash'     : '1.0',
+                'studioName'      : '',
+                'codeHost'        : '127.0.0.1',
+                'tcpHost'         : '127.0.0.1',
+                'codePort'        : '80',
+                'tcpPort'         : '4747',
+                'entryPoint'      : '',
+                'pushUrl'         : 'http://127.0.0.1/push/%s/?device=%s&amp;version=%s',
+                'servicesUrl'     : 'http://127.0.0.1',
+                'installShortcut' : 'false',
+                'contactsUrl'     : ''
+                },
+                name                = buildOptions[ 'shortname' ],
+                activity            = ( buildOptions[ 'activity' ].substring(0, 1) == '.' ) ? buildOptions[ 'activity' ].substring( 1 ) : buildOptions[ 'activity' ]
+
+            // add component scripts to scriptSource
 			var componentScripts = loadAssociatedScriptModules( projectLibraryPath, library.component )
 
 			scriptSource += ',' + processSource(
@@ -115,11 +151,14 @@ define(
 			)
 
 			// set up temporary android project
-			var projectId      = projectConfig.config.projectId,
-				tmpProjectPath = path.join( projectPath, 'build', 'tmp', 'android', projectId ),
-				resourcesPath  = path.join( tmpProjectPath, 'assets', 'resources'),
-                tealeafPath    = path.join( tmpProjectPath, '..', 'TeaLeaf'),
-                outputPath     = path.join( outputPath, 'android' )
+			var tmpProjectPath          = path.join( projectPath, 'build', 'tmp', 'android', projectId ),
+				resourcesPath           = path.join( tmpProjectPath, 'assets', 'resources'),
+                tealeafPath             = path.join( tmpProjectPath, '..', 'TeaLeaf'),
+                outputPath              = path.join( outputPath, 'android'),
+                unsignedDebugApkFile    = path.join( tmpProjectPath, 'bin', name + '-debug-unsigned.apk'),
+                unsignedReleaseApkFile  = path.join( tmpProjectPath, 'bin', name + '-release-unsigned.apk'),
+                unalignedReleaseApkFile = path.join( tmpProjectPath, 'bin', name + '-release-signed-unaligned.apk'),
+                signedReleaseApkFile    = path.join( tmpProjectPath, 'bin', name + '-release-signed.apk')
 
             console.log( '[spellcli] Cleaning ' + tmpProjectPath )
             rmdir.sync( tmpProjectPath )
@@ -139,46 +178,6 @@ define(
                     inflateSymlinks: false
                 }
             )
-
-            var defaultOptions = {
-              /*
-                 A package name must be constitued of two Java identifiers.
-                 Each identifier allowed characters are: a-z A-Z 0-9 _
-               */
-              'package'         : 'com.kaisergames.' + projectId, //namespace,
-              'activity'        : '.' + projectId + 'Activity',
-
-              'title'           : 'Jungle Chaos', //title underneath the icon
-              'version'         : '1.0', // is shown in app manager
-              'versionCode'     : '1',
-
-              'shortname'       : projectId,
-              'disableLogs'     : debug ? 'false' : 'true',
-              'debuggable'      : debug ? 'true' : 'false',
-              'develop'         : debug ? 'true' : 'false',
-
-              'orientation'     : 'landscape', //landscape, unspecified
-
-              //unused parameters
-              'appid'           : 'Jungle Chaos',
-              'gameHash'        : '1.0',
-              'sdkHash'         : '1.0',
-              'androidHash'     : '1.0',
-              'studioName'      : '',
-              'codeHost'        : '127.0.0.1',
-              'tcpHost'         : '127.0.0.1',
-              'codePort'        : '80',
-              'tcpPort'         : '4747',
-              'entryPoint'      : '',
-              'pushUrl'         : 'http://127.0.0.1/push/%s/?device=%s&amp;version=%s',
-              'servicesUrl'     : 'http://127.0.0.1',
-              'installShortcut' : 'false',
-              'contactsUrl'     : ''
-            };
-
-            var buildOptions = defaultOptions,
-                name = buildOptions[ 'shortname' ],
-                activity = ( buildOptions[ 'activity' ].substring(0, 1) == '.' ) ? buildOptions[ 'activity' ].substring( 1 ) : buildOptions[ 'activity' ]
 
 			var f = ff(
 				function() {
@@ -359,15 +358,11 @@ define(
 				},
                 function() {
                     //sign apk file, if we have keys a and doing a release build
-
-                    var unsignedReleaseApkFile  = path.join( tmpProjectPath, 'bin', name + '-release-unsigned.apk'),
-                        unalignedReleaseApkFile = path.join( tmpProjectPath, 'bin', name + '-release-signed-unaligned.apk')
-
                     console.log( '[spellcli] Signing ' + unsignedReleaseApkFile )
 
                     var androidSigningKey           = 'kibakumbajunglechaos',
                         androidSigningKeyPass       = 'DidverjUk7',
-                        androidSigningKeyStore      = '/home/julian/workspace/spellEngine/modules/spellAndroid/kibakumbajunglechaos.keystore',
+                        androidSigningKeyStore      = '/home/julian/workspace/spellEngine/projects/superkumba/resources/android/kibakumbajunglechaos.keystore',
                         androidSigningKeyStorePass  = 'DidverjUk7'
 
                     var nextCb = f.wait()
@@ -390,14 +385,25 @@ define(
                         },
                         true,
                         function() {
-                            console.log( '[spellcli] Aligning signed unaligned apk file ' + unalignedReleaseApkFile )
+                            console.log( '[spellcli] Aligning signed unaligned apk file ' + unalignedReleaseApkFile + ' and save it as ' + signedReleaseApkFile)
 
-                            nextCb()
+                            spawnChildProcess(
+                                zipalignTool,
+                                [
+                                    '-f', '-v', '4', unalignedReleaseApkFile, signedReleaseApkFile
+                                ],
+                                {
+                                    cwd : tmpProjectPath,
+                                    env : { JAVA_HOME: JDKPath }
+                                },
+                                true,
+                                nextCb()
+                            )
                         }
                     )
                 },
 				function() {
-                    var apkFileName         = name + '-' + ( (debug) ? 'debug' : 'release-unsigned' ) + '.apk',
+                    var apkFileName         = debug ? unsignedDebugApkFile : signedReleaseApkFile,
                         apkPath             = path.join( tmpProjectPath, 'bin', apkFileName ),
                         outputFile          = path.join( outputPath, apkFileName )
 
