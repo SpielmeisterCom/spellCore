@@ -362,28 +362,29 @@ define(
                     )
 				},
                 function() {
-                    //sign apk file, if we have keys a and doing a release build
-                    console.log( '[spellcli] Signing ' + unsignedReleaseApkFile )
+                    if( !debug ) {
+                        console.log( '[spellcli] Signing ' + unsignedReleaseApkFile )
 
-                    spawnChildProcess(
-                        'jarsigner',
-                        [
-                            '-sigalg',      'MD5withRSA',
-                            '-digestalg',   'SHA1',
-                            '-keystore',    androidSigningKeyStore,
-                            '-storepass',   androidSigningKeyStorePass,
-                            '-keypass',     androidSigningKeyPass,
-                            '-signedjar',   unalignedReleaseApkFile,
-                            unsignedReleaseApkFile,
-                            androidSigningKey
-                        ],
-                        {
-                            cwd : tmpProjectPath,
-                            env : { JAVA_HOME: JDKPath }
-                        },
-                        true,
-                        f.wait()
-                    )
+                        spawnChildProcess(
+                            'jarsigner',
+                            [
+                                '-sigalg',      'MD5withRSA',
+                                '-digestalg',   'SHA1',
+                                '-keystore',    androidSigningKeyStore,
+                                '-storepass',   androidSigningKeyStorePass,
+                                '-keypass',     androidSigningKeyPass,
+                                '-signedjar',   unalignedReleaseApkFile,
+                                unsignedReleaseApkFile,
+                                androidSigningKey
+                            ],
+                            {
+                                cwd : tmpProjectPath,
+                                env : { JAVA_HOME: JDKPath }
+                            },
+                            true,
+                            f.wait()
+                        )
+                    }
                 },
                 function() {
                     if( !debug ) {
