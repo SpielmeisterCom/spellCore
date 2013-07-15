@@ -332,16 +332,12 @@ define(
 						path.join( spelljsResourcesPath, 'spell.js.mp3' )
 					)
 
-					//writeMetaDataFile( spelljsResourcesPath )
-
 					copyFiles(
 						projectLibraryPath,
 						libraryResourcesPath,
-						createProjectLibraryFilePaths( projectLibraryPath )
+						createProjectLibraryFilePaths( projectLibraryPath, true )
 					)
-
-					//writeMetaDataFile( libraryResourcesPath )
-				},
+                },
 				function() {
                     console.log( '[spellcli] Running ant in ' + tmpProjectPath + ' to build the android project' )
 
