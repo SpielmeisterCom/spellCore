@@ -160,7 +160,7 @@ define(
 				resourcesPath           = path.join( tmpProjectPath, 'assets', 'resources'),
                 tealeafPath             = path.join( tmpProjectPath, '..', 'TeaLeaf'),
                 outputPath              = path.join( outputPath, 'android'),
-                unsignedDebugApkFile    = path.join( tmpProjectPath, 'bin', name + '-debug-unsigned.apk'),
+                unsignedDebugApkFile    = path.join( tmpProjectPath, 'bin', name + '-debug.apk'),
                 unsignedReleaseApkFile  = path.join( tmpProjectPath, 'bin', name + '-release-unsigned.apk'),
                 unalignedReleaseApkFile = path.join( tmpProjectPath, 'bin', name + '-release-signed-unaligned.apk'),
                 signedReleaseApkFile    = path.join( tmpProjectPath, 'bin', name + '-release-signed.apk')
