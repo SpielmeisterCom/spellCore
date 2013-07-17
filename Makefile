@@ -16,9 +16,9 @@ SPELL_FLASH_DIR             = ../spellFlash
 FLEX_SDK_DIR                = $(SPELL_FLASH_DIR)/vendor/flex_sdk_4.8.0
 SPELL_FLASH_OUT_DIR         = build/spellFlash
 FLEX_SDK_OUT_DIR            = $(SPELL_FLASH_OUT_DIR)/vendor/flex_sdk
-NODE                        = ../nodejs/node
-NODE_SRC                    = ../nodejs/src
-NODE_PATH                   = $$(../nodejs/node --which)
+NODE                        = modules/nodejs/node
+NODE_SRC                    = modules/nodejs/src
+NODE_PATH                   = $$(modules/nodejs/node --which)
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
