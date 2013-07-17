@@ -51,7 +51,7 @@ cli: cli-js
 	cd $(NODE_SRC) && git reset --hard master
 
 	#patching nodejs src
-	cd $(NODE_SRC) && patch -p1 <../../../modules/spellCore/nodejs_spellCore_integration.patch
+	cd $(NODE_SRC) && patch -p1 <../../../nodejs_spellCore_integration.patch
 
 	# creating cli executable
 	mv $(SPELL_CLI_LIB) $(NODE_SRC)/lib/_third_party_main.js
@@ -60,17 +60,17 @@ cli: cli-js
 	$(SED) 's/uglify-js/uglifyjs/g' $(NODE_SRC)/lib/_third_party_main.js
 
 	#integrate requirejs
-	tail -n +2 ../../node_modules/requirejs/bin/r.js >$(NODE_SRC)/lib/requirejs.js
+	tail -n +2 modules/node_modules/requirejs/bin/r.js >$(NODE_SRC)/lib/requirejs.js
 
 	#integrate mkdirp
-	cp ../../node_modules/mkdirp/index.js $(NODE_SRC)/lib/mkdirp.js
+	cp modules/node_modules/mkdirp/index.js $(NODE_SRC)/lib/mkdirp.js
 
 	#integrate uglify-js
-	cp ../../node_modules/uglify-js/uglify-js.js $(NODE_SRC)/lib/uglifyjs.js
-	cp ../../node_modules/uglify-js/lib/process.js $(NODE_SRC)/lib/uglifyjs_process.js
-	cp ../../node_modules/uglify-js/lib/parse-js.js $(NODE_SRC)/lib/uglifyjs_parsejs.js
-	cp ../../node_modules/uglify-js/lib/squeeze-more.js $(NODE_SRC)/lib/uglifyjs_squeezemore.js
-	cp ../../node_modules/uglify-js/lib/consolidator.js $(NODE_SRC)/lib/uglifyjs_consolidator.js
+	cp modules/node_modules/uglify-js/uglify-js.js $(NODE_SRC)/lib/uglifyjs.js
+	cp modules/node_modules/uglify-js/lib/process.js $(NODE_SRC)/lib/uglifyjs_process.js
+	cp modules/node_modules/uglify-js/lib/parse-js.js $(NODE_SRC)/lib/uglifyjs_parsejs.js
+	cp modules/node_modules/uglify-js/lib/squeeze-more.js $(NODE_SRC)/lib/uglifyjs_squeezemore.js
+	cp modules/node_modules/uglify-js/lib/consolidator.js $(NODE_SRC)/lib/uglifyjs_consolidator.js
 	$(SED) 's/\.\/lib\/parse-js/uglifyjs_parsejs/g' $(NODE_SRC)/lib/*.js
 	$(SED) 's/\.\/parse-js/uglifyjs_parsejs/g' $(NODE_SRC)/lib/*.js
 	$(SED) 's/\.\/lib\/process/uglifyjs_process/g' $(NODE_SRC)/lib/*.js
@@ -81,18 +81,18 @@ cli: cli-js
 	$(SED) 's/\.\/consolidator/uglifyjs_consolidator/g' $(NODE_SRC)/lib/*.js
 
 	#integrate underscore
-	cp ../../node_modules/underscore/underscore.js $(NODE_SRC)/lib/underscore.js
+	cp modules/node_modules/underscore/underscore.js $(NODE_SRC)/lib/underscore.js
 
 	#integrate ff
-	cp ../../node_modules/ff/lib/ff.js $(NODE_SRC)/lib/ff.js
+	cp modules/node_modules/ff/lib/ff.js $(NODE_SRC)/lib/ff.js
 
 	#integrate amd-helper
-	cp ../../node_modules/amd-helper/lib/index.js $(NODE_SRC)/lib/amdhelper.js
-	cp ../../node_modules/amd-helper/lib/createModuleHeader.js $(NODE_SRC)/lib/amdhelper_createModuleHeader.js
-	cp ../../node_modules/amd-helper/lib/extractModuleHeader.js $(NODE_SRC)/lib/amdhelper_extractModuleHeader.js
-	cp ../../node_modules/amd-helper/lib/loadModule.js $(NODE_SRC)/lib/amdhelper_loadModule.js
-	cp ../../node_modules/amd-helper/lib/loadModules.js $(NODE_SRC)/lib/amdhelper_loadModules.js
-	cp ../../node_modules/amd-helper/lib/traceDependencies.js $(NODE_SRC)/lib/amdhelper_traceDependencies.js
+	cp modules/node_modules/amd-helper/lib/index.js $(NODE_SRC)/lib/amdhelper.js
+	cp modules/node_modules/amd-helper/lib/createModuleHeader.js $(NODE_SRC)/lib/amdhelper_createModuleHeader.js
+	cp modules/node_modules/amd-helper/lib/extractModuleHeader.js $(NODE_SRC)/lib/amdhelper_extractModuleHeader.js
+	cp modules/node_modules/amd-helper/lib/loadModule.js $(NODE_SRC)/lib/amdhelper_loadModule.js
+	cp modules/node_modules/amd-helper/lib/loadModules.js $(NODE_SRC)/lib/amdhelper_loadModules.js
+	cp modules/node_modules/amd-helper/lib/traceDependencies.js $(NODE_SRC)/lib/amdhelper_traceDependencies.js
 	$(SED) 's/amd-helper/amdhelper/g' $(NODE_SRC)/lib/*.js
 	$(SED) 's/.\/extractModuleHeader/amdhelper_extractModuleHeader/g' $(NODE_SRC)/lib/*.js
 	$(SED) 's/.\/loadModule/amdhelper_loadModule/g' $(NODE_SRC)/lib/*.js
@@ -101,53 +101,53 @@ cli: cli-js
 	$(SED) 's/uglify-js/uglifyjs/g' $(NODE_SRC)/lib/*.js
 
 	#integrate flob
-	cp ../../node_modules/flob/lib/index.js $(NODE_SRC)/lib/flob.js
-	cp ../../node_modules/flob/lib/byTypes.js $(NODE_SRC)/lib/flob_byTypes.js
-	cp ../../node_modules/flob/lib/sync.js $(NODE_SRC)/lib/flob_sync.js
+	cp modules/node_modules/flob/lib/index.js $(NODE_SRC)/lib/flob.js
+	cp modules/node_modules/flob/lib/byTypes.js $(NODE_SRC)/lib/flob_byTypes.js
+	cp modules/node_modules/flob/lib/sync.js $(NODE_SRC)/lib/flob_sync.js
 	$(SED) 's/.\/byTypes/flob_byTypes/g' $(NODE_SRC)/lib/flob.js
 	$(SED) 's/.\/sync/flob_sync/g' $(NODE_SRC)/lib/flob.js
 
 	#integrate glob
-	cp ../../node_modules/glob/glob.js $(NODE_SRC)/lib/glob.js
+	cp modules/node_modules/glob/glob.js $(NODE_SRC)/lib/glob.js
 
 	#integrate graceful-fs (dependency for glob)
-	cp ../../node_modules/glob/node_modules/graceful-fs/graceful-fs.js $(NODE_SRC)/lib/gracefulfs.js
+	cp modules/node_modules/glob/node_modules/graceful-fs/graceful-fs.js $(NODE_SRC)/lib/gracefulfs.js
 	$(SED) 's/graceful-fs/gracefulfs/g' $(NODE_SRC)/lib/*.js
 
 	#integrate minimatch (dependency for glob)
-	cp ../../node_modules/glob/node_modules/minimatch/minimatch.js $(NODE_SRC)/lib/minimatch.js
+	cp modules/node_modules/glob/node_modules/minimatch/minimatch.js $(NODE_SRC)/lib/minimatch.js
 
 	#integrate lru-cache (dependency for minimatch)
-	cp ../../node_modules/glob/node_modules/minimatch/node_modules/lru-cache/lib/lru-cache.js $(NODE_SRC)/lib/lrucache.js
+	cp modules/node_modules/glob/node_modules/minimatch/node_modules/lru-cache/lib/lru-cache.js $(NODE_SRC)/lib/lrucache.js
 	$(SED) 's/lru-cache/lrucache/g' $(NODE_SRC)/lib/*.js
 
 	#integrate inherits
-	cp ../../node_modules/glob/node_modules/inherits/inherits.js $(NODE_SRC)/lib/inherits.js
+	cp modules/node_modules/glob/node_modules/inherits/inherits.js $(NODE_SRC)/lib/inherits.js
 
 	#integrate underscore.string
-	cp ../../node_modules/underscore.string/lib/underscore.string.js $(NODE_SRC)/lib/underscorestring.js
+	cp modules/node_modules/underscore.string/lib/underscore.string.js $(NODE_SRC)/lib/underscorestring.js
 	$(SED) 's/underscore.string/underscorestring/g' $(NODE_SRC)/lib/*.js
 
 	#integrate xmlbuilder
-	cp ../../node_modules/xmlbuilder/lib/index.js $(NODE_SRC)/lib/xmlbuilder.js
-	cp ../../node_modules/xmlbuilder/lib/XMLBuilder.js $(NODE_SRC)/lib/xmlbuilder_XMLBuilder.js
-	cp ../../node_modules/xmlbuilder/lib/XMLFragment.js $(NODE_SRC)/lib/xmlbuilder_XMLFragment.js
+	cp modules/node_modules/xmlbuilder/lib/index.js $(NODE_SRC)/lib/xmlbuilder.js
+	cp modules/node_modules/xmlbuilder/lib/XMLBuilder.js $(NODE_SRC)/lib/xmlbuilder_XMLBuilder.js
+	cp modules/node_modules/xmlbuilder/lib/XMLFragment.js $(NODE_SRC)/lib/xmlbuilder_XMLFragment.js
 	$(SED) 's/.\/XMLBuilder/xmlbuilder_XMLBuilder/g' $(NODE_SRC)/lib/xmlbuilder*.js
 	$(SED) 's/.\/XMLFragment/xmlbuilder_XMLFragment/g' $(NODE_SRC)/lib/xmlbuilder*.js
 
 	#integrate rimraf
-	cp ../../node_modules/rimraf/rimraf.js $(NODE_SRC)/lib/rimraf.js
+	cp modules/node_modules/rimraf/rimraf.js $(NODE_SRC)/lib/rimraf.js
 
 	#integrate zipstream
-	cp ../../node_modules/zipstream/zipstream.js $(NODE_SRC)/lib/zipstream.js
-	cp ../../node_modules/zipstream/crc32.js $(NODE_SRC)/lib/zipstream_crc32.js
+	cp modules/node_modules/zipstream/zipstream.js $(NODE_SRC)/lib/zipstream.js
+	cp modules/node_modules/zipstream/crc32.js $(NODE_SRC)/lib/zipstream_crc32.js
 	$(SED) 's/.\/crc32/zipstream_crc32/g' $(NODE_SRC)/lib/zipstream.js
 
 	#integrate commander
-	cp ../../node_modules/commander/lib/commander.js $(NODE_SRC)/lib/commander.js
+	cp modules/node_modules/commander/lib/commander.js $(NODE_SRC)/lib/commander.js
 
 	#integrate spell-license
-	cp ../../node_modules/spell-license/lib/index.js $(NODE_SRC)/lib/spelllicense.js
+	cp modules/node_modules/spell-license/lib/index.js $(NODE_SRC)/lib/spelllicense.js
 	$(SED) 's/spell-license/spelllicense/g' $(NODE_SRC)/lib/*.js
 
 	#compile nodejs
@@ -156,11 +156,11 @@ ifeq ($(WINDOWS_ENV),true)
 
 	cd $(NODE_SRC) && ./vcbuild.bat
 	cp $(NODE_SRC)/Release/node.exe build/spellcli.exe
-	../upx/upx -9 build/spellcli.exe
+	modules/upx/upx -9 build/spellcli.exe
 else
 	cd $(NODE_SRC) && make clean && ./configure && make -j4
 	cp $(NODE_SRC)/out/Release/node build/spellcli
-	../upx/upx -9 build/spellcli
+	modules/upx/upx -9 build/spellcli
 endif
 
 
