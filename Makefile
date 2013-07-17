@@ -254,11 +254,3 @@ $(SPELL_LOADER_MIN_LIB): $(SPELL_LOADER_LIB)
 .PHONY: clean
 clean:
 	rm -rf build/*
-
-
-.PHONY: docs
-docs:
-	jsduck --config docs/jsduck_conf.json
-	cp docs/css/*.css docs/generated/resources/css
-	cp docs/images/* docs/generated/resources/images
-	cp docs/favicon.ico docs/generated/favicon.ico
