@@ -1,3 +1,6 @@
 [submodule "modules/upx"]
 	path = modules/upx
 	url = ssh://git@stash.spielmeister.com:7999/spellcommon/upx.git
+[submodule "modules/nodejs"]
+	path = modules/nodejs
+	url = ssh://git@stash.spielmeister.com:7999/spellcommon/nodejs.git
