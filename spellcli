@@ -8,8 +8,8 @@ fi
 
 DIRNAME=$(dirname $FILE)
 
-if [ -f $DIRNAME/../nodejs/node ]; then
-	NODE=$DIRNAME/../nodejs/node
+if [ -f $DIRNAME/modules/nodejs/node ]; then
+	NODE=$DIRNAME/modules/nodejs/node
 
 elif [ -f $DIRNAME/node ]; then
 	NODE=$DIRNAME/node
