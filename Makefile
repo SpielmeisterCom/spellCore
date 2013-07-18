@@ -42,11 +42,11 @@ cli-js:
 	mkdir -p $(SPELL_CORE_OUT_LIB_DIR)
 
 	cat spell.cli.js > $(SPELL_CLI_LIB)
-	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander,ff,spell-license" >> $(SPELL_CLI_LIB)
+	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander,ff,spell-license,wrench" >> $(SPELL_CLI_LIB)
 
 
 .PHONY: cli
-cli: cli-js 
+cli: cli-js
 	#reseting node src directory
 	cd $(NODE_SRC) && git reset --hard master
 
@@ -149,6 +149,9 @@ cli: cli-js
 	#integrate spell-license
 	cp modules/node_modules/spell-license/lib/index.js $(NODE_SRC)/lib/spelllicense.js
 	$(SED) 's/spell-license/spelllicense/g' $(NODE_SRC)/lib/*.js
+
+	#integrate wrench
+	cp modules/node_modules/wrench/lib/wrench.js $(NODE_SRC)/lib/wrench.js
 
 	#compile nodejs
 ifeq ($(WINDOWS_ENV),true)

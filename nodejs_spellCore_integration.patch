@@ -1,8 +1,8 @@
 diff --git src/node.gyp src/node.gyp
-index b07a1e0..49c8617 100644
+index b07a1e0..a1734e9 100644
 --- src/node.gyp
 +++ src/node.gyp
-@@ -58,6 +58,39 @@
+@@ -58,6 +58,40 @@
        'lib/util.js',
        'lib/vm.js',
        'lib/zlib.js',
@@ -39,6 +39,7 @@ index b07a1e0..49c8617 100644
 +      'lib/commander.js',
 +      'lib/spelllicense.js',
 +      'lib/_third_party_main.js',
++      'lib/wrench.js'
      ],
    },
  
