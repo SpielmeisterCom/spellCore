@@ -93,10 +93,11 @@ define(
             return cliParams
         }
 
-		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, target, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
+		var build = function( environmentConfig, projectPath, projectLibraryPath, outputPath, target, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
 			var projectId               = projectConfig.config.projectId,
                 androidBuildSettings    = projectConfig.config.android || {},
                 hasSigningSettings      = androidBuildSettings.signingKeyStore && androidBuildSettings.signingKeyStorePass && androidBuildSettings.signingKeyAlias && androidBuildSettings.signingKeyPass,
+				spellCorePath           = environmentConfig.spellCorePath,
                 spellEnginePath         = path.resolve( spellCorePath, '../../../..' ),
                 androidSdkPath          = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'android-sdk', os.platform() == 'darwin' ? 'osx-ia32' : 'linux-ia32'),
                 JDKPath                 = path.resolve( spellEnginePath, 'modules', 'spellAndroid', 'modules', 'jdk', os.platform() == 'darwin' ? 'osx-x64' : 'linux-ia32'),

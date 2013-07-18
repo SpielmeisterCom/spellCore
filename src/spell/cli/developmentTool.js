@@ -82,24 +82,6 @@ define(
 			return []
 		}
 
-		var getSpellCorePath = function( basePath, isDevEnv ) {
-			var spellCorePath = path.join( basePath, 'build', 'spellCore' )
-
-			if( isDevEnv &&
-				isDirectory( spellCorePath ) ) {
-
-				return spellCorePath
-			}
-
-			spellCorePath = path.join( basePath, 'spellCore' )
-
-			if( !isDirectory( spellCorePath ) ) {
-				printErrors( 'Could not locate directory "spellCore".' )
-			}
-
-			return spellCorePath
-		}
-
 		var createProjectPath = function( cwd, project ) {
 			return path.resolve( project || cwd )
 		}
@@ -108,9 +90,57 @@ define(
 			console.log( 'Working on project directory "' + projectPath + '".' )
 		}
 
+		var createEnvironmentConfig = function( basePath, data ) {
+			var configLines = _.reject(
+				data.toString().split( '\n' ),
+				function( line ) {
+					return !line ||
+						line[ 0 ] === '#'
+				}
+			)
+
+			var config = _.reduce(
+				configLines,
+				function( memo, line ) {
+					var parts = line.split( '=' )
+
+					if( parts.length === 2 ) {
+						memo[ parts[ 0 ].trim() ] = parts[ 1 ].trim()
+					}
+
+					return memo
+				},
+				{}
+			)
+
+			if( !config.spellCorePath ||
+				!config.spellFlashPath ||
+				!config.licenseFilePath ) {
+
+				printErrors( 'Error: Invalid spellcli configuration file.' )
+				process.exit( 1 )
+			}
+
+			config.spellCorePath = path.resolve( basePath, config.spellCorePath )
+			config.spellFlashPath = path.resolve( basePath, config.spellFlashPath )
+			config.licenseFilePath = path.resolve( basePath, config.licenseFilePath )
+
+			return config
+		}
+
 		return function( argv, cwd, basePath, isDevEnv ) {
-			var spellCorePath       = getSpellCorePath( basePath, isDevEnv ),
-				licenseFilePath     = path.resolve( basePath, 'license.txt' ),
+			var spellCliConfigFilePath = path.resolve( basePath, 'spellcli.cfg' )
+
+			if( !fs.existsSync( spellCliConfigFilePath ) ) {
+				printErrors( 'Error: Missing spellcli configuration file "' + spellCliConfigFilePath + '".' )
+
+				process.exit( 1 )
+			}
+
+			var environmentConfig = createEnvironmentConfig( basePath, fs.readFileSync( spellCliConfigFilePath ) )
+
+			var spellCorePath       = environmentConfig.spellCorePath,
+				licenseFilePath     = environmentConfig.licenseFilePath,
 				hasInstalledLicense = fs.existsSync( licenseFilePath )
 
 			var installedLicenseInfo = hasInstalledLicense ?
@@ -175,7 +205,7 @@ define(
 				console.log( 'building...' )
 
 				executeCreateBuild(
-					spellCorePath,
+					environmentConfig,
 					projectPath,
 					projectFilePath,
 					target,

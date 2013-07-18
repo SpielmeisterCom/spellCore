@@ -6,7 +6,7 @@ define(
 
 		return function() {
 			return function(
-				spellCorePath,
+				environmentConfig,
 				projectPath,
 				projectLibraryPath,
 				outputPath,
@@ -19,7 +19,7 @@ define(
 				anonymizeModuleIds,
 				debug
 			) {
-				this.spellCorePath      = spellCorePath
+				this.environmentConfig  = environmentConfig
 				this.projectPath        = projectPath
 				this.projectLibraryPath = projectLibraryPath
 				this.outputPath         = outputPath

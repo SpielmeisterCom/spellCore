@@ -172,7 +172,7 @@ define(
 			)
 		}
 
-		return function( spellCorePath, projectPath, projectFilePath, target, minify, anonymizeModuleIds, debug, forceSplashScreen, next ) {
+		return function( environmentConfig, projectPath, projectFilePath, target, minify, anonymizeModuleIds, debug, forceSplashScreen, next ) {
 			target = target || 'html5'
 
 			var errors             = [],
@@ -234,7 +234,7 @@ define(
 				builderTypes,
 				function( builderType ) {
 					var builder = new builderType(
-						spellCorePath,
+						environmentConfig,
 						projectPath,
 						projectLibraryPath,
 						outputPath,

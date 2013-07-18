@@ -61,7 +61,7 @@ define(
 			init : function() {
 				this.builders = [
 					new FlashBuilder(
-						this.spellCorePath,
+						this.environmentConfig,
 						this.projectPath,
 						this.projectLibraryPath,
 						this.outputPath,
@@ -75,7 +75,7 @@ define(
 						this.debug
 					),
 					new HTML5Builder(
-						this.spellCorePath,
+						this.environmentConfig,
 						this.projectPath,
 						this.projectLibraryPath,
 						this.outputPath,
@@ -117,7 +117,7 @@ define(
 				f.next( function() {
 					build(
 						this.projectLibraryPath,
-						this.spellCorePath,
+						this.environmentConfig.spellCorePath,
 						outputWebPath,
 						this.debug
 					)

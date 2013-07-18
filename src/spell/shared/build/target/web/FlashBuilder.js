@@ -378,7 +378,7 @@ define(
 		}
 
 
-		var build = function( spellCorePath, projectPath, projectLibraryPath, outputPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
+		var build = function( spellCorePath, spellFlashPath, projectPath, projectLibraryPath, outputPath, projectConfig, library, cacheContent, scriptSource, minify, anonymizeModuleIds, debug, next ) {
 			var errors                   = [],
 				projectBuildPath         = path.join( projectPath, 'build' ),
 				tmpPath                  = path.join( projectBuildPath, 'tmp', 'web', 'flash' ),
@@ -386,7 +386,6 @@ define(
 				spielmeisterPackagePath  = path.join( srcPath, 'Spielmeister' ),
 				outputFlashPath          = path.join( outputPath, 'web', 'flash' ),
 				compilerConfigFilePath   = path.join( tmpPath, 'compile-config.xml' ),
-				spellFlashPath           = path.join( spellCorePath, '..', 'spellFlash' ),
 				flexSdkPath              = path.join( spellFlashPath, 'vendor/flex_sdk' ),
 				compilerExecutablePath   = path.join( flexSdkPath, 'bin', os.platform() == 'win32' ? 'mxmlc.bat' : 'mxmlc' )
 
@@ -516,7 +515,8 @@ define(
 					},
 					function() {
 						build(
-							this.spellCorePath,
+							this.environmentConfig.spellCorePath,
+							this.environmentConfig.spellFlashPath,
 							this.projectPath,
 							this.projectLibraryPath,
 							this.outputPath,

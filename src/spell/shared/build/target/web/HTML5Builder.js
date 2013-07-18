@@ -96,7 +96,7 @@ define(
 				console.log( 'building for sub-target "' + TARGET_NAME + '"...' )
 
 				build(
-					this.spellCorePath,
+					this.environmentConfig.spellCorePath,
 					this.projectPath,
 					this.projectLibraryPath,
 					this.outputPath,
