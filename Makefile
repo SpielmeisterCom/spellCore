@@ -27,12 +27,12 @@ WINDOWS_ENV = false
 
 ifeq ($(UNAME_S),CYGWIN_NT-6.1-WOW64)
 	WINDOWS_ENV = true
-	VISUAL_STUDIO_PATCH_FILE = nodejs_vs10.patch
+	VISUAL_STUDIO_PATCH_FILE = patches/nodejs_vs10.patch
 endif
 
 ifeq ($(UNAME_S),CYGWIN_NT-6.2-WOW64)
 	WINDOWS_ENV = true
-	VISUAL_STUDIO_PATCH_FILE = nodejs_vs11.patch
+	VISUAL_STUDIO_PATCH_FILE = patches/nodejs_vs11.patch
 endif
 
 
@@ -52,7 +52,7 @@ cli: cli-js
 	cd $(NODE_SRC) && git reset --hard master
 
 	#patching nodejs src
-	cd $(NODE_SRC) && patch -p1 <../../../nodejs_spellCore_integration.patch
+	cd $(NODE_SRC) && patch -p1 <../../../patches/nodejs_spellCore_integration.patch
 
 	# creating cli executable
 	cp $(SPELL_CLI_LIB) $(NODE_SRC)/lib/_third_party_main.js
