@@ -45,7 +45,7 @@ define(
 				createLine( 'license id', payload.lid ) + '\n' +
 				createLine( 'product id', payload.pid ) + '\n' +
 				createLine( 'product features', '' ) + '\n' +
-				createFeatureList( licenseInfo.productFeatures ) + '\n' +
+				createFeatureList( payload.pfs ) + '\n' +
 				createLine( 'issue date', payload.isd ) + '\n' +
 				createLine( 'validity period (days)', payload.days ) + '\n' +
 				createLine( 'status', licenseInfo.isValid ? 'valid' : 'not valid' )	:
