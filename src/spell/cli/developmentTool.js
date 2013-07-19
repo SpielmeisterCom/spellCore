@@ -299,7 +299,7 @@ define(
 							printLicenseInfo(
 								isDevEnv,
 								humanReadable,
-								licenseInfo,
+								suppliedLicenseInfo,
 								onComplete
 							)
 						}
