@@ -34,6 +34,10 @@ define(
 		}
 
 		return function( isDevEnv, humanReadable, licenseInfo, next ) {
+			if( !licenseInfo ) {
+				next( 'Error: licenseInfo is undefined.' )
+			}
+
 			var payload = licenseInfo.payload
 
 			var message = humanReadable ?
