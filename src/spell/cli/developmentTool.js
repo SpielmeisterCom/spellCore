@@ -3,6 +3,7 @@ define(
 	[
 		'spell/cli/Certificates',
 		'spell/shared/build/cleanDirectory',
+		'spell/shared/build/createOsPath',
 		'spell/shared/build/executeCreateBuild',
 		'spell/shared/build/exportArchive',
 		'spell/shared/build/initializeProjectDirectory',
@@ -19,6 +20,7 @@ define(
 	function(
 		Certificates,
 		cleanDirectory,
+		createOsPath,
 		executeCreateBuild,
 		exportArchive,
 		initializeProjectDirectory,
@@ -87,59 +89,57 @@ define(
 		}
 
 		var createEnvironmentConfig = function( basePath, data ) {
-			var configLines = _.reject(
-				data.toString().split( '\n' ),
-				function( line ) {
-					return !line ||
-						line[ 0 ] === '#'
-				}
-			)
+			try {
+				var config = JSON.parse( data.toString() )
 
-			var config = _.reduce(
-				configLines,
-				function( memo, line ) {
-					var parts = line.split( '=' )
-
-					if( parts.length === 2 ) {
-						memo[ parts[ 0 ].trim() ] = parts[ 1 ].trim()
-					}
-
-					return memo
-				},
-				{}
-			)
+			} catch( e ) {
+				printErrors( 'Error: Parsing spell configuration file failed.' )
+				process.exit( 1 )
+			}
 
 			if( !config.spellCorePath ||
-				!config.spellFlashPath ||
-				!config.licenseFilePath ) {
+				!config.spellFlashPath) {
 
-				printErrors( 'Error: Invalid spellcli configuration file.' )
+				printErrors( 'Error: Invalid spell configuration file.' )
 				process.exit( 1 )
 			}
 
 			config.spellCorePath = path.resolve( basePath, config.spellCorePath )
 			config.spellFlashPath = path.resolve( basePath, config.spellFlashPath )
-			config.licenseFilePath = path.resolve( basePath, config.licenseFilePath )
 
 			return config
 		}
 
-		return function( argv, cwd, basePath, isDevEnv ) {
-			var spellCliConfigFilePath = path.resolve( basePath, 'spellcli.cfg' )
+		var createConfigFilePath = function( basePath, fileName ) {
+			var environmentConfigFilePath = path.resolve( basePath, fileName )
 
-			if( !fs.existsSync( spellCliConfigFilePath ) ) {
-				printErrors( 'Error: Missing spellcli configuration file "' + spellCliConfigFilePath + '".' )
+			if( fs.existsSync( environmentConfigFilePath ) ) {
+				return environmentConfigFilePath
+			}
+
+			var appDataPath = createOsPath().createAppDataPath( 'spell' )
+
+			environmentConfigFilePath = path.resolve( appDataPath, fileName )
+
+			if( fs.existsSync( environmentConfigFilePath ) ) {
+				return environmentConfigFilePath
+			}
+		}
+
+		return function( argv, cwd, basePath, isDevEnv ) {
+			var environmentConfigFilePath = createConfigFilePath( basePath, 'config.json' )
+
+			if( !environmentConfigFilePath ) {
+				printErrors( 'Error: Missing spell configuration file "spell.cfg".' )
 
 				process.exit( 1 )
 			}
 
-			var environmentConfig = createEnvironmentConfig( basePath, fs.readFileSync( spellCliConfigFilePath ) )
+			var environmentConfig   = createEnvironmentConfig( basePath, fs.readFileSync( environmentConfigFilePath ) ),
+				spellCorePath       = environmentConfig.spellCorePath,
+				licenseFilePath     = createConfigFilePath( basePath, 'license.txt' )
 
-			var spellCorePath       = environmentConfig.spellCorePath,
-				licenseFilePath     = environmentConfig.licenseFilePath,
-				hasInstalledLicense = fs.existsSync( licenseFilePath )
-
-			var installedLicenseInfo = hasInstalledLicense ?
+			var installedLicenseInfo = licenseFilePath ?
 				license.createLicenseInfo( Certificates.LICENSE_PUBLIC_KEY, fs.readFileSync( licenseFilePath ).toString() ) :
 				undefined
 
