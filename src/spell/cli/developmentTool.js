@@ -130,7 +130,7 @@ define(
 			var environmentConfigFilePath = createConfigFilePath( basePath, 'config.json' )
 
 			if( !environmentConfigFilePath ) {
-				printErrors( 'Error: Missing spell configuration file "spell.cfg".' )
+				printErrors( 'Error: Missing spell configuration file "config.json".' )
 
 				process.exit( 1 )
 			}
