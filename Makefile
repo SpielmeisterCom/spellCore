@@ -170,11 +170,11 @@ ifeq ($(WINDOWS_ENV),true)
 
 	cd $(NODE_SRC) && ./vcbuild.bat
 	cp $(NODE_SRC)/Release/node.exe $(SPELL_CLI_OUT_DIR)/spellcli.exe
-	modules/upx/upx -9 build/spellcli.exe
+	modules/upx/upx -9 $(SPELL_CLI_OUT_DIR)/spellcli.exe
 else
 	cd $(NODE_SRC) && make clean && ./configure && make -j4
 	cp $(NODE_SRC)/out/Release/node $(SPELL_CLI_OUT_DIR)/spellcli
-	modules/upx/upx -9 build/spellcli
+	modules/upx/upx -9 $(SPELL_CLI_OUT_DIR)/spellcli
 endif
 
 .PHONY: engine-debug
