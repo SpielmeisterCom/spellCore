@@ -9,7 +9,7 @@ SPELL_HTML5_ADAPTER_LIB     = build/spellCore/lib/spell.html5.js
 SPELL_HTML5_ADAPTER_MIN_LIB = build/spellCore/lib/spell.html5.min.js
 SPELL_ENGINE_DEBUG_LIB      = build/spellCore/lib/spell.debug.js
 SPELL_ENGINE_RELEASE_LIB    = build/spellCore/lib/spell.release.js
-SPELL_CLI_LIB               = build/spellCore/lib/spell.cli.js
+SPELL_CLI_LIB               = build/spellCore/lib/spellcli.js
 SPELL_CORE_OUT_DIR          = build/spellCore
 SPELL_CORE_OUT_LIB_DIR      = $(SPELL_CORE_OUT_DIR)/lib
 NODE                        = modules/nodejs/node
@@ -41,7 +41,8 @@ cli-js:
 	# creating the javascript includes for the command line tool
 	mkdir -p $(SPELL_CORE_OUT_LIB_DIR)
 
-	cat spell.cli.js > $(SPELL_CLI_LIB)
+	echo 'var RELEASE = true' > $(SPELL_CLI_LIB)
+	cat src/spell/cli/spellcli.js >> $(SPELL_CLI_LIB)
 	$(NODE) tools/n.js -s src -m spell/cli/developmentTool -i "fs,mkdirp,path,uglify-js,amd-helper,flob,child_process,xmlbuilder,os,underscore.string,rimraf,zipstream,util,commander,ff,spell-license,wrench" >> $(SPELL_CLI_LIB)
 
 
@@ -54,7 +55,7 @@ cli: cli-js
 	cd $(NODE_SRC) && patch -p1 <../../../nodejs_spellCore_integration.patch
 
 	# creating cli executable
-	mv $(SPELL_CLI_LIB) $(NODE_SRC)/lib/_third_party_main.js
+	cp $(SPELL_CLI_LIB) $(NODE_SRC)/lib/_third_party_main.js
 
 	#patch includes in _third_party_main.js
 	$(SED) 's/uglify-js/uglifyjs/g' $(NODE_SRC)/lib/_third_party_main.js

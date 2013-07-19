@@ -1,29 +1,23 @@
+var DEBUG    = typeof( RELEASE ) === 'undefined',
+	isDevEnv = DEBUG
+
 var fs        = require( 'fs' ),
 	path      = require( 'path' ),
 	requirejs = require( 'requirejs' ),
 	define    = requirejs.define
 
 // argv[ 1 ] is path to executed script
-var basePath = path.resolve( path.dirname( process.argv[ 1 ] ) )
-
-// probe for development environment
-var isDevEnv = false,
-	srcPath  = path.resolve( basePath, 'src' )
-
-if( fs.existsSync( srcPath ) ) {
-	stat = fs.lstatSync( srcPath )
-
-	if( stat ) {
-		isDevEnv = stat.isDirectory()
-	}
-}
+var scriptPath = path.resolve( path.dirname( process.argv[ 1 ] ) ),
+	basePath   = DEBUG ? path.resolve( scriptPath, '..', '..', '..' ) : scriptPath
 
 // set up requirejs
 var config = {
 	nodeRequire : require
 }
 
-if( isDevEnv ) {
+if( DEBUG ) {
+	var srcPath = path.resolve( basePath, 'src' )
+
 	config.baseUrl = srcPath
 }
 

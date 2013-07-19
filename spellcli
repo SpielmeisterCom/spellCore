@@ -21,4 +21,4 @@ else
 	echo Error: Could not find node binary!
 fi
 
-$NODE $DIRNAME/spell.cli.js $*
+$NODE $DIRNAME/src/spell/cli/spellcli.js $*
