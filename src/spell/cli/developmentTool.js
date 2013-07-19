@@ -98,7 +98,7 @@ define(
 			}
 
 			if( !config.spellCorePath ||
-				!config.spellFlashPath) {
+				!config.spellFlashPath ) {
 
 				printErrors( 'Error: Invalid spell configuration file.' )
 				process.exit( 1 )
