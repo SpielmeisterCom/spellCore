@@ -19,22 +19,30 @@ NODE_PATH                   = $$(modules/nodejs/node --which)
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 	SED = sed -i "" -e
-else
+	SPELL_CLI_OUT_DIR = build/osx-ia32
+	WINDOWS_ENV = false
+
+else ifeq ($(UNAME_S),Linux)
 	SED = sed -i
-endif
+	SPELL_CLI_OUT_DIR = build/linux-x64
+	WINDOWS_ENV = false
 
-WINDOWS_ENV = false
-
-ifeq ($(UNAME_S),CYGWIN_NT-6.1-WOW64)
+else ifeq ($(UNAME_S),CYGWIN_NT-6.1-WOW64)
+	SED = sed -i
 	WINDOWS_ENV = true
+	SPELL_CLI_OUT_DIR = build/win-ia32
 	VISUAL_STUDIO_PATCH_FILE = patches/nodejs_vs10.patch
-endif
 
-ifeq ($(UNAME_S),CYGWIN_NT-6.2-WOW64)
+else ifeq ($(UNAME_S),CYGWIN_NT-6.2-WOW64)
+	SED = sed -i
 	WINDOWS_ENV = true
+	SPELL_CLI_OUT_DIR = build/win-ia32
 	VISUAL_STUDIO_PATCH_FILE = patches/nodejs_vs11.patch
 endif
 
+
+.PHONY: all
+all: engine-release cli
 
 .PHONY: cli-js
 cli-js:
@@ -155,22 +163,19 @@ cli: cli-js
 	cp modules/node_modules/wrench/lib/wrench.js $(NODE_SRC)/lib/wrench.js
 
 	#compile nodejs
+	mkdir -p $(SPELL_CLI_OUT_DIR) || true
+
 ifeq ($(WINDOWS_ENV),true)
 	cd $(NODE_SRC) && patch -p1 <../../../modules/spellCore/$(VISUAL_STUDIO_PATCH_FILE)
 
 	cd $(NODE_SRC) && ./vcbuild.bat
-	cp $(NODE_SRC)/Release/node.exe build/spellcli.exe
+	cp $(NODE_SRC)/Release/node.exe $(SPELL_CLI_OUT_DIR)/spellcli.exe
 	modules/upx/upx -9 build/spellcli.exe
 else
 	cd $(NODE_SRC) && make clean && ./configure && make -j4
-	cp $(NODE_SRC)/out/Release/node build/spellcli
+	cp $(NODE_SRC)/out/Release/node $(SPELL_CLI_OUT_DIR)/spellcli
 	modules/upx/upx -9 build/spellcli
 endif
-
-
-.PHONY: deploy
-deploy: engine-release cli
-
 
 .PHONY: engine-debug
 engine-debug: clean $(SPELL_ENGINE_DEBUG_LIB) $(SPELL_ENGINE_RELEASE_LIB) additional-dependencies
