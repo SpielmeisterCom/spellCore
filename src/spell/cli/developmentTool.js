@@ -5,10 +5,8 @@ define(
 		'spell/shared/build/cleanDirectory',
 		'spell/shared/build/executeCreateBuild',
 		'spell/shared/build/exportArchive',
-		'spell/shared/build/isDevEnvironment',
 		'spell/shared/build/initializeProjectDirectory',
 		'spell/shared/build/isFile',
-		'spell/shared/build/isDirectory',
 		'spell/shared/build/printLicenseInfo',
 		'spell/shared/Configuration',
 
@@ -23,10 +21,8 @@ define(
 		cleanDirectory,
 		executeCreateBuild,
 		exportArchive,
-		isDevEnvironment,
 		initializeProjectDirectory,
 		isFile,
-		isDirectory,
 		printLicenseInfo,
 		Configuration,
 
@@ -217,7 +213,7 @@ define(
 				)
 			}
 
-			var initCommand = function( spellCorePath, cwd, apiVersion, isDevEnvironment, command ) {
+			var initCommand = function( spellCorePath, cwd, apiVersion, isDevEnv, command ) {
 				var projectPath = createProjectPath( cwd, command.project ),
 					force       = command.force
 
@@ -230,7 +226,7 @@ define(
 					createProjectFilePath( projectPath ),
 					force,
 					apiVersion,
-					isDevEnvironment,
+					isDevEnv,
 					onComplete
 				)
 			}
