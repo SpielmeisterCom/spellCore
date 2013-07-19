@@ -12,23 +12,21 @@ SPELL_ENGINE_RELEASE_LIB    = build/lib/spell.release.js
 SPELL_CORE_OUT_DIR          = build
 SPELL_CORE_OUT_LIB_DIR      = $(SPELL_CORE_OUT_DIR)/lib
 NODE                        = modules/nodejs/node
-NODE_SRC                    = modules/nodejs/src
-NODE_PATH                   = $$(modules/nodejs/node --which)
 
-.PHONY: all
+.PHONY: all clean engine-debug engine-release additional-dependencies
 all: engine-release
 
-.PHONY: engine-debug
+clean:
+	rm -rf build/*
+
 engine-debug: clean $(SPELL_ENGINE_DEBUG_LIB) $(SPELL_ENGINE_RELEASE_LIB) additional-dependencies
 
 
-.PHONY: engine-release
 engine-release: clean $(SPELL_ENGINE_RELEASE_LIB) additional-dependencies
 	# deleting unminified files
 	rm -f $(SPELL_COMMON_LIB) $(SPELL_HTML5_ADAPTER_LIB) $(SPELL_LOADER_LIB) $(SPELL_ENGINE_DEBUG_LIB)
 
 
-.PHONY: additional-dependencies
 additional-dependencies:
 	# copy additional dependencies to output directory
 	cp -R library $(SPELL_CORE_OUT_DIR)
@@ -73,6 +71,3 @@ $(SPELL_LOADER_MIN_LIB): $(SPELL_LOADER_LIB)
 	$(NODE) tools/n.js mangle $(SPELL_LOADER_LIB) > $(SPELL_LOADER_MIN_LIB) --no-anonymization
 
 
-.PHONY: clean
-clean:
-	rm -rf build/*
