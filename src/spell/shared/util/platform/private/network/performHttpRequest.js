@@ -28,17 +28,10 @@ define(
 
 			if( onLoad ) {
 				request.onreadystatechange = function() {
-					var status = this.status
-
 					if( this.readyState == 4 &&
-						status == 200 ) {
+						this.status == 200 ) {
 
 						onLoad( this.responseText )
-
-					} else if( status != 0 &&
-						status != 200 ) {
-
-						onError( 'Request failed with http status ' + status + '.' )
 					}
 				}
 			}
