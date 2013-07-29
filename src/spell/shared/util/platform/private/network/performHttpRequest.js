@@ -15,35 +15,47 @@ define(
 				function( value, key ) {
 					return key + '=' + encodeURIComponent( value )
 				}
+
 			).join( '&' )
 		}
 
-		var createCorsRequest = function( method, url, onLoad, onError, parameters ) {
-			var request = typeof XDomainRequest !== 'undefined' ?
-                new XDomainRequest() :
-                new XMLHttpRequest()
+		var createRequest = function() {
+			return typeof XDomainRequest === 'undefined' ? new XMLHttpRequest() : new XDomainRequest()
+		}
 
-			request.onreadystatechange = function() {
-				if( this.readyState == 4 &&
-					this.status == 200 ) {
+		var createCorsRequest = function( method, url, data, onLoad, onError ) {
+			var request = createRequest()
 
-					onLoad( this.responseText )
+			if( onLoad ) {
+				request.onreadystatechange = function() {
+					var status = this.status
+
+					if( this.readyState == 4 &&
+						status == 200 ) {
+
+						onLoad( this.responseText )
+
+					} else if( status != 0 &&
+						status != 200 ) {
+
+						onError( 'Request failed with http status ' + status + '.' )
+					}
 				}
 			}
 
-            if( _.size( parameters ) > 0 &&
-                method == 'GET' ) {
+			if( _.size( data ) > 0 &&
+				method == 'GET' ) {
 
-                url += '?' + createParameters( parameters )
-            }
+				url += '?' + createParameters( data )
+			}
 
 			if( onError ) {
 				request.onerror = function( event ) {
-					onError( 'Error while accessing ' + url, event )
+					onError( 'Error while accessing ' + url + '.' )
 				}
 			}
 
-            request.open( method, url, true )
+			request.open( method, url, true )
 
 			return request
 		}
@@ -54,15 +66,11 @@ define(
 		 *
 		 * @param method
 		 * @param url
+		 * @param data
 		 * @param onLoad
 		 * @param onError
-		 * @param parameters
 		 */
-		var performHttpRequest = function( method, url, onLoad, onError, parameters ) {
-			if( !url ) {
-				throw 'url is undefined.'
-			}
-
+		var performHttpRequest = function( method, url, data, onLoad, onError ) {
 			if( !method ) {
 				throw 'method is undefined.'
 			}
@@ -73,18 +81,18 @@ define(
 				throw 'The provided method is not supported.'
 			}
 
-			if( !onLoad ) {
-				throw 'onLoad is undefined.'
+			if( !url ) {
+				throw 'url is undefined.'
 			}
 
-			var request = createCorsRequest( method, url, onLoad, onError, parameters )
+			var request = createCorsRequest( method, url, data, onLoad, onError )
 
 			if( method === 'POST' ) {
 				if( request.setRequestHeader ) {
 					request.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' )
 				}
 
-				request.send( createParameters( parameters ) )
+				request.send( createParameters( data ) )
 
 			} else {
 				request.send()

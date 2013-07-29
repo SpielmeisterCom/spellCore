@@ -14,13 +14,7 @@ define(
 		var rpcBuffer = []
 
 		var sendLogRequest = function( url, data ) {
-			PlatformKit.network.performHttpRequest(
-				'POST',
-				url,
-				function() {},
-				function() {},
-				data
-			)
+			PlatformKit.network.performHttpRequest( 'POST', url, data )
 		}
 
 		var createLogData = function( spell, sceneId, clientId, payload ) {
