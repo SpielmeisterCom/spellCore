@@ -350,6 +350,14 @@ if( !window.console ) {
 		return child
 	}
 
+	var isValidProtocol = function() {
+		return window.location.protocol != 'file:'
+	}
+
+	var showMessage = function( id, message ) {
+		document.getElementById( id ).innerHTML = '<p style="color: #FFFFFF">' + message + '</p>'
+	}
+
 	window.spell = {
 		start : function( config, onInitialized, debugMessageCallback ) {
 			if( !config ) config = {}
@@ -358,17 +366,20 @@ if( !window.console ) {
 			setDefaults( config )
 
 			if( !hasContainer( config.id ) ) {
-				console.log( 'Error: \'' + config.id + '\' is not a valid dom node id. Could not start engine.' )
+				throw 'Could not find dom node with id "' + config.id + '". Please provide a valid id.'
+			}
+
+			if( !isValidProtocol() ) {
+				throw 'Protocol "file:" is not supported. Please use "http:" instead.'
+			}
+
+			if( !isBrowserCapable( config ) ) {
+				showMessage( config.id, 'Your browser does not meet the minimum requirements to run SpellJS.' )
+
 				return
 			}
 
-			if( isBrowserCapable( config ) ) {
-				process( this, config, onInitialized, debugMessageCallback )
-
-			} else {
-				var message = 'Your browser does not meet the minimum requirements in order to run SpellJS. :('
-				document.getElementById( config.id ).innerHTML = '<p style="color: #FFFFFF">' + message + '</p>'
-			}
+			process( this, config, onInitialized, debugMessageCallback )
 		},
 		addToCache : function( x ) {
 			this.cache = x
