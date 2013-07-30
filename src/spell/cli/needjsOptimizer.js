@@ -35,7 +35,7 @@ define(
 				moduleNames.reverse(),
 				function( moduleName ) {
 					console.log(
-						fs.readFileSync( sourcePath + '/' + moduleName + '.js').toString( 'utf-8' )
+						fs.readFileSync( sourcePath + '/' + moduleName + '.js').toString()
 					)
 				}
 			)
@@ -79,7 +79,7 @@ define(
 				process.exit( 0 )
 			}
 
-			var data          = fs.readFileSync( filePath, 'utf-8' ),
+			var data          = fs.readFileSync( filePath ),
 				mangledSource = processSource( data, command.minification, command.anonymization )
 
 			console.log( mangledSource )
