@@ -369,7 +369,9 @@ if( !window.console ) {
 				throw 'Could not find dom node with id "' + config.id + '". Please provide a valid id.'
 			}
 
-			if( !isValidProtocol() ) {
+			if( config.mode == MODE.DEPLOYED &&
+				!isValidProtocol() ) {
+
 				throw 'Protocol "file:" is not supported. Please use "http:" instead.'
 			}
 
