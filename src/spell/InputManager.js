@@ -39,8 +39,7 @@ define(
 		}
 
 		var InputManager = function( configurationManager, renderingContext ) {
-			this.nativeInput          = PlatformKit.createInput( configurationManager, renderingContext )
-			this.configurationManager = configurationManager
+			this.nativeInput = PlatformKit.createInput( configurationManager, renderingContext )
 		}
 
 		InputManager.prototype = {
