@@ -87,7 +87,7 @@ define(
 			},
 
 			injectKeyEvent : function( type, keyCode ) {
-				inputEvents.push( createKeyEvent( type, keyCode ) )
+				processEvent( createKeyEvent( type, keyCode ) )
 			},
 
 			/**
