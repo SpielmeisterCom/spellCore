@@ -8,27 +8,55 @@ define(
 	'spell/InputManager',
 	[
 		'spell/shared/util/platform/PlatformKit',
-		'spell/shared/util/input/keyCodes'
+		'spell/shared/util/input/keyCodes',
+		'spell/shared/util/xor',
+
+		'spell/functions'
 	],
 	function(
 		PlatformKit,
-		keyCodes
+		keyCodes,
+		xor,
+
+		_
 	) {
 		'use strict'
 
 
-		var inputEvents = [],
-			keyPressed = {}
+		var inputEvents       = [],
+			keyCodeToKeyState = {}
 
 		var processEvent = function( event ) {
 			inputEvents.push( event )
 
 			var type      = event.type,
-				isKeyDown = type == 'keyDown'
+				keyCode   = event.keyCode,
+				isKeyDown = type == 'keyDown',
+				isKeyUp   = type == 'keyUp'
 
-			if( isKeyDown || type == 'keyUp' ) {
-				keyPressed[ event.keyCode ] = isKeyDown
+			if( xor( isKeyDown, isKeyUp ) ) {
+				var keyState = getKeyState( keyCode )
+
+				if( keyState.isPressed == isKeyDown ) {
+					return
+				}
+
+				keyState.isPressed = isKeyDown
+
+				processOnKey( isKeyDown ? keyState.onKeyDown : keyState.onKeyUp )
 			}
+		}
+
+		var createKeyState = function() {
+			return {
+				isPressed : false,
+				onKeyDown : [],
+				onKeyUp : []
+			}
+		}
+
+		var getKeyState = function( keyCode ) {
+			return keyCodeToKeyState[ keyCode ] || ( keyCodeToKeyState[ keyCode ] = createKeyState() )
 		}
 
 		var createKeyEvent = function( type, keyCode ) {
@@ -37,6 +65,30 @@ define(
 				keyCode : keyCode
 			}
 		}
+
+		var addOnKey = function( keyCodeHandlers, handler ) {
+			return ( keyCodeHandlers ? keyCodeHandlers : [] ).concat( handler )
+		}
+
+		var removeOnKey = function( keyCodeHandlers, handler ) {
+			return keyCodeHandlers ?
+				_.reject(
+					keyCodeHandlers,
+					function( x ) {
+						return x == handler
+					}
+				) :
+				[]
+		}
+
+		var processOnKey = function( keyCodeHandlers ) {
+			if( !keyCodeHandlers ) return
+
+			for( var i = 0, n = keyCodeHandlers.length; i < n; i++ ) {
+				keyCodeHandlers[ i ].call()
+			}
+		}
+
 
 		var InputManager = function( configurationManager, renderingContext ) {
 			this.nativeInput = PlatformKit.createInput( configurationManager, renderingContext )
@@ -83,11 +135,59 @@ define(
 			 * @return {Boolean}
 			 */
 			isKeyPressed : function( keyCode ) {
-				return !!keyPressed[ keyCode ]
+				return getKeyState( keyCode ).isPressed
 			},
 
 			injectKeyEvent : function( type, keyCode ) {
 				processEvent( createKeyEvent( type, keyCode ) )
+			},
+
+			/**
+			 * Adds a key down handler.
+			 *
+			 * @param keyCode
+			 * @param handler
+			 */
+			addOnKeyDown : function( keyCode, handler ) {
+				var keyState = getKeyState( keyCode )
+
+				keyState.onKeyDown = addOnKey( keyState.onKeyDown, handler )
+			},
+
+			/**
+			 * Removes a key down handler
+			 *
+			 * @param keyCode
+			 * @param handler
+			 */
+			removeOnKeyDown : function( keyCode, handler ) {
+				var keyState = getKeyState( keyCode )
+
+				keyState.onKeyDown = removeOnKey( keyState.onKeyDown, handler )
+			},
+
+			/**
+			 * Adds a key up handler.
+			 *
+			 * @param keyCode
+			 * @param handler
+			 */
+			addOnKeyUp : function( keyCode, handler ) {
+				var keyState = getKeyState( keyCode )
+
+				keyState.onKeyUp = addOnKey( keyState.onKeyUp, handler )
+			},
+
+			/**
+			 * Removes a key up handler.
+			 *
+			 * @param keyCode
+			 * @param handler
+			 */
+			removeOnKeyUp : function( keyCode, handler ) {
+				var keyState = getKeyState( keyCode )
+
+				keyState.onKeyUp = removeOnKey( keyState.onKeyUp, handler )
 			},
 
 			/**
