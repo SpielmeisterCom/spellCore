@@ -24,7 +24,9 @@ define(
 
 
 		var inputEvents       = [],
-			keyCodeToKeyState = {}
+			commands          = [],
+			keyCodeToKeyState = {},
+			inputContexts     = {}
 
 		var processEvent = function( event ) {
 			inputEvents.push( event )
@@ -44,6 +46,29 @@ define(
 				keyState.isPressed = isKeyDown
 
 				processOnKey( isKeyDown ? keyState.onKeyDown : keyState.onKeyUp )
+
+				// create command if it is mapped by an input context
+				var command = createCommand( inputContexts, keyCode, isKeyDown )
+
+				if( command ) {
+					commands.push( command )
+				}
+			}
+		}
+
+		var createCommand = function( inputContexts, keyCode, isStart ) {
+			for( var id in inputContexts ) {
+				var inputContext = inputContexts[ id ]
+
+				for( var mappedKeyCode in inputContext ) {
+					if( mappedKeyCode == keyCode ) {
+						var command = inputContext[ mappedKeyCode ]
+
+						// i.e. isStart = true, command = "fire" -> "startFire"
+						return ( isStart ? 'start' : 'stop' ) +
+							command.substr( 0, 1 ).toUpperCase() + command.substr( 1, command.length )
+					}
+				}
 			}
 		}
 
@@ -188,6 +213,22 @@ define(
 				var keyState = getKeyState( keyCode )
 
 				keyState.onKeyUp = removeOnKey( keyState.onKeyUp, handler )
+			},
+
+			addInputContext : function( id, config ) {
+				inputContexts[ id ] = config
+			},
+
+			removeInputContext : function( id ) {
+				delete inputContexts[ id ]
+			},
+
+			getCommands : function() {
+				return commands
+			},
+
+			clearCommands : function() {
+				commands.length = 0
 			},
 
 			/**
