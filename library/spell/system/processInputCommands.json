@@ -3,12 +3,8 @@
 	"readonly": true,
 	"input": [
 		{
-			"name": "actors",
-			"componentId": "spell.component.actor"
-		},
-		{
-			"name": "inputDefinitions",
-			"componentId": "spell.component.inputDefinition"
+			"name": "controllable",
+			"componentId": "spell.component.controllable"
 		}
 	],
 	"version": 1,

@@ -23,35 +23,38 @@ define(
 		'use strict'
 
 
-		var inputEvents       = [],
-			commands          = [],
-			keyCodeToKeyState = {},
-			inputContexts     = {}
+		var inputEvents               = [],
+			commands                  = [],
+			isKeyCodePressed          = {},
+			inputEventTypeToListeners = {},
+			inputContexts             = {}
 
 		var processEvent = function( event ) {
 			inputEvents.push( event )
 
 			var type      = event.type,
-				keyCode   = event.keyCode,
 				isKeyDown = type == 'keyDown',
 				isKeyUp   = type == 'keyUp'
 
-			if( xor( isKeyDown, isKeyUp ) ) {
-				var keyState = getKeyState( keyCode )
+			if( isKeyDown || isKeyUp ) {
+				var keyCode = event.keyCode
 
-				if( keyState.isPressed == isKeyDown ) {
-					return
-				}
-
-				keyState.isPressed = isKeyDown
-
-				processOnKey( isKeyDown ? keyState.onKeyDown : keyState.onKeyUp )
+				isKeyCodePressed[ keyCode ] = isKeyDown
 
 				// create command if it is mapped by an input context
 				var command = createCommand( inputContexts, keyCode, isKeyDown )
 
 				if( command ) {
 					commands.push( command )
+				}
+			}
+
+			// process registered input event listeners
+			var registeredListeners = inputEventTypeToListeners[ type ]
+
+			if( registeredListeners ) {
+				for( var i = 0, n = registeredListeners.length; i < n; i++ ) {
+					registeredListeners[ i ].call( null, event )
 				}
 			}
 		}
@@ -72,45 +75,10 @@ define(
 			}
 		}
 
-		var createKeyState = function() {
-			return {
-				isPressed : false,
-				onKeyDown : [],
-				onKeyUp : []
-			}
-		}
-
-		var getKeyState = function( keyCode ) {
-			return keyCodeToKeyState[ keyCode ] || ( keyCodeToKeyState[ keyCode ] = createKeyState() )
-		}
-
 		var createKeyEvent = function( type, keyCode ) {
 			return {
 				type : type,
 				keyCode : keyCode
-			}
-		}
-
-		var addOnKey = function( keyCodeHandlers, handler ) {
-			return ( keyCodeHandlers ? keyCodeHandlers : [] ).concat( handler )
-		}
-
-		var removeOnKey = function( keyCodeHandlers, handler ) {
-			return keyCodeHandlers ?
-				_.reject(
-					keyCodeHandlers,
-					function( x ) {
-						return x == handler
-					}
-				) :
-				[]
-		}
-
-		var processOnKey = function( keyCodeHandlers ) {
-			if( !keyCodeHandlers ) return
-
-			for( var i = 0, n = keyCodeHandlers.length; i < n; i++ ) {
-				keyCodeHandlers[ i ].call()
 			}
 		}
 
@@ -160,59 +128,30 @@ define(
 			 * @return {Boolean}
 			 */
 			isKeyPressed : function( keyCode ) {
-				return getKeyState( keyCode ).isPressed
+				return isKeyCodePressed[ keyCode ]
 			},
 
 			injectKeyEvent : function( type, keyCode ) {
 				processEvent( createKeyEvent( type, keyCode ) )
 			},
 
-			/**
-			 * Adds a key down handler.
-			 *
-			 * @param keyCode
-			 * @param handler
-			 */
-			addOnKeyDown : function( keyCode, handler ) {
-				var keyState = getKeyState( keyCode )
+			addListener : function( eventType, listener ) {
+				var registeredListeners = inputEventTypeToListeners[ eventType ] || ( inputEventTypeToListeners[ eventType ] = [] )
 
-				keyState.onKeyDown = addOnKey( keyState.onKeyDown, handler )
+				registeredListeners.push( listener )
 			},
 
-			/**
-			 * Removes a key down handler
-			 *
-			 * @param keyCode
-			 * @param handler
-			 */
-			removeOnKeyDown : function( keyCode, handler ) {
-				var keyState = getKeyState( keyCode )
+			removeListener : function( eventType, listener ) {
+				var registeredListeners = inputEventTypeToListeners[ eventType ]
 
-				keyState.onKeyDown = removeOnKey( keyState.onKeyDown, handler )
-			},
+				if( !registeredListeners ) return
 
-			/**
-			 * Adds a key up handler.
-			 *
-			 * @param keyCode
-			 * @param handler
-			 */
-			addOnKeyUp : function( keyCode, handler ) {
-				var keyState = getKeyState( keyCode )
-
-				keyState.onKeyUp = addOnKey( keyState.onKeyUp, handler )
-			},
-
-			/**
-			 * Removes a key up handler.
-			 *
-			 * @param keyCode
-			 * @param handler
-			 */
-			removeOnKeyUp : function( keyCode, handler ) {
-				var keyState = getKeyState( keyCode )
-
-				keyState.onKeyUp = removeOnKey( keyState.onKeyUp, handler )
+				inputEventTypeToListeners[ eventType ] = _.filter(
+					registeredListeners,
+					function( registeredListener ) {
+						return registeredListener === listener
+					}
+				)
 			},
 
 			addInputContext : function( id, config ) {
