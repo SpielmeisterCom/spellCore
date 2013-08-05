@@ -17,10 +17,6 @@ define(
 		'use strict'
 
 
-		/*
-		 * private
-		 */
-
 		var createFrameOffset = function( frameWidth, frameHeight, numX, numY, frameId, innerPadding ) {
 			if( !innerPadding ) innerPadding = 0
 
@@ -77,7 +73,7 @@ define(
 			}
 		}
 
-		var createKeyToActionMapAsset = function( asset ) {
+		var createInputMapAsset = function( asset ) {
 			return _.reduce(
 				asset.config,
 				function( memo, action, key ) {
@@ -88,6 +84,7 @@ define(
 				{}
 			)
 		}
+
 		var eachAnimatedAttribute = function( animate, iterator ) {
 			return _.each(
 				animate,
@@ -153,10 +150,6 @@ define(
 		}
 
 
-		/*
-		 * public
-		 */
-
 		return function( assetManager, newAssetDefinitions, overwriteExisting ) {
 			var filteredAssetDefinitions = overwriteExisting ?
 				newAssetDefinitions :
@@ -190,8 +183,8 @@ define(
 							type : type
 						}
 
-					} else if( type === 'keyToActionMap' ) {
-						asset = createKeyToActionMapAsset( assetDefinition )
+					} else if( type === 'inputMap' ) {
+						asset = createInputMapAsset( assetDefinition )
 
 					} else if( type === 'keyFrameAnimation' ) {
 						asset = createKeyFrameAnimationAsset( assetDefinition )
