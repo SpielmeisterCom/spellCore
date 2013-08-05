@@ -9,14 +9,12 @@ define(
 	[
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/input/keyCodes',
-		'spell/shared/util/xor',
 
 		'spell/functions'
 	],
 	function(
 		PlatformKit,
 		keyCodes,
-		xor,
 
 		_
 	) {
