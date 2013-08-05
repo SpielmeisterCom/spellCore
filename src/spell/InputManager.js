@@ -33,11 +33,14 @@ define(
 			inputEvents.push( event )
 
 			var type      = event.type,
-				isKeyDown = type == 'keyDown',
-				isKeyUp   = type == 'keyUp'
+				isKeyDown = type === 'keyDown',
+				isKeyUp   = type === 'keyUp'
 
 			if( isKeyDown || isKeyUp ) {
-				var keyCode = event.keyCode
+				var keyCode = event.keyCode,
+					repeat  = isKeyCodePressed[ keyCode ] === isKeyDown
+
+				if( repeat ) return
 
 				isKeyCodePressed[ keyCode ] = isKeyDown
 
