@@ -34,9 +34,9 @@ define(
 			}
 		}
 
-		var processKeyInput = function( spell ) {}
+		var processInputCommands = function( spell ) {}
 
-		processKeyInput.prototype = {
+		processInputCommands.prototype = {
 			init : function( spell ) {
 				spell.inputManager.clearCommands()
 
@@ -66,6 +66,6 @@ define(
 			process : process
 		}
 
-		return processKeyInput
+		return processInputCommands
 	}
 )
