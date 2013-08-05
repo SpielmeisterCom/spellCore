@@ -13,6 +13,7 @@ define(
 		 */
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			spell.inputManager.clearInputEvents()
+			spell.inputManager.clearCommands()
 		}
 
 		var ClearKeyInput = function( spell ) {}

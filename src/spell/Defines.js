@@ -27,7 +27,8 @@ define(
 			PHYSICS_JNRPLAYER_SHAPE_COMPONENT_ID      : 'spell.component.physics.shape.jumpAndRunPlayer',
 			KEY_FRAME_ANIMATION_COMPONENT_ID          : 'spell.component.animation.keyFrameAnimation',
 			SOUND_EMITTER_COMPONENT_ID                : 'spell.component.audio.soundEmitter',
-			VISUAL_OBJECT_COMPONENT_ID                : 'spell.component.visualObject'
+			VISUAL_OBJECT_COMPONENT_ID                : 'spell.component.visualObject',
+			CONTROLLABLE_COMPONENT_ID                 : 'spell.component.controllable'
 		}
 	}
 )

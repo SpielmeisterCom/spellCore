@@ -1,5 +1,5 @@
 define(
-	'spell/component/actor',
+	'spell/component/controllable',
 	function() {
 		'use strict'
 
