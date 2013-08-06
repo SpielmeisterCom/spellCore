@@ -128,7 +128,7 @@ define(
 			/**
 			 * Returns true if the key with the given key code is currently pressed, false otherwise.
 			 *
-			 * @param keyCode
+			 * @param {String} keyCode
 			 * @return {Boolean}
 			 */
 			isKeyPressed : function( keyCode ) {
@@ -138,8 +138,8 @@ define(
 			/**
 			 * Injects a key event into the input manager processing pipeline.
 			 *
-			 * @param type the key event type (keyDown, keyUp)
-			 * @param keyCode the key code
+			 * @param {String} type the key event type (keyDown, keyUp)
+			 * @param {String} keyCode the key code
 			 */
 			injectKeyEvent : function( type, keyCode ) {
 				processEvent( createKeyEvent( type, keyCode ) )
@@ -148,8 +148,8 @@ define(
 			/**
 			 * Adds an input event listener.
 			 *
-			 * @param eventType the event type (keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel)
-			 * @param listener the listener function
+			 * @param {String} eventType the event type (keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel)
+			 * @param {Function} listener the listener function
 			 */
 			addListener : function( eventType, listener ) {
 				var registeredListeners = inputEventTypeToListeners[ eventType ] || ( inputEventTypeToListeners[ eventType ] = [] )
@@ -160,8 +160,8 @@ define(
 			/**
 			 * Removes an input event listener.
 			 *
-			 * @param eventType the event type (keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel)
-			 * @param listener the listener function
+			 * @param {String} eventType the event type (keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel)
+			 * @param {Function} listener the listener function
 			 */
 			removeListener : function( eventType, listener ) {
 				var registeredListeners = inputEventTypeToListeners[ eventType ]
@@ -179,8 +179,8 @@ define(
 			/**
 			 * Adds an input context.
 			 *
-			 * @param id the id of the input context
-			 * @param config the configuration object
+			 * @param {String} id the id of the input context
+			 * @param {Object} config the configuration object
 			 */
 			addInputContext : function( id, config ) {
 				inputContexts[ id ] = config
@@ -189,7 +189,7 @@ define(
 			/**
 			 * Removes an input context.
 			 *
-			 * @param id the id of the input context
+			 * @param {String} id the id of the input context
 			 */
 			removeInputContext : function( id ) {
 				delete inputContexts[ id ]
