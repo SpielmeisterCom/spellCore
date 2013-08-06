@@ -92,6 +92,7 @@ define(
 			/**
 			 * Initialize the InputManager and register all input binding.
 			 * This function is being called by spellCore, don't call it yourself!
+			 *
 			 * @private
 			 */
 			init : function() {
@@ -101,6 +102,7 @@ define(
 			/**
 			 * Destroys the InputManager and unregister all input bindings.
 			 * This function is being called by spellCore, don't call it yourself!
+			 *
 			 * @private
 			 */
 			destroy : function() {
@@ -108,7 +110,8 @@ define(
 			},
 
 			/**
-			 * Get the InputEvents Queue
+			 * Get the InputEvents queue
+			 *
 			 * @return {Array}
 			 */
 			getInputEvents : function() {
@@ -123,7 +126,7 @@ define(
 			},
 
 			/**
-			 * Returns true if the key with the given key code is pressed, false otherwise.
+			 * Returns true if the key with the given key code is currently pressed, false otherwise.
 			 *
 			 * @param keyCode
 			 * @return {Boolean}
@@ -132,16 +135,34 @@ define(
 				return isKeyCodePressed[ keyCode ]
 			},
 
+			/**
+			 * Injects a key event into the input manager processing pipeline.
+			 *
+			 * @param type the key event type (keyDown, keyUp)
+			 * @param keyCode the key code
+			 */
 			injectKeyEvent : function( type, keyCode ) {
 				processEvent( createKeyEvent( type, keyCode ) )
 			},
 
+			/**
+			 * Adds an input event listener.
+			 *
+			 * @param eventType the event type (keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel)
+			 * @param listener the listener function
+			 */
 			addListener : function( eventType, listener ) {
 				var registeredListeners = inputEventTypeToListeners[ eventType ] || ( inputEventTypeToListeners[ eventType ] = [] )
 
 				registeredListeners.push( listener )
 			},
 
+			/**
+			 * Removes an input event listener.
+			 *
+			 * @param eventType the event type (keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel)
+			 * @param listener the listener function
+			 */
 			removeListener : function( eventType, listener ) {
 				var registeredListeners = inputEventTypeToListeners[ eventType ]
 
@@ -155,18 +176,37 @@ define(
 				)
 			},
 
+			/**
+			 * Adds an input context.
+			 *
+			 * @param id the id of the input context
+			 * @param config the configuration object
+			 */
 			addInputContext : function( id, config ) {
 				inputContexts[ id ] = config
 			},
 
+			/**
+			 * Removes an input context.
+			 *
+			 * @param id the id of the input context
+			 */
 			removeInputContext : function( id ) {
 				delete inputContexts[ id ]
 			},
 
+			/**
+			 * Returns the list of queued commands.
+			 *
+			 * @return {Array}
+			 */
 			getCommands : function() {
 				return commands
 			},
 
+			/**
+			 * Clears the list of queued commands.
+			 */
 			clearCommands : function() {
 				commands.length = 0
 			},
