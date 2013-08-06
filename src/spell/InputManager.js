@@ -189,7 +189,11 @@ define(
 			/**
 			 * Removes an input context.
 			 *
+<<<<<<< HEAD
 			 * @param id {String} the id of the input context
+=======
+			 * @param {String} id the id of the input context
+>>>>>>> 731eb0204f3cb3150b223e679e1e7eff32381567
 			 */
 			removeInputContext : function( id ) {
 				delete inputContexts[ id ]
