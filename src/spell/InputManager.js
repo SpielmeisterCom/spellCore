@@ -158,13 +158,13 @@ define(
 			 *
 			 * Example:
 			 *
-			 *     var listenForUpArrowDown = function( event ) {
-			 *         if( event.keyCode === spell.inputManager.KEY.UP_ARROW ) {
+			 *     var processSpaceDown = function( event ) {
+			 *         if( event.keyCode === spell.inputManager.KEY.SPACE ) {
 			 *             // do something clever
 			 *         }
 			 *     }
 			 *
-			 *     spell.inputManager.addListener( 'keyDown', listenForUpArrowDown )
+			 *     spell.inputManager.addListener( 'keyDown', processSpaceDown )
 			 *
 			 * @param {String} eventType can be any of the following values: keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel
 			 * @param {Function} listener
@@ -180,13 +180,13 @@ define(
 			 *
 			 * Example:
 			 *
-			 *     var listenForUpArrowDown = function( event ) {
-			 *         if( event.keyCode === spell.inputManager.KEY.UP_ARROW ) {
+			 *     var processSpaceDown = function( event ) {
+			 *         if( event.keyCode === spell.inputManager.KEY.SPACE ) {
 			 *             // do something clever
 			 *         }
 			 *     }
 			 *
-			 *     spell.inputManager.removeListener( 'keyDown', listenForUpArrowDown )
+			 *     spell.inputManager.removeListener( 'keyDown', processSpaceDown )
 			 *
 			 * @param {String} eventType can be any of the following values: keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel
 			 * @param {Function} listener
