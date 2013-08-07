@@ -59,8 +59,7 @@ define(
 
 
 		/**
-		 *
-		 * @param audioResource
+		 * @param {AudioResource} audioResource
 		 * @param id
 		 * @param volume
 		 * @param loop
@@ -193,6 +192,12 @@ define(
 			onLoadCallback( audioElement )
 		}
 
+		/*
+		 * Returns a AudioResource instance.
+		 *
+		 * @param buffer
+		 * @return {AudioResource}
+		 */
 		var createSound = function( buffer ) {
 			return {
 				/*
@@ -212,7 +217,7 @@ define(
 		/*
 		 * Returns an audio context. Once a context has been created additional calls to this method return the same instance.
 		 *
-		 * @param sound - the audio element
+		 * @return {Object}
 		 */
 		var createAudioContext = function() {
 			return createWrapperContext()

@@ -1,4 +1,6 @@
 /**
+ * The RenderingContext provides rendering of graphical primitives.
+ *
  * Spell includes the following rendering context implementations:
  *
  * + **canvas-2d** - uses the 2d context supplied by the canvas element *(html5 target only)*

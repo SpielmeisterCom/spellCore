@@ -33,13 +33,13 @@ define(
 		}
 
 		/**
-		 *
-		 * @param audioResource
+		 * @param {AudioResource} audioResource
 		 * @param id
 		 * @param volume
 		 * @param loop
 		 */
 		var play = function( audioResource, id, volume, loop ) {
+			// TODO: The id parameter must be removed. Ids can only be guaranteed to be unqiue if the user can not provide its own.
 			id     = id ? id : createSoundId()
 			loop   = !!loop
 			volume = volume ? volume : 1
@@ -168,7 +168,7 @@ define(
 		/*
 		 * Returns a audio context. Once a context has been created additional calls to this method return the same context instance.
 		 *
-		 * @param sound - the audio element
+		 * @return {Object}
 		 */
 		var createAudioContext = function() {
 			if( context ) return context
@@ -179,9 +179,10 @@ define(
 		}
 
 		/*
-		 * Returns instance of audio class
+		 * Returns a AudioResource instance.
 		 *
-		 * @param audioBuffer
+		 * @param buffer
+		 * @return {AudioResource}
 		 */
 		var createSound = function( buffer ) {
 			return {

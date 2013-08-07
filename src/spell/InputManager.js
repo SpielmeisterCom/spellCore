@@ -1,5 +1,5 @@
 /**
- * The InputManager contains functions for processing user input
+ * The InputManager provides handling of user input.
  *
  * @class spell.inputManager
  * @singleton

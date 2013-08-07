@@ -16,6 +16,12 @@ define(
 			return isMutedValue
 		}
 
+		/*
+		 * Returns a AudioResource instance.
+		 *
+		 * @param buffer
+		 * @return {AudioResource}
+		 */
 		var createSound = function( buffer ) {
 			return {}
 		}
@@ -50,6 +56,8 @@ define(
 
 		/*
 		 * Returns an audio context.
+		 *
+		 * @return {Object}
 		 */
 		var createAudioContext = function() {
 			return createWrapperContext()
