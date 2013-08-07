@@ -128,6 +128,14 @@ define(
 			/**
 			 * Returns true if the key with the given key code is currently pressed, false otherwise.
 			 *
+			 * Example:
+			 *
+			 *     var inputManager = spell.inputManager
+			 *
+			 *     if( inputManager.isKeyPressed( inputManager.KEY.SPACE ) ) {
+			 *         // do stuff
+			 *     }
+			 *
 			 * @param {String} keyCode
 			 * @return {Boolean}
 			 */
@@ -146,10 +154,20 @@ define(
 			},
 
 			/**
-			 * Adds an input event listener.
+			 * Adds a listener for events of the type specified by eventType.
 			 *
-			 * @param {String} eventType the event type (keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel)
-			 * @param {Function} listener the listener function
+			 * Example:
+			 *
+			 *     var listenForUpArrowDown = function( event ) {
+			 *         if( event.keyCode === spell.inputManager.KEY.UP_ARROW ) {
+			 *             // do something clever
+			 *         }
+			 *     }
+			 *
+			 *     spell.inputManager.addListener( 'keyDown', listenForUpArrowDown )
+			 *
+			 * @param {String} eventType can be any of the following values: keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel
+			 * @param {Function} listener
 			 */
 			addListener : function( eventType, listener ) {
 				var registeredListeners = inputEventTypeToListeners[ eventType ] || ( inputEventTypeToListeners[ eventType ] = [] )
@@ -158,10 +176,20 @@ define(
 			},
 
 			/**
-			 * Removes an input event listener.
+			 * Removes a listener for events of the type specified by eventType
 			 *
-			 * @param {String} eventType the event type (keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel)
-			 * @param {Function} listener the listener function
+			 * Example:
+			 *
+			 *     var listenForUpArrowDown = function( event ) {
+			 *         if( event.keyCode === spell.inputManager.KEY.UP_ARROW ) {
+			 *             // do something clever
+			 *         }
+			 *     }
+			 *
+			 *     spell.inputManager.removeListener( 'keyDown', listenForUpArrowDown )
+			 *
+			 * @param {String} eventType can be any of the following values: keyDown, keyUp, pointerDown, pointerMove, pointerUp, pointerCancel
+			 * @param {Function} listener
 			 */
 			removeListener : function( eventType, listener ) {
 				var registeredListeners = inputEventTypeToListeners[ eventType ]
@@ -179,17 +207,28 @@ define(
 			/**
 			 * Adds an input context.
 			 *
-			 * @param {String} id the id of the input context
-			 * @param {Object} config the configuration object
+			 * Example:
+			 *
+			 *     spell.inputManager.addInputContext(
+			 *         'myInputContext',
+			 *         spell.assetManager.get( 'myGame.myInputMapAsset' )
+			 *     )
+			 *
+			 * @param {String} id a unique string that identifies the input context
+			 * @param {Object} inputMap the inputMap asset maps input to commands
 			 */
-			addInputContext : function( id, config ) {
-				inputContexts[ id ] = config
+			addInputContext : function( id, inputMap ) {
+				inputContexts[ id ] = inputMap.config
 			},
 
 			/**
 			 * Removes an input context.
 			 *
-			 * @param {String} id the id of the input context
+			 * Example:
+			 *
+			 *     spell.inputManager.removeInputContext( 'myInputContext' )
+			 *
+			 * @param {String} id a unique string that identifies the input context
 			 */
 			removeInputContext : function( id ) {
 				delete inputContexts[ id ]
