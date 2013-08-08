@@ -232,6 +232,9 @@ define(
 				invoke( executionGroups.render, 'init', this.statisticsManager, false, [ spell, sceneConfig, initialConfig ] )
 				invoke( executionGroups.update, 'init', this.statisticsManager, false, [ spell, sceneConfig, initialConfig ] )
 
+				// creating entities from scene config
+				entityManager.createEntities( sceneConfig.entities )
+
 				// initializing scene
 				var moduleId = createModuleId( createId( sceneConfig.namespace, sceneConfig.name ) )
 
