@@ -19,10 +19,6 @@ define(
 		'use strict'
 
 
-		/*
-		 * private
-		 */
-
 		var wrapArray = function( x ) {
 			return _.isArray( x ) ? x : [ x ]
 		}
@@ -58,16 +54,29 @@ define(
 		}
 
 
-		/*
-		 * public
-		 */
-
 		function EventManager() {
 			this.subscribers = forestMultiMap.create()
 		}
 
 		EventManager.prototype = {
-			subscribe: function( scope, subscriber ) {
+			/**
+			 * Subscribes a subscriber to the specified event scope.
+			 *
+			 * Example:
+			 *
+			 *     var processTransformCreated = function( component, entityId ) {
+			 *         ...
+			 *     }
+			 *
+			 *     spell.eventManager.subscribe(
+			 *         [ spell.eventManager.EVENT.COMPONENT_CREATED, 'spell.component.2d.transform' ],
+			 *         processTransformCreated
+			 *     )
+			 *
+			 * @param {String|String[]} scope can either be a string or an array of strings specifying the event scope
+			 * @param {Function} subscriber the callback function
+			 */
+			subscribe : function( scope, subscriber ) {
 				var wrappedScope = wrapArray( scope )
 
 				forestMultiMap.add(
@@ -79,7 +88,24 @@ define(
 				this.publish( Events.SUBSCRIBE, [ wrappedScope, subscriber ] )
 			},
 
-			unsubscribe: function( scope, subscriber ) {
+			/**
+			 * Unsubscribes a subscriber from the specified event scope.
+			 *
+			 * Example:
+			 *
+			 *     var processTransformCreated = function( component, entityId ) {
+			 *         ...
+			 *     }
+			 *
+			 *     spell.eventManager.unsubscribe(
+			 *         [ spell.eventManager.EVENT.COMPONENT_CREATED, 'spell.component.2d.transform' ],
+			 *         processTransformCreated
+			 *     )
+			 *
+			 * @param {String|String[]} scope can either be a string or an array of strings specifying the event scope
+			 * @param {Function} subscriber the callback function
+			 */
+			unsubscribe : function( scope, subscriber ) {
 				var wrappedScope = wrapArray( scope )
 
 				forestMultiMap.remove( this.subscribers, wrappedScope, subscriber )
@@ -87,7 +113,18 @@ define(
 				this.publish( Events.UNSUBSCRIBE, [ wrappedScope, subscriber ] )
 			},
 
-			unsubscribeAll: function( scope ) {
+			/**
+			 * Unsubscribes all subscribers from the specified event scope.
+			 *
+			 * Example:
+			 *
+			 *     spell.eventManager.unsubscribeAll(
+			 *         [ spell.eventManager.EVENT.COMPONENT_CREATED, 'spell.component.2d.transform' ]
+			 *     )
+			 *
+			 * @param {String|String[]} scope can either be a string or an array of strings specifying the event scope
+			 */
+			unsubscribeAll : function( scope ) {
 				var wrappedScope = wrapArray( scope )
 
 				forestMultiMap.remove( this.subscribers, wrappedScope )
@@ -95,7 +132,17 @@ define(
 				this.publish( Events.UNSUBSCRIBE, [ wrappedScope ] )
 			},
 
-			publish: function( scope, eventArgs ) {
+			/**
+			 * Publishes the event to all subscribers which are subscribed to the specified event scope.
+			 *
+			 * Example:
+			 *
+			 *     spell.eventManager.publish( spell.eventManager.EVENT.SERVER_CONNECTION_ESTABLISHED, [ response.status ] )
+			 *
+			 * @param {String|String[]} scope can either be a string or an array of strings specifying the event scope
+			 * @param {Array} eventArgs an array of event arguments
+			 */
+			publish : function( scope, eventArgs ) {
 				var subscribersInScope = forestMultiMap.get( this.subscribers, wrapArray( scope ) ),
 					wrappedEventArgs   = wrapArray( eventArgs )
 
@@ -106,7 +153,7 @@ define(
 				return true
 			},
 
-			waitFor: function( scope, subscriber ) {
+			waitFor : function( scope, subscriber ) {
 				waitForChainConfig = {
 					events : [ {
 						scope      : wrapArray( scope ),
@@ -117,7 +164,7 @@ define(
 				return this
 			},
 
-			and: function( scope, subscriber ) {
+			and : function( scope, subscriber ) {
 				// check if pending chain call exists
 				if( !waitForChainConfig ) throw 'A call to the method "and" must be chained to a previous call to "waitFor".'
 
@@ -129,7 +176,7 @@ define(
 				return this
 			},
 
-			resume: function( callback ) {
+			resume : function( callback ) {
 				// check if pending chain call exists, return otherwise
 				if( !waitForChainConfig ) throw 'A call to the method "resume" must be chained to a previous call to "waitFor" or "and".'
 
@@ -140,6 +187,9 @@ define(
 				waitForChainConfig = false
 			},
 
+			/**
+			 * Map of supported events.
+			 */
 			EVENT : Events
 		}
 
