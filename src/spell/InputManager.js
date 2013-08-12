@@ -218,7 +218,7 @@ define(
 			 * @param {Object} inputMap the inputMap asset maps input to commands
 			 */
 			addInputContext : function( id, inputMap ) {
-				inputContexts[ id ] = inputMap.config
+				inputContexts[ id ] = inputMap
 			},
 
 			/**
