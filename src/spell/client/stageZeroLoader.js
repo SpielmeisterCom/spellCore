@@ -42,6 +42,10 @@ if( !window.console ) {
 			DEVELOPMENT_STANDALONE : 'development_standalone'
 		}
 
+	var arrayContains = function( array, value ) {
+		return array.indexOf( value ) > -1
+	}
+
 	var getUrlParameters = function() {
 		var url = window.location.href
 		var map = {}
@@ -238,8 +242,14 @@ if( !window.console ) {
 	}
 
 	var supportsOnlySingleChannelAudio = function() {
-		return navigator.userAgent.indexOf( 'IEMobile/9.0' ) > -1 ||
-			navigator.userAgent.indexOf( 'IEMobile/10.0' ) > -1
+		return arrayContains( navigator.userAgent, 'IEMobile/9.0' ) ||
+			arrayContains( navigator.userAgent, 'IEMobile/10.0' )
+	}
+
+	var checkSubTargetAvailability = function( includedSubTargets, target ) {
+		if( !arrayContains( includedSubTargets, target ) ) {
+			throw 'Error: Invalid sub-target. The requested sub-target "' + target + '" was not included in the build. Please make sure that the build includes the required sub-targets.'
+		}
 	}
 
 	var process = function( spellObject, config, onInitialized, debugMessageCallback ) {
@@ -253,12 +263,18 @@ if( !window.console ) {
 			throw 'Error: Invalid config. Value \'' + config.target + '\' for property \'target\' is not supported.'
 		}
 
-		if( config.verbose ) console.log( 'stage-zero-loader: chose ' + config.target + ' target' )
+		if( config.verbose ) {
+			console.log( 'stage-zero-loader: chose ' + config.target + ' target' )
+		}
 
 		if( config.target === 'html5' ) {
+			checkSubTargetAvailability( INCLUDED_SUB_TARGETS, 'html5' )
+
 			loadHtml5Executable( config, spellObject, onInitialized, debugMessageCallback )
 
-		} else {
+		} else if( config.target === 'flash' ) {
+			checkSubTargetAvailability( INCLUDED_SUB_TARGETS, 'flash' )
+
 			loadFlashExecutable( config, config.verbose )
 		}
 	}
