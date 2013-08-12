@@ -257,6 +257,9 @@ define(
 				// destroying scene
 				this.script.destroy( this.spell, sceneConfig )
 
+				// removing all entities
+				this.entityManager.init()
+
 				// destroying systems
 				invoke( executionGroups.render, 'destroy', this.statisticsManager, false, [ spell, sceneConfig ] )
 				invoke( executionGroups.update, 'destroy', this.statisticsManager, false, [ spell, sceneConfig ] )
