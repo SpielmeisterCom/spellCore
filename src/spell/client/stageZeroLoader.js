@@ -42,7 +42,13 @@ if( !window.console ) {
 			DEVELOPMENT_STANDALONE : 'development_standalone'
 		}
 
+	if( typeof INCLUDED_SUB_TARGETS === 'undefined' ) {
+		var INCLUDED_SUB_TARGETS = undefined
+	}
+
 	var arrayContains = function( array, value ) {
+		if( !array ) return false
+
 		return array.indexOf( value ) > -1
 	}
 
@@ -246,8 +252,12 @@ if( !window.console ) {
 			arrayContains( navigator.userAgent, 'IEMobile/10.0' )
 	}
 
-	var checkSubTargetAvailability = function( includedSubTargets, target ) {
-		if( !arrayContains( includedSubTargets, target ) ) {
+	var checkSubTargetAvailability = function( target ) {
+		if( !INCLUDED_SUB_TARGETS ) {
+			return true
+		}
+
+		if( !arrayContains( INCLUDED_SUB_TARGETS, target ) ) {
 			throw 'Error: Invalid sub-target. The requested sub-target "' + target + '" was not included in the build. Please make sure that the build includes the required sub-targets.'
 		}
 	}
@@ -268,12 +278,12 @@ if( !window.console ) {
 		}
 
 		if( config.target === 'html5' ) {
-			checkSubTargetAvailability( INCLUDED_SUB_TARGETS, 'html5' )
+			checkSubTargetAvailability( 'html5' )
 
 			loadHtml5Executable( config, spellObject, onInitialized, debugMessageCallback )
 
 		} else if( config.target === 'flash' ) {
-			checkSubTargetAvailability( INCLUDED_SUB_TARGETS, 'flash' )
+			checkSubTargetAvailability( 'flash' )
 
 			loadFlashExecutable( config, config.verbose )
 		}
