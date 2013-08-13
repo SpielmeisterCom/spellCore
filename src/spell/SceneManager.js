@@ -153,6 +153,9 @@ define(
 
 		SceneManager.prototype = {
 			changeScene : function( startSceneId, initialConfig, showLoadingScene ) {
+				initialConfig = initialConfig || {}
+				showLoadingScene = showLoadingScene || false
+
 				if( !this.isModeDevelopment ) {
 					startScene.call( this, startSceneId, initialConfig, showLoadingScene )
 
