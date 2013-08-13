@@ -1,3 +1,9 @@
+/**
+ * The SceneManager enables controlling of the currently executed scene.
+ *
+ * @class spell.sceneManager
+ * @singleton
+ */
 define(
 	'spell/SceneManager',
 	[
@@ -39,7 +45,7 @@ define(
 			}
 		}
 
-		var startScene = function( startSceneId, initialConfig, showLoadingScene ) {
+		var startScene = function( targetSceneId, initialConfig, showLoadingScene ) {
 			var freeMemory = showLoadingScene
 
 			var preNextFrameCallback = function() {
@@ -70,7 +76,7 @@ define(
 
 
 				// check if library dependencies of next scene are already available
-				var nextScene = spell.scenes[ startSceneId ]
+				var nextScene = spell.scenes[ targetSceneId ]
 
 				if( nextScene &&
 					spell.libraryManager.isAvailable( nextScene.libraryIds ) ) {
@@ -83,7 +89,7 @@ define(
 						this.libraryManager,
 						this.statisticsManager,
 						this.isModeDevelopment,
-						startSceneId,
+						targetSceneId,
 						initialConfig
 					)
 
@@ -106,7 +112,7 @@ define(
 								this.isModeDevelopment,
 								loadingSceneId,
 								{
-									startSceneId : startSceneId,
+									startSceneId : targetSceneId,
 									initialConfig : initialConfig
 								}
 							),
@@ -117,7 +123,7 @@ define(
 						// load library dependencies first
 						loadSceneResources(
 							spell,
-							startSceneId,
+							targetSceneId,
 							_.bind(
 								postLoadedResources,
 								this,
@@ -126,7 +132,7 @@ define(
 								this.libraryManager,
 								this.statisticsManager,
 								this.isModeDevelopment,
-								startSceneId,
+								targetSceneId,
 								initialConfig
 							),
 							onProgress
@@ -152,18 +158,25 @@ define(
 		}
 
 		SceneManager.prototype = {
-			changeScene : function( startSceneId, initialConfig, showLoadingScene ) {
+			/**
+			 * Changes the currently executed scene to the scene specified by targetSceneId.
+			 *
+			 * @param {String} targetSceneId the library id of the scene to which to change
+			 * @param {Object} initialConfig configuration passed to the start scene
+			 * @param {Boolean} showLoadingScene if true the loading scene is displayed
+			 */
+			changeScene : function( targetSceneId, initialConfig, showLoadingScene ) {
 				initialConfig = initialConfig || {}
 				showLoadingScene = showLoadingScene || false
 
 				if( !this.isModeDevelopment ) {
-					startScene.call( this, startSceneId, initialConfig, showLoadingScene )
+					startScene.call( this, targetSceneId, initialConfig, showLoadingScene )
 
 				} else {
 					this.spell.sendMessageToEditor(
 						'spelled.debug.application.startScene',
 						{
-							startSceneId : startSceneId,
+							startSceneId : targetSceneId,
 							initialConfig : initialConfig,
 							showLoadingScene : showLoadingScene
 						}
