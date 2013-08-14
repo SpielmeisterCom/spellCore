@@ -54,8 +54,8 @@ define(
 		}
 
 		util.clamp = function( value, lowerBound, upperBound ) {
-			if ( value < lowerBound) return lowerBound
-			if ( value > upperBound) return upperBound
+			if( value < lowerBound ) return lowerBound
+			if( value > upperBound ) return upperBound
 
 			return value
 		}
