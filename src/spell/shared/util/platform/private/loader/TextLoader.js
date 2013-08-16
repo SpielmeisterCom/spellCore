@@ -1,21 +1,19 @@
 define(
 	'spell/shared/util/platform/private/loader/TextLoader',
 	[
+		'spell/shared/util/createUrlWithCacheBreaker',
 		'spell/Events',
 
 		'spell/functions'
 	],
 	function(
+		createUrlWithCacheBreaker,
 		Events,
 
 		_
 	) {
 		'use strict'
 
-
-		/*
-		 * private
-		 */
 
 		var onLoad = function( request ) {
 			if( this.loaded === true ) return
@@ -49,12 +47,9 @@ define(
 		}
 
 
-		/*
-		 * public
-		 */
-
-		var TextLoader = function( postProcess, libraryUrl, libraryPath, onLoadCallback, onErrorCallback ) {
+		var TextLoader = function( postProcess, invalidateCache, libraryUrl, libraryPath, onLoadCallback, onErrorCallback ) {
 			this.postProcess     = postProcess
+			this.invalidateCache = invalidateCache
 			this.libraryUrl      = libraryUrl
 			this.libraryPath     = libraryPath
 			this.onLoadCallback  = onLoadCallback
@@ -71,7 +66,12 @@ define(
 				request.onreadystatechange = _.bind( onReadyStateChange, this, request )
 				request.onerror            = _.bind( onError, this )
 
-				request.open( 'GET', url, true )
+				request.open(
+					'GET',
+					this.invalidateCache ? createUrlWithCacheBreaker( url ) : url,
+					true
+				)
+
 				request.send()
 			}
 		}

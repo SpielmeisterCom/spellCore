@@ -166,7 +166,8 @@ define(
 				eventManager         = new EventManager(),
 				configurationManager = new ConfigurationManager( eventManager ),
 				statisticsManager    = new StatisticsManager(),
-				mainLoop             = createMainLoop( eventManager, statisticsManager )
+				mainLoop             = createMainLoop( eventManager, statisticsManager ),
+				isModeDeployed       = loaderConfig.mode === 'deployed'
 
 			configurationManager.setConfig( loaderConfig )
 
@@ -175,7 +176,7 @@ define(
 			spell.applicationModule    = undefined
 			spell.configurationManager = configurationManager
 			spell.eventManager         = eventManager
-			spell.libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ) )
+			spell.libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ), isModeDeployed )
 			spell.loaderConfig         = loaderConfig
 			spell.logger               = logger
 			spell.mainLoop             = mainLoop
@@ -186,7 +187,7 @@ define(
 
 			this.spell = spell
 
-			if( loaderConfig.mode !== 'deployed' ) {
+			if( !isModeDeployed ) {
 				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
 				initDebugEnvironment( logger )
 
