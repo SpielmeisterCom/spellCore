@@ -1,13 +1,10 @@
-
 define(
-	'spell/shared/util/Logger',
+	'spell/shared/util/Console',
 	[
-		'spell/shared/util/platform/log',
-		'spell/functions'
+		'spell/shared/util/platform/log'
 	],
 	function(
-		platformLog,
-		_
+		platformLog
 	) {
 		'use strict'
 
@@ -17,7 +14,6 @@ define(
 			LOG_LEVEL_WARN   = 2,
 			LOG_LEVEL_ERROR  = 3,
 			LOG_LEVEL_SILENT = 4
-
 
 		var logLevels = [
 			'DEBUG',
@@ -40,7 +36,7 @@ define(
 		}
 
 		/**
-		 * @class spell.shared.util.Logger
+		 * @class spell.shared.util.Console
 		 *
 		 * The following log levels are available: LOG_LEVEL_DEBUG (0), LOG_LEVEL_INFO (1), LOG_LEVEL_WARN (2), LOG_LEVEL_ERROR (3), LOG_LEVEL_SILENT (4). The
 		 * log level is used for filtering the logged messages. For example setting the log level to "LOG_LEVEL_WARN" (2) causes all messages with a lower level
@@ -50,18 +46,18 @@ define(
 		 *
 		 * @constructor
 		 *
-		 * Creates a new Logger Instance.
+		 * Creates a new Console Instance.
 		 *
 		 * @param {Number} level sets the current log level
 		 */
-		var Logger = function( level ) {
+		var Console = function( level ) {
 			validate( level )
 
 			this.currentLogLevel     = level || LOG_LEVEL_INFO
 			this.sendMessageToEditor = undefined
 		}
 
-		Logger.prototype = {
+		Console.prototype = {
 			LOG_LEVEL_DEBUG : LOG_LEVEL_DEBUG,
 
 			LOG_LEVEL_INFO : LOG_LEVEL_INFO,
@@ -156,6 +152,6 @@ define(
 			}
 		}
 
-		return Logger
+		return Console
 	}
 )

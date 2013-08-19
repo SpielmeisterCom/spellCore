@@ -198,7 +198,7 @@ define(
 				this.statisticsManager.init()
 
 				if( !hasActiveCamera( sceneConfig ) ) {
-					spell.logger.error( 'Could not start scene "' + sceneConfig.name + '" because no camera entity was found. A scene must have at least one active camera entity.' )
+					spell.console.error( 'Could not start scene "' + sceneConfig.name + '" because no camera entity was found. A scene must have at least one active camera entity.' )
 
 					return
 				}

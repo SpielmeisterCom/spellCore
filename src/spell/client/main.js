@@ -15,7 +15,7 @@ define(
 		'spell/LibraryManager',
 		'spell/shared/util/createModuleLoader',
 		'spell/StatisticsManager',
-		'spell/shared/util/Logger',
+		'spell/shared/util/Console',
 		'spell/shared/util/physics/createBox2dContext',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
@@ -38,7 +38,7 @@ define(
 		LibraryManager,
 		createModuleLoader,
 		StatisticsManager,
-		Logger,
+		Console,
 		createBox2dContext,
 		PlatformKit,
 		initDebugEnvironment,
@@ -65,7 +65,7 @@ define(
                 spell.loaderConfig
             )
 
-			spell.logger.setSendMessageToEditor( this.sendMessageToEditor )
+			spell.console.setSendMessageToEditor( this.sendMessageToEditor )
 
 			if( cacheContent ) {
 				libraryManager.addToCache( cacheContent )
@@ -86,7 +86,7 @@ define(
 				configurationManager.getValue( 'screenSize' )
 			)
 
-			spell.logger.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
+			spell.console.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
 
 
 			// creating audio context
@@ -94,7 +94,7 @@ define(
 				configurationManager.getValue( 'audioBackEnd' )
 			)
 
-			spell.logger.debug( 'created audio context (' + audioContext.getConfiguration().type + ')' )
+			spell.console.debug( 'created audio context (' + audioContext.getConfiguration().type + ')' )
 
 
 			spell.libraryManager.init( audioContext, renderingContext )
@@ -143,7 +143,7 @@ define(
 			spell.translate            = translatePartial
 			spell.inputManager         = inputManager
 
-			spell.logger.debug( 'client started' )
+			spell.console.debug( 'client started' )
 
 			var run = function() {
 				spell.sceneManager.startScene( spell.applicationModule.startScene, {}, !isModeDevelopment )
@@ -162,7 +162,7 @@ define(
 
 		var init = function( loaderConfig ) {
 			var spell                = {},
-				logger               = new Logger(),
+				console              = new Console(),
 				eventManager         = new EventManager(),
 				configurationManager = new ConfigurationManager( eventManager ),
 				statisticsManager    = new StatisticsManager(),
@@ -177,7 +177,7 @@ define(
 			spell.eventManager         = eventManager
 			spell.libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ) )
 			spell.loaderConfig         = loaderConfig
-			spell.logger               = logger
+			spell.console              = console
 			spell.mainLoop             = mainLoop
 			spell.registerTimer        = PlatformKit.registerTimer
 			spell.scenes               = {}
@@ -187,8 +187,8 @@ define(
 			this.spell = spell
 
 			if( loaderConfig.mode !== 'deployed' ) {
-				logger.setLogLevel( logger.LOG_LEVEL_DEBUG )
-				initDebugEnvironment( logger )
+				console.setLogLevel( console.LOG_LEVEL_DEBUG )
+				initDebugEnvironment( console )
 
 				this.debugMessageHandler = createDebugMessageHandler(
 					spell,

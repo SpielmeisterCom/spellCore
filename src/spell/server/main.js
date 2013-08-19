@@ -7,7 +7,7 @@ define(
 		'spell/EventManager',
 		'spell/EntityManager',
 		'spell/SceneManager',
-		'spell/shared/util/Logger',
+		'spell/shared/util/Console',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/Types',
 
@@ -24,7 +24,7 @@ define(
 		EventManager,
 		entityManager,
 		SceneManager,
-		Logger,
+		Console,
 		PlatformKit,
 		Types,
 
@@ -41,7 +41,7 @@ define(
 		 * private
 		 */
 
-		var logger = new Logger()
+		var console = new Console()
 
 		var isRoot = function() {
 			return process.getuid() === 0
