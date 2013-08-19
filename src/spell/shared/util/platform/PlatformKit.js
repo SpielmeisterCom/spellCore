@@ -153,16 +153,16 @@ define(
 				return new PersistentStorage()
 			},
 
-			createImageLoader : function( renderingContext, invalidateCache, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-				return new ImageLoader( renderingContext, invalidateCache, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
+			createImageLoader : function( renderingContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+				return new ImageLoader( renderingContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			createSoundLoader : function( audioContext, invalidateCache, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-				return new SoundLoader( audioContext, invalidateCache, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
+			createSoundLoader : function( audioContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+				return new SoundLoader( audioContext, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			createTextLoader : function( postProcess, invalidateCache, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-				return new TextLoader( postProcess, invalidateCache, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
+			createTextLoader : function( postProcess, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+				return new TextLoader( postProcess, resourcePath, resourceName, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
 			loadInterstitial : advertisement.loadInterstitial,

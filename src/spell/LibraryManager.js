@@ -59,11 +59,10 @@ define(
 			return resourceTypeToLoaderFactory[ type ]
 		}
 
-		var createLoadingProcess = function( id, libraryPaths, libraryUrl, invalidateCache, config, next ) {
+		var createLoadingProcess = function( id, libraryPaths, libraryUrl, config, next ) {
 			return {
 				id                 : id,
 				libraryPaths       : libraryPaths,
-				invalidateCache    : invalidateCache,
 				numCompleted       : 0,
 				name               : config.name,
 				next               : next,
@@ -146,9 +145,8 @@ define(
 		}
 
 		var startLoadingProcess = function( cache, eventManager, resourceTypeToLoaderFactory, loadingProcesses, loadingProcess ) {
-			var omitCache       = loadingProcess.omitCache,
-				libraryPaths    = loadingProcess.libraryPaths,
-				invalidateCache = loadingProcess.invalidateCache
+			var omitCache    = loadingProcess.omitCache,
+				libraryPaths = loadingProcess.libraryPaths
 
 			for( var i = 0, n = libraryPaths.length; i < n; i++ ) {
 				var libraryPath = libraryPaths[ i ],
@@ -180,7 +178,6 @@ define(
 
 				var loader = loaderFactory(
 					loadingProcess.libraryUrl,
-					invalidateCache,
 					libraryPathUrlUsedForLoading,
 					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
 					_.bind( onErrorCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
@@ -196,11 +193,10 @@ define(
 		}
 
 
-		var LibraryManager = function( eventManager, libraryUrl, isModeDeployed ) {
+		var LibraryManager = function( eventManager, libraryUrl ) {
 			this.eventManager                = eventManager
 			this.loadingProcesses            = {}
 			this.libraryUrl                  = libraryUrl
-			this.invalidateCache             = !isModeDeployed
 			this.resourceTypeToLoaderFactory
 
 			this.cache = {
@@ -278,7 +274,6 @@ define(
 					id,
 					libraryPaths,
 					this.libraryUrl,
-					this.invalidateCache,
 					config || {},
 					next
 				)
