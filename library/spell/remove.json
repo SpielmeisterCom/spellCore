@@ -1,6 +1,11 @@
 {
+	"version": 1,
 	"type": "asset",
 	"subtype": "appearance",
-	"file": "remove.png",
-	"version": 1
+	"config": {
+		"localized": false,
+		"localization": "",
+		"extension": "png"
+	},
+	"dependencies": []
 }

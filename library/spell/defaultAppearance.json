@@ -1,6 +1,11 @@
 {
+	"version": 1,
 	"type": "asset",
 	"subtype": "appearance",
-	"file": "defaultAppearance.png",
-	"version": 1
+	"config": {
+		"localized": false,
+		"localization": "",
+		"extension": "png"
+	},
+	"dependencies": []
 }
