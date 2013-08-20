@@ -107,7 +107,7 @@ define(
 				systems,
 				function( memo, system ) {
 					var systemId       = system.id,
-						systemTemplate = libraryManager.get( createLibraryFilePathFromId( systemId ) )
+						systemTemplate = libraryManager.get( systemId )
 
 					if( !systemTemplate ) {
 						throw 'Error: Could not get template for id \'' + systemId + '\'.'
@@ -297,7 +297,7 @@ define(
 					spell,
 					this.entityManager,
 					systemId,
-					this.libraryManager.get( createLibraryFilePathFromId( systemId ) ),
+					this.libraryManager.get( systemId ),
 					this.isModeDevelopment,
 					systemConfig
 				)
@@ -326,7 +326,7 @@ define(
 							spell,
 							spell.entityManager,
 							systemId,
-							libraryManager.get( createLibraryFilePathFromId( systemId ) ),
+							libraryManager.get( systemId ),
 							isModeDevelopment,
 							systemConfig
 						)

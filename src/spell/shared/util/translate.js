@@ -1,18 +1,13 @@
 define(
 	'spell/shared/util/translate',
-	[
-		'spell/shared/util/createLibraryFilePathFromId'
-	],
-	function(
-		createLibraryFilePathFromId
-	) {
+	function() {
 		'use strict'
 
 
 		return function( libraryManager, currentLanguage, translationAssetId, text ) {
 			if( !translationAssetId ) return
 
-			var translation = libraryManager.get( createLibraryFilePathFromId( translationAssetId ) )
+			var translation = libraryManager.get( translationAssetId )
 			if( !translation ) return
 
 			var translatedText = translation.config[ text ]

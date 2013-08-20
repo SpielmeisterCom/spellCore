@@ -19,19 +19,44 @@ define(
 			return _.unique(
 				_.reduce(
 					assets,
-					function( memo, asset ) {
-						if( !asset.file ) return memo
+					function( memo, asset, assetId ) {
+						var config = asset.config
 
-						var libraryFilePath
+						if( !config ) {
+							return memo
+						}
 
-						if( asset.config && asset.config.localized ) {
-							var fileName          = asset.file,
-								fileExtension     = fileName.substr( fileName.lastIndexOf( '.' ) + 1 ),
-								localizedFileName = asset.name + '.' + currentLanguage + '.' + fileExtension
+						var subtype = asset.subtype
 
-							libraryFilePath = {
-								libraryPath : createLibraryFilePath( asset.namespace, asset.file ),
-								libraryPathUrlUsedForLoading : createLibraryFilePath( asset.namespace, localizedFileName )
+						if( subtype !== 'appearance' &&
+							subtype !== 'font' &&
+							subtype !== 'sound' &&
+							subtype !== 'spriteSheet' ) {
+
+							return memo
+						}
+
+						var isLocalizable   = config.localized !== undefined,
+							libraryFilePath
+
+						if( isLocalizable ) {
+							if( config.localized ) {
+								var languageToExtension = config.localization,
+									fileExtension       = languageToExtension[ currentLanguage ],
+									localizedFileName   = asset.name + '.' + currentLanguage + '.' + fileExtension
+
+								libraryFilePath = {
+									libraryPath : createLibraryFilePath( asset.namespace, asset.name + '.' + fileExtension ),
+									libraryPathUrlUsedForLoading : createLibraryFilePath( asset.namespace, localizedFileName )
+								}
+
+							} else {
+								if( subtype === 'sound' ) {
+									libraryFilePath = createLibraryFilePath( asset.namespace, asset.name + '.mp3' )
+
+								} else {
+									libraryFilePath = createLibraryFilePath( asset.namespace, asset.name + '.' + config.extension )
+								}
 							}
 
 						} else {

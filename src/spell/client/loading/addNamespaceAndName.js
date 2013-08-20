@@ -1,15 +1,6 @@
 define(
 	'spell/client/loading/addNamespaceAndName',
-	[
-		'spell/shared/util/createIdFromLibraryFilePath',
-
-		'spell/functions'
-	],
-	function(
-		createIdFromLibraryFilePath,
-
-		_
-	) {
+	function() {
 		'use strict'
 
 
@@ -19,15 +10,14 @@ define(
 		 * @param records
 		 */
 		var addNamespaceAndName = function( records ) {
-			_.each(
-				records,
-				function( value, key ) {
-					var idParts = createIdFromLibraryFilePath( key, true )
+			for( var key in records ) {
+				var value = records[ key ]
 
-					value.name      = idParts.pop()
-					value.namespace = idParts.join( '.' )
-				}
-			)
+				var splitOffset = key.lastIndexOf( '.' )
+
+				value.name      = key.substr( splitOffset + 1, key.length )
+				value.namespace = key.substr( 0, splitOffset )
+			}
 		}
 
 		return addNamespaceAndName

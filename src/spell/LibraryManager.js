@@ -2,6 +2,7 @@ define(
 	'spell/LibraryManager',
 	[
 		'spell/client/loading/addNamespaceAndName',
+		'spell/shared/util/createIdFromLibraryFilePath',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/createLibraryFilePathFromId',
 		'spell/shared/util/platform/PlatformKit',
@@ -11,6 +12,7 @@ define(
 	],
 	function(
 		addNamespaceAndName,
+		createIdFromLibraryFilePath,
 		createLibraryFilePath,
 		createLibraryFilePathFromId,
 		PlatformKit,
@@ -91,12 +93,11 @@ define(
 				var loadedLibraryRecords = _.reduce(
 					libraryPaths,
 					function( memo, value ) {
-						if( _.isObject( value ) ) {
-							memo[ value.libraryPath ] = cache[ value.libraryPath ]
+						var key = _.isObject( value ) ?
+							createIdFromLibraryFilePath( value.libraryPath ) :
+							createIdFromLibraryFilePath( value )
 
-						} else {
-							memo[ value ] = cache[ value ]
-						}
+						memo[ key ] = cache[ key ]
 
 						return memo
 					},
@@ -131,7 +132,7 @@ define(
 				throw 'Error: Resource "' + libraryPath + '" from loading process "' + loadingProcess.id + '" is undefined or empty on loading completed.'
 			}
 
-			cache[ libraryPath ] = loadedResource
+			cache[ createIdFromLibraryFilePath( libraryPath ) ] = loadedResource
 
 			updateProgress( eventManager, cache, loadingProcesses, loadingProcess )
 		}
@@ -161,7 +162,7 @@ define(
 				}
 
 				if( !omitCache ) {
-					var cachedEntry = cache[ libraryPath ]
+					var cachedEntry = cache[ createIdFromLibraryFilePath( libraryPath ) ]
 
 					if( cachedEntry ) {
 						onLoadCallback( eventManager, cache, loadingProcesses, loadingProcess, libraryPath, cachedEntry )
@@ -206,22 +207,26 @@ define(
 		}
 
 		LibraryManager.prototype = {
-			get : function( libraryPath ) {
+			get : function( libraryId ) {
 				var cache = this.cache
 
-				return cache.metaData[ libraryPath ] || cache.resource[ libraryPath ]
+				return cache.metaData[ libraryId ] || cache.resource[ libraryId ]
 			},
 
-			getByLibraryId : function( libraryId ) {
-				return this.get( createLibraryFilePathFromId( libraryId ) )
+			getMetaData : function( libraryId ) {
+				return this.cache.metaData[ libraryId ]
+			},
+
+			getResource : function( libraryId ) {
+				return this.cache.resource[ libraryId ]
 			},
 
 			getMetaDataRecordsByType : function( type ) {
 				return _.reduce(
 					this.cache.metaData,
-					function( memo, metaDataRecord, libraryPath ) {
+					function( memo, metaDataRecord, libraryId ) {
 						if( metaDataRecord.type === type ) {
-							memo[ libraryPath ] = metaDataRecord
+							memo[ libraryId ] = metaDataRecord
 						}
 
 						return memo
@@ -231,7 +236,17 @@ define(
 			},
 
 			addToCache : function( content ) {
-				_.extend( this.cache.metaData, content )
+				var tmp = _.reduce(
+					content,
+					function( memo, key, value ) {
+						memo[ createIdFromLibraryFilePath( value ) ] = key
+
+						return memo
+					},
+					{}
+				)
+
+				_.extend( this.cache.metaData, tmp )
 				addNamespaceAndName( this.cache.metaData )
 			},
 
@@ -239,7 +254,7 @@ define(
 				var cache = this.cache
 
 				for( var i = 0, n = libraryIds.length, entry; i < n; i++ ) {
-					entry = cache.metaData[ createLibraryFilePathFromId( libraryIds[ i ] ) ]
+					entry = cache.metaData[ libraryIds[ i ] ]
 
 					if( !entry ) return false
 

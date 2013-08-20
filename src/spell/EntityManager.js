@@ -524,7 +524,7 @@ define(
 			}
 
 			if( entityTemplateId ) {
-				var entityTemplate = libraryManager.getByLibraryId( entityTemplateId )
+				var entityTemplate = libraryManager.get( entityTemplateId )
 
 				if( !entityTemplate ) {
 					throw 'Error: Unknown entity template \'' + entityTemplateId + '\'. Could not create entity.'
@@ -643,7 +643,7 @@ define(
 			_.each(
 				entity,
 				function( attributeConfig, componentId ) {
-					var componentDefinition = libraryManager.getByLibraryId( componentId )
+					var componentDefinition = libraryManager.get( componentId )
 
 					if( !componentDefinition ) {
 						throw 'Error: Could not find component definition "' + componentId +
@@ -668,7 +668,7 @@ define(
 
 		var createComponents = function( spell, assetManager, libraryManager, moduleLoader, entityTemplateId, config ) {
 			var entityTemplate = entityTemplateId ?
-				libraryManager.getByLibraryId( entityTemplateId ) :
+				libraryManager.get( entityTemplateId ) :
 				undefined
 
 			return createComponentsTM( spell, assetManager, libraryManager, moduleLoader, config, entityTemplateId, entityTemplate )

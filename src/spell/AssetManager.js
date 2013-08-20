@@ -40,16 +40,18 @@ define(
 					libraryManager = this.libraryManager
 
 				for( var id in assets ) {
-					var asset      = assets[ id ],
-						resourceId = asset.resourceId
+					var asset     = assets[ id ],
+						libraryId = asset.resourceId || id.substr( id.indexOf( ':' ) + 1, id.length )
 
-					if( !resourceId ) continue
-					if( !resources[ resourceId ] ) continue
+					if( !resources[ libraryId ] ) {
+						continue
+					}
 
-					var resource = libraryManager.get( resourceId )
-					if( !resource ) return
+					var resource = libraryManager.getResource( libraryId ) || libraryManager.getMetaData( libraryId )
 
-					asset.resource = resource
+					if( resource ) {
+						asset.resource = resource
+					}
 				}
 			},
 			free : function() {

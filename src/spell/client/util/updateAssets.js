@@ -2,6 +2,7 @@ define(
 	'spell/client/util/updateAssets',
 	[
 		'spell/shared/util/createAssetId',
+		'spell/shared/util/createIdFromLibraryFilePath',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/input/keyCodes',
 
@@ -9,6 +10,7 @@ define(
 	],
 	function(
 		createAssetId,
+		createIdFromLibraryFilePath,
 		createLibraryFilePath,
 		keyCodes,
 
@@ -144,9 +146,11 @@ define(
 		var addResourceId = function( asset, assetDefinition ) {
 			var file = assetDefinition.file
 
-			if( !file ) return
+			if( !file ) {
+				return
+			}
 
-			asset.resourceId = createLibraryFilePath( assetDefinition.namespace, file )
+			asset.resourceId = createIdFromLibraryFilePath( assetDefinition.namespace + '.' + file )
 		}
 
 

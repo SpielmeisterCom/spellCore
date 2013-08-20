@@ -2,13 +2,11 @@ define(
 	'spell/client/development/createSystemMessageHandler',
 	[
 		'spell/client/development/createMessageDispatcher',
-		'spell/shared/util/createId',
-		'spell/shared/util/createLibraryFilePathFromId'
+		'spell/shared/util/createId'
 	],
 	function(
 		createMessageDispatcher,
-		createId,
-		createLibraryFilePathFromId
+		createId
 	) {
 		'use strict'
 
@@ -35,7 +33,7 @@ define(
 
 					var metaDataCache = {}
 
-					metaDataCache[ createLibraryFilePathFromId( libraryId ) ] = definition
+					metaDataCache[ libraryId ] = definition
 
 					spell.libraryManager.addToCache( metaDataCache )
 
