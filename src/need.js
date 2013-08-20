@@ -18,38 +18,26 @@
 		return request
 	}
 
-	var loadModule = function( name, libraryUrl, libraryManager ) {
+	var loadModule = function( name, libraryUrl ) {
 		var scriptName = name + '.js',
-			cachedEntry,
-			source
+			moduleUrl  = libraryUrl ? libraryUrl + '/' + scriptName : scriptName,
+			request    = createRequest( moduleUrl )
 
-		if( libraryManager ) {
-			cachedEntry = libraryManager.get( scriptName )
+		if( request.status !== 200 &&
+			request.status !== 0 ) {
+
+			throw 'Error: Loading \'' + moduleUrl + '\' failed.'
 		}
 
-		if( cachedEntry ) {
-			source = cachedEntry
-
-		} else {
-			var moduleUrl = libraryUrl ? libraryUrl + '/' + scriptName : scriptName,
-				request   = createRequest( moduleUrl )
-
-			if( request.status !== 200 &&
-				request.status !== 0 ) {
-
-				throw 'Error: Loading \'' + moduleUrl + '\' failed.'
-			}
-
-			source = request.responseText
-		}
+		var source = request.responseText
 
 		eval( createModuleSource( scriptName, source ) )
 
 		return modules[ name ]
 	}
 
-	var createModule = function( name, config ) {
-		var module = loadModule( name, config.libraryUrl, config.libraryManager )
+	var createModule = function( name, libraryUrl ) {
+		var module = loadModule( name, libraryUrl )
 
 		if( !module ) throw 'Error: Could not load module \'' + name + '\'.'
 
@@ -71,7 +59,7 @@
 				}
 
 				if( !dependencyModule ) {
-					dependencyModule = createModule( dependencyName, config )
+					dependencyModule = createModule( dependencyName, config.libraryUrl )
 				}
 
 				if( !dependencyModule.instance ) {
@@ -151,7 +139,7 @@
 				throw 'Error: Missing module \'' + name + '\'. External loading is disabled. Please make sure that all required modules are shipped.'
 			}
 
-			module = createModule( name, config )
+			module = createModule( name, config.libraryUrl )
 		}
 
 		if( !module.instance ) {

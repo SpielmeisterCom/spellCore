@@ -104,7 +104,7 @@ define(
 
 			var isModeDevelopment = configurationManager.getValue( 'mode' ) !== 'deployed'
 
-			var moduleLoader = createModuleLoader( libraryManager, isModeDevelopment, configurationManager.getValue( 'libraryUrl' ) )
+			var moduleLoader = createModuleLoader( isModeDevelopment, configurationManager.getValue( 'libraryUrl' ) )
 
 			var entityManager = new EntityManager( spell, configurationManager, assetManager, spell.eventManager, libraryManager, moduleLoader )
 
