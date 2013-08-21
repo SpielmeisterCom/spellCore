@@ -1,9 +1,5 @@
 /**
- * The EntityManager contains functions for creating, updating and destroying entities and for
- * querying and updating components.
- *
- * You can use the EntityManager for example in your system's init, activate, deactivate, destroy and process functions
- * to create or destroy entities, or to add or remove components from entities and update components.
+ * The EntityManager offers methods for creating, updating and destroying entities and for querying and updating components and component attributes.
  *
  * @class spell.entityManager
  * @singleton

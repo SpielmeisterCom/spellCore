@@ -1,4 +1,6 @@
 /**
+ * The EventManager offers access to the engine internal message bus. It can be used to implement observer behavior.
+ *
  * @class spell.eventManager
  * @singleton
  */

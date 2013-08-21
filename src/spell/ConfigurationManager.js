@@ -1,8 +1,8 @@
 /**
+ * The ConfigurationManager offers access to various engine internal configuration options.
+ *
  * @class spell.configurationManager
  * @singleton
- *
- * The ConfigurationManager offers access to various engine internal configuration options.
  */
 define(
 	'spell/ConfigurationManager',
