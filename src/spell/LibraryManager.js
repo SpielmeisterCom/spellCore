@@ -239,7 +239,10 @@ define(
 				var tmp = _.reduce(
 					content,
 					function( memo, key, value ) {
-						memo[ createIdFromLibraryFilePath( value ) ] = key
+						var extension = value.substr( value.lastIndexOf( '.' ) + 1, value.length ),
+							isScript  = extension === 'js'
+
+						memo[ isScript ? value : createIdFromLibraryFilePath( value ) ] = key
 
 						return memo
 					},
