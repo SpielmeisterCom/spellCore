@@ -34,6 +34,7 @@
  * @class spell.functions
  * @singleton
  */
+
 define(
 	'spell/functions',
 	[
@@ -42,7 +43,10 @@ define(
 	function(
 		platformImpl
 	) {
-		var _ = {}
+		'use strict'
+
+
+		var _ = {};
 
 		/**
 		 * Returns *true* if **object** is an Array.
@@ -57,7 +61,7 @@ define(
 		 * @param {Object} object
 		 * @returns {Boolean}
 		 */
-		_.isArray = platformImpl.isArray
+		_.isArray = platformImpl.isArray;
 
 		/**
 		 * Returns *true* if **value** is an Object.
@@ -72,7 +76,7 @@ define(
 		 * @param {Object} value
 		 * @return {Boolean}
 		 */
-		_.isObject = platformImpl.isObject
+		_.isObject = platformImpl.isObject;
 
 		/**
 		 * Return the number of values in the **list**.
@@ -85,7 +89,7 @@ define(
 		 * @param {Object} list
 		 * @return {Number}
 		 */
-		_.size = platformImpl.size
+		_.size = platformImpl.size;
 
 		/**
 		 * Converts the **list** (anything that can be iterated over), into a real Array.
@@ -99,7 +103,7 @@ define(
 		 * @param {Object} list
 		 * @return {Array}
 		 */
-		_.toArray = platformImpl.toArray
+		_.toArray = platformImpl.toArray;
 
 
 		/**
@@ -121,7 +125,7 @@ define(
 		 * @param {Object} [context] The context in which the iterator should be bound to
 		 * @returns {void}
 		 */
-		_.each = platformImpl.each
+		_.each = platformImpl.each;
 
 		/**
 		 * Produces a new array of values by mapping each value in **list** through a
@@ -142,7 +146,7 @@ define(
 		 * @param {Object} [context] The context in which the iterator should be bound to
 		 * @returns {Array} Array with the values of **list** mapped through the **iterator** transformation function
 		 */
-		_.map = platformImpl.map
+		_.map = platformImpl.map;
 
 		/**
 		 * Returns the last element of an **array**. Passing **n** will return the last n elements of the array.
@@ -156,7 +160,7 @@ define(
 		 * @param {Number} [n]
 		 * @return {Array|Object}
 		 */
-		_.last = platformImpl.last
+		_.last = platformImpl.last;
 
 		/**
 		 * Looks through each value in the **list**, returning an array of all the values that pass a
@@ -172,7 +176,7 @@ define(
 		 * @param {Object} [context]
 		 * @return {Array}
 		 */
-		_.filter = platformImpl.filter
+		_.filter = platformImpl.filter;
 
 		/**
 		 * Does the object contain the given key?
@@ -186,7 +190,7 @@ define(
 		 * @param {String} key
 		 * @return {Boolean}
 		 */
-		_.has = platformImpl.has
+		_.has = platformImpl.has;
 
 		/**
 		 * Returns *true* if any of the values in the **list** pass the **iterator** truth test.
@@ -202,7 +206,7 @@ define(
 		 * @param [context]
 		 * @return {Boolean}
 		 */
-		_.any = platformImpl.any
+		_.any = platformImpl.any;
 
 		/**
 		 * Looks through each value in the **list**, returning the first one that passes a truth test (**iterator**).
@@ -218,7 +222,7 @@ define(
 		 * @param {Object} [context]
 		 * @return {Object}
 		 */
-		_.find = platformImpl.find
+		_.find = platformImpl.find;
 
 		/**
 		 * Invokes the given **iterator** function *n* times.
@@ -231,7 +235,7 @@ define(
 		 * @param {Function} iterator
 		 * @param {Object} [context]
 		 */
-		_.times = platformImpl.times
+		_.times = platformImpl.times;
 
 		/**
 		 * Copy all of the properties in the **source** objects over to the **destination** object,
@@ -247,7 +251,7 @@ define(
 		 * @param {Object...} sources
 		 * @return {Object}
 		 */
-		_.extend = platformImpl.extend
+		_.extend = platformImpl.extend;
 
 		/**
 		 * Returns *true* if all of the values in the **list** pass the **iterator** truth test.
@@ -262,7 +266,7 @@ define(
 		 * @param {Object} [context]
 		 * @returns {Boolean}
 		 */
-		_.all = platformImpl.all
+		_.all = platformImpl.all;
 
 		/**
 		 * A function to create flexibly-numbered lists of integers, handy for each and map loops.
@@ -286,7 +290,7 @@ define(
 		 * @param {Number} [step] defaults to 1 of omitted
 		 * @return {Array}
 		 */
-		_.range = platformImpl.range
+		_.range = platformImpl.range;
 
 		/**
 		 * **reduce** boils down a list of values into a single value.
@@ -305,7 +309,7 @@ define(
 		 * @param {Object} [context] Context in which the iterator should be called
 		 * @return {Object}
 		 */
-		_.reduce = platformImpl.reduce
+		_.reduce = platformImpl.reduce;
 
 		/**
 		 * Bind a **function** to an **object**, meaning that whenever the function is called,
@@ -324,7 +328,7 @@ define(
 		 * @param {Object...} [arguments]
 		 * @return {Function}
 		 */
-		_.bind = platformImpl.bind
+		_.bind = platformImpl.bind;
 
 		/**
 		 * Returns the values in **list** without the elements that the truth test (**iterator**) passes.
@@ -340,7 +344,7 @@ define(
 		 * @param {Object} [context]
 		 * @return {Array}
 		 */
-		_.reject = platformImpl.reject
+		_.reject = platformImpl.reject;
 
 		/**
 		 * Create a shallow-copied clone of the **object**. Any nested objects or arrays will be
@@ -354,7 +358,7 @@ define(
 		 * @param {Object} object
 		 * @return {Object}
 		 */
-		_.clone = platformImpl.clone
+		_.clone = platformImpl.clone;
 
 		/**
 		 * Fill in missing properties in **object** with default values from the **defaults** objects,
@@ -371,7 +375,7 @@ define(
 		 * @param {Object...} defaults
 		 * @return {Object}
 		 */
-		_.defaults = platformImpl.defaults
+		_.defaults = platformImpl.defaults;
 
 		/**
 		 * Returns the index at which **value** can be found in the **array**, or -1 if value is not present
@@ -388,7 +392,7 @@ define(
 		 * @param {Boolean} [isSorted]
 		 * @return {Number}
 		 */
-		_.indexOf = platformImpl.indexOf
+		_.indexOf = platformImpl.indexOf;
 
 		/**
 		 * Returns true if object is a String.
@@ -399,7 +403,7 @@ define(
 		 * @param {Object} object
 		 * @return {Boolean}
 		 */
-		_.isString = platformImpl.isString
+		_.isString = platformImpl.isString;
 
 		/**
 		 * Returns *true* if **object** contains no values.
@@ -414,7 +418,7 @@ define(
 		 * @param {Object} object
 		 * @return {Boolean}
 		 */
-		_.isEmpty = platformImpl.isEmpty
+		_.isEmpty = platformImpl.isEmpty;
 
 		/**
 		 * Retrieve all the names of the **object**'s properties.
@@ -427,7 +431,7 @@ define(
 		 * @param {Object} object
 		 * @returns {Array}
 		 */
-		_.keys = platformImpl.keys
+		_.keys = platformImpl.keys;
 
 		/**
 		 * Returns true if object is a Function.
@@ -440,7 +444,7 @@ define(
 		 * @param {Object} object
 		 * @return {Boolean}
 		 */
-		_.isFunction = platformImpl.isFunction
+		_.isFunction = platformImpl.isFunction;
 
 		/**
 		 * Returns *true* if the **value** is present in the **list**, using === to test equality.
@@ -454,7 +458,7 @@ define(
 		 * @param {Object} value
 		 * @return {Boolean}
 		 */
-		_.contains = platformImpl.contains
+		_.contains = platformImpl.contains;
 
 		/**
 		 * Calls the method named by **methodName** on each value in the list. Any extra **arguments**
@@ -470,7 +474,7 @@ define(
 		 * @param {Object...} arguments
 		 * @return {Array}
 		 */
-		_.invoke = platformImpl.invoke
+		_.invoke = platformImpl.invoke;
 
 		/**
 		 * Flattens a nested **array** (the nesting can be to any depth). If you pass **shallow**,
@@ -488,7 +492,7 @@ define(
 		 * @param {Boolean} shallow
 		 * @return {Array}
 		 */
-		_.flatten = platformImpl.flatten
+		_.flatten = platformImpl.flatten;
 
 		/**
 		 * Return a copy of the **object**, filtered to only have values for the whitelisted keys specified in **keys**.
@@ -502,7 +506,7 @@ define(
 		 * @param {Array} keys Array containing the keys for the whitelist in **object**
 		 * @return {Object}
 		 */
-		_.pick = platformImpl.pick
+		_.pick = platformImpl.pick;
 
 		/**
 		 * Computes the union of the passed-in **arrays**: the list of unique items, in order,
@@ -516,7 +520,7 @@ define(
 		 * @param {Array...} arrays
 		 * @return {Array}
 		 */
-		_.union = platformImpl.union
+		_.union = platformImpl.union;
 
 		/**
 		 * Returns the values from **array** that are not present in the **other** arrays.
@@ -530,7 +534,7 @@ define(
 		 * @param {Array...} others
 		 * @return {Array}
 		 */
-		_.difference = platformImpl.difference
+		_.difference = platformImpl.difference;
 
 		/**
 		 * Return all of the values of the **object**'s properties.
@@ -543,7 +547,7 @@ define(
 		 * @param {Object} object
 		 * @return {Array}
 		 */
-		_.values = platformImpl.values
+		_.values = platformImpl.values;
 
 		/**
 		 * Produces a duplicate-free version of the **array**, using === to test object equality.
@@ -558,7 +562,7 @@ define(
 		 * @param {Boolean} [isSorted]
 		 * @return {Array}
 		 */
-		_.unique = platformImpl.unique
+		_.unique = platformImpl.unique;
 
 		/**
 		 * Returns everything but the last entry of the **array**.
@@ -573,7 +577,7 @@ define(
 		 * @param {Number} [n] Exclude the last n elments from the result
 		 * @return {Array}
 		 */
-		_.initial = platformImpl.initial
+		_.initial = platformImpl.initial;
 
 		/**
 		 * A convenient version of what is perhaps the most common use-case for {@link #map}:
@@ -589,7 +593,7 @@ define(
 		 * @param {String|Number} propertyName key that will be used to lookup the value in the elements of **list**
 		 * @return {Array}
 		 */
-		_.pluck = platformImpl.pluck
+		_.pluck = platformImpl.pluck;
 
 		/**
 		 * Merges together the values of each of the **arrays** with the values at the corresponding position.
@@ -603,7 +607,7 @@ define(
 		 * @param {Array...} arrays
 		 * @return {Array}
 		 */
-		_.zip = platformImpl.zip
+		_.zip = platformImpl.zip;
 
 		/**
 		 * Creates a version of the function that will only be run after first being called count times. Useful for
@@ -617,7 +621,7 @@ define(
 		 * @param {Number} count The count after which the callback function is called.
 		 * @param {Function} function The callback function to call after the **count** times.
 		 */
-		_.after = platformImpl.after
+		_.after = platformImpl.after;
 
 		/**
 		 * Computes the list of values that are the intersection of all the arrays. Each value in the result is present in each of the arrays.
@@ -630,7 +634,7 @@ define(
 		 * @param {Array...} arrays
 		 * @return {Array}
 		 */
-		_.intersection = platformImpl.intersection
+		_.intersection = platformImpl.intersection;
 
 		/**
 		 * Returns true if object is NaN.
@@ -638,7 +642,7 @@ define(
 		 *
 		 * @param {Object} Number
 		 */
-		_.isNaN = platformImpl.isNaN
+		_.isNaN = platformImpl.isNaN;
 
 		/**
 		 * Returns the same value that is used as the argument. In math: f(x) = x
@@ -648,7 +652,7 @@ define(
 		 *     moe === _.identity(moe);
 		 *     //=> true
 		 */
-		_.identity = platformImpl.identity
+		_.identity = platformImpl.identity;
 
 		return _
 	}
