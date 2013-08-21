@@ -1,6 +1,8 @@
 /**
  * @class spell.configurationManager
  * @singleton
+ *
+ * The ConfigurationManager offers access to various engine internal configuration options.
  */
 define(
 	'spell/ConfigurationManager',
@@ -48,17 +50,14 @@ define(
 			return false
 		}
 
-		/**
-		 * These are the platform agnostic options.
-		 *
-		 * The property "configurable" controls if the option can be overridden by the environment configuration set up by the stage-0-loader.
-		 */
+		// These are the platform agnostic options.
+		//
+		// The property "configurable" controls if the option can be overridden by the environment configuration set up by the stage-0-loader.
 		var validOptions = _.extend(
 			{
-				/**
-				 * The screen mode which the user requested. Can be either "fit" or "fixed". If set to "fit" the maximum available screen area is used and the
-				 * option "screenSize" is ignored. If set to "fixed" the option "screenSize" is used to determine the used screen size. The default is "fit".
-				 */
+
+				// The screen mode which the user requested. Can be either "fit" or "fixed". If set to "fit" the maximum available screen area is used and the
+				// option "screenSize" is ignored. If set to "fixed" the option "screenSize" is used to determine the used screen size. The default is "fit".
 				screenMode : {
 					validValues : [ 'fill', 'fit', 'fixed' ],
 					configurable : true,
@@ -102,9 +101,7 @@ define(
 			PlatformKit.configurationOptions.validOptions
 		)
 
-		/*
-		 * These options are used when they are not overridden by the environment configuration set up by the stage-0-loader.
-		 */
+		// These options are used when they are not overridden by the environment configuration set up by the stage-0-loader.
 		var defaultOptions = _.extend(
 			{
 				screenMode              : 'fixed',
@@ -189,6 +186,13 @@ define(
 		}
 
 		ConfigurationManager.prototype = {
+			/**
+			 * Sets the configuration option *key* to *value*.
+			 *
+			 * @private
+			 * @param {String} key
+			 * @param {String} value
+			 */
 			setValue : function( key, value ) {
 				var config = this.config
 
@@ -217,9 +221,28 @@ define(
 					vec2.copy( config.currentScreenSize, value )
 				}
 			},
+
+			/**
+			 * Returns the configuration option specified by *key*.
+			 *
+			 * Example:
+			 *     var screenSize = spell.configurationManager.getValue( 'currentScreenSize' )
+			 *
+			 *     spell.logger.debug( screenSize )
+			 *
+			 * @param {String} key
+			 * @return {String}
+			 */
 			getValue : function( key ) {
 				return this.config[ key ]
 			},
+
+			/**
+			 * Sets mutliple configuration options at once.
+			 *
+			 * @private
+			 * @param {Object} x the configuration
+			 */
 			setConfig : function( x ) {
 				for( var key in x ) {
 					if( key === 'supportedLanguages' || key === 'defaultLanguage' || key === 'currentLanguage' ) {
