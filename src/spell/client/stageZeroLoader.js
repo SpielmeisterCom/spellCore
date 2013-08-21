@@ -227,7 +227,10 @@ if( !window.console ) {
 			config.mode = MODE.DEPLOYED
 		}
 
-		if( !config.currentLanguage ) {
+		if( ( config.detectLanguage === undefined ||
+			config.detectLanguage === true ) &&
+			!config.currentLanguage ) {
+
 			config.currentLanguage = detectBrowserLanguage()
 		}
 	}

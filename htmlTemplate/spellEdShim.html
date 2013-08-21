@@ -126,6 +126,7 @@
 		addEvent( window, 'message', handleMessageFromEditor )
 
 		var config = {
+			detectLanguage : false,
 			mode : isEmbedded ? 'development_embedded' : 'development_standalone',
 			platform : 'html5',
 			screenMode : 'fit',
