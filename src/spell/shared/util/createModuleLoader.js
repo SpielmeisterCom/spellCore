@@ -13,11 +13,12 @@ define(
 
 		var instance
 
-		return function( isModeDevelopment, libraryUrl ) {
+		return function( libraryManager, isModeDevelopment, libraryUrl ) {
 			if( !instance ) {
 				instance = {
 					require : function( moduleId ) {
 						var config = {
+							libraryManager : isModeDevelopment ? libraryManager : undefined,
 							hashModuleId   : hashModuleId,
 							loadingAllowed : isModeDevelopment,
 							libraryUrl     : libraryUrl
