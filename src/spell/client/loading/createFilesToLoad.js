@@ -19,18 +19,19 @@ define(
 			return _.unique(
 				_.reduce(
 					assets,
-					function( memo, asset, assetId ) {
+					function( memo, asset ) {
 						var config = asset.config
 
 						if( !config ) {
 							return memo
 						}
 
-						var subtype = asset.subtype
+						var subtype = asset.subtype,
+							isSound = subtype === 'sound'
 
-						if( subtype !== 'appearance' &&
+						if( !isSound &&
+							subtype !== 'appearance' &&
 							subtype !== 'font' &&
-							subtype !== 'sound' &&
 							subtype !== 'spriteSheet' ) {
 
 							return memo
@@ -42,7 +43,7 @@ define(
 						if( isLocalizable ) {
 							if( config.localized ) {
 								var languageToExtension = config.localization,
-									fileExtension       = languageToExtension[ currentLanguage ],
+									fileExtension       = isSound ? 'mp3' : languageToExtension[ currentLanguage ],
 									localizedFileName   = asset.name + '.' + currentLanguage + '.' + fileExtension
 
 								libraryFilePath = {
