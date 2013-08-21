@@ -52,7 +52,7 @@ define(
 				 * @param payload
 				 */
 				startScene : function( payload ) {
-					spell.sceneManager.startScene( payload.startSceneId, payload.initialConfig, payload.showLoadingScene )
+					spell.sceneManager.startScene( payload.targetSceneId, payload.initialConfig, payload.showLoadingScene )
 				}
 			} )
 		}

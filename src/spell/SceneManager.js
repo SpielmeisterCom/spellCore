@@ -112,7 +112,7 @@ define(
 								this.isModeDevelopment,
 								loadingSceneId,
 								{
-									startSceneId : targetSceneId,
+									targetSceneId : targetSceneId,
 									initialConfig : initialConfig
 								}
 							),
@@ -162,7 +162,7 @@ define(
 			 * Changes the currently executed scene to the scene specified by targetSceneId.
 			 *
 			 * @param {String} targetSceneId the library id of the scene to which to change
-			 * @param {Object} initialConfig configuration passed to the start scene
+			 * @param {Object} initialConfig configuration passed to the target scene
 			 * @param {Boolean} showLoadingScene if true the loading scene is displayed
 			 */
 			changeScene : function( targetSceneId, initialConfig, showLoadingScene ) {
@@ -176,7 +176,7 @@ define(
 					this.spell.sendMessageToEditor(
 						'spelled.debug.application.startScene',
 						{
-							startSceneId : targetSceneId,
+							targetSceneId : targetSceneId,
 							initialConfig : initialConfig,
 							showLoadingScene : showLoadingScene
 						}
