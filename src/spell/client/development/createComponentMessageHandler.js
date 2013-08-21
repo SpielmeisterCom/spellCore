@@ -1,15 +1,25 @@
 define(
 	'spell/client/development/createComponentMessageHandler',
 	[
-		'spell/client/development/createMessageDispatcher'
+		'spell/client/development/createMessageDispatcher',
+		'spell/client/development/library/loadAsset'
 	],
 	function(
-		createMessageDispatcher
+		createMessageDispatcher,
+		loadAsset
 	) {
 		'use strict'
 
 
 		return function( spell ) {
+			var updateComponent = function( payload ) {
+				var success = spell.entityManager.updateComponent( payload.entityId, payload.componentId, payload.config )
+
+				if( !success ) {
+					spell.console.error( 'Could not update component \'' + payload.componentId + '\' in entity ' + payload.entityId + '.' )
+				}
+			}
+
 			return createMessageDispatcher( {
 				add : function( payload ) {
 					spell.entityManager.addComponent( payload.entityId, payload.componentId )
@@ -18,10 +28,23 @@ define(
 					spell.entityManager.removeComponent( payload.entityId, payload.componentId )
 				},
 				update : function( payload ) {
-					var success = spell.entityManager.updateComponent( payload.entityId, payload.componentId, payload.config )
+					var assetId = payload.config.assetId
 
-					if( !success ) {
-						spell.console.error( 'Could not update component \'' + payload.componentId + '\' in entity ' + payload.entityId + '.' )
+					if( assetId ) {
+						loadAsset(
+							spell,
+							assetId,
+							function( loadedFiles ) {
+								spell.assetManager.injectResources( loadedFiles )
+
+								spell.entityManager.updateAssetReferences( assetId, spell.assetManager.get( assetId ) )
+
+								updateComponent( payload )
+							}
+						)
+
+					} else {
+						updateComponent( payload )
 					}
 				}
 			} )

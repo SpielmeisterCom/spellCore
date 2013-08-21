@@ -1,6 +1,7 @@
 define(
 	'spell/client/development/library/updateAsset',
 	[
+		'spell/client/development/library/loadAsset',
 		'spell/client/loading/addNamespaceAndName',
 		'spell/client/loading/createFilesToLoad',
 		'spell/client/loading/injectResource',
@@ -14,6 +15,7 @@ define(
 		'spell/functions'
 	],
 	function(
+		loadAsset,
 		addNamespaceAndName,
 		createFilesToLoad,
 		injectResource,
@@ -97,38 +99,25 @@ define(
 				)
 			}
 
-			if( definition.assetId ) {
-				var assetId = definition.assetId
+			var assetId = definition.assetId
 
-				// load meta data record
-				spell.libraryManager.load(
-					[ createLibraryFilePathFromId( assetId.slice( assetId.indexOf( ':' ) + 1 ) ) ],
-					{
-						omitCache          : true,
-						onLoadingCompleted : function( loadedLibraryRecords ) {
-							updateAssets( assetManager, loadedLibraryRecords )
+			if( assetId ) {
+				// load referenced asset first
+				loadAsset(
+					spell,
+					assetId,
+					function( loadedFiles ) {
+						// now update referencing asset (-> updated definition) and inject referenced asset
+						updateAssets( assetManager, loadedAssets, true )
 
-							// load file
-							spell.libraryManager.load(
-								createFilesToLoad( configurationManager, loadedLibraryRecords ),
-								{
-									isMetaDataLoad     : false,
-									omitCache          : true,
-									onLoadingCompleted : function( loadedFiles ) {
-										updateAssets( assetManager, loadedAssets, true )
+						assetManager.injectResources( loadedFiles )
 
-										assetManager.injectResources( loadedFiles )
+						spell.entityManager.updateAssetReferences( typedId, assetManager.get( typedId ) )
 
-										spell.entityManager.updateAssetReferences( typedId, assetManager.get( typedId ) )
-
-										spell.eventManager.publish(
-											[ Events.ASSET_UPDATED, definition.subtype ],
-											[ typedId ]
-										)
-									}
-								}
-							)
-						}
+						spell.eventManager.publish(
+							[ Events.ASSET_UPDATED, definition.subtype ],
+							[ typedId ]
+						)
 					}
 				)
 			}
