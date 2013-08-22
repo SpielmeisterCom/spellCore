@@ -37,6 +37,8 @@ define(
 
 
 		/**
+		 * 2x2 matrix functions
+		 *
 		 * @class spell.math.mat2
 		 * @singleton
 		 * @requires Math
@@ -198,8 +200,9 @@ define(
 		};
 
 		/**
-		 * Alias for {@link mat2.multiply}
-		 * @function
+		 * Alias for {@link #multiply}
+		 *
+		 * @property {Function}
 		 */
 		mat2.mul = mat2.multiply;
 

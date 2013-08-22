@@ -42,6 +42,8 @@ define(
 		'use strict'
 
 		/**
+		 * quaternion functions
+		 *
 		 * @class spell.math.quat
 		 * @singleton
 		 * @requires Math
@@ -216,7 +218,7 @@ define(
 		};
 
 		/**
-		 * Adds two quat's
+		 * Adds two quaternions
 		 *
 		 * @param {quat} out the receiving quaternion
 		 * @param {quat} a the first operand
@@ -227,7 +229,7 @@ define(
 		quat.add = vec4.add;
 
 		/**
-		 * Multiplies two quat's
+		 * Multiplies two quaternions
 		 *
 		 * @param {quat} out the receiving quaternion
 		 * @param {quat} a the first operand
@@ -246,8 +248,9 @@ define(
 		};
 
 		/**
-		 * Alias for {@link quat.multiply}
-		 * @function
+		 * Alias for {@link #multiply}
+		 *
+		 * @property {Function}
 		 */
 		quat.mul = quat.multiply;
 
@@ -345,7 +348,7 @@ define(
 		};
 
 		/**
-		 * Calculates the dot product of two quat's
+		 * Calculates the dot product of two quaternions
 		 *
 		 * @param {quat} a the first operand
 		 * @param {quat} b the second operand
@@ -355,7 +358,7 @@ define(
 		quat.dot = vec4.dot;
 
 		/**
-		 * Performs a linear interpolation between two quat's
+		 * Performs a linear interpolation between two quaternions
 		 *
 		 * @param {quat} out the receiving quaternion
 		 * @param {quat} a the first operand
@@ -454,17 +457,16 @@ define(
 		};
 
 		/**
-		 * Calculates the length of a quat
+		 * Alias for {@link spell.math.vec4#length}
 		 *
-		 * @param {quat} a vector to calculate length of
-		 * @returns {Number} length of a
-		 * @function
+		 * @property {Function}
 		 */
 		quat.length = vec4.length;
 
 		/**
-		 * Alias for {@link quat.length}
-		 * @function
+		 * Alias for {@link #length}
+		 *
+		 * @property {Function}
 		 */
 		quat.len = quat.length;
 
@@ -478,8 +480,9 @@ define(
 		quat.squaredLength = vec4.squaredLength;
 
 		/**
-		 * Alias for {@link quat.squaredLength}
-		 * @function
+		 * Alias for {@link #squaredLength}
+		 *
+		 * @property {Function}
 		 */
 		quat.sqrLen = quat.squaredLength;
 

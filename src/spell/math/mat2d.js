@@ -37,12 +37,8 @@ define(
 
 
 		/**
-		 * @class spell.math.mat2d
-		 * @singleton
-		 * @requires Math
-		 * @requires spell.shared.util.platform.Types
+		 * 3x2 matrix functions
 		 *
-		 * @description
 		 * A mat2d contains six elements defined as:
 		 * <pre>
 		 * [a, b,
@@ -56,6 +52,11 @@ define(
 		 *  tx,ty,1]
 		 * </pre>
 		 * The last column is ignored so the array is shorter and operations are faster.
+		 *
+		 * @class spell.math.mat2d
+		 * @singleton
+		 * @requires Math
+		 * @requires spell.shared.util.platform.Types
 		 */
 		var mat2d = {};
 
@@ -162,7 +163,7 @@ define(
 		};
 
 		/**
-		 * Multiplies two mat2d's
+		 * Multiplies two matrixes
 		 *
 		 * @param {mat2d} out the receiving matrix
 		 * @param {mat2d} a the first operand
@@ -185,8 +186,9 @@ define(
 		};
 
 		/**
-		 * Alias for {@link mat2d.multiply}
-		 * @function
+		 * Alias for {@link #multiply}
+		 *
+		 * @property {Function}
 		 */
 		mat2d.mul = mat2d.multiply;
 

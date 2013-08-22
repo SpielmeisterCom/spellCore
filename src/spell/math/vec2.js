@@ -39,6 +39,8 @@ define(
 
 
 		/**
+		 * 2d vector functions
+		 *
 		 * @class spell.math.vec2
 		 * @singleton
 		 * @requires Math
@@ -50,7 +52,7 @@ define(
 		/**
 		 * Creates a new, empty vec2
 		 *
-		 * @returns {vec2} a new 2D vector
+		 * @returns {vec2} a new 2d vector
 		 */
 		vec2.create = function() {
 		    var out = Types.createFloatArray(2);
@@ -63,7 +65,7 @@ define(
 		 * Creates a new vec2 initialized with values from an existing vector
 		 *
 		 * @param {vec2} a vector to clone
-		 * @returns {vec2} a new 2D vector
+		 * @returns {vec2} a new 2d vector
 		 */
 		vec2.clone = function(a) {
 		    var out = Types.createFloatArray(2);
@@ -77,7 +79,7 @@ define(
 		 *
 		 * @param {Number} x X component
 		 * @param {Number} y Y component
-		 * @returns {vec2} a new 2D vector
+		 * @returns {vec2} a new 2d vector
 		 */
 		vec2.fromValues = function(x, y) {
 		    var out = Types.createFloatArray(2);
@@ -89,7 +91,7 @@ define(
 		/**
 		 * Copy the values from one vec2 to another
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the source vector
 		 * @returns {vec2} out
 		 */
@@ -102,7 +104,7 @@ define(
 		/**
 		 * Set the components of a vec2 to the given values
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {Number} x X component
 		 * @param {Number} y Y component
 		 * @returns {vec2} out
@@ -114,9 +116,9 @@ define(
 		};
 
 		/**
-		 * Adds two vec2's
+		 * Adds two vectors
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
 		 * @returns {vec2} out
@@ -130,7 +132,7 @@ define(
 		/**
 		 * Subtracts vector b from vector a
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
 		 * @returns {vec2} out
@@ -142,15 +144,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec2.subtract}
-		 * @function
+		 * Alias for {@link #subtract}
+		 *
+		 * @property {Function}
 		 */
 		vec2.sub = vec2.subtract;
 
 		/**
-		 * Multiplies two vec2's
+		 * Multiplies two vectors
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
 		 * @returns {vec2} out
@@ -162,15 +165,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec2.multiply}
-		 * @function
+		 * Alias for {@link #multiply}
+		 *
+		 * @property {Function}
 		 */
 		vec2.mul = vec2.multiply;
 
 		/**
-		 * Divides two vec2's
+		 * Divides two vectors
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
 		 * @returns {vec2} out
@@ -182,15 +186,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec2.divide}
-		 * @function
+		 * Alias for {@link #divide}
+		 *
+		 * @property {Function}
 		 */
 		vec2.div = vec2.divide;
 
 		/**
-		 * Returns the minimum of two vec2's
+		 * Returns the minimum of two vectors
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
 		 * @returns {vec2} out
@@ -202,9 +207,9 @@ define(
 		};
 
 		/**
-		 * Returns the maximum of two vec2's
+		 * Returns the maximum of two vectors
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
 		 * @returns {vec2} out
@@ -218,7 +223,7 @@ define(
 		/**
 		 * Scales a vec2 by a scalar number
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the vector to scale
 		 * @param {Number} b amount to scale the vector by
 		 * @returns {vec2} out
@@ -230,9 +235,9 @@ define(
 		};
 
 		/**
-		 * Adds two vec2's after scaling the second operand by a scalar value
+		 * Adds two vectors after scaling the second operand by a scalar value
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
 		 * @param {Number} scale the amount to scale b by before adding
@@ -245,7 +250,7 @@ define(
 		};
 
 		/**
-		 * Calculates the euclidian distance between two vec2's
+		 * Calculates the euclidian distance between two vectors
 		 *
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
@@ -258,13 +263,14 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec2.distance}
-		 * @function
+		 * Alias for {@link #distance}
+		 *
+		 * @property {Function}
 		 */
 		vec2.dist = vec2.distance;
 
 		/**
-		 * Calculates the squared euclidian distance between two vec2's
+		 * Calculates the squared euclidian distance between two vectors
 		 *
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
@@ -277,8 +283,9 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec2.squaredDistance}
-		 * @function
+		 * Alias for {@link #squaredDistance}
+		 *
+		 * @property {Function}
 		 */
 		vec2.sqrDist = vec2.squaredDistance;
 
@@ -295,8 +302,9 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec2.length}
-		 * @function
+		 * Alias for {@link #length}
+		 *
+		 * @property {Function}
 		 */
 		vec2.len = vec2.length;
 
@@ -313,15 +321,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec2.squaredLength}
-		 * @function
+		 * Alias for {@link #squaredLength}
+		 *
+		 * @property {Function}
 		 */
 		vec2.sqrLen = vec2.squaredLength;
 
 		/**
 		 * Negates the components of a vec2
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a vector to negate
 		 * @returns {vec2} out
 		 */
@@ -334,7 +343,7 @@ define(
 		/**
 		 * Normalize a vec2
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a vector to normalize
 		 * @returns {vec2} out
 		 */
@@ -352,7 +361,7 @@ define(
 		};
 
 		/**
-		 * Calculates the dot product of two vec2's
+		 * Calculates the dot product of two vectors
 		 *
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
@@ -363,10 +372,10 @@ define(
 		};
 
 		/**
-		 * Computes the cross product of two vec2's
+		 * Computes the cross product of two vectors
 		 * Note that the cross product must by definition produce a 3D vector
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
 		 * @returns {vec3} out
@@ -379,9 +388,9 @@ define(
 		};
 
 		/**
-		 * Performs a linear interpolation between two vec2's
+		 * Performs a linear interpolation between two vectors
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the first operand
 		 * @param {vec2} b the second operand
 		 * @param {Number} t interpolation amount between the two inputs
@@ -398,7 +407,7 @@ define(
 		/**
 		 * Generates a random vector with the given scale
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {Number} [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
 		 * @returns {vec2} out
 		 */
@@ -413,7 +422,7 @@ define(
 		/**
 		 * Transforms the vec2 with a mat2
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the vector to transform
 		 * @param {mat2} m matrix to transform with
 		 * @returns {vec2} out
@@ -429,7 +438,7 @@ define(
 		/**
 		 * Transforms the vec2 with a mat2d
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the vector to transform
 		 * @param {mat2d} m matrix to transform with
 		 * @returns {vec2} out
@@ -446,7 +455,7 @@ define(
 		 * Transforms the vec2 with a mat3
 		 * 3rd vector component is implicitly '1'
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the vector to transform
 		 * @param {mat3} m matrix to transform with
 		 * @returns {vec2} out
@@ -464,7 +473,7 @@ define(
 		 * 3rd vector component is implicitly '0'
 		 * 4th vector component is implicitly '1'
 		 *
-		 * @param {vec2} out the receiving vector
+		 * @param {vec2} out the result vector
 		 * @param {vec2} a the vector to transform
 		 * @param {mat4} m matrix to transform with
 		 * @returns {vec2} out

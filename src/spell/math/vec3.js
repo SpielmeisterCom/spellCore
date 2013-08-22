@@ -39,6 +39,8 @@ define(
 
 
 		/**
+		 * 3d vector functions
+		 *
 		 * @class spell.math.vec3
 		 * @singleton
 		 * @requires Math
@@ -50,7 +52,7 @@ define(
 		/**
 		 * Creates a new, empty vec3
 		 *
-		 * @returns {vec3} a new 3D vector
+		 * @returns {vec3} a new 3d vector
 		 */
 		vec3.create = function() {
 		    var out = Types.createFloatArray(3);
@@ -64,7 +66,7 @@ define(
 		 * Creates a new vec3 initialized with values from an existing vector
 		 *
 		 * @param {vec3} a vector to clone
-		 * @returns {vec3} a new 3D vector
+		 * @returns {vec3} a new 3d vector
 		 */
 		vec3.clone = function(a) {
 		    var out = Types.createFloatArray(3);
@@ -80,7 +82,7 @@ define(
 		 * @param {Number} x X component
 		 * @param {Number} y Y component
 		 * @param {Number} z Z component
-		 * @returns {vec3} a new 3D vector
+		 * @returns {vec3} a new 3d vector
 		 */
 		vec3.fromValues = function(x, y, z) {
 		    var out = Types.createFloatArray(3);
@@ -93,7 +95,7 @@ define(
 		/**
 		 * Copy the values from one vec3 to another
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the source vector
 		 * @returns {vec3} out
 		 */
@@ -107,7 +109,7 @@ define(
 		/**
 		 * Set the components of a vec3 to the given values
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {Number} x X component
 		 * @param {Number} y Y component
 		 * @param {Number} z Z component
@@ -121,9 +123,9 @@ define(
 		};
 
 		/**
-		 * Adds two vec3's
+		 * Adds two vectors
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
 		 * @returns {vec3} out
@@ -138,7 +140,7 @@ define(
 		/**
 		 * Subtracts vector b from vector a
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
 		 * @returns {vec3} out
@@ -151,15 +153,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec3.subtract}
-		 * @function
+		 * Alias for {@link #subtract}
+		 *
+		 * @property {Function}
 		 */
 		vec3.sub = vec3.subtract;
 
 		/**
-		 * Multiplies two vec3's
+		 * Multiplies two vectors
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
 		 * @returns {vec3} out
@@ -172,15 +175,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec3.multiply}
-		 * @function
+		 * Alias for {@link #multiply}
+		 *
+		 * @property {Function}
 		 */
 		vec3.mul = vec3.multiply;
 
 		/**
-		 * Divides two vec3's
+		 * Divides two vectors
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
 		 * @returns {vec3} out
@@ -193,15 +197,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec3.divide}
-		 * @function
+		 * Alias for {@link #divide}
+		 *
+		 * @property {Function}
 		 */
 		vec3.div = vec3.divide;
 
 		/**
-		 * Returns the minimum of two vec3's
+		 * Returns the minimum of two vectors
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
 		 * @returns {vec3} out
@@ -214,9 +219,9 @@ define(
 		};
 
 		/**
-		 * Returns the maximum of two vec3's
+		 * Returns the maximum of two vectors
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
 		 * @returns {vec3} out
@@ -231,7 +236,7 @@ define(
 		/**
 		 * Scales a vec3 by a scalar number
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the vector to scale
 		 * @param {Number} b amount to scale the vector by
 		 * @returns {vec3} out
@@ -244,9 +249,9 @@ define(
 		};
 
 		/**
-		 * Adds two vec3's after scaling the second operand by a scalar value
+		 * Adds two vectors after scaling the second operand by a scalar value
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
 		 * @param {Number} scale the amount to scale b by before adding
@@ -260,7 +265,7 @@ define(
 		};
 
 		/**
-		 * Calculates the euclidian distance between two vec3's
+		 * Calculates the euclidian distance between two vectors
 		 *
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
@@ -274,13 +279,14 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec3.distance}
-		 * @function
+		 * Alias for {@link #distance}
+		 *
+		 * @property {Function}
 		 */
 		vec3.dist = vec3.distance;
 
 		/**
-		 * Calculates the squared euclidian distance between two vec3's
+		 * Calculates the squared euclidian distance between two vectors
 		 *
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
@@ -294,8 +300,9 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec3.squaredDistance}
-		 * @function
+		 * Alias for {@link #squaredDistance}
+		 *
+		 * @property {Function}
 		 */
 		vec3.sqrDist = vec3.squaredDistance;
 
@@ -313,8 +320,9 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec3.length}
-		 * @function
+		 * Alias for {@link #length}
+		 *
+		 * @property {Function}
 		 */
 		vec3.len = vec3.length;
 
@@ -332,15 +340,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec3.squaredLength}
-		 * @function
+		 * Alias for {@link #squaredLength}
+		 *
+		 * @property {Function}
 		 */
 		vec3.sqrLen = vec3.squaredLength;
 
 		/**
 		 * Negates the components of a vec3
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a vector to negate
 		 * @returns {vec3} out
 		 */
@@ -354,7 +363,7 @@ define(
 		/**
 		 * Normalize a vec3
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a vector to normalize
 		 * @returns {vec3} out
 		 */
@@ -374,7 +383,7 @@ define(
 		};
 
 		/**
-		 * Calculates the dot product of two vec3's
+		 * Calculates the dot product of two vectors
 		 *
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
@@ -385,9 +394,9 @@ define(
 		};
 
 		/**
-		 * Computes the cross product of two vec3's
+		 * Computes the cross product of two vectors
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
 		 * @returns {vec3} out
@@ -403,9 +412,9 @@ define(
 		};
 
 		/**
-		 * Performs a linear interpolation between two vec3's
+		 * Performs a linear interpolation between two vectors
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the first operand
 		 * @param {vec3} b the second operand
 		 * @param {Number} t interpolation amount between the two inputs
@@ -424,7 +433,7 @@ define(
 		/**
 		 * Generates a random vector with the given scale
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {Number} [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
 		 * @returns {vec3} out
 		 */
@@ -445,7 +454,7 @@ define(
 		 * Transforms the vec3 with a mat4.
 		 * 4th vector component is implicitly '1'
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the vector to transform
 		 * @param {mat4} m matrix to transform with
 		 * @returns {vec3} out
@@ -461,7 +470,7 @@ define(
 		/**
 		 * Transforms the vec3 with a mat3.
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the vector to transform
 		 * @param {mat4} m the 3x3 matrix to transform with
 		 * @returns {vec3} out
@@ -477,7 +486,7 @@ define(
 		/**
 		 * Transforms the vec3 with a quat
 		 *
-		 * @param {vec3} out the receiving vector
+		 * @param {vec3} out the result vector
 		 * @param {vec3} a the vector to transform
 		 * @param {quat} q quaternion to transform with
 		 * @returns {vec3} out

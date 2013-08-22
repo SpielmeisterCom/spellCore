@@ -39,6 +39,8 @@ define(
 
 
 		/**
+		 * 4x4 matrix functions
+		 *
 		 * @class spell.math.mat4
 		 * @singleton
 		 * @requires Math
@@ -317,7 +319,7 @@ define(
 		};
 
 		/**
-		 * Multiplies two mat4's
+		 * Multiplies two matrixes
 		 *
 		 * @param {mat4} out the receiving matrix
 		 * @param {mat4} a the first operand
@@ -358,8 +360,9 @@ define(
 		};
 
 		/**
-		 * Alias for {@link mat4.multiply}
-		 * @function
+		 * Alias for {@link #multiply}
+		 *
+		 * @property {Function}
 		 */
 		mat4.mul = mat4.multiply;
 

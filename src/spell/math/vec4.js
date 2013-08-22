@@ -39,6 +39,8 @@ define(
 
 
 		/**
+		 * 4d vector functions
+		 *
 		 * @class spell.math.vec4
 		 * @singleton
 		 * @requires Math
@@ -50,7 +52,7 @@ define(
 		/**
 		 * Creates a new, empty vec4
 		 *
-		 * @returns {vec4} a new 4D vector
+		 * @returns {vec4} a new 4d vector
 		 */
 		vec4.create = function() {
 		    var out = Types.createFloatArray(4);
@@ -65,7 +67,7 @@ define(
 		 * Creates a new vec4 initialized with values from an existing vector
 		 *
 		 * @param {vec4} a vector to clone
-		 * @returns {vec4} a new 4D vector
+		 * @returns {vec4} a new 4d vector
 		 */
 		vec4.clone = function(a) {
 		    var out = Types.createFloatArray(4);
@@ -83,7 +85,7 @@ define(
 		 * @param {Number} y Y component
 		 * @param {Number} z Z component
 		 * @param {Number} w W component
-		 * @returns {vec4} a new 4D vector
+		 * @returns {vec4} a new 4d vector
 		 */
 		vec4.fromValues = function(x, y, z, w) {
 		    var out = Types.createFloatArray(4);
@@ -97,7 +99,7 @@ define(
 		/**
 		 * Copy the values from one vec4 to another
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the source vector
 		 * @returns {vec4} out
 		 */
@@ -112,7 +114,7 @@ define(
 		/**
 		 * Set the components of a vec4 to the given values
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {Number} x X component
 		 * @param {Number} y Y component
 		 * @param {Number} z Z component
@@ -128,9 +130,9 @@ define(
 		};
 
 		/**
-		 * Adds two vec4's
+		 * Adds two vectors
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the first operand
 		 * @param {vec4} b the second operand
 		 * @returns {vec4} out
@@ -146,7 +148,7 @@ define(
 		/**
 		 * Subtracts vector b from vector a
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the first operand
 		 * @param {vec4} b the second operand
 		 * @returns {vec4} out
@@ -160,15 +162,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec4.subtract}
-		 * @function
+		 * Alias for {@link #subtract}
+		 *
+		 * @property {Function}
 		 */
 		vec4.sub = vec4.subtract;
 
 		/**
-		 * Multiplies two vec4's
+		 * Multiplies two vectors
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the first operand
 		 * @param {vec4} b the second operand
 		 * @returns {vec4} out
@@ -182,15 +185,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec4.multiply}
-		 * @function
+		 * Alias for {@link #multiply}
+		 *
+		 * @property {Function}
 		 */
 		vec4.mul = vec4.multiply;
 
 		/**
-		 * Divides two vec4's
+		 * Divides two vectors
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the first operand
 		 * @param {vec4} b the second operand
 		 * @returns {vec4} out
@@ -204,15 +208,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec4.divide}
-		 * @function
+		 * Alias for {@link #divide}
+		 *
+		 * @property {Function}
 		 */
 		vec4.div = vec4.divide;
 
 		/**
-		 * Returns the minimum of two vec4's
+		 * Returns the minimum of two vectors
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the first operand
 		 * @param {vec4} b the second operand
 		 * @returns {vec4} out
@@ -226,9 +231,9 @@ define(
 		};
 
 		/**
-		 * Returns the maximum of two vec4's
+		 * Returns the maximum of two vectors
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the first operand
 		 * @param {vec4} b the second operand
 		 * @returns {vec4} out
@@ -244,7 +249,7 @@ define(
 		/**
 		 * Scales a vec4 by a scalar number
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the vector to scale
 		 * @param {Number} b amount to scale the vector by
 		 * @returns {vec4} out
@@ -258,9 +263,9 @@ define(
 		};
 
 		/**
-		 * Adds two vec4's after scaling the second operand by a scalar value
+		 * Adds two vectors after scaling the second operand by a scalar value
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the first operand
 		 * @param {vec4} b the second operand
 		 * @param {Number} scale the amount to scale b by before adding
@@ -275,7 +280,7 @@ define(
 		};
 
 		/**
-		 * Calculates the euclidian distance between two vec4's
+		 * Calculates the euclidian distance between two vectors
 		 *
 		 * @param {vec4} a the first operand
 		 * @param {vec4} b the second operand
@@ -290,13 +295,14 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec4.distance}
-		 * @function
+		 * Alias for {@link #distance}
+		 *
+		 * @property {Function}
 		 */
 		vec4.dist = vec4.distance;
 
 		/**
-		 * Calculates the squared euclidian distance between two vec4's
+		 * Calculates the squared euclidian distance between two vectors
 		 *
 		 * @param {vec4} a the first operand
 		 * @param {vec4} b the second operand
@@ -311,8 +317,9 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec4.squaredDistance}
-		 * @function
+		 * Alias for {@link #squaredDistance}
+		 *
+		 * @property {Function}
 		 */
 		vec4.sqrDist = vec4.squaredDistance;
 
@@ -331,8 +338,9 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec4.length}
-		 * @function
+		 * Alias for {@link #length}
+		 *
+		 * @property {Function}
 		 */
 		vec4.len = vec4.length;
 
@@ -351,15 +359,16 @@ define(
 		};
 
 		/**
-		 * Alias for {@link vec4.squaredLength}
-		 * @function
+		 * Alias for {@link #squaredLength}
+		 *
+		 * @property {Function}
 		 */
 		vec4.sqrLen = vec4.squaredLength;
 
 		/**
 		 * Negates the components of a vec4
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a vector to negate
 		 * @returns {vec4} out
 		 */
@@ -374,7 +383,7 @@ define(
 		/**
 		 * Normalize a vec4
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a vector to normalize
 		 * @returns {vec4} out
 		 */
@@ -395,7 +404,7 @@ define(
 		};
 
 		/**
-		 * Calculates the dot product of two vec4's
+		 * Calculates the dot product of two vectors
 		 *
 		 * @param {vec4} a the first operand
 		 * @param {vec4} b the second operand
@@ -406,9 +415,9 @@ define(
 		};
 
 		/**
-		 * Performs a linear interpolation between two vec4's
+		 * Performs a linear interpolation between two vectors
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the first operand
 		 * @param {vec4} b the second operand
 		 * @param {Number} t interpolation amount between the two inputs
@@ -429,7 +438,7 @@ define(
 		/**
 		 * Generates a random vector with the given scale
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {Number} [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
 		 * @returns {vec4} out
 		 */
@@ -449,7 +458,7 @@ define(
 		/**
 		 * Transforms the vec4 with a mat4.
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the vector to transform
 		 * @param {mat4} m matrix to transform with
 		 * @returns {vec4} out
@@ -466,7 +475,7 @@ define(
 		/**
 		 * Transforms the vec4 with a quat
 		 *
-		 * @param {vec4} out the receiving vector
+		 * @param {vec4} out the result vector
 		 * @param {vec4} a the vector to transform
 		 * @param {quat} q quaternion to transform with
 		 * @returns {vec4} out
@@ -489,7 +498,7 @@ define(
 		};
 
 		/**
-		 * Perform some operation over an array of vec4s.
+		 * Perform some operation over an array of vectors.
 		 *
 		 * @param {Array} a the array of vectors to iterate over
 		 * @param {Number} stride Number of elements between the start of each vec4. If 0 assumes tightly packed

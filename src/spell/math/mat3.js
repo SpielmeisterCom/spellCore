@@ -37,6 +37,8 @@ define(
 
 
 		/**
+		 * 3x3 matrix functions
+		 *
 		 * @class spell.math.mat3
 		 * @singleton
 		 * @requires Math
@@ -249,7 +251,7 @@ define(
 		};
 
 		/**
-		 * Multiplies two mat3's
+		 * Multiplies two matrixes
 		 *
 		 * @param {mat3} out the receiving matrix
 		 * @param {mat3} a the first operand
@@ -280,8 +282,9 @@ define(
 		};
 
 		/**
-		 * Alias for {@link mat3.multiply}
-		 * @function
+		 * Alias for {@link #multiply}
+		 *
+		 * @property {Function}
 		 */
 		mat3.mul = mat3.multiply;
 
