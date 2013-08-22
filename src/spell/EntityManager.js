@@ -1,5 +1,5 @@
 /**
- * The EntityManager offers methods for creating, updating and destroying entities and for querying and updating components and component attributes.
+ * The EntityManager offers methods for creating, updating and destroying entities as well as for querying and updating components and component attributes.
  *
  * @class spell.entityManager
  * @singleton
@@ -118,6 +118,7 @@ define(
 		/**
 		 * Updates the world transformation from a local transformation
 		 *
+		 * @private
 		 * @param componentMaps
 		 * @param entityId
 		 * @return {*}
@@ -493,6 +494,7 @@ define(
 		/**
 		 * Normalizes the provided entity config
 		 *
+		 * @private
 		 * @param libraryManager
 		 * @param arg1 can be either an entity template id or a entity config
 		 * @private
@@ -601,6 +603,7 @@ define(
 		 * This function dereferences asset ids. If a component with an asset id attribute is found the reference is resolved and a additional asset attribute
 		 * is added to the component instance.
 		 *
+		 * @private
 		 * @param assetManager
 		 * @param component
 		 * @return {*}
@@ -844,6 +847,7 @@ define(
 		/**
 		 * Sets the attribute of a component to the specified value.
 		 *
+		 * @private
 		 * @param component
 		 * @param attributeId
 		 * @param value
@@ -1420,6 +1424,7 @@ define(
 			/**
 			 * Refreshes all references to assets that components hold
 			 *
+			 * @private
 			 * @param assetManager
 			 */
 			refreshAssetReferences : function( assetManager ) {
@@ -1490,6 +1495,12 @@ define(
 				}
 			},
 
+			/**
+			 * Registers the component specified by componentDefition. Components must be registered with this method before they can be used.
+			 *
+			 * @private
+			 * @param componentDefinition
+			 */
 			registerComponent : function( componentDefinition ) {
 				var componentId = createId( componentDefinition.namespace, componentDefinition.name )
 
