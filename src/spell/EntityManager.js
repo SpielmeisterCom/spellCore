@@ -1045,19 +1045,6 @@ define(
 			},
 
 			/**
-			 * Returns an entity by its id.
-			 *
-			 * NOTE: Do not use this function to frequently query large amounts of entities. In order to process entities frequently with better performance
-			 * define a system input that matches your requirements.
-			 *
-			 * @param {String} entityId the entity id
-			 * @return {Object}
-			 */
-			getEntityById : function( entityId ) {
-				return assembleEntityInstance( this.componentMaps, entityId )
-			},
-
-			/**
 			 * Creates an exact copy of the given entityId
 			 * @param entityId
 			 */
@@ -1104,26 +1091,6 @@ define(
 				}
 
 				return resultIds
-			},
-
-			/**
-			 * Returns a collection of entities which have the requested name.
-			 *
-			 * @param {String} name the name of the entity
-			 * @return {Object}
-			 */
-			getEntitiesByName : function( name ) {
-				var ids = this.getEntityIdsByName( name, undefined )
-
-				var entities = {}
-
-				for( var i = 0, numIds = ids.length; i < numIds; i++ ) {
-					var id = ids[ i ]
-
-					entities[ id ] = this.getEntityById( id )
-				}
-
-				return entities
 			},
 
 			/**
