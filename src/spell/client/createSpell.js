@@ -10,7 +10,7 @@ define(
 		'spell/math/vec2',
 		'spell/math/vec3',
 		'spell/math/vec4',
-		'spell/random/XorShift32'
+		'spell/math/random/XorShift32'
     ],
 	function(
 		mat2,
