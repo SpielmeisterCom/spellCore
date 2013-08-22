@@ -1,6 +1,7 @@
 define(
 	'spell/client/main',
 	[
+		'spell/client/createSpell',
 		'spell/client/development/createDebugMessageHandler',
 		'spell/client/staticInclude',
 		'spell/client/setApplicationModule',
@@ -24,6 +25,7 @@ define(
 		'spell/functions'
 	],
 	function(
+		createSpell,
 		createDebugMessageHandler,
 		staticInclude,
 		setApplicationModule,
@@ -161,7 +163,7 @@ define(
 		}
 
 		var init = function( loaderConfig ) {
-			var spell                = {},
+			var spell                = createSpell(),
 				console              = new Console(),
 				eventManager         = new EventManager(),
 				configurationManager = new ConfigurationManager( eventManager ),
