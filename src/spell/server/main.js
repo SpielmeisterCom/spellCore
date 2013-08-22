@@ -7,7 +7,7 @@ define(
 		'spell/EventManager',
 		'spell/EntityManager',
 		'spell/SceneManager',
-		'spell/shared/util/Console',
+		'spell/Console',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/Types',
 

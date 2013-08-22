@@ -1,5 +1,16 @@
+/**
+ * The Console enables logging of messages. Messages logged to this console are shown in the SpellEd console.
+ *
+ * The following log levels are available: LOG_LEVEL_DEBUG (0), LOG_LEVEL_INFO (1), LOG_LEVEL_WARN (2), LOG_LEVEL_ERROR (3), LOG_LEVEL_SILENT (4). The
+ * log level is used for filtering the logged messages. For example setting the log level to *LOG_LEVEL_WARN* (2) causes all messages with a lower level
+ * to be discarded without being logged. The default log level is LOG_LEVEL_INFO (1). If you want to disable all logging set the log level to
+ * *LOG_LEVEL_SILENT* (4).
+ *
+ * @class spell.console
+ * @singleton
+ */
 define(
-	'spell/shared/util/Console',
+	'spell/Console',
 	[
 		'spell/shared/util/platform/log'
 	],
@@ -35,21 +46,7 @@ define(
 			return logLevels[ level ] + ' - ' + text
 		}
 
-		/**
-		 * @class spell.shared.util.Console
-		 *
-		 * The following log levels are available: LOG_LEVEL_DEBUG (0), LOG_LEVEL_INFO (1), LOG_LEVEL_WARN (2), LOG_LEVEL_ERROR (3), LOG_LEVEL_SILENT (4). The
-		 * log level is used for filtering the logged messages. For example setting the log level to "LOG_LEVEL_WARN" (2) causes all messages with a lower level
-		 * to be discarded without being logged. The default log level is LOG_LEVEL_INFO (1). If you want to disable all logging set the log level to
-		 * "LOG_LEVEL_SILENT" (4).
-		 *
-		 *
-		 * @constructor
-		 *
-		 * Creates a new Console Instance.
-		 *
-		 * @param {Number} level sets the current log level
-		 */
+
 		var Console = function( level ) {
 			validate( level )
 

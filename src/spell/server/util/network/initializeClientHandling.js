@@ -1,7 +1,7 @@
 define(
 	'spell/server/util/network/initializeClientHandling',
 	[
-		'spell/shared/util/Console',
+		'spell/Console',
 
 		'websocket',
 		'spell/functions'

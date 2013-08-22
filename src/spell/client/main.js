@@ -15,7 +15,7 @@ define(
 		'spell/LibraryManager',
 		'spell/shared/util/createModuleLoader',
 		'spell/StatisticsManager',
-		'spell/shared/util/Console',
+		'spell/Console',
 		'spell/shared/util/physics/createBox2dContext',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',

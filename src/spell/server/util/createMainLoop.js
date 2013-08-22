@@ -2,7 +2,7 @@ define(
 	'spell/server/util/createMainLoop',
 	[
 		'spell/Events',
-		'spell/shared/util/Console',
+		'spell/Console',
 		'spell/shared/util/platform/Types',
 		'spell/shared/util/platform/PlatformKit',
 
