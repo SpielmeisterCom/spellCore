@@ -18,6 +18,7 @@ define(
 		 *     var number2 = prng.{@link #next}();
 		 *
 		 * @class spell.math.random.XorShift32
+		 * @constructor
 		 */
 		var XorShift32 = function( seed ) {
 			this.x = seed
