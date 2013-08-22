@@ -1,4 +1,4 @@
-/**
+/*
  * This class is derived from the library "Underscore" which original license follows:
  *
  * Licence Notice Underscore.js 1.3.3:
@@ -25,8 +25,9 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
- *
- *
+ */
+
+/**
  * *spell.functions* is a collection of utility functions akin to [underscore js](http://underscorejs.org).
  *
  * @class spell.functions
