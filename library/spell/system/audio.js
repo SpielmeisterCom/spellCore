@@ -6,12 +6,10 @@
 define(
 	'spell/system/audio',
 	[
-		'spell/Defines',
-		'spell/Events'
+		'spell/Defines'
 	],
 	function(
-		Defines,
-		Events
+		Defines
 	) {
 		'use strict'
 
@@ -60,8 +58,15 @@ define(
 					playSound( entityManager, audioContext, id, soundEmitter )
 				}
 
-				eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterUpdatedHandler )
-				eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterUpdatedHandler )
+				eventManager.subscribe(
+					[ eventManager.EVENT.COMPONENT_CREATED, Defines.SOUND_EMITTER_COMPONENT_ID ],
+					this.soundEmitterUpdatedHandler
+				)
+
+				eventManager.subscribe(
+					[ eventManager.EVENT.COMPONENT_UPDATED, Defines.SOUND_EMITTER_COMPONENT_ID ],
+					this.soundEmitterUpdatedHandler
+				)
 			},
 
 			/**
@@ -72,8 +77,15 @@ define(
 			destroy: function( spell ) {
 				var eventManager = spell.eventManager
 
-				eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterUpdatedHandler )
-				eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.SOUND_EMITTER_COMPONENT_ID ], this.soundEmitterUpdatedHandler )
+				eventManager.unsubscribe(
+					[ eventManager.EVENT.COMPONENT_CREATED, Defines.SOUND_EMITTER_COMPONENT_ID ],
+					this.soundEmitterUpdatedHandler
+				)
+
+				eventManager.unsubscribe(
+					[ eventManager.EVENT.COMPONENT_UPDATED, Defines.SOUND_EMITTER_COMPONENT_ID ],
+					this.soundEmitterUpdatedHandler
+				)
 			},
 
 			/**

@@ -8,7 +8,6 @@ define(
 		'spell/shared/util/createLibraryFilePathsFromIds',
 		'spell/math/util',
 		'spell/shared/util/createId',
-		'spell/Events',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'
@@ -21,7 +20,6 @@ define(
 		createLibraryFilePathsFromIds,
 		mathUtil,
 		createId,
-		Events,
 		PlatformKit,
 
 		_
@@ -79,12 +77,14 @@ define(
 
 			LoadingProgress.prototype = {
 				addBundle : function( name, portion ) {
+					var eventManager = this.eventManager
+
 					// the loading interval is [ 0, 0.99 ], call "complete" to signal progress of 1
 					var handler = _.bind( this.progressHandler, this, portion * 0.99 )
 
 					this.bundles[ name ] = handler
 
-					this.eventManager.subscribe( [ Events.RESOURCE_PROGRESS, name ], handler )
+					eventManager.subscribe( [ eventManager.EVENT.RESOURCE_PROGRESS, name ], handler )
 				},
 				complete : function() {
 					this.progressCallback( 1 )
@@ -96,7 +96,7 @@ define(
 					for( var name in bundles ) {
 						var handler = bundles[ name ]
 
-						eventManager.unsubscribe( [ Events.RESOURCE_PROGRESS, name ], handler )
+						eventManager.unsubscribe( [ eventManager.EVENT.RESOURCE_PROGRESS, name ], handler )
 					}
 				}
 			}
@@ -109,6 +109,7 @@ define(
 			var assetManager         = spell.assetManager,
 				configurationManager = spell.configurationManager,
 				eventManager         = spell.eventManager,
+				EVENT                = eventManager.EVENT,
 				libraryManager       = spell.libraryManager,
 				resources            = spell.resources,
 				entityManager        = spell.entityManager
@@ -124,14 +125,14 @@ define(
 
 
 			eventManager.waitFor(
-				[ Events.RESOURCE_LOADING_COMPLETED, sceneId ],
+				[ EVENT.RESOURCE_LOADING_COMPLETED, sceneId ],
 				function( loadedRecords ) {
 					addIdAsKey( spell.scenes, loadedRecords )
 				}
 
 			).resume( function() {
 				eventManager.waitFor(
-					[ Events.RESOURCE_LOADING_COMPLETED, libraryBundleName ],
+					[ EVENT.RESOURCE_LOADING_COMPLETED, libraryBundleName ],
 					function( loadedRecords ) {
 						var library = groupByType( loadedRecords )
 
@@ -154,16 +155,16 @@ define(
 					}
 
 				).and(
-					[ Events.RESOURCE_LOADING_COMPLETED, resourceBundleName ],
+					[ EVENT.RESOURCE_LOADING_COMPLETED, resourceBundleName ],
 					_.bind( assetManager.injectResources, assetManager )
 
 				).resume( function() {
 					loadingProgress.complete()
 					loadingProgress.destroy()
 
-					eventManager.unsubscribeAll( [ Events.RESOURCE_LOADING_COMPLETED, sceneId ] )
-					eventManager.unsubscribeAll( [ Events.RESOURCE_LOADING_COMPLETED, libraryBundleName ] )
-					eventManager.unsubscribeAll( [ Events.RESOURCE_LOADING_COMPLETED, resourceBundleName ] )
+					eventManager.unsubscribeAll( [ EVENT.RESOURCE_LOADING_COMPLETED, sceneId ] )
+					eventManager.unsubscribeAll( [ EVENT.RESOURCE_LOADING_COMPLETED, libraryBundleName ] )
+					eventManager.unsubscribeAll( [ EVENT.RESOURCE_LOADING_COMPLETED, resourceBundleName ] )
 
 					next()
 				} )

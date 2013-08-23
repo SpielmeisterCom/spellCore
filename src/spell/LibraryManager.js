@@ -6,7 +6,6 @@ define(
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/createLibraryFilePathFromId',
 		'spell/shared/util/platform/PlatformKit',
-		'spell/Events',
 
 		'spell/functions'
 	],
@@ -16,7 +15,6 @@ define(
 		createLibraryFilePath,
 		createLibraryFilePathFromId,
 		PlatformKit,
-		Events,
 
 		_
 	) {
@@ -86,7 +84,7 @@ define(
 				name            = loadingProcess.name
 
 			eventManager.publish(
-				[ Events.RESOURCE_PROGRESS, name ],
+				[ eventManager.EVENT.RESOURCE_PROGRESS, name ],
 				[ progress, loadingProcess.numCompleted, numLibraryPaths ]
 			)
 
@@ -117,7 +115,7 @@ define(
 
 				if( name ) {
 					eventManager.publish(
-						[ Events.RESOURCE_LOADING_COMPLETED, name ],
+						[ eventManager.EVENT.RESOURCE_LOADING_COMPLETED, name ],
 						[ loadedLibraryRecords ]
 					)
 				}

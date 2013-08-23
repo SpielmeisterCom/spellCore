@@ -1,7 +1,6 @@
 define(
 	'spell/server/util/createMainLoop',
 	[
-		'spell/Events',
 		'spell/Console',
 		'spell/shared/util/platform/Types',
 		'spell/shared/util/platform/PlatformKit',
@@ -9,7 +8,6 @@ define(
 		'spell/functions'
 	],
 	function(
-		Events,
 		Console,
 		Types,
 		PlatformKit,
@@ -45,8 +43,8 @@ define(
 			// update interval, we need to maintain a set of all update intervals that subscribers are interested in.
 			var updateIntervals = {}
 
-			eventManager.subscribe( Events.SUBSCRIBE, function( scope, subscriber ) {
-				if ( scope[ 0 ] === Events.LOGIC_UPDATE ) {
+			eventManager.subscribe( eventManager.EVENT.SUBSCRIBE, function( scope, subscriber ) {
+				if ( scope[ 0 ] === eventManager.EVENT.LOGIC_UPDATE ) {
 					var interval = scope[ 1 ]
 					if ( !updateIntervals.hasOwnProperty( interval ) ) {
 						updateIntervals[ interval ] = {
@@ -58,7 +56,7 @@ define(
 			} )
 
 			eventManager.subscribe(
-				Events.CLOCK_SYNC_ESTABLISHED,
+				eventManager.EVENT.CLOCK_SYNC_ESTABLISHED,
 				function( timeInMs ) {
 					remoteGameTimeInMs = timeInMs
 				}
@@ -91,7 +89,7 @@ define(
 						// the browser tab has been in the background for a while and requestAnimationFrame is used.
 						if ( updateInterval.accumulatedTimeInMs <= 5 * deltaTimeInMs ) {
 							eventManager.publish(
-								[ Events.LOGIC_UPDATE, deltaTimeInMsAsString ],
+								[ eventManager.EVENT.LOGIC_UPDATE, deltaTimeInMsAsString ],
 								[
 									updateInterval.localGameTimeInMs,
 									deltaTimeInMs / 1000
@@ -105,7 +103,7 @@ define(
 				} )
 
 
-				eventManager.publish( Events.RENDER_UPDATE, [ localTimeInMs, passedTimeInMs ] )
+				eventManager.publish( eventManager.EVENT.RENDER_UPDATE, [ localTimeInMs, passedTimeInMs ] )
 
 
 				var localGameTimeDifferenceInMs = remoteGameTimeInMs - localTimeInMs

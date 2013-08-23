@@ -1,13 +1,11 @@
 define(
 	'spell/shared/util/platform/private/graphics/initViewport',
 	[
-		'spell/Events',
 		'spell/shared/util/platform/private/getAvailableScreenSize',
 
 		'spell/functions'
 	],
 	function(
-		Events,
 		getAvailableScreenSize,
 
 		_
@@ -75,7 +73,7 @@ define(
 				}
 
 				eventManager.publish(
-					Events.AVAILABLE_SCREEN_SIZE_CHANGED,
+					eventManager.EVENT.AVAILABLE_SCREEN_SIZE_CHANGED,
 					[ id ? getAvailableScreenSize( id ) : initialScreenSize ]
 				)
 			}

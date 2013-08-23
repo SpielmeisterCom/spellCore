@@ -1,13 +1,11 @@
 define(
 	'spell/shared/util/Timer',
 	[
-		'spell/Events',
 		'spell/shared/util/platform/Types',
 
 		'spell/functions'
 	],
 	function(
-		Events,
 		Types,
 
 		_
@@ -56,7 +54,7 @@ define(
 			)
 
 			eventManager.subscribe(
-				Events.CLOCK_SYNC_ESTABLISHED,
+				eventManager.EVENT.CLOCK_SYNC_ESTABLISHED,
 				_.bind(
 					function( initialRemoteGameTimeInMs ) {
 						this.newRemoteTime = this.remoteTime = this.localTime = initialRemoteGameTimeInMs

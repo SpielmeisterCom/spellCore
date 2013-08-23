@@ -2,13 +2,11 @@ define(
 	'spell/system/processInputCommands',
 	[
 		'spell/Defines',
-		'spell/Events',
 
 		'spell/functions'
 	],
 	function(
 		Defines,
-		Events,
 
 		_
 	) {
@@ -52,14 +50,17 @@ define(
 					playerControlledIds.push( entityId )
 				}
 
-				spell.eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CONTROLLABLE_COMPONENT_ID ], processControllableComponentEvents )
-				spell.eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CONTROLLABLE_COMPONENT_ID ], processControllableComponentEvents )
+				var eventManager = spell.eventManager
+
+				eventManager.subscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.CONTROLLABLE_COMPONENT_ID ], processControllableComponentEvents )
+				eventManager.subscribe( [ eventManager.EVENT.COMPONENT_UPDATED, Defines.CONTROLLABLE_COMPONENT_ID ], processControllableComponentEvents )
 			},
 			destroy : function( spell ) {
-				var processControllableComponentEvents = this.processControllableComponentEvents
+				var eventManager                       = spell.eventManager,
+					processControllableComponentEvents = this.processControllableComponentEvents
 
-				spell.eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CONTROLLABLE_COMPONENT_ID ], processControllableComponentEvents )
-				spell.eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CONTROLLABLE_COMPONENT_ID ], processControllableComponentEvents )
+				eventManager.unsubscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.CONTROLLABLE_COMPONENT_ID ], processControllableComponentEvents )
+				eventManager.unsubscribe( [ eventManager.EVENT.COMPONENT_UPDATED, Defines.CONTROLLABLE_COMPONENT_ID ], processControllableComponentEvents )
 			},
 			activate : function( spell ) {},
 			deactivate : function( spell ) {},

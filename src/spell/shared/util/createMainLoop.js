@@ -1,7 +1,6 @@
 define(
 	'spell/shared/util/createMainLoop',
 	[
-		'spell/Events',
 		'spell/data/Tree',
 		'spell/shared/util/StopWatch',
 		'spell/shared/util/Timer',
@@ -11,7 +10,6 @@ define(
 		'spell/functions'
 	],
 	function(
-		Events,
 		Tree,
 		StopWatch,
 		Timer,
