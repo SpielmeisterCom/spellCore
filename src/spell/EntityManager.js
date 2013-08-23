@@ -917,7 +917,7 @@ define(
 			 * * **id** [String] - if specified the entity will be created using this id. Please note: you should not use this function unless you know what you're doing. Normally the engine assigns entityIds automatically.
 			 * * **name** [String] - a name for this entity. If specified, you can use the {@link #getEntityIdsByName} function to lookup named entities to their entityIds
 			 *
-			 * Example usage:
+			 * Example:
 			 *
 			 *     // create a new entity with the given components
 			 *     var entityId = spell.entityManager.createEntity({
@@ -1131,7 +1131,7 @@ define(
 			/**
 			 * Reassigns an entity to become the child of a parent entity.
 			 *
-			 * Example usage:
+			 * Example:
 			 *
 			 *     // make entity A the child of entity B
 			 *     spell.entityManager.reassign( aId, bId )
@@ -1165,7 +1165,7 @@ define(
 			/**
 			 * Adds a component to an entity.
 			 *
-			 * Example usage:
+			 * Example:
 			 *
 			 *     // add a component with it's default configuration to this entity
 			 *     spell.entityManager.addComponent( entityId, "spell.component.2d.graphics.debug.box" )
@@ -1247,7 +1247,7 @@ define(
 			/**
 			 * Updates the attributes of a component. Returns true when successful, false otherwise.
 			 *
-			 * Example usage:
+			 * Example:
 			 *     // update a component of an entity
 			 *     spell.entityManager.updateComponent(
 			 *         entityId,
@@ -1297,7 +1297,7 @@ define(
 			/**
 			 * Updates one attribute of a component. Returns true when successful, false otherwise.
 			 *
-			 * Example usage:
+			 * Example:
 			 *     // update a specific attribute of a component of an entity
 			 *     spell.entityManager.updateComponentAttribute(
 			 *         entityId,

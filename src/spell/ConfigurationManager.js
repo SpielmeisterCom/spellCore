@@ -1,6 +1,11 @@
 /**
  * The ConfigurationManager offers access to various engine internal configuration options.
  *
+ * Example:
+ *     var screenSize = spell.configurationManager.getValue( 'currentScreenSize' )
+ *
+ *     spell.logger.debug( screenSize )
+ *
  * @class spell.configurationManager
  * @singleton
  */
@@ -187,7 +192,7 @@ define(
 
 		ConfigurationManager.prototype = {
 			/**
-			 * Sets the configuration option *key* to *value*.
+			 * Sets the configuration option key to value.
 			 *
 			 * @private
 			 * @param {String} key
@@ -223,12 +228,7 @@ define(
 			},
 
 			/**
-			 * Returns the configuration option specified by *key*.
-			 *
-			 * Example:
-			 *     var screenSize = spell.configurationManager.getValue( 'currentScreenSize' )
-			 *
-			 *     spell.logger.debug( screenSize )
+			 * Returns the configuration option specified by key.
 			 *
 			 * @param {String} key
 			 * @return {String}
