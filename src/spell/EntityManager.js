@@ -836,9 +836,9 @@ define(
 			// apply scale factor
 			if( transforms && transforms[ entityId ] ) {
 
-                //TODO: using the worldScale would be more correct here, but as we don't want to calculate it
-                //only for this test, use the local scale
-				//vec2.multiply( dimensions, dimensions, transforms[ entityId ].scale )
+                // TODO: using the worldScale would be more correct here, but as we don't want to calculate it
+                // only for this test, use the local scale
+				// vec2.multiply( dimensions, dimensions, transforms[ entityId ].scale )
 			}
 
 			return dimensions
@@ -919,14 +919,14 @@ define(
 			 *
 			 * Example usage:
 			 *
-			 *     //create a new entity with the given components
+			 *     // create a new entity with the given components
 			 *     var entityId = spell.entityManager.createEntity({
 			 *         config: {
 			 *             "spell.component.2d.transform": {
 			 *                 "translation": [ 100, 200 ]
 			 *             },
 			 *             "spell.component.visualObject": {
-			 *               //if no configuration is specified the default values of this component will be used
+			 *               // if no configuration is specified the default values of this component will be used
 			 *             },
 			 *             "spell.component.2d.graphics.appearance": {
 			 *                 "assetId": "appearance:library.identifier.of.my.static.appearance"
@@ -934,14 +934,14 @@ define(
 			 *         }
 			 *     })
 			 *
-			 *     //create a new entity with child entities
+			 *     // create a new entity with child entities
 			 *     var entityId = spell.entityManager.createEntity({
 			 *         config: {
 			 *             "spell.component.2d.transform": {
 			 *                 "translation": [ 100, 200 ]
 			 *             },
 			 *             "spell.component.visualObject": {
-			 *               //if no configuration is specified the default values of this component will be used
+			 *               // if no configuration is specified the default values of this component will be used
 			 *             },
 			 *             "spell.component.2d.graphics.appearance": {
 			 *                 "assetId": "appearance:library.identifier.of.my.static.appearance"
@@ -951,10 +951,10 @@ define(
 			 *             {
 			 *                 config: {
 			 *                     "spell.component.2d.transform": {
-			 *                         "translation": [ -15, 20 ] //translation is relative to the parent
+			 *                         "translation": [ -15, 20 ] // translation is relative to the parent
 			 *                     },
 			 *                     "spell.component.visualObject": {
-			 *                       //if no configuration is specified the default values of this component will be used
+			 *                       // if no configuration is specified the default values of this component will be used
 			 *                     },
 			 *                     "spell.component.2d.graphics.appearance": {
 			 *                         "assetId": "appearance:library.identifier.of.my.other.static.appearance"
@@ -964,12 +964,12 @@ define(
 			 *         ]
 			 *     })
 			 *
-			 *     //create a new entity from an entity template
+			 *     // create a new entity from an entity template
 			 *     var entityId = spell.entityManager.createEntity({
 			 *         entityTemplateId: 'library.identifier.of.my.template'
 			 *     })
 			 *
-			 *     //create a new entity from an entity template and override values from the template
+			 *     // create a new entity from an entity template and override values from the template
 			 *     var entityId = spell.entityManager.createEntity({
 			 *         entityTemplateId: 'library.identifier.of.my.template',
 			 *         config: {
@@ -1133,10 +1133,10 @@ define(
 			 *
 			 * Example usage:
 			 *
-			 *     //make entity A the child of entity B
+			 *     // make entity A the child of entity B
 			 *     spell.entityManager.reassign( aId, bId )
 			 *
-			 *     //make entity A a root entity, that is it has no parent
+			 *     // make entity A a root entity, that is it has no parent
 			 *     spell.entityManager.reassign( aId )
 			 *
 			 * @param entityId the id of the entity which gets reassigned
@@ -1167,10 +1167,10 @@ define(
 			 *
 			 * Example usage:
 			 *
-			 *     //add a component with it's default configuration to this entity
+			 *     // add a component with it's default configuration to this entity
 			 *     spell.entityManager.addComponent( entityId, "spell.component.2d.graphics.debug.box" )
 			 *
-			 *     //add a component to this entity and override a default value
+			 *     // add a component to this entity and override a default value
 			 *     spell.entityManager.addComponent(
 			 *         entityId,
 			 *         "spell.component.2d.graphics.textApperance",

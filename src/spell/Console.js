@@ -6,6 +6,10 @@
  * to be discarded without being logged. The default log level is LOG_LEVEL_INFO (1). If you want to disable all logging set the log level to
  * *LOG_LEVEL_SILENT* (4).
  *
+ * Example:
+ *
+ *     spell.console.debug( "collected gold : " + numGold )
+ *
  * @class spell.console
  * @singleton
  */
