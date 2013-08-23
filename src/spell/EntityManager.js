@@ -16,7 +16,6 @@ define(
 		'spell/shared/util/createId',
 		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
-		'spell/Events',
 		'spell/data/entity/applyEntityConfig',
 		'spell/stringUtil',
 		'spell/shared/util/platform/PlatformKit',
@@ -38,7 +37,6 @@ define(
 		createId,
 		createModuleId,
 		deepClone,
-		Events,
 		applyEntityConfig,
 		stringUtil,
 		PlatformKit,
@@ -260,7 +258,10 @@ define(
 			for( var componentId in entityComponents ) {
 				component = entityComponents[ componentId ]
 
-				eventManager.publish( [ Events.COMPONENT_CREATED, componentId ], [ component, entityId ] )
+				eventManager.publish(
+					[ eventManager.EVENT.COMPONENT_CREATED, componentId ],
+					[ component, entityId ]
+				)
 			}
 		}
 
@@ -319,7 +320,7 @@ define(
 			}
 
 			if( removedEntity ) {
-				eventManager.publish( Events.ENTITY_DESTROYED, entityId )
+				eventManager.publish( eventManager.EVENT.ENTITY_DESTROYED, entityId )
 
 				if( childrenComponent ) {
 					var childrenIds = childrenComponent.ids
@@ -756,7 +757,7 @@ define(
 
 
 			_.extend( entityComponents, childrenComponentConfig )
-			eventManager.publish( Events.ENTITY_CREATED, [ entityId, entityComponents ] )
+			eventManager.publish( eventManager.EVENT.ENTITY_CREATED, [ entityId, entityComponents ] )
 
 			return entityId
 		}
@@ -1002,14 +1003,14 @@ define(
 					if( parentChildrenComponent ) {
 						parentChildrenComponent.ids.push( entityId )
 
-						this.eventManager.publish( [ Events.COMPONENT_UPDATED, CHILDREN_COMPONENT_ID ], [ parentChildrenComponent, entityId ] )
+						this.eventManager.publish( [ this.eventManager.EVENT.COMPONENT_UPDATED, CHILDREN_COMPONENT_ID ], [ parentChildrenComponent, entityId ] )
 
 					} else {
 						parentChildrenComponent = { ids : [ entityId ] }
 
 						childrenComponents[ parentId ] = parentChildrenComponent
 
-						this.eventManager.publish( [ Events.COMPONENT_CREATED, CHILDREN_COMPONENT_ID ], [ parentChildrenComponent, entityId ] )
+						this.eventManager.publish( [ this.eventManager.EVENT.COMPONENT_CREATED, CHILDREN_COMPONENT_ID ], [ parentChildrenComponent, entityId ] )
 					}
 				}
 
@@ -1289,7 +1290,7 @@ define(
 					updateVisualObject( this.componentMaps, entityId )
 				}
 
-				this.eventManager.publish( [ Events.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
+				this.eventManager.publish( [ this.eventManager.EVENT.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
 
 				return true
 			},
@@ -1342,7 +1343,10 @@ define(
 					updateVisualObject( this.componentMaps, entityId )
 				}
 
-				this.eventManager.publish( [ Events.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
+				this.eventManager.publish(
+					[ this.eventManager.EVENT.COMPONENT_UPDATED, componentId ],
+					[ component, entityId ]
+				)
 
 				return true
 			},

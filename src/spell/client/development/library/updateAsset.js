@@ -10,7 +10,6 @@ define(
 		'spell/shared/util/createId',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/createLibraryFilePathFromId',
-		'spell/Events',
 
 		'spell/functions'
 	],
@@ -24,7 +23,6 @@ define(
 		createId,
 		createLibraryFilePath,
 		createLibraryFilePathFromId,
-		Events,
 
 		_
 	) {
@@ -33,6 +31,7 @@ define(
 
 		return function( spell, payload ) {
 			var assetManager         = spell.assetManager,
+				eventManager         = spell.eventManager,
 				configurationManager = spell.configurationManager,
 				definition           = payload.definition,
 				id                   = createId( definition.namespace, definition.name ),
@@ -53,8 +52,8 @@ define(
 
 				updateAssets( assetManager, loadedAssets, true )
 
-				spell.eventManager.publish(
-					[ Events.ASSET_UPDATED, definition.subtype ],
+				eventManager.publish(
+					[ eventManager.EVENT.ASSET_UPDATED, definition.subtype ],
 					[ typedId ]
 				)
 			}
@@ -90,8 +89,8 @@ define(
 
 							spell.entityManager.refreshAssetReferences( assetManager )
 
-							spell.eventManager.publish(
-								[ Events.ASSET_UPDATED, definition.subtype ],
+							eventManager.publish(
+								[ eventManager.EVENT.ASSET_UPDATED, definition.subtype ],
 								[ typedId ]
 							)
 						}
@@ -114,8 +113,8 @@ define(
 
 						spell.entityManager.updateAssetReferences( typedId, assetManager.get( typedId ) )
 
-						spell.eventManager.publish(
-							[ Events.ASSET_UPDATED, definition.subtype ],
+						eventManager.publish(
+							[ eventManager.EVENT.ASSET_UPDATED, definition.subtype ],
 							[ typedId ]
 						)
 					}

@@ -1,7 +1,6 @@
 define(
 	'spell/shared/util/scene/Scene',
 	[
-		'spell/Events',
 		'spell/Defines',
 		'spell/data/entity/flatten',
 		'spell/data/SortedMap',
@@ -18,7 +17,6 @@ define(
 		'spell/functions'
 	],
 	function(
-		Events,
 		Defines,
 		flattenEntityConfig,
 		SortedMap,

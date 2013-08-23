@@ -8,13 +8,11 @@ define(
 	'spell/EventManager',
 	[
 		'spell/data/forestMultiMap',
-		'spell/Events',
 
 		'spell/functions'
 	],
 	function(
 		forestMultiMap,
-		Events,
 
 		_
 	) {
@@ -87,7 +85,7 @@ define(
 					subscriber
 				)
 
-				this.publish( Events.SUBSCRIBE, [ wrappedScope, subscriber ] )
+				this.publish( this.EVENT.SUBSCRIBE, [ wrappedScope, subscriber ] )
 			},
 
 			/**
@@ -112,7 +110,7 @@ define(
 
 				forestMultiMap.remove( this.subscribers, wrappedScope, subscriber )
 
-				this.publish( Events.UNSUBSCRIBE, [ wrappedScope, subscriber ] )
+				this.publish( this.EVENT.UNSUBSCRIBE, [ wrappedScope, subscriber ] )
 			},
 
 			/**
@@ -131,7 +129,7 @@ define(
 
 				forestMultiMap.remove( this.subscribers, wrappedScope )
 
-				this.publish( Events.UNSUBSCRIBE, [ wrappedScope ] )
+				this.publish( this.EVENT.UNSUBSCRIBE, [ wrappedScope ] )
 			},
 
 			/**
@@ -192,7 +190,22 @@ define(
 			/**
 			 * Map of supported events.
 			 */
-			EVENT : Events
+			EVENT : {
+				SERVER_CONNECTION_ESTABLISHED : 0,
+				MESSAGE_RECEIVED : 1,
+				CLOCK_SYNC_ESTABLISHED : 2,
+				COMPONENT_CREATED : 3,
+				COMPONENT_UPDATED : 4,
+				ENTITY_CREATED : 5,
+				ENTITY_DESTROYED : 6,
+				ASSET_UPDATED : 7,
+				SUBSCRIBE : 8,
+				UNSUBSCRIBE : 9,
+				RESOURCE_PROGRESS : 10,
+				RESOURCE_LOADING_COMPLETED : 11,
+				AVAILABLE_SCREEN_SIZE_CHANGED : 12,
+				SCREEN_RESIZE : 13
+			}
 		}
 
 		return EventManager

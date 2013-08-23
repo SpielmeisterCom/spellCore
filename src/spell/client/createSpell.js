@@ -1,6 +1,6 @@
 define(
 	'spell/client/createSpell',
-    [
+    [,
 		'spell/math/mat2',
 		'spell/math/mat2d',
 		'spell/math/mat3',
@@ -29,6 +29,7 @@ define(
 
 		return function() {
 			return {
+				events : Events,
 				math : {
 					random : {
 						XorShift32 : XorShift32
