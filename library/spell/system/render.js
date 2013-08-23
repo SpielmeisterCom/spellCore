@@ -12,7 +12,6 @@ define(
 		'spell/client/util/createEffectiveCameraDimensions',
 		'spell/client/util/createIncludedRectangle',
 		'spell/Defines',
-		'spell/Events',
 		'spell/shared/util/translate',
 		'spell/shared/util/platform/PlatformKit',
 
@@ -35,7 +34,6 @@ define(
 		createEffectiveCameraDimensions,
 		createIncludedRectangle,
 		Defines,
-		Events,
 		translate,
 		PlatformKit,
 
@@ -537,7 +535,7 @@ define(
 				this
 			)
 
-			eventManager.subscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
+			eventManager.subscribe( eventManager.EVENT.SCREEN_RESIZE, this.screenResizeHandler )
 
 
 			this.cameraChangedHandler = _.bind(
@@ -547,8 +545,8 @@ define(
 				this
 			)
 
-			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
-			eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+			eventManager.subscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+			eventManager.subscribe( [ eventManager.EVENT.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 
 
 			// HACK: textAppearances should get translated when they are created or when the current language is changed
@@ -559,7 +557,7 @@ define(
 				spell.configurationManager.getValue( 'currentLanguage' )
 			)
 
-			eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
+			eventManager.subscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
 
 
 //			statisticsManager = spell.statisticsManager
@@ -575,10 +573,10 @@ define(
 		var destroy = function( spell ) {
 			var eventManager = this.eventManager
 
-			eventManager.unsubscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
-			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
-			eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
-			eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
+			eventManager.unsubscribe( eventManager.EVENT.SCREEN_RESIZE, this.screenResizeHandler )
+			eventManager.unsubscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+			eventManager.unsubscribe( [ eventManager.EVENT.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+			eventManager.unsubscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
 
 			this.context.clear()
 		}

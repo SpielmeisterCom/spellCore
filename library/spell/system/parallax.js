@@ -7,12 +7,10 @@ define(
 	'spell/system/parallax',
 	[
 		'spell/Defines',
-		'spell/Events',
 		'spell/math/vec2'
 	],
 	function(
 		Defines,
-		Events,
 		vec2
 	) {
 		'use strict'

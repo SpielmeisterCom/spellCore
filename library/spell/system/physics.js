@@ -2,7 +2,6 @@ define(
 	'spell/system/physics',
 	[
 		'spell/Defines',
-		'spell/Events',
 		'spell/math/util',
 		'spell/shared/util/platform/PlatformKit',
 
@@ -10,7 +9,6 @@ define(
 	],
 	function(
 		Defines,
-		Events,
 		mathUtil,
 		PlatformKit,
 
@@ -272,13 +270,17 @@ define(
 			this.entityCreatedHandler = _.bind( createBody, null, spell, this.config.debug, this.world )
 			this.entityDestroyHandler = _.bind( this.removedEntitiesQueue.push, this.removedEntitiesQueue )
 
-			spell.eventManager.subscribe( Events.ENTITY_CREATED, this.entityCreatedHandler )
-			spell.eventManager.subscribe( Events.ENTITY_DESTROYED, this.entityDestroyHandler )
+			var eventManager = spell.eventManager
+
+			eventManager.subscribe( eventManager.EVENT.ENTITY_CREATED, this.entityCreatedHandler )
+			eventManager.subscribe( eventManager.EVENT.ENTITY_DESTROYED, this.entityDestroyHandler )
 		}
 
 		var destroy = function( spell ) {
-			spell.eventManager.unsubscribe( Events.ENTITY_CREATED, this.entityCreatedHandler )
-			spell.eventManager.unsubscribe( Events.ENTITY_DESTROYED, this.entityDestroyHandler )
+			var eventManager = spell.eventManager
+
+			eventManager.unsubscribe( eventManager.EVENT.ENTITY_CREATED, this.entityCreatedHandler )
+			eventManager.unsubscribe( eventManager.EVENT.ENTITY_DESTROYED, this.entityDestroyHandler )
 		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {

@@ -2,7 +2,6 @@ define(
 	'spell/system/processPointerInput',
 	[
 		'spell/Defines',
-		'spell/Events',
 		'spell/client/util/createEffectiveCameraDimensions',
 		'spell/math/util',
 		'spell/math/vec2',
@@ -11,7 +10,6 @@ define(
 	],
 	function(
 		Defines,
-		Events,
 		createEffectiveCameraDimensions,
 		mathUtil,
 		vec2,
@@ -157,8 +155,8 @@ define(
 					this
 				)
 
-				eventManager.subscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
-				eventManager.subscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+				eventManager.subscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+				eventManager.subscribe( [ eventManager.EVENT.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 
 
 				this.screenResizeHandler = _.bind(
@@ -168,7 +166,7 @@ define(
 					this
 				)
 
-				eventManager.subscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
+				eventManager.subscribe( eventManager.EVENT.SCREEN_RESIZE, this.screenResizeHandler )
 			},
 
 			/**
@@ -179,9 +177,9 @@ define(
 			destroy: function( spell ) {
 				var eventManager = spell.eventManager
 
-				eventManager.unsubscribe( [ Events.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
-				eventManager.unsubscribe( [ Events.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
-				eventManager.unsubscribe( Events.SCREEN_RESIZE, this.screenResizeHandler )
+				eventManager.unsubscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+				eventManager.unsubscribe( [ eventManager.EVENT.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
+				eventManager.unsubscribe( eventManager.EVENT.SCREEN_RESIZE, this.screenResizeHandler )
 			},
 
 			/**
