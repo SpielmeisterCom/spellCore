@@ -1,6 +1,6 @@
 define(
 	'spell/client/createSpell',
-    [,
+    [
 		'spell/math/mat2',
 		'spell/math/mat2d',
 		'spell/math/mat3',
