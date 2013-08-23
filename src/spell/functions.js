@@ -28,7 +28,7 @@
  */
 
 /**
- * *spell.functions* is a collection of utility functions akin to [underscore js](http://underscorejs.org).
+ * *spell.functions* is a collection of utility functions akin to [underscore.js](http://underscorejs.org).
  *
  * @class spell.functions
  * @singleton
