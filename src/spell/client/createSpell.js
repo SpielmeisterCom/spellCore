@@ -29,7 +29,6 @@ define(
 
 		return function() {
 			return {
-				events : Events,
 				math : {
 					random : {
 						XorShift32 : XorShift32
