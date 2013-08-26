@@ -1,6 +1,15 @@
 /**
  * The AudioContext provides playing of sound effects.
  *
+ * Example:
+ *
+ *     spell.audioContext.play(
+ *         spell.assetManager.get( 'sound:myGame.creakyNoise' ).resource,
+ *         'creakyNoise',
+ *         0.7,
+ *         false
+ *     )
+ *
  * @class spell.audioContext
  * @singleton
  */

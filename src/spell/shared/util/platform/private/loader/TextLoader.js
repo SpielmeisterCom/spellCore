@@ -2,13 +2,11 @@ define(
 	'spell/shared/util/platform/private/loader/TextLoader',
 	[
 		'spell/shared/util/createUrlWithCacheBreaker',
-		'spell/Events',
 
 		'spell/functions'
 	],
 	function(
 		createUrlWithCacheBreaker,
-		Events,
 
 		_
 	) {

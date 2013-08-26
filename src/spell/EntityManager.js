@@ -16,7 +16,6 @@ define(
 		'spell/shared/util/createId',
 		'spell/shared/util/createModuleId',
 		'spell/shared/util/deepClone',
-		'spell/Events',
 		'spell/data/entity/applyEntityConfig',
 		'spell/stringUtil',
 		'spell/shared/util/platform/PlatformKit',
@@ -38,7 +37,6 @@ define(
 		createId,
 		createModuleId,
 		deepClone,
-		Events,
 		applyEntityConfig,
 		stringUtil,
 		PlatformKit,
@@ -260,7 +258,10 @@ define(
 			for( var componentId in entityComponents ) {
 				component = entityComponents[ componentId ]
 
-				eventManager.publish( [ Events.COMPONENT_CREATED, componentId ], [ component, entityId ] )
+				eventManager.publish(
+					[ eventManager.EVENT.COMPONENT_CREATED, componentId ],
+					[ component, entityId ]
+				)
 			}
 		}
 
@@ -319,7 +320,7 @@ define(
 			}
 
 			if( removedEntity ) {
-				eventManager.publish( Events.ENTITY_DESTROYED, entityId )
+				eventManager.publish( eventManager.EVENT.ENTITY_DESTROYED, entityId )
 
 				if( childrenComponent ) {
 					var childrenIds = childrenComponent.ids
@@ -756,7 +757,7 @@ define(
 
 
 			_.extend( entityComponents, childrenComponentConfig )
-			eventManager.publish( Events.ENTITY_CREATED, [ entityId, entityComponents ] )
+			eventManager.publish( eventManager.EVENT.ENTITY_CREATED, [ entityId, entityComponents ] )
 
 			return entityId
 		}
@@ -836,9 +837,9 @@ define(
 			// apply scale factor
 			if( transforms && transforms[ entityId ] ) {
 
-                //TODO: using the worldScale would be more correct here, but as we don't want to calculate it
-                //only for this test, use the local scale
-				//vec2.multiply( dimensions, dimensions, transforms[ entityId ].scale )
+                // TODO: using the worldScale would be more correct here, but as we don't want to calculate it
+                // only for this test, use the local scale
+				// vec2.multiply( dimensions, dimensions, transforms[ entityId ].scale )
 			}
 
 			return dimensions
@@ -917,16 +918,16 @@ define(
 			 * * **id** [String] - if specified the entity will be created using this id. Please note: you should not use this function unless you know what you're doing. Normally the engine assigns entityIds automatically.
 			 * * **name** [String] - a name for this entity. If specified, you can use the {@link #getEntityIdsByName} function to lookup named entities to their entityIds
 			 *
-			 * Example usage:
+			 * Example:
 			 *
-			 *     //create a new entity with the given components
+			 *     // create a new entity with the given components
 			 *     var entityId = spell.entityManager.createEntity({
 			 *         config: {
 			 *             "spell.component.2d.transform": {
 			 *                 "translation": [ 100, 200 ]
 			 *             },
 			 *             "spell.component.visualObject": {
-			 *               //if no configuration is specified the default values of this component will be used
+			 *               // if no configuration is specified the default values of this component will be used
 			 *             },
 			 *             "spell.component.2d.graphics.appearance": {
 			 *                 "assetId": "appearance:library.identifier.of.my.static.appearance"
@@ -934,14 +935,14 @@ define(
 			 *         }
 			 *     })
 			 *
-			 *     //create a new entity with child entities
+			 *     // create a new entity with child entities
 			 *     var entityId = spell.entityManager.createEntity({
 			 *         config: {
 			 *             "spell.component.2d.transform": {
 			 *                 "translation": [ 100, 200 ]
 			 *             },
 			 *             "spell.component.visualObject": {
-			 *               //if no configuration is specified the default values of this component will be used
+			 *               // if no configuration is specified the default values of this component will be used
 			 *             },
 			 *             "spell.component.2d.graphics.appearance": {
 			 *                 "assetId": "appearance:library.identifier.of.my.static.appearance"
@@ -951,10 +952,10 @@ define(
 			 *             {
 			 *                 config: {
 			 *                     "spell.component.2d.transform": {
-			 *                         "translation": [ -15, 20 ] //translation is relative to the parent
+			 *                         "translation": [ -15, 20 ] // translation is relative to the parent
 			 *                     },
 			 *                     "spell.component.visualObject": {
-			 *                       //if no configuration is specified the default values of this component will be used
+			 *                       // if no configuration is specified the default values of this component will be used
 			 *                     },
 			 *                     "spell.component.2d.graphics.appearance": {
 			 *                         "assetId": "appearance:library.identifier.of.my.other.static.appearance"
@@ -964,12 +965,12 @@ define(
 			 *         ]
 			 *     })
 			 *
-			 *     //create a new entity from an entity template
+			 *     // create a new entity from an entity template
 			 *     var entityId = spell.entityManager.createEntity({
 			 *         entityTemplateId: 'library.identifier.of.my.template'
 			 *     })
 			 *
-			 *     //create a new entity from an entity template and override values from the template
+			 *     // create a new entity from an entity template and override values from the template
 			 *     var entityId = spell.entityManager.createEntity({
 			 *         entityTemplateId: 'library.identifier.of.my.template',
 			 *         config: {
@@ -1002,14 +1003,14 @@ define(
 					if( parentChildrenComponent ) {
 						parentChildrenComponent.ids.push( entityId )
 
-						this.eventManager.publish( [ Events.COMPONENT_UPDATED, CHILDREN_COMPONENT_ID ], [ parentChildrenComponent, entityId ] )
+						this.eventManager.publish( [ this.eventManager.EVENT.COMPONENT_UPDATED, CHILDREN_COMPONENT_ID ], [ parentChildrenComponent, entityId ] )
 
 					} else {
 						parentChildrenComponent = { ids : [ entityId ] }
 
 						childrenComponents[ parentId ] = parentChildrenComponent
 
-						this.eventManager.publish( [ Events.COMPONENT_CREATED, CHILDREN_COMPONENT_ID ], [ parentChildrenComponent, entityId ] )
+						this.eventManager.publish( [ this.eventManager.EVENT.COMPONENT_CREATED, CHILDREN_COMPONENT_ID ], [ parentChildrenComponent, entityId ] )
 					}
 				}
 
@@ -1131,12 +1132,12 @@ define(
 			/**
 			 * Reassigns an entity to become the child of a parent entity.
 			 *
-			 * Example usage:
+			 * Example:
 			 *
-			 *     //make entity A the child of entity B
+			 *     // make entity A the child of entity B
 			 *     spell.entityManager.reassign( aId, bId )
 			 *
-			 *     //make entity A a root entity, that is it has no parent
+			 *     // make entity A a root entity, that is it has no parent
 			 *     spell.entityManager.reassign( aId )
 			 *
 			 * @param entityId the id of the entity which gets reassigned
@@ -1165,12 +1166,12 @@ define(
 			/**
 			 * Adds a component to an entity.
 			 *
-			 * Example usage:
+			 * Example:
 			 *
-			 *     //add a component with it's default configuration to this entity
+			 *     // add a component with it's default configuration to this entity
 			 *     spell.entityManager.addComponent( entityId, "spell.component.2d.graphics.debug.box" )
 			 *
-			 *     //add a component to this entity and override a default value
+			 *     // add a component to this entity and override a default value
 			 *     spell.entityManager.addComponent(
 			 *         entityId,
 			 *         "spell.component.2d.graphics.textApperance",
@@ -1247,7 +1248,7 @@ define(
 			/**
 			 * Updates the attributes of a component. Returns true when successful, false otherwise.
 			 *
-			 * Example usage:
+			 * Example:
 			 *     // update a component of an entity
 			 *     spell.entityManager.updateComponent(
 			 *         entityId,
@@ -1289,7 +1290,7 @@ define(
 					updateVisualObject( this.componentMaps, entityId )
 				}
 
-				this.eventManager.publish( [ Events.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
+				this.eventManager.publish( [ this.eventManager.EVENT.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
 
 				return true
 			},
@@ -1297,7 +1298,7 @@ define(
 			/**
 			 * Updates one attribute of a component. Returns true when successful, false otherwise.
 			 *
-			 * Example usage:
+			 * Example:
 			 *     // update a specific attribute of a component of an entity
 			 *     spell.entityManager.updateComponentAttribute(
 			 *         entityId,
@@ -1342,7 +1343,10 @@ define(
 					updateVisualObject( this.componentMaps, entityId )
 				}
 
-				this.eventManager.publish( [ Events.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
+				this.eventManager.publish(
+					[ this.eventManager.EVENT.COMPONENT_UPDATED, componentId ],
+					[ component, entityId ]
+				)
 
 				return true
 			},

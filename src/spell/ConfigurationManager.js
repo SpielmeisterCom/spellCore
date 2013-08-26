@@ -1,6 +1,11 @@
 /**
  * The ConfigurationManager offers access to various engine internal configuration options.
  *
+ * Example:
+ *     var screenSize = spell.configurationManager.getValue( 'currentScreenSize' )
+ *
+ *     spell.logger.debug( screenSize )
+ *
  * @class spell.configurationManager
  * @singleton
  */
@@ -11,7 +16,6 @@ define(
 		'spell/math/util',
 		'spell/math/vec2',
 		'spell/shared/util/platform/PlatformKit',
-		'spell/Events',
 
 		'spell/functions'
 	],
@@ -20,7 +24,6 @@ define(
 		mathUtil,
 		vec2,
 		PlatformKit,
-		Events,
 
 		_
 	) {
@@ -145,7 +148,7 @@ define(
 			this.eventManager = eventManager
 
 			eventManager.subscribe(
-				[ Events.AVAILABLE_SCREEN_SIZE_CHANGED ],
+				[ eventManager.EVENT.AVAILABLE_SCREEN_SIZE_CHANGED ],
 				_.bind(
 					function( availableScreenSize ) {
 						var config               = this.config,
@@ -178,7 +181,10 @@ define(
 							throw 'Error: Screen mode \'' + screenMode + '\' is not supported.'
 						}
 
-						eventManager.publish( Events.SCREEN_RESIZE, [ config.currentScreenSize ] )
+						eventManager.publish(
+							eventManager.EVENT.SCREEN_RESIZE,
+							[ config.currentScreenSize ]
+						)
 					},
 					this
 				)
@@ -187,7 +193,7 @@ define(
 
 		ConfigurationManager.prototype = {
 			/**
-			 * Sets the configuration option *key* to *value*.
+			 * Sets the configuration option key to value.
 			 *
 			 * @private
 			 * @param {String} key
@@ -213,7 +219,7 @@ define(
 					key === 'screenMode' ) {
 
 					this.eventManager.publish(
-						Events.AVAILABLE_SCREEN_SIZE_CHANGED,
+						this.eventManager.EVENT.AVAILABLE_SCREEN_SIZE_CHANGED,
 						[ PlatformKit.getAvailableScreenSize( this.getValue( 'id' ) ) ]
 					)
 
@@ -223,12 +229,7 @@ define(
 			},
 
 			/**
-			 * Returns the configuration option specified by *key*.
-			 *
-			 * Example:
-			 *     var screenSize = spell.configurationManager.getValue( 'currentScreenSize' )
-			 *
-			 *     spell.logger.debug( screenSize )
+			 * Returns the configuration option specified by key.
 			 *
 			 * @param {String} key
 			 * @return {String}

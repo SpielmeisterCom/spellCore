@@ -1,3 +1,18 @@
+/**
+ * The AssetManager provides access to asset instances.
+ *
+ * Example:
+ *
+ *     spell.audioContext.play(
+ *         spell.assetManager.get( 'sound:myGame.creakyNoise' ).resource,
+ *         'creakyNoise',
+ *         0.7,
+ *         false
+ *     )
+ *
+ * @class spell.assetManager
+ * @singleton
+ */
 define(
 	'spell/AssetManager',
 	function() {
@@ -10,12 +25,43 @@ define(
 		}
 
 		AssetManager.prototype = {
+			/**
+			 * Adds an asset.
+			 *
+			 * @param {String} id
+			 * @param {String} asset
+			 */
 			add : function( id, asset ) {
 				this.assets[ id ] = asset
 			},
+
+			/**
+			 * Gets an asset by id.
+			 *
+			 * @param {String} id
+			 * @return {Object}
+			 */
 			get : function( id ) {
 				return this.assets[ id ]
 			},
+
+			/**
+			 * Returns true if an asset with the specified id exists.
+			 *
+			 * @param {String} id
+			 * @return {Boolean}
+			 */
+			has : function( id ) {
+				return !!this.assets[ id ]
+			},
+
+			/**
+			 * Returns the library ids of all assets which reference a specific resource id.
+			 *
+			 * @private
+			 * @param {String} resourceId
+			 * @return {Array}
+			 */
 			getLibraryIdByResourceId : function( resourceId ) {
 				var assets = this.assets,
 					ids = []
@@ -32,9 +78,13 @@ define(
 
 				return ids
 			},
-			has : function( id ) {
-				return !!this.assets[ id ]
-			},
+
+			/**
+			 * Inject the provided resources into asset instances where applicable.
+			 *
+			 * @private
+			 * @param {Object} resources
+			 */
 			injectResources : function( resources ) {
 				var assets         = this.assets,
 					libraryManager = this.libraryManager
@@ -54,6 +104,12 @@ define(
 					}
 				}
 			},
+
+			/**
+			 * Frees all asset instances.
+			 *
+			 * @private
+			 */
 			free : function() {
 				this.assets = {}
 			}
