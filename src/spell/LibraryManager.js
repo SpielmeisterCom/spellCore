@@ -5,6 +5,7 @@ define(
 		'spell/shared/util/createIdFromLibraryFilePath',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/createLibraryFilePathFromId',
+		'spell/shared/util/createUrlWithCacheBreaker',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/functions'
@@ -14,6 +15,7 @@ define(
 		createIdFromLibraryFilePath,
 		createLibraryFilePath,
 		createLibraryFilePathFromId,
+		createUrlWithCacheBreaker,
 		PlatformKit,
 
 		_
@@ -146,8 +148,7 @@ define(
 
 		var startLoadingProcess = function( cache, eventManager, resourceTypeToLoaderFactory, loadingProcesses, loadingProcess ) {
 			var omitCache       = loadingProcess.omitCache,
-				libraryPaths    = loadingProcess.libraryPaths,
-				invalidateCache = loadingProcess.invalidateCache
+				libraryPaths    = loadingProcess.libraryPaths
 
 			for( var i = 0, n = libraryPaths.length; i < n; i++ ) {
 				var libraryPath = libraryPaths[ i ],
@@ -177,10 +178,12 @@ define(
 					throw 'Error: Unable to load resource of type "' + loadingProcess.type + '".'
 				}
 
+				var url = loadingProcess.libraryUrl ?
+					loadingProcess.libraryUrl + '/' + libraryPathUrlUsedForLoading :
+					libraryPathUrlUsedForLoading
+
 				var loader = loaderFactory(
-					invalidateCache,
-					loadingProcess.libraryUrl,
-					libraryPathUrlUsedForLoading,
+					loadingProcess.invalidateCache ? createUrlWithCacheBreaker( url ) : url,
 					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
 					_.bind( onErrorCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
 					_.bind( onTimedOutCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath )

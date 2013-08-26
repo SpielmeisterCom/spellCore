@@ -1,13 +1,9 @@
 define(
 	'spell/shared/util/platform/private/loader/SoundLoader',
 	[
-		'spell/shared/util/createUrlWithCacheBreaker',
-
 		'spell/functions'
 	],
 	function(
-		createUrlWithCacheBreaker,
-
 		_
 	) {
 		'use strict'
@@ -23,11 +19,9 @@ define(
 		}
 
 
-		var SoundLoader = function( audioContext, invalidateCache, libraryUrl, libraryPath, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+		var SoundLoader = function( audioContext, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 			this.audioContext    = audioContext
-			this.invalidateCache = invalidateCache
-			this.libraryUrl      = libraryUrl
-			this.libraryPath     = libraryPath
+			this.url             = url
 			this.onLoadCallback  = onLoadCallback
 			this.onErrorCallback = onErrorCallback
 			this.loaded          = false
@@ -35,12 +29,8 @@ define(
 
 		SoundLoader.prototype = {
 			start : function() {
-				var url = this.libraryUrl ?
-					this.libraryUrl + '/' + this.libraryPath :
-					this.libraryPath
-
 				this.audioContext.loadBuffer(
-					this.invalidateCache ? createUrlWithCacheBreaker( url ) : url,
+					this.url,
 					_.bind( onLoad, this )
 				)
 			}

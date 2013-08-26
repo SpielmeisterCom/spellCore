@@ -1,13 +1,9 @@
 define(
 	'spell/shared/util/platform/private/loader/TextLoader',
 	[
-		'spell/shared/util/createUrlWithCacheBreaker',
-
 		'spell/functions'
 	],
 	function(
-		createUrlWithCacheBreaker,
-
 		_
 	) {
 		'use strict'
@@ -45,11 +41,9 @@ define(
 		}
 
 
-		var TextLoader = function( postProcess, invalidateCache, libraryUrl, libraryPath, onLoadCallback, onErrorCallback ) {
+		var TextLoader = function( postProcess, url, onLoadCallback, onErrorCallback ) {
 			this.postProcess     = postProcess
-			this.invalidateCache = invalidateCache
-			this.libraryUrl      = libraryUrl
-			this.libraryPath     = libraryPath
+			this.url             = this.url
 			this.onLoadCallback  = onLoadCallback
 			this.onErrorCallback = onErrorCallback
 			this.loaded          = false
@@ -57,19 +51,13 @@ define(
 
 		TextLoader.prototype = {
 			start : function() {
-				var url     = this.libraryUrl ? this.libraryUrl + '/' + this.libraryPath : this.libraryPath,
-					request = new XMLHttpRequest()
+				var request = new XMLHttpRequest()
 
 				request.onload             = _.bind( onLoad, this, request )
 				request.onreadystatechange = _.bind( onReadyStateChange, this, request )
 				request.onerror            = _.bind( onError, this )
 
-				request.open(
-					'GET',
-					this.invalidateCache ? createUrlWithCacheBreaker( url ) : url,
-					true
-				)
-
+				request.open( 'GET', this.url, true )
 				request.send()
 			}
 		}

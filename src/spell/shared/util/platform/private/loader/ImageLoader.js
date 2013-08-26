@@ -1,13 +1,9 @@
 define(
 	'spell/shared/util/platform/private/loader/ImageLoader',
 	[
-		'spell/shared/util/createUrlWithCacheBreaker',
-
 		'spell/functions'
 	],
 	function(
-		createUrlWithCacheBreaker,
-
 		_
 	) {
 		'use strict'
@@ -39,11 +35,9 @@ define(
 		}
 
 
-		var ImageLoader = function( renderingContext, invalidateCache, libraryUrl, libraryPath, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+		var ImageLoader = function( renderingContext, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 			this.renderingContext = renderingContext
-			this.invalidateCache  = invalidateCache
-			this.libraryUrl       = libraryUrl
-			this.libraryPath      = libraryPath
+			this.url              = url
 			this.onLoadCallback   = onLoadCallback
 			this.onErrorCallback  = onErrorCallback
 			this.loaded           = false
@@ -56,14 +50,7 @@ define(
 				image.onload             = _.bind( onLoad, this, image )
 				image.onreadystatechange = _.bind( onReadyStateChange, this, image )
 				image.onerror            = _.bind( onError, this, image )
-
-				var url = this.libraryUrl ?
-					this.libraryUrl + '/' + this.libraryPath :
-					this.libraryPath
-
-				image.src = this.invalidateCache ?
-					createUrlWithCacheBreaker( url ) :
-					url
+				image.src                = this.url
 			}
 		}
 
