@@ -10,7 +10,7 @@ define(
 
 
 		return function( url ) {
-			return url + '?t=' + ( Types.Time.getCurrentInMs() / 1000 | 0 )
+			return url + '?t=' + Types.Time.getCurrentInMs()
 		}
 	}
 )

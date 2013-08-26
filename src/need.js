@@ -9,6 +9,10 @@
 		return array.indexOf( value ) !== -1
 	}
 
+	var createUrlWithCacheBreaker = function( url ) {
+		return url + '?t=' + Date.now()
+	}
+
 	var createModuleSource = function( scriptName, source ) {
 		return source + '\n//@ sourceURL=' + scriptName
 	}
@@ -16,7 +20,12 @@
 	var createRequest = function( url ) {
 		var request = new XMLHttpRequest()
 
-		request.open( 'GET', url, false )
+		request.open(
+			'GET',
+			createUrlWithCacheBreaker( url ),
+			false
+		)
+
 		request.send()
 
 		return request
