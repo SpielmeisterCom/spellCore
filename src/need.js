@@ -6,7 +6,7 @@
 	var modules  = {}
 
 	var createModuleSource = function( scriptName, source ) {
-		return source + '\n//@ sourceURL=' + scriptName
+		return source + '\n//# sourceURL=' + scriptName
 	}
 
 	var createRequest = function( url ) {
