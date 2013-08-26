@@ -35,23 +35,29 @@ define(
 		}
 
 		return function( spell, payload ) {
-			var moduleId = createModuleId( payload.id )
+			var libraryId = payload.id,
+				moduleId  = createModuleId( libraryId )
 
 			// reload amd module
 			PlatformKit.ModuleLoader.define( moduleId, payload.moduleSource )
 
-			// restart the affected systems
+			var dependentModules = PlatformKit.ModuleLoader.createDependentModules( moduleId ).concat( moduleId )
+
+			// restart affected systems
 			var sceneManager = spell.sceneManager,
-				systemIds    = createAffectedSystems(
-					spell.libraryManager,
-					PlatformKit.ModuleLoader.createDependentModules( moduleId ).concat( moduleId )
-				)
+				systemIds    = createAffectedSystems( spell.libraryManager, dependentModules )
 
 			_.each(
 				systemIds,
 				function( systemId ) {
 					sceneManager.restartSystem( systemId )
 				}
+			)
+
+			// refresh references in component instances
+			spell.entityManager.updateAssetReferences(
+				'script:' + libraryId,
+				PlatformKit.ModuleLoader.require( moduleId )
 			)
 		}
 	}
