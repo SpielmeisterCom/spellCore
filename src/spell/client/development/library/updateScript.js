@@ -38,7 +38,7 @@ define(
 			var moduleId = createModuleId( payload.id )
 
 			// reload amd module
-			define( moduleId, payload.moduleSource )
+			PlatformKit.ModuleLoader.define( moduleId, payload.moduleSource )
 
 			// restart the affected systems
 			var sceneManager = spell.sceneManager,

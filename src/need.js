@@ -5,6 +5,10 @@
 ( function( document ) {
 	var modules  = {}
 
+	var arrayContains = function( array, value ) {
+		return array.indexOf( value ) !== -1
+	}
+
 	var createModuleSource = function( scriptName, source ) {
 		return source + '\n//@ sourceURL=' + scriptName
 	}
@@ -87,33 +91,28 @@
 		return body.apply( null, moduleInstanceArgs )
 	}
 
-	var traceDependentModules = function( names, dependentModules ) {
-		dependentModules = dependentModules || []
+	var createDependentModulesR = function( dependencyName, result ) {
+		for( var dependentName in modules ) {
+			var dependentModule = modules[ dependentName ]
 
-		for( var i = 0, numNames = names.length; i < numNames; i++ ) {
-			var name = names[ i ]
+			if( !dependentModule ) {
+				throw 'Error: Module id "' + dependentName + '" could not be resolved.'
+			}
 
-			for( var moduleName in modules ) {
-				var module       = modules[ moduleName ],
-					dependencies = module.dependencies
+			if( arrayContains( dependentModule.dependencies, dependencyName ) &&
+				!arrayContains( result, dependentName ) ) {
 
-				if( !dependencies ) continue
+				result.push( dependentName )
 
-				for( var i = 0, numDependencies = dependencies.length; i < numDependencies; i++ ) {
-					var dependencyName = dependencies[ i ]
-
-					if( name === dependencyName ) {
-						dependentModules.push( moduleName )
-					}
-				}
+				createDependentModulesR( dependentName, result )
 			}
 		}
 
-		return dependentModules
+		return result
 	}
 
 	var createDependentModules = function( name ) {
-		return traceDependentModules( [ name ] )
+		return createDependentModulesR( name, [] )
 	}
 
 	var define = function( name ) {
@@ -126,14 +125,30 @@
 			throw 'Error: Module definition is invalid.'
 		}
 
+		// call this function again through eval
 		if( typeof( arg1 ) === 'string' ) {
 			eval( createModuleSource( name + '.js', arg1 ) )
 
-		} else {
-			modules[ name ] = {
-				body         : ( numArguments === 2 ? arg1 : arguments[ 2 ] ),
-				dependencies : ( numArguments === 2 ? undefined : arg1 )
+			return
+		}
+
+		// "redefine" the module
+		if( modules[ name ] ) {
+			modules[ name ].instance = undefined
+
+			// reset instances of all dependent modules so that consecutive calls to require need to rebuild their dependencies with updated module instances
+			var dependentModules = createDependentModules( name )
+
+			for( var i = 0, n = dependentModules.length; i < n; i++ ) {
+				modules[ dependentModules[ i ] ].instance = undefined
 			}
+		}
+
+		// create the module
+		modules[ name ] = {
+			body         : numArguments === 2 ? arg1 : arguments[ 2 ],
+			dependencies : numArguments === 2 ? [] : arg1,
+			instance     : undefined
 		}
 	}
 
@@ -161,7 +176,7 @@
 		return module.instance
 	}
 
-	window.define  = define
+	window.define = define
 	window.require = require
 	window.createDependentModules = createDependentModules
 } )( document )
