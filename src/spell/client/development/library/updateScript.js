@@ -57,7 +57,7 @@ define(
 			// refresh references in component instances
 			spell.entityManager.updateAssetReferences(
 				'script:' + libraryId,
-				PlatformKit.ModuleLoader.require( moduleId )
+				spell.moduleLoader.require( moduleId )
 			)
 		}
 	}
