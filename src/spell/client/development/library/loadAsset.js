@@ -24,15 +24,21 @@ define(
 					onLoadingCompleted : function( loadedLibraryRecords ) {
 						updateAssets( spell.assetManager, loadedLibraryRecords )
 
-						// load file
-						spell.libraryManager.load(
-							createFilesToLoad( spell.configurationManager, loadedLibraryRecords ),
-							{
-								isMetaDataLoad     : false,
-								omitCache          : true,
-								onLoadingCompleted : next
-							}
-						)
+						var filesToLoad = createFilesToLoad( spell.configurationManager, loadedLibraryRecords )
+
+						if( filesToLoad.length > 0 ) {
+							spell.libraryManager.load(
+								filesToLoad,
+								{
+									isMetaDataLoad     : false,
+									omitCache          : true,
+									onLoadingCompleted : next
+								}
+							)
+
+						} else {
+							next()
+						}
 					}
 				}
 			)

@@ -86,6 +86,8 @@ define(
 			 * @param {Object} resources
 			 */
 			injectResources : function( resources ) {
+				if( !resources ) return
+
 				var assets         = this.assets,
 					libraryManager = this.libraryManager
 
