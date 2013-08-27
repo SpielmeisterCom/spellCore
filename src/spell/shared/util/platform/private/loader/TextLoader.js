@@ -43,7 +43,7 @@ define(
 
 		var TextLoader = function( postProcess, url, onLoadCallback, onErrorCallback ) {
 			this.postProcess     = postProcess
-			this.url             = this.url
+			this.url             = url
 			this.onLoadCallback  = onLoadCallback
 			this.onErrorCallback = onErrorCallback
 			this.loaded          = false
