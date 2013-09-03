@@ -148,7 +148,7 @@ define(
 			spell.console.debug( 'client started' )
 
 			var run = function() {
-				spell.sceneManager.startScene( spell.applicationModule.startScene, {}, !isModeDevelopment )
+				spell.sceneManager.startScene( spell.applicationModule.startScene, undefined, !isModeDevelopment )
 				spell.mainLoop.run()
 			}
 
