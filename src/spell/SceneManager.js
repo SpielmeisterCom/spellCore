@@ -166,7 +166,6 @@ define(
 			 * @param {Boolean} showLoadingScene if true the loading scene is displayed
 			 */
 			changeScene : function( targetSceneId, initialConfig, showLoadingScene ) {
-				initialConfig = initialConfig || {}
 				showLoadingScene = showLoadingScene || false
 
 				if( !this.isModeDevelopment ) {
