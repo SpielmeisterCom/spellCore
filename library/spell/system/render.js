@@ -61,8 +61,8 @@ define(
 //		var statisticsManager,
 //			performance = window.performance
 
-		var translateTextAppearance = function( libraryManager, currentLanguage, textAppearance ) {
-			var text = translate( libraryManager, currentLanguage, textAppearance.translationAssetId, textAppearance.text )
+		var translateTextAppearance = function( assetManager, currentLanguage, textAppearance ) {
+			var text = translate( assetManager, currentLanguage, textAppearance.translationAssetId, textAppearance.text )
 			if( !text ) return
 
 			textAppearance.renderText = text
@@ -553,7 +553,7 @@ define(
 			this.translateTextAppearanceHandler = _.bind(
 				translateTextAppearance,
 				null,
-				spell.libraryManager,
+				spell.assetManager,
 				spell.configurationManager.getValue( 'currentLanguage' )
 			)
 

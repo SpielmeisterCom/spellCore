@@ -4,10 +4,10 @@ define(
 		'use strict'
 
 
-		return function( libraryManager, currentLanguage, translationAssetId, text ) {
+		return function( assetManager, currentLanguage, translationAssetId, text ) {
 			if( !translationAssetId ) return
 
-			var translation = libraryManager.get( translationAssetId )
+			var translation = assetManager.get( translationAssetId )
 			if( !translation ) return
 
 			var translatedText = translation.config[ text ]
