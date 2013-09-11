@@ -205,6 +205,8 @@ define(
 					libraryManager  = this.libraryManager,
 					executionGroups = this.executionGroups
 
+				entityManager.init()
+
 				executionGroups.render = createSystems(
 					spell,
 					entityManager,
@@ -256,7 +258,7 @@ define(
 				this.script.destroy( this.spell, sceneConfig )
 
 				// removing all entities
-				this.entityManager.init()
+				this.entityManager.destroy()
 
 				// destroying systems
 				invoke( executionGroups.render, 'destroy', this.statisticsManager, false, [ spell, sceneConfig ] )
