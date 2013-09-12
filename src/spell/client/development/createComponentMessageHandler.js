@@ -16,7 +16,7 @@ define(
 				var success = spell.entityManager.updateComponent( payload.entityId, payload.componentId, payload.config )
 
 				if( !success ) {
-					spell.console.error( 'Could not update component \'' + payload.componentId + '\' in entity ' + payload.entityId + '.' )
+					spell.console.error( 'Could not update component "' + payload.componentId + '" in entity ' + payload.entityId + '.' )
 				}
 			}
 
