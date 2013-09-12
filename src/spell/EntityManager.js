@@ -523,7 +523,7 @@ define(
 			return entityConfig
 		}
 
-		var createMetaDataComponents = function( libraryManager, moduleLoader, parentId, name, entityTemplateId ) {
+		var createMetaDataComponents = function( spell, libraryManager, moduleLoader, parentId, name, entityTemplateId ) {
 			var result = {},
 				component
 
@@ -687,7 +687,7 @@ define(
 			var entityId = getEntityId( entityConfig.id )
 
 			// creating meta data components which the engine requires
-			var metaDataComponents = createMetaDataComponents( libraryManager, moduleLoader, parentId, entityConfig.name, entityTemplateId )
+			var metaDataComponents = createMetaDataComponents( spell, libraryManager, moduleLoader, parentId, entityConfig.name, entityTemplateId )
 
 			addComponents( componentMaps, eventManager, spatialIndex, entityId, metaDataComponents )
 
