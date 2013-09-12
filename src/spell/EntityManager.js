@@ -53,7 +53,7 @@ define(
 
 		var nextEntityId                     = 1,
 			createComponentType              = PlatformKit.createComponentType,
-			ROOT_COMPONENT_ID                = Defines.ROOT_COMPONENT_ID,
+			ROOT_ENTITY_ID                   = '0',
 			CHILDREN_COMPONENT_ID            = Defines.CHILDREN_COMPONENT_ID,
 			PARENT_COMPONENT_ID              = Defines.PARENT_COMPONENT_ID,
 			METADATA_COMPONENT_ID            = Defines.METADATA_COMPONENT_ID,
@@ -414,56 +414,31 @@ define(
 			return result
 		}
 
-		var attachEntityToParent = function( componentMaps, entityId, parentEntityId ) {
-			var parentComponents    = componentMaps[ PARENT_COMPONENT_ID ],
-				childrenComponents  = componentMaps[ CHILDREN_COMPONENT_ID ],
-				children            = childrenComponents[ parentEntityId ]
+		var changeParent = function( componentMaps, entityId, oldParentEntityId, newParentEntityId ) {
+			newParentEntityId = newParentEntityId || ROOT_ENTITY_ID
 
-			if( children ) {
-				children.ids.push( entityId )
+			if( entityId === newParentEntityId ) return true
+
+			var childrenComponents = componentMaps[ CHILDREN_COMPONENT_ID ]
+
+			// detach entity from old parent
+			var oldParentChildrenComponent = childrenComponents[ oldParentEntityId ]
+			if( !oldParentChildrenComponent ) return false
+
+			var oldParentChildrenIds = oldParentChildrenComponent.ids,
+				index                = _.indexOf( oldParentChildrenIds, entityId )
+
+			if( index >= 0 ) {
+				arrayRemove( oldParentChildrenIds, index )
 			}
 
-			parentComponents[ entityId ] = { id : parentEntityId }
-		}
+			// attach entity to new parent
+			var newParentChildrenComponent = childrenComponents[ newParentEntityId ]
+			if( !newParentChildrenComponent ) return false
 
-		var detachEntityFromParent = function( childrenComponents, entityId, parentEntityId ) {
-			for( var id in childrenComponents ) {
-				var children = childrenComponents[ id ],
-					index    = _.indexOf( children.ids, entityId )
+			newParentChildrenComponent.ids.push( entityId )
 
-				if( index !== -1 ) {
-					arrayRemove( children.ids, index )
-
-					break
-				}
-			}
-		}
-
-		var reassignEntity = function( componentMaps, entityId, parentEntityId ) {
-			if( entityId === parentEntityId ) return
-
-			var rootComponents     = componentMaps[ ROOT_COMPONENT_ID ],
-				childrenComponents = componentMaps[ CHILDREN_COMPONENT_ID ],
-				isRoot             = !!rootComponents[ entityId ]
-
-			if( isRoot && !parentEntityId ) return
-
-			if( parentEntityId ) {
-				detachEntityFromParent( childrenComponents, entityId, parentEntityId )
-				attachEntityToParent( componentMaps, entityId, parentEntityId )
-
-				if( isRoot ) {
-					// remove root component from entity
-					delete rootComponents[ entityId ]
-				}
-			}
-
-			if( !isRoot && !parentEntityId ) {
-				// just got promoted to root
-				rootComponents[ entityId ] = {}
-
-				detachEntityFromParent( childrenComponents, entityId, parentEntityId )
-			}
+			return true
 		}
 
 		var addToSpatialIndex = function( spatialIndex, componentMaps, dimensions, entityId ) {
@@ -522,9 +497,9 @@ define(
 			var entityConfig = {
 				children         : arg1.children || [],
 				config           : arg1.config || {},
-				id               : arg1.id ? arg1.id : undefined,
-				parentId         : arg1.parentId,
-				name             : arg1.name || '',
+				id               : arg1.id,
+				parentId         : arg1.parentId !== undefined ? arg1.parentId : ROOT_ENTITY_ID,
+				name             : arg1.name,
 				entityTemplateId : entityTemplateId
 			}
 
@@ -548,23 +523,30 @@ define(
 			return entityConfig
 		}
 
-		var createMetaDataComponents = function( isRoot, parentId, name, entityTemplateId ) {
-			var result = {}
+		var createMetaDataComponents = function( libraryManager, moduleLoader, parentId, name, entityTemplateId ) {
+			var result = {},
+				component
 
-			if( isRoot && !parentId ) {
-				result[ ROOT_COMPONENT_ID ] = {}
-			}
+			// PARENT_COMPONENT_ID
+			result[ PARENT_COMPONENT_ID ] = component = createComponent(
+				spell,
+				moduleLoader,
+				libraryManager.get( PARENT_COMPONENT_ID ),
+				PARENT_COMPONENT_ID
+			)
 
-			if( parentId ) {
-				result[ PARENT_COMPONENT_ID ] = {
-					id : parentId
-				}
-			}
+			component.id = parentId
 
-			result[ METADATA_COMPONENT_ID ] = {
-				name : name,
-				entityTemplateId : entityTemplateId
-			}
+			// METADATA_COMPONENT_ID
+			result[ METADATA_COMPONENT_ID ] = component = createComponent(
+				spell,
+				moduleLoader,
+				libraryManager.get( METADATA_COMPONENT_ID ),
+				METADATA_COMPONENT_ID
+			)
+
+			component.name = name
+			component.entityTemplateId = entityTemplateId
 
 			return result
 		}
@@ -689,26 +671,23 @@ define(
 			return createComponentsTM( spell, assetManager, libraryManager, moduleLoader, config, entityTemplateId, entityTemplate )
 		}
 
-		var createEntity = function( spell, assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig, isRoot ) {
+		var createEntity = function( spell, assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig ) {
 			entityConfig = normalizeEntityConfig( libraryManager, entityConfig )
 
 			if( !entityConfig ) throw 'Error: Supplied invalid arguments.'
 
-			var entityTemplateId   = entityConfig.entityTemplateId,
-				config             = entityConfig.config,
-				parentId           = entityConfig.parentId
+			var entityTemplateId = entityConfig.entityTemplateId,
+				config           = entityConfig.config,
+				parentId         = entityConfig.parentId
 
 			if( !entityTemplateId && !config ) {
 				throw 'Error: Supplied invalid arguments.'
 			}
 
-			isRoot = isRoot === true ||
-				( isRoot === undefined && !parentId )
-
 			var entityId = getEntityId( entityConfig.id )
 
 			// creating meta data components which the engine requires
-			var metaDataComponents = createMetaDataComponents( isRoot, parentId, entityConfig.name, entityTemplateId )
+			var metaDataComponents = createMetaDataComponents( libraryManager, moduleLoader, parentId, entityConfig.name, entityTemplateId )
 
 			addComponents( componentMaps, eventManager, spatialIndex, entityId, metaDataComponents )
 
@@ -722,7 +701,8 @@ define(
 				entityConfig.children,
 				function( entityConfig ) {
 					entityConfig.parentId = entityId
-					return createEntity( spell, assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig, false )
+
+					return createEntity( spell, assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig )
 				}
 			)
 
@@ -740,27 +720,16 @@ define(
 
 			// check for validity: is the name unique?
 			if( entityConfig.name ) {
-				var siblingIds
+				var parentChildrenComponent = componentMaps[ CHILDREN_COMPONENT_ID ][ parentId ]
 
-				if( isRoot ) {
-					siblingIds = _.keys( componentMaps[ ROOT_COMPONENT_ID ] )
-
-				} else {
-					var parentChildrenComponent = componentMaps[ CHILDREN_COMPONENT_ID ][ parentId ]
-
-					if( parentChildrenComponent ) {
-						siblingIds = parentChildrenComponent.ids
-					}
-				}
-
-				if( siblingIds &&
-					isAmbiguousSiblingName( componentMaps, siblingIds, entityId, entityConfig.name ) ) {
+				if( parentChildrenComponent &&
+					isAmbiguousSiblingName( componentMaps, parentChildrenComponent.ids, entityId, entityConfig.name ) ) {
 
 					throw 'Error: The name "' + entityConfig.name + '" of entity ' + entityId + ' collides with one if its siblings. Entity siblings must have unique names.'
 				}
 			}
 
-			_.extend( entityComponents, childrenComponentConfig )
+			_.extend( entityComponents, metaDataComponents, childrenComponentConfig )
 			eventManager.publish( eventManager.EVENT.ENTITY_CREATED, [ entityId, entityComponents ] )
 
 			return entityId
@@ -1111,6 +1080,14 @@ define(
 			 */
 			init : function() {
 				this.spatialIndex = new QuadTree( this.configurationManager.getValue( 'quadTreeSize' ) )
+
+				// create root entity
+				var entityConfig = {
+					id : ROOT_ENTITY_ID,
+					parentId : ''
+				}
+
+				createEntity( this.spell, this.assetManager, this.eventManager, this.libraryManager, this.moduleLoader, this.componentMaps, this.spatialIndex, entityConfig )
             },
 
 			/**
@@ -1135,23 +1112,23 @@ define(
 			},
 
 			/**
-			 * Reassigns an entity to become the child of a parent entity.
+			 * Changes the parent of the specified entity.
 			 *
 			 * Example:
 			 *
 			 *     // make entity A the child of entity B
-			 *     spell.entityManager.reassign( aId, bId )
+			 *     spell.entityManager.changeParentEntity( aId, bId )
 			 *
 			 *     // make entity A a root entity, that is it has no parent
-			 *     spell.entityManager.reassign( aId )
+			 *     spell.entityManager.changeParentEntity( aId )
 			 *
 			 * @param entityId the id of the entity which gets reassigned
-			 * @param parentEntityId the id of the entity which will be the parent entity
+			 * @param newParentEntityId the id of the entity which will be the parent entity
 			 */
-			reassignEntity : function( entityId, parentEntityId ) {
+			changeParentEntity : function( entityId, newParentEntityId ) {
 				if( !entityId ) throw 'Error: Missing entity id.'
 
-				reassignEntity( this.componentMaps, entityId, parentEntityId )
+				this.updateComponent( entityId, PARENT_COMPONENT_ID, { id : newParentEntityId } )
 			},
 
 			/**
@@ -1273,17 +1250,26 @@ define(
 				var component = this.getComponentById( entityId, componentId )
 				if( !component ) return false
 
+				var oldComponentState = deepClone( component )
+
 				updateComponentTM( this.assetManager, this.moduleLoader, this.componentsWithAssets, componentId, component, attributeConfig )
 
 				var componentMaps = this.componentMaps,
+					eventManager  = this.eventManager,
 					spatialIndex  = this.spatialIndex
 
-				if( componentId === TRANSFORM_COMPONENT_ID ) {
+				if( componentId === PARENT_COMPONENT_ID ) {
+					oldComponentState.id
+
+					changeParent( componentMaps, entityId, oldComponentState.id, component.id )
+					updateWorldTransform( componentMaps, eventManager, spatialIndex, true, entityId )
+
+				} else if( componentId === TRANSFORM_COMPONENT_ID ) {
 					if( attributeConfig.translation ||
 						attributeConfig.scale ||
 						attributeConfig.rotation !== undefined ) {
 
-						updateWorldTransform( componentMaps, this.eventManager, spatialIndex, true, entityId )
+						updateWorldTransform( componentMaps, eventManager, spatialIndex, true, entityId )
 					}
 
 				} else if( componentId === TEXTURE_MATRIX_COMPONENT_ID ) {
@@ -1299,7 +1285,7 @@ define(
 					updateVisualObject( componentMaps, entityId )
 				}
 
-				this.eventManager.publish( [ this.eventManager.EVENT.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
+				eventManager.publish( [ eventManager.EVENT.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
 
 				return true
 			},

@@ -5,7 +5,7 @@ define(
 
 
 		return {
-			ROOT_COMPONENT_ID                         : 'spell.component.entityComposite.root',
+			ROOT_ENTITY_ID                            : '0',
 			PARENT_COMPONENT_ID                       : 'spell.component.entityComposite.parent',
 			CHILDREN_COMPONENT_ID                     : 'spell.component.entityComposite.children',
 			METADATA_COMPONENT_ID                     : 'spell.component.entityMetaData',
