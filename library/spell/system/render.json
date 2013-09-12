@@ -11,10 +11,6 @@
 			"componentId": "spell.component.2d.transform"
 		},
 		{
-			"name": "roots",
-			"componentId": "spell.component.entityComposite.root"
-		},
-		{
 			"name": "childrenComponents",
 			"componentId": "spell.component.entityComposite.children"
 		},

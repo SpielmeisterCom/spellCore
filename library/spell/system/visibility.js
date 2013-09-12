@@ -58,7 +58,7 @@ define(
 						children : childrenComponent ? childrenComponent.ids : [],
 						layer : visualObject.layer,
 						id : entityId,
-						parent : parentComponent ? parentComponent.id : 0
+						parent : parentComponent ? parentComponent.id : '0'
 					}
 
 					if( visualObject.pass === 'ui' ) {
