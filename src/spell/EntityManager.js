@@ -707,13 +707,19 @@ define(
 			)
 
 			// adding the descendant entity ids to this entity
-			var childrenComponentConfig = {}
+			var childrenComponent = createComponent(
+				spell,
+				moduleLoader,
+				libraryManager.get( CHILDREN_COMPONENT_ID ),
+				CHILDREN_COMPONENT_ID
+			)
 
-			childrenComponentConfig[ CHILDREN_COMPONENT_ID ] = {
-				ids : childEntityIds
-			}
+			childrenComponent.ids = childrenComponent.ids.concat( childEntityIds )
 
-			addComponents( componentMaps, eventManager, spatialIndex, entityId, childrenComponentConfig )
+			var childrenComponents = {} // actually it is just one component
+			childrenComponents[ CHILDREN_COMPONENT_ID ] = childrenComponent
+
+			addComponents( componentMaps, eventManager, spatialIndex, entityId, childrenComponents )
 
 			// HACK: now that the parent-child structure is in place the spatial index can be updated for real
 			updateSpatialIndex( componentMaps, spatialIndex, entityId )
@@ -729,7 +735,7 @@ define(
 				}
 			}
 
-			_.extend( entityComponents, metaDataComponents, childrenComponentConfig )
+			_.extend( entityComponents, metaDataComponents, childrenComponents )
 			eventManager.publish( eventManager.EVENT.ENTITY_CREATED, [ entityId, entityComponents ] )
 
 			return entityId
