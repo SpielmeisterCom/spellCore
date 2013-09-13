@@ -1094,21 +1094,7 @@ define(
 			 * Destroys the entity manager. Frees all internal resources.
 			 */
 			destroy : function() {
-				var componentMaps = this.componentMaps,
-					eventManager  = this.eventManager,
-					spatialIndex  = this.spatialIndex
-
-				// remove component instances
-				for( var componentId in componentMaps ) {
-					var components = componentMaps[ componentId ]
-
-					for( var entityId in components ) {
-						removeComponents( eventManager, componentMaps, spatialIndex, entityId )
-					}
-
-					// explicitly resetting component map for good measure
-					componentMaps[ componentId ] = {}
-				}
+				this.removeEntity( ROOT_ENTITY_ID )
 			},
 
 			/**
