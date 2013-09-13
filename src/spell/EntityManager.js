@@ -53,7 +53,8 @@ define(
 
 		var nextEntityId                     = 1,
 			createComponentType              = PlatformKit.createComponentType,
-			ROOT_ENTITY_ID                   = '0',
+			INVALID_ENTITY_ID                = Defines.INVALID_ENTITY_ID,
+			ROOT_ENTITY_ID                   = Defines.ROOT_ENTITY_ID,
 			CHILDREN_COMPONENT_ID            = Defines.CHILDREN_COMPONENT_ID,
 			PARENT_COMPONENT_ID              = Defines.PARENT_COMPONENT_ID,
 			METADATA_COMPONENT_ID            = Defines.METADATA_COMPONENT_ID,
@@ -109,6 +110,18 @@ define(
 			return '' + number
 		}
 
+		var getAncestorComponent = function( parentComponents, components, currentEntityId ) {
+			while( currentEntityId !== INVALID_ENTITY_ID ) {
+				currentEntityId = parentComponents[ currentEntityId ].id
+
+				var currentComponent = components[ currentEntityId ]
+
+				if( currentComponent ) {
+					return currentComponent
+				}
+			}
+		}
+
 		/**
 		 * Updates the world transformation from a local transformation
 		 *
@@ -121,53 +134,40 @@ define(
 			var transformComponents = componentMaps[ TRANSFORM_COMPONENT_ID ],
 				transform           = transformComponents[ entityId ]
 
-			if( !transform ) return
+			if( transform ) {
+				var localMatrix = transform.localMatrix,
+					worldMatrix = transform.worldMatrix
 
-			var parentComponents   = componentMaps[ PARENT_COMPONENT_ID ],
-				childrenComponents = componentMaps[ CHILDREN_COMPONENT_ID ],
-				children           = childrenComponents[ entityId ],
-				localMatrix        = transform.localMatrix,
-				worldMatrix        = transform.worldMatrix,
-				parent,
-				parentMatrix
+				// set new localToWorldMatrix
+				mat3.identity( localMatrix )
+				mat3.translate( localMatrix, localMatrix, transform.translation )
+				mat3.rotate( localMatrix, localMatrix, transform.rotation )
+				mat3.scale( localMatrix, localMatrix, transform.scale )
 
-			// set new localToWorldMatrix
-			mat3.identity( localMatrix )
-			mat3.translate( localMatrix, localMatrix, transform.translation )
-			mat3.rotate( localMatrix, localMatrix, transform.rotation )
-			mat3.scale( localMatrix, localMatrix, transform.scale )
+				// get nearest ancestor with a transform component
+				var ancestorTransform = getAncestorComponent( componentMaps[ PARENT_COMPONENT_ID ], transformComponents, entityId )
 
-			// search for nearest ancestor with a transform component
-			var parentEntityId = entityId // search begins with the current entityId as an origin
+				if( ancestorTransform ) {
+					// multiply parent's localToWorldMatrix with ours
+					mat3.multiply( worldMatrix, ancestorTransform.worldMatrix, localMatrix )
 
-			while( parent = parentComponents[ parentEntityId ] ) {
-				parentEntityId = parent.id
+				} else {
+					// if this entity has no parent, the localToWorld Matrix equals the localMatrix
+					mat3.copy( worldMatrix, localMatrix )
+				}
 
-				var parentTransform = transformComponents[ parentEntityId ]
+				transform.worldTranslation[ 0 ] = worldMatrix[ 6 ]
+				transform.worldTranslation[ 1 ] = worldMatrix[ 7 ]
 
-				if( parentTransform ) {
-					parentMatrix = parentTransform.worldMatrix
-					break
+				if( syncSpatialIndex ) {
+					updateSpatialIndex( componentMaps, spatialIndex, entityId )
 				}
 			}
 
-			if( parentMatrix ) {
-				// multiply parent's localToWorldMatrix with ours
-				mat3.multiply( worldMatrix, parentMatrix, localMatrix )
-
-			} else {
-				// if this entity has no parent, the localToWorld Matrix equals the localMatrix
-				mat3.copy( worldMatrix, localMatrix )
-			}
-
-            transform.worldTranslation[ 0 ] = worldMatrix[ 6 ]
-            transform.worldTranslation[ 1 ] = worldMatrix[ 7 ]
-
-			if( syncSpatialIndex ) {
-				updateSpatialIndex( componentMaps, spatialIndex, entityId )
-			}
-
 			// update the children
+			var childrenComponents = componentMaps[ CHILDREN_COMPONENT_ID ],
+				children           = childrenComponents[ entityId ]
+
 			if( children ) {
 				var childrenIds = children.ids
 
@@ -194,13 +194,12 @@ define(
 			)
 		}
 
-		var updateVisualObjectR = function( childrenComponents, visualObjectComponents, parentWorldOpacity, entityId ) {
+		var updateVisualObjectR = function( childrenComponents, visualObjectComponents, entityId, ancestorWorldOpacity ) {
 			var visualObjectComponent = visualObjectComponents[ entityId ],
-				worldOpacity          = 1.0
+				worldOpacity          = ancestorWorldOpacity
 
 			if( visualObjectComponent ) {
-				worldOpacity = visualObjectComponent.opacity * parentWorldOpacity
-				visualObjectComponent.worldOpacity = worldOpacity
+				visualObjectComponent.worldOpacity = worldOpacity *= visualObjectComponent.opacity
 			}
 
 			var childrenComponent = childrenComponents[ entityId ]
@@ -209,31 +208,20 @@ define(
 				var childrenIds = childrenComponent.ids
 
 				for( var i = 0, n = childrenIds.length; i < n; i++ ) {
-					updateVisualObjectR( childrenComponents, visualObjectComponents, worldOpacity, childrenIds[ i ] )
+					updateVisualObjectR( childrenComponents, visualObjectComponents, childrenIds[ i ], worldOpacity )
 				}
 			}
 		}
 
 		var updateVisualObject = function( componentMaps, entityId ) {
-			// getting the parent's "world opacity"
-			var parentComponent        = componentMaps[ PARENT_COMPONENT_ID ][ entityId ],
-				visualObjectComponents = componentMaps[ VISUAL_OBJECT_COMPONENT_ID ],
-				parentWorldOpacity     = 1.0
+			var visualObjects        = componentMaps[ VISUAL_OBJECT_COMPONENT_ID ],
+				ancestorVisualObject = getAncestorComponent( componentMaps[ PARENT_COMPONENT_ID ], visualObjects, entityId )
 
-			if( parentComponent ) {
-				var parentVisualObject = visualObjectComponents[ parentComponent.id ]
-
-				if( parentVisualObject ) {
-					parentWorldOpacity = parentVisualObject.worldOpacity
-				}
-			}
-
-			// propagate the change towards the leafs
 			updateVisualObjectR(
 				componentMaps[ CHILDREN_COMPONENT_ID ],
-				visualObjectComponents,
-				parentWorldOpacity,
-				entityId
+				visualObjects,
+				entityId,
+				ancestorVisualObject ? ancestorVisualObject.worldOpacity : 1.0
 			)
 		}
 
@@ -293,55 +281,41 @@ define(
 
 			delete components[ entityId ]
 
-			if( componentId === TRANSFORM_COMPONENT_ID ||
-				componentId === VISUAL_OBJECT_COMPONENT_ID ) {
+			if( componentId === TRANSFORM_COMPONENT_ID ) {
+				updateWorldTransform( componentMaps, eventManager, spatialIndex, true, entityId )
 
+			} else if( componentId === VISUAL_OBJECT_COMPONENT_ID ) {
 				spatialIndex.remove( entityId )
+				updateVisualObject( componentMaps, entityId )
 			}
 
 			eventManager.publish( [ eventManager.EVENT.COMPONENT_REMOVED, componentId ], entityId )
 		}
 
-		var removeComponents = function( eventManager, componentMaps, spatialIndex, entityId, entityComponentId ) {
-			var childrenComponents = componentMaps[ CHILDREN_COMPONENT_ID ],
-				parentComponent    = componentMaps[ PARENT_COMPONENT_ID ][ entityId ]
+		var removeEntity = function( eventManager, componentMaps, spatialIndex, entityId ) {
+			var childrenComponent = componentMaps[ CHILDREN_COMPONENT_ID ][ entityId ]
 
-			if( parentComponent ) {
-				var parentChildrenComponent = childrenComponents[ parentComponent.id ]
+			if( childrenComponent ) {
+				var childrenIds = childrenComponent.ids
 
-				if( parentChildrenComponent ) {
-					var parentChildrenIds = parentChildrenComponent.ids
-
-					parentChildrenIds.splice( parentChildrenIds.indexOf( entityId ), 1 )
+				for( var i = 0, n = childrenIds.length; i < n; i++ ) {
+					removeEntity( eventManager, componentMaps, spatialIndex, childrenIds[ i ] )
 				}
 			}
 
-			var childrenComponent = childrenComponents[ entityId ],
-				removedEntity     = true
+			// remove all components, that is "remove the entity"
+			// TODO: use some kind of ordered map here, the current approach is bad
+			for( var componentId in componentMaps ) {
+				if( componentId === PARENT_COMPONENT_ID ||
+					componentId === CHILDREN_COMPONENT_ID ) continue
 
-			if( entityComponentId ) {
-				// remove a single component from the entity
-				removeComponent( eventManager, componentMaps, spatialIndex, entityComponentId, entityId )
-				removedEntity = !entityExists( componentMaps, entityId )
-
-			} else {
-				// remove all components, that is "remove the entity"
-				for( var componentId in componentMaps ) {
-					removeComponent( eventManager, componentMaps, spatialIndex, componentId, entityId )
-				}
+				removeComponent( eventManager, componentMaps, spatialIndex, componentId, entityId )
 			}
 
-			if( removedEntity ) {
-				eventManager.publish( eventManager.EVENT.ENTITY_DESTROYED, entityId )
+			removeComponent( eventManager, componentMaps, spatialIndex, PARENT_COMPONENT_ID, entityId )
+			removeComponent( eventManager, componentMaps, spatialIndex, CHILDREN_COMPONENT_ID, entityId )
 
-				if( childrenComponent ) {
-					var childrenIds = childrenComponent.ids
-
-					for( var i = 0, n = childrenIds.length; i < n; i++ ) {
-						removeComponents( eventManager, componentMaps, spatialIndex, childrenIds[ i ] )
-					}
-				}
-			}
+			eventManager.publish( eventManager.EVENT.ENTITY_REMOVED, entityId )
 		}
 
 		/**
@@ -1020,7 +994,7 @@ define(
 					return false
 				}
 
-				removeComponents( this.eventManager, this.componentMaps, this.spatialIndex, entityId )
+				removeEntity( this.eventManager, this.componentMaps, this.spatialIndex, entityId )
 
 				return true
 			},
@@ -1095,7 +1069,7 @@ define(
 				// create root entity
 				var entityConfig = {
 					id : ROOT_ENTITY_ID,
-					parentId : ''
+					parentId : INVALID_ENTITY_ID
 				}
 
 				createEntity( this.spell, this.assetManager, this.eventManager, this.libraryManager, this.moduleLoader, this.componentMaps, this.spatialIndex, entityConfig )
@@ -1188,7 +1162,14 @@ define(
 			removeComponent : function( entityId, componentId ) {
 				if( !entityId ) throw 'Error: Missing entity id.'
 
-				removeComponents( this.eventManager, this.componentMaps, this.spatialIndex, entityId, componentId )
+				var eventManager  = this.eventManager,
+					componentMaps = this.componentMaps
+
+				removeComponent( eventManager, componentMaps, this.spatialIndex, componentId, entityId )
+
+				if( !entityExists( componentMaps, entityId ) ) {
+					eventManager.publish( eventManager.EVENT.ENTITY_REMOVED, entityId )
+				}
 			},
 
 			/**
@@ -1256,10 +1237,9 @@ define(
 					spatialIndex  = this.spatialIndex
 
 				if( componentId === PARENT_COMPONENT_ID ) {
-					oldComponentState.id
-
 					changeParent( componentMaps, entityId, oldComponentState.id, component.id )
 					updateWorldTransform( componentMaps, eventManager, spatialIndex, true, entityId )
+					updateVisualObject( componentMaps, entityId )
 
 				} else if( componentId === TRANSFORM_COMPONENT_ID ) {
 					if( attributeConfig.translation ||
@@ -1309,20 +1289,26 @@ define(
 				var component = this.getComponentById( entityId, componentId )
 				if( !component ) return false
 
-				var attribute = component[ attributeId ]
-				if( attribute === undefined ) return false
+				var oldAttributeValue = component[ attributeId ]
+				if( oldAttributeValue === undefined ) return false
 
 				updateComponentAttributeTM( this.assetManager, this.moduleLoader, this.componentsWithAssets, componentId, attributeId, component, value )
 
 				var componentMaps = this.componentMaps,
+					eventManager  = this.eventManager,
 					spatialIndex  = this.spatialIndex
 
-				if( componentId === TRANSFORM_COMPONENT_ID ) {
+				if( componentId === PARENT_COMPONENT_ID ) {
+					changeParent( componentMaps, entityId, oldAttributeValue, value )
+					updateWorldTransform( componentMaps, eventManager, spatialIndex, true, entityId )
+					updateVisualObject( componentMaps, entityId )
+
+				} else if( componentId === TRANSFORM_COMPONENT_ID ) {
 					if( attributeId === 'translation' ||
 						attributeId === 'scale' ||
 						attributeId === 'rotation' ) {
 
-						updateWorldTransform( componentMaps, this.eventManager, spatialIndex, true, entityId )
+						updateWorldTransform( componentMaps, eventManager, spatialIndex, true, entityId )
 					}
 
 				} else if( componentId === TEXTURE_MATRIX_COMPONENT_ID ) {
@@ -1338,7 +1324,7 @@ define(
 					updateVisualObject( componentMaps, entityId )
 				}
 
-				this.eventManager.publish( [ this.eventManager.EVENT.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
+				eventManager.publish( [ eventManager.EVENT.COMPONENT_UPDATED, componentId ], [ component, entityId ] )
 
 				return true
 			},

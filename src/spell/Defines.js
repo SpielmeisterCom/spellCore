@@ -5,6 +5,7 @@ define(
 
 
 		return {
+			INVALID_ENTITY_ID                         : '',
 			ROOT_ENTITY_ID                            : '0',
 			PARENT_COMPONENT_ID                       : 'spell.component.entityComposite.parent',
 			CHILDREN_COMPONENT_ID                     : 'spell.component.entityComposite.children',

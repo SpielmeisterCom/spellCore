@@ -273,14 +273,14 @@ define(
 			var eventManager = spell.eventManager
 
 			eventManager.subscribe( eventManager.EVENT.ENTITY_CREATED, this.entityCreatedHandler )
-			eventManager.subscribe( eventManager.EVENT.ENTITY_DESTROYED, this.entityDestroyHandler )
+			eventManager.subscribe( eventManager.EVENT.ENTITY_REMOVED, this.entityDestroyHandler )
 		}
 
 		var destroy = function( spell ) {
 			var eventManager = spell.eventManager
 
 			eventManager.unsubscribe( eventManager.EVENT.ENTITY_CREATED, this.entityCreatedHandler )
-			eventManager.unsubscribe( eventManager.EVENT.ENTITY_DESTROYED, this.entityDestroyHandler )
+			eventManager.unsubscribe( eventManager.EVENT.ENTITY_REMOVED, this.entityDestroyHandler )
 		}
 
 		var process = function( spell, timeInMs, deltaTimeInMs ) {

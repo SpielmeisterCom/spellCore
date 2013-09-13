@@ -195,17 +195,18 @@ define(
 				MESSAGE_RECEIVED : 1,
 				CLOCK_SYNC_ESTABLISHED : 2,
 				COMPONENT_CREATED : 3,
-				COMPONENT_UPDATED : 4,
-				COMPONENT_REMOVED : 5,
+				COMPONENT_REMOVED : 4,
+				COMPONENT_UPDATED : 5,
 				ENTITY_CREATED : 6,
-				ENTITY_DESTROYED : 7,
-				ASSET_UPDATED : 8,
-				SUBSCRIBE : 9,
-				UNSUBSCRIBE : 10,
-				RESOURCE_PROGRESS : 11,
-				RESOURCE_LOADING_COMPLETED : 12,
-				AVAILABLE_SCREEN_SIZE_CHANGED : 13,
-				SCREEN_RESIZE : 14
+				ENTITY_DESTROYED : 7, // skip sending all the component removal events and just destroy the entity
+				ENTITY_REMOVED : 8, // perform an ordered removal of the entity, that is send component removal events
+				ASSET_UPDATED : 9,
+				SUBSCRIBE : 10,
+				UNSUBSCRIBE : 11,
+				RESOURCE_PROGRESS : 12,
+				RESOURCE_LOADING_COMPLETED : 13,
+				AVAILABLE_SCREEN_SIZE_CHANGED : 14,
+				SCREEN_RESIZE : 15
 			}
 		}
 
