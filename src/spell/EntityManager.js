@@ -545,8 +545,13 @@ define(
 				METADATA_COMPONENT_ID
 			)
 
-			component.name = name
-			component.entityTemplateId = entityTemplateId
+			if( name ) {
+				component.name = name
+			}
+
+			if( entityTemplateId ) {
+				component.entityTemplateId = entityTemplateId
+			}
 
 			return result
 		}
