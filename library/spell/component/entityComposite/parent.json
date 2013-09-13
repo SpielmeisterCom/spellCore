@@ -8,6 +8,7 @@
 		{
 			"name": "id",
 			"doc": "entityId of the parent of this entity",
+			"default": "0",
 			"type": "string"
 		}
 	],
