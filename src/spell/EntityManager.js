@@ -608,8 +608,16 @@ define(
 			return component
 		}
 
-		var createComponentsTM = function( spell, assetManager, libraryManager, moduleLoader, componentConfig, entityTemplateId, entityTemplate, injectAssets ) {
+		var createComponents = function( spell, assetManager, libraryManager, moduleLoader, componentConfig, entityTemplateId, injectAssets ) {
 			if( injectAssets === undefined ) injectAssets = true
+
+			if( entityTemplateId ) {
+				var entityTemplate = libraryManager.get( entityTemplateId )
+
+				if( !entityTemplate ) {
+					throw 'Error: Unknown entity template "' + entityTemplateId + '". Could not create entity.'
+				}
+			}
 
 			var entity = applyEntityConfig(
 				entityTemplate ? deepClone( entityTemplate.config ) : {},
@@ -642,14 +650,6 @@ define(
 			return entity
 		}
 
-		var createComponents = function( spell, assetManager, libraryManager, moduleLoader, entityTemplateId, config ) {
-			var entityTemplate = entityTemplateId ?
-				libraryManager.get( entityTemplateId ) :
-				undefined
-
-			return createComponentsTM( spell, assetManager, libraryManager, moduleLoader, config, entityTemplateId, entityTemplate )
-		}
-
 		var createEntity = function( spell, assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig ) {
 			entityConfig = normalizeEntityConfig( libraryManager, entityConfig )
 
@@ -671,7 +671,7 @@ define(
 			addComponents( componentMaps, eventManager, spatialIndex, entityId, metaDataComponents )
 
 			// creating the entity
-			var entityComponents = createComponents( spell, assetManager, libraryManager, moduleLoader, entityTemplateId, config )
+			var entityComponents = createComponents( spell, assetManager, libraryManager, moduleLoader, config, entityTemplateId )
 
 			addComponents( componentMaps, eventManager, spatialIndex, entityId, entityComponents )
 
@@ -1149,7 +1149,7 @@ define(
 					this.eventManager,
 					this.spatialIndex,
 					entityId,
-					createComponents( this.spell, this.assetManager, this.libraryManager, this.moduleLoader, null, componentConfigs )
+					createComponents( this.spell, this.assetManager, this.libraryManager, this.moduleLoader, componentConfigs )
 				)
 			},
 
