@@ -25,7 +25,7 @@
         },
         {
             "name": "metadata",
-            "componentId": "spell.component.entityMetaData"
+            "componentId": "spell.component.metaData"
         },
         {
             "name": "editorConfigurations",
