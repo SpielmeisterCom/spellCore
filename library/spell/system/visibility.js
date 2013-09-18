@@ -51,14 +51,13 @@ define(
 						return
 					}
 
-					var childrenComponent = entity[ Defines.CHILDREN_COMPONENT_ID ],
-						parentComponent   = entity[ Defines.PARENT_COMPONENT_ID ]
+					var compositeComponent = entity[ Defines.COMPOSITE_COMPONENT_ID ]
 
 					var entityInfo = {
-						children : childrenComponent ? childrenComponent.ids : [],
+						children : compositeComponent.childrenIds,
 						layer : visualObject.layer,
 						id : entityId,
-						parent : parentComponent ? parentComponent.id : '0'
+						parent : compositeComponent.parentId
 					}
 
 					if( visualObject.pass === 'ui' ) {

@@ -7,9 +7,8 @@ define(
 		return {
 			INVALID_ENTITY_ID                         : '',
 			ROOT_ENTITY_ID                            : '0',
-			PARENT_COMPONENT_ID                       : 'spell.component.entityComposite.parent',
-			CHILDREN_COMPONENT_ID                     : 'spell.component.entityComposite.children',
-			METADATA_COMPONENT_ID                     : 'spell.component.entityMetaData',
+			COMPOSITE_COMPONENT_ID                    : 'spell.component.composite',
+			METADATA_COMPONENT_ID                     : 'spell.component.metaData',
 			EVENT_HANDLERS_COMPONENT_ID               : 'spell.component.eventHandlers',
 			TRANSFORM_COMPONENT_ID                    : 'spell.component.2d.transform',
 			TEXTURE_MATRIX_COMPONENT_ID               : 'spell.component.2d.graphics.textureMatrix',
