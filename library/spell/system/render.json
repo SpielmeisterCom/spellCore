@@ -11,10 +11,6 @@
 			"componentId": "spell.component.2d.transform"
 		},
 		{
-			"name": "childrenComponents",
-			"componentId": "spell.component.entityComposite.children"
-		},
-		{
 			"name": "appearances",
 			"componentId": "spell.component.2d.graphics.appearance"
 		},

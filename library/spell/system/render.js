@@ -257,7 +257,6 @@ define(
 			textAppearances,
 			tilemaps,
 			spriteSheetAppearances,
-			childrenComponents,
 			quadGeometries,
 			visualObjects,
 			rectangles,
@@ -459,7 +458,7 @@ define(
 			context.restore()
 		}
 
-		var drawDebug = function( context, childrenComponents, debugBoxes, debugCircles, transforms, deltaTimeInMs, id ) {
+		var drawDebug = function( context, debugBoxes, debugCircles, transforms, deltaTimeInMs, id ) {
 			var debugBox    = debugBoxes[ id ],
 				debugCircle = debugCircles[ id ],
 				transform   = transforms[ id ]
@@ -592,7 +591,6 @@ define(
 				textAppearances        = this.textAppearances,
 				tilemaps               = this.tilemaps,
 				spriteSheetAppearances = this.spriteSheetAppearances,
-				childrenComponents     = this.childrenComponents,
 				quadGeometries         = this.quadGeometries,
 				visualObjects          = this.visualObjects,
 				rectangles             = this.rectangles,
@@ -632,7 +630,6 @@ define(
 					textAppearances,
 					tilemaps,
 					spriteSheetAppearances,
-					childrenComponents,
 					quadGeometries,
 					visualObjects,
 					rectangles,
@@ -661,7 +658,6 @@ define(
 						textAppearances,
 						tilemaps,
 						spriteSheetAppearances,
-						childrenComponents,
 						quadGeometries,
 						visualObjects,
 						rectangles,
@@ -678,7 +674,7 @@ define(
 						debugCircles = this.debugCircles
 
 					for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
-						drawDebug( context, childrenComponents, debugBoxes, debugCircles, transforms, deltaTimeInMs, visibleEntityIdsSorted[ i ] )
+						drawDebug( context, debugBoxes, debugCircles, transforms, deltaTimeInMs, visibleEntityIdsSorted[ i ] )
 					}
 				}
 			}
@@ -701,7 +697,6 @@ define(
 					textAppearances,
 					tilemaps,
 					spriteSheetAppearances,
-					childrenComponents,
 					quadGeometries,
 					visualObjects,
 					rectangles,
