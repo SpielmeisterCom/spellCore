@@ -943,9 +943,6 @@ define(
 			createEntity : function( entityConfig ) {
 				var entityId = createEntity( this.spell, this.assetManager, this.eventManager, this.libraryManager, this.moduleLoader, this.componentMaps, this.spatialIndex, entityConfig )
 
-				// HACK: updateVisualObject requires the complete ECS to be completely instantiated, because it propagates information towards the leafs.
-				updateVisualObject( this.componentMaps, entityId )
-
 				// adding the entity id to its parent's children component
 				var parentComponent = this.componentMaps[ PARENT_COMPONENT_ID ][ entityId ]
 
