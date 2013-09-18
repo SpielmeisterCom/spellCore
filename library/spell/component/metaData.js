@@ -1,17 +1,17 @@
 define(
-	'spell/component/entityMetaData',
+	'spell/component/metaData',
 	function() {
 		'use strict'
 
 
-		var entityMetaData = function( spell ) {
+		var metaData = function( spell ) {
 
 		}
 
-		entityMetaData.prototype = {
+		metaData.prototype = {
 
 		}
 
-		return entityMetaData
+		return metaData
 	}
 )
