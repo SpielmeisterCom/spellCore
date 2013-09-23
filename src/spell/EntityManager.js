@@ -394,10 +394,8 @@ define(
 			var parentCompositeComponent = compositeComponents[ parentEntityId ]
 			if( !parentCompositeComponent ) return
 
-			var parentChildrenIds = parentCompositeComponent.childrenIds
-
-			// forcing entityId to type string because indexOf performs a type-safe comparison, entityId can be a number on the flash target
-			var index = parentChildrenIds.indexOf( '' + entityId )
+			var parentChildrenIds = parentCompositeComponent.childrenIds,
+				index             = parentChildrenIds.indexOf( entityId )
 
 			if( index >= 0 ) {
 				arrayRemove( parentChildrenIds, index )
@@ -1175,7 +1173,12 @@ define(
 
 				if( !component ) return false
 
-				var oldComponentState = deepClone( component )
+				// HACK: create a partial clone of the component
+				var oldComponentState = {}
+
+				for( var attributeId in attributeConfig ) {
+					oldComponentState[ attributeId ] = deepClone( component[ attributeId ] )
+				}
 
 				updateComponentTM( this.assetManager, this.moduleLoader, this.componentsWithAssets, componentId, component, attributeConfig )
 
