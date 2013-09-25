@@ -283,9 +283,10 @@ define(
 						context.setGlobalAlpha( worldOpacity )
 					}
 
-					if( appearance ) {
-						var asset   = appearance.asset,
-							texture = asset.resource
+					var asset = appearance ? appearance.asset : undefined
+
+					if( asset ) {
+						var texture = asset.resource
 
 						if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
 

@@ -99,7 +99,7 @@ define(
 				// load referenced asset first
 				loadAsset(
 					spell,
-					assetId,
+					id,
 					function( loadedFiles ) {
 						// now update referencing asset (-> updated definition) and inject referenced asset
 						updateAssets( assetManager, loadedAssets, true )

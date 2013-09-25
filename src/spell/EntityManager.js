@@ -573,23 +573,24 @@ define(
 		 */
 		var injectAsset = function( assetManager, moduleLoader, component ) {
 			var assetId = component.assetId
-			if( !assetId ) return
 
-			var asset = assetManager.get( assetId )
+			if( assetId ) {
+				var asset = assetManager.get( assetId )
 
-			if( !asset &&
-				stringUtil.startsWith( assetId, 'script:' ) ) {
+				if( !asset &&
+					stringUtil.startsWith( assetId, 'script:' ) ) {
 
-				var libraryId = assetId.substr( 7 )
+					var libraryId = assetId.substr( 7 )
 
-				asset = moduleLoader.require( createModuleId( libraryId ) )
+					asset = moduleLoader.require( createModuleId( libraryId ) )
+				}
+
+				if( !asset ) {
+					throw 'Error: Could not resolve asset id "' + assetId + '" to asset instance. Please make sure that the asset id is valid.'
+				}
+
+				component.asset = asset
 			}
-
-			if( !asset ) {
-				throw 'Error: Could not resolve asset id \'' + assetId + '\' to asset instance. Please make sure that the asset id is valid.'
-			}
-
-			component.asset = asset
 
 			return component
 		}

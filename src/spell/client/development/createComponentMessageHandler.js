@@ -2,11 +2,13 @@ define(
 	'spell/client/development/createComponentMessageHandler',
 	[
 		'spell/client/development/createMessageDispatcher',
-		'spell/client/development/library/loadAsset'
+		'spell/client/development/library/loadAsset',
+		'spell/shared/util/createLibraryIdFromAssetId'
 	],
 	function(
 		createMessageDispatcher,
-		loadAsset
+		loadAsset,
+		createLibraryIdFromAssetId
 	) {
 		'use strict'
 
@@ -33,7 +35,7 @@ define(
 					if( assetId ) {
 						loadAsset(
 							spell,
-							assetId,
+							createLibraryIdFromAssetId( assetId ),
 							function( loadedFiles ) {
 								spell.assetManager.injectResources( loadedFiles )
 

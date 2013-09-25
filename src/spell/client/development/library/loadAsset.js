@@ -13,9 +13,7 @@ define(
 		'use strict'
 
 
-		return function( spell, assetId, next ) {
-			var libraryId = assetId.slice( assetId.indexOf( ':' ) + 1 )
-
+		return function( spell, libraryId, next ) {
 			// load meta data record
 			spell.libraryManager.load(
 				[ createLibraryFilePathFromId( libraryId ) ],
