@@ -10,6 +10,7 @@ define(
 		'spell/shared/util/createId',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/createLibraryFilePathFromId',
+		'spell/shared/util/createLibraryIdFromAssetId',
 
 		'spell/functions'
 	],
@@ -23,6 +24,7 @@ define(
 		createId,
 		createLibraryFilePath,
 		createLibraryFilePathFromId,
+		createLibraryIdFromAssetId,
 
 		_
 	) {
@@ -99,7 +101,7 @@ define(
 				// load referenced asset first
 				loadAsset(
 					spell,
-					id,
+					createLibraryIdFromAssetId( assetId ),
 					function( loadedFiles ) {
 						// now update referencing asset (-> updated definition) and inject referenced asset
 						updateAssets( assetManager, loadedAssets, true )
