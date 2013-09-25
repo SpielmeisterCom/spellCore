@@ -35,14 +35,9 @@ define(
 				configurationManager = spell.configurationManager,
 				definition           = payload.definition,
 				id                   = createId( definition.namespace, definition.name ),
-				typedId              = createAssetId( definition.subtype, id ),
-				libraryFilePath      = createLibraryFilePathFromId( id )
+				typedId              = createAssetId( definition.subtype, id )
 
-			var loadedAssets = {}
-
-			loadedAssets[ libraryFilePath ] = definition
-			addNamespaceAndName( loadedAssets )
-
+			var loadedAssets = [ definition ]
 
 			// The current state of asset update handling needs to be improved. In order to do that dependencies between assets must be accessible in a
 			// normalized fashion.
