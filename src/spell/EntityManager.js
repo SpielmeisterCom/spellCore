@@ -695,9 +695,9 @@ define(
 			var entityId = getEntityId( entityConfig.id )
 
 			// creating base components which the engine requires
-			var baeComponents = createBaseComponents( spell, libraryManager, moduleLoader, parentId, entityConfig.name, entityTemplateId )
+			var baseComponents = createBaseComponents( spell, libraryManager, moduleLoader, parentId, entityConfig.name, entityTemplateId )
 
-			addComponents( componentMaps, eventManager, spatialIndex, entityId, baeComponents )
+			addComponents( componentMaps, eventManager, spatialIndex, entityId, baseComponents )
 
 			// creating the entity
 			var entityComponents = createComponents( spell, assetManager, libraryManager, moduleLoader, config, entityTemplateId )
@@ -726,7 +726,7 @@ define(
 				}
 			}
 
-			_.extend( entityComponents, baeComponents )
+			_.extend( entityComponents, baseComponents )
 			eventManager.publish( eventManager.EVENT.ENTITY_CREATED, [ entityId, entityComponents ] )
 
 			return entityId
