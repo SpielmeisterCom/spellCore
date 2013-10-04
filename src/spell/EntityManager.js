@@ -109,11 +109,53 @@ define(
 			return '' + number
 		}
 
-		var getAncestorComponent = function( compositeComponents, components, currentEntityId ) {
-			while( currentEntityId !== INVALID_ENTITY_ID ) {
-				currentEntityId = compositeComponents[ currentEntityId ].parentId
+		/**
+		 * Returns the id of the nearest ancestor entity which has a specific component instance.
+		 *
+		 * @param compositeComponents
+		 * @param components component map of the requested component type
+		 * @param entityId the search begins at the entity with this id
+		 * @return {*}
+		 */
+		var getAncestorId = function( compositeComponents, components, entityId ) {
+			var compositeComponent
 
-				var currentComponent = components[ currentEntityId ]
+			while( entityId !== INVALID_ENTITY_ID ) {
+				compositeComponent = compositeComponents[ entityId ]
+				if( !compositeComponent ) return
+
+				entityId = compositeComponent.parentId
+
+				if( components[ entityId ] ) {
+					return entityId
+				}
+			}
+		}
+
+		/**
+		 * Returns the next available component from the path in the entity composite tree that spans from the current entity to the root entity.
+		 *
+		 * @param compositeComponents
+		 * @param components
+		 * @param entityId
+		 * @param includeCurrentEntity
+		 * @return {Object}
+		 */
+		var getNearestComponent = function( compositeComponents, components, entityId, includeCurrentEntity ) {
+			var currentComponent
+
+			if( includeCurrentEntity ) {
+				currentComponent = components[ entityId ]
+
+				if( currentComponent ) {
+					return currentComponent
+				}
+			}
+
+			while( entityId !== INVALID_ENTITY_ID ) {
+				entityId = compositeComponents[ entityId ].parentId
+
+				currentComponent = components[ entityId ]
 
 				if( currentComponent ) {
 					return currentComponent
@@ -144,7 +186,7 @@ define(
 				mat3.scale( localMatrix, localMatrix, transform.scale )
 
 				// get nearest ancestor with a transform component
-				var ancestorTransform = getAncestorComponent( componentMaps[ COMPOSITE_COMPONENT_ID ], transformComponents, entityId )
+				var ancestorTransform = getNearestComponent( componentMaps[ COMPOSITE_COMPONENT_ID ], transformComponents, entityId, false )
 
 				if( ancestorTransform ) {
 					// multiply parent's localToWorldMatrix with ours
@@ -207,7 +249,7 @@ define(
 		var updateVisualObject = function( componentMaps, entityId ) {
 			var compositeComponents  = componentMaps[ COMPOSITE_COMPONENT_ID ],
 				visualObjects        = componentMaps[ VISUAL_OBJECT_COMPONENT_ID ],
-				ancestorVisualObject = getAncestorComponent( compositeComponents, visualObjects, entityId )
+				ancestorVisualObject = getNearestComponent( compositeComponents, visualObjects, entityId, false )
 
 			updateVisualObjectR(
 				compositeComponents,
@@ -817,6 +859,25 @@ define(
 			}
 		}
 
+		var bubbleEventR = function( spell, compositeComponents, eventHandlersComponents, entityId, eventId, eventArguments ) {
+			var eventHandlersComponent = eventHandlersComponents[ entityId ]
+
+			if( eventHandlersComponent ) {
+				var eventHandler = eventHandlersComponent.asset[ eventId ]
+
+				if( eventHandler ) {
+					eventHandler.apply( null, [ spell, entityId ].concat( eventArguments ) )
+
+					return
+				}
+			}
+
+			var nearestEntityId = getAncestorId( compositeComponents, eventHandlersComponents, entityId )
+			if( !nearestEntityId ) return
+
+			bubbleEventR( spell, compositeComponents, eventHandlersComponents, nearestEntityId, eventId, eventArguments )
+		}
+
 		var EntityManager = function( spell, configurationManager, assetManager, eventManager, libraryManager, moduleLoader ) {
 			this.configurationManager = configurationManager
 			this.componentMaps        = {}
@@ -1358,15 +1419,16 @@ define(
 			 * @param eventArguments
 			 */
 			triggerEvent : function( entityId, eventId, eventArguments ) {
-				var component = this.componentMaps[ EVENT_HANDLERS_COMPONENT_ID ][ entityId ]
+				var componentMaps = this.componentMaps
 
-				if( !component ) return
-
-				var eventHandler = component.asset[ eventId ]
-
-				if( !eventHandler ) return
-
-				eventHandler.apply( null, [ this.spell, entityId ].concat( eventArguments ) )
+				bubbleEventR(
+					this.spell,
+					componentMaps[ COMPOSITE_COMPONENT_ID ],
+					componentMaps[ EVENT_HANDLERS_COMPONENT_ID ],
+					entityId,
+					eventId,
+					eventArguments
+				)
 			},
 
 			updateEntityTemplate : function( entityDefinition ) {
