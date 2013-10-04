@@ -13,6 +13,7 @@ define(
 			TRANSFORM_COMPONENT_ID                    : 'spell.component.2d.transform',
 			TEXTURE_MATRIX_COMPONENT_ID               : 'spell.component.2d.graphics.textureMatrix',
 			CAMERA_COMPONENT_ID                       : 'spell.component.2d.graphics.camera',
+			CAMERA_MOVEMENT_COMPONENT_ID              : 'spell.component.2d.graphics.cameraMovement',
 			STATIC_APPEARANCE_COMPONENT_ID            : 'spell.component.2d.graphics.appearance',
 			TEXT_APPEARANCE_COMPONENT_ID              : 'spell.component.2d.graphics.textAppearance',
 			ANIMATED_APPEARANCE_COMPONENT_ID          : 'spell.component.2d.graphics.animatedAppearance',
