@@ -383,7 +383,7 @@ if( !window.console ) {
 		var isFileProtocol = window.location.protocol == 'file:'
 
 		//In node-webkit the file protocol is allowed
-		return !isFileProtocol || ( isFileProtocol && ( typeof process == 'object' ) )
+		return !isFileProtocol || ( isFileProtocol && ( typeof window.process == 'object' ) )
 	}
 
 	var showMessage = function( id, message ) {
