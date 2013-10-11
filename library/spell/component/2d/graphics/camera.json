@@ -5,13 +5,13 @@
 	"attributes": [
 		{
 			"name": "width",
-			"type": "integer",
+			"type": "number",
 			"default": 320,
 			"doc": "the width of the section of the scene in logical units captured by the camera"
 		},
 		{
 			"name": "height",
-			"type": "integer",
+			"type": "number",
 			"default": 240,
 			"doc": "the height of the section of the scene in logical units captured by the camera"
 		},
