@@ -863,12 +863,16 @@ define(
 			var eventHandlersComponent = eventHandlersComponents[ entityId ]
 
 			if( eventHandlersComponent ) {
-				var eventHandler = eventHandlersComponent.asset[ eventId ]
+				var scriptInstance = eventHandlersComponent.asset
 
-				if( eventHandler ) {
-					eventHandler.apply( null, [ spell, entityId ].concat( eventArguments ) )
+				if( scriptInstance ) {
+					var eventHandler = eventHandlersComponent.asset[ eventId ]
 
-					return
+					if( eventHandler ) {
+						eventHandler.apply( null, [ spell, entityId ].concat( eventArguments ) )
+
+						return
+					}
 				}
 			}
 
