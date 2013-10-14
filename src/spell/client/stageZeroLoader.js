@@ -135,7 +135,7 @@ if( !window.console ) {
 
 	var isLessThanBrowser = function( name, minimumVersion ) {
 		var match = name === 'Safari' ?
-				navigator.userAgent.match( /.*Version\/(\d+).*Safari/ ) :
+				navigator.userAgent.match( /.*Version\/(\d+)\S*\s(Safari)/ ) :
 				name === 'IE' ?
 					navigator.userAgent.match( /.*MSIE (\d+)/ ) :
 					navigator.userAgent.match( new RegExp( '.*' + name + '\\/(\\d+)' ) )
@@ -151,7 +151,7 @@ if( !window.console ) {
 		var canvasElement = document.createElement( 'canvas' )
 
 		return canvasElement.getContext &&
-			canvasElement.getContext( '2d' )
+			!!canvasElement.getContext( '2d' )
 	}
 
 	var isWebGlCapable = function() {
