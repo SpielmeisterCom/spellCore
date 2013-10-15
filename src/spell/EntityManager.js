@@ -516,7 +516,7 @@ define(
 				var entityTemplate = libraryManager.get( entityTemplateId )
 
 				if( !entityTemplate ) {
-					throw 'Error: Unknown entity template \'' + entityTemplateId + '\'. Could not create entity.'
+					throw 'Error: Unknown entity template "' + entityTemplateId + '". Could not create entity.'
 				}
 
 				entityConfig.children = applyOverloadedChildrenConfig( entityTemplate.children, entityConfig.children )
