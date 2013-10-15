@@ -79,7 +79,9 @@ define(
                     continue
                 }
 
+				// NOTE: I guess the visualObject component should contain the effective dimension information.
 				var entityDimensions = entityManager.getEntityDimensions( entityId )
+				if( !entityDimensions ) continue
 
 				var isEntityHit = isPointWithinEntity(
 					entityDimensions,
