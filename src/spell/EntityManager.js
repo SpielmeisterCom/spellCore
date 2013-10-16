@@ -436,8 +436,10 @@ define(
 			var parentCompositeComponent = compositeComponents[ parentEntityId ]
 			if( !parentCompositeComponent ) return
 
-			var parentChildrenIds = parentCompositeComponent.childrenIds,
-				index             = parentChildrenIds.indexOf( entityId )
+			var parentChildrenIds = parentCompositeComponent.childrenIds
+
+			// forcing entityId to type string because indexOf performs a type-safe comparison, entityId can be a number on the flash target
+			var index = parentChildrenIds.indexOf( '' + entityId )
 
 			if( index >= 0 ) {
 				arrayRemove( parentChildrenIds, index )
