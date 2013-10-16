@@ -18,10 +18,13 @@ define(
 	[
 		'spell/functions'
 	],
-	function( _ ) {
-		"use strict";
+	function(
+		_
+	) {
+		'use strict'
 
-		var nativeHandler = null
+
+		var nativeHandler
 
 		var nativeHandlerImpl = function( callback, event ) {
 			event.preventDefault()
@@ -30,11 +33,9 @@ define(
 				direction = delta > 0 ? 1 : -1
 
 			callback( {
-				type        : 'mouseWheel',
-				direction   : direction
+				type : 'mouseWheel',
+				direction : direction
 			} )
-
-
 		}
 
 		var registerListener = function( el, callback ) {
@@ -45,19 +46,17 @@ define(
 		}
 
 		var removeListener = function( el ) {
-			if( nativeKeyHandler !== null ) {
+			if( nativeHandler ) {
 				el.removeEventLister( 'mousewheel', nativeHandler )
 				el.removeEventLister( 'DOMMouseScroll', nativeHandler )
-			}
 
-			nativeKeyHandler = null
+				nativeHandler = undefined
+			}
 		}
 
 		return {
-			registerListener: registerListener,
-			removeListener: removeListener
+			registerListener : registerListener,
+			removeListener : removeListener
 		}
-
-
 	}
 )
