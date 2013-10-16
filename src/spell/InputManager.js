@@ -21,6 +21,20 @@ define(
 		'use strict'
 
 
+		var Command = function( id, isStart ) {
+			this.id = id
+			this.isStart = isStart
+		}
+
+		Command.prototype = {
+			getEventName : function() {
+				return this.getType() + this.id
+			},
+			getType : function() {
+				return this.isStart ? 'start' : 'stop'
+			}
+		}
+
 		var inputEvents               = [],
 			commands                  = [],
 			isKeyCodePressed          = {},
@@ -68,9 +82,10 @@ define(
 					if( mappedKeyCode == keyCode ) {
 						var command = inputContext[ mappedKeyCode ]
 
-						// i.e. isStart = true, command = "fire" -> "startFire"
-						return ( isStart ? 'start' : 'stop' ) +
-							command.substr( 0, 1 ).toUpperCase() + command.substr( 1, command.length )
+						return new Command(
+							command.substr( 0, 1 ).toUpperCase() + command.substr( 1, command.length ),
+							isStart
+						)
 					}
 				}
 			}
