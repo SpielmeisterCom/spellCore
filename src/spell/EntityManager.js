@@ -709,11 +709,11 @@ define(
 			// creating child entities
 			var children = entityConfig.children
 
-			for( var i = 0, entityConfig, n = children.length; i < n; i++ ) {
-				entityConfig = children[ i ]
-				entityConfig.parentId = entityId
+			for( var i = 0, childEntityConfig, n = children.length; i < n; i++ ) {
+				childEntityConfig = children[ i ]
+				childEntityConfig.parentId = entityId
 
-				createEntity( spell, assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, entityConfig )
+				createEntity( spell, assetManager, eventManager, libraryManager, moduleLoader, componentMaps, spatialIndex, childEntityConfig )
 			}
 
 			// HACK: now that the composite structure is in place the spatial index can be updated for real
