@@ -1,14 +1,14 @@
 define(
 	'spell/shared/util/platform/private/platformDetails',
 	[
-		'spell/shared/util/platform/private/input/supportedPointerApi',
+		'spell/shared/util/platform/private/input/support',
 		'spell/shared/util/platform/private/isHtml5CocoonJS',
 		'spell/shared/util/platform/private/isHtml5Ejecta',
 		'spell/shared/util/platform/private/isHtml5GameClosure',
 		'spell/shared/util/platform/private/jsonCoder'
 	],
 	function(
-		supportedPointerApi,
+		support,
 		isHtml5CocoonJS,
 		isHtml5Ejecta,
 		isHtml5GameClosure,
@@ -26,9 +26,10 @@ define(
                 return !( isHtml5CocoonJS || isHtml5Ejecta || isHtml5GameClosure )
             },
 			hasTouchSupport : function() {
-				return supportedPointerApi.hasWebkitTouchApi() ||
-					supportedPointerApi.hasPointerTouchApi()
+				return support.hasWebkitTouchApi() ||
+					support.hasPointerTouchApi()
 			},
+			hasDeviceOrientationSupport : support.hasDeviceOrientationSupport,
 			getOS : function() {
 				if( isHtml5CocoonJS ) {
 					var userAgentParts = navigator.userAgent.split( ',' )

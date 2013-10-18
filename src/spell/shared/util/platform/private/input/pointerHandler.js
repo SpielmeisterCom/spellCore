@@ -80,7 +80,7 @@
 define(
 	'spell/shared/util/platform/private/input/pointerHandler',
 	[
-		'spell/shared/util/platform/private/input/supportedPointerApi',
+		'spell/shared/util/platform/private/input/support',
 
 		'spell/functions'
 	],

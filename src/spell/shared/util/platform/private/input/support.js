@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/platform/private/input/supportedPointerApi',
+	'spell/shared/util/platform/private/input/support',
 	[
 		'spell/shared/util/platform/private/isHtml5Ejecta'
 	],
@@ -24,6 +24,9 @@ define(
 				return ( 'ontouchstart' in window ) || // webkit
 					( window.DocumentTouch && document instanceof DocumentTouch ) || // Firefox Mobile
 					isHtml5Ejecta
+			},
+			hasDeviceOrientationApi : function() {
+				return window.DeviceMotionEvent !== undefined
 			}
 		}
 	}
