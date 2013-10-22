@@ -29,7 +29,7 @@ define(
 				return support.hasWebkitTouchApi() ||
 					support.hasPointerTouchApi()
 			},
-			hasDeviceOrientationSupport : support.hasDeviceOrientationSupport,
+			hasDeviceOrientationSupport : support.hasDeviceOrientationApi,
 			getOS : function() {
 				if( isHtml5CocoonJS ) {
 					var userAgentParts = navigator.userAgent.split( ',' )
