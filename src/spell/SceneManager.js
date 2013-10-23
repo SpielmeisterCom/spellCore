@@ -21,6 +21,11 @@ define(
 		'use strict'
 
 
+		var update = function( entityManager, scene, timeInMs, deltaTimeInMs ) {
+			entityManager.updateDeferredEvents( deltaTimeInMs )
+			scene.update( timeInMs, deltaTimeInMs )
+		}
+
 		var postLoadedResources = function( spell, entityManager, libraryManager, statisticsManager, isModeDevelopment, sceneId, initialConfig ) {
 			var sceneConfig = spell.scenes[ sceneId ]
 
@@ -33,7 +38,7 @@ define(
 			scene.init()
 
 			this.mainLoop.setRenderCallback( _.bind( scene.render, scene ) )
-			this.mainLoop.setUpdateCallback( _.bind( scene.update, scene ) )
+			this.mainLoop.setUpdateCallback( _.bind( update, null, entityManager, scene ) )
 
 			this.activeScene = scene
 

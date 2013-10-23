@@ -66,6 +66,29 @@ define(
 			TILEMAP_COMPONENT_ID             = Defines.TILEMAP_COMPONENT_ID,
 			VISUAL_OBJECT_COMPONENT_ID       = Defines.VISUAL_OBJECT_COMPONENT_ID
 
+		var DeferredEvent = function( entityId, eventId, eventArguments, timerInMs, timerCondition ) {
+			this.entityId       = entityId
+			this.eventId        = eventId
+			this.eventArguments = eventArguments
+			this.timerInMs      = timerInMs
+			this.timerCondition = timerCondition
+		}
+
+		DeferredEvent.prototype = {
+			trigger : function( entityManager ) {
+				entityManager.triggerEvent( this.entityId, this.eventId, this.eventArguments )
+			},
+			ready : function( deltaTimeInMs ) {
+				var timerCondition = this.timerCondition
+
+				if( timerCondition && !timerCondition() ) {
+					return false
+				}
+
+				return ( this.timerInMs -= deltaTimeInMs ) <= 0
+			}
+		}
+
 		var isValidComponentDefinition = function( template ) {
 			// check for ambiguous attribute names
 			var attributeNameCounts = _.reduce(
@@ -902,6 +925,7 @@ define(
 			this.spell                = spell
 			this.spatialIndex         = undefined
 			this.componentsWithAssets = {}
+			this.deferredEvents       = []
 		}
 
 		EntityManager.prototype = {
@@ -1098,6 +1122,7 @@ define(
 			 */
 			destroy : function() {
 				this.removeEntity( ROOT_ENTITY_ID )
+				this.deferredEvents.length = 0
 			},
 
 			/**
@@ -1431,18 +1456,25 @@ define(
 			 * @param entityId
 			 * @param eventId
 			 * @param eventArguments
+			 * @param timerInMs
+			 * @param timerCondition
 			 */
-			triggerEvent : function( entityId, eventId, eventArguments ) {
-				var componentMaps = this.componentMaps
+			triggerEvent : function( entityId, eventId, eventArguments, timerInMs, timerCondition ) {
+				if( timerInMs ) {
+					this.deferredEvents.push( new DeferredEvent( entityId, eventId, eventArguments, timerInMs, timerCondition ) )
 
-				bubbleEventR(
-					this.spell,
-					componentMaps[ COMPOSITE_COMPONENT_ID ],
-					componentMaps[ EVENT_HANDLERS_COMPONENT_ID ],
-					entityId,
-					eventId,
-					eventArguments
-				)
+				} else {
+					var componentMaps = this.componentMaps
+
+					bubbleEventR(
+						this.spell,
+						componentMaps[ COMPOSITE_COMPONENT_ID ],
+						componentMaps[ EVENT_HANDLERS_COMPONENT_ID ],
+						entityId,
+						eventId,
+						eventArguments
+					)
+				}
 			},
 
 			updateEntityTemplate : function( entityDefinition ) {
@@ -1498,6 +1530,27 @@ define(
 
 				} else {
 					delete this.componentsWithAssets[ componentId ]
+				}
+			},
+
+			updateDeferredEvents : function( deltaTimeInMs ) {
+				var deferredEvents = this.deferredEvents,
+					n              = deferredEvents.length
+
+				for( var i = 0, deferredEvent; i < n; i++ ) {
+					deferredEvent = deferredEvents[ i ]
+
+					if( !deferredEvent.ready( deltaTimeInMs ) ) continue
+
+					deferredEvent.trigger( this )
+					deferredEvents[ i ] = undefined
+				}
+
+				// clean up
+				for( var j = 0; j < n; j++ ) {
+					if( deferredEvents[ j ] ) continue
+
+					arrayRemove( deferredEvents, j )
 				}
 			}
 		}
