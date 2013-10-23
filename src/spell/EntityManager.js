@@ -378,7 +378,11 @@ define(
 						entityTemplateChildConfig.children = mergeOverloadedChildren( entityTemplateChildConfig.children, overloadedChildConfig.children )
 						entityTemplateChildConfig.id       = overloadedChildConfig.id
 
-						applyEntityConfig( entityTemplateChildConfig.config || {}, overloadedChildConfig.config )
+						if( !entityTemplateChildConfig.config ) {
+							entityTemplateChildConfig.config = {}
+						}
+
+						applyEntityConfig( entityTemplateChildConfig.config, overloadedChildConfig.config )
 
 					} else {
 						memo.push( overloadedChildConfig )
@@ -415,7 +419,11 @@ define(
 					continue
 				}
 
-				applyEntityConfig( entityTemplateChild.config || {}, overloadedChild.config )
+				if( !entityTemplateChild.config ) {
+					entityTemplateChild.config = {}
+				}
+
+				applyEntityConfig( entityTemplateChild.config, overloadedChild.config )
 
 				if( overloadedChild.id ) {
 					entityTemplateChild.id = overloadedChild.id
