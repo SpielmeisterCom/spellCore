@@ -110,11 +110,16 @@ define(
 
 			var entityManager = new EntityManager( spell, configurationManager, assetManager, spell.eventManager, libraryManager, moduleLoader )
 
+			var inputManager = new InputManager( configurationManager, renderingContext )
+			inputManager.init()
+
 			var sceneManager = new SceneManager(
 				spell,
 				entityManager,
+				inputManager,
 				spell.statisticsManager,
 				libraryManager,
+				applicationModule.config,
 				spell.mainLoop,
 				this.sendMessageToEditor,
 				isModeDevelopment
@@ -126,9 +131,6 @@ define(
 				libraryManager,
 				configurationManager.getValue( 'currentLanguage' )
 			)
-
-			var inputManager = new InputManager( configurationManager, renderingContext )
-			inputManager.init()
 
 			spell.audioContext         = audioContext
 			spell.assetManager         = assetManager
