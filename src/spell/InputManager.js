@@ -214,7 +214,7 @@ define(
 				inputEventTypeToListeners[ eventType ] = _.filter(
 					registeredListeners,
 					function( registeredListener ) {
-						return registeredListener === listener
+						return registeredListener !== listener
 					}
 				)
 			},
