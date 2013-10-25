@@ -177,6 +177,9 @@ define(
 						isPortraitMode  = orientation === 'portrait',
 						isLandscapeMode = orientation === 'landscape'
 
+					//TODO: Quickfix. Martin, validate if this is correct
+					if( !this.activeScene ) return
+
 					if( ( isPortraitMode && Math.abs( this.currentGamma ) > 50 ) ||
 						( isLandscapeMode && Math.abs( this.currentGamma ) <= 50 ) ) {
 
