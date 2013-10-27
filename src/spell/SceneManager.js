@@ -37,7 +37,8 @@ define(
 
 			scene.init()
 
-			this.connectScene( scene )
+			this.mainLoop.setRenderCallback( _.bind( scene.render, scene ) )
+			this.mainLoop.setUpdateCallback( _.bind( update, null, entityManager, scene ) )
 
 			this.activeScene = scene
 
@@ -56,7 +57,8 @@ define(
 				var spell = this.spell
 
 				if( this.activeScene ) {
-					this.disconnectScene()
+					this.mainLoop.setRenderCallback()
+					this.mainLoop.setUpdateCallback()
 					this.activeScene.destroy()
 					this.activeScene = undefined
 
@@ -147,7 +149,7 @@ define(
 			this.mainLoop.setPreNextFrame( _.bind( preNextFrameCallback, this ) )
 		}
 
-		var SceneManager = function( spell, entityManager, inputManager, statisticsManager, libraryManager, applicationModuleConfig, mainLoop, sendMessageToEditor, isModeDevelopment ) {
+		var SceneManager = function( spell, entityManager, statisticsManager, libraryManager, mainLoop, sendMessageToEditor, isModeDevelopment ) {
 			this.activeScene
 			this.entityManager       = entityManager
 			this.mainLoop            = mainLoop
@@ -158,41 +160,6 @@ define(
 			this.isModeDevelopment   = isModeDevelopment
 			this.cmdQueue            = []
 			this.loadingPending      = false
-			this.currentGamma        = 0
-
-
-			this.deviceOrientationHandler = _.bind(
-				function( event ) {
-					this.currentGamma = event.gamma
-				},
-				this
-			)
-
-			inputManager.addListener( 'deviceOrientation', this.deviceOrientationHandler )
-
-
-			this.screenResizeHandler = _.bind(
-				function( size ) {
-					var orientation     = applicationModuleConfig.android.orientation,
-						isPortraitMode  = orientation === 'portrait',
-						isLandscapeMode = orientation === 'landscape'
-
-					//TODO: Quickfix. Martin, validate if this is correct
-					if( !this.activeScene ) return
-
-					if( ( isPortraitMode && Math.abs( this.currentGamma ) > 50 ) ||
-						( isLandscapeMode && Math.abs( this.currentGamma ) <= 50 ) ) {
-
-						this.disconnectScene()
-
-					} else {
-						this.connectScene( this.activeScene )
-					}
-				},
-				this
-			)
-
-			spell.eventManager.subscribe( spell.eventManager.EVENT.SCREEN_RESIZE, this.screenResizeHandler )
 		}
 
 		SceneManager.prototype = {
@@ -222,16 +189,6 @@ define(
 			},
 
 			startScene : startScene,
-
-			connectScene : function( scene ) {
-				this.mainLoop.setUpdateCallback( _.bind( update, null, this.entityManager, scene ) )
-				this.mainLoop.setRenderCallback( _.bind( scene.render, scene ) )
-			},
-
-			disconnectScene : function() {
-				this.mainLoop.setUpdateCallback()
-				this.mainLoop.setRenderCallback()
-			},
 
 			processCmdQueue : function() {
 				if( this.loadingPending ) {
