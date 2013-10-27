@@ -67,7 +67,7 @@ define(
 		 * @param id the id of the spell container div
 		 */
 		return function( eventManager, id, initialScreenSize ) {
-			var performScreenResize = function() {
+			var processResize = function() {
 				if( window.scrollTo ) {
 					window.scrollTo( 0, 0 )
 				}
@@ -78,16 +78,32 @@ define(
 				)
 			}
 
+			var processOrientationChange = function() {
+				var orientation    = window.orientation,
+					orienationMode = orientation === 0 ?
+						'portrait' :
+						orientation === -90 ?
+							'landscapeRotatedRight' :
+							'landscapeRotatedLeft'
+
+				eventManager.publish(
+					eventManager.EVENT.DEVICE_ORIENTATION_CHANGED,
+					[ orienationMode ]
+				)
+
+				processResize()
+			}
+
 			var deviceClass = getDeviceClass( navigator.userAgent )
 
 			if( deviceClass ) {
 				updateViewportMetaTag( deviceClass.initialScale, deviceClass.maximumScale )
 			}
 
-			window.addEventListener( 'resize', performScreenResize, true )
-			window.addEventListener( 'orientationchange', performScreenResize, true )
+			window.addEventListener( 'orientationchange', processOrientationChange, true )
+			window.addEventListener( 'resize', processResize, true )
 
-			performScreenResize()
+			processOrientationChange()
 		}
 	}
 )
