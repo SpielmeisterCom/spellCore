@@ -50,14 +50,14 @@ define(
 			spacing = fontAsset.config.hSpacing + spacing
 			if( !align ) return 0
 
-			var width           = 0,
-				numCharacters   = text.length,
-				charset         = fontAsset.config.charset
+			var width         = 0,
+				numCharacters = text.length,
+				charset       = fontAsset.config.charset
 
 			if( align === 'left' ) return width
 			if( align === 'right' ) return width
 
-			if( align === 'center' ){
+			if( align === 'center' ) {
 				for( var i = 0; i < numCharacters; i++ ) {
 					var charData = charset[ text.charAt( i ) ]
 
