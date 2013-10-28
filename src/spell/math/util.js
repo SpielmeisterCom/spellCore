@@ -185,6 +185,21 @@ define(
 			return out
 		};
 
+		/**
+		 * A triangle wave function. The output range is -1 to 1.
+		 *
+		 * @param {Number} t
+		 * @param {Number} a
+		 * @return {Number}
+		 */
+		util.triangle = function( t, a ) {
+			if( a == 0 ) return 0
+
+			var ta = t / a
+
+			return 2 * Math.abs( 2 * ( ta - Math.floor( ta + 0.5 ) ) ) - 1
+		}
+
 		return util
 	}
 )
