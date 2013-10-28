@@ -293,18 +293,14 @@ define(
 //							var start = performance.now()
 
 							// static appearance
-							context.save()
-							{
-								context.drawTexture(
-									texture,
-									vec2.scale( tmpVec2, quadDimensions, -0.5 ),
-									quadDimensions,
-									textureMatrix && !textureMatrix.isIdentity ?
-										textureMatrix.matrix :
-										undefined
-								)
-							}
-							context.restore()
+							context.drawTexture(
+								texture,
+								vec2.scale( tmpVec2, quadDimensions, -0.5 ),
+								quadDimensions,
+								textureMatrix && !textureMatrix.isIdentity ?
+									textureMatrix.matrix :
+									undefined
+							)
 
 //							var elapsed = performance.now() - start
 
@@ -368,17 +364,13 @@ define(
 
 //							var start = performance.now()
 
-							context.save()
-							{
-								context.drawSubTexture(
-									texture,
-									frameOffset,
-									assetFrameDimensions,
-									vec2.scale( tmpVec2, quadDimensions, -0.5 ),
-									quadDimensions
-								)
-							}
-							context.restore()
+							context.drawSubTexture(
+								texture,
+								frameOffset,
+								assetFrameDimensions,
+								vec2.scale( tmpVec2, quadDimensions, -0.5 ),
+								quadDimensions
+							)
 
 //							var elapsed = performance.now() - start
 
