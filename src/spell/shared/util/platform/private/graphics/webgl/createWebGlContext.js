@@ -149,7 +149,8 @@ define(
 				translate               : translate,
 				viewport                : _.bind( viewport, null, shaderProgram ),
 				transformScreenToWorld  : transformScreenToWorld,
-				getCanvasElement        : function() { return canvas }
+				getCanvasElement        : function() { return canvas },
+				flush                   : function() {}
 			}
 		}
 

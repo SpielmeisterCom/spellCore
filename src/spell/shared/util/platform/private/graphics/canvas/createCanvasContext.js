@@ -1,6 +1,7 @@
 define(
 	'spell/shared/util/platform/private/graphics/canvas/createCanvasContext',
 	[
+		'spell/functions',
 		'spell/shared/util/platform/private/graphics/StateStack',
 		'spell/shared/util/color',
 
@@ -9,6 +10,7 @@ define(
 		'spell/math/mat3'
 	],
 	function(
+		_,
 		StateStack,
 		color,
 
@@ -213,6 +215,9 @@ define(
 		var createWrapperContext = function() {
 			initWrapperContext()
 
+			// The gameclosure canvas wrapper exposes a flush method. It flushes accumulated state to the color buffer.
+			var flush = _.isFunction( context.flush ) ? context.flush : function() {}
+
 			return {
 				clear                  : clear,
 				createTexture          : createCanvasTexture,
@@ -238,7 +243,8 @@ define(
 				translate              : translate,
 				viewport               : viewport,
 				transformScreenToWorld : transformScreenToWorld,
-				getCanvasElement       : function() { return canvas }
+				getCanvasElement       : function() { return canvas },
+				flush                  : flush
 			}
 		}
 

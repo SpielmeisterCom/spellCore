@@ -695,6 +695,8 @@ define(
 				)
 			}
 
+			context.flush()
+
 			setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
 
 			// clear unsafe area
