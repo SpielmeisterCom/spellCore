@@ -401,12 +401,6 @@ if( !window.console ) {
 				throw 'Could not find dom node with id "' + config.id + '". Please provide a valid id.'
 			}
 
-			if( config.mode == MODE.DEPLOYED &&
-				!isValidProtocol() ) {
-
-				throw 'Protocol "file:" is not supported. Please use "http:" instead.'
-			}
-
 			if( !isBrowserCapable( config ) ) {
 				showMessage( config.id, 'Your browser does not meet the minimum requirements to run SpellJS.' )
 
