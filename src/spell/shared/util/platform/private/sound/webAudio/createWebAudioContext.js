@@ -60,7 +60,7 @@ define(
 
 		var stop = function( id ) {
 			var sourceNode = sourceNodes[ id ]
-			if( sourceNode ) sourceNode.noteOff(0)
+			if( sourceNode && sourceNode.playbackState === sourceNode.PLAYING_STATE ) sourceNode.noteOff(0)
 		}
 
 		var setVolume = function ( id, volume ) {
