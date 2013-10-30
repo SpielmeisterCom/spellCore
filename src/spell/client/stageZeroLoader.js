@@ -379,13 +379,6 @@ if( !window.console ) {
 		return child
 	}
 
-	var isValidProtocol = function() {
-		var isFileProtocol = window.location.protocol == 'file:',
-			isNodeWebKit   = typeof window.process == 'object'
-
-		return !isFileProtocol || ( isNodeWebKit && isFileProtocol )
-	}
-
 	var showMessage = function( id, message ) {
 		document.getElementById( id ).innerHTML = '<p style="color: #FFFFFF">' + message + '</p>'
 	}
