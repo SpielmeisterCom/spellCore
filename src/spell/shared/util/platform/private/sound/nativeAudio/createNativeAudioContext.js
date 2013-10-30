@@ -68,8 +68,12 @@ define(
 
 //			console.log( ' *** stop: ' + id )
 
-			NATIVE.sound.stopSound( url )
+			//TODO: Repair this
+			//just a test if this causes the crash on android
+
+			//NATIVE.sound.stopSound( url )
 		}
+
 
 		var play = function( audioResource, id, volume, loop ) {
 			volume = volume | 1.0
