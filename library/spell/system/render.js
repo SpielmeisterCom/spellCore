@@ -154,6 +154,12 @@ define(
 				offsetInMs / animationLengthInMs
 		}
 
+		var updatePlaying = function( animationLengthInMs, offsetInMs, looped ) {
+			return looped ?
+				true :
+				offsetInMs < animationLengthInMs
+		}
+
 		var transformTo2dTileMapCoordinates = function( worldToLocalMatrix, tilemapDimensions, frameDimensions, maxTileMapY, point ) {
 			var transformedPoint = vec2.divide(
 				tmpVec2,
@@ -338,26 +344,25 @@ define(
 							// animated appearance
 							var assetFrameDimensions = asset.frameDimensions,
 								assetNumFrames       = asset.numFrames,
-								wasPlaying           = appearance.playing
+								assetFrameDuration   = asset.frameDuration,
+								animationLengthInMs  = assetNumFrames * assetFrameDuration
 
 							var quadDimensions = quadGeometry ?
 								quadGeometry.dimensions :
 								assetFrameDimensions
 
-							if( wasPlaying ) {
-								if( appearance.offset == 0 ) {
-									entityManager.triggerEvent( id, 'animationStart', [ 'animation', appearance ] )
-								}
-
-								appearance.offset = createOffset(
-									deltaTimeInMs,
-									appearance.offset,
-									appearance.replaySpeed,
-									assetNumFrames,
-									asset.frameDuration,
-									appearance.looped
-								)
+							if( appearance.playing === true && appearance.offset == 0 ) {
+								entityManager.triggerEvent( id, 'animationStart', [ 'animation', appearance ] )
 							}
+
+							appearance.offset = createOffset(
+								deltaTimeInMs,
+								appearance.offset,
+								appearance.replaySpeed,
+								assetNumFrames,
+								asset.frameDuration,
+								appearance.looped
+							)
 
 							var frameId     = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
 								frameOffset = asset.frameOffsets[ frameId ]
@@ -374,13 +379,12 @@ define(
 
 //							var elapsed = performance.now() - start
 
-							var reachedEnd = appearance.offset >= 1,
-								isPlaying  = wasPlaying && ( appearance.looped || !reachedEnd )
+							var isPlaying = updatePlaying( animationLengthInMs, appearance.offset * animationLengthInMs, appearance.looped )
 
-							if( isPlaying != wasPlaying ) {
+							if( isPlaying !== appearance.playing ) {
 								appearance.playing = isPlaying
 
-								if( !isPlaying ) {
+								if( isPlaying === false ) {
 									entityManager.triggerEvent( id, 'animationEnd', [ 'animation', appearance ] )
 								}
 							}
