@@ -1,6 +1,11 @@
 define(
 	'spell/math/random/XorShift32',
-	function() {
+	[
+		'spell/math/util'
+	],
+	function(
+		mathUtil
+	) {
 		'use strict'
 
 
@@ -58,6 +63,17 @@ define(
 			 */
 			nextBetween : function( min, max ) {
 				return ( min + this.next() * ( max - min ) )
+			},
+
+			/**
+			 * Returns the next integer between min and max in the sequence.
+			 *
+			 * @param {Number} min The minimum value
+			 * @param {Number} max The maximum value
+			 * @return {Number}
+			 */
+			nextIntegerBetween : function( min, max ) {
+				return Math.round( this.nextBetween( Math.ceil( min ), Math.floor( max ) ) )
 			}
 		}
 
