@@ -1,11 +1,6 @@
 define(
 	'spell/math/random/XorShift32',
-	[
-		'spell/math/util'
-	],
-	function(
-		mathUtil
-	) {
+	function() {
 		'use strict'
 
 
