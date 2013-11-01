@@ -59,6 +59,7 @@ define(
 				spell.libraryManager.load(
 					createFilesToLoad( configurationManager, loadedAssets ),
 					{
+						assetManager       : spell.assetManager,
 						isMetaDataLoad     : false,
 						omitCache          : true,
 						onLoadingCompleted : function( loadedFiles ) {

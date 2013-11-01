@@ -38,7 +38,7 @@ define(
 		 * @param volume
 		 * @param loop
 		 */
-		var play = function( audioResource, id, volume, loop ) {
+		var play = function( audioAsset, id, volume, loop ) {
 			// TODO: The id parameter must be removed. Ids can only be guaranteed to be unqiue if the user can not provide its own.
 			id     = id ? id : createSoundId()
 			loop   = !!loop
@@ -46,7 +46,7 @@ define(
 
 			var sourceNode = _.has( sourceNodes, id ) ?
 				sourceNodes[ id ] :
-				create( id, audioResource )
+				create( id, audioAsset.resource )
 
 			setLoop( id, loop )
 			setVolume( id, volume )
@@ -118,7 +118,7 @@ define(
 			return isMutedValue
 		}
 
-		var loadBuffer = function( src, onLoadCallback ) {
+		var loadBuffer = function( src, audioAsset, onLoadCallback ) {
 			if( !src ) {
 				throw 'Error: No src provided.'
 			}

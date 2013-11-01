@@ -26,7 +26,7 @@ define(
 			return {}
 		}
 
-		var loadBuffer = function( src, onLoadCallback ) {
+		var loadBuffer = function( src, audioAsset, onLoadCallback ) {
 			if( !src ) {
 				throw 'Error: No src provided.'
 			}

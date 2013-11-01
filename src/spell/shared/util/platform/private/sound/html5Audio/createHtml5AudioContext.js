@@ -64,7 +64,7 @@ define(
 		 * @param volume
 		 * @param loop
 		 */
-		var play = function( audioResource, id, volume, loop ) {
+		var play = function( audioAsset, id, volume, loop ) {
 			if( !id ) {
 				id = createSoundId()
 			}
@@ -75,10 +75,9 @@ define(
 				numFreeChannels > 0 ) {
 
 				// when a free channel exists play the sound
-
 				numFreeChannels--
 
-				audioElement = create( id, audioResource )
+				audioElement = create( id, audioAsset.resource )
 				audioElements[ id ] = audioElement
 			}
 
@@ -164,7 +163,7 @@ define(
 
 		var tick = function() {}
 
-		var loadBuffer = function( src, onLoadCallback ) {
+		var loadBuffer = function( src, audioAsset, onLoadCallback ) {
 			if( !src ) {
 				throw 'Error: No src provided.'
 			}

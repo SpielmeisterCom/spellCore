@@ -63,6 +63,7 @@ define(
 
 		var createLoadingProcess = function( id, libraryPaths, libraryUrl, invalidateCache, config, next ) {
 			return {
+				assetManager       : config.assetManager,
 				id                 : id,
 				libraryPaths       : libraryPaths,
 				invalidateCache    : invalidateCache,
@@ -183,6 +184,8 @@ define(
 					libraryPathUrlUsedForLoading
 
 				var loader = loaderFactory(
+					loadingProcess.assetManager,
+					createIdFromLibraryFilePath( libraryPath ),
 					loadingProcess.invalidateCache ? createUrlWithCacheBreaker( url ) : url,
 					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
 					_.bind( onErrorCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),

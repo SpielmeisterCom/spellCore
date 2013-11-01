@@ -41,7 +41,7 @@ define(
 		}
 
 
-		var TextLoader = function( postProcess, url, onLoadCallback, onErrorCallback ) {
+		var TextLoader = function( postProcess, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 			this.postProcess     = postProcess
 			this.url             = url
 			this.onLoadCallback  = onLoadCallback

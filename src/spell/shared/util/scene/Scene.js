@@ -320,7 +320,9 @@ define(
 
 				libraryManager.load(
 					createLibraryFilePathsFromIds( [ systemId ] ),
-					undefined,
+					{
+						assetManager : spell.assetManager
+					},
 					function() {
 						var system = createSystem(
 							spell,

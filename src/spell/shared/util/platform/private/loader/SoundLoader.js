@@ -19,8 +19,9 @@ define(
 		}
 
 
-		var SoundLoader = function( audioContext, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+		var SoundLoader = function( audioContext, asset, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 			this.audioContext    = audioContext
+			this.asset           = asset
 			this.url             = url
 			this.onLoadCallback  = onLoadCallback
 			this.onErrorCallback = onErrorCallback
@@ -31,6 +32,7 @@ define(
 			start : function() {
 				this.audioContext.loadBuffer(
 					this.url,
+					this.asset,
 					_.bind( onLoad, this )
 				)
 			}

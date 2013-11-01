@@ -13,13 +13,6 @@ define(
 
 		var dummy = function() {}
 
-		var isBackgroundMusic = function( src ) {
-			return src == 'library/superkumba/sounds/KibaKumbaDschungel.mp3' ||
-				src == 'library/superkumba/sounds/KibaKumbaWueste.mp3' ||
-				src == 'library/superkumba/sounds/KibaKumbaHoehle.mp3' ||
-				src == 'library/superkumba/sounds/KibaKumbaArktis.mp3'
-		}
-
 		// Unfortunately the game closure sound api is missing a "sound identity" concept. Therefore it is not possible to reference a playing sound by anything
 		// but its src attribute value. The src value is not unqiue though.
 
@@ -74,11 +67,10 @@ define(
 			//NATIVE.sound.stopSound( url )
 		}
 
-
-		var play = function( audioResource, id, volume, loop ) {
+		var play = function( audioAsset, id, volume, loop ) {
 			volume = volume | 1.0
 
-			var url = audioResource.src
+			var url = audioAsset.resource.src
 
 			if( id ) {
 				idToUrl[ id ] = url
@@ -86,15 +78,12 @@ define(
 
 //			console.log( ' *** play: ' + url + ', ' + ( id ? id : 'anonymous' ) + ', vol: ' + ( isMutedValue ? 0.0 : volume ) )
 
-			var play = isBackgroundMusic( url ) ?
-				NATIVE.sound.playBackgroundMusic :
-				NATIVE.sound.playSound
+			if( audioAsset.isMusic ) {
+				NATIVE.sound.playBackgroundMusic( url, isMutedValue ? 0 : volume, !!loop )
 
-			play(
-				url,
-				isMutedValue ? 0.0 : volume,
-				!!loop
-			)
+			} else {
+				NATIVE.sound.playSound( url, isMutedValue ? 0 : volume, !!loop )
+			}
 		}
 
 		var createSound = function( audioBuffer ) {
@@ -116,7 +105,7 @@ define(
 		}
 
 
-		var loadBuffer = function( src, onLoadCallback ) {
+		var loadBuffer = function( src, audioAsset, onLoadCallback ) {
 			if( !src ) {
 				throw 'Error: No src provided.'
 			}
@@ -131,7 +120,7 @@ define(
 
 			audioBuffers[ fixedSrc ] = audioBuffer
 
-			if( isBackgroundMusic( fixedSrc ) ) {
+			if( audioAsset.isMusic ) {
 				onLoadCallback( audioBuffer )
 
 			} else {

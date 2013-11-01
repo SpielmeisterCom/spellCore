@@ -5,6 +5,7 @@
 define(
 	'spell/shared/util/platform/PlatformKit',
 	[
+		'spell/shared/util/createAssetId',
 		'spell/shared/util/platform/private/Application',
 		'spell/shared/util/platform/private/Box2D',
 		'spell/shared/util/platform/private/callNextFrame',
@@ -32,6 +33,7 @@ define(
 		'spell/shared/util/platform/private/createComponentType'
 	],
 	function(
+		createAssetId,
 		Application,
 		Box2D,
 		callNextFrame,
@@ -153,15 +155,17 @@ define(
 				return new PersistentStorage()
 			},
 
-			createImageLoader : function( renderingContext, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+			createImageLoader : function( renderingContext, assetManager, libraryId, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 				return new ImageLoader( renderingContext, url, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			createSoundLoader : function( audioContext, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-				return new SoundLoader( audioContext, url, onLoadCallback, onErrorCallback, onTimedOutCallback )
+			createSoundLoader : function( audioContext, assetManager, libraryId, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+				var asset = assetManager.get( createAssetId( 'sound', libraryId ) )
+
+				return new SoundLoader( audioContext, asset, url, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			createTextLoader : function( postProcess, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+			createTextLoader : function( postProcess, assetManager, libraryId, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 				return new TextLoader( postProcess, url, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 

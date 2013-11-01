@@ -172,9 +172,15 @@ define(
 						type    = assetDefinition.subtype,
 						assetId = createAssetId( type, assetDefinition.namespace, assetDefinition.name )
 
-					if( type === 'appearance' || type === 'sound' ) {
+					if( type === 'appearance' ) {
 						asset = {
 							type : type
+						}
+
+					} else if( type === 'sound' ) {
+						asset = {
+							type : type,
+							isMusic : !!assetDefinition.config.isMusic
 						}
 
 					} else if( type === 'spriteSheet' ) {
