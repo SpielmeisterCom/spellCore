@@ -13,8 +13,8 @@ define(
 		var isBrokenDeviceOrientationApi = true
 
 		if( window.DeviceMotionEvent ) {
-			var NUM_SAMPLES                  = 10,
-				counter                      = NUM_SAMPLES
+			var NUM_SAMPLES = 10,
+				counter     = NUM_SAMPLES
 
 			// Bad hack for detecting wrong api implementation ( for example on ipad1 )
 			var checkIsBrokenDeviceOrientationApi = function( event ) {
