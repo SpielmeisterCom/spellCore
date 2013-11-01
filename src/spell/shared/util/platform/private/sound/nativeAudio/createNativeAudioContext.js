@@ -1,10 +1,12 @@
 define(
 	'spell/shared/util/platform/private/sound/nativeAudio/createNativeAudioContext',
 	[
+		'spell/shared/util/createNormalizedVolume',
 		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
 		'spell/shared/util/platform/private/sound/createSoundId'
 	],
 	function(
+		createNormalizedVolume,
 		createFixedSoundFileSrc,
 		createSoundId
 	) {
@@ -50,7 +52,7 @@ define(
 
 //			console.log( ' *** setVolume: ' + id + ' vol. ' + ( isMutedValue ? 0.0 : 1.0 ) )
 
-			NATIVE.sound.setVolume( url, volume )
+			NATIVE.sound.setVolume( url, createNormalizedVolume( volume ) )
 		}
 
 		var stop = function ( id ) {
@@ -61,31 +63,37 @@ define(
 
 //			console.log( ' *** stop: ' + id )
 
-			//TODO: Repair this
-			//just a test if this causes the crash on android
+			// TODO: Repair this
+			// just a test if this causes the crash on android
 
-			//NATIVE.sound.stopSound( url )
+			NATIVE.sound.stopSound( url )
 		}
 
-		var play = function( audioAsset, id, volume, loop ) {
-			volume = volume | 1.0
+		var play = function( soundAsset, volume, loop ) {
+			var id               = createSoundId(),
+				url              = soundAsset.resource.src,
+				normalizedVolume = createNormalizedVolume( volume )
 
-			var url = audioAsset.resource.src
+			idToUrl[ id ] = url
 
-			if( id ) {
-				idToUrl[ id ] = url
-			}
+//			console.log( ' *** play: ' + url + ', ' + ( id ? id : 'anonymous' ) + ', vol: ' + ( isMutedValue ? 0.0 : normalizedVolume ) )
 
-//			console.log( ' *** play: ' + url + ', ' + ( id ? id : 'anonymous' ) + ', vol: ' + ( isMutedValue ? 0.0 : volume ) )
-
-			if( audioAsset.isMusic ) {
-				NATIVE.sound.playBackgroundMusic( url, isMutedValue ? 0 : volume, !!loop )
+			if( soundAsset.isMusic ) {
+				NATIVE.sound.playBackgroundMusic( url, isMutedValue ? 0 : normalizedVolume, !!loop )
 
 			} else {
-				NATIVE.sound.playSound( url, isMutedValue ? 0 : volume, !!loop )
+				NATIVE.sound.playSound( url, isMutedValue ? 0 : normalizedVolume, !!loop )
 			}
+
+			return id
 		}
 
+		/*
+		 * Returns a SoundResource instance.
+		 *
+		 * @param buffer
+		 * @return {SoundResource}
+		 */
 		var createSound = function( audioBuffer ) {
 //			console.log( ' *** Creating sound from buffer ' + audioBuffer.src )
 
@@ -105,7 +113,7 @@ define(
 		}
 
 
-		var loadBuffer = function( src, audioAsset, onLoadCallback ) {
+		var loadBuffer = function( src, soundAsset, onLoadCallback ) {
 			if( !src ) {
 				throw 'Error: No src provided.'
 			}
@@ -120,7 +128,7 @@ define(
 
 			audioBuffers[ fixedSrc ] = audioBuffer
 
-			if( audioAsset.isMusic ) {
+			if( soundAsset.isMusic ) {
 				onLoadCallback( audioBuffer )
 
 			} else {

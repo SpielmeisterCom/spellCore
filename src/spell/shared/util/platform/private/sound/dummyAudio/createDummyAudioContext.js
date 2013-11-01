@@ -1,12 +1,21 @@
 define(
 	'spell/shared/util/platform/private/sound/dummyAudio/createDummyAudioContext',
-	function() {
+	[
+		'spell/shared/util/platform/private/sound/createSoundId'
+	],
+	function(
+		createSoundId
+	) {
 		'use strict'
 
 
 		var isMutedValue = false
 
 		var dummy = function() {}
+
+		var play = function( soundAsset, volume, loop ) {
+			return createSoundId()
+		}
 
 		var setAllMuted = function( isMute ) {
 			isMutedValue = isMute
@@ -17,16 +26,16 @@ define(
 		}
 
 		/*
-		 * Returns a AudioResource instance.
+		 * Returns a SoundResource instance.
 		 *
 		 * @param buffer
-		 * @return {AudioResource}
+		 * @return {SoundResource}
 		 */
 		var createSound = function( buffer ) {
 			return {}
 		}
 
-		var loadBuffer = function( src, audioAsset, onLoadCallback ) {
+		var loadBuffer = function( src, soundAsset, onLoadCallback ) {
 			if( !src ) {
 				throw 'Error: No src provided.'
 			}
@@ -41,7 +50,7 @@ define(
 		var createWrapperContext = function() {
 			return {
 				tick             : dummy,
-				play             : dummy,
+				play             : play,
 				setLoop          : dummy,
 				setVolume        : dummy,
 				setAllMuted      : setAllMuted,
