@@ -27,15 +27,7 @@ define(
 			remove : function() {
 				var linkedList  = this.linkedList,
 					currentNode = this.currentNode,
-					removeNode
-
-				if( !currentNode ) {
-					removeNode = linkedList.lastNode
-					if( !removeNode ) return
-
-				} else {
-					removeNode = currentNode.previous
-				}
+					removeNode  = currentNode ? currentNode.previous : linkedList.lastNode
 
 				if( !removeNode ) return
 
