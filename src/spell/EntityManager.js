@@ -7,6 +7,7 @@
 define(
 	'spell/EntityManager',
 	[
+		'spell/data/LinkedList',
 		'spell/data/entity/createAmbiguousSiblingName',
 		'spell/data/entity/recursiveFind',
 		'spell/data/spatial/QuadTree',
@@ -28,6 +29,7 @@ define(
 		'spell/functions'
 	],
 	function(
+		LinkedList,
 		createAmbiguousSiblingName,
 		recursiveFind,
 		QuadTree,
@@ -925,7 +927,7 @@ define(
 			this.spell                = spell
 			this.spatialIndex         = undefined
 			this.componentsWithAssets = {}
-			this.deferredEvents       = []
+			this.deferredEvents       = new LinkedList()
 		}
 
 		EntityManager.prototype = {
@@ -1122,7 +1124,7 @@ define(
 			 */
 			destroy : function() {
 				this.removeEntity( ROOT_ENTITY_ID )
-				this.deferredEvents.length = 0
+				this.deferredEvents.clear()
 			},
 
 			/**
@@ -1461,7 +1463,7 @@ define(
 			 */
 			triggerEvent : function( entityId, eventId, eventArguments, timerInMs, timerCondition ) {
 				if( timerInMs ) {
-					this.deferredEvents.push( new DeferredEvent( entityId, eventId, eventArguments, timerInMs, timerCondition ) )
+					this.deferredEvents.append( new DeferredEvent( entityId, eventId, eventArguments, timerInMs, timerCondition ) )
 
 				} else {
 					var componentMaps = this.componentMaps
@@ -1535,22 +1537,17 @@ define(
 
 			updateDeferredEvents : function( deltaTimeInMs ) {
 				var deferredEvents = this.deferredEvents,
-					n              = deferredEvents.length
+					iterator       = deferredEvents.createIterator(),
+					node,
+					deferredEvent
 
-				for( var i = 0, deferredEvent; i < n; i++ ) {
-					deferredEvent = deferredEvents[ i ]
+				while( node = iterator.next() ) {
+					deferredEvent = node.data
 
-					if( !deferredEvent.ready( deltaTimeInMs ) ) continue
-
-					deferredEvent.trigger( this )
-					deferredEvents[ i ] = undefined
-				}
-
-				// clean up
-				for( var j = 0; j < n; j++ ) {
-					if( deferredEvents[ j ] ) continue
-
-					arrayRemove( deferredEvents, j )
+					if( deferredEvent.ready( deltaTimeInMs ) ) {
+						iterator.remove()
+						deferredEvent.trigger( this )
+					}
 				}
 			}
 		}
