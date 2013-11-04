@@ -22,7 +22,7 @@ define(
 			}
 
 			if( !soundEmitter.play ) {
-				audioContext.play( soundEmitter.asset.resource, id, soundEmitter.volume, soundEmitter.loop )
+				audioContext.play( soundEmitter.asset, soundEmitter.volume, soundEmitter.loop )
 
 				soundEmitter.play = true
 
