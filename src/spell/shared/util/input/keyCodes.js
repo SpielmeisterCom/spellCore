@@ -103,9 +103,14 @@ define(
 		    "SINGLE_QUOTE": 222,
 
 			/**
-			 * Android back button. The key code is arbitrarily choosen.
+			 * Hardware back button. The key code is arbitrarily choosen.
 			 */
-			"ANDROID_BACK": 230
+			"BACK": 230,
+
+			/**
+			 * Menu button. The key code is arbitrarily choosen.
+			 */
+			"MENU": 231
 		}
 	}
 )
