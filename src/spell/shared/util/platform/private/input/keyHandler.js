@@ -82,16 +82,15 @@ define(
 
 		var nativeHandler
 
-		var createKeyEvent = function( keyCode, type ) {
-			return {
-				keyCode : keyCode,
-				type : type == 'keydown' ? 'keyDown' : 'keyUp'
-			}
+		var KeyEvent = function( keyCode, type ) {
+			this.keyCode = keyCode
+			this.type = type === 'keydown' ? 'keyDown' : 'keyUp'
 		}
 
 		var nativeHandlerImpl = function( callback, event ) {
 			event.preventDefault()
-			callback( createKeyEvent( event.keyCode, event.type ) )
+
+			callback( new KeyEvent( event.keyCode, event.type ) )
 		}
 
 		var registerListener = function( el, callback ) {
@@ -105,7 +104,7 @@ define(
 				NATIVE.events.registerHandler(
 					'keyEvent',
 					function( event ) {
-						callback( createKeyEvent( event.keyCode, event.type ) )
+						callback( new KeyEvent( event.keyCode, event.type ) )
 					}
 				)
 			}
