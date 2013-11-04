@@ -69,12 +69,14 @@ define(
 	'spell/shared/util/platform/private/input/keyHandler',
 	[
 		'spell/shared/util/platform/private/isHtml5GameClosure',
-
+		'spell/shared/util/platform/private/isHtml5Tizen',
+		'spell/shared/util/input/keyCodes',
 		'spell/functions'
 	],
 	function(
 		isHtml5GameClosure,
-
+		isHtml5Tizen,
+		keyCodes,
 		_
 	) {
 		'use strict'
@@ -90,7 +92,19 @@ define(
 		var nativeHandlerImpl = function( callback, event ) {
 			event.preventDefault()
 
-			callback( new KeyEvent( event.keyCode, event.type ) )
+			var keyCode = event.keyCode 
+			
+			if( isHtml5Tizen ) {
+				if( event.keyName == 'back' ) {
+					keyCode = keyCodes.BACK
+
+				} else if ( event.keyName == 'menu' ) {
+					keyCode = keyCodes.MENU
+				}
+			}
+
+
+			callback( new KeyEvent( keyCode, event.type ) )
 		}
 
 		var registerListener = function( el, callback ) {
@@ -113,12 +127,20 @@ define(
 
 			el.addEventListener( 'keyup', nativeHandler, true )
 			el.addEventListener( 'keydown', nativeHandler, true )
+
+			if( isHtml5Tizen ) {
+				el.addEventListener( 'tizenhwkey', nativeHandler, true )
+			}
 		}
 
 		var removeListener = function( el ) {
 			if( nativeHandler !== null ) {
 				el.removeEventLister( 'keyup', nativeHandler )
 				el.removeEventLister( 'keydown', nativeHandler )
+
+				if( isHtml5Tizen ) {
+					el.removeEventLister( 'tizenhwkey', nativeHandler )
+				}
 			}
 
 			nativeHandler = null
