@@ -60,6 +60,8 @@ define(
 		'use strict'
 
 
+		var TO_DEGREE_FACTOR = 180 / Math.PI
+
 		var nativeHandler
 
 		var DeviceOrientationEvent = function( alpha, beta, gamma ) {
@@ -79,7 +81,11 @@ define(
 			registerListener : function( el, callback ) {
 				if( isHtml5GameClosure ) {
 					nativeHandler = function( event ) {
-						callback( new DeviceOrientationEvent( event.alpha, event.beta, event.gamma ) )
+						callback( new DeviceOrientationEvent(
+							event.alpha * TO_DEGREE_FACTOR,
+							event.beta * TO_DEGREE_FACTOR,
+							event.gamma * TO_DEGREE_FACTOR
+						) )
 					}
 
 					NATIVE.events.registerHandler( 'deviceorientation', nativeHandler )
