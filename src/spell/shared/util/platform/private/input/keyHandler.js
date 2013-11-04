@@ -92,19 +92,27 @@ define(
 		var nativeHandlerImpl = function( callback, event ) {
 			event.preventDefault()
 
-			var keyCode = event.keyCode 
+			var keyCode         = event.keyCode,
+				keyIdentifier   = event.keyIdentifier
 			
 			if( isHtml5Tizen ) {
-				if( event.keyName == 'back' ) {
+				if( keyIdentifier == 'XF86Send') { //menu button
+					keyCode = keyCodes.MENU
+
+				} else if( keyIdentifier == 'XF86Phone' ) { //home button
+					keyCode = keyCodes.HOME
+
+				} else if ( keyIdentifier == 'XF86Stop' ) { //back button
 					keyCode = keyCodes.BACK
 
-				} else if ( event.keyName == 'menu' ) {
-					keyCode = keyCodes.MENU
+				} else if ( keyIdentifier == 'XF86PowerOff' ) { //power button
+					keyCode = keyCodes.POWER
 				}
 			}
 
-
-			callback( new KeyEvent( keyCode, event.type ) )
+			if( keyCode ) {
+				callback( new KeyEvent( keyCode, event.type ) )
+			}
 		}
 
 		var registerListener = function( el, callback ) {

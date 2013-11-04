@@ -103,14 +103,12 @@ define(
 		    "SINGLE_QUOTE": 222,
 
 			/**
-			 * Hardware back button. The key code is arbitrarily choosen.
+			 * Hardware buttons. The key codes are arbitrarily choosen.
 			 */
 			"BACK": 230,
-
-			/**
-			 * Menu button. The key code is arbitrarily choosen.
-			 */
-			"MENU": 231
+			"MENU": 231,
+			"POWER": 232,
+			"HOME": 233
 		}
 	}
 )
