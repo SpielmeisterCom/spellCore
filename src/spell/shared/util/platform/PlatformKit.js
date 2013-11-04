@@ -22,6 +22,7 @@ define(
 		'spell/shared/util/platform/private/loader/ImageLoader',
 		'spell/shared/util/platform/private/loader/SoundLoader',
 		'spell/shared/util/platform/private/loader/TextLoader',
+		'spell/shared/util/platform/private/input/support',
 		'spell/shared/util/platform/private/Input',
 		'spell/shared/util/platform/private/configurationOptions',
 		'spell/shared/util/platform/private/storage/PersistentStorage',
@@ -50,6 +51,7 @@ define(
 		ImageLoader,
 		SoundLoader,
 		TextLoader,
+		support,
 		Input,
 		configurationOptions,
 		PersistentStorage,
@@ -178,7 +180,9 @@ define(
 
 			Application : Application,
 
-			createSplashScreenImage : createSplashScreenImage
+			createSplashScreenImage : createSplashScreenImage,
+
+			init : support.init
 		}
 	}
 )

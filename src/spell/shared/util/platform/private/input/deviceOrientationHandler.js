@@ -50,37 +50,55 @@
 define(
 	'spell/shared/util/platform/private/input/deviceOrientationHandler',
 	[
-		'spell/functions'
+		'spell/functions',
+		'spell/shared/util/platform/private/isHtml5GameClosure'
 	],
 	function(
-		_
+		_,
+		isHtml5GameClosure
 	) {
 		'use strict'
 
 
 		var nativeHandler
 
+		var DeviceOrientationEvent = function( alpha, beta, gamma ) {
+			this.type = 'deviceOrientation'
+			this.alpha = alpha
+			this.beta = beta
+			this.gamma = gamma
+		}
+
 		var nativeHandlerImpl = function( callback, event ) {
 			event.preventDefault()
 
-			callback( {
-				type : 'deviceOrientation',
-				alpha : event.alpha,
-				beta : event.beta,
-				gamma : event.gamma
-			} )
+			callback( new DeviceOrientationEvent( event.alpha, event.beta, event.gamma ) )
 		}
 
 		return {
 			registerListener : function( el, callback ) {
-				nativeHandler = _.bind( nativeHandlerImpl, this, callback )
+				if( isHtml5GameClosure ) {
+					nativeHandler = function( event ) {
+						callback( new DeviceOrientationEvent( event.alpha, event.beta, event.gamma ) )
+					}
 
-				el.addEventListener( 'deviceorientation', nativeHandler, true )
+					NATIVE.events.registerHandler( 'deviceorientation', nativeHandler )
+
+				} else {
+					nativeHandler = _.bind( nativeHandlerImpl, this, callback )
+
+					el.addEventListener( 'deviceorientation', nativeHandler, true )
+				}
 			},
 			removeListener : function( el ) {
 				if( !nativeHandler ) return
 
-				el.removeEventLister( 'deviceorientation', nativeHandler )
+				if( isHtml5GameClosure ) {
+					NATIVE.events.unregisterHandler( 'deviceorientation', nativeHandler )
+
+				} else {
+					el.removeEventListener( 'deviceorientation', nativeHandler, true )
+				}
 
 				nativeHandler = undefined
 			}

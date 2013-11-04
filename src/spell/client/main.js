@@ -54,6 +54,10 @@ define(
 		'use strict'
 
 
+		var preStart = function( applicationModule, cacheContent ) {
+			PlatformKit.init( _.bind( start, this, applicationModule, cacheContent ) )
+		}
+
 		var start = function( applicationModule, cacheContent ) {
 			var spell                = this.spell,
 				configurationManager = spell.configurationManager,
@@ -208,7 +212,7 @@ define(
 		}
 
 		main.prototype = {
-			start : start,
+			start : preStart,
 
 			/*
 			 * This callback is called when the engine instance sends message to the editing environment.
