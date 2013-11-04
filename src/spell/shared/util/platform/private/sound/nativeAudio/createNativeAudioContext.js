@@ -1,10 +1,12 @@
 define(
 	'spell/shared/util/platform/private/sound/nativeAudio/createNativeAudioContext',
 	[
+		'spell/shared/util/createNormalizedVolume',
 		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
 		'spell/shared/util/platform/private/sound/createSoundId'
 	],
 	function(
+		createNormalizedVolume,
 		createFixedSoundFileSrc,
 		createSoundId
 	) {
@@ -12,13 +14,6 @@ define(
 
 
 		var dummy = function() {}
-
-		var isBackgroundMusic = function( src ) {
-			return src == 'library/superkumba/sounds/KibaKumbaDschungel.mp3' ||
-				src == 'library/superkumba/sounds/KibaKumbaWueste.mp3' ||
-				src == 'library/superkumba/sounds/KibaKumbaHoehle.mp3' ||
-				src == 'library/superkumba/sounds/KibaKumbaArktis.mp3'
-		}
 
 		// Unfortunately the game closure sound api is missing a "sound identity" concept. Therefore it is not possible to reference a playing sound by anything
 		// but its src attribute value. The src value is not unqiue though.
@@ -57,7 +52,7 @@ define(
 
 //			console.log( ' *** setVolume: ' + id + ' vol. ' + ( isMutedValue ? 0.0 : 1.0 ) )
 
-			NATIVE.sound.setVolume( url, volume )
+			NATIVE.sound.setVolume( url, createNormalizedVolume( volume ) )
 		}
 
 		var stop = function ( id ) {
@@ -68,35 +63,37 @@ define(
 
 //			console.log( ' *** stop: ' + id )
 
-			//TODO: Repair this
-			//just a test if this causes the crash on android
+			// TODO: Repair this
+			// just a test if this causes the crash on android
 
-			//NATIVE.sound.stopSound( url )
+			NATIVE.sound.stopSound( url )
 		}
 
+		var play = function( soundAsset, volume, loop ) {
+			var id               = createSoundId(),
+				url              = soundAsset.resource.src,
+				normalizedVolume = createNormalizedVolume( volume )
 
-		var play = function( audioResource, id, volume, loop ) {
-			volume = volume | 1.0
+			idToUrl[ id ] = url
 
-			var url = audioResource.src
+//			console.log( ' *** play: ' + url + ', ' + ( id ? id : 'anonymous' ) + ', vol: ' + ( isMutedValue ? 0.0 : normalizedVolume ) )
 
-			if( id ) {
-				idToUrl[ id ] = url
+			if( soundAsset.isMusic ) {
+				NATIVE.sound.playBackgroundMusic( url, isMutedValue ? 0 : normalizedVolume, !!loop )
+
+			} else {
+				NATIVE.sound.playSound( url, isMutedValue ? 0 : normalizedVolume, !!loop )
 			}
 
-//			console.log( ' *** play: ' + url + ', ' + ( id ? id : 'anonymous' ) + ', vol: ' + ( isMutedValue ? 0.0 : volume ) )
-
-			var play = isBackgroundMusic( url ) ?
-				NATIVE.sound.playBackgroundMusic :
-				NATIVE.sound.playSound
-
-			play(
-				url,
-				isMutedValue ? 0.0 : volume,
-				!!loop
-			)
+			return id
 		}
 
+		/*
+		 * Returns a SoundResource instance.
+		 *
+		 * @param buffer
+		 * @return {SoundResource}
+		 */
 		var createSound = function( audioBuffer ) {
 //			console.log( ' *** Creating sound from buffer ' + audioBuffer.src )
 
@@ -116,7 +113,7 @@ define(
 		}
 
 
-		var loadBuffer = function( src, onLoadCallback ) {
+		var loadBuffer = function( src, soundAsset, onLoadCallback ) {
 			if( !src ) {
 				throw 'Error: No src provided.'
 			}
@@ -131,7 +128,7 @@ define(
 
 			audioBuffers[ fixedSrc ] = audioBuffer
 
-			if( isBackgroundMusic( fixedSrc ) ) {
+			if( soundAsset.isMusic ) {
 				onLoadCallback( audioBuffer )
 
 			} else {

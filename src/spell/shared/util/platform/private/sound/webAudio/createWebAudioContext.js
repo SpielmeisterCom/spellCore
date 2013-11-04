@@ -1,12 +1,14 @@
 define(
 	'spell/shared/util/platform/private/sound/webAudio/createWebAudioContext',
 	[
+		'spell/shared/util/createNormalizedVolume',
 		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
 		'spell/shared/util/platform/private/sound/createSoundId',
 
 		'spell/functions'
 	],
 	function(
+		createNormalizedVolume,
 		createFixedSoundFileSrc,
 		createSoundId,
 
@@ -19,11 +21,11 @@ define(
 			sourceNodes  = {},
 			isMutedValue = false
 
-		var create = function( id, audioResource ) {
+		var create = function( id, soundResource ) {
 			var gainNode   = context.createGainNode(),
 				sourceNode = context.createBufferSource()
 
-			sourceNode.buffer = audioResource.privateAudioResource
+			sourceNode.buffer = soundResource.resource
 
 			sourceNode.connect( gainNode )
 			gainNode.connect( context.destination )
@@ -33,20 +35,16 @@ define(
 		}
 
 		/**
-		 * @param {AudioResource} audioResource
-		 * @param id
+		 * @param {SoundAsset} soundAsset
 		 * @param volume
 		 * @param loop
 		 */
-		var play = function( audioResource, id, volume, loop ) {
-			// TODO: The id parameter must be removed. Ids can only be guaranteed to be unqiue if the user can not provide its own.
-			id     = id ? id : createSoundId()
-			loop   = !!loop
-			volume = volume ? volume : 1
+		var play = function( soundAsset, volume, loop ) {
+			var id = createSoundId()
 
 			var sourceNode = _.has( sourceNodes, id ) ?
 				sourceNodes[ id ] :
-				create( id, audioResource )
+				create( id, soundAsset.resource )
 
 			setLoop( id, loop )
 			setVolume( id, volume )
@@ -56,28 +54,42 @@ define(
 			if( sourceNode.playbackState !== sourceNode.PLAYING_STATE ) {
 				sourceNode.noteOn( 0 )
 			}
+
+			return id
 		}
 
 		var stop = function( id ) {
 			var sourceNode = sourceNodes[ id ]
-			if( sourceNode && sourceNode.playbackState === sourceNode.PLAYING_STATE ) sourceNode.noteOff(0)
+
+			if( sourceNode &&
+				sourceNode.playbackState === sourceNode.PLAYING_STATE ) {
+
+				sourceNode.noteOff( 0 )
+			}
 		}
 
 		var setVolume = function ( id, volume ) {
-			volume = !isNaN( volume ) ? volume : 1
 			var sourceNode = sourceNodes[ id ]
-			if( sourceNode ) sourceNode.gain.value = volume
+
+			if( sourceNode ) {
+				sourceNode.gain.value = createNormalizedVolume( volume )
+			}
 		}
 
 		var setLoop = function( id, loop ) {
-			loop = !!loop
 			var sourceNode = sourceNodes[ id ]
-			if( sourceNode ) sourceNode.loop = loop
+
+			if( sourceNode ) {
+				sourceNode.loop = !!loop
+			}
 		}
 
 		var mute = function( id ) {
 			var sourceNode = sourceNodes[ id ]
-			if( sourceNode ) sourceNode.gain.value = 0
+
+			if( sourceNode ) {
+				sourceNode.gain.value = 0
+			}
 		}
 
 		var destroy = function( id ) {
@@ -105,6 +117,7 @@ define(
 				_.each( sourceNodes, function( value, key ) {
 					mute( key )
 				} )
+
 			} else {
 				_.each( sourceNodes, function( value, key ) {
 					setVolume( key, 1 )
@@ -118,7 +131,7 @@ define(
 			return isMutedValue
 		}
 
-		var loadBuffer = function( src, onLoadCallback ) {
+		var loadBuffer = function( src, soundAsset, onLoadCallback ) {
 			if( !src ) {
 				throw 'Error: No src provided.'
 			}
@@ -179,10 +192,10 @@ define(
 		}
 
 		/*
-		 * Returns a AudioResource instance.
+		 * Returns a SoundResource instance.
 		 *
 		 * @param buffer
-		 * @return {AudioResource}
+		 * @return {SoundResource}
 		 */
 		var createSound = function( buffer ) {
 			return {
@@ -196,7 +209,7 @@ define(
 				 *
 				 * This is an implementation detail of the class. If you write code that depends on this you better know what you are doing.
 				 */
-				privateAudioResource : buffer
+				resource : buffer
 			}
 		}
 

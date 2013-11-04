@@ -18,6 +18,7 @@ define(
 			spell.libraryManager.load(
 				[ createLibraryFilePathFromId( libraryId ) ],
 				{
+					assetManager       : spell.assetManager,
 					omitCache          : true,
 					onLoadingCompleted : function( loadedLibraryRecords ) {
 						updateAssets( spell.assetManager, loadedLibraryRecords )
@@ -28,6 +29,7 @@ define(
 							spell.libraryManager.load(
 								filesToLoad,
 								{
+									assetManager       : spell.assetManager,
 									isMetaDataLoad     : false,
 									omitCache          : true,
 									onLoadingCompleted : next

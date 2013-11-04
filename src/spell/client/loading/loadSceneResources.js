@@ -141,6 +141,7 @@ define(
 						libraryManager.load(
 							createFilesToLoad( configurationManager, library.asset ),
 							{
+								assetManager : spell.assetManager,
 								name : resourceBundleName,
 								isMetaDataLoad : false
 							}
@@ -175,6 +176,7 @@ define(
 				libraryManager.load(
 					createLibraryFilePathsFromIds( scene.libraryIds ),
 					{
+						assetManager : spell.assetManager,
 						name : libraryBundleName
 					}
 				)
@@ -184,6 +186,7 @@ define(
 			libraryManager.load(
 				createLibraryFilePathsFromIds( [ sceneId ] ),
 				{
+					assetManager : spell.assetManager,
 					name : sceneId
 				}
 			)

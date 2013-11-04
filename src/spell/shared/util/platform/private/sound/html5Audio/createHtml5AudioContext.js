@@ -1,11 +1,13 @@
 define(
 	'spell/shared/util/platform/private/sound/html5Audio/createHtml5AudioContext',
 	[
+		'spell/shared/util/createNormalizedVolume',
 		'spell/shared/util/platform/private/isHtml5CocoonJS',
 		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
 		'spell/shared/util/platform/private/sound/createSoundId'
 	],
 	function(
+		createNormalizedVolume,
 		isHtml5CocoonJS,
 		createFixedSoundFileSrc,
 		createSoundId
@@ -19,16 +21,16 @@ define(
 			isMutedValue    = false,
 			numFreeChannels = MAX_NUM_CHANNELS
 
-		var create = function( id, audioResource ) {
+		var create = function( id, soundResource ) {
 			var audio
 
 			if( !isHtml5CocoonJS &&
-				audioResource.privateAudioResource.cloneNode ) {
-				audio = audioResource.privateAudioResource.cloneNode( true )
+				soundResource.resource.cloneNode ) {
+				audio = soundResource.resource.cloneNode( true )
 
 			} else {
 				audio = new Audio()
-				audio.src = audioResource.privateAudioResource.src
+				audio.src = soundResource.resource.src
 			}
 
 			audio.id = id
@@ -59,26 +61,21 @@ define(
 
 
 		/**
-		 * @param {AudioResource} audioResource
-		 * @param id
+		 * @param {SoundAsset} soundAsset
 		 * @param volume
 		 * @param loop
 		 */
-		var play = function( audioResource, id, volume, loop ) {
-			if( !id ) {
-				id = createSoundId()
-			}
-
-			var audioElement = audioElements[ id ]
+		var play = function( soundAsset, volume, loop ) {
+			var id           = createSoundId(),
+				audioElement = audioElements[ id ]
 
 			if( !audioElement &&
 				numFreeChannels > 0 ) {
 
 				// when a free channel exists play the sound
-
 				numFreeChannels--
 
-				audioElement = create( id, audioResource )
+				audioElement = create( id, soundAsset.resource )
 				audioElements[ id ] = audioElement
 			}
 
@@ -119,19 +116,17 @@ define(
 		}
 
 		var setVolume = function ( id, volume ) {
-			volume = !isNaN( volume ) && volume < 1 && volume >= 0 ? volume : 1
-
 			var audioElement = audioElements[ id ]
 			if( !audioElement ) return
 
-			audioElement.volume = volume
+			audioElement.volume = createNormalizedVolume( volume )
 		}
 
 		var setLoop = function( id, loop ) {
 			var audioElement = audioElements[ id ]
 			if( !audioElement ) return
 
-			audioElement.loop = loop
+			audioElement.loop = !!loop
 
 			if( loop ) {
 				audioElement.addEventListener( 'ended', loopCallback, true )
@@ -164,7 +159,7 @@ define(
 
 		var tick = function() {}
 
-		var loadBuffer = function( src, onLoadCallback ) {
+		var loadBuffer = function( src, soundAsset, onLoadCallback ) {
 			if( !src ) {
 				throw 'Error: No src provided.'
 			}
@@ -193,10 +188,10 @@ define(
 		}
 
 		/*
-		 * Returns a AudioResource instance.
+		 * Returns a SoundResource instance.
 		 *
 		 * @param buffer
-		 * @return {AudioResource}
+		 * @return {SoundResource}
 		 */
 		var createSound = function( buffer ) {
 			return {
@@ -210,7 +205,7 @@ define(
 				 *
 				 * This is an implementation detail of the class. If you write code that depends on this you better know what you are doing.
 				 */
-				privateAudioResource : buffer
+				resource : buffer
 			}
 		}
 

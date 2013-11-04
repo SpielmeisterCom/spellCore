@@ -4,7 +4,7 @@ define(
 		'use strict'
 
 
-		var nextSoundId  = 0
+		var nextSoundId  = 1
 
 		return function() {
 			return nextSoundId++
