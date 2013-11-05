@@ -264,13 +264,12 @@ define(
 			isAvailable : function( libraryIds ) {
 				var cache = this.cache
 
-				for( var i = 0, n = libraryIds.length, entry; i < n; i++ ) {
-					entry = cache.metaData[ libraryIds[ i ] ]
+				for( var i = 0, entry, libraryId, n = libraryIds.length; i < n; i++ ) {
+					libraryId = libraryIds[ i ]
+					entry = cache.metaData[ libraryId ]
 
-					if( !entry ) return false
-
-					if( entry.file &&
-						!cache.resource[ createLibraryFilePath( entry.namespace, entry.file ) ] ) {
+					if( !entry ||
+						( entry.file && !cache.resource[ libraryId ] ) ) {
 
 						return false
 					}
