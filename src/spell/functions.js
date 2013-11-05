@@ -611,6 +611,21 @@ define(
 		_.zip = platformImpl.zip;
 
 		/**
+		 * Creates a version of the function that can only be called one time. Repeated calls to the modified function will have no effect, returning the value
+		 * from the original call. Useful for initialization functions, instead of having to set a boolean flag and then check it later.
+		 *
+		 * Example:
+		 *
+		 *     var initialize = _.once( createApplication )
+		 *     initialize()
+		 *     initialize()
+		 *     // Application is only created once.
+		 *
+		 * @param {Function} function The callback function to call on the first time.
+		 */
+		_.once = platformImpl.once;
+
+		/**
 		 * Creates a version of the function that will only be run after first being called count times. Useful for
 		 * grouping asynchronous responses, where you want to be sure that all the async calls have finished, before
 		 * proceeding.

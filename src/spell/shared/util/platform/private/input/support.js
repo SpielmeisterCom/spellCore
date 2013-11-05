@@ -1,17 +1,23 @@
 define(
 	'spell/shared/util/platform/private/input/support',
 	[
+		'spell/functions',
 		'spell/shared/util/platform/private/input/deviceOrientationHandler',
 		'spell/shared/util/platform/private/isHtml5Ejecta',
-		'spell/shared/util/platform/private/isHtml5GameClosure'
+		'spell/shared/util/platform/private/isHtml5GameClosure',
+		'spell/shared/util/platform/private/registerTimer'
 	],
 	function(
+		_,
 		deviceOrientationHandler,
 		isHtml5Ejecta,
-		isHtml5GameClosure
+		isHtml5GameClosure,
+		registerTimer
 	) {
 		'use strict'
 
+
+		var DEVICE_ORIENTATION_PROBING_TIMEOUT = 50
 
 		var isBrokenDeviceOrientationApi = true
 
@@ -37,25 +43,23 @@ define(
 			},
 			init : function( next ) {
 				if( !isHtml5GameClosure && window.DeviceMotionEvent ) {
-					var NUM_SAMPLES = 10,
-						counter     = NUM_SAMPLES
+					var doneProbing = _.once( function() {
+						deviceOrientationHandler.removeListener( window )
 
-					// HACK: probing for broken API implementation (i.e. mobile safari does not provide angles)
-					var checkIsBrokenDeviceOrientationApi = function( event ) {
+						next()
+					} )
+
+					var probeDeviceOrientationApi = function( event ) {
 						if( event.gamma !== 0 ) {
 							isBrokenDeviceOrientationApi = false
 						}
 
-						if( !isBrokenDeviceOrientationApi || counter < 0 ) {
-							deviceOrientationHandler.removeListener( window )
-
-							next()
-						}
-
-						counter--
+						doneProbing()
 					}
 
-					deviceOrientationHandler.registerListener( window, checkIsBrokenDeviceOrientationApi )
+					registerTimer( doneProbing, DEVICE_ORIENTATION_PROBING_TIMEOUT )
+
+					deviceOrientationHandler.registerListener( window, probeDeviceOrientationApi )
 
 				} else {
 					next()
