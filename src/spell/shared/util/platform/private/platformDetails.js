@@ -42,7 +42,7 @@ define(
 				} else if( isHtml5GameClosure ) {
 					return 'Android ' + gameClosureDeviceInfo.versionRelease
 
-				}else {
+				} else {
 					return navigator.platform
 				}
 			},
