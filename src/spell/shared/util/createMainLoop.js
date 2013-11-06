@@ -23,7 +23,7 @@ define(
 
 		var UPDATE_INTERVAL_IN_MS  = 32,
 			MAX_ELAPSED_TIME_IN_MS = 100,
-			PERFORMANCE_PRINT_INTERVAL_IN_MS = 1000
+			PERFORMANCE_PRINT_INTERVAL_IN_MS = 10000
 
 		var eachNode = Tree.eachNode
 
@@ -52,8 +52,98 @@ define(
 			return message
 		}
 
+		var callEveryFrameRelease = function( currentTimeInMs ) {
+			if( this.preNextFrame.length > 0 ) {
+				this.preNextFrame.pop()()
+			}
 
-		var MainLoop = function( eventManager, statisticsManager, updateIntervalInMs ) {
+			var timer = this.timer
+
+			timer.update()
+
+			var updateIntervalInMs = this.updateIntervalInMs,
+				localTimeInMs      = timer.getLocalTime(),
+				elapsedTimeInMs    = Math.min( timer.getElapsedTime(), MAX_ELAPSED_TIME_IN_MS )
+
+			if( this.update ) {
+				var accumulatedTimeInMs = this.accumulatedTimeInMs + elapsedTimeInMs
+
+				while( accumulatedTimeInMs >= updateIntervalInMs ) {
+					this.update( localTimeInMs, updateIntervalInMs )
+
+					accumulatedTimeInMs -= updateIntervalInMs
+				}
+
+				this.accumulatedTimeInMs = accumulatedTimeInMs
+			}
+
+			if( this.render ) {
+				this.render( localTimeInMs, elapsedTimeInMs )
+			}
+
+			PlatformKit.callNextFrame( this.callEveryFramePartial )
+		}
+
+		var callEveryFrameDebug = function( currentTimeInMs ) {
+			if( this.preNextFrame.length > 0 ) {
+				this.preNextFrame.pop()()
+			}
+
+			var statisticsManager = this.statisticsManager,
+				timer             = this.timer
+
+			timer.update()
+
+			var updateIntervalInMs = this.updateIntervalInMs,
+				localTimeInMs      = timer.getLocalTime(),
+				elapsedTimeInMs    = Math.min( timer.getElapsedTime(), MAX_ELAPSED_TIME_IN_MS )
+
+			this.totalStopWatch.start()
+			statisticsManager.startTick( localTimeInMs, elapsedTimeInMs )
+
+			if( this.update ) {
+				this.stopWatch.start()
+
+				var accumulatedTimeInMs = this.accumulatedTimeInMs + elapsedTimeInMs
+
+				while( accumulatedTimeInMs >= updateIntervalInMs ) {
+					this.update( localTimeInMs, updateIntervalInMs )
+
+					accumulatedTimeInMs -= updateIntervalInMs
+				}
+
+				this.accumulatedTimeInMs = accumulatedTimeInMs
+
+				statisticsManager.updateNode( 'update', this.stopWatch.stop() )
+			}
+
+			if( this.render ) {
+				this.stopWatch.start()
+
+				this.render( localTimeInMs, elapsedTimeInMs )
+
+				statisticsManager.updateNode( 'render', this.stopWatch.stop() )
+			}
+
+			statisticsManager.updateNode( 'total', this.totalStopWatch.stop() )
+
+			// print performance statistics
+			if( this.timeSinceLastPerfPrintInMs > PERFORMANCE_PRINT_INTERVAL_IN_MS ) {
+				this.timeSinceLastPerfPrintInMs -= PERFORMANCE_PRINT_INTERVAL_IN_MS
+
+//				console.log(
+//					createMetricsMessage( statisticsManager.getMetrics( PERFORMANCE_PRINT_INTERVAL_IN_MS ) )
+//				)
+			}
+
+			this.timeSinceLastPerfPrintInMs += elapsedTimeInMs
+
+			PlatformKit.callNextFrame( this.callEveryFramePartial )
+		}
+
+
+		var MainLoop = function( eventManager, statisticsManager, isDebug, updateIntervalInMs ) {
+			this.isDebug             = isDebug
 			this.updateIntervalInMs  = updateIntervalInMs || UPDATE_INTERVAL_IN_MS
 			this.render              = null
 			this.update              = null
@@ -80,77 +170,14 @@ define(
 			setPreNextFrame: function( f ) {
 				this.preNextFrame.push( f )
 			},
-			callEveryFrame : function( currentTimeInMs ) {
-				if( this.preNextFrame.length > 0 ) {
-					this.preNextFrame.pop()()
-				}
-
-				var statisticsManager = this.statisticsManager,
-					timer             = this.timer
-
-				timer.update()
-
-				var updateIntervalInMs = this.updateIntervalInMs,
-					localTimeInMs      = timer.getLocalTime(),
-					elapsedTimeInMs    = Math.min( timer.getElapsedTime(), MAX_ELAPSED_TIME_IN_MS )
-
-				this.totalStopWatch.start()
-				statisticsManager.startTick( localTimeInMs, elapsedTimeInMs )
-
-				if( this.update ) {
-					this.stopWatch.start()
-
-					var accumulatedTimeInMs = this.accumulatedTimeInMs + elapsedTimeInMs
-
-					while( accumulatedTimeInMs >= updateIntervalInMs ) {
-						this.update( localTimeInMs, updateIntervalInMs )
-
-						accumulatedTimeInMs -= updateIntervalInMs
-					}
-
-					this.accumulatedTimeInMs = accumulatedTimeInMs
-
-					statisticsManager.updateNode( 'update', this.stopWatch.stop() )
-				}
-
-				if( this.render ) {
-					this.stopWatch.start()
-
-					this.render( localTimeInMs, elapsedTimeInMs )
-
-					statisticsManager.updateNode( 'render', this.stopWatch.stop() )
-				}
-
-				statisticsManager.updateNode( 'total', this.totalStopWatch.stop() )
-
-
-				// print performance statistics
-				if( this.timeSinceLastPerfPrintInMs > PERFORMANCE_PRINT_INTERVAL_IN_MS ) {
-					this.timeSinceLastPerfPrintInMs -= PERFORMANCE_PRINT_INTERVAL_IN_MS
-
-//					console.log(
-//						createMetricsMessage( statisticsManager.getMetrics( PERFORMANCE_PRINT_INTERVAL_IN_MS ) )
-//					)
-				}
-
-				this.timeSinceLastPerfPrintInMs += elapsedTimeInMs
-
-
-				PlatformKit.callNextFrame( this.callEveryFramePartial )
-			},
 			run : function() {
-				this.callEveryFramePartial = _.bind( this.callEveryFrame, this )
+				this.callEveryFramePartial = _.bind( this.isDebug ? callEveryFrameDebug : callEveryFrameRelease, this )
 				this.callEveryFramePartial( Types.Time.getCurrentInMs() )
 			}
 		}
 
-
-		/*
-		 * public
-		 */
-
-		return function( eventManager, statisticsManager, updateInterval ) {
-			return new MainLoop( eventManager, statisticsManager, updateInterval )
+		return function( eventManager, statisticsManager, isDebug, updateInterval ) {
+			return new MainLoop( eventManager, statisticsManager, isDebug, updateInterval )
 		}
 	}
 )

@@ -3,6 +3,7 @@ define(
 	[
 		'spell/client/createSpell',
 		'spell/client/development/createDebugMessageHandler',
+		'spell/client/isDebug',
 		'spell/client/staticInclude',
 		'spell/client/setApplicationModule',
 		'spell/client/showSplashScreen',
@@ -27,6 +28,7 @@ define(
 	function(
 		createSpell,
 		createDebugMessageHandler,
+		isDebug,
 		staticInclude,
 		setApplicationModule,
 		showSplashScreen,
@@ -170,7 +172,7 @@ define(
 				eventManager         = new EventManager(),
 				configurationManager = new ConfigurationManager( eventManager ),
 				statisticsManager    = new StatisticsManager(),
-				mainLoop             = createMainLoop( eventManager, statisticsManager ),
+				mainLoop             = createMainLoop( eventManager, statisticsManager, isDebug ),
 				isModeDeployed       = loaderConfig.mode === 'deployed'
 
 			configurationManager.setConfig( loaderConfig )
