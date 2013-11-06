@@ -36,6 +36,7 @@ if( !window.console ) {
 ;( function( document ) {
 	var MIN_FLASH_PLAYER_VERSION = '10.1.0',
 		DEFAULT_CONTAINER_ID = 'spell',
+		IS_MOBILE_SAFARI = navigator.platform.match( /^(iPad|iPod|iPhone)$/ ),
 		MODE = {
 			DEPLOYED : 'deployed',
 			DEVELOPMENT_EMBEDDED : 'development_embedded',
@@ -88,13 +89,16 @@ if( !window.console ) {
 	}
 
 	var isHtml5AudioSupported = function() {
+		if( IS_MOBILE_SAFARI ) {
+			return false
+		}
+
 		var elem              = document.createElement( 'audio' ),
 			audioObjSupported = !!elem.canPlayType
 
 		if( !audioObjSupported ) return false
 
 		var supportedFormats = [ 'audio/ogg; codecs="vorbis"', 'audio/mpeg' ]
-
 
 		if( supportsOnlySingleChannelAudio() ) return false
 
@@ -111,7 +115,11 @@ if( !window.console ) {
 	}
 
 	var isWebAudioSupported = function() {
-		if( !window.webkitAudioContext ) return false
+		if( IS_MOBILE_SAFARI ||
+			!window.webkitAudioContext ) {
+
+			return false
+		}
 
 		try {
 			var test = new webkitAudioContext()
