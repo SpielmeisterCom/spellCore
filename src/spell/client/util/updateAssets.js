@@ -115,29 +115,25 @@ define(
 		}
 
 		var createSpriteSheetAsset = function( asset ) {
-			var frameWidth      = asset.config.frameWidth,
-				frameHeight     = asset.config.frameHeight,
+			var frameWidth      = asset.config.frameWidth || 1,
+				frameHeight     = asset.config.frameHeight || 1,
 				innerPadding    = asset.config.innerPadding || 0,
-				numX            = Math.floor( asset.config.textureWidth / (frameWidth + innerPadding*2) ),
-				numY            = Math.floor( asset.config.textureHeight / (frameHeight + innerPadding*2) ),
+				numX            = Math.floor( asset.config.textureWidth / ( frameWidth + innerPadding * 2 ) ),
+				numY            = Math.floor( asset.config.textureHeight / ( frameHeight + innerPadding * 2 ) ),
 				numFrames       = numX * numY
 
 			// create a lookup table to lookup the subtextures
-			var frameOffsets = [],
-				frames       = []
+			var frameOffsets = []
 
 			for( var i = 0; i < numFrames; i++ ) {
-				frameOffsets[ i ] = createFrameOffset( frameWidth, frameHeight, numX, numY, i, innerPadding )
-				frames[ i ] = i
+				frameOffsets.push( createFrameOffset( frameWidth, frameHeight, numX, numY, i, innerPadding ) )
 			}
 
 			return {
 				frameDimensions : [ frameWidth, frameHeight ],
-				frames          : frames,
 				frameOffsets    : frameOffsets,
 				frameMaxX       : numX,
 				frameMaxY       : numY,
-				numFrames       : numFrames,
 				config          : asset.config,
 				type            : asset.subtype
 			}
