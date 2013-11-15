@@ -79,7 +79,7 @@ define(
 
 		var tmpVec2 = vec2.create()
 
-		//private functions
+		// private functions
 		var isPointWithinEntity = function ( worldPosition, entityId ) {
 			var transform = this.transforms[ entityId ],
 				entityDimensions = this.spell.entityManager.getEntityDimensions( entityId )
@@ -125,7 +125,7 @@ define(
 
                 mat3.invert( worldToLocalMatrix, tilemapTransform.worldMatrix )
 
-                //convert worldposition to coordinates which are local to the tilemaps origin
+                // convert worldposition to coordinates which are local to the tilemaps origin
 				vec2.transformMat3( tmpVec2, worldPosition, worldToLocalMatrix )
 
 				if ( entityManager.hasComponent(entityId, 'spell.component.2d.graphics.shape.rectangle') ) {
@@ -136,7 +136,7 @@ define(
 					offsetY         = Math.floor( tmpVec2[ 1 ] / frameDimensions[ 1 ]),
 					currentOffset   = [ offsetX, offsetY ]
 
-				//transform the grid aligned local coordinates to world coordinates again
+				// transform the grid aligned local coordinates to world coordinates again
 				tmpVec2[ 0 ] = offsetX * frameDimensions[ 0 ] + frameDimensions[ 0 ] / 2
 				tmpVec2[ 1 ] = offsetY * frameDimensions[ 1 ] + frameDimensions[ 1 ] / 2
 				vec2.transformMat3( tmpVec2, tmpVec2, tilemapTransform.worldMatrix )
@@ -147,7 +147,7 @@ define(
 
 
 			} else {
-				//it's not placeable here
+				// it's not placeable here
 				if( !entityManager.hasComponent(entityId, 'spell.component.2d.graphics.shape.rectangle') ) {
 
 					entityManager.addComponent(entityId, 'spell.component.2d.graphics.shape.rectangle',
@@ -180,7 +180,7 @@ define(
 				normalizedOffsetX = offset[ 0 ] + Math.floor(tilemapDimensions[ 0 ] / 2),
 				normalizedOffsetY = maxY - (offset[ 1 ] + Math.floor(maxY / 2) + 1)
 
-			//make sure the tilemapData structure is initialized
+			// make sure the tilemapData structure is initialized
 			for (var y=0; y < tilemapDimensions[1].length; y++) {
 				for (var x=0; x < tilemapDimensions[0].length; x++) {
 					if (tilemapData[ y ][ x ] === undefined) {
@@ -253,10 +253,9 @@ define(
 			var entityManager               = this.spell.entityManager,
 				spriteSheetAssetId          = tilemapAsset.asset.spriteSheet.assetId,
 				frameDimensions             = tilemapAsset.asset.spriteSheet.frameDimensions,
-				numFrames                   = tilemapAsset.asset.spriteSheet.numFrames,
-				numFrames                   = numFrames + 1 //we add one frame for the delete icon
+				numFrames                   = tilemapAsset.asset.spriteSheet.frameOffsets.length + 1 // add one frame for the delete icon
 
-			//present a nice quadratic selection menu for the tiles
+			// present a nice quadratic selection menu for the tiles
 			var framesPerRow = Math.floor( Math.sqrt(numFrames) )
 
 			var offsetX     = cursorWorldPosition[ 0 ],
@@ -264,7 +263,7 @@ define(
 				frameWidth  = framesPerRow * frameDimensions[ 0 ],
 				frameHeight = framesPerRow * frameDimensions[ 1 ]
 
-			//draw a background for the tile selection menu
+			// draw a background for the tile selection menu
 			this.tilemapSelectionBackground = entityManager.createEntity({
 				'config': {
 					'spell.component.2d.transform': {
@@ -288,7 +287,7 @@ define(
 				}
 			})
 
-			//draw every tile of the tileset
+			// draw every tile of the tileset
 			this.tilemapSelectionMap = {}
 			for (var x=0; x<numFrames-1; x++) {
 				this.tilemapSelectionMap[ x ] = entityManager.createEntity({
@@ -338,7 +337,7 @@ define(
 
 		}
 
-		//public functions
+		// public functions
 		tilemapEditor.prototype = {
 
 			init: function( spell, editorSystem ) {
@@ -422,7 +421,7 @@ define(
 				var entityManager = spell.entityManager
 
 				if(event.button != 0) {
-					//only respond to left mouseclicks
+					// only respond to left mouseclicks
 					return
 				}
 
@@ -431,7 +430,7 @@ define(
 					this.tilemapSelectionCursor         = this.tilemapSelectionHighlighted
 					this.tilemapSelectionHighlighted    = null
 
-					//find the current selected frame index
+					// find the current selected frame index
 					for(var frameIndex in this.tilemapSelectionMap) {
 						var entityId = this.tilemapSelectionMap[ frameIndex ]
 

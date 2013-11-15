@@ -386,9 +386,9 @@ define(
 							}
 
 						} else if( asset.type === 'spriteSheet' ) {
-							var frames            = appearance.drawAllFrames ? asset.frames : appearance.frames,
-								frameDimensions   = asset.frameDimensions,
+							var frameDimensions   = asset.frameDimensions,
 								frameOffsets      = asset.frameOffsets,
+								frames            = appearance.drawAllFrames ? _.keys( asset.frameOffsets ) : appearance.frames,
 								frameOffset       = undefined,
 								quadDimensions    = quadGeometry ? quadGeometry.dimensions :  [ ( frames.length -0 ) * frameDimensions[ 0 ], frameDimensions[ 1 ] ],
 								numFramesInQuad   = [
@@ -406,13 +406,7 @@ define(
 								{
 									context.scale( frameDimensions )
 
-									for(
-										var x = 0, length = frames.length;
-									     x < length &&
-										 x < totalFramesInQuad;
-									     x++
-										) {
-
+									for( var x = 0, length = frames.length; x < length && x < totalFramesInQuad; x++ ) {
 										frameId     = frames[ x ]
 										frameOffset = frameOffsets[ frameId ]
 

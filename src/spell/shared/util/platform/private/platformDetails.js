@@ -23,7 +23,7 @@ define(
 
 		return {
 			hasPlentyRAM : function() {
-                return !( isHtml5CocoonJS || isHtml5Ejecta || isHtml5GameClosure )
+                return !( isHtml5CocoonJS || isHtml5Ejecta )
             },
 			hasTouchSupport : function() {
 				return support.hasWebkitTouchApi() ||
