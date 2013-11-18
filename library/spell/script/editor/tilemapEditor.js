@@ -181,8 +181,8 @@ define(
 				normalizedOffsetY = maxY - (offset[ 1 ] + Math.floor(maxY / 2) + 1)
 
 			// make sure the tilemapData structure is initialized
-			for (var y=0; y < tilemapDimensions[1].length; y++) {
-				for (var x=0; x < tilemapDimensions[0].length; x++) {
+			for (var y=0; y < tilemapDimensions[1]; y++) {
+				for (var x=0; x < tilemapDimensions[0]; x++) {
 					if (tilemapData[ y ][ x ] === undefined) {
 						tilemapData[ y ][ x ] = null
 					}
