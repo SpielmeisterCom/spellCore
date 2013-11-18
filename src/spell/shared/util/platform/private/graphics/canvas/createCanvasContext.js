@@ -131,10 +131,10 @@ define(
 						textureHeight * fromTexCoordY,
 						textureWidth * texCoordRangeX,
 						textureHeight * texCoordRangeY,
-						destinationWidth * destinationPositionX - 0.5,
-						destinationHeight * destinationPositionY - 0.5,
-						destinationWidth * scaledTexCoordRangeX + 1,
-						destinationHeight * scaledTexCoordRangeY + 1
+						destinationWidth * destinationPositionX,
+						destinationHeight * destinationPositionY,
+						destinationWidth * scaledTexCoordRangeX,
+						destinationHeight * scaledTexCoordRangeY
 					)
 
 					destinationPositionX += scaledTexCoordRangeX
