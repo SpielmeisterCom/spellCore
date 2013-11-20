@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/platform/private/isHtml5CocoonJS',
+	'spell/shared/util/platform/private/environment/isHtml5CocoonJS',
 	function() {
 		'use strict'
 

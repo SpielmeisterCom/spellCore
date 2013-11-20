@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/platform/private/isHtml5Ejecta',
+	'spell/shared/util/platform/private/environment/isHtml5Ejecta',
 	function() {
 		'use strict'
 

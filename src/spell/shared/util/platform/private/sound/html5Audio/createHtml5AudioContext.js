@@ -2,7 +2,7 @@ define(
 	'spell/shared/util/platform/private/sound/html5Audio/createHtml5AudioContext',
 	[
 		'spell/shared/util/createNormalizedVolume',
-		'spell/shared/util/platform/private/isHtml5CocoonJS',
+		'spell/shared/util/platform/private/environment/isHtml5CocoonJS',
 		'spell/shared/util/platform/private/sound/createFixedSoundFileSrc',
 		'spell/shared/util/platform/private/sound/createSoundId'
 	],

@@ -51,7 +51,7 @@ define(
 	'spell/shared/util/platform/private/input/deviceOrientationHandler',
 	[
 		'spell/functions',
-		'spell/shared/util/platform/private/isHtml5GameClosure'
+		'spell/shared/util/platform/private/environment/isHtml5GameClosure'
 	],
 	function(
 		_,

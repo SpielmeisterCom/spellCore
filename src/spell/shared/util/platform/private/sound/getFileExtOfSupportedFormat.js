@@ -1,7 +1,7 @@
 define(
 	'spell/shared/util/platform/private/sound/getFileExtOfSupportedFormat',
 	[
-		'spell/shared/util/platform/private/isHtml5GameClosure'
+		'spell/shared/util/platform/private/environment/isHtml5GameClosure'
 	],
 	function(
 		isHtml5GameClosure

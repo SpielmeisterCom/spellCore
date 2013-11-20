@@ -1,9 +1,9 @@
 define(
 	'spell/shared/util/platform/private/openURL',
 	[
-		'spell/shared/util/platform/private/isHtml5CocoonJS',
-		'spell/shared/util/platform/private/isHtml5Ejecta',
-		'spell/shared/util/platform/private/isHtml5Tizen'
+		'spell/shared/util/platform/private/environment/isHtml5CocoonJS',
+		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
+		'spell/shared/util/platform/private/environment/isHtml5Tizen'
 	],
 	function(
 		isHtml5CocoonJS,

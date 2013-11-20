@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/platform/private/isBrowser',
+	'spell/shared/util/platform/private/environment/isBrowser',
 	function() {
 		'use strict'
 

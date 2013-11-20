@@ -1,7 +1,7 @@
 define(
 	'spell/shared/util/platform/private/graphics/createSplashScreenImage',
 	[
-		'spell/shared/util/platform/private/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
 		'spell/data/algorithm/RLE'
 	],
 	function(

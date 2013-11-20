@@ -1,8 +1,8 @@
 define(
 	'spell/shared/util/platform/private/Application',
 	[
-		'spell/shared/util/platform/private/isHtml5GameClosure',
-		'spell/shared/util/platform/private/isHtml5Tizen'
+		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5Tizen'
 	],
 	function(
 		isHtml5GameClosure,
