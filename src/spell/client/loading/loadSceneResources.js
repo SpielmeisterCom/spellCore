@@ -30,15 +30,14 @@ define(
 		var groupByType = function( libraryRecords ) {
 			return _.reduce(
 				libraryRecords,
-				function( memo, value ) {
+				function( memo, value, libraryId ) {
 					var type = value.type
 
-					if( memo[ type ] ) {
-						memo[ type ].push( value )
-
-					} else {
-						memo[ type ] = [ value ]
+					if( !memo[ type ] ) {
+						memo[ type ] = {}
 					}
+
+					memo[ type ][ libraryId ] = value
 
 					return memo
 				},

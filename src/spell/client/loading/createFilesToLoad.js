@@ -14,60 +14,51 @@ define(
 
 
 		return function( configurationManager, assets ) {
-			var currentLanguage = configurationManager.getValue( 'currentLanguage' )
+			var currentLanguage     = configurationManager.getValue( 'currentLanguage' ),
+				currentQualityLevel = configurationManager.getValue( 'currentQualityLevel' )
 
-			return _.unique(
-				_.reduce(
-					assets,
-					function( memo, asset ) {
-						var config = asset.config
+			return _.reduce(
+				assets,
+				function( memo, asset, libraryId ) {
+					var config          = asset.config,
+						subtype         = asset.subtype,
+						isSound         = subtype === 'sound',
+						isAppearance    = subtype === 'appearance',
+						isFont          = subtype === 'font',
+						isSpriteSheet   = subtype === 'spriteSheet',
+						libraryFilePath
 
-						if( !config ) {
-							return memo
-						}
+					if( config &&
+						( isSound || isAppearance || isFont || isSpriteSheet ) ) {
 
-						var subtype = asset.subtype,
-							isSound = subtype === 'sound'
-
-						if( !isSound &&
-							subtype !== 'appearance' &&
-							subtype !== 'font' &&
-							subtype !== 'spriteSheet' ) {
-
-							return memo
-						}
-
-						var isLocalizable   = config.localized !== undefined,
-							libraryFilePath
-
-						if( isLocalizable ) {
-							if( config.localized ) {
-								var languageToExtension = config.localization,
-									fileExtension       = isSound ? 'mp3' : languageToExtension[ currentLanguage ],
-									localizedFileName   = asset.name + '.' + currentLanguage + '.' + fileExtension
-
-								libraryFilePath = {
-									libraryPath : createLibraryFilePath( asset.namespace, asset.name + '.' + fileExtension ),
-									libraryPathUrlUsedForLoading : createLibraryFilePath( asset.namespace, localizedFileName )
-								}
-
-							} else {
-								if( subtype === 'sound' ) {
-									libraryFilePath = createLibraryFilePath( asset.namespace, asset.name + '.mp3' )
-
-								} else {
-									libraryFilePath = createLibraryFilePath( asset.namespace, asset.name + '.' + config.extension )
-								}
-							}
+						if( isFont || isSpriteSheet ) {
+							libraryFilePath = createLibraryFilePath( asset.namespace, asset.file )
 
 						} else {
-							libraryFilePath = createLibraryFilePath( asset.namespace, asset.file )
+							var isLocalized        = config.localized,
+								qualityLevelSuffix = config.qualityLevels ? '.' + currentQualityLevel : ''
+
+							if( isLocalized ) {
+								var languageToExtension = config.localization,
+									fileExtension       = isSound ? 'mp3' : languageToExtension[ currentLanguage ],
+									localizedFileName   = asset.name + '.' + currentLanguage + qualityLevelSuffix + '.' + fileExtension
+
+								libraryFilePath = createLibraryFilePath( asset.namespace, localizedFileName )
+
+							} else {
+								libraryFilePath = createLibraryFilePath(
+									asset.namespace,
+									asset.name + qualityLevelSuffix + ( isSound ? '.mp3' : '.' + config.extension )
+								)
+							}
 						}
 
-						return memo.concat( libraryFilePath )
-					},
-					[]
-				)
+						memo[ libraryId ] = libraryFilePath
+					}
+
+					return memo
+				},
+				{}
 			)
 		}
 	}

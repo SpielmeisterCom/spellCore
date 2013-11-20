@@ -13,8 +13,16 @@ define(
 		'use strict'
 
 
-		return function( ids ) {
-			return _.map( ids, createLibraryFilePathFromId )
+		return function( libraryIds ) {
+			return _.reduce(
+				libraryIds,
+				function( memo, libraryId ) {
+					memo[ libraryId ] = createLibraryFilePathFromId( libraryId )
+
+					return memo
+				},
+				{}
+			)
 		}
 	}
 )

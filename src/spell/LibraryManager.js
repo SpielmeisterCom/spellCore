@@ -48,24 +48,19 @@ define(
 			}
 		}
 
-		var getLoaderFactory = function( resourceTypeToLoaderFactory, type, libraryPath ) {
-			if( type === 'auto' ) {
-				if( _.isObject( libraryPath ) ) {
-					type = _.last( libraryPath.libraryPath.split( '.' ) )
+		var getLoaderFactory = function( resourceTypeToLoaderFactory, type, libraryFilePath ) {
+			var actualType = 'auto' ?
+				_.last( libraryFilePath.split( '.' ) ) :
+				type
 
-				} else {
-					type = _.last( libraryPath.split( '.' ) )
-				}
-			}
-
-			return resourceTypeToLoaderFactory[ type ]
+			return resourceTypeToLoaderFactory[ actualType ]
 		}
 
-		var createLoadingProcess = function( id, libraryPaths, libraryUrl, invalidateCache, config, next ) {
+		var createLoadingProcess = function( id, libraryIdsToLibraryFilePaths, libraryUrl, invalidateCache, config, next ) {
 			return {
 				assetManager       : config.assetManager,
 				id                 : id,
-				libraryPaths       : libraryPaths,
+				libraryFilePaths   : libraryIdsToLibraryFilePaths,
 				invalidateCache    : invalidateCache,
 				numCompleted       : 0,
 				name               : config.name,
@@ -81,10 +76,10 @@ define(
 		var updateProgress = function( eventManager, cache, loadingProcesses, loadingProcess ) {
 			loadingProcess.numCompleted++
 
-			var libraryPaths    = loadingProcess.libraryPaths,
-				numLibraryPaths = libraryPaths.length,
-				progress        = loadingProcess.numCompleted / numLibraryPaths,
-				name            = loadingProcess.name
+			var libraryFilePaths = loadingProcess.libraryFilePaths,
+				numLibraryPaths  = _.size( libraryFilePaths ),
+				progress         = loadingProcess.numCompleted / numLibraryPaths,
+				name             = loadingProcess.name
 
 			eventManager.publish(
 				[ eventManager.EVENT.RESOURCE_PROGRESS, name ],
@@ -92,19 +87,7 @@ define(
 			)
 
 			if( loadingProcess.numCompleted === numLibraryPaths ) {
-				var loadedLibraryRecords = _.reduce(
-					libraryPaths,
-					function( memo, value ) {
-						var key = _.isObject( value ) ?
-							createIdFromLibraryFilePath( value.libraryPath ) :
-							createIdFromLibraryFilePath( value )
-
-						memo[ key ] = cache[ key ]
-
-						return memo
-					},
-					{}
-				)
+				var loadedLibraryRecords = _.pick( cache, _.keys( libraryFilePaths ) )
 
 				if( loadingProcess.isMetaDataLoad ) {
 					addNamespaceAndName( loadedLibraryRecords )
@@ -129,71 +112,62 @@ define(
 			}
 		}
 
-		var onLoadCallback = function( eventManager, cache, loadingProcesses, loadingProcess, libraryPath, loadedResource ) {
+		var onLoadCallback = function( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath, loadedResource ) {
 			if( !loadedResource ) {
-				throw 'Error: Resource "' + libraryPath + '" from loading process "' + loadingProcess.id + '" is undefined or empty on loading completed.'
+				throw 'Error: Loading library file "' + libraryFilePath + '" from loading process "' + loadingProcess.id + '" returned a false value.'
 			}
 
-			cache[ createIdFromLibraryFilePath( libraryPath ) ] = loadedResource
+			cache[ libraryId ] = loadedResource
 
 			updateProgress( eventManager, cache, loadingProcesses, loadingProcess )
 		}
 
-		var onErrorCallback = function( eventManager, cache, loadingProcesses, loadingProcess, resourceName ) {
-			throw 'Error: Loading resource "' + resourceName + '" failed.'
+		var onErrorCallback = function( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath ) {
+			throw 'Error: Loading library file "' + libraryFilePath + '" failed.'
 		}
 
-		var onTimedOutCallback = function( eventManager, cache, loadingProcesses, loadingProcess, resourceName ) {
-			throw 'Error: Loading resource "' + resourceName + '" timed out.'
+		var onTimedOutCallback = function( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath ) {
+			throw 'Error: Loading library file "' + libraryFilePath + '" timed out.'
 		}
 
 		var startLoadingProcess = function( cache, eventManager, resourceTypeToLoaderFactory, loadingProcesses, loadingProcess ) {
-			var omitCache       = loadingProcess.omitCache,
-				libraryPaths    = loadingProcess.libraryPaths
+			var omitCache        = loadingProcess.omitCache,
+				libraryFilePaths = loadingProcess.libraryFilePaths
 
-			for( var i = 0, n = libraryPaths.length; i < n; i++ ) {
-				var libraryPath = libraryPaths[ i ],
-					libraryPathUrlUsedForLoading
-
-				if( _.isObject( libraryPath ) ) {
-					libraryPath = libraryPaths[ i ].libraryPath
-					libraryPathUrlUsedForLoading = libraryPaths[ i ].libraryPathUrlUsedForLoading
-
-				} else {
-					libraryPathUrlUsedForLoading = libraryPath
-				}
+			for( var libraryId in libraryFilePaths ) {
+				var libraryFilePath = libraryFilePaths[ libraryId ]
 
 				if( !omitCache ) {
-					var cachedEntry = cache[ createIdFromLibraryFilePath( libraryPath ) ]
+					var cachedEntry = cache[ libraryId ]
 
 					if( cachedEntry ) {
-						onLoadCallback( eventManager, cache, loadingProcesses, loadingProcess, libraryPath, cachedEntry )
+						onLoadCallback( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath, cachedEntry )
 
 						continue
 					}
 				}
 
-				var loaderFactory = getLoaderFactory( resourceTypeToLoaderFactory, loadingProcess.type, libraryPath )
+				var loaderFactory = getLoaderFactory( resourceTypeToLoaderFactory, loadingProcess.type, libraryFilePath )
 
 				if( !loaderFactory ) {
 					throw 'Error: Unable to load resource of type "' + loadingProcess.type + '".'
 				}
 
 				var url = loadingProcess.libraryUrl ?
-					loadingProcess.libraryUrl + '/' + libraryPathUrlUsedForLoading :
-					libraryPathUrlUsedForLoading
+					loadingProcess.libraryUrl + '/' + libraryFilePath :
+					libraryFilePath
 
 				var loader = loaderFactory(
 					loadingProcess.assetManager,
-					createIdFromLibraryFilePath( libraryPath ),
+					libraryId,
 					loadingProcess.invalidateCache ? createUrlWithCacheBreaker( url ) : url,
-					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
-					_.bind( onErrorCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath ),
-					_.bind( onTimedOutCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryPath )
+					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath ),
+					_.bind( onErrorCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath ),
+					_.bind( onTimedOutCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath )
 				)
 
 				if( !loader ) {
-					throw 'Could not create a loader for resource "' + libraryPath + '".'
+					throw 'Could not create a loader for resource "' + libraryFilePath + '".'
 				}
 
 				loader.start()
@@ -282,22 +256,20 @@ define(
 				this.cache.resource = {}
 			},
 
-			load : function( libraryPaths, config, next ) {
+			load : function( libraryIdsToLibraryFilePaths, config, next ) {
 				if( !this.resourceTypeToLoaderFactory ) {
 					throw 'Error: Library manager is not properly initialized.'
 				}
 
-				// TODO: work on a list of assets/libraryRecords and call their getLibraryResourcePaths() methods to determine
-				// the required resources instead of a list of libraryPaths
-				if( libraryPaths.length === 0 ) {
-					throw 'Error: No library paths provided.'
+				if( _.size( libraryIdsToLibraryFilePaths ) === 0 ) {
+					throw 'Error: No library file paths provided.'
 				}
 
 				var id = createLoadingProcessId()
 
 				var loadingProcess = createLoadingProcess(
 					id,
-					libraryPaths,
+					libraryIdsToLibraryFilePaths,
 					this.libraryUrl,
 					this.invalidateCache,
 					config || {},

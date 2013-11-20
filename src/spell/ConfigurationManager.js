@@ -58,7 +58,6 @@ define(
 		// The property "configurable" controls if the option can be overridden by the environment configuration set up by the stage-0-loader.
 		var validOptions = _.extend(
 			{
-
 				// The screen mode which the user requested. Can be either "fit" or "fixed". If set to "fit" the maximum available screen area is used and the
 				// option "screenSize" is ignored. If set to "fixed" the option "screenSize" is used to determine the used screen size. The default is "fit".
 				screenMode : {
@@ -98,6 +97,15 @@ define(
 					configurable : true
 				},
 				loadingScene : {
+					configurable : true
+				},
+				quality : {
+					configurable : true
+				},
+				qualityLevels : {
+					configurable : true
+				},
+				currentQualityLevel : {
 					configurable : true
 				}
 			},
@@ -211,6 +219,17 @@ define(
 					}
 
 					return
+
+				} else if( key === 'quality' &&
+					config.qualityLevels ) {
+
+					var qualityLevel = config.qualityLevels[ value ]
+
+					if( qualityLevel ) {
+						config.currentQualityLevel = qualityLevel
+					}
+
+					return
 				}
 
 				update( config, defaultOptions, validOptions, key, value )
@@ -246,7 +265,13 @@ define(
 			 */
 			setConfig : function( x ) {
 				for( var key in x ) {
-					if( key === 'supportedLanguages' || key === 'defaultLanguage' || key === 'currentLanguage' ) {
+					if( key === 'supportedLanguages' ||
+						key === 'defaultLanguage' ||
+						key === 'currentLanguage' ||
+						key === 'quality' ||
+						key === 'qualityLevels' ||
+						key === 'currentQualityLevel' ) {
+
 						continue
 					}
 
@@ -257,6 +282,13 @@ define(
 				if( x.supportedLanguages ) this.setValue( 'supportedLanguages', x.supportedLanguages )
 				if( x.defaultLanguage ) this.setValue( 'defaultLanguage', x.defaultLanguage )
 				if( x.currentLanguage ) this.setValue( 'currentLanguage', x.currentLanguage )
+
+				if( x.qualityLevels ) this.setValue( 'qualityLevels', x.qualityLevels )
+				if( x.quality ) this.setValue( 'quality', x.quality )
+
+				if( !this.config.currentQualityLevel ) {
+					this.setValue( 'currentQualityLevel', 1 )
+				}
 			}
 		}
 
