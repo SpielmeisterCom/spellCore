@@ -3,7 +3,6 @@ define(
 	[
 		'spell/shared/util/createId',
 		'spell/shared/util/createAssetId',
-		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/input/keyCodes',
 
 		'spell/functions'
@@ -11,7 +10,6 @@ define(
 	function(
 		createId,
 		createAssetId,
-		createLibraryFilePath,
 		keyCodes,
 
 		_
