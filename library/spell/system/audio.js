@@ -32,7 +32,6 @@ define(
 			}
 		}
 
-
 		/**
 		 * Creates an instance of the system.
 		 *
@@ -41,6 +40,7 @@ define(
 		 */
 		var audio = function( spell ) {
 			this.soundEmitterUpdatedHandler = null
+			this.visibilityChangedHandler = null
 		}
 
 		audio.prototype = {
@@ -52,10 +52,22 @@ define(
 			init: function( spell ) {
 				var audioContext  = spell.audioContext,
 					entityManager = spell.entityManager,
-					eventManager  = spell.eventManager
+					eventManager  = spell.eventManager,
+					wasMuted      = false
 
 				this.soundEmitterUpdatedHandler = function( soundEmitter, id ) {
 					playSound( entityManager, audioContext, id, soundEmitter )
+				}
+
+				this.visibilityChangedHandler = function( isVisible ) {
+					if( isVisible ) {
+						audioContext.setAllMuted( wasMuted )
+
+					} else {
+						wasMuted = audioContext.isAllMuted()
+						audioContext.setAllMuted( true )
+					}
+
 				}
 
 				eventManager.subscribe(
@@ -66,6 +78,11 @@ define(
 				eventManager.subscribe(
 					[ eventManager.EVENT.COMPONENT_UPDATED, Defines.SOUND_EMITTER_COMPONENT_ID ],
 					this.soundEmitterUpdatedHandler
+				)
+
+				eventManager.subscribe(
+					eventManager.EVENT.VISIBILITY_CHANGED,
+					this.visibilityChangedHandler
 				)
 			},
 
@@ -85,6 +102,11 @@ define(
 				eventManager.unsubscribe(
 					[ eventManager.EVENT.COMPONENT_UPDATED, Defines.SOUND_EMITTER_COMPONENT_ID ],
 					this.soundEmitterUpdatedHandler
+				)
+
+				eventManager.unsubscribe(
+					eventManager.EVENT.VISIBILITY_CHANGED,
+					this.visibilityChangedHandler
 				)
 			},
 
