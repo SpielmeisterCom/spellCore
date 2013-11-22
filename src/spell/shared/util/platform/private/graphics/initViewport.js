@@ -35,7 +35,7 @@ define(
 
 		var deviceClasses = [
 			{
-				userAgentKeywords : [ 'iPhone', 'iPod' ],
+				userAgentKeywords : [ 'iPhone', 'iPod', 'Tizen' ],
 				initialScale : 0.5,
 				maximumScale : 0.5
 			},
