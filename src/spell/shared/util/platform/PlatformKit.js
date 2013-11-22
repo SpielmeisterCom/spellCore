@@ -24,6 +24,7 @@ define(
 		'spell/shared/util/platform/private/loader/TextLoader',
 		'spell/shared/util/platform/private/input/support',
 		'spell/shared/util/platform/private/Input',
+		'spell/shared/util/platform/private/Environment',
 		'spell/shared/util/platform/private/configurationOptions',
 		'spell/shared/util/platform/private/storage/PersistentStorage',
 		'spell/shared/util/platform/private/openURL',
@@ -53,6 +54,7 @@ define(
 		TextLoader,
 		support,
 		Input,
+		Environment,
 		configurationOptions,
 		PersistentStorage,
 		openURL,
@@ -71,6 +73,10 @@ define(
 
 		var createInput = function( configurationManager, renderingContext ) {
 			return new Input( configurationManager, renderingContext )
+		}
+
+		var createEnvironment = function( configurationManager, eventManager ) {
+			return new Environment( configurationManager, eventManager )
 		}
 
         var registerOnScreenResize = function( eventManager, id, initialScreenSize ) {
@@ -140,6 +146,11 @@ define(
 			 *
 			 */
 			createInput : createInput,
+
+			/*
+			 *
+			 */
+			createEnvironment : createEnvironment,
 
 			/*
 			 *

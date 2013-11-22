@@ -63,7 +63,8 @@ define(
 		var start = function( applicationModule, cacheContent ) {
 			var spell                = this.spell,
 				configurationManager = spell.configurationManager,
-				libraryManager       = spell.libraryManager
+				libraryManager       = spell.libraryManager,
+				eventManager         = spell.eventManager
 
 			setApplicationModule(
                 spell,
@@ -78,6 +79,10 @@ define(
 			if( cacheContent ) {
 				libraryManager.addToCache( cacheContent )
 			}
+
+			//Initialize Environment
+			var environment = PlatformKit.createEnvironment( configurationManager, eventManager )
+			environment.init()
 
 			// creating rendering context
 			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
@@ -148,6 +153,8 @@ define(
 			spell.sendMessageToEditor  = this.sendMessageToEditor
 			spell.translate            = translatePartial
 			spell.inputManager         = inputManager
+			spell.environment          = environment
+			spell.env                  = spell.environment
 
 			spell.console.debug( 'client started' )
 
