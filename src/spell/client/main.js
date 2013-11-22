@@ -80,10 +80,6 @@ define(
 				libraryManager.addToCache( cacheContent )
 			}
 
-			//Initialize Environment
-			var environment = PlatformKit.createEnvironment( configurationManager, eventManager )
-			environment.init()
-
 			// creating rendering context
 			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
 				spell.eventManager,
@@ -153,7 +149,7 @@ define(
 			spell.sendMessageToEditor  = this.sendMessageToEditor
 			spell.translate            = translatePartial
 			spell.inputManager         = inputManager
-			spell.environment          = environment
+			spell.environment          = PlatformKit.createEnvironment( configurationManager, eventManager )
 			spell.env                  = spell.environment
 
 			spell.console.debug( 'client started' )

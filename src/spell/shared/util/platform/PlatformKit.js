@@ -76,7 +76,11 @@ define(
 		}
 
 		var createEnvironment = function( configurationManager, eventManager ) {
-			return new Environment( configurationManager, eventManager )
+			var environment = new Environment( configurationManager, eventManager )
+
+			environment.init()
+
+			return environment
 		}
 
         var registerOnScreenResize = function( eventManager, id, initialScreenSize ) {
