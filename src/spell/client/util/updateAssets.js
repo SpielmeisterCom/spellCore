@@ -1,16 +1,16 @@
 define(
 	'spell/client/util/updateAssets',
 	[
+		'spell/shared/util/createId',
 		'spell/shared/util/createAssetId',
-		'spell/shared/util/createIdFromLibraryFilePath',
 		'spell/shared/util/createLibraryFilePath',
 		'spell/shared/util/input/keyCodes',
 
 		'spell/functions'
 	],
 	function(
+		createId,
 		createAssetId,
-		createIdFromLibraryFilePath,
 		createLibraryFilePath,
 		keyCodes,
 
@@ -146,7 +146,7 @@ define(
 				return
 			}
 
-			asset.resourceId = createIdFromLibraryFilePath( assetDefinition.namespace + '.' + file )
+			asset.resourceId = createId( assetDefinition.namespace, assetDefinition.name )
 		}
 
 
