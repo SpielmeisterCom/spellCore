@@ -2,11 +2,13 @@ define(
 	'spell/shared/util/platform/private/getAvailableScreenSize',
     [
 		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
-        'spell/shared/util/platform/private/environment/isHtml5Ejecta'
+        'spell/shared/util/platform/private/environment/isHtml5Ejecta',
+	    'spell/shared/util/platform/private/environment/isHtml5Tizen'
     ],
 	function(
 		isHtml5GameClosure,
-        isHtml5Ejecta
+        isHtml5Ejecta,
+	    isHtml5Tizen
     ) {
 		'use strict'
 
@@ -35,10 +37,12 @@ define(
 
 		return function( id ) {
             if( isHtml5GameClosure ||
-				isHtml5Ejecta ) {
+				isHtml5Ejecta ||
+	            isHtml5Tizen) {
 
                 return [ window.innerWidth, window.innerHeight ]
-            }
+
+            } 
 
 			if( !id ) {
 				throw 'Missing container id argument. Please call the function with the spell container id.'
