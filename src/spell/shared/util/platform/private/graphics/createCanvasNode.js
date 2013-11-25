@@ -8,7 +8,7 @@ define(
             var canvas
 
             if ( window && window.canvas ) {
-                // if a global canvas element was specified, use this (for Ejecta/CocoonJS style environments)
+                // if a global canvas element was specified, use this (for Ejecta style environment)
                 canvas = window.canvas
 
             } else {

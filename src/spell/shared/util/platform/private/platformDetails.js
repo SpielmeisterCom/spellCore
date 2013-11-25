@@ -2,14 +2,12 @@ define(
 	'spell/shared/util/platform/private/platformDetails',
 	[
 		'spell/shared/util/platform/private/input/support',
-		'spell/shared/util/platform/private/environment/isHtml5CocoonJS',
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
 		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
 		'spell/shared/util/platform/private/jsonCoder'
 	],
 	function(
 		support,
-		isHtml5CocoonJS,
 		isHtml5Ejecta,
 		isHtml5GameClosure,
 		jsonCoder
@@ -23,7 +21,7 @@ define(
 
 		return {
 			hasPlentyRAM : function() {
-                return !( isHtml5CocoonJS || isHtml5Ejecta )
+                return !isHtml5Ejecta
             },
 			hasTouchSupport : function() {
 				return support.hasWebkitTouchApi() ||
@@ -31,12 +29,7 @@ define(
 			},
 			hasDeviceOrientationSupport : support.hasDeviceOrientationApi,
 			getOS : function() {
-				if( isHtml5CocoonJS ) {
-					var userAgentParts = navigator.userAgent.split( ',' )
-
-					return userAgentParts[ 0 ] + ' ' + userAgentParts[ 1 ].trim()
-
-				} else if( isHtml5Ejecta ) {
+				if( isHtml5Ejecta ) {
 					return 'iOS ' + navigator.userAgent.match( /([\.\d]+)\)$/ )[ 1 ]
 
 				} else if( isHtml5GameClosure ) {
@@ -47,19 +40,15 @@ define(
 				}
 			},
 			getPlatformAdapter : function() {
-				if( isHtml5CocoonJS ) return 'cocoonjs'
 				if( isHtml5Ejecta ) return 'ejecta'
 				if( isHtml5GameClosure ) return 'gameclosure'
 
 				return 'html5'
 			},
 			getPlatform : function() {
-				if( isHtml5CocoonJS ) return navigator.appVersion
-
 				return navigator.userAgent
 			},
 			getDevice : function() {
-				if( isHtml5CocoonJS ) return navigator.platform
 				if( isHtml5Ejecta ) return navigator.userAgent.match( /\((.*);/ )[ 1 ]
 				if( isHtml5GameClosure ) return gameClosureDeviceInfo.model + ', ' + gameClosureDeviceInfo.manufacturer
 
@@ -72,7 +61,7 @@ define(
 				return screen.width
 			},
 			isMobileDevice: function() {
-				return isHtml5CocoonJS || isHtml5Ejecta || isHtml5GameClosure
+				return isHtml5Ejecta || isHtml5GameClosure
 			}
 		}
 	}
