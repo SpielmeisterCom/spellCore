@@ -51,11 +51,13 @@ define(
 	'spell/shared/util/platform/private/input/deviceOrientationHandler',
 	[
 		'spell/functions',
-		'spell/shared/util/platform/private/environment/isHtml5GameClosure'
+		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5Tizen'
 	],
 	function(
 		_,
-		isHtml5GameClosure
+		isHtml5GameClosure,
+		isHtml5Tizen
 	) {
 		'use strict'
 
@@ -89,6 +91,17 @@ define(
 					}
 
 					NATIVE.events.registerHandler( 'deviceorientation', nativeHandler )
+
+				} else if( isHtml5Tizen ) {
+					nativeHandler = function( event ) {
+						callback( new DeviceOrientationEvent(
+							event.alpha * TO_DEGREE_FACTOR,
+							event.beta * TO_DEGREE_FACTOR,
+							event.gamma * -TO_DEGREE_FACTOR
+						) )
+					}
+
+					el.addEventListener( 'deviceorientation', nativeHandler, true )
 
 				} else {
 					nativeHandler = _.bind( nativeHandlerImpl, this, callback )
