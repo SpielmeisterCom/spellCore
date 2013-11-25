@@ -50,11 +50,11 @@ define(
 					} )
 
 					var probeDeviceOrientationApi = function( event ) {
-						if( event.gamma !== 0 ) {
+						if( isBrokenDeviceOrientationApi &&
+							event.gamma !== 0 ) {
+
 							isBrokenDeviceOrientationApi = false
 						}
-
-						doneProbing()
 					}
 
 					registerTimer( doneProbing, DEVICE_ORIENTATION_PROBING_TIMEOUT )
