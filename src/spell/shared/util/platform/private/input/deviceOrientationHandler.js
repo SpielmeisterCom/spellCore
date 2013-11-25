@@ -94,11 +94,7 @@ define(
 
 				} else if( isHtml5Tizen ) {
 					nativeHandler = function( event ) {
-						callback( new DeviceOrientationEvent(
-							event.alpha * TO_DEGREE_FACTOR,
-							event.beta * TO_DEGREE_FACTOR,
-							event.gamma * -TO_DEGREE_FACTOR
-						) )
+						callback( new DeviceOrientationEvent( event.alpha, event.beta, -event.gamma ) )
 					}
 
 					el.addEventListener( 'deviceorientation', nativeHandler, true )
