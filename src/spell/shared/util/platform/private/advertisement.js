@@ -17,7 +17,7 @@ define(
 					ejecta.loadInterstitial()
 
 				} else if( isHtml5GameClosure ) {
-					NATIVE.advertisement.loadInterstitial()
+					NATIVE.plugins.sendEvent( 'AdMobPlugin', 'loadInterstitial', JSON.stringify( {} ) )
 				}
 			},
 			showInterstitial : function() {
@@ -25,7 +25,7 @@ define(
 					ejecta.showInterstitial()
 
 				} else if( isHtml5GameClosure ) {
-					NATIVE.advertisement.showInterstitial()
+					NATIVE.plugins.sendEvent( 'AdMobPlugin', 'showInterstitial', JSON.stringify( {} ) )
 				}
 			}
 		}
