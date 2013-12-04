@@ -421,7 +421,7 @@ define(
 
 		var mergeOverloadedChildren = function( entityTemplateChildren, overloadedChildren ) {
 			if( !overloadedChildren || overloadedChildren.length === 0 ) {
-				return overloadedChildren
+				return entityTemplateChildren
 			}
 
 			if( !entityTemplateChildren || entityTemplateChildren.length === 0 ) {
@@ -453,6 +453,8 @@ define(
 				if( overloadedChild.id ) {
 					entityTemplateChild.id = overloadedChild.id
 				}
+
+				entityTemplateChild.children = applyOverloadedChildrenConfig( entityTemplateChild.children, overloadedChild.children )
 			}
 
 			return result
