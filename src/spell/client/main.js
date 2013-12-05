@@ -16,6 +16,7 @@ define(
 		'spell/InputManager',
 		'spell/LibraryManager',
 		'spell/shared/util/createModuleLoader',
+		'spell/PluginManager',
 		'spell/StatisticsManager',
 		'spell/Console',
 		'spell/shared/util/physics/createBox2dContext',
@@ -41,6 +42,7 @@ define(
 		InputManager,
 		LibraryManager,
 		createModuleLoader,
+		PluginManager,
 		StatisticsManager,
 		Console,
 		createBox2dContext,
@@ -193,6 +195,7 @@ define(
 			spell.scenes               = {}
 			spell.statisticsManager    = statisticsManager
 			spell.storage              = PlatformKit.createPersistentStorage()
+			spell.pluginManager        = new PluginManager()
 
 			this.spell = spell
 
