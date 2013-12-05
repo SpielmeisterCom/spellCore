@@ -57,7 +57,7 @@ define(
 
 
 		var preStart = function( applicationModule, cacheContent ) {
-			PlatformKit.init( _.bind( start, this, applicationModule, cacheContent ) )
+			PlatformKit.init( this.spell, _.bind( start, this, applicationModule, cacheContent ) )
 		}
 
 		var start = function( applicationModule, cacheContent ) {

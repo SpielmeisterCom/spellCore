@@ -32,7 +32,8 @@ define(
 		'spell/shared/util/platform/private/graphics/initViewport',
 		'spell/shared/util/platform/private/advertisement',
 		'spell/shared/util/platform/private/flurry',
-		'spell/shared/util/platform/private/createComponentType'
+		'spell/shared/util/platform/private/createComponentType',
+		'spell/functions'
 	],
 	function(
 		createAssetId,
@@ -62,7 +63,8 @@ define(
 		initViewport,
 		advertisement,
 		flurry,
-		createComponentType
+		createComponentType,
+		_
 	) {
 		'use strict'
 
@@ -197,7 +199,12 @@ define(
 
 			createSplashScreenImage : createSplashScreenImage,
 
-			init : support.init
+			init : function( spell, next ) {
+				support.init(
+					spell,
+					_.bind( advertisement.init, advertisement, spell, next )
+				)
+			}
 		}
 	}
 )
