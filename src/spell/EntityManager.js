@@ -430,17 +430,18 @@ define(
 
 			var result = deepClone( entityTemplateChildren )
 
-			for( var i = 0; i < result.length; i++ ) {
-				var entityTemplateChild = result[ i ]
+			for( var i = 0; i < overloadedChildren.length; i++ ) {
+				var overloadedChild = overloadedChildren[ i ]
 
-				var overloadedChild = _.find(
-					overloadedChildren,
+				var entityTemplateChild = _.find(
+					result,
 					function( tmp ) {
-						return tmp.name === entityTemplateChild.name
+						return tmp.name === overloadedChild.name
 					}
 				)
 
-				if( !overloadedChild ) {
+				if( !entityTemplateChild ) {
+					result.push( deepClone( overloadedChild ) )
 					continue
 				}
 
