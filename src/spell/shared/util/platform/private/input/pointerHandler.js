@@ -154,7 +154,10 @@ define(
 				screenSize = configurationManager.getValue( 'currentScreenSize' ),
 				offset     = getOffset( container )
 
-			event.preventDefault()
+			// only preventDefault on touchmove, otherwise no click event is triggered in mobile Safari
+			if( eventType == 'touchmove' ) {
+				event.preventDefault()
+			}
 
 			if( eventMappings[ eventType ] ) {
 				eventType = eventMappings[ eventType ]
