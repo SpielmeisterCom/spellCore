@@ -93,6 +93,8 @@ define(
 
 
 		var nativeHandler = null
+		var nativeClickHandler = null
+
 		var registeredEvents = [ ]
 		var eventMappings = {
 			pointermove     : 'pointerMove',
@@ -200,7 +202,25 @@ define(
 				eventType = eventMappings[ eventType ]
 			}
 
+
 			emitSpellPointerEvent( callback, eventType, pointerId, button, positionX, positionY )
+		}
+
+		var nativeClickHandlerImpl = function( callback, eventMappings, container, configurationManager, event ) {
+			var eventType  = event.type,
+				screenSize = configurationManager.getValue( 'currentScreenSize' ),
+				offset     = getOffset( container ),
+				positionX  = event.pageX - offset[ 0 ],
+				positionY  = event.pageY - offset[ 1 ]
+
+			// if the event missed the display it gets ignored
+			if( positionX < 0 || positionX > screenSize[ 0 ] ||
+				positionY < 0 || positionY > screenSize [ 1 ] ) {
+
+				return false
+			}
+
+			emitSpellPointerEvent( callback, eventType, 0, 0, positionX, positionY )
 		}
 
 		var registerListener = function( el, container, configurationManager, callback ) {
@@ -233,6 +253,9 @@ define(
 			for( var i in registeredEvents ) {
 				el.addEventListener( registeredEvents[ i ], nativeHandler, true )
 			}
+
+			nativeClickHandler = _.bind( nativeClickHandlerImpl, this, callback, eventMappings, container, configurationManager )
+			el.addEventListener( 'click', nativeClickHandler, true )
 		}
 
 		var removeListener = function( el ) {
@@ -243,6 +266,9 @@ define(
 				registeredEvents.length = 0
 				nativeHandler = null
 			}
+
+			el.removeEventListener( 'click', nativeClickHandler )
+			nativeClickHandler = null
 		}
 
 		return {

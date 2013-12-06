@@ -38,11 +38,33 @@ define(
 			]
 		}
 
+		var clickHandlerImpl = function( entityManager, screenSize, cameras, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, clickEvent ) {
+			var	camera                    = cameras[ currentCameraId ],
+				cameraTransform           = transforms[ currentCameraId ],
+				aspectRatio               = screenSize[ 0 ] / screenSize[ 1 ],
+				effectiveCameraDimensions = createEffectiveCameraDimensions( camera.width, camera.height, cameraTransform.scale, aspectRatio )
+
+			processEvent(
+				entityManager,
+				screenSize,
+				effectiveCameraDimensions,
+				pointedEntityMap,
+				renderingContext,
+				eventHandlers,
+				transforms,
+				visualObjects,
+				clickEvent
+			)
+
+
+		}
+
 		var processEvent = function( entityManager, screenSize, effectiveCameraDimensions, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvent ) {
 			if( inputEvent.type !== 'pointerDown' &&
 				inputEvent.type !== 'pointerMove' &&
 				inputEvent.type !== 'pointerUp' &&
-				inputEvent.type !== 'pointerCancel' ) {
+				inputEvent.type !== 'pointerCancel' &&
+				inputEvent.type !== 'click' ) {
 
 				return
 			}
@@ -111,7 +133,10 @@ define(
 					} else if( inputEvent.type === 'pointerMove' ) {
                         pointedEntityMap[ entityId ] = inputEvent.pointerId
                         entityManager.triggerEvent( entityId, 'pointerMove' )
-					}
+
+					} else if( inputEvent.type === 'click' ) {
+	                    entityManager.triggerEvent( entityId, 'click' )
+                    }
 
 				} else if( pointedEntityMap[ entityId ] === inputEvent.pointerId ) {
 					// pointer moved out of the entity
@@ -121,6 +146,7 @@ define(
 			}
 		}
 
+		var clickHandler
 
 		/**
 		 * Creates an instance of the system.
@@ -169,7 +195,23 @@ define(
 				)
 
 				eventManager.subscribe( eventManager.EVENT.SCREEN_RESIZE, this.screenResizeHandler )
+
+				clickHandler = _.bind(
+					clickHandlerImpl,
+					this,
+					spell.entityManager,
+					this.screenSize,
+					this.cameras,
+					this.pointedEntityMap,
+					spell.renderingContext,
+					this.eventHandlers,
+					this.transforms,
+					this.visualObjects
+				)
+				spell.inputManager.addListener('click', clickHandler )
 			},
+
+
 
 			/**
 		 	 * Gets called when the system is destroyed.
@@ -182,6 +224,8 @@ define(
 				eventManager.unsubscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 				eventManager.unsubscribe( [ eventManager.EVENT.COMPONENT_UPDATED, Defines.CAMERA_COMPONENT_ID ], this.cameraChangedHandler )
 				eventManager.unsubscribe( eventManager.EVENT.SCREEN_RESIZE, this.screenResizeHandler )
+
+				spell.inputManager.removeListener('click', clickHandler )
 			},
 
 			/**

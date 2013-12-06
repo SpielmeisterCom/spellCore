@@ -42,11 +42,15 @@ define(
 			inputContexts             = {}
 
 		var processEvent = function( event ) {
-			inputEvents.push( event )
-
 			var type      = event.type,
 				isKeyDown = type === 'keyDown',
-				isKeyUp   = type === 'keyUp'
+				isKeyUp   = type === 'keyUp',
+				isClick   = type === 'click'
+
+			if( !isClick ) {
+				//the click event can be only processed via addListener
+				inputEvents.push( event )
+			}
 
 			if( isKeyDown || isKeyUp ) {
 				var keyCode = event.keyCode,
