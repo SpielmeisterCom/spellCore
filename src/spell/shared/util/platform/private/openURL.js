@@ -29,7 +29,7 @@ define(
 				)
 
 			} else {
-				window.open( url, message )
+				window.open( url, '_blank' )
 			}
 		}
 	}
