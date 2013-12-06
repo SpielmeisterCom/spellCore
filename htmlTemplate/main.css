@@ -20,6 +20,11 @@ body {
 	overflow: hidden;
 	display: block;
 	margin: 0 auto;
+
+	/*
+	 * Important for mobile Safari, otherwise it will not react to onclick events!
+	*/
+	cursor: pointer;
 }
 
 #spell-canvas {
