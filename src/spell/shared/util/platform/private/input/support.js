@@ -41,7 +41,7 @@ define(
 				return isHtml5GameClosure ||
 					( window.DeviceMotionEvent !== undefined && !isBrokenDeviceOrientationApi )
 			},
-			init : function( next ) {
+			init : function( spell, next ) {
 				if( !isHtml5GameClosure && window.DeviceMotionEvent ) {
 					var doneProbing = _.once( function() {
 						deviceOrientationHandler.removeListener( window )

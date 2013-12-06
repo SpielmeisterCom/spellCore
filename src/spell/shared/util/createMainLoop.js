@@ -85,6 +85,8 @@ define(
 		}
 
 		var callEveryFrameDebug = function( currentTimeInMs ) {
+			if( this.isPaused ) return
+
 			if( this.preNextFrame.length > 0 ) {
 				this.preNextFrame.pop()()
 			}
@@ -158,6 +160,7 @@ define(
 			this.statisticsManager = statisticsManager
 			this.stopWatch         = new StopWatch()
 			this.totalStopWatch    = new StopWatch()
+			this.isPaused          = false
 		}
 
 		MainLoop.prototype = {
@@ -173,6 +176,12 @@ define(
 			run : function() {
 				this.callEveryFramePartial = _.bind( this.isDebug ? callEveryFrameDebug : callEveryFrameRelease, this )
 				this.callEveryFramePartial( Types.Time.getCurrentInMs() )
+			},
+			pause : function() {
+				this.isPaused = true
+			},
+			resume : function() {
+				this.isPaused = false
 			}
 		}
 

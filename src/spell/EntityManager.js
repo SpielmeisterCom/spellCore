@@ -421,7 +421,7 @@ define(
 
 		var mergeOverloadedChildren = function( entityTemplateChildren, overloadedChildren ) {
 			if( !overloadedChildren || overloadedChildren.length === 0 ) {
-				return overloadedChildren
+				return entityTemplateChildren
 			}
 
 			if( !entityTemplateChildren || entityTemplateChildren.length === 0 ) {
@@ -430,17 +430,18 @@ define(
 
 			var result = deepClone( entityTemplateChildren )
 
-			for( var i = 0; i < result.length; i++ ) {
-				var entityTemplateChild = result[ i ]
+			for( var i = 0; i < overloadedChildren.length; i++ ) {
+				var overloadedChild = overloadedChildren[ i ]
 
-				var overloadedChild = _.find(
-					overloadedChildren,
+				var entityTemplateChild = _.find(
+					result,
 					function( tmp ) {
-						return tmp.name === entityTemplateChild.name
+						return tmp.name === overloadedChild.name
 					}
 				)
 
-				if( !overloadedChild ) {
+				if( !entityTemplateChild ) {
+					result.push( deepClone( overloadedChild ) )
 					continue
 				}
 
@@ -453,6 +454,8 @@ define(
 				if( overloadedChild.id ) {
 					entityTemplateChild.id = overloadedChild.id
 				}
+
+				entityTemplateChild.children = applyOverloadedChildrenConfig( entityTemplateChild.children, overloadedChild.children )
 			}
 
 			return result

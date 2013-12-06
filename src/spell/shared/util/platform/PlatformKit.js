@@ -32,7 +32,9 @@ define(
 		'spell/shared/util/platform/private/graphics/initViewport',
 		'spell/shared/util/platform/private/advertisement',
 		'spell/shared/util/platform/private/flurry',
-		'spell/shared/util/platform/private/createComponentType'
+		'spell/shared/util/platform/private/createComponentType',
+		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/functions'
 	],
 	function(
 		createAssetId,
@@ -62,7 +64,9 @@ define(
 		initViewport,
 		advertisement,
 		flurry,
-		createComponentType
+		createComponentType,
+		isHtml5GameClosure,
+		_
 	) {
 		'use strict'
 
@@ -186,9 +190,6 @@ define(
 				return new TextLoader( postProcess, url, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			loadInterstitial : advertisement.loadInterstitial,
-			showInterstitial : advertisement.showInterstitial,
-
 			flurry : flurry,
 
 			createComponentType : createComponentType,
@@ -197,7 +198,16 @@ define(
 
 			createSplashScreenImage : createSplashScreenImage,
 
-			init : support.init
+			init : function( spell, next ) {
+				support.init(
+					spell,
+					_.bind( advertisement.init, advertisement, spell, next )
+				)
+			},
+
+			getPlugins : function() {
+				return isHtml5GameClosure ? { admob : advertisement } : {}
+			}
 		}
 	}
 )
