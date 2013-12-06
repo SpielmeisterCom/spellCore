@@ -132,8 +132,7 @@ if( !window.console ) {
 	}
 
 	var isHtml5Capable = function() {
-		var notCapable = isLessThanBrowser( 'Chrome', 22 ) ||
-			isLessThanBrowser( 'Firefox', 18 ) ||
+		var notCapable = isLessThanBrowser( 'Firefox', 18 ) ||
 			isLessThanBrowser( 'IE', 10 ) ||
 			!isCanvas2dCapable() // all other browsers must at least provide a canvas-2d implementation
 
