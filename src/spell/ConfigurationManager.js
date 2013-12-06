@@ -40,17 +40,23 @@ define(
 			return _.contains( validValues, value ) ? value : false
 		}
 
-		var extractVec2 =  function( validValues, value ) {
-			if( _.isArray( value ) &&
-				value.length === 2 ) {
+		var extractVec2 =  function( validValues, v ) {
+			var parts = _.isArray( v ) ?
+				v :
+				v.split( ',' )
 
-				value[ 0 ] =  parseFloat( value[ 0 ] )
-				value[ 1 ] =  parseFloat( value[ 1 ] )
-
-				return value
+			if( parts.length !== 2 ) {
+				throw 'Could not create vec2 from string "' + v + '".'
 			}
 
-			return false
+			var x = parseInt( parts[ 0 ], 10 ),
+				y = parseInt( parts[ 1 ], 10 )
+
+			if( _.isNaN( x ) || _.isNaN( y ) ) {
+				throw 'Could not create vec2 from string "' + v + '".'
+			}
+
+			return [ x, y ]
 		}
 
 		// These are the platform agnostic options.
@@ -243,7 +249,7 @@ define(
 					)
 
 				} else if( key === 'screenSize' ) {
-					vec2.copy( config.currentScreenSize, value )
+					vec2.copy( config.currentScreenSize, config.screenSize )
 				}
 			},
 

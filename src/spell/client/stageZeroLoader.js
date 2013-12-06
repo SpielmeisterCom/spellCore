@@ -67,6 +67,12 @@ if( !window.console ) {
 		return map
 	}
 
+	var normalizeConfig = function( config ) {
+		for( var key in config ) {
+			config[ key ] = config[ key ].toString()
+		}
+	}
+
 	/*
 	 * Overrides config values set by script with those provided in the url.
 	 *
@@ -391,8 +397,11 @@ if( !window.console ) {
 
 	window.spell = {
 		start : function( config, onInitialized, debugMessageCallback ) {
-			if( !config ) config = {}
+			if( !config ) {
+				config = {}
+			}
 
+			normalizeConfig( config )
 			setUrlParameters( config )
 			setDefaults( config )
 
