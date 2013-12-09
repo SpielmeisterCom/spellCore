@@ -206,7 +206,15 @@ define(
 			},
 
 			getPlugins : function() {
-				return isHtml5GameClosure ? { admob : advertisement } : {}
+				if( isHtml5GameClosure ) {
+					return {
+						admob : advertisement,
+						admobWithChartboost : advertisement
+					}
+
+				} else {
+					return {}
+				}
 			}
 		}
 	}

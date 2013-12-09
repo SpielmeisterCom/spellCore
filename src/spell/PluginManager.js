@@ -19,7 +19,7 @@ define(
 
 		PluginManager.prototype = {
 			getById : function( pluginId ) {
-				this.plugins[ pluginId ]
+				return this.plugins[ pluginId ]
 			}
 		}
 
