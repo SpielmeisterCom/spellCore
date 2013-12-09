@@ -33,6 +33,7 @@ define(
 		'spell/shared/util/platform/private/advertisement',
 		'spell/shared/util/platform/private/flurry',
 		'spell/shared/util/platform/private/createComponentType',
+		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
 		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
 		'spell/functions'
 	],
@@ -65,6 +66,7 @@ define(
 		advertisement,
 		flurry,
 		createComponentType,
+		isHtml5Ejecta,
 		isHtml5GameClosure,
 		_
 	) {
@@ -206,7 +208,9 @@ define(
 			},
 
 			getPlugins : function() {
-				if( isHtml5GameClosure ) {
+				if( isHtml5Ejecta ||
+					isHtml5GameClosure ) {
+
 					return {
 						admob : advertisement,
 						admobWithChartboost : advertisement
