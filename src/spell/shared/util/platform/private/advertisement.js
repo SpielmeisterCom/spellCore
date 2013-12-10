@@ -55,8 +55,13 @@ define(
 
 		return {
 			init : function( spell, next ) {
-				if( isHtml5GameClosure ) {
-					NATIVE.events.registerHandler( 'interstitial', _.bind( processInterstitial, null, spell ) )
+				var processInterstitialPartial = _.bind( processInterstitial, null, spell )
+
+				if( isHtml5Ejecta ) {
+					document.addEventListener( 'interstitial', processInterstitialPartial )
+
+				} else if( isHtml5GameClosure ) {
+					NATIVE.events.registerHandler( 'interstitial', processInterstitialPartial )
 				}
 
 				next()
