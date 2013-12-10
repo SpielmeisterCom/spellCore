@@ -41,8 +41,7 @@ define(
 	            isHtml5Tizen) {
 
                 return [ window.innerWidth, window.innerHeight ]
-
-            } 
+            }
 
 			if( !id ) {
 				throw 'Missing container id argument. Please call the function with the spell container id.'
