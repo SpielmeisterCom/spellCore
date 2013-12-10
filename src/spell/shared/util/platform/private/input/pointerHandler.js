@@ -85,7 +85,7 @@ define(
 		'spell/functions'
 	],
 	function(
-		supportedPointerApi,
+		supportedInputApi,
 
 		_
 	) {
@@ -124,6 +124,17 @@ define(
 				button    : button, // 0=left button, 1=middle button if present, 2=right button
 				position  : [ positionX, positionY ] // position of the pointer in screen coordinates (origin top left!)
 			} )
+
+			if( !supportedInputApi.hasNativeClickEvent() &&
+				eventType === 'pointerDown' ) {
+
+				callback( {
+					type      : 'click',
+					pointerId : 0,
+					button    : 0, // 0=left button, 1=middle button if present, 2=right button
+					position  : [ positionX, positionY ] // position of the pointer in screen coordinates (origin top left!)
+				} )
+			}
 		}
 
 		function getOffset( element ) {
@@ -227,19 +238,19 @@ define(
 		}
 
 		var registerListener = function( el, container, configurationManager, callback ) {
-			if( supportedPointerApi.hasPointerApi() ) {
+			if( supportedInputApi.hasPointerApi() ) {
 				nativeHandler = _.bind( nativePointerHandlerImpl, this, callback, eventMappings, container, configurationManager )
 				registeredEvents = [
 					'pointermove', 'pointerup', 'pointerdown', 'pointercancel'
 				]
 
-			} else if( supportedPointerApi.hasMicrosoftPointerApi() ) {
+			} else if( supportedInputApi.hasMicrosoftPointerApi() ) {
 				nativeHandler = _.bind( nativePointerHandlerImpl, this, callback, eventMappings, container, configurationManager )
 				registeredEvents = [
 					'MSPointerMove', 'MSPointerUp', 'MSPointerDown', 'MSPointerCancel'
 				]
 
-			} else if( supportedPointerApi.hasWebkitTouchApi() ) {
+			} else if( supportedInputApi.hasWebkitTouchApi() ) {
 				nativeHandler = _.bind( nativeTouchHandlerImpl, this, callback, eventMappings, container, configurationManager )
 				registeredEvents = [
 					'touchstart', 'touchmove', 'touchend', 'touchcancel'

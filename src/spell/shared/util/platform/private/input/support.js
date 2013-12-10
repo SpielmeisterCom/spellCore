@@ -41,6 +41,9 @@ define(
 				return isHtml5GameClosure ||
 					( window.DeviceMotionEvent !== undefined && !isBrokenDeviceOrientationApi )
 			},
+			hasNativeClickEvent : function() {
+				return !( isHtml5Ejecta || isHtml5GameClosure )
+			},
 			init : function( spell, next ) {
 				if( !isHtml5GameClosure && window.DeviceMotionEvent ) {
 					var doneProbing = _.once( function() {
