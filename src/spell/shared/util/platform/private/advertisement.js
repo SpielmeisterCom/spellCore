@@ -30,7 +30,6 @@ define(
 						mutedState = spell.audioContext.isAllMuted()
 
 						if( !mutedState ) {
-							console.log( 'spell.audioContext.setAllMuted( true )' )
 							spell.audioContext.setAllMuted( true )
 						}
 
@@ -45,7 +44,6 @@ define(
 				isPaused = false
 
 				if( !mutedState ) {
-					console.log( 'spell.audioContext.setAllMuted( false )' )
 					spell.audioContext.setAllMuted( false )
 				}
 
