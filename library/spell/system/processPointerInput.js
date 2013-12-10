@@ -56,8 +56,6 @@ define(
 				visualObjects,
 				clickEvent
 			)
-
-
 		}
 
 		var processEvent = function( entityManager, screenSize, effectiveCameraDimensions, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvent ) {
@@ -210,10 +208,9 @@ define(
 					this.transforms,
 					this.visualObjects
 				)
-				spell.inputManager.addListener('click', clickHandler )
+
+				spell.inputManager.addListener( 'click', clickHandler )
 			},
-
-
 
 			/**
 		 	 * Gets called when the system is destroyed.
