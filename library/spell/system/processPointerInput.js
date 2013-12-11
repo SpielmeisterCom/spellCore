@@ -19,8 +19,8 @@ define(
 		'use strict'
 
 
-		var currentCameraId
-		var lastClickedEntity
+		var currentCameraId,
+			lastClickedEntityId
 
 		var isPointWithinEntity = function ( entityDimensions, transform, worldPosition ) {
 			return mathUtil.isPointInRect(
@@ -126,7 +126,7 @@ define(
 
 
                     } else if( inputEvent.type === 'pointerDown' ) {
-						lastClickedEntity = entityId
+						lastClickedEntityId = entityId
                         pointedEntityMap[ entityId ] = inputEvent.pointerId
                         entityManager.triggerEvent( entityId, 'pointerDown' )
 
@@ -134,7 +134,9 @@ define(
                         pointedEntityMap[ entityId ] = inputEvent.pointerId
                         entityManager.triggerEvent( entityId, 'pointerMove' )
 
-					} else if( inputEvent.type === 'click' && entityId === lastClickedEntity ) {
+					} else if( inputEvent.type === 'click' &&
+						( !lastClickedEntityId || entityId === lastClickedEntityId ) ) {
+
 	                    entityManager.triggerEvent( entityId, 'click' )
                     }
 
