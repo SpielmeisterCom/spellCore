@@ -118,12 +118,12 @@ define(
                     }
 
                     if( inputEvent.type === 'pointerUp' ) {
+						lastClickedEntityId = undefined
                         pointedEntityMap[ entityId ] = false
                         entityManager.triggerEvent( entityId, 'pointerUp' )
 
                         // TODO: only fire pointerOut for devices that don't support hover status
                         entityManager.triggerEvent( entityId, 'pointerOut' )
-
 
                     } else if( inputEvent.type === 'pointerDown' ) {
 						lastClickedEntityId = entityId
