@@ -4,21 +4,24 @@ define(
 		'spell/shared/util/platform/private/sound/dummyAudio/createDummyAudioContext',
 		'spell/shared/util/platform/private/sound/html5Audio/createHtml5AudioContext',
 		'spell/shared/util/platform/private/sound/webAudio/createWebAudioContext',
-		'spell/shared/util/platform/private/sound/nativeAudio/createNativeAudioContext'
+		'spell/shared/util/platform/private/sound/nativeAudio/createNativeAudioContext',
+		'spell/shared/util/platform/private/sound/winPhoneAudio/createWinPhoneAudioContext'
 	],
 	function(
 		createDummyAudioContext,
 		createHtml5AudioContext,
 		createWebAudioContext,
-		createNativeAudioContext
+		createNativeAudioContext,
+		createWinPhoneAudioContext
 	) {
 		'use strict'
 
 
-		var BACK_END_DUMMY_AUDIO  = 'dummy',
-			BACK_END_WEB_AUDIO    = 'web',
-			BACK_END_HTML5_AUDIO  = 'html5',
-			BACK_END_NATIVE_AUDIO = 'native'
+		var BACK_END_DUMMY_AUDIO    = 'dummy',
+			BACK_END_WEB_AUDIO      = 'web',
+			BACK_END_HTML5_AUDIO    = 'html5',
+			BACK_END_NATIVE_AUDIO   = 'native',
+			BACK_END_WIN_PHONE_AUDIO = 'winPhone'
 
 		var context = null
 
@@ -40,6 +43,9 @@ define(
 
 				} else if( requestedBackEnd === undefined ? true : ( requestedBackEnd === BACK_END_NATIVE_AUDIO ) ) {
 					context = createNativeAudioContext()
+
+				} else if( requestedBackEnd === undefined ? true : ( requestedBackEnd === BACK_END_WIN_PHONE_AUDIO ) ) {
+					context = createWinPhoneAudioContext()
 				}
 
 			} catch( e ) {
@@ -56,6 +62,7 @@ define(
 			BACK_END_HTML5_AUDIO : BACK_END_HTML5_AUDIO,
 			BACK_END_WEB_AUDIO : BACK_END_WEB_AUDIO,
 			BACK_END_NATIVE_AUDIO : BACK_END_NATIVE_AUDIO,
+			BACK_END_WIN_PHONE_AUDIO : BACK_END_WIN_PHONE_AUDIO,
 			createAudioContext : createAudioContext
 		}
 	}
