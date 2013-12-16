@@ -2,17 +2,22 @@ define(
 	'spell/shared/util/platform/private/openURL',
 	[
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
-		'spell/shared/util/platform/private/environment/isHtml5Tizen'
+		'spell/shared/util/platform/private/environment/isHtml5Tizen',
+		'spell/shared/util/platform/private/environment/isHtml5WinPhone'
 	],
 	function(
 		isHtml5Ejecta,
-	    isHtml5Tizen
+	    isHtml5Tizen,
+		isHtml5WinPhone
 	) {
 		'use strict'
 
 
 		return function( url, message ) {
-			if( isHtml5Ejecta ) {
+			if( isHtml5WinPhone ) {
+				window.external.notify( 'openUrl;' + url )
+
+			} else if( isHtml5Ejecta ) {
 				ejecta.openURL( url, message )
 
 			} else if( isHtml5Tizen ) {
