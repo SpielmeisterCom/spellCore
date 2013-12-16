@@ -70,12 +70,14 @@ define(
 	[
 		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
 		'spell/shared/util/platform/private/environment/isHtml5Tizen',
+		'spell/shared/util/platform/private/environment/isHtml5WinPhone',
 		'spell/shared/util/input/keyCodes',
 		'spell/functions'
 	],
 	function(
 		isHtml5GameClosure,
 		isHtml5Tizen,
+		isHtml5WinPhone,
 		keyCodes,
 		_
 	) {
@@ -94,7 +96,7 @@ define(
 
 			var keyCode         = event.keyCode,
 				keyIdentifier   = event.keyIdentifier
-			
+
 			if( isHtml5Tizen ) {
 				if( keyIdentifier == 'XF86Send') { //menu button
 					keyCode = keyCodes.MENU
@@ -129,7 +131,12 @@ define(
 						callback( new KeyEvent( event.keyCode, event.type ) )
 					}
 				)
+			} else if( isHtml5WinPhone ) {
+				window.backButtonPressed = function( keyCode, type ) {
+					callback(new KeyEvent(parseInt( keyCode,10), type))
+				}
 			}
+
 
 			nativeHandler = _.bind( nativeHandlerImpl, this, callback )
 

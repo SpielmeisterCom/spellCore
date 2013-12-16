@@ -120,6 +120,10 @@ if( !window.console ) {
 		return false
 	}
 
+	var isHtml5WinPhone = function() {
+		return window.external && typeof(window.external.notify ) !== 'undefined'
+	}
+
 	var isWebAudioSupported = function() {
 		if( IS_MOBILE_SAFARI ||
 			!window.webkitAudioContext ) {
@@ -227,7 +231,9 @@ if( !window.console ) {
 					'web' :
 					isHtml5AudioSupported() ?
 						'html5' :
-						'dummy'
+						isHtml5WinPhone() ?
+							'winPhone' :
+							'dummy'
 			}
 		}
 
