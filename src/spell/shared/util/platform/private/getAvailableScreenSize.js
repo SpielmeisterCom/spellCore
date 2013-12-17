@@ -3,12 +3,14 @@ define(
     [
 		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
         'spell/shared/util/platform/private/environment/isHtml5Ejecta',
-	    'spell/shared/util/platform/private/environment/isHtml5Tizen'
+	    'spell/shared/util/platform/private/environment/isHtml5Tizen',
+		'spell/shared/util/platform/private/environment/isHtml5WinPhone'
     ],
 	function(
 		isHtml5GameClosure,
         isHtml5Ejecta,
-	    isHtml5Tizen
+	    isHtml5Tizen,
+		isHtml5WinPhone
     ) {
 		'use strict'
 
@@ -38,7 +40,8 @@ define(
 		return function( id ) {
             if( isHtml5GameClosure ||
 				isHtml5Ejecta ||
-	            isHtml5Tizen) {
+	            isHtml5Tizen ||
+				isHtml5WinPhone ) {
 
                 return [ window.innerWidth, window.innerHeight ]
             }
