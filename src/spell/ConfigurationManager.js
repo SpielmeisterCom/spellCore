@@ -176,8 +176,8 @@ define(
 						} else if( screenMode === 'fit' ) {
 							// set the screen size up to the limits provided by the "screenSize" configuration option
 							var clampedAvailableScreenSize = [
-								mathUtil.clamp( availableScreenSize[ 0 ], 0, screenSize[ 0 ] ),
-								mathUtil.clamp( availableScreenSize[ 1 ], 0, screenSize[ 1 ] )
+								mathUtil.clamp( availableScreenSize[ 0 ], 1, screenSize[ 0 ] ),
+								mathUtil.clamp( availableScreenSize[ 1 ], 1, screenSize[ 1 ] )
 							]
 
 							config.currentScreenSize = createScreenSize(
