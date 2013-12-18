@@ -64,15 +64,16 @@ define(
 
 		var start = function( applicationModule, cacheContent ) {
 			var spell                = this.spell,
-				configurationManager = spell.configurationManager,
-				libraryManager       = spell.libraryManager,
-				eventManager         = spell.eventManager
+				eventManager         = spell.eventManager,
+				configurationManager = spell.configurationManager = new ConfigurationManager( eventManager ),
+				isModeDeployed       = spell.loaderConfig.mode === 'deployed',
+				libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ), isModeDeployed )
 
 			setApplicationModule(
                 spell,
                 configurationManager,
+				PlatformKit.platformDetails.getTarget(),
                 applicationModule,
-                applicationModule.config,
                 spell.loaderConfig
             )
 
@@ -82,6 +83,8 @@ define(
 				libraryManager.addToCache( cacheContent )
 			}
 
+			PlatformKit.registerOnScreenResize( spell.eventManager, configurationManager.getValue( 'id' ) )
+
 			// creating rendering context
 			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
 				spell.eventManager,
@@ -89,12 +92,6 @@ define(
 				configurationManager.getValue( 'currentScreenSize' )[ 0 ],
 				configurationManager.getValue( 'currentScreenSize' )[ 1 ],
 				configurationManager.getValue( 'renderingBackEnd' )
-			)
-
-			PlatformKit.registerOnScreenResize(
-				spell.eventManager,
-				configurationManager.getValue( 'id' ),
-				configurationManager.getValue( 'screenSize' )
 			)
 
 			spell.console.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
@@ -108,7 +105,7 @@ define(
 			spell.console.debug( 'created audio context (' + audioContext.getConfiguration().type + ')' )
 
 
-			spell.libraryManager.init( audioContext, renderingContext )
+			libraryManager.init( audioContext, renderingContext )
 
 
 			var assetManager = new AssetManager( libraryManager )
@@ -153,6 +150,7 @@ define(
 			spell.inputManager         = inputManager
 			spell.environment          = PlatformKit.createEnvironment( configurationManager, eventManager )
 			spell.env                  = spell.environment
+			spell.libraryManager       = libraryManager
 
 			spell.console.debug( 'client started' )
 
@@ -175,27 +173,22 @@ define(
 			var spell                = createSpell(),
 				console              = new Console(),
 				eventManager         = new EventManager(),
-				configurationManager = new ConfigurationManager( eventManager ),
 				statisticsManager    = new StatisticsManager(),
 				mainLoop             = createMainLoop( eventManager, statisticsManager, isDebug ),
 				isModeDeployed       = loaderConfig.mode === 'deployed'
 
-			configurationManager.setConfig( loaderConfig )
-
 			statisticsManager.init()
 
-			spell.applicationModule    = undefined
-			spell.configurationManager = configurationManager
-			spell.eventManager         = eventManager
-			spell.libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ), isModeDeployed )
-			spell.loaderConfig         = loaderConfig
-			spell.console              = console
-			spell.mainLoop             = mainLoop
-			spell.registerTimer        = PlatformKit.registerTimer
-			spell.scenes               = {}
-			spell.statisticsManager    = statisticsManager
-			spell.storage              = PlatformKit.createPersistentStorage()
-			spell.pluginManager        = new PluginManager()
+			spell.applicationModule = undefined
+			spell.eventManager      = eventManager
+			spell.loaderConfig      = loaderConfig
+			spell.console           = console
+			spell.mainLoop          = mainLoop
+			spell.registerTimer     = PlatformKit.registerTimer
+			spell.scenes            = {}
+			spell.statisticsManager = statisticsManager
+			spell.storage           = PlatformKit.createPersistentStorage()
+			spell.pluginManager     = new PluginManager()
 
 			this.spell = spell
 

@@ -37,6 +37,12 @@ define(
 			return [ Math.round( left ), Math.round( top ) ]
 		}
 
+		var createScreenSize = function( id ) {
+			var offset = getOffset( document.getElementById( id ) )
+
+			return [ window.innerWidth - offset[ 0 ], window.innerHeight - offset[ 1 ] ]
+		}
+
 		return function( id ) {
             if( isHtml5GameClosure ||
 				isHtml5Ejecta ||
@@ -50,11 +56,7 @@ define(
 				throw 'Missing container id argument. Please call the function with the spell container id.'
 			}
 
-			var offset = getOffset( document.getElementById( id ) ),
-				width  = window.innerWidth - offset[ 0 ],
-				height = window.innerHeight - offset[ 1 ]
-
-			return [ width, height ]
+			return createScreenSize( id )
 		}
 	}
 )

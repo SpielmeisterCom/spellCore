@@ -47,6 +47,34 @@ if( !window.console ) {
 		var INCLUDED_SUB_TARGETS = undefined
 	}
 
+	var getOffset = function( element ) {
+		if( !element.getBoundingClientRect ) {
+			return [ 0, 0 ]
+		}
+
+		var box = element.getBoundingClientRect()
+
+		var body    = document.body
+		var docElem = document.documentElement
+
+		var scrollTop  = window.pageYOffset || docElem.scrollTop || body.scrollTop
+		var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft
+
+		var clientTop  = docElem.clientTop || body.clientTop || 0
+		var clientLeft = docElem.clientLeft || body.clientLeft || 0
+
+		var top  = box.top + scrollTop - clientTop
+		var left = box.left + scrollLeft - clientLeft
+
+		return [ Math.round( left ), Math.round( top ) ]
+	}
+
+	var createScreenSize = function( id ) {
+		var offset = getOffset( document.getElementById( id ) )
+
+		return [ window.innerWidth - offset[ 0 ], window.innerHeight - offset[ 1 ] ]
+	}
+
 	var arrayContains = function( array, value ) {
 		if( !array ) return false
 
@@ -347,14 +375,59 @@ if( !window.console ) {
 		head.js.apply( null, args )
 	}
 
+	var resizeFlashObject = function( flashObject, screenSize ) {
+		flashObject.width = screenSize[ 0 ]
+		flashObject.height = screenSize[ 1 ]
+		flashObject.processResize( screenSize )
+	}
+
 	var loadFlashExecutable = function( config, verbose ) {
 		if( verbose ) printLoading()
 
 		// create dom structure shim
-		var screenNode      = createChildNode( config.id, config.id + '-screen' )
-		var screenFlashNode = createChildNode( screenNode.id, screenNode.id + '-flash' )
+		var spellNodeId     = config.id,
+			screenNode      = createChildNode( spellNodeId, config.id + '-screen' ),
+			screenFlashNode = createChildNode( screenNode.id, screenNode.id + '-flash' )
 
 		config.libraryUrl = 'library'
+
+		// Flash calls this function to signal that the platform adapter initialization is almost complete.
+		window.signalInitDone = function() {
+			delete window.signalInitDone
+
+			var flashObject = swfobject.getObjectById( screenFlashNode.id )
+
+			if( flashObject && flashObject.initDone ) {
+				resizeFlashObject( flashObject, createScreenSize( spellNodeId ) )
+				flashObject.initDone()
+
+			} else {
+				throw 'Could not call "flashObject.initDone()".'
+			}
+		}
+
+		var processflashObjectCreated = function( event ) {
+			if( !event.success ) {
+				throw 'Failed to embed swf.'
+
+				return
+			}
+
+			if( verbose ) printLaunching()
+
+			var flashObject = event.ref
+
+			window.addEventListener(
+				'resize',
+				function() {
+					var screenSize = createScreenSize( spellNodeId )
+
+					console.log( 'resize: ' + screenSize )
+
+					resizeFlashObject( flashObject, screenSize )
+				}
+			)
+		}
 
 		swfobject.embedSWF(
 			'flash/spell.swf',
@@ -366,7 +439,7 @@ if( !window.console ) {
 			config,
 			null,
 			null,
-			function() { if( verbose ) printLaunching() }
+			processflashObjectCreated
 		)
 	}
 

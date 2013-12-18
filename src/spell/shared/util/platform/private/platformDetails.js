@@ -4,12 +4,18 @@ define(
 		'spell/shared/util/platform/private/input/support',
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
 		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5Tizen',
+		'spell/shared/util/platform/private/environment/isHtml5WinPhone',
+		'spell/shared/util/platform/private/environment/isHtml5WinStore',
 		'spell/shared/util/platform/private/jsonCoder'
 	],
 	function(
 		support,
 		isHtml5Ejecta,
 		isHtml5GameClosure,
+		isHtml5Tizen,
+		isHtml5WinPhone,
+		isHtml5WinStore,
 		jsonCoder
 	) {
 		'use strict'
@@ -47,6 +53,15 @@ define(
 			},
 			getPlatform : function() {
 				return navigator.userAgent
+			},
+			getTarget : function() {
+				if( isHtml5Ejecta ) return 'ios'
+				if( isHtml5GameClosure ) return 'android'
+				if( isHtml5Tizen ) return 'tizen'
+				if( isHtml5WinPhone ) return 'winphone'
+				if( isHtml5WinStore ) return 'winstore'
+
+				return 'web'
 			},
 			getDevice : function() {
 				if( isHtml5Ejecta ) return navigator.userAgent.match( /\((.*);/ )[ 1 ]

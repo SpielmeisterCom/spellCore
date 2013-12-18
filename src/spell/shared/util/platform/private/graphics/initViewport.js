@@ -66,7 +66,7 @@ define(
 		 * @param eventManager the event manager
 		 * @param id the id of the spell container div
 		 */
-		return function( eventManager, id, initialScreenSize ) {
+		return function( eventManager, id ) {
 			var processResize = function() {
 				if( window.scrollTo ) {
 					window.scrollTo( 0, 0 )
@@ -74,7 +74,7 @@ define(
 
 				eventManager.publish(
 					eventManager.EVENT.AVAILABLE_SCREEN_SIZE_CHANGED,
-					[ id ? getAvailableScreenSize( id ) : initialScreenSize ]
+					[ getAvailableScreenSize( id ) ]
 				)
 			}
 
