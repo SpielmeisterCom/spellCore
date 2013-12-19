@@ -9,7 +9,8 @@ define(
 		'use strict'
 
 
-		var isMutedValue = false
+		var isMutedValue         = false
+		var isContextPausedValue = false
 
 		var dummy = function() {}
 
@@ -17,12 +18,28 @@ define(
 			return createSoundId()
 		}
 
-		var setAllMuted = function( isMute ) {
-			isMutedValue = isMute
+		var muteContext = function() {
+			isMutedValue = true
 		}
 
-		var isAllMuted = function() {
+		var unmuteContext = function() {
+			isMutedValue = false
+		}
+
+		var isContextMuted = function() {
 			return isMutedValue
+		}
+
+		var isContextPaused = function() {
+			return isContextPausedValue
+		}
+
+		var pauseContext = function() {
+			isContextPausedValue = true
+		}
+
+		var resumeContext = function() {
+			isContextPausedValue = false
 		}
 
 		/*
@@ -53,10 +70,17 @@ define(
 				play             : play,
 				setLoop          : dummy,
 				setVolume        : dummy,
-				setAllMuted      : setAllMuted,
-				isAllMuted       : isAllMuted,
+				pause            : dummy,
+				resume           : dummy,
 				stop             : dummy,
 				mute             : dummy,
+				unmute           : dummy,
+				muteContext      : muteContext,
+				unmuteContext    : unmuteContext,
+				isContextMuted   : isContextMuted,
+				pauseContext     : pauseContext,
+				resumeContext    : resumeContext,
+				isContextPaused  : isContextPaused,
 				createSound      : createSound,
 				loadBuffer       : loadBuffer,
 				getConfiguration : function() { return { type : 'dummy' } }
