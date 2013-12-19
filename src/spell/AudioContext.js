@@ -43,11 +43,64 @@ AudioContext.prototype = {
 	mute : function( id ) {},
 
 	/**
+	 * Unmutes the sound specified by the id.
+	 *
+	 * Example:
+	 *
+	 *     spell.audioContext.unmute( 'creakyNoise' )
+	 *
+	 * @param {String} id
+	 */
+	unmute : function( id ) {},
+
+	/**
 	 * Returns true if the audio context is muted, false otherwise.
 	 *
 	 * @return {Boolean}
 	 */
-	isAllMuted : function() {},
+	isContextMuted : function() {},
+
+	/**
+	 * Mutes the audio context.
+	 */
+	muteContext : function() {},
+
+	/**
+	 * Unmutes the audio context.
+	 */
+	unmuteContext : function() {},
+
+	/**
+	 * Pauses the audio context.
+	 */
+	pauseContext : function() {},
+
+	/**
+	 * Resumes the audio context.
+	 */
+	resumeContext : function() {},
+
+	/**
+	 * Pauses the sound specified by the id.
+	 *
+	 * Example:
+	 *
+	 *     spell.audioContext.pause( 'creakyNoise' )
+	 *
+	 * @param {String} id
+	 */
+	pause: function( id ) {},
+
+	/**
+	 * Resumes the sound specified by the id.
+	 *
+	 * Example:
+	 *
+	 *     spell.audioContext.resume( 'creakyNoise' )
+	 *
+	 * @param {String} id
+	 */
+	resume: function( id ) {},
 
 	/**
 	 * Loads an audio file asynchronously into a buffer.
@@ -75,13 +128,6 @@ AudioContext.prototype = {
 	 * @param {Boolean} loop if true the sound effect is looped
 	 */
 	play : function( audioResource, id, volume, loop ) {},
-
-	/**
-	 * Sets the audio context's "all muted" state.
-	 *
-	 * @param isMute If true all currently playing sounds get muted, they get unmuted otherwise.
-	 */
-	setAllMuted : function( isMute ) {},
 
 	/**
 	 * Sets the sound specified by the id to looping.
