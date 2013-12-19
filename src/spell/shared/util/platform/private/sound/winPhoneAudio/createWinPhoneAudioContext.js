@@ -15,8 +15,9 @@ define(
 		'use strict'
 
 
-		var isMutedValue = false
-		var html5AudioContext = createHtml5AudioContext()
+		var isMutedValue         = false
+		var html5AudioContext    = createHtml5AudioContext()
+		var isContextPausedValue = false
 
 		var generateRequest = function( params ) {
 			return params.join( ';' )
@@ -35,7 +36,7 @@ define(
 			var id  = createSoundId(),
 				src = soundAsset.resource.resource.src
 
-			volume = isMuted() ? 0 : createNormalizedVolume( volume )
+			volume = isContextMuted() ? 0 : createNormalizedVolume( volume )
 			loop   = !!loop
 
 			if( soundAsset.isMusic ) {
@@ -48,14 +49,6 @@ define(
 			}
 
 			return id
-		}
-
-		var stopAll = function () {
-			sendNotification( 'stopAll' )
-		}
-
-		var resumeAll = function() {
-			sendNotification( 'resumeAll' )
 		}
 
 		var stop = function( id ) {
@@ -73,24 +66,55 @@ define(
 		}
 
 		var mute = function( id ) {
-			setVolume( id, 0 )
+			sendNotification( 'mute', id )
 		}
 
-		var setMute = function( isMute ) {
-			if( isMute ) {
-				stopAll()
-
-			} else {
-				resumeAll()
-			}
-
-			isMutedValue = isMute
-
-			html5AudioContext.setAllMuted( isMute )
+		var unmute = function( id ) {
+			sendNotification( 'unmute', id )
 		}
 
-		var isMuted = function() {
+		var muteContext = function() {
+			html5AudioContext.muteContext()
+			sendNotification( 'muteContext' )
+
+			isMutedValue = true
+		}
+
+		var unmuteContext = function() {
+			html5AudioContext.unmuteContext()
+			sendNotification( 'unmuteContext' )
+
+			isMutedValue = false
+		}
+
+		var isContextMuted = function() {
 			return isMutedValue
+		}
+
+		var pause = function( id ) {
+			sendNotification( 'pause', id )
+		}
+
+		var resume = function( id ) {
+			sendNotification( 'resume', id )
+		}
+
+		var pauseContext = function() {
+			html5AudioContext.pauseContext()
+			sendNotification( 'pauseContext' )
+
+			isContextPausedValue = true
+		}
+
+		var resumeContext = function() {
+			html5AudioContext.resumeContext()
+			sendNotification( 'resumeContext' )
+
+			isContextPausedValue = false
+		}
+
+		var isContextPaused = function() {
+			return isContextPausedValue
 		}
 
 		var tick = function() {}
@@ -151,10 +175,17 @@ define(
 				play             : play,
 				setLoop          : setLoop,
 				setVolume        : setVolume,
-				setAllMuted      : setMute,
-				isAllMuted       : isMuted,
+				pause            : pause,
+				resume           : resume,
 				stop             : stop,
 				mute             : mute,
+				unmute           : unmute,
+				muteContext      : muteContext,
+				unmuteContext    : unmuteContext,
+				isContextMuted   : isContextMuted,
+				pauseContext     : pauseContext,
+				resumeContext    : resumeContext,
+				isContextPaused  : isContextPaused,
 				createSound      : createSound,
 				loadBuffer       : loadBuffer,
 				getConfiguration : function() { return { type : 'winPhone' } }
