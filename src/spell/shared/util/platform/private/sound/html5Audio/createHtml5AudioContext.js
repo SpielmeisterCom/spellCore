@@ -15,9 +15,10 @@ define(
 
 		var MAX_NUM_CHANNELS = 16 // the maximum amount of concurrently playing audio elements
 
-		var audioElements   = {},
-			isMutedValue    = false,
-			numFreeChannels = MAX_NUM_CHANNELS
+		var audioElements        = {},
+			isMutedValue         = false,
+			numFreeChannels      = MAX_NUM_CHANNELS,
+			isContextPausedValue = false
 
 		var create = function( id, soundResource ) {
 			var audio
@@ -80,7 +81,7 @@ define(
 				setLoop( id, loop )
 				setVolume( id, volume )
 
-				if( isMuted() ) {
+				if( isContextMuted() ) {
 					mute( id )
 				}
 
@@ -91,18 +92,6 @@ define(
 			}
 
 			return id
-		}
-
-		var stopAll = function() {
-			for( var id in audioElements ) {
-				mute( id )
-			}
-		}
-
-		var resumeAll = function() {
-			for( var id in audioElements ) {
-				setVolume( id, 1 )
-			}
 		}
 
 		var stop = function( id ) {
@@ -116,7 +105,8 @@ define(
 			var audioElement = audioElements[ id ]
 			if( !audioElement ) return
 
-			audioElement.volume = createNormalizedVolume( volume )
+
+			audioElement.volume = audioElement.sourceVolume = createNormalizedVolume( volume )
 		}
 
 		var setLoop = function( id, loop ) {
@@ -136,22 +126,75 @@ define(
 		}
 
 		var mute = function( id ) {
-			setVolume( id, 0 )
+			var audioElement = audioElements[ id ]
+
+			if( audioElement ) {
+				audioElement.volume = 0
+			}
 		}
 
-		var setMute = function( isMute ) {
-			if( isMute ) {
-				stopAll()
+		var unmute = function( id ) {
+			var audioElement = audioElements[ id ]
 
-			} else {
-				resumeAll()
+			if( audioElement ) {
+				audioElement.volume = audioElement.sourceVolume
+			}
+		}
+
+		var muteContext = function() {
+			for( var id in audioElements ) {
+				mute( id )
 			}
 
-			isMutedValue = isMute
+			isMutedValue = true
 		}
 
-		var isMuted = function() {
+		var unmuteContext = function() {
+			for( var id in audioElements ) {
+				unmute( id )
+			}
+
+			isMutedValue = false
+		}
+
+		var isContextMuted = function() {
 			return isMutedValue
+		}
+
+		var pause = function( id ) {
+			var audioElement = audioElements[ id ]
+
+			if( audioElement ) {
+				audioElement.pause()
+			}
+		}
+
+		var resume = function( id ) {
+			var audioElement = audioElements[ id ]
+
+			if( audioElement ) {
+				audioElement.play()
+			}
+		}
+
+		var pauseContext = function() {
+			for( var id in audioElements ) {
+				pause( id )
+			}
+
+			isContextPausedValue = true
+		}
+
+		var resumeContext = function() {
+			for( var id in audioElements ) {
+				resume( id )
+			}
+
+			isContextPausedValue = false
+		}
+
+		var isContextPaused = function() {
+			return isContextPausedValue
 		}
 
 		var tick = function() {}
@@ -224,13 +267,20 @@ define(
 				play             : play,
 				setLoop          : setLoop,
 				setVolume        : setVolume,
-				setAllMuted      : setMute,
-				isAllMuted       : isMuted,
+				pause            : pause,
+				resume           : resume,
 				stop             : stop,
 				mute             : mute,
+				unmute           : unmute,
+				muteContext      : muteContext,
+				unmuteContext    : unmuteContext,
+				isContextMuted   : isContextMuted,
+				pauseContext     : pauseContext,
+				resumeContext    : resumeContext,
+				isContextPaused  : isContextPaused,
 				createSound      : createSound,
 				loadBuffer       : loadBuffer,
-				getConfiguration : function() { return { type : 'html5' } }
+				getConfiguration : function() { return { type : 'web' } }
 			}
 		}
 
