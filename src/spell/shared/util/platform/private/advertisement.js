@@ -27,12 +27,7 @@ define(
 				// delay pausing because the chartboost interstitial takes its time
 				registerTimer(
 					function() {
-						mutedState = spell.audioContext.isAllMuted()
-
-						if( !mutedState ) {
-							spell.audioContext.setAllMuted( true )
-						}
-
+						spell.audioContext.pauseContext()
 						spell.mainLoop.pause()
 					},
 					100
@@ -43,10 +38,7 @@ define(
 
 				isPaused = false
 
-				if( !mutedState ) {
-					spell.audioContext.setAllMuted( false )
-				}
-
+				spell.audioContext.resumeContext()
 				spell.mainLoop.resume()
 			}
 		}
