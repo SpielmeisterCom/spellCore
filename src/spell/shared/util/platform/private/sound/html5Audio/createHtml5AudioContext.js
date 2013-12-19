@@ -79,15 +79,16 @@ define(
 
 			if( audioElement ) {
 				setLoop( id, loop )
-				setVolume( id, volume )
-
-				if( isContextMuted() ) {
-					mute( id )
-				}
 
 				if( !audioElement.playing ) {
 					audioElement.playing = true
 					audioElement.play()
+				}
+
+				//set volume after play. In some browser it won't have an effect otherwise
+				setVolume( id, volume )
+				if( isContextMuted() ) {
+					mute( id )
 				}
 			}
 

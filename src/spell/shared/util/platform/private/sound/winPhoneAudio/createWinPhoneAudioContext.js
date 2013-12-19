@@ -36,11 +36,15 @@ define(
 			var id  = createSoundId(),
 				src = soundAsset.resource.resource.src
 
-			volume = isContextMuted() ? 0 : createNormalizedVolume( volume )
+			volume = createNormalizedVolume( volume )
 			loop   = !!loop
 
 			if( soundAsset.isMusic ) {
 				html5AudioContext.loadBuffer( src, soundAsset, function() {
+					if( isContextMuted() ) {
+						html5AudioContext.muteContext()
+					}
+
 					html5AudioContext.play( soundAsset, volume, loop )
 				})
 
