@@ -65,7 +65,7 @@ define(
 		var start = function( applicationModule, cacheContent ) {
 			var spell                = this.spell,
 				eventManager         = spell.eventManager,
-				configurationManager = spell.configurationManager = new ConfigurationManager( eventManager ),
+				configurationManager = spell.configurationManager,
 				isModeDeployed       = spell.loaderConfig.mode === 'deployed',
 				libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ), isModeDeployed )
 
@@ -173,22 +173,24 @@ define(
 			var spell                = createSpell(),
 				console              = new Console(),
 				eventManager         = new EventManager(),
+				configurationManager = new ConfigurationManager( eventManager ),
 				statisticsManager    = new StatisticsManager(),
 				mainLoop             = createMainLoop( eventManager, statisticsManager, isDebug ),
 				isModeDeployed       = loaderConfig.mode === 'deployed'
 
 			statisticsManager.init()
 
-			spell.applicationModule = undefined
-			spell.eventManager      = eventManager
-			spell.loaderConfig      = loaderConfig
-			spell.console           = console
-			spell.mainLoop          = mainLoop
-			spell.registerTimer     = PlatformKit.registerTimer
-			spell.scenes            = {}
-			spell.statisticsManager = statisticsManager
-			spell.storage           = PlatformKit.createPersistentStorage()
-			spell.pluginManager     = new PluginManager()
+			spell.applicationModule    = undefined
+			spell.configurationManager = configurationManager
+			spell.eventManager         = eventManager
+			spell.loaderConfig         = loaderConfig
+			spell.console              = console
+			spell.mainLoop             = mainLoop
+			spell.registerTimer        = PlatformKit.registerTimer
+			spell.scenes               = {}
+			spell.statisticsManager    = statisticsManager
+			spell.storage              = PlatformKit.createPersistentStorage()
+			spell.pluginManager        = new PluginManager()
 
 			this.spell = spell
 
