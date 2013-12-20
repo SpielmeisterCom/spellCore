@@ -195,10 +195,7 @@ define(
 							throw 'Error: Screen mode \'' + screenMode + '\' is not supported.'
 						}
 
-						eventManager.publish(
-							eventManager.EVENT.SCREEN_RESIZE,
-							[ config.currentScreenSize ]
-						)
+						eventManager.publish( eventManager.EVENT.SCREEN_RESIZE, [ config.currentScreenSize ] )
 					},
 					this
 				)
@@ -276,7 +273,10 @@ define(
 						key === 'currentLanguage' ||
 						key === 'quality' ||
 						key === 'qualityLevels' ||
-						key === 'currentQualityLevel' ) {
+						key === 'currentQualityLevel' ||
+						key === 'screenSize' ||
+						key === 'screenAspectRatio' ||
+						key === 'screenMode' ) {
 
 						continue
 					}
@@ -291,6 +291,10 @@ define(
 
 				if( x.qualityLevels ) this.setValue( 'qualityLevels', x.qualityLevels )
 				if( x.quality ) this.setValue( 'quality', x.quality )
+
+				if( x.screenSize ) this.setValue( 'screenSize', x.screenSize )
+				if( x.screenAspectRatio ) this.setValue( 'screenAspectRatio', x.screenAspectRatio )
+				if( x.screenMode ) this.setValue( 'screenMode', x.screenMode )
 
 				if( !this.config.currentQualityLevel ) {
 					this.setValue( 'currentQualityLevel', 1 )
