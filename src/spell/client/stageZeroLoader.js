@@ -420,11 +420,7 @@ if( !window.console ) {
 			window.addEventListener(
 				'resize',
 				function() {
-					var screenSize = createScreenSize( spellNodeId )
-
-					console.log( 'resize: ' + screenSize )
-
-					resizeFlashObject( flashObject, screenSize )
+					resizeFlashObject( flashObject, createScreenSize( spellNodeId ) )
 				}
 			)
 		}
