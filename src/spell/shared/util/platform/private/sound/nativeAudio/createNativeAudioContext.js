@@ -30,19 +30,60 @@ define(
 			this.loaded  = false
 		}
 
-		var isMutedValue = false
+		var isMutedValue         = false
+		var isContextPausedValue = false
 
-		var setAllMuted = function( isMute ) {
-			isMutedValue = isMute
-
-//			console.log( ' *** setAllMuted: ' + isMutedValue )
+		var muteContext = function() {
+			isMutedValue = true
 
 			for( var id in idToUrl ) {
-				setVolume( id , isMutedValue ? 0.0 : 1.0 )
+				setVolume( id , 0.0 )
 			}
 		}
 
-		var isAllMuted = function() {
+		var pause = function( id ) {
+			var url = idToUrl[ id ]
+			if( !url ) return
+
+			NATIVE.sound.pauseSound( url )
+		}
+
+		var resume = function( id ) {
+			var url = idToUrl[ id ]
+			if( !url ) return
+
+			NATIVE.sound.play( url, 1, false )
+		}
+
+		var pauseContext = function() {
+			isContextPausedValue = true
+
+			for( var id in idToUrl ) {
+				NATIVE.sound.pauseSound( id )
+			}
+		}
+
+		var resumeContext = function() {
+			isContextPausedValue = true
+
+			for( var id in idToUrl ) {
+				NATIVE.sound.playSound( id )
+			}
+		}
+
+		var isContextPaused = function() {
+			return isContextPausedValue
+		}
+
+		var unmuteContext = function() {
+			isMutedValue = false
+
+			for( var id in idToUrl ) {
+				setVolume( id , 1.0 )
+			}
+		}
+
+		var isContextMuted = function() {
 			return isMutedValue
 		}
 
@@ -143,10 +184,17 @@ define(
 				play             : play,
 				setLoop          : dummy,
 				setVolume        : setVolume,
-				setAllMuted      : setAllMuted,
-				isAllMuted       : isAllMuted,
+				pause            : pause,
+				resume           : resume,
 				stop             : stop,
 				mute             : dummy,
+				unmute           : dummy,
+				muteContext      : muteContext,
+				unmuteContext    : unmuteContext,
+				isContextMuted   : isContextMuted,
+				pauseContext     : pauseContext,
+				resumeContext    : resumeContext,
+				isContextPaused  : isContextPaused,
 				createSound      : createSound,
 				loadBuffer       : loadBuffer,
 				getConfiguration : function() { return { type : 'native' } }
