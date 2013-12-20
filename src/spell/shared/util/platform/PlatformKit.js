@@ -89,10 +89,6 @@ define(
 			return environment
 		}
 
-        var registerOnScreenResize = function( eventManager, id, initialScreenSize ) {
-			initViewport( eventManager, id, initialScreenSize )
-        }
-
 		return {
 			/*
 			 *
@@ -167,11 +163,6 @@ define(
 			 */
 			getAvailableScreenSize : getAvailableScreenSize,
 
-			/*
-			 *
-			 */
-			registerOnScreenResize : registerOnScreenResize,
-
 			openURL : openURL,
 
 			createPersistentStorage : function() {
@@ -201,6 +192,12 @@ define(
 			createSplashScreenImage : createSplashScreenImage,
 
 			init : function( spell, next ) {
+				initViewport(
+					spell.eventManager,
+					spell.configurationManager.getValue( 'id' ),
+					spell.configurationManager.getValue( 'currentScreenSize' )
+				)
+
 				support.init(
 					spell,
 					_.bind( advertisement.init, advertisement, spell, next )

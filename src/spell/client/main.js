@@ -83,8 +83,6 @@ define(
 				libraryManager.addToCache( cacheContent )
 			}
 
-			PlatformKit.registerOnScreenResize( spell.eventManager, configurationManager.getValue( 'id' ) )
-
 			// creating rendering context
 			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
 				spell.eventManager,
