@@ -17,20 +17,65 @@ define(
 		'use strict'
 
 
+		var PLAYING_STATE = {
+			 INIT: 0,
+ 			 PLAYING: 1,
+			 PAUSED: 2,
+			 FINISHED: 3
+		}
+
+		var SourceNodeWrapper = function( soundResource, volume, loop ) {
+			this.volume             = volume
+			this.loop               = loop
+			this.startOffsetContext = 0
+			this.pauseOffsetContext = 0
+			this.startOffset        = 0
+			this.state              = PLAYING_STATE.INIT
+
+			this.soundResource = soundResource
+		}
+
+		SourceNodeWrapper.prototype = {
+
+
+			play: function() {
+				if( !this.node ||
+					this.node.playbackState !== this.node.PLAYING_STATE ) {
+
+					var gainNode    = context.createGainNode(),
+						startOffset = this.startOffset + this.pauseOffsetContext - this.startOffsetContext
+
+					this.node = context.createBufferSource()
+					this.node.buffer = this.soundResource.resource
+					this.node.connect( gainNode )
+
+					gainNode.connect( context.destination )
+
+					this.startOffsetContext = context.currentTime
+					this.startOffset = startOffset % this.node.buffer.duration
+
+					this.node.gain.value = isMuted() ? 0 : this.volume
+					this.node.loop = this.loop
+					this.state = PLAYING_STATE.PLAYING
+
+					this.node.start( 0, this.startOffset )
+				}
+			}
+		}
+
 		var context,
-			sourceNodes  = {},
-			isMutedValue = false
+			sourceNodes     = {},
+			isMutedValue    = false,
+			isContextPaused = false
 
-		var create = function( id, soundResource ) {
-			var gainNode   = context.createGainNode(),
-				sourceNode = context.createBufferSource()
+		var create = function( id, soundResource, volume, loop, offset ) {
+			volume = createNormalizedVolume( volume )
+			loop   = !!loop
+			offset = offset || 0
 
-			sourceNode.buffer = soundResource.resource
-
-			sourceNode.connect( gainNode )
-			gainNode.connect( context.destination )
-
+			var sourceNode = new SourceNodeWrapper( soundResource, volume, loop, offset )
 			sourceNodes[ id ] = sourceNode
+
 			return sourceNode
 		}
 
@@ -49,11 +94,7 @@ define(
 			setLoop( id, loop )
 			setVolume( id, volume )
 
-			if( isMuted() ) mute( id )
-
-			if( sourceNode.playbackState !== sourceNode.PLAYING_STATE ) {
-				sourceNode.noteOn( 0 )
-			}
+			sourceNode.play()
 
 			return id
 		}
@@ -62,9 +103,9 @@ define(
 			var sourceNode = sourceNodes[ id ]
 
 			if( sourceNode &&
-				sourceNode.playbackState === sourceNode.PLAYING_STATE ) {
+				sourceNode.node.playbackState === sourceNode.node.PLAYING_STATE ) {
 
-				sourceNode.noteOff( 0 )
+				sourceNode.node.stop( 0 )
 			}
 		}
 
@@ -72,7 +113,11 @@ define(
 			var sourceNode = sourceNodes[ id ]
 
 			if( sourceNode ) {
-				sourceNode.gain.value = createNormalizedVolume( volume )
+				sourceNode.volume =  createNormalizedVolume( volume )
+
+				if( sourceNode.node ) {
+					sourceNode.node.gain.value = sourceNode.volume
+				}
 			}
 		}
 
@@ -81,6 +126,10 @@ define(
 
 			if( sourceNode ) {
 				sourceNode.loop = !!loop
+
+				if( sourceNode.node ) {
+					sourceNode.node.loop = sourceNode.loop
+				}
 			}
 		}
 
@@ -88,7 +137,15 @@ define(
 			var sourceNode = sourceNodes[ id ]
 
 			if( sourceNode ) {
-				sourceNode.gain.value = 0
+				sourceNode.node.gain.value = 0
+			}
+		}
+
+		var unmute = function( id ) {
+			var sourceNode = sourceNodes[ id ]
+
+			if( sourceNode ) {
+				sourceNode.node.gain.value = sourceNode.volume
 			}
 		}
 
@@ -106,29 +163,78 @@ define(
 			for( var id in sourceNodes ) {
 				var sourceNode = sourceNodes[ id ]
 
-				if( sourceNode.playbackState === sourceNode.FINISHED_STATE ) {
+				if( sourceNode.state != PLAYING_STATE.PAUSED &&
+					sourceNode.node.playbackState === sourceNode.node.FINISHED_STATE ) {
+
 					destroy( id )
 				}
 			}
 		}
 
-		var setMute = function( isMute ) {
-			if( isMute === true ) {
-				_.each( sourceNodes, function( value, key ) {
-					mute( key )
-				} )
+		var muteContext = function() {
+			_.each( sourceNodes, function( value, key ) {
+				mute( key )
+			} )
 
-			} else {
-				_.each( sourceNodes, function( value, key ) {
-					setVolume( key, 1 )
-				} )
-			}
+			isMutedValue = true
+		}
 
-			isMutedValue = isMute
+		var unmuteContext = function() {
+			_.each( sourceNodes, function( value, key ) {
+				unmute( key )
+			} )
+
+			isMutedValue = false
+		}
+
+		var resumeContext = function() {
+			_.each( sourceNodes, function( value, key ) {
+				resume( key )
+			} )
+
+			isContextPaused = false
+		}
+
+		var pauseContext = function() {
+			_.each( sourceNodes, function( value, key ) {
+				pause( key )
+			} )
+
+			isContextPaused = true
+		}
+
+		var isContextMuted = function() {
+			return isMutedValue
+		}
+
+		var getIsContextPaused = function() {
+			return isContextPaused
 		}
 
 		var isMuted = function() {
 			return isMutedValue
+		}
+
+		var pause = function( id ) {
+			var sourceNode = sourceNodes[ id ]
+
+			if( sourceNode &&
+				sourceNode.node.playbackState === sourceNode.node.PLAYING_STATE ) {
+
+				sourceNode.state = PLAYING_STATE.PAUSED
+				sourceNode.pauseOffsetContext = context.currentTime
+				sourceNode.node.stop( 0 )
+			}
+		}
+
+		var resume = function( id ) {
+			var sourceNode = sourceNodes[ id ]
+
+			if( sourceNode &&
+				sourceNode.node.playbackState !== sourceNode.node.PLAYING_STATE ) {
+
+				sourceNode.play()
+			}
 		}
 
 		var loadBuffer = function( src, soundAsset, onLoadCallback ) {
@@ -168,10 +274,17 @@ define(
 				play             : play,
 				setLoop          : setLoop,
 				setVolume        : setVolume,
-				setAllMuted      : setMute,
-				isAllMuted       : isMuted,
+				pause            : pause,
+				resume           : resume,
 				stop             : stop,
 				mute             : mute,
+				unmute           : unmute,
+				muteContext      : muteContext,
+				unmuteContext    : unmuteContext,
+				isContextMuted   : isContextMuted,
+				pauseContext     : pauseContext,
+				resumeContext    : resumeContext,
+				isContextPaused  : getIsContextPaused,
 				createSound      : createSound,
 				loadBuffer       : loadBuffer,
 				getConfiguration : function() { return { type : 'web' } }

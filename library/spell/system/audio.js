@@ -16,7 +16,7 @@ define(
 
 		var playSound = function( entityManager, audioContext, id, soundEmitter ) {
 			if( soundEmitter.mute ||
-				audioContext.isAllMuted() ) {
+				audioContext.isContextMuted() ) {
 
 				audioContext.mute( id )
 			}
@@ -52,8 +52,7 @@ define(
 			init: function( spell ) {
 				var audioContext  = spell.audioContext,
 					entityManager = spell.entityManager,
-					eventManager  = spell.eventManager,
-					wasMuted      = false
+					eventManager  = spell.eventManager
 
 				this.soundEmitterUpdatedHandler = function( soundEmitter, id ) {
 					playSound( entityManager, audioContext, id, soundEmitter )
@@ -61,11 +60,10 @@ define(
 
 				this.visibilityChangedHandler = function( isVisible ) {
 					if( isVisible ) {
-						audioContext.setAllMuted( wasMuted )
+						audioContext.resumeContext()
 
 					} else {
-						wasMuted = audioContext.isAllMuted()
-						audioContext.setAllMuted( true )
+						audioContext.pauseContext()
 					}
 
 				}

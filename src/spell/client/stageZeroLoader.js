@@ -160,9 +160,10 @@ if( !window.console ) {
 		}
 
 		try {
-			var test = new webkitAudioContext()
+			var test   = new webkitAudioContext(),
+				buffer = test.createBufferSource()
 
-			return true
+			return ( typeof( buffer.start) == 'function' ) ? true : false
 
 		} catch ( e ) {
 			return false
