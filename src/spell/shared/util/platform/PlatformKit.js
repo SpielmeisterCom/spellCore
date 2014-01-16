@@ -28,6 +28,7 @@ define(
 		'spell/shared/util/platform/private/configurationOptions',
 		'spell/shared/util/platform/private/storage/PersistentStorage',
 		'spell/shared/util/platform/private/openURL',
+        'spell/shared/util/platform/private/physics2dDevice',
 		'spell/shared/util/platform/private/platformDetails',
 		'spell/shared/util/platform/private/graphics/initViewport',
 		'spell/shared/util/platform/private/advertisement',
@@ -61,6 +62,7 @@ define(
 		configurationOptions,
 		PersistentStorage,
 		openURL,
+        physics2dDevice,
 		platformDetails,
 		initViewport,
 		advertisement,
@@ -94,6 +96,11 @@ define(
 			 *
 			 */
 			Box2D : Box2D,
+
+            /*
+             *
+             */
+            Physics : new physics2dDevice(),
 
 			/*
 			 *
