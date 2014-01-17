@@ -19,7 +19,6 @@ define(
 		'spell/PluginManager',
 		'spell/StatisticsManager',
 		'spell/Console',
-		'spell/shared/util/physics/createBox2dContext',
         'spell/shared/util/physics/createPhysicsContext',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
@@ -46,7 +45,6 @@ define(
 		PluginManager,
 		StatisticsManager,
 		Console,
-		createBox2dContext,
         createPhysicsContext,
 		PlatformKit,
 		initDebugEnvironment,
@@ -68,8 +66,7 @@ define(
 			var spell                = this.spell,
 				eventManager         = spell.eventManager,
 				configurationManager = spell.configurationManager,
-				isModeDeployed       = spell.loaderConfig.mode === 'deployed',
-				libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ), isModeDeployed )
+				libraryManager       = spell.libraryManager
 
 			setApplicationModule(
                 spell,
@@ -141,8 +138,6 @@ define(
 			spell.configurationManager = configurationManager
 			spell.moduleLoader         = moduleLoader
 			spell.entityManager        = entityManager
-			spell.box2dContext         = createBox2dContext()
-			spell.box2dWorlds          = {}
             spell.physicsContext       = createPhysicsContext()
             spell.physicsWorlds        = {}
 			spell.renderingContext     = renderingContext
@@ -193,6 +188,7 @@ define(
 			spell.statisticsManager    = statisticsManager
 			spell.storage              = PlatformKit.createPersistentStorage()
 			spell.pluginManager        = new PluginManager()
+            spell.libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ), isModeDeployed )
 
 			this.spell = spell
 
