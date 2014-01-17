@@ -21,6 +21,7 @@ define(
 			TILEMAP_COMPONENT_ID                      : 'spell.component.2d.graphics.tilemap',
 			PARALLAX_COMPONENT_ID                     : 'spell.component.2d.graphics.parallax',
 			PHYSICS_BODY_COMPONENT_ID                 : 'spell.component.physics.body',
+            PHYSICS_CONTACT_TRIGGER_COMPONENT_ID      : 'spell.component.physics.contactTrigger',
 			PHYSICS_FIXTURE_COMPONENT_ID              : 'spell.component.physics.fixture',
 			PHYSICS_BOX_SHAPE_COMPONENT_ID            : 'spell.component.physics.shape.box',
 			PHYSICS_CIRCLE_SHAPE_COMPONENT_ID         : 'spell.component.physics.shape.circle',
