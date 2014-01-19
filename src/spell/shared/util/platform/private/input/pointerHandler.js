@@ -81,12 +81,13 @@ define(
 	'spell/shared/util/platform/private/input/pointerHandler',
 	[
 		'spell/shared/util/platform/private/input/support',
+		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
 
 		'spell/functions'
 	],
 	function(
 		supportedInputApi,
-
+		isHtml5Ejecta,
 		_
 	) {
 		'use strict'
@@ -138,7 +139,7 @@ define(
 		}
 
 		function getOffset( element ) {
-			if( !element.getBoundingClientRect ) {
+			if( isHtml5Ejecta || !element.getBoundingClientRect ) {
 				return [ 0, 0 ]
 			}
 
