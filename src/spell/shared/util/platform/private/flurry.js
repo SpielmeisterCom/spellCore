@@ -14,7 +14,7 @@ define(
 		return {
 			logEvent : function( eventName, timed ) {
 				if( isHtml5Ejecta ) {
-					ejecta.flurryLogEvent( eventName, timed )
+					//ejecta.flurryLogEvent( eventName, timed )
 
 				} else if( isHtml5GameClosure ) {
 					NATIVE.flurry.logEvent( eventName )
@@ -22,7 +22,7 @@ define(
 			},
 			endTimedEvent : function( eventName ) {
 				if( isHtml5Ejecta ) {
-					ejecta.flurryEndTimedEvent( eventName )
+					//ejecta.flurryEndTimedEvent( eventName )
 
 				} else if( isHtml5GameClosure ) {
 					NATIVE.flurry.endTimedEvent( eventName )

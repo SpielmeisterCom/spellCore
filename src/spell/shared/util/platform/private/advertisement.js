@@ -58,7 +58,7 @@ define(
 			},
 			loadInterstitial : function() {
 				if( isHtml5Ejecta ) {
-					ejecta.loadInterstitial()
+					//ejecta.loadInterstitial()
 
 				} else if( isHtml5GameClosure ) {
 					NATIVE.plugins.sendEvent( 'AdMobPlugin', 'loadInterstitial', JSON.stringify( {} ) )
@@ -66,7 +66,7 @@ define(
 			},
 			showInterstitial : function() {
 				if( isHtml5Ejecta ) {
-					ejecta.showInterstitial()
+					//ejecta.showInterstitial()
 
 				} else if( isHtml5GameClosure ) {
 					NATIVE.plugins.sendEvent( 'AdMobPlugin', 'showInterstitial', JSON.stringify( {} ) )
