@@ -1,3 +1,6 @@
 [submodule "modules/node_modules"]
 	path = modules/node_modules
 	url = ssh://git@stash.spielmeister.com:7999/spellcommon/node_modules.git
+[submodule "modules/spellCli"]
+	path = modules/spellCli
+	url = ssh://git@stash.spielmeister.com:7999/spellcli/spellcli.git
