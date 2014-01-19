@@ -1,11 +1,11 @@
 define(
 	'spell/shared/util/platform/private/sound/getFileExtOfSupportedFormat',
 	[
-		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
 		'spell/shared/util/platform/private/environment/isHtml5WinPhone'
 	],
 	function(
-		isHtml5GameClosure,
+		isHtml5TeaLeaf,
 		isHtml5WinPhone
 	) {
 		'use strict'
@@ -37,7 +37,7 @@ define(
 				return 'wav'
 			}
 
-			if( isHtml5GameClosure ) {
+			if( isHtml5TeaLeaf ) {
 				return 'mp3'
 			}
 

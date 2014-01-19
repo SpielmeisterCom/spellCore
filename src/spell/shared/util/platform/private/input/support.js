@@ -4,14 +4,14 @@ define(
 		'spell/functions',
 		'spell/shared/util/platform/private/input/deviceOrientationHandler',
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
-		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
 		'spell/shared/util/platform/private/registerTimer'
 	],
 	function(
 		_,
 		deviceOrientationHandler,
 		isHtml5Ejecta,
-		isHtml5GameClosure,
+		isHtml5TeaLeaf,
 		registerTimer
 	) {
 		'use strict'
@@ -38,14 +38,14 @@ define(
 					isHtml5Ejecta
 			},
 			hasDeviceOrientationApi : function() {
-				return isHtml5GameClosure ||
+				return isHtml5TeaLeaf ||
 					( window.DeviceMotionEvent !== undefined && !isBrokenDeviceOrientationApi )
 			},
 			hasNativeClickEvent : function() {
-				return !( isHtml5Ejecta || isHtml5GameClosure )
+				return !( isHtml5Ejecta || isHtml5TeaLeaf )
 			},
 			init : function( spell, next ) {
-				if( !isHtml5GameClosure && window.DeviceMotionEvent ) {
+				if( !isHtml5TeaLeaf && window.DeviceMotionEvent ) {
 					var doneProbing = _.once( function() {
 						deviceOrientationHandler.removeListener( window )
 

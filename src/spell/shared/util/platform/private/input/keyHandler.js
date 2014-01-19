@@ -68,14 +68,14 @@
 define(
 	'spell/shared/util/platform/private/input/keyHandler',
 	[
-		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
 		'spell/shared/util/platform/private/environment/isHtml5Tizen',
 		'spell/shared/util/platform/private/environment/isHtml5WinPhone',
 		'spell/shared/util/input/keyCodes',
 		'spell/functions'
 	],
 	function(
-		isHtml5GameClosure,
+		isHtml5TeaLeaf,
 		isHtml5Tizen,
 		isHtml5WinPhone,
 		keyCodes,
@@ -124,7 +124,7 @@ define(
 				return
 			}
 
-			if( isHtml5GameClosure ) {
+			if( isHtml5TeaLeaf ) {
 				NATIVE.events.registerHandler(
 					'keyEvent',
 					function( event ) {

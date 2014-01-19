@@ -1,11 +1,11 @@
 define(
 	'spell/shared/util/platform/private/graphics/createSplashScreenImage',
 	[
-		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
 		'spell/data/algorithm/RLE'
 	],
 	function(
-		isHtml5GameClosure,
+		isHtml5TeaLeaf,
 		RLE
 	) {
 		'use strict'
@@ -26,7 +26,7 @@ define(
 		}
 
 		return function() {
-			if( isHtml5GameClosure ) {
+			if( isHtml5TeaLeaf ) {
 				return
 			}
 

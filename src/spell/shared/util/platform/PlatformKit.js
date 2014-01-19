@@ -34,7 +34,7 @@ define(
 		'spell/shared/util/platform/private/flurry',
 		'spell/shared/util/platform/private/createComponentType',
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
-		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
 		'spell/functions'
 	],
 	function(
@@ -67,7 +67,7 @@ define(
 		flurry,
 		createComponentType,
 		isHtml5Ejecta,
-		isHtml5GameClosure,
+		isHtml5TeaLeaf,
 		_
 	) {
 		'use strict'
@@ -206,7 +206,7 @@ define(
 
 			getPlugins : function() {
 				if( isHtml5Ejecta ||
-					isHtml5GameClosure ) {
+					isHtml5TeaLeaf ) {
 
 					return {
 						admob : advertisement,

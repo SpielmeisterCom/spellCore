@@ -51,12 +51,12 @@ define(
 	'spell/shared/util/platform/private/input/deviceOrientationHandler',
 	[
 		'spell/functions',
-		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
 		'spell/shared/util/platform/private/environment/isHtml5Tizen'
 	],
 	function(
 		_,
-		isHtml5GameClosure,
+		isHtml5TeaLeaf,
 		isHtml5Tizen
 	) {
 		'use strict'
@@ -81,7 +81,7 @@ define(
 
 		return {
 			registerListener : function( el, callback ) {
-				if( isHtml5GameClosure ) {
+				if( isHtml5TeaLeaf ) {
 					nativeHandler = function( event ) {
 						callback( new DeviceOrientationEvent(
 							event.alpha * TO_DEGREE_FACTOR,
@@ -108,7 +108,7 @@ define(
 			removeListener : function( el ) {
 				if( !nativeHandler ) return
 
-				if( isHtml5GameClosure ) {
+				if( isHtml5TeaLeaf ) {
 					NATIVE.events.unregisterHandler( 'deviceorientation', nativeHandler )
 
 				} else {

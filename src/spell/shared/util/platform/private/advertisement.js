@@ -2,13 +2,13 @@ define(
 	'spell/shared/util/platform/private/advertisement',
 	[
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
-		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
 		'spell/shared/util/platform/private/registerTimer',
 		'spell/functions'
 	],
 	function(
 		isHtml5Ejecta,
-		isHtml5GameClosure,
+		isHtml5TeaLeaf,
 		registerTimer,
 		_
 	) {
@@ -50,7 +50,7 @@ define(
 				if( isHtml5Ejecta ) {
 					document.addEventListener( 'interstitial', processInterstitialPartial )
 
-				} else if( isHtml5GameClosure ) {
+				} else if( isHtml5TeaLeaf ) {
 					NATIVE.events.registerHandler( 'interstitial', processInterstitialPartial )
 				}
 
@@ -60,7 +60,7 @@ define(
 				if( isHtml5Ejecta ) {
 					//ejecta.loadInterstitial()
 
-				} else if( isHtml5GameClosure ) {
+				} else if( isHtml5TeaLeaf ) {
 					NATIVE.plugins.sendEvent( 'AdMobPlugin', 'loadInterstitial', JSON.stringify( {} ) )
 				}
 			},
@@ -68,7 +68,7 @@ define(
 				if( isHtml5Ejecta ) {
 					//ejecta.showInterstitial()
 
-				} else if( isHtml5GameClosure ) {
+				} else if( isHtml5TeaLeaf ) {
 					NATIVE.plugins.sendEvent( 'AdMobPlugin', 'showInterstitial', JSON.stringify( {} ) )
 				}
 			}

@@ -1,12 +1,12 @@
 define(
 	'spell/shared/util/platform/private/Application',
 	[
-		'spell/shared/util/platform/private/environment/isHtml5GameClosure',
+		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
 		'spell/shared/util/platform/private/environment/isHtml5Tizen',
 		'spell/shared/util/platform/private/environment/isHtml5WinPhone'
 	],
 	function(
-		isHtml5GameClosure,
+		isHtml5TeaLeaf,
 	    isHtml5Tizen,
 		isHtml5WinPhone
 	) {
@@ -15,7 +15,7 @@ define(
 
 		return {
 			close : function() {
-				if( isHtml5GameClosure ) {
+				if( isHtml5TeaLeaf ) {
 					NATIVE.sendActivityToBack()
 
 				} else if ( isHtml5Tizen ) {
