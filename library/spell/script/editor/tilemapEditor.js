@@ -231,7 +231,9 @@ define(
 
 			destroyTilemapSelectionEntities.call( this )
 
-			showTilemapSelector.call( this, editorSystem.cursorWorldPosition, this.tilemaps[ selectedEntityId ] )
+			if( editorSystem.cursorWorldPosition ) {
+				showTilemapSelector.call( this, editorSystem.cursorWorldPosition, this.tilemaps[ selectedEntityId ] )
+			}
 		}
 
 		/**
