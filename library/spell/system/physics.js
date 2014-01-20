@@ -1,10 +1,10 @@
 /**
- * @class spell.physics
+ * @class spell.system.physics
  * @singleton
  */
 
 define(
-    'spell/physics',
+    'spell/system/physics',
     [
         'spell/Defines',
         'spell/math/util',
@@ -25,6 +25,9 @@ define(
         //TODO: check if the boxtree can be removed, instead use our quadtree http://docs.turbulenz.com/jslibrary_api/broadphase_api.html#broadphase
         //TODO: add license of torbulenz to spellCore LICENCE
         var Physics = PlatformKit.Physics
+
+		var awakeColor    = [ 0.82, 0.76, 0.07 ],
+			notAwakeColor = [ 0.27, 0.25, 0.02 ]
 
         /**
          * Creates an instance of the system.
@@ -77,7 +80,7 @@ define(
             )
         }
 
-        var createBody = function( entityManager, world, entityId, entity ) {
+        var createBody = function( entityManager, debug, world, entityId, entity ) {
             var body               = entity[ Defines.PHYSICS_BODY_COMPONENT_ID ],
                 fixture            = entity[ Defines.PHYSICS_FIXTURE_COMPONENT_ID ],
                 boxShape           = entity[ Defines.PHYSICS_BOX_SHAPE_COMPONENT_ID ],
@@ -121,6 +124,45 @@ define(
             createContactListener( entityManager, entityId, shape, contactTrigger )
 
             world.createBodyDef( entityId, body, [ shape ], transform )
+
+			if( debug ) {
+				var componentId,
+					config
+
+				if( circleShape ) {
+					componentId = 'spell.component.2d.graphics.debug.circle'
+					config = {
+						radius : circleShape.radius
+					}
+
+				} else if( convexPolygonShape ) {
+					var minX = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var x = v[ 0 ]; return memo < x ? memo : x }, 0 ),
+						maxX = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var x = v[ 0 ]; return memo > x ? memo : x }, 0 ),
+						minY = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var y = v[ 1 ]; return memo < y ? memo : y }, 0 ),
+						maxY = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var y = v[ 1 ]; return memo > y ? memo : y }, 0 )
+
+					componentId = 'spell.component.2d.graphics.debug.box'
+					config = {
+						width : maxX - minX,
+						height : maxY - minY
+					}
+
+				} else {
+					var boxesqueShape = boxShape
+
+					componentId = 'spell.component.2d.graphics.debug.box'
+					config = {
+						width : boxesqueShape.dimensions[ 0 ],
+						height : boxesqueShape.dimensions[ 1 ]
+					}
+				}
+
+				entityManager.addComponent(
+					entityId,
+					componentId,
+					config
+				)
+			}
         }
 
 
@@ -129,6 +171,23 @@ define(
                 world.destroyBody( entityIds[ i ] )
             }
         }
+
+		var updateDebug = function( rigidBodies, debugBoxes, debugCircles ) {
+			var length = rigidBodies.length
+
+
+			for( var i = 0; i < length; i++ ) {
+				var body = rigidBodies[i]
+
+				var id = body.userData
+
+				if( !id ) continue
+
+				var debugShape = debugBoxes[ id ] || debugCircles[ id ]
+
+				debugShape.color = body.sleeping ? awakeColor : notAwakeColor
+			}
+		}
 
         var incrementState = function( entityManager, rigidBodies, bodies, transforms ) {
             var length = rigidBodies.length
@@ -173,7 +232,7 @@ define(
                     spell.physicsWorlds.main = world
                 }
 
-                this.entityCreatedHandler = _.bind( createBody, null, spell.entityManager, this.world )
+                this.entityCreatedHandler = _.bind( createBody, null, spell.entityManager, this.config.debug, this.world )
                 this.entityDestroyHandler = _.bind( this.removedEntitiesQueue.push, this.removedEntitiesQueue )
 
                 var eventManager = spell.eventManager
@@ -232,6 +291,10 @@ define(
                 world.step( deltaTimeInMs )
 
                 incrementState( spell.entityManager, world.getAllBodies(), this.bodies, transforms )
+
+				if( this.config.debug ) {
+					updateDebug( world.getAllBodies(), this.debugBoxes, this.debugCircles )
+				}
             }
         }
 
