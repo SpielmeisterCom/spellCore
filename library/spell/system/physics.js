@@ -185,7 +185,7 @@ define(
 
 				var debugShape = debugBoxes[ id ] || debugCircles[ id ]
 
-				debugShape.color = body.sleeping ? awakeColor : notAwakeColor
+				debugShape.color = body.sleeping ? notAwakeColor : awakeColor
 			}
 		}
 
