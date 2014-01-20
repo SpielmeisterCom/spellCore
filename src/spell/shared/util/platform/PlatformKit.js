@@ -7,7 +7,6 @@ define(
 	[
 		'spell/shared/util/createAssetId',
 		'spell/shared/util/platform/private/Application',
-		'spell/shared/util/platform/private/Box2D',
 		'spell/shared/util/platform/private/callNextFrame',
 		'spell/shared/util/platform/private/createHost',
 		'spell/shared/util/platform/private/jsonCoder',
@@ -28,6 +27,7 @@ define(
 		'spell/shared/util/platform/private/configurationOptions',
 		'spell/shared/util/platform/private/storage/PersistentStorage',
 		'spell/shared/util/platform/private/openURL',
+        'spell/shared/util/platform/private/physics2dDevice',
 		'spell/shared/util/platform/private/platformDetails',
 		'spell/shared/util/platform/private/graphics/initViewport',
 		'spell/shared/util/platform/private/advertisement',
@@ -40,7 +40,6 @@ define(
 	function(
 		createAssetId,
 		Application,
-		Box2D,
 		callNextFrame,
 		createHost,
 		jsonCoder,
@@ -61,6 +60,7 @@ define(
 		configurationOptions,
 		PersistentStorage,
 		openURL,
+        physics2dDevice,
 		platformDetails,
 		initViewport,
 		advertisement,
@@ -90,10 +90,10 @@ define(
 		}
 
 		return {
-			/*
-			 *
-			 */
-			Box2D : Box2D,
+            /*
+             *
+             */
+            Physics : new physics2dDevice(),
 
 			/*
 			 *
