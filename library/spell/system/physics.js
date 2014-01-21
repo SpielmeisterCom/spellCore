@@ -116,7 +116,7 @@ define(
                 shapeDef.vertices = boxShape ? Physics.createBoxVertices(
                     boxShape.dimensions[ 0 ],
                     boxShape.dimensions[ 1 ]
-                ): [ convexPolygonShape.vertices ]
+                ): convexPolygonShape.vertices
 
                 var shape = Physics.createPolygonShape( shapeDef )
             }
