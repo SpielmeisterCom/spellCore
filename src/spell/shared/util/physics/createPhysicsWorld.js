@@ -33,12 +33,12 @@ define(
             }
 		}
 
-		var applyTorque = function( entityId, torque ) {
+		var setTorque = function( entityId, torque ) {
 			var body = this.getBodyById( entityId )
 			if( !body ) return
 
 			if( torque ) {
-				body.setForce( torque * this.scale )
+				body.setTorque( torque * this.scale )
 			}
 		}
 
@@ -168,7 +168,7 @@ define(
             step          : step,
 			applyForce    : applyForce,
 			applyImpulse  : applyImpulse,
-			applyTorque   : applyTorque,
+            setTorque     : setTorque,
             createBodyDef : createBodyDef,
 			destroyBody   : destroyBody,
 			getBodyById   : getBodyById,
