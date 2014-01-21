@@ -147,6 +147,7 @@ define(
 						height : maxY - minY
 					}
 
+                //TODO: Add showing of triangles
 				} else {
 					var boxesqueShape = boxShape
 
@@ -204,13 +205,20 @@ define(
 
                 // transfering state to components
                 var position  = body.getPosition(),
-                    transform = transforms[ id ]
+                    transform = transforms[ id ],
+                    bodyDef   = bodies[ id ]
 
                 if( !transform || ( !position[0] || !position[1] ) ) continue
 
                 transform.translation[ 0 ] = position[0]
                 transform.translation[ 1 ] = position[1]
-                transform.rotation = body.getRotation()
+
+                //TODO: check for existing of internal flags for fixed rotation in physics engine
+                if( !bodyDef.fixedRotation ){
+                    transform.rotation = body.getRotation()
+                } else {
+                    body.setRotation( transform.rotation )
+                }
 
                 entityManager.updateWorldTransform( id )
             }
