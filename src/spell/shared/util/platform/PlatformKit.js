@@ -7,6 +7,7 @@ define(
 	[
 		'spell/shared/util/createAssetId',
 		'spell/shared/util/platform/private/Application',
+		'spell/shared/util/platform/private/Box2D',
 		'spell/shared/util/platform/private/callNextFrame',
 		'spell/shared/util/platform/private/createHost',
 		'spell/shared/util/platform/private/jsonCoder',
@@ -40,6 +41,7 @@ define(
 	function(
 		createAssetId,
 		Application,
+		Box2D,
 		callNextFrame,
 		createHost,
 		jsonCoder,
@@ -90,7 +92,12 @@ define(
 		}
 
 		return {
-            /*
+			/*
+			 *
+			 */
+			Box2D : Box2D,
+
+			/*
              *
              */
             Physics : new physics2dDevice(),
