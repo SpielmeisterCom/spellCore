@@ -97,10 +97,10 @@ define(
 
             var shapeDef = {
                 material : Physics.createMaterial({
-//                elasticity : 0,
-//                staticFriction : 6,
-                    dynamicFriction : fixture.friction,
-//                rollingFriction : 0.001,
+                    elasticity : fixture.elasticity,
+                    staticFriction : fixture.staticFriction,
+                    dynamicFriction : fixture.dynamicFriction,
+                    rollingFriction : fixture.rollingFriction,
                     density: fixture.density
                 }),
                 group: fixture.categoryBits,

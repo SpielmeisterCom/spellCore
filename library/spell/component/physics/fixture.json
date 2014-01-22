@@ -12,15 +12,30 @@
 			"default": 1
 		},
 		{
-			"name": "friction",
+			"name": "staticFriction",
 			"type": "number",
-			"default": 0.5
+			"default": 2
 		},
+        {
+            "name": "dynamicFriction",
+            "type": "number",
+            "default": 1
+        },
+        {
+            "name": "rollingFriction",
+            "type": "number",
+            "default": 0.005
+        },
 		{
 			"name": "restitution",
 			"type": "number",
 			"default": 0.2
 		},
+        {
+            "name": "elasticity",
+            "type": "number",
+            "default": 0
+        },
 		{
 			"name": "categoryBits",
 			"type": "integer",
