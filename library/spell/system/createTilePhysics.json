@@ -1,0 +1,42 @@
+{
+	"version": 1,
+	"type": "system",
+	"dependencies": [
+		"spell.entity.physics.collision_block",
+		"spell.component.physics.slope",
+		"spell.entity.physics.slopeLeft",
+		"spell.entity.physics.slopeRight",
+		"spell.component.2d.graphics.tilemap",
+		"spell.component.2d.transform",
+		"spell.component.physics.body",
+		"spell.component.physics.fixture",
+		"spell.component.physics.shape.box",
+		"spell.component.physics.shape.convexPolygon"
+	],
+	"input": [
+		{
+			"name": "tilemaps",
+			"componentId": "spell.component.2d.graphics.tilemap"
+		}
+	],
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": true,
+			"doc": "if active is false the system will be skipped during processing"
+		},
+		{
+			"name": "LEFT_SLOPE_INDEX",
+			"type": "number",
+			"default": 13,
+			"doc": ""
+		},
+		{
+			"name": "RIGHT_SLOPE_INDEX",
+			"type": "number",
+			"default": 15,
+			"doc": ""
+		}
+	]
+}

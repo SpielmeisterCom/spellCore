@@ -1,0 +1,43 @@
+{
+	"version": 1,
+	"type": "entityTemplate",
+	"dependencies": [
+		"spell.component.physics.slope",
+		"spell.component.2d.transform",
+		"spell.component.physics.body",
+		"spell.component.physics.fixture",
+		"spell.component.physics.shape.convexPolygon",
+		"spell.component.visualObject"
+	],
+	"config": {
+		"spell.component.visualObject": {},
+		"spell.component.2d.transform": {},
+		"spell.component.physics.body": {
+			"fixedRotation": true
+		},
+		"spell.component.physics.fixture": {
+			"categoryBits": 36864,
+			"restitution": 0,
+			"friction": 0,
+			"density": 0
+		},
+		"spell.component.physics.shape.convexPolygon": {
+			"vertices": [
+				[
+					-32,
+					-32
+				],
+				[
+					32,
+					-32
+				],
+				[
+					-32,
+					32
+				]
+			]
+		},
+		"spell.component.physics.slope": {}
+	},
+	"children": []
+}
