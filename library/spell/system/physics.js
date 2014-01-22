@@ -204,14 +204,12 @@ define(
                 if( !id ) continue
 
                 // transfering state to components
-                var position  = body.getPosition(),
-                    transform = transforms[ id ],
+                var transform = transforms[ id ],
                     bodyDef   = bodies[ id ]
 
-                if( !transform || ( !position[0] || !position[1] ) ) continue
+                if( !transform ) continue
 
-                transform.translation[ 0 ] = position[0]
-                transform.translation[ 1 ] = position[1]
+                body.getPosition( transform.translation )
 
                 //TODO: check for existing of internal flags for fixed rotation in physics engine
                 if( !bodyDef.fixedRotation ){
@@ -300,7 +298,7 @@ define(
                 }
 
                 world.step( deltaTimeInMs )
-
+                //TODO: iterate only dynamic & kinematic bodies
                 incrementState( spell.entityManager, world.getAllBodies(), this.bodies, transforms )
 
 				if( this.config.debug ) {
