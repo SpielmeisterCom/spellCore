@@ -108,18 +108,28 @@ define(
 				scale       = this.scale
 
             var physicsBody = Physics.createRigidBody({
-                type: body.type,
-                velocity: [
-                    body.velocity[ 0 ] * scale,
-                    body.velocity[ 1 ] * scale
-                ],
-                shapes : shapes,
-                position: [
-                    translation[ 0 ] * scale,
-                    translation[ 1 ] * scale
-                ],
-                rotation: transform.rotation,
-                userData: entityId
+                type            : body.type,
+                velocity        : [
+                                    body.velocity[ 0 ] * scale,
+                                    body.velocity[ 1 ] * scale
+                                ],
+                shapes          : shapes,
+                position        :[
+                                    translation[ 0 ] * scale,
+                                    translation[ 1 ] * scale
+                                ],
+                rotation        : transform.rotation,
+                mass            : body.mass > 0 ? body.mass : undefined,
+                inertia         : body.inertia > 0 ? body.inertia : undefined,
+                sleeping        : body.sleeping,
+                bullet          : body.bullet,
+                angularVelocity : body.angularVelocity,
+                force           : body.force,
+                torque          : body.torque,
+                linearDrag      : body.linearDrag,
+                angularDrag     : body.angularDrag,
+                surfaceVelocity : body.surfaceVelocity,
+                userData        : entityId
             })
 
             this.rawWorld.addRigidBody( physicsBody )
