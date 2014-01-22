@@ -220,6 +220,9 @@ define(
                     body.setRotation( transform.rotation )
                 }
 
+                //Sync velocity
+                body.getVelocity( bodyDef.velocity )
+
                 entityManager.updateWorldTransform( id )
             }
         }

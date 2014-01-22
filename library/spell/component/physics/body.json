@@ -23,10 +23,6 @@
 			"name": "velocity",
 			"type": "vec2",
 			"default": [ 0, 0 ]
-		},
-		{
-			"name": "maxVelocity",
-			"type": "vec2"
 		}
 	]
 }
