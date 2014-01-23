@@ -6,11 +6,11 @@
 	"doc": "",
     "icon": "resources/images/icons/component.png",
     "attributes": [
-		{
-			"name": "density",
-			"type": "number",
-			"default": 1
-		},
+        {
+            "name": "elasticity",
+            "type": "number",
+            "default": 0
+        },
 		{
 			"name": "staticFriction",
 			"type": "number",
@@ -26,15 +26,10 @@
             "type": "number",
             "default": 0.005
         },
-		{
-			"name": "restitution",
-			"type": "number",
-			"default": 0.2
-		},
         {
-            "name": "elasticity",
+            "name": "density",
             "type": "number",
-            "default": 0
+            "default": 1
         },
 		{
 			"name": "categoryBits",
