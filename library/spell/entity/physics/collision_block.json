@@ -12,12 +12,10 @@
 		"spell.component.visualObject": {},
 		"spell.component.2d.transform": {},
 		"spell.component.physics.body": {
-			"fixedRotation": true
-		},
+            "type": "static"
+        },
 		"spell.component.physics.fixture": {
-			"categoryBits": 4096,
-			"restitution": 0,
-			"density": 0
+			"categoryBits": 4096
 		},
 		"spell.component.physics.shape.box": {
 			"dimensions": [
