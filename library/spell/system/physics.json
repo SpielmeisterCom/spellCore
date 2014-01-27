@@ -25,14 +25,6 @@
 		{
 			"name": "circleShapes",
 			"componentId": "spell.component.physics.shape.circle"
-		},
-		{
-			"name": "debugBoxes",
-			"componentId": "spell.component.2d.graphics.debug.box"
-		},
-		{
-			"name": "debugCircles",
-			"componentId": "spell.component.2d.graphics.debug.circle"
 		}
 	],
 	"version": 1,
@@ -42,12 +34,6 @@
 			"type": "boolean",
 			"default": true,
 			"doc": "if active is false the system will be skipped during processing"
-		},
-		{
-			"name": "debug",
-			"type": "boolean",
-			"default": true,
-			"doc": "if true debug information will be processed"
 		},
 		{
 			"name": "gravity",
@@ -60,6 +46,54 @@
 			"type": "number",
 			"default": 1,
 			"doc": "the scale that is applied to input before it is passed to the physics engine"
+		},
+		{
+			"name": "showConstraints",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether constraints will be drawn in calls to drawWorld(..)"
+		},
+		{
+			"name": "showContacts",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether contact points will be drawn in calls to drawWorld(..)"
+		},
+		{
+			"name": "showContactImpulses",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether contact impulses will be drawn in calls to drawWorld(..). For impulses to be drawn, it must also be the case that showContacts is true."
+		},
+		{
+			"name": "showRigidBodies",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether rigid bodies will be drawn in calls to drawWorld(..)"
+		},
+		{
+			"name": "showColliderShapes",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether collidable shapes will be drawn in calls to drawWorld(..) and drawRigidBody(..)"
+		},
+		{
+			"name": "showSensorShapes",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether shapes with sensor true will be drawn in calls to drawWorld(..) and drawRigidBody(..)"
+		},
+		{
+			"name": "showBodyDetail",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether rigid body details (origin, and change in position since last update) will be drawn in calls to drawWorld(..), and drawRigidBody(..)"
+		},
+		{
+			"name": "showShapeDetail",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether shape details (world-space bounds) will be drawn in calls to drawWorld(..), and drawRigidBody(..)"
 		}
 	]
 }

@@ -24,10 +24,8 @@ define(
 
         //TODO: check if the boxtree can be removed, instead use our quadtree http://docs.turbulenz.com/jslibrary_api/broadphase_api.html#broadphase
         //TODO: add license of torbulenz to spellCore LICENCE
-        var Physics = PlatformKit.Physics
-
-		var awakeColor    = [ 0.82, 0.76, 0.07 ],
-			notAwakeColor = [ 0.27, 0.25, 0.02 ]
+        var Physics   = PlatformKit.Physics.device,
+            debugDraw = PlatformKit.Physics.debugDrawer
 
         /**
          * Creates an instance of the system.
@@ -80,17 +78,57 @@ define(
             )
         }
 
+
+        var createJNRPlayerBody = function( shapeDef, JNRunPlayerShape ) {
+            var width  = JNRunPlayerShape.dimensions[ 0 ],
+                height = JNRunPlayerShape.dimensions[ 0 ],
+                shapes = [
+                    Physics.createPolygonShape(
+                        _.extend({
+                                vertices: [
+                                    [ 0,0 ],
+                                    [ 0, height ],
+                                    [ width, height ],
+                                    [ width, 0 ]
+                                ]
+                            },
+                            shapeDef
+                        )
+                    ),
+                    Physics.createCircleShape(
+                        _.extend({
+                                radius: width,
+                                origin: [width/2, 0]
+                            },
+                            shapeDef
+                        )
+                    ),
+                    Physics.createCircleShape(
+                        _.extend({
+                                radius: width,
+                                origin: [width/2, height]
+                            },
+                            shapeDef
+                        )
+                    )
+                ]
+
+
+            return shapes
+        }
+
         var createBody = function( entityManager, debug, world, entityId, entity ) {
             var body               = entity[ Defines.PHYSICS_BODY_COMPONENT_ID ],
                 fixture            = entity[ Defines.PHYSICS_FIXTURE_COMPONENT_ID ],
                 boxShape           = entity[ Defines.PHYSICS_BOX_SHAPE_COMPONENT_ID ],
                 circleShape        = entity[ Defines.PHYSICS_CIRCLE_SHAPE_COMPONENT_ID ],
                 convexPolygonShape = entity[ Defines.PHYSICS_CONVEX_POLYGON_SHAPE_COMPONENT_ID ],
+                JNRunPlayerShape   = entity[ Defines.PHYSICS_JNRPLAYER_SHAPE_COMPONENT_ID ],
                 transform          = entity[ Defines.TRANSFORM_COMPONENT_ID ],
                 contactTrigger     = entity[ Defines.PHYSICS_CONTACT_TRIGGER_COMPONENT_ID ]
 
             if( !body || !fixture || !transform ||
-                ( !boxShape && !circleShape && !convexPolygonShape ) ) {
+                ( !boxShape && !circleShape && !convexPolygonShape && !JNRunPlayerShape ) ) {
 
                 return
             }
@@ -108,62 +146,29 @@ define(
                 sensor: fixture.isSensor
             }
 
-            if( circleShape ) {
-                shapeDef.radius = circleShape.radius
-                var shape = Physics.createCircleShape( shapeDef )
+            if( JNRunPlayerShape ) {
+                var shape = createJNRPlayerBody( shapeDef, JNRunPlayerShape )
+
+                world.createBodyDef( entityId, body, shape, transform )
 
             } else {
-                shapeDef.vertices = boxShape ? Physics.createBoxVertices(
-                    boxShape.dimensions[ 0 ],
-                    boxShape.dimensions[ 1 ]
-                ): convexPolygonShape.vertices
+                if( circleShape ) {
+                    shapeDef.radius = circleShape.radius
+                    var shape = Physics.createCircleShape( shapeDef )
 
-                var shape = Physics.createPolygonShape( shapeDef )
+                } else {
+                    shapeDef.vertices = boxShape ? Physics.createBoxVertices(
+                        boxShape.dimensions[ 0 ],
+                        boxShape.dimensions[ 1 ]
+                    ): convexPolygonShape.vertices
+
+                    var shape = Physics.createPolygonShape( shapeDef )
+                }
+
+                createContactListener( entityManager, entityId, shape, contactTrigger )
+
+                world.createBodyDef( entityId, body, [ shape ], transform )
             }
-
-            createContactListener( entityManager, entityId, shape, contactTrigger )
-
-            world.createBodyDef( entityId, body, [ shape ], transform )
-
-			if( debug ) {
-				var componentId,
-					config
-
-				if( circleShape ) {
-					componentId = 'spell.component.2d.graphics.debug.circle'
-					config = {
-						radius : circleShape.radius
-					}
-
-				} else if( convexPolygonShape ) {
-					var minX = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var x = v[ 0 ]; return memo < x ? memo : x }, 0 ),
-						maxX = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var x = v[ 0 ]; return memo > x ? memo : x }, 0 ),
-						minY = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var y = v[ 1 ]; return memo < y ? memo : y }, 0 ),
-						maxY = _.reduce( convexPolygonShape.vertices, function( memo, v ) { var y = v[ 1 ]; return memo > y ? memo : y }, 0 )
-
-					componentId = 'spell.component.2d.graphics.debug.box'
-					config = {
-						width : maxX - minX,
-						height : maxY - minY
-					}
-
-                //TODO: Add showing of triangles
-				} else {
-					var boxesqueShape = boxShape
-
-					componentId = 'spell.component.2d.graphics.debug.box'
-					config = {
-						width : boxesqueShape.dimensions[ 0 ],
-						height : boxesqueShape.dimensions[ 1 ]
-					}
-				}
-
-				entityManager.addComponent(
-					entityId,
-					componentId,
-					config
-				)
-			}
         }
 
 
@@ -172,23 +177,6 @@ define(
                 world.destroyBody( entityIds[ i ] )
             }
         }
-
-		var updateDebug = function( rigidBodies, debugBoxes, debugCircles ) {
-			var length = rigidBodies.length
-
-
-			for( var i = 0; i < length; i++ ) {
-				var body = rigidBodies[i]
-
-				var id = body.userData
-
-				if( !id ) continue
-
-				var debugShape = debugBoxes[ id ] || debugCircles[ id ]
-
-				debugShape.color = body.sleeping ? notAwakeColor : awakeColor
-			}
-		}
 
         var incrementState = function( entityManager, rigidBodies, bodies, transforms ) {
             var length = rigidBodies.length
@@ -225,6 +213,66 @@ define(
             }
         }
 
+        var _graphicsDevice = {
+            width: 800,
+            height: 600,
+            technique: undefined,
+            setStream: function() {
+
+            },
+            setTechnique: function( technique ) {
+                this.technique = technique
+            },
+            setTechniqueParameters: function() {
+
+            },
+            setScissor: function() {
+
+            },
+            createIndexBuffer: function() {
+                return {
+                    destroy: function() {
+
+                    },
+                    setData: function() {
+
+                    }
+                }
+            },
+            setIndexBuffer: function() {
+
+            },
+            drawIndexed: function() {
+
+            },
+            createSemantics: function() {
+
+            },
+            createVertexBuffer: function() {
+                return {
+                    destroy: function() {
+
+                    },
+                    setData: function() {
+
+                    }
+                }
+            },
+            createShader: function() {
+                return {
+                    getTechnique: function() {
+                        return {}
+                    }
+                }
+            },
+            createTechniqueParameters: function() {
+
+                return {
+                    clipSpace: new Array(4)
+                }
+            }
+        }
+
         physics.prototype = {
             /**
              * Gets called when the system is created.
@@ -233,12 +281,38 @@ define(
              */
             init: function( spell ) {
                 this.world = spell.physicsWorlds.main
+				var config = this.config
 
                 if( !this.world ) {
                     var world = spell.physicsContext.createWorld( this.config.gravity, this.config.scale )
 
                     this.world = world
                     spell.physicsWorlds.main = world
+                }
+
+                if(
+					config.showConstraints ||
+					config.showContacts ||
+					config.showContactImpulses ||
+					config.showRigidBodies ||
+					config.showColliderShapes ||
+					config.showSensorShapes ||
+					config.showBodyDetail ||
+					config.showShapeDetail
+				) {
+                    var debug = debugDraw.create( { graphicsDevice: _graphicsDevice } )
+                    debug.renderingContext = spell.renderingContext
+
+                    debug.showConstraints     = config.showConstraints
+					debug.showContacts        = config.showContacts
+					debug.showContactImpulses = config.showContactImpulses
+					debug.showRigidBodies     = config.showRigidBodies
+					debug.showColliderShapes  = config.showColliderShapes
+					debug.showSensorShapes    = config.showSensorShapes
+					debug.showBodyDetail      = config.showBodyDetail
+					debug.showShapeDetail     = config.showShapeDetail
+
+                    spell.physicsWorlds.debugDraw = debug
                 }
 
                 this.entityCreatedHandler = _.bind( createBody, null, spell.entityManager, this.config.debug, this.world )
@@ -300,10 +374,6 @@ define(
                 world.step( deltaTimeInMs )
                 //TODO: iterate only dynamic & kinematic bodies
                 incrementState( spell.entityManager, world.getAllBodies(), this.bodies, transforms )
-
-				if( this.config.debug ) {
-					updateDebug( world.getAllBodies(), this.debugBoxes, this.debugCircles )
-				}
             }
         }
 

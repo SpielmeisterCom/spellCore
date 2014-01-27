@@ -1170,7 +1170,7 @@ define(
 			 * Example:
 			 *
 			 *     // add a component with it's default configuration to this entity
-			 *     spell.entityManager.addComponent( entityId, "spell.component.2d.graphics.debug.box" )
+			 *     spell.entityManager.addComponent( entityId, "spell.component.2d.graphics.shape.rectangle" )
 			 *
 			 *     // add a component to this entity and override a default value
 			 *     spell.entityManager.addComponent(
