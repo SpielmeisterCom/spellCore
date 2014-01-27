@@ -12813,6 +12813,359 @@ var Physics2DDevice = (function () {
     }
 }());
 
+// =========================================================================
+// PULLEY CONSTRAINT
+        Physics2DPulleyConstraint.prototype._draw = function _pulleyDrawFn(debug) {
+            var colA = (this.sleeping ? debug.constraintSleepingColorA : debug.constraintColorA);
+            var colB = (this.sleeping ? debug.constraintSleepingColorB : debug.constraintColorB);
+            var colC = (this.sleeping ? debug.constraintSleepingColorC : debug.constraintColorC);
+            var colD = (this.sleeping ? debug.constraintSleepingColorD : debug.constraintColorD);
+            var colSA = (this.sleeping ? debug.constraintErrorSleepingColorA : debug.constraintErrorColorA);
+            var colSB = (this.sleeping ? debug.constraintErrorSleepingColorB : debug.constraintErrorColorB);
+            var colSC = (this.sleeping ? debug.constraintErrorSleepingColorC : debug.constraintErrorColorC);
+            var colSD = (this.sleeping ? debug.constraintErrorSleepingColorD : debug.constraintErrorColorD);
+
+            var data = this._data;
+            var b1 = this.bodyA._data;
+            var b2 = this.bodyB._data;
+            var b3 = this.bodyC._data;
+            var b4 = this.bodyD._data;
+
+            var x1 = (b1[(/*BODY_POS*/ 2)] + data[(/*PULLEY_RANCHOR1*/ 19)]);
+            var y1 = (b1[(/*BODY_POS*/ 2) + 1] + data[(/*PULLEY_RANCHOR1*/ 19) + 1]);
+            var x2 = (b2[(/*BODY_POS*/ 2)] + data[(/*PULLEY_RANCHOR2*/ 21)]);
+            var y2 = (b2[(/*BODY_POS*/ 2) + 1] + data[(/*PULLEY_RANCHOR2*/ 21) + 1]);
+            var x3 = (b3[(/*BODY_POS*/ 2)] + data[(/*PULLEY_RANCHOR3*/ 23)]);
+            var y3 = (b3[(/*BODY_POS*/ 2) + 1] + data[(/*PULLEY_RANCHOR3*/ 23) + 1]);
+            var x4 = (b4[(/*BODY_POS*/ 2)] + data[(/*PULLEY_RANCHOR4*/ 25)]);
+            var y4 = (b4[(/*BODY_POS*/ 2) + 1] + data[(/*PULLEY_RANCHOR4*/ 25) + 1]);
+
+            var n12x = (x2 - x1);
+            var n12y = (y2 - y1);
+            var n34x = (x4 - x3);
+            var n34y = (y4 - y3);
+            var nL12 = Math.sqrt((n12x * n12x) + (n12y * n12y));
+            var nL34 = Math.sqrt((n34x * n34x) + (n34y * n34y));
+            var ratio = data[(/*PULLEY_RATIO*/ 7)];
+            this._drawLink(debug, x1, y1, x2, y2, n12x, n12y, nL12, (nL34 * ratio), 1.0, colSA, colSB);
+            this._drawLink(debug, x3, y3, x4, y4, n34x, n34y, nL34, nL12, (1 / ratio), colSC, colSD);
+
+            var rad = (debug.constraintAnchorRadius * debug.screenToPhysics2D);
+            debug._drawAnchor(x1, y1, rad, colA);
+            debug._drawAnchor(x2, y2, rad, colB);
+            debug._drawAnchor(x3, y3, rad, colC);
+            debug._drawAnchor(x4, y4, rad, colD);
+        };
+
+        Physics2DPulleyConstraint.prototype._drawLink = function _drawLinkFn(debug, x1, y1, x2, y2, nx, ny, nl, bias, scale, colSA, colSB) {
+            if (nl > Physics2DConfig.NORMALIZE_EPSILON) {
+                var rec = (1 / nl);
+                nx *= rec;
+                ny *= rec;
+
+                var midX = (0.5 * (x1 + x2));
+                var midY = (0.5 * (y1 + y2));
+
+                var data = this._data;
+                var jointMin = (data[(/*PULLEY_JOINTMIN*/ 5)] - bias) * scale;
+                if (jointMin < 0) {
+                    jointMin = 0;
+                }
+                var jointMax = (data[(/*PULLEY_JOINTMAX*/ 6)] - bias) * scale;
+                if (jointMax < 0) {
+                    jointMax = 0;
+                }
+
+                var minX1 = (midX - (nx * (jointMin * 0.5)));
+                var minY1 = (midY - (ny * (jointMin * 0.5)));
+                var minX2 = (midX + (nx * (jointMin * 0.5)));
+                var minY2 = (midY + (ny * (jointMin * 0.5)));
+                var maxX1 = (midX - (nx * (jointMax * 0.5)));
+                var maxY1 = (midY - (ny * (jointMax * 0.5)));
+                var maxX2 = (midX + (nx * (jointMax * 0.5)));
+                var maxY2 = (midY + (ny * (jointMax * 0.5)));
+
+                debug.drawLine(minX1, minY1, minX2, minY2, colSA);
+                debug.drawLine(maxX1, maxY1, minX1, minY1, colSB);
+                debug.drawLine(maxX2, maxY2, minX2, minY2, colSB);
+
+                if (!this._stiff) {
+                    var numCoils = debug.constraintSpringNumCoils;
+                    var radius = (debug.constraintSpringRadius * debug.screenToPhysics2D);
+                    if (nl > jointMax) {
+                        debug.drawLinearSpring(maxX1, maxY1, x1, y1, numCoils, radius, colSB);
+                        debug.drawLinearSpring(maxX2, maxY2, x2, y2, numCoils, radius, colSB);
+                    } else if (nl < jointMin) {
+                        debug.drawLinearSpring(minX1, minY1, x1, y1, numCoils, radius, colSA);
+                        debug.drawLinearSpring(minX2, minY2, x2, y2, numCoils, radius, colSA);
+                    }
+                }
+            }
+        };
+
+// =========================================================================
+// LINE CONSTRAINT
+        Physics2DLineConstraint.prototype._draw = function lineDrawFn(debug) {
+            var colA = (this.sleeping ? debug.constraintSleepingColorA : debug.constraintColorA);
+            var colB = (this.sleeping ? debug.constraintSleepingColorB : debug.constraintColorB);
+            var colSA = (this.sleeping ? debug.constraintErrorSleepingColorA : debug.constraintErrorColorA);
+            var colSB = (this.sleeping ? debug.constraintErrorSleepingColorB : debug.constraintErrorColorB);
+            var colSC = (this.sleeping ? debug.constraintErrorSleepingColorC : debug.constraintErrorColorC);
+
+            var data = this._data;
+            var b1 = this.bodyA._data;
+            var b2 = this.bodyB._data;
+
+            var x1 = (b1[(/*BODY_POS*/ 2)] + data[(/*LINE_RANCHOR1*/ 13)]);
+            var y1 = (b1[(/*BODY_POS*/ 2) + 1] + data[(/*LINE_RANCHOR1*/ 13) + 1]);
+            var x2 = (b2[(/*BODY_POS*/ 2)] + data[(/*LINE_RANCHOR2*/ 15)]);
+            var y2 = (b2[(/*BODY_POS*/ 2) + 1] + data[(/*LINE_RANCHOR2*/ 15) + 1]);
+            var dx = data[(/*LINE_RAXIS*/ 17)];
+            var dy = data[(/*LINE_RAXIS*/ 17) + 1];
+
+            var jointMin = data[(/*LINE_JOINTMIN*/ 5)];
+            var jointMax = data[(/*LINE_JOINTMAX*/ 6)];
+            if (jointMin === Number.NEGATIVE_INFINITY) {
+                jointMin = -1e20;
+            }
+            if (jointMax === Number.POSITIVE_INFINITY) {
+                jointMax = 1e20;
+            }
+
+            var delX = (x2 - x1);
+            var delY = (y2 - y1);
+            var pn = (delX * dx) + (delY * dy);
+
+            var ex1 = (x1 + (dx * jointMin));
+            var ey1 = (y1 + (dy * jointMin));
+            var ex2 = (x1 + (dx * jointMax));
+            var ey2 = (y1 + (dy * jointMax));
+
+            var t;
+            if (pn > jointMin) {
+                t = Math.min(pn, jointMax);
+                debug.drawLine(ex1, ey1, x1 + (dx * t), y1 + (dy * t), colSA);
+            }
+            if (pn < jointMax) {
+                t = Math.max(pn, jointMin);
+                debug.drawLine(ex2, ey2, x1 + (dx * t), y1 + (dy * t), colSB);
+            }
+
+            if (!this._stiff) {
+                var anchX = (pn < jointMin ? ex1 : (pn > jointMax ? ex2 : (x1 + (dx * pn))));
+                var anchY = (pn < jointMin ? ey1 : (pn > jointMax ? ey2 : (y1 + (dy * pn))));
+
+                var numCoils = debug.constraintSpringNumCoils;
+                var radius = (debug.constraintSpringRadius * debug.screenToPhysics2D);
+                debug.drawLinearSpring(anchX, anchY, x2, y2, numCoils, radius, colSC);
+            }
+
+            var rad = (debug.constraintAnchorRadius * debug.screenToPhysics2D);
+            debug._drawAnchor(x1, y1, rad, colA);
+            debug._drawAnchor(x2, y2, rad, colB);
+        };
+
+// =========================================================================
+// DISTANCE CONSTRAINT
+        Physics2DDistanceConstraint.prototype._draw = function distanceDrawFn(debug) {
+            var colA = (this.sleeping ? debug.constraintSleepingColorA : debug.constraintColorA);
+            var colB = (this.sleeping ? debug.constraintSleepingColorB : debug.constraintColorB);
+            var colSA = (this.sleeping ? debug.constraintErrorSleepingColorA : debug.constraintErrorColorA);
+            var colSB = (this.sleeping ? debug.constraintErrorSleepingColorB : debug.constraintErrorColorB);
+
+            var data = this._data;
+            var b1 = this.bodyA._data;
+            var b2 = this.bodyB._data;
+
+            var x1 = (b1[(/*BODY_POS*/ 2)] + data[(/*DIST_RANCHOR1*/ 11)]);
+            var y1 = (b1[(/*BODY_POS*/ 2) + 1] + data[(/*DIST_RANCHOR1*/ 11) + 1]);
+            var x2 = (b2[(/*BODY_POS*/ 2)] + data[(/*DIST_RANCHOR2*/ 13)]);
+            var y2 = (b2[(/*BODY_POS*/ 2) + 1] + data[(/*DIST_RANCHOR2*/ 13) + 1]);
+
+            var nx = (x2 - x1);
+            var ny = (y2 - y1);
+            var nlsq = ((nx * nx) + (ny * ny));
+            if (nlsq > Physics2DConfig.NORMALIZE_SQ_EPSILON) {
+                var nl = Math.sqrt(nlsq);
+                var rec = (1 / nl);
+                nx *= rec;
+                ny *= rec;
+
+                var midX = (0.5 * (x1 + x2));
+                var midY = (0.5 * (y1 + y2));
+
+                var jointMin = data[(/*DIST_JOINTMIN*/ 5)];
+                var jointMax = data[(/*DIST_JOINTMAX*/ 6)];
+                var minX1 = (midX - (nx * (jointMin * 0.5)));
+                var minY1 = (midY - (ny * (jointMin * 0.5)));
+                var minX2 = (midX + (nx * (jointMin * 0.5)));
+                var minY2 = (midY + (ny * (jointMin * 0.5)));
+                var maxX1 = (midX - (nx * (jointMax * 0.5)));
+                var maxY1 = (midY - (ny * (jointMax * 0.5)));
+                var maxX2 = (midX + (nx * (jointMax * 0.5)));
+                var maxY2 = (midY + (ny * (jointMax * 0.5)));
+
+                debug.drawLine(minX1, minY1, minX2, minY2, colSA);
+                debug.drawLine(maxX1, maxY1, minX1, minY1, colSB);
+                debug.drawLine(maxX2, maxY2, minX2, minY2, colSB);
+
+                if (!this._stiff) {
+                    var numCoils = debug.constraintSpringNumCoils;
+                    var radius = (debug.constraintSpringRadius * debug.screenToPhysics2D);
+                    if (nl > jointMax) {
+                        debug.drawLinearSpring(maxX1, maxY1, x1, y1, numCoils, radius, colSB);
+                        debug.drawLinearSpring(maxX2, maxY2, x2, y2, numCoils, radius, colSB);
+                    } else if (nl < jointMin) {
+                        debug.drawLinearSpring(minX1, minY1, x1, y1, numCoils, radius, colSA);
+                        debug.drawLinearSpring(minX2, minY2, x2, y2, numCoils, radius, colSA);
+                    }
+                }
+            }
+
+            var rad = (debug.constraintAnchorRadius * debug.screenToPhysics2D);
+            debug._drawAnchor(x1, y1, rad, colA);
+            debug._drawAnchor(x2, y2, rad, colB);
+        };
+
+// =========================================================================
+// ANGLE CONSTRAINT
+        Physics2DAngleConstraint.prototype._draw = function angleDrawFn(debug) {
+            var colA = (this.sleeping ? debug.constraintSleepingColorA : debug.constraintColorA);
+            var colB = (this.sleeping ? debug.constraintSleepingColorB : debug.constraintColorB);
+            var colSA = (this.sleeping ? debug.constraintErrorSleepingColorA : debug.constraintErrorColorA);
+            var colSB = (this.sleeping ? debug.constraintErrorSleepingColorB : debug.constraintErrorColorB);
+
+            var data = this._data;
+            var b1 = this.bodyA._data;
+            var b2 = this.bodyB._data;
+
+            var ratio = data[(/*ANGLE_RATIO*/ 7)];
+            this._drawForBody(debug, b1, b2, ratio, -1, colSA, colSB, colA);
+            this._drawForBody(debug, b2, b1, (1 / ratio), (1 / ratio), colSA, colSB, colB);
+        };
+
+        Physics2DAngleConstraint.prototype._drawForBody = function _drawForBodyFn(debug, b1, b2, bodyScale, limitScale, colA, colB, col) {
+            var data = this._data;
+            var jointMin = data[(/*ANGLE_JOINTMIN*/ 5)];
+            var jointMax = data[(/*ANGLE_JOINTMAX*/ 6)];
+
+            var min = (b2[(/*BODY_POS*/ 2) + 2] * bodyScale) + (jointMin * limitScale);
+            var max = (b2[(/*BODY_POS*/ 2) + 2] * bodyScale) + (jointMax * limitScale);
+            if (min > max) {
+                var tmp = min;
+                min = max;
+                max = tmp;
+            }
+
+            var minRadius = (debug.constraintSpiralMinRadius * debug.screenToPhysics2D);
+            var deltaRadius = (debug.constraintSpiralDeltaRadius * debug.screenToPhysics2D);
+            var indicatorSize = (debug.constraintAnchorRadius * debug.screenToPhysics2D);
+            var numCoils = debug.constraintSpiralNumCoils;
+
+            var x = b1[(/*BODY_POS*/ 2)];
+            var y = b1[(/*BODY_POS*/ 2) + 1];
+            var rot = b1[(/*BODY_POS*/ 2) + 2];
+
+            var dr;
+            if (rot > min) {
+                dr = Math.min(rot, max);
+                debug.drawSpiral(x, y, min, dr, minRadius, minRadius + ((dr - min) * deltaRadius), colA);
+            } else if (!this._stiff && rot < min) {
+                debug.drawSpiralSpring(x, y, rot, min, minRadius + ((rot - min) * deltaRadius), minRadius, numCoils, colA);
+            }
+
+            if (rot < max) {
+                dr = Math.max(rot, min);
+                debug.drawSpiral(x, y, dr, max, minRadius + ((dr - min) * deltaRadius), minRadius + ((max - min) * deltaRadius), colB);
+            } else if (!this._stiff && rot > max) {
+                debug.drawSpiralSpring(x, y, rot, max, minRadius + ((rot - min) * deltaRadius), minRadius + ((max - min) * deltaRadius), numCoils, colB);
+            }
+
+            debug._drawAngleIndicator(x, y, rot, minRadius + ((rot - min) * deltaRadius), indicatorSize, col);
+        };
+
+// =========================================================================
+// WELD CONSTRAINT
+        Physics2DWeldConstraint.prototype._draw = function weldDrawFn(debug) {
+            var colA = (this.sleeping ? debug.constraintSleepingColorA : debug.constraintColorA);
+            var colB = (this.sleeping ? debug.constraintSleepingColorB : debug.constraintColorB);
+            var colE = (this.sleeping ? debug.constraintErrorSleepingColorC : debug.constraintErrorColorC);
+
+            var data = this._data;
+            var b1 = this.bodyA._data;
+            var b2 = this.bodyB._data;
+
+            var x1 = (b1[(/*BODY_POS*/ 2)] + data[(/*WELD_RANCHOR1*/ 9)]);
+            var y1 = (b1[(/*BODY_POS*/ 2) + 1] + data[(/*WELD_RANCHOR1*/ 9) + 1]);
+            var x2 = (b2[(/*BODY_POS*/ 2)] + data[(/*WELD_RANCHOR2*/ 11)]);
+            var y2 = (b2[(/*BODY_POS*/ 2) + 1] + data[(/*WELD_RANCHOR2*/ 11) + 1]);
+
+            var rad = (debug.constraintAnchorRadius * debug.screenToPhysics2D);
+            debug._drawAnchor(x1, y1, rad, colA);
+            debug._drawAnchor(x2, y2, rad, colB);
+
+            if (this._stiff) {
+                debug.drawLine(x1, y1, x2, y2, colE);
+            } else {
+                var numCoils = debug.constraintSpringNumCoils;
+                var radius = (debug.constraintSpringRadius * debug.screenToPhysics2D);
+                debug.drawLinearSpring(x1, y1, x2, y2, numCoils, radius, colE);
+
+                var minRadius = (debug.constraintSpiralMinRadius * debug.screenToPhysics2D);
+                var deltaRadius = (debug.constraintSpiralDeltaRadius * debug.screenToPhysics2D);
+                var indicatorSize = (debug.constraintAnchorRadius * debug.screenToPhysics2D);
+                numCoils = debug.constraintSpiralNumCoils;
+
+                var target, min;
+
+                // angle indication on bodyA
+                min = b1[(/*BODY_POS*/ 2) + 2];
+                target = (b2[(/*BODY_POS*/ 2) + 2] - data[(/*WELD_PHASE*/ 13)]);
+
+                var colSA = (this.sleeping ? debug.constraintErrorSleepingColorA : debug.constraintErrorColorA);
+                var colSB = (this.sleeping ? debug.constraintErrorSleepingColorB : debug.constraintErrorColorB);
+
+                debug.drawSpiralSpring(b1[(/*BODY_POS*/ 2)], b1[(/*BODY_POS*/ 2) + 1], min, target, minRadius, minRadius + ((target - min) * deltaRadius), numCoils, colSB);
+                debug._drawAngleIndicator(b1[(/*BODY_POS*/ 2)], b1[(/*BODY_POS*/ 2) + 1], min, minRadius, indicatorSize, colSA);
+
+                min = b2[(/*BODY_POS*/ 2) + 2];
+                target = (data[(/*WELD_PHASE*/ 13)] + b1[(/*BODY_POS*/ 2) + 2]);
+
+                debug.drawSpiralSpring(b2[(/*BODY_POS*/ 2)], b2[(/*BODY_POS*/ 2) + 1], min, target, minRadius, minRadius + ((target - min) * deltaRadius), numCoils, colSA);
+                debug._drawAngleIndicator(b2[(/*BODY_POS*/ 2)], b2[(/*BODY_POS*/ 2) + 1], min, minRadius, indicatorSize, colSB);
+            }
+        };
+
+// =========================================================================
+// POINT CONSTRAINT
+        Physics2DPointConstraint.prototype._draw = function pointDrawFn(debug) {
+            var colA = (this.sleeping ? debug.constraintSleepingColorA : debug.constraintColorA);
+            var colB = (this.sleeping ? debug.constraintSleepingColorB : debug.constraintColorB);
+            var colE = (this.sleeping ? debug.constraintErrorSleepingColorC : debug.constraintErrorColorC);
+
+            var data = this._data;
+            var b1 = this.bodyA._data;
+            var b2 = this.bodyB._data;
+
+            var x1 = (b1[(/*BODY_POS*/ 2)] + data[(/*POINT_RANCHOR1*/ 9)]);
+            var y1 = (b1[(/*BODY_POS*/ 2) + 1] + data[(/*POINT_RANCHOR1*/ 9) + 1]);
+            var x2 = (b2[(/*BODY_POS*/ 2)] + data[(/*POINT_RANCHOR2*/ 11)]);
+            var y2 = (b2[(/*BODY_POS*/ 2) + 1] + data[(/*POINT_RANCHOR2*/ 11) + 1]);
+
+            var rad = (debug.constraintAnchorRadius * debug.screenToPhysics2D);
+            debug._drawAnchor(x1, y1, rad, colA);
+            debug._drawAnchor(x2, y2, rad, colB);
+
+            if (this._stiff) {
+                debug.drawLine(x1, y1, x2, y2, colE);
+            } else {
+                var numCoils = debug.constraintSpringNumCoils;
+                var radius = (debug.constraintSpringRadius * debug.screenToPhysics2D);
+                debug.drawLinearSpring(x1, y1, x2, y2, numCoils, radius, colE);
+            }
+        };
+
+
 // Must defer so that floatArray on Physics2DDevice is defined.
 Physics2DMaterial.defaultMaterial = Physics2DMaterial.create();
 // Copyright (c) 2012 Turbulenz Limited

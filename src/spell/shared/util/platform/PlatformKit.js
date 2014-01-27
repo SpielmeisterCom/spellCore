@@ -29,6 +29,7 @@ define(
 		'spell/shared/util/platform/private/storage/PersistentStorage',
 		'spell/shared/util/platform/private/openURL',
         'spell/shared/util/platform/private/physics2dDevice',
+        'spell/shared/util/platform/private/physics2dDebugDraw',
 		'spell/shared/util/platform/private/platformDetails',
 		'spell/shared/util/platform/private/graphics/initViewport',
 		'spell/shared/util/platform/private/advertisement',
@@ -63,6 +64,7 @@ define(
 		PersistentStorage,
 		openURL,
         physics2dDevice,
+        physics2dDebugDraw,
 		platformDetails,
 		initViewport,
 		advertisement,
@@ -101,6 +103,7 @@ define(
              *
              */
             Physics : new physics2dDevice(),
+            PhysicsDebugDraw: physics2dDebugDraw,
 
 			/*
 			 *

@@ -441,35 +441,6 @@ define(
 			context.restore()
 		}
 
-		var drawDebug = function( context, debugBoxes, debugCircles, transforms, deltaTimeInMs, id ) {
-			var debugBox    = debugBoxes[ id ],
-				debugCircle = debugCircles[ id ],
-				transform   = transforms[ id ]
-
-			if( !debugBox && !debugCircle ) return
-
-			context.save()
-			{
-				if( transform ) {
-					context.setTransform( transform.worldMatrix )
-				}
-
-				if( debugBox ) {
-					drawPhysicsBox( context, debugBox.width, debugBox.height, debugBox.color, 1 )
-
-				} else {
-					drawPhysicsCircle( context, debugCircle.radius, debugCircle.color, 1 )
-				}
-
-				context.setColor( markerColor )
-				drawPhysicsPoint( context, 0.2 )
-
-				context.setLineColor( markerColor )
-				drawPhysicsOrigin( context, 0.25 )
-			}
-			context.restore()
-		}
-
 		var setCamera = function( context, cameraDimensions, position ) {
 			// setting up the camera geometry
 			var halfWidth  = cameraDimensions[ 0 ] * 0.5,
@@ -652,16 +623,13 @@ define(
 					)
 				}
 
-				if( this.config.debug &&
-					drawDebugShapes ) {
+                if( this.config.debug && spell.physicsWorlds && spell.physicsWorlds.debugDraw ) {
+                    var debug = spell.physicsWorlds.debugDraw
+                    debug.begin()
+                    debug.drawWorld( spell.physicsWorlds.main.rawWorld )
+                    debug.end()
+                }
 
-					var debugBoxes   = this.debugBoxes,
-						debugCircles = this.debugCircles
-
-					for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
-						drawDebug( context, debugBoxes, debugCircles, transforms, deltaTimeInMs, visibleEntityIdsSorted[ i ] )
-					}
-				}
 			}
 			context.restore()
 
