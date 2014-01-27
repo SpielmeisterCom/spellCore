@@ -623,7 +623,7 @@ define(
 					)
 				}
 
-                if( this.config.debug && spell.physicsWorlds && spell.physicsWorlds.debugDraw ) {
+                if( spell.physicsWorlds && spell.physicsWorlds.debugDraw ) {
                     var debug = spell.physicsWorlds.debugDraw
                     debug.begin()
                     debug.drawWorld( spell.physicsWorlds.main.rawWorld )

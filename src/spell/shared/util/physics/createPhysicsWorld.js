@@ -13,7 +13,7 @@ define(
 		'use strict'
 
 
-		var Physics            = PlatformKit.Physics,
+		var Physics            = PlatformKit.Physics.device,
             idToBody           = {}
 
 		var getBodyById = function( entityId ) {

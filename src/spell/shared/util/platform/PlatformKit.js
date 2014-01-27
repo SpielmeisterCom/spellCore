@@ -102,8 +102,10 @@ define(
 			/*
              *
              */
-            Physics : new physics2dDevice(),
-            PhysicsDebugDraw: physics2dDebugDraw,
+            Physics : {
+				device      : new physics2dDevice(),
+				debugDrawer : physics2dDebugDraw
+			},
 
 			/*
 			 *

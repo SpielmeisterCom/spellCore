@@ -548,38 +548,41 @@ define(
         };
 
         Physics2DDebugDraw.prototype._drawPolygonShape = function (polygon, color) {
-            var r = color[0];
-            var g = color[1];
-            var b = color[2];
-            var a = color[3];
+			var numVertices = this._numVertices;
+			var vindex = (numVertices * 6);
 
-            var numVertices = this._numVertices;
-            var vindex = (numVertices * 6);
-            var iindex = (this._numLines * 2);
+			var pdata = polygon._data;
+			var pindex = (/*POLY_VERTICES*/ 6);
+			var limit = pdata.length;
 
-            var pdata = polygon._data;
-            var pindex = (/*POLY_VERTICES*/ 6);
-            var limit = pdata.length;
+			var i;
 
-            var vCount = ((limit - pindex) / (/*POLY_STRIDE*/ 13));
-            this._prepare(vCount, vCount); // vCount verts and lines.
+			var vertices = []
 
-            var vdata = this._vertexData;
-            var idata = this._indexData;
-            var i;
-            for (i = 0; pindex < limit; pindex += (/*POLY_STRIDE*/ 13), i += 1) {
-                vdata[vindex] = pdata[pindex + (/*POLY_WORLD*/ 2)];
-                vdata[vindex + 1] = pdata[pindex + (/*POLY_WORLD*/ 2) + 1];
-                vdata[vindex + 2] = r;
-                vdata[vindex + 3] = g;
-                vdata[vindex + 4] = b;
-                vdata[vindex + 5] = a;
-                vindex += 6;
+			for (i = 0; pindex < limit; pindex += (/*POLY_STRIDE*/ 13), i += 1) {
+				vertices.push({
+					x: pdata[pindex + (/*POLY_WORLD*/ 2)],
+					y: pdata[pindex + (/*POLY_WORLD*/ 2) + 1]
+				})
 
-                idata[iindex] = (numVertices + i);
-                idata[iindex + 1] = (numVertices + ((i + 1) % vCount));
-                iindex += 2;
-            }
+				vindex += 6;
+			}
+
+
+			var firstPoint = vertices[0],
+				lastPoint  = undefined
+
+			limit = vertices.length
+
+			for ( i = 0; i < limit; i++ ) {
+				var nextPoint = vertices[ i ]
+
+				if( lastPoint ) this.drawLine( lastPoint.x, lastPoint.y, nextPoint.x, nextPoint.y, color )
+
+				lastPoint = nextPoint
+			}
+
+			this.drawLine( firstPoint.x, firstPoint.y, lastPoint.x, lastPoint.y, color )
         };
 
         // =========================================================================

@@ -24,8 +24,8 @@ define(
 
         //TODO: check if the boxtree can be removed, instead use our quadtree http://docs.turbulenz.com/jslibrary_api/broadphase_api.html#broadphase
         //TODO: add license of torbulenz to spellCore LICENCE
-        var Physics   = PlatformKit.Physics,
-            debugDraw = PlatformKit.PhysicsDebugDraw
+        var Physics   = PlatformKit.Physics.device,
+            debugDraw = PlatformKit.Physics.debugDrawer
 
         /**
          * Creates an instance of the system.
@@ -281,6 +281,7 @@ define(
              */
             init: function( spell ) {
                 this.world = spell.physicsWorlds.main
+				var config = this.config
 
                 if( !this.world ) {
                     var world = spell.physicsContext.createWorld( this.config.gravity, this.config.scale )
@@ -289,14 +290,27 @@ define(
                     spell.physicsWorlds.main = world
                 }
 
-                if( this.config.debug ) {
+                if(
+					config.showConstraints ||
+					config.showContacts ||
+					config.showContactImpulses ||
+					config.showRigidBodies ||
+					config.showColliderShapes ||
+					config.showSensorShapes ||
+					config.showBodyDetail ||
+					config.showShapeDetail
+				) {
                     var debug = debugDraw.create( { graphicsDevice: _graphicsDevice } )
                     debug.renderingContext = spell.renderingContext
 
-                    debug.showRigidBodies = true
-                    debug.showContacts    = true
-                    debug.showConstraints = true
-                    debug.showBodyDetail  = true
+                    debug.showConstraints     = config.showConstraints
+					debug.showContacts        = config.showContacts
+					debug.showContactImpulses = config.showContactImpulses
+					debug.showRigidBodies     = config.showRigidBodies
+					debug.showColliderShapes  = config.showColliderShapes
+					debug.showSensorShapes    = config.showSensorShapes
+					debug.showBodyDetail      = config.showBodyDetail
+					debug.showShapeDetail     = config.showShapeDetail
 
                     spell.physicsWorlds.debugDraw = debug
                 }
