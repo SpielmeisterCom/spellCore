@@ -81,11 +81,11 @@ define(
 			for( var i = 0; i < shapes.length; i++ ) {
 				var shape = shapes[ i ]
 
-                if( group ) {
+                if( group !== undefined ) {
                     shape.setGroup( group )
                 }
 
-                if( maskBits ) {
+                if( maskBits !== undefined ) {
                     shape.setMask( maskBits )
                 }
 			}
