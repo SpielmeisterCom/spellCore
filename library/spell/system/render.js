@@ -280,11 +280,12 @@ define(
 					var asset = appearance ? appearance.asset : undefined
 
 					if( asset ) {
-						var texture = asset.resource
+						var type    = asset.type,
+                            texture = asset.resource
 
-						if( !texture ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
+						if( !texture && type !== '2dTileMap' ) throw 'The resource id \'' + asset.resourceId + '\' could not be resolved.'
 
-						if( asset.type === 'appearance' ) {
+						if( type === 'appearance' ) {
 							var textureMatrix  = textureMatrices[ id ],
 								quadDimensions = quadGeometry ?
 									quadGeometry.dimensions :
@@ -304,7 +305,7 @@ define(
 
 //							var elapsed = performance.now() - start
 
-						} else if( asset.type === 'font' ) {
+						} else if( type === 'font' ) {
 //							var start = performance.now()
 
 							// text appearance
@@ -321,8 +322,10 @@ define(
 
 //							var elapsed = performance.now() - start
 
-						} else if( asset.type === '2dTileMap' ) {
+						} else if( type === '2dTileMap' ) {
 //							var start = performance.now()
+
+                            texture = asset.spriteSheet.resource
 
                             if( !worldToLocalMatrixCache[ id ] ) {
                                 worldToLocalMatrixCache[ id ] = mat3.create()
@@ -334,7 +337,7 @@ define(
 
 //							var elapsed = performance.now() - start
 
-						} else if( asset.type === 'animation' ) {
+						} else if( type === 'animation' ) {
 							// animated appearance
 							var assetFrameDimensions = asset.frameDimensions,
 								assetNumFrames       = asset.numFrames,
@@ -385,7 +388,7 @@ define(
 								}
 							}
 
-						} else if( asset.type === 'spriteSheet' ) {
+						} else if( type === 'spriteSheet' ) {
 							var frameDimensions   = asset.frameDimensions,
 								frameOffsets      = asset.frameOffsets,
 								frames            = appearance.drawAllFrames ? _.keys( asset.frameOffsets ) : appearance.frames,
