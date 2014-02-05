@@ -84,7 +84,9 @@ define(
 
 
         var createJNRPlayerBody = function( shapeDef, JNRunPlayerShape ) {
-            var width  = JNRunPlayerShape.dimensions[ 0 ],
+            var radius = JNRunPlayerShape.dimensions[ 0 ] * 0.9,
+                width  = JNRunPlayerShape.dimensions[ 0 ],
+                sensorHeight = 5,
                 height = JNRunPlayerShape.dimensions[ 0 ],
                 shapes = [
                     Physics.createPolygonShape(
@@ -93,36 +95,40 @@ define(
                             shapeDef,
                             {
                                 vertices: [
-                                    [ 0,0 ],
-                                    [ 0, height ],
-                                    [ width, height ],
-                                    [ width, 0 ]
+                                    [ -width, height ],
+                                    [ -width, height + sensorHeight ],
+                                    [ width, height + sensorHeight ],
+                                    [ width, height ]
                                 ],
+                                group: 0x0500,
+                                mask: 0xFFFF,
+                                sensor: true
+                            }
+                        )
+                    ),
+                    Physics.createCircleShape(
+                        _.extend(
+                            {},
+                            shapeDef,
+                            {
+                                radius: radius,
                                 group: 0x0900,
                                 mask: 0xFFFF
                             }
                         )
                     ),
-                    Physics.createCircleShape(
+                    Physics.createPolygonShape(
                         _.extend(
                             {},
                             shapeDef,
                             {
-                                radius: width,
-                                origin: [width/2, 0],
+                                vertices: [
+                                    [ -width, -height ],
+                                    [ -width, -height - sensorHeight ],
+                                    [ width, -height - sensorHeight ],
+                                    [ width, -height ]
+                                ],
                                 group: 0x0300,
-                                mask: 0xFFFF
-                            }
-                        )
-                    ),
-                    Physics.createCircleShape(
-                        _.extend(
-                            {},
-                            shapeDef,
-                            {
-                                radius: width,
-                                origin: [width/2, height],
-                                group: 0x0500,
                                 mask: 0xFFFF,
                                 sensor: true
                             }
@@ -225,7 +231,6 @@ define(
                     world.setRotation( id, transform.rotation )
                 }
 
-                //Sync velocity
                 //Sync velocity
                 var maxVelocity = body.maxVelocity,
                     velocity    = world.getVelocity( id )

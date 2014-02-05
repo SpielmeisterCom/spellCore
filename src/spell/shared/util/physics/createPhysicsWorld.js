@@ -72,6 +72,32 @@ define(
 			])
 		}
 
+        var setVelocityX = function( entityId, velocityX ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            var scale    = this.scale,
+                velocity = body.getVelocity()
+
+            body.setVelocity( [
+                velocityX * scale,
+                velocity[ 1 ]
+            ])
+        }
+
+        var setVelocityY = function( entityId, velocityY ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            var scale    = this.scale,
+                velocity = body.getVelocity()
+
+            body.setVelocity( [
+                velocity[ 0 ],
+                velocityY * scale
+            ])
+        }
+
         var getVelocity = function( entityId ) {
             var body = getBodyById( entityId )
             if( !body ) return
@@ -102,11 +128,9 @@ define(
 			var body = getBodyById( entityId )
 			if( !body ) return
 
-			var scale = this.scale
-
             body.setPosition([
-				position[ 0 ] * scale,
-                position[ 1 ] * scale
+				position[ 0 ],
+                position[ 1 ]
 			])
 		}
 
@@ -143,8 +167,8 @@ define(
                                 ],
                 shapes          : shapes,
                 position        :[
-                                    translation[ 0 ] * scale,
-                                    translation[ 1 ] * scale
+                                    translation[ 0 ],
+                                    translation[ 1 ]
                                 ],
                 rotation        : transform.rotation,
                 mass            : body.mass > 0 ? body.mass : undefined,
@@ -208,6 +232,8 @@ define(
 			setPosition   : setPosition,
             getPosition   : getPosition,
 			setVelocity   : setVelocity,
+            setVelocityX  : setVelocityX,
+            setVelocityY  : setVelocityY,
             getVelocity   : getVelocity,
             setRotation   : setRotation,
             getRotation   : getRotation
