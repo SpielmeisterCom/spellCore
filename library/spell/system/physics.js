@@ -25,7 +25,8 @@ define(
         //TODO: check if the boxtree can be removed, instead use our quadtree http://docs.turbulenz.com/jslibrary_api/broadphase_api.html#broadphase
         //TODO: add license of torbulenz to spellCore LICENCE
         var Physics   = PlatformKit.Physics.device,
-            debugDraw = PlatformKit.Physics.debugDrawer
+            debugDraw = PlatformKit.Physics.debugDrawer,
+            clamp     = mathUtil.clamp
 
         /**
          * Creates an instance of the system.
@@ -40,40 +41,43 @@ define(
             this.removedEntitiesQueue = []
         }
 
-        var triggerContactEntityEvent = function( entityManager, eventId, entityIdA, shape, params ) {
-            var entityIdB = shape.body.userData
+        var triggerContactEntityEvent = function( entityManager, eventId, arbiter, params ) {
+            var entityIdA = arbiter.bodyA.userData,
+                entityIdB = arbiter.bodyB.userData
 
-            entityManager.triggerEvent( entityIdA, eventId, [ entityIdB ].concat( params ) )
-            //TODO: check if we need to generate events for the other entity also
-//            entityManager.triggerEvent( entityIdB, eventId, [ entityIdA ].join( params ) )
+            entityManager.triggerEvent( entityIdA, eventId, [ entityIdB, arbiter ].concat( params ) )
+            entityManager.triggerEvent( entityIdB, eventId, [ entityIdA, arbiter ].concat( params ) )
         }
 
-        var createContactListener = function( entityManager, entityId, shape, contactTrigger ) {
+        var createContactListener = function( entityManager, shape, contactTrigger ) {
+
             shape.addEventListener(
                 'begin', function( arbiter, otherShape ) {
-                    triggerContactEntityEvent( entityManager, 'onBeginContact', entityId, otherShape )
+                    triggerContactEntityEvent( entityManager, 'beginContact', arbiter, [] )
 
-                    if( contactTrigger ) {
-                        triggerContactEntityEvent( entityManager, contactTrigger.eventId, entityId, otherShape, contactTrigger.parameters.split(',') )
+                    if( contactTrigger && contactTrigger.eventId ) {
+                        var params = !contactTrigger.parameters ? [] : _.isArray( contactTrigger.parameters ) ? contactTrigger.parameters : contactTrigger.parameters.split(',')
+
+                        triggerContactEntityEvent( entityManager, contactTrigger.eventId, arbiter, params )
                     }
                 }
             )
 
             shape.addEventListener(
                 'end', function( arbiter, otherShape ) {
-                    triggerContactEntityEvent( entityManager, 'onEndContact', entityId, otherShape )
+                    triggerContactEntityEvent( entityManager, 'endContact', arbiter, [] )
                 }
             )
 
             shape.addEventListener(
                 'preSolve', function( arbiter, otherShape ) {
-                    triggerContactEntityEvent( entityManager, 'preSolve', entityId, otherShape, [ arbiter ] )
+                    triggerContactEntityEvent( entityManager, 'preSolve', arbiter, [] )
                 }
             )
 
             shape.addEventListener(
                 'progress', function( arbiter, otherShape ) {
-                    triggerContactEntityEvent( entityManager, 'progress', entityId, otherShape )
+                    triggerContactEntityEvent( entityManager, 'progress', arbiter, [] )
                 }
             )
         }
@@ -84,31 +88,44 @@ define(
                 height = JNRunPlayerShape.dimensions[ 0 ],
                 shapes = [
                     Physics.createPolygonShape(
-                        _.extend({
+                        _.extend(
+                            {},
+                            shapeDef,
+                            {
                                 vertices: [
                                     [ 0,0 ],
                                     [ 0, height ],
                                     [ width, height ],
                                     [ width, 0 ]
-                                ]
-                            },
-                            shapeDef
+                                ],
+                                group: 0x0900,
+                                mask: 0xFFFF
+                            }
                         )
                     ),
                     Physics.createCircleShape(
-                        _.extend({
+                        _.extend(
+                            {},
+                            shapeDef,
+                            {
                                 radius: width,
-                                origin: [width/2, 0]
-                            },
-                            shapeDef
+                                origin: [width/2, 0],
+                                group: 0x0300,
+                                mask: 0xFFFF
+                            }
                         )
                     ),
                     Physics.createCircleShape(
-                        _.extend({
+                        _.extend(
+                            {},
+                            shapeDef,
+                            {
                                 radius: width,
-                                origin: [width/2, height]
-                            },
-                            shapeDef
+                                origin: [width/2, height],
+                                group: 0x0500,
+                                mask: 0xFFFF,
+                                sensor: true
+                            }
                         )
                     )
                 ]
@@ -134,27 +151,26 @@ define(
             }
 
             var shapeDef = {
-                material : Physics.createMaterial({
-                    elasticity : fixture.elasticity,
-                    staticFriction : fixture.staticFriction,
-                    dynamicFriction : fixture.dynamicFriction,
-                    rollingFriction : fixture.rollingFriction,
-                    density: fixture.density
-                }),
-                group: fixture.categoryBits,
-                mask: fixture.maskBits,
-                sensor: fixture.isSensor
-            }
+                    material : Physics.createMaterial({
+                        elasticity : fixture.elasticity,
+                        staticFriction : fixture.staticFriction,
+                        dynamicFriction : fixture.dynamicFriction,
+                        rollingFriction : fixture.rollingFriction,
+                        density: fixture.density
+                    }),
+                    group: fixture.categoryBits,
+                    mask: fixture.maskBits,
+                    sensor: fixture.isSensor
+                },
+                shapes = []
 
             if( JNRunPlayerShape ) {
-                var shape = createJNRPlayerBody( shapeDef, JNRunPlayerShape )
-
-                world.createBodyDef( entityId, body, shape, transform )
+                shapes = createJNRPlayerBody( shapeDef, JNRunPlayerShape )
 
             } else {
                 if( circleShape ) {
                     shapeDef.radius = circleShape.radius
-                    var shape = Physics.createCircleShape( shapeDef )
+                    shapes.push( Physics.createCircleShape( shapeDef ) )
 
                 } else {
                     shapeDef.vertices = boxShape ? Physics.createBoxVertices(
@@ -162,13 +178,18 @@ define(
                         boxShape.dimensions[ 1 ]
                     ): convexPolygonShape.vertices
 
-                    var shape = Physics.createPolygonShape( shapeDef )
+                    shapes.push( Physics.createPolygonShape( shapeDef ) )
                 }
-
-                createContactListener( entityManager, entityId, shape, contactTrigger )
-
-                world.createBodyDef( entityId, body, [ shape ], transform )
             }
+
+            _.each(
+                shapes,
+                function( shape ) {
+                    createContactListener( entityManager, shape, contactTrigger )
+                }
+            )
+
+            world.createBodyDef( entityId, body, shapes, transform )
         }
 
 
@@ -178,36 +199,49 @@ define(
             }
         }
 
-        var incrementState = function( entityManager, rigidBodies, bodies, transforms ) {
-            var length = rigidBodies.length
+        var incrementState = function( entityManager, world, bodies, transforms ) {
 
-            for( var i = 0; i < length; i++ ) {
-                var body = rigidBodies[i]
+            for( var id in bodies ) {
+                var body = bodies[ id ]
 
-                if( body.isStatic() || body.sleeping ) {
+                if( body.type === 'static' ) {
                     continue
                 }
 
-                var id = body.userData
-                if( !id ) continue
-
                 // transfering state to components
-                var transform = transforms[ id ],
-                    bodyDef   = bodies[ id ]
+                var transform = transforms[ id ]
 
                 if( !transform ) continue
 
-                body.getPosition( transform.translation )
+                var position = world.getPosition( id )
+
+                transform.translation[ 0 ] = position[0]
+                transform.translation[ 1 ] = position[1]
 
                 //TODO: check for existing of internal flags for fixed rotation in physics engine
-                if( !bodyDef.fixedRotation ){
-                    transform.rotation = body.getRotation()
+                if( !body.fixedRotation ){
+                    transform.rotation = world.getRotation( id )
                 } else {
-                    body.setRotation( transform.rotation )
+                    world.setRotation( id, transform.rotation )
                 }
 
                 //Sync velocity
-                body.getVelocity( bodyDef.velocity )
+                //Sync velocity
+                var maxVelocity = body.maxVelocity,
+                    velocity    = world.getVelocity( id )
+
+                if( maxVelocity ) {
+                    // clamping velocity to range
+                    var maxVelocityX = maxVelocity[ 0 ],
+                        maxVelocityY = maxVelocity[ 1 ]
+
+                    velocity[0] = clamp( velocity[0], -maxVelocityX, maxVelocityX )
+                    velocity[1] = clamp( velocity[1], -maxVelocityY, maxVelocityY )
+
+                    world.setVelocity( id, velocity )
+                }
+
+                body.velocity = velocity
 
                 entityManager.updateWorldTransform( id )
             }
@@ -300,8 +334,14 @@ define(
 					config.showBodyDetail ||
 					config.showShapeDetail
 				) {
-                    var debug = debugDraw.create( { graphicsDevice: _graphicsDevice } )
-                    debug.renderingContext = spell.renderingContext
+                    var debug = spell.physicsWorlds.debugDraw
+
+                    if( !debug ) {
+                        debug = debugDraw.create( { graphicsDevice: _graphicsDevice } )
+                        debug.renderingContext = spell.renderingContext
+
+                        spell.physicsWorlds.debugDraw = debug
+                    }
 
                     debug.showConstraints     = config.showConstraints
 					debug.showContacts        = config.showContacts
@@ -311,8 +351,6 @@ define(
 					debug.showSensorShapes    = config.showSensorShapes
 					debug.showBodyDetail      = config.showBodyDetail
 					debug.showShapeDetail     = config.showShapeDetail
-
-                    spell.physicsWorlds.debugDraw = debug
                 }
 
                 this.entityCreatedHandler = _.bind( createBody, null, spell.entityManager, this.config.debug, this.world )
@@ -373,7 +411,7 @@ define(
 
                 world.step( deltaTimeInMs )
                 //TODO: iterate only dynamic & kinematic bodies
-                incrementState( spell.entityManager, world.getAllBodies(), this.bodies, transforms )
+                incrementState( spell.entityManager, world, this.bodies, transforms )
             }
         }
 

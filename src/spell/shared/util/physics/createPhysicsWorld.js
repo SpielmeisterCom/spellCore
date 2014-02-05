@@ -21,7 +21,7 @@ define(
 		}
 
 		var applyForce = function( entityId, force ) {
-			var body = this.getBodyById( entityId )
+			var body = getBodyById( entityId )
 			if( !body ) return
 
 			var scale  = this.scale,
@@ -34,16 +34,16 @@ define(
 		}
 
 		var setTorque = function( entityId, torque ) {
-			var body = this.getBodyById( entityId )
+			var body = getBodyById( entityId )
 			if( !body ) return
 
 			if( torque ) {
-				body.setTorque( torque * this.scale )
+				body.setTorque( torque )
 			}
 		}
 
 		var applyImpulse = function( entityId, impulse, point ) {
-			var body = this.getBodyById( entityId )
+			var body = getBodyById( entityId )
 			if( !body ) return
 
 			var scale    = this.scale,
@@ -61,7 +61,7 @@ define(
 		}
 
 		var setVelocity = function( entityId, velocity ) {
-			var body = this.getBodyById( entityId )
+			var body = getBodyById( entityId )
 			if( !body ) return
 
 			var scale = this.scale
@@ -72,8 +72,15 @@ define(
 			])
 		}
 
+        var getVelocity = function( entityId ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            return body.getVelocity()
+        }
+
 		var setFilterData = function( entityId, group, maskBits ) {
-			var body = this.getBodyById( entityId )
+			var body = getBodyById( entityId )
 			if( !body ) return
 
             var shapes = body.shapes
@@ -92,16 +99,37 @@ define(
 		}
 
 		var setPosition = function( entityId, position ) {
-			var body = this.getBodyById( entityId )
+			var body = getBodyById( entityId )
 			if( !body ) return
 
 			var scale = this.scale
 
-            body.setPosition(
+            body.setPosition([
 				position[ 0 ] * scale,
                 position[ 1 ] * scale
-			)
+			])
 		}
+
+        var getPosition = function( entityId ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            return body.getPosition()
+        }
+
+        var getRotation = function( entityId ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            return body.getRotation()
+        }
+
+        var setRotation = function( entityId, rotation ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            body.setRotation( rotation )
+        }
 
 		var createBodyDef = function( entityId, body, shapes, transform ) {
 			var translation = transform.translation,
@@ -140,7 +168,7 @@ define(
 		}
 
 		var destroyBody = function( entityId ) {
-			var body = this.getBodyById( entityId )
+			var body = getBodyById( entityId )
 			if( !body ) return
 
 			delete idToBody[ entityId ]
@@ -148,17 +176,12 @@ define(
 			this.rawWorld.removeRigidBody( body )
 		}
 
-        var getAllBodies = function() {
-            //TODO: maybe get only dynamic & kinetic bodies?
-            return this.rawWorld.rigidBodies
-        }
-
 		var getRawWorld = function() {
 			return this.rawWorld
 		}
 
         var step = function( deltaTimeInMs ) {
-            this.rawWorld.step( deltaTimeInMs / 1000 )
+            this.rawWorld.step( deltaTimeInMs * 0.001 )
         }
 
 		var PhysicsWorld = function( gravity, scale ) {
@@ -174,18 +197,20 @@ define(
 		}
 
         PhysicsWorld.prototype = {
-            getAllBodies  : getAllBodies,
             step          : step,
 			applyForce    : applyForce,
 			applyImpulse  : applyImpulse,
             setTorque     : setTorque,
             createBodyDef : createBodyDef,
 			destroyBody   : destroyBody,
-			getBodyById   : getBodyById,
 			getRawWorld   : getRawWorld,
 			setFilterData : setFilterData,
 			setPosition   : setPosition,
-			setVelocity   : setVelocity
+            getPosition   : getPosition,
+			setVelocity   : setVelocity,
+            getVelocity   : getVelocity,
+            setRotation   : setRotation,
+            getRotation   : getRotation
 		}
 
 		return function( gravity, scale ) {
