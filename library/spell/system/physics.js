@@ -85,7 +85,7 @@ define(
 
         var createJNRPlayerBody = function( shapeDef, JNRunPlayerShape ) {
             var radius = JNRunPlayerShape.dimensions[ 0 ] * 0.9,
-                width  = JNRunPlayerShape.dimensions[ 0 ],
+                width  = JNRunPlayerShape.dimensions[ 0 ] * 0.7,
                 sensorHeight = 5,
                 height = JNRunPlayerShape.dimensions[ 0 ],
                 shapes = [
@@ -232,21 +232,7 @@ define(
                 }
 
                 //Sync velocity
-                var maxVelocity = body.maxVelocity,
-                    velocity    = world.getVelocity( id )
-
-                if( maxVelocity ) {
-                    // clamping velocity to range
-                    var maxVelocityX = maxVelocity[ 0 ],
-                        maxVelocityY = maxVelocity[ 1 ]
-
-                    velocity[0] = clamp( velocity[0], -maxVelocityX, maxVelocityX )
-                    velocity[1] = clamp( velocity[1], -maxVelocityY, maxVelocityY )
-
-                    world.setVelocity( id, velocity )
-                }
-
-                body.velocity = velocity
+                world.getVelocity( body.velocity )
 
                 entityManager.updateWorldTransform( id )
             }
