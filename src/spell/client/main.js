@@ -66,8 +66,7 @@ define(
 			var spell                = this.spell,
 				eventManager         = spell.eventManager,
 				configurationManager = spell.configurationManager,
-				isModeDeployed       = spell.loaderConfig.mode === 'deployed',
-				libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ), isModeDeployed )
+				libraryManager       = spell.libraryManager
 
 			setApplicationModule(
                 spell,
@@ -174,12 +173,14 @@ define(
 				configurationManager = new ConfigurationManager( eventManager ),
 				statisticsManager    = new StatisticsManager(),
 				mainLoop             = createMainLoop( eventManager, statisticsManager, isDebug ),
-				isModeDeployed       = loaderConfig.mode === 'deployed'
+				isModeDeployed       = loaderConfig.mode === 'deployed',
+				libraryManager       = new LibraryManager( spell, eventManager, configurationManager.getValue( 'libraryUrl' ), isModeDeployed )
 
 			statisticsManager.init()
 
 			spell.applicationModule    = undefined
 			spell.configurationManager = configurationManager
+			spell.libraryManager       = libraryManager
 			spell.eventManager         = eventManager
 			spell.loaderConfig         = loaderConfig
 			spell.console              = console

@@ -111,80 +111,89 @@ define(
 				resources            = spell.resources,
 				entityManager        = spell.entityManager
 
-			var libraryBundleName  = sceneId + '-library',
-				resourceBundleName = sceneId + '-resources'
+//			var libraryBundleName  = sceneId + '-library',
+//				resourceBundleName = sceneId + '-resources'
+//
+//			var loadingProgress = createLoadingProgress( eventManager, progressCallback )
+//
+//			loadingProgress.addBundle( sceneId, 0.1 )
+//			loadingProgress.addBundle( libraryBundleName, 0.1 )
+//			loadingProgress.addBundle( resourceBundleName, 0.8 )
+//
+//
+//			eventManager.waitFor(
+//				[ EVENT.RESOURCE_LOADING_COMPLETED, sceneId ],
+//				function( loadedRecords ) {
+//					addIdAsKey( spell.scenes, loadedRecords )
+//				}
+//
+//			).resume( function() {
+//				eventManager.waitFor(
+//					[ EVENT.RESOURCE_LOADING_COMPLETED, libraryBundleName ],
+//					function( loadedRecords ) {
+//						var library = groupByType( loadedRecords )
+//
+//						updateAssets( assetManager, library.asset )
+//
+//						libraryManager.load(
+//							createFilesToLoad( configurationManager, library.asset ),
+//							{
+//								assetManager : spell.assetManager,
+//								name : resourceBundleName,
+//								isMetaDataLoad : false
+//							}
+//						)
+//
+//						_.each(
+//							library.component,
+//							_.bind( entityManager.registerComponent, entityManager )
+//						)
+//
+//						addIdAsKey( spell.scenes, library.scene )
+//					}
+//
+//				).and(
+//					[ EVENT.RESOURCE_LOADING_COMPLETED, resourceBundleName ],
+//					_.bind( assetManager.injectResources, assetManager )
+//
+//				).resume( function() {
+//					loadingProgress.complete()
+//					loadingProgress.destroy()
+//
+//					eventManager.unsubscribeAll( [ EVENT.RESOURCE_LOADING_COMPLETED, sceneId ] )
+//					eventManager.unsubscribeAll( [ EVENT.RESOURCE_LOADING_COMPLETED, libraryBundleName ] )
+//					eventManager.unsubscribeAll( [ EVENT.RESOURCE_LOADING_COMPLETED, resourceBundleName ] )
+//
+//					next()
+//				} )
+//
+//				// start loading the required library records
+//				var scene = spell.scenes[ sceneId ]
+//
+//				libraryManager.load(
+//					createLibraryFilePathsFromIds( scene.libraryIds ),
+//					{
+//						assetManager : spell.assetManager,
+//						name : libraryBundleName
+//					}
+//				)
+//			} )
+//
+//			// load scene library record
+//			libraryManager.load(
+//				createLibraryFilePathsFromIds( [ sceneId ] ),
+//				{
+//					assetManager : spell.assetManager,
+//					name : sceneId
+//				}
+//			)
 
-			var loadingProgress = createLoadingProgress( eventManager, progressCallback )
+			debugger
 
-			loadingProgress.addBundle( sceneId, 0.1 )
-			loadingProgress.addBundle( libraryBundleName, 0.1 )
-			loadingProgress.addBundle( resourceBundleName, 0.8 )
-
-
-			eventManager.waitFor(
-				[ EVENT.RESOURCE_LOADING_COMPLETED, sceneId ],
-				function( loadedRecords ) {
-					addIdAsKey( spell.scenes, loadedRecords )
-				}
-
-			).resume( function() {
-				eventManager.waitFor(
-					[ EVENT.RESOURCE_LOADING_COMPLETED, libraryBundleName ],
-					function( loadedRecords ) {
-						var library = groupByType( loadedRecords )
-
-						updateAssets( assetManager, library.asset )
-
-						libraryManager.load(
-							createFilesToLoad( configurationManager, library.asset ),
-							{
-								assetManager : spell.assetManager,
-								name : resourceBundleName,
-								isMetaDataLoad : false
-							}
-						)
-
-						_.each(
-							library.component,
-							_.bind( entityManager.registerComponent, entityManager )
-						)
-
-						addIdAsKey( spell.scenes, library.scene )
-					}
-
-				).and(
-					[ EVENT.RESOURCE_LOADING_COMPLETED, resourceBundleName ],
-					_.bind( assetManager.injectResources, assetManager )
-
-				).resume( function() {
-					loadingProgress.complete()
-					loadingProgress.destroy()
-
-					eventManager.unsubscribeAll( [ EVENT.RESOURCE_LOADING_COMPLETED, sceneId ] )
-					eventManager.unsubscribeAll( [ EVENT.RESOURCE_LOADING_COMPLETED, libraryBundleName ] )
-					eventManager.unsubscribeAll( [ EVENT.RESOURCE_LOADING_COMPLETED, resourceBundleName ] )
-
-					next()
-				} )
-
-				// start loading the required library records
-				var scene = spell.scenes[ sceneId ]
-
-				libraryManager.load(
-					createLibraryFilePathsFromIds( scene.libraryIds ),
-					{
-						assetManager : spell.assetManager,
-						name : libraryBundleName
-					}
-				)
-			} )
-
-			// load scene library record
 			libraryManager.load(
-				createLibraryFilePathsFromIds( [ sceneId ] ),
-				{
-					assetManager : spell.assetManager,
-					name : sceneId
+				sceneId,
+				function() {
+					debugger
 				}
 			)
 		}

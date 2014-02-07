@@ -179,7 +179,7 @@ define(
 				return new SoundLoader( audioContext, asset, url, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
-			createTextLoader : function( postProcess, assetManager, libraryId, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+			createTextLoader : function( postProcess, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
 				return new TextLoader( postProcess, url, onLoadCallback, onErrorCallback, onTimedOutCallback )
 			},
 
