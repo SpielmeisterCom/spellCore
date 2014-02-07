@@ -45,6 +45,16 @@
 			"name": "isSensor",
 			"type": "boolean",
 			"default": false
-		}
+		},
+	    {
+		    "name": "restitution",
+		    "type": "number",
+		    "default": 0.2
+	    },
+	    {
+		    "name": "friction",
+		    "type": "number",
+		    "default": 0.5
+	    }
 	]
 }
