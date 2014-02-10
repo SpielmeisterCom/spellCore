@@ -28,6 +28,11 @@
 
 	textLoader( describe, it );
 
+
+	var soundLoader = require('spellTest/shared/util/platform/private/loader/SoundLoader')
+
+	soundLoader( describe, it );
+
 	mocha.checkLeaks();
 	mocha.run();
 
