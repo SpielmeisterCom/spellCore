@@ -56,7 +56,16 @@
 			source = request.responseText
 		}
 
-		eval( createModuleSource( scriptName, source ) )
+		try {
+			eval( createModuleSource( scriptName, source ) )
+
+		} catch( e ) {
+
+			if( e instanceof SyntaxError ) {
+				console.error( 'SyntaxError in ' + scriptName )
+				console.error( e.stack )
+			}
+		}
 
 		return modules[ name ]
 	}
@@ -161,8 +170,13 @@
 		}
 	}
 
+	define.amd = true
+
 	var require = function( name, args, config ) {
 		if( !name ) throw 'Error: No module name provided.'
+
+		args    = args || []
+		config  = config || {}
 
 		var module = modules[ name ]
 
