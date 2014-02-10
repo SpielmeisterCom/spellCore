@@ -1,12 +1,12 @@
 define(
-	'spellTest/Loader',
+	'spellTest/RequestManager',
 	[
 		'chai',
-		'spell/Loader'
+		'spell/RequestManager'
 	],
 	function(
 		chai,
-		Loader
+		RequestManager
 	) {
 		'use strict'
 
@@ -62,12 +62,12 @@ define(
 			}
 
 
-			var loader = new Loader( imageLoaderMock, soundLoaderMock, textLoaderMock )
+			var requestManager = new RequestManager( imageLoaderMock, soundLoaderMock, textLoaderMock )
 
-			describe( 'Loader', function( ) {
+			describe( 'RequestManager', function( ) {
 				[ 'jpeg', 'jpg', 'png' ].forEach(function( type ) {
 					it( 'should load ' + type + ' as image', function( done ) {
-						loader.load( 'data/defaultAppearance.' + type, function( err, data ) {
+						requestManager.get( 'data/defaultAppearance.' + type, function( err, data ) {
 
 							expect( err ).to.not.exist
 							expect( data ).to.exists
@@ -80,7 +80,7 @@ define(
 					})
 
 					it( 'should force load ' + type + ' as image', function( done ) {
-						loader.load( 'data/defaultAppearance.XXX', function( err, data ) {
+						requestManager.get( 'data/defaultAppearance.XXX', function( err, data ) {
 
 							expect( err ).to.not.exist
 							expect( data).to.exists
@@ -96,7 +96,7 @@ define(
 
 				it( 'should automatically decode json files', function( done ) {
 
-					loader.load( 'data/test.json', function( err, data ) {
+					requestManager.get( 'data/test.json', function( err, data ) {
 						expect( err ).to.not.exist
 						expect( data).to.exists
 
@@ -109,7 +109,7 @@ define(
 
 				it( 'should handle malformed json files', function( done ) {
 
-					loader.load( 'data/malformed.json', function( err, data ) {
+					requestManager.get( 'data/malformed.json', function( err, data ) {
 						expect( err ).to.exist
 						expect( data).to.not.exists
 
@@ -119,7 +119,7 @@ define(
 
 				it( 'should treat unknown types as txt', function( done ) {
 
-					loader.load( 'data/defaultAppearance.xxx', function( err, data ) {
+					requestManager.get( 'data/defaultAppearance.xxx', function( err, data ) {
 						expect( err ).to.not.exist
 						expect( data).to.exists
 
@@ -133,7 +133,7 @@ define(
 				it( 'should throw an exception for unknown forced type', function( done ) {
 					expect(
 						function() {
-							loader.load( 'data/test.txt', function( err, data ) {}, 'XXX')
+							requestManager.get( 'data/test.txt', function( err, data ) {}, 'XXX')
 						}
 					).to.throw( 'Unknown forceType' )
 

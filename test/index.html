@@ -30,8 +30,8 @@
 	var soundLoader = require('spellTest/shared/util/platform/private/loader/SoundLoader')
 	soundLoader( describe, it );
 
-	var Loader = require('spellTest/Loader')
-	Loader( describe, it );
+	var RequestManager = require('spellTest/RequestManager')
+	RequestManager( describe, it );
 
 	mocha.checkLeaks();
 	mocha.run();
