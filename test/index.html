@@ -23,6 +23,11 @@
 
 	imageLoader( describe, it );
 
+
+	var textLoader = require('spellTest/shared/util/platform/private/loader/TextLoader')
+
+	textLoader( describe, it );
+
 	mocha.checkLeaks();
 	mocha.run();
 
