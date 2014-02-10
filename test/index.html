@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>SpellJS Mocha Testrunner</title>
+
+	<script type="text/javascript" src="need.js"></script>
+
+
+	<link rel="stylesheet" href="mocha.css" />
+</head>
+<body>
+	<div id="mocha"></div>
+
+	<script src="mocha.js"></script>
+
+</body>
+
+<script type="text/javascript">
+	mocha.setup('bdd')
+
+	var imageLoader = require('spellTest/shared/util/platform/private/loader/ImageLoader')
+
+	imageLoader( describe, it );
+
+	mocha.checkLeaks();
+	mocha.run();
+
+</script>
+
+
+<script>
+</script>
+
+</html>

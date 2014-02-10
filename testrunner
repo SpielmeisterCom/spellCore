@@ -1,0 +1,28 @@
+#!/usr/bin/env node
+
+var requirejs = require( 'requirejs' ),
+	fs        = require( 'fs' ),
+	path      = require( 'path' ),
+	spellPath = path.resolve( process.mainModule.filename, '..' ),
+	define    = requirejs.define
+
+requirejs.config( {
+	baseUrl: spellPath + '/src',
+	paths: {
+		'test': spellPath + '/test',
+		'spell-shared': spellPath + '/node_modules/spell-shared'
+	},
+	nodeRequire: require
+} )
+
+requirejs(
+	[
+		'test/testServer'
+	],
+	function(
+		testServer
+	) {
+		testServer( process.argv, process.cwd(), spellPath )
+	}
+)
+
