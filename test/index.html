@@ -20,18 +20,18 @@
 	mocha.setup('bdd')
 
 	var imageLoader = require('spellTest/shared/util/platform/private/loader/ImageLoader')
-
 	imageLoader( describe, it );
 
 
 	var textLoader = require('spellTest/shared/util/platform/private/loader/TextLoader')
-
 	textLoader( describe, it );
 
 
 	var soundLoader = require('spellTest/shared/util/platform/private/loader/SoundLoader')
-
 	soundLoader( describe, it );
+
+	var Loader = require('spellTest/Loader')
+	Loader( describe, it );
 
 	mocha.checkLeaks();
 	mocha.run();

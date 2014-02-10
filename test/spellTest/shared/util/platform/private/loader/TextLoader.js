@@ -11,9 +11,7 @@ define(
 		'use strict'
 
 		return function( describe, it ) {
-			var assert = chai.assert,
-				should = chai.should(),
-				expect = chai.expect
+			var expect = chai.expect
 
 			var textLoader = new TextLoader()
 
@@ -21,7 +19,7 @@ define(
 				it( 'should load text files', function( done ) {
 					textLoader.load( 'data/test.txt', function( err, data ) {
 
-						should.not.exist( err )
+						expect( err ).to.not.exist
 						expect( data ).to.be.equal( "Hello World\n" )
 					} )
 
@@ -31,8 +29,8 @@ define(
 				it( 'should fail on non existing files', function( done ) {
 					textLoader.load( 'data/non-existent.txt', function( err, data ) {
 
-						should.exist( err )
-						should.not.exist( data )
+						expect( err ).to.exist
+						expect( data ).to.not.exist
 					} )
 
 					done()
