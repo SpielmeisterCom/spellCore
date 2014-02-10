@@ -18,7 +18,7 @@ define(
 			var textLoader = new TextLoader()
 
 			describe( 'TextLoader', function( ) {
-				it( 'should correctly load text files', function( done ) {
+				it( 'should load text files', function( done ) {
 					textLoader.load( 'data/test.txt', function( err, data ) {
 
 						should.not.exist( err )
@@ -28,7 +28,7 @@ define(
 					done()
 				})
 
-				it( 'should correctly fail on non existing files', function( done ) {
+				it( 'should fail on non existing files', function( done ) {
 					textLoader.load( 'data/non-existent.txt', function( err, data ) {
 
 						should.exist( err )

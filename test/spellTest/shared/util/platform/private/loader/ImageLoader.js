@@ -27,7 +27,7 @@ define(
 			var imageLoader = new ImageLoader( renderingContextMock )
 
 			describe( 'ImageLoader', function( ) {
-				it( 'should correctly load images and create textures from it', function( done ) {
+				it( 'should load images and create textures from it', function( done ) {
 					imageLoader.load( 'data/defaultAppearance.png', function( err, data ) {
 						should.not.exist( err )
 						should.exist( data )
@@ -44,7 +44,7 @@ define(
 					} )
 				})
 
-				it( 'should correctly fail on non existent image', function( done ) {
+				it( 'should fail on non existent image', function( done ) {
 					imageLoader.load( 'data/non-existent.png', function( err, data ) {
 
 					should.exist( err )

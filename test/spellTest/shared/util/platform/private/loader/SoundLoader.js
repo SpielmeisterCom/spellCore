@@ -37,7 +37,7 @@ define(
 			var soundLoader = new SoundLoader( audioContextMock )
 
 			describe( 'SoundLoader', function( ) {
-				it( 'should correctly load music (using audioContext)', function( done ) {
+				it( 'should load music (using audioContext)', function( done ) {
 					soundLoader.load( 'data/music.mp3', true, function( err, data ) {
 						should.not.exist( err )
 						should.exist( data )
@@ -46,7 +46,7 @@ define(
 					} )
 				})
 
-				it( 'should correctly load sound effects (using audioContext)', function( done ) {
+				it( 'should load sound effects (using audioContext)', function( done ) {
 					soundLoader.load( 'data/non-existent.png', false, function( err, data ) {
 
 					should.not.exist( err )
