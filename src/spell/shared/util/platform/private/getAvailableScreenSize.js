@@ -16,7 +16,7 @@ define(
 
 
 		var getOffset = function( element ) {
-            if( !element.getBoundingClientRect ) {
+            if( !element || !element.getBoundingClientRect ) {
                 return [ 0, 0 ]
             }
 
