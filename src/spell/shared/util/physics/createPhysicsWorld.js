@@ -204,8 +204,8 @@ define(
 			return this.rawWorld
 		}
 
-        var step = function( deltaTimeInMs ) {
-            this.rawWorld.step( deltaTimeInMs * 0.001 )
+        var step = function( deltaTime) {
+            this.rawWorld.step( deltaTime )
         }
 
 		var PhysicsWorld = function( gravity, scale ) {
@@ -220,9 +220,41 @@ define(
 			this.scale = scale
 		}
 
+        var setAngularVelocity = function( entityId, angularVelocity ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            body.setAngularVelocity( angularVelocity )
+        }
+
+        var getAngularVelocity = function( entityId ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            return body.getAngularVelocity()
+        }
+
+        var setSurfaceVelocity = function( entityId, velocity ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            body.setSurfaceVelocity( velocity )
+        }
+
+        var getSurfaceVelocity = function( entityId ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            return body.getSurfaceVelocity()
+        }
+
         PhysicsWorld.prototype = {
             step          : step,
 			applyForce    : applyForce,
+            setAngularVelocity: setAngularVelocity,
+            getAngularVelocity: getAngularVelocity,
+            getSurfaceVelocity: getSurfaceVelocity,
+            setSurfaceVelocity: setSurfaceVelocity,
 			applyImpulse  : applyImpulse,
             setTorque     : setTorque,
             createBodyDef : createBodyDef,

@@ -232,7 +232,8 @@ define(
                 }
 
                 //Sync velocity
-                world.getVelocity( body.velocity )
+                //TODO: find a nice solultion for syncing the velocity into the spell components
+                //body.velocity = world.getVelocity()
 
                 entityManager.updateWorldTransform( id )
             }
@@ -400,7 +401,7 @@ define(
                     removedEntitiesQueue.length = 0
                 }
 
-                world.step( deltaTimeInMs )
+                world.step( deltaTimeInMs * 0.001 )
                 //TODO: iterate only dynamic & kinematic bodies
                 incrementState( spell.entityManager, world, this.bodies, transforms )
             }
