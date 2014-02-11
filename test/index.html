@@ -11,6 +11,7 @@
 </head>
 <body>
 	<div id="mocha"></div>
+    <div id="spell"></div>
 
 	<script src="mocha.js"></script>
 
@@ -33,7 +34,11 @@
 	var RequestManager = require('spellTest/RequestManager')
 	RequestManager( describe, it );
 
-	mocha.checkLeaks();
+    var spellClient = require('spellTest/client/main')
+    spellClient( describe, it );
+
+
+    mocha.checkLeaks();
 	mocha.run();
 
 </script>
