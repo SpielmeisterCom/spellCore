@@ -7,14 +7,12 @@ define(
     'spell/system/physics',
     [
         'spell/Defines',
-        'spell/math/util',
         'spell/shared/util/platform/PlatformKit',
 
         'spell/functions'
     ],
     function(
         Defines,
-        mathUtil,
         PlatformKit,
 
         _
@@ -25,8 +23,7 @@ define(
         //TODO: check if the boxtree can be removed, instead use our quadtree http://docs.turbulenz.com/jslibrary_api/broadphase_api.html#broadphase
         //TODO: add license of torbulenz to spellCore LICENCE
         var Physics   = PlatformKit.Physics.device,
-            debugDraw = PlatformKit.Physics.debugDrawer,
-            clamp     = mathUtil.clamp
+            debugDraw = PlatformKit.Physics.debugDrawer
 
         /**
          * Creates an instance of the system.
@@ -45,8 +42,31 @@ define(
             var entityIdA = arbiter.bodyA.userData,
                 entityIdB = arbiter.bodyB.userData
 
-            entityManager.triggerEvent( entityIdA, eventId, [ entityIdB, arbiter ].concat( params ) )
-            entityManager.triggerEvent( entityIdB, eventId, [ entityIdA, arbiter ].concat( params ) )
+            var fixtureA = entityManager.getComponentById(
+                entityIdA,
+                Defines.PHYSICS_FIXTURE_COMPONENT_ID
+            )
+
+            var fixtureB = entityManager.getComponentById(
+                entityIdB,
+                Defines.PHYSICS_FIXTURE_COMPONENT_ID
+            )
+
+            var bodyA = entityManager.getComponentById(
+                entityIdA,
+                Defines.PHYSICS_BODY_COMPONENT_ID
+            )
+
+            var bodyB = entityManager.getComponentById(
+                entityIdB,
+                Defines.PHYSICS_BODY_COMPONENT_ID
+            )
+
+            if( fixtureA && fixtureB && bodyA && bodyB ) {
+                entityManager.triggerEvent( entityIdA, eventId, [ entityIdB, arbiter, bodyA, bodyB, fixtureA, fixtureB ].concat( params ) )
+                entityManager.triggerEvent( entityIdB, eventId, [ entityIdA, arbiter, bodyB, bodyA, fixtureB, fixtureA ].concat( params ) )
+
+            }
         }
 
         var createContactListener = function( entityManager, shape, contactTrigger ) {
@@ -140,7 +160,7 @@ define(
             return shapes
         }
 
-        var createBody = function( entityManager, debug, world, entityId, entity ) {
+        var createBody = function( entityManager, world, entityId, entity ) {
             var body               = entity[ Defines.PHYSICS_BODY_COMPONENT_ID ],
                 fixture            = entity[ Defines.PHYSICS_FIXTURE_COMPONENT_ID ],
                 boxShape           = entity[ Defines.PHYSICS_BOX_SHAPE_COMPONENT_ID ],
@@ -307,7 +327,7 @@ define(
              */
             init: function( spell ) {
                 this.world = spell.physicsWorlds.main
-				var config = this.config
+                var config = this.config
 
                 if( !this.world ) {
                     var world = spell.physicsContext.createWorld( this.config.gravity, this.config.scale )
@@ -317,15 +337,15 @@ define(
                 }
 
                 if(
-					config.showConstraints ||
-					config.showContacts ||
-					config.showContactImpulses ||
-					config.showRigidBodies ||
-					config.showColliderShapes ||
-					config.showSensorShapes ||
-					config.showBodyDetail ||
-					config.showShapeDetail
-				) {
+                    config.showConstraints ||
+                        config.showContacts ||
+                        config.showContactImpulses ||
+                        config.showRigidBodies ||
+                        config.showColliderShapes ||
+                        config.showSensorShapes ||
+                        config.showBodyDetail ||
+                        config.showShapeDetail
+                    ) {
                     var debug = spell.physicsWorlds.debugDraw
 
                     if( !debug ) {
@@ -336,16 +356,16 @@ define(
                     }
 
                     debug.showConstraints     = config.showConstraints
-					debug.showContacts        = config.showContacts
-					debug.showContactImpulses = config.showContactImpulses
-					debug.showRigidBodies     = config.showRigidBodies
-					debug.showColliderShapes  = config.showColliderShapes
-					debug.showSensorShapes    = config.showSensorShapes
-					debug.showBodyDetail      = config.showBodyDetail
-					debug.showShapeDetail     = config.showShapeDetail
+                    debug.showContacts        = config.showContacts
+                    debug.showContactImpulses = config.showContactImpulses
+                    debug.showRigidBodies     = config.showRigidBodies
+                    debug.showColliderShapes  = config.showColliderShapes
+                    debug.showSensorShapes    = config.showSensorShapes
+                    debug.showBodyDetail      = config.showBodyDetail
+                    debug.showShapeDetail     = config.showShapeDetail
                 }
 
-                this.entityCreatedHandler = _.bind( createBody, null, spell.entityManager, this.config.debug, this.world )
+                this.entityCreatedHandler = _.bind( createBody, null, spell.entityManager, this.world )
                 this.entityDestroyHandler = _.bind( this.removedEntitiesQueue.push, this.removedEntitiesQueue )
 
                 var eventManager = spell.eventManager
