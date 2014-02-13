@@ -208,13 +208,15 @@ define(
             this.rawWorld.step( deltaTime )
         }
 
-		var PhysicsWorld = function( gravity, scale ) {
+		var PhysicsWorld = function( gravity, scale, velocityIterations, positionIterations ) {
 			if( !gravity ) gravity = [ 0, 0 ]
 			if( !scale ) scale = 1
 
             //TODO: maybe usage of other broadphase object
 			this.rawWorld = Physics.createWorld( {
-                gravity : gravity
+                gravity            : gravity,
+                velocityIterations : velocityIterations,
+                positionIterations : positionIterations
             });
 
 			this.scale = scale
@@ -276,8 +278,8 @@ define(
             getRotation   : getRotation
 		}
 
-		return function( gravity, scale ) {
-			return new PhysicsWorld( gravity, scale )
+		return function( gravity, scale, velocityIterations, positionIterations ) {
+			return new PhysicsWorld( gravity, scale, velocityIterations, positionIterations )
 		}
 	}
 )

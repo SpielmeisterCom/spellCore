@@ -329,7 +329,7 @@ define(
                 var config = this.config
 
                 if( !this.world ) {
-                    var world = spell.physicsContext.createWorld( this.config.gravity, this.config.scale )
+                    var world = spell.physicsContext.createWorld( this.config.gravity, this.config.scale, this.config.velocityIterations, this.config.positionIterations )
 
                     this.world = world
                     spell.physicsWorlds.main = world
