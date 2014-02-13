@@ -252,8 +252,7 @@ define(
                 }
 
                 //Sync velocity
-                //TODO: find a nice solultion for syncing the velocity into the spell components
-                //body.velocity = world.getVelocity()
+                body.velocity = world.getVelocity( id )
 
                 entityManager.updateWorldTransform( id )
             }
