@@ -248,8 +248,13 @@ define(
             return body.getSurfaceVelocity()
         }
 
+        var clear = function() {
+            this.rawWorld.clear()
+        }
+
         PhysicsWorld.prototype = {
             step          : step,
+            clear         : clear,
 			applyForce    : applyForce,
             setAngularVelocity: setAngularVelocity,
             getAngularVelocity: getAngularVelocity,

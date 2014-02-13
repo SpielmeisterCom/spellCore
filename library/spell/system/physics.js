@@ -382,6 +382,16 @@ define(
             destroy: function( spell ) {
                 var eventManager = spell.eventManager
 
+                this.world.clear()
+
+                this.world = undefined
+                spell.physicsWorlds.main = undefined
+
+                if( this.debug ) {
+                    this.debug = undefined
+                    spell.physicsWorlds.debugDraw = undefined
+                }
+
                 eventManager.unsubscribe( eventManager.EVENT.ENTITY_CREATED, this.entityCreatedHandler )
                 eventManager.unsubscribe( eventManager.EVENT.ENTITY_REMOVED, this.entityDestroyHandler )
             },
