@@ -506,8 +506,7 @@ define(
 
 			if( !dimensions ) {
 				//HACK: there shouldn't be any objects with no dimension
-				return
-				dimensions = [ 100000, 100000 ]
+				dimensions = [ 10000, 10000 ]
 			}
 
 
