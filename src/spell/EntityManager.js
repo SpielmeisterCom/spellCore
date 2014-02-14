@@ -1039,7 +1039,7 @@ define(
 			 *     var entityId = spell.entityManager.createEntity({
 			 *         entityTemplateId: 'library.identifier.of.my.template',
 			 *         config: {
-			 *             "spell.component.box2d.simpleBox": {
+			 *             "test.simpleBox": {
 			 *                 "dimensions": [ 100, 100 ]
 			 *              },
 			 *              "spell.component.2d.transform": {
