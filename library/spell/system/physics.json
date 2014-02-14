@@ -47,6 +47,18 @@
 			"default": 1,
 			"doc": "the scale that is applied to input before it is passed to the physics engine"
 		},
+        {
+            "name": "velocityIterations",
+            "type": "number",
+            "default": 8,
+            "doc": "The number of physics iterations to use when solving errors in velocity constraints. This value must be positive, and is largely responsible for the stability of the physics"
+        },
+        {
+            "name": "positionIterations",
+            "type": "number",
+            "default": 8,
+            "doc": "The number of physics iterations to use when solving errors in position constraints. This value must be positive and is responsible for solving errors in contact penetrations and stiff constraints"
+        },
 		{
 			"name": "showConstraints",
 			"type": "boolean",

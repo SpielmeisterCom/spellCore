@@ -252,8 +252,7 @@ define(
                 }
 
                 //Sync velocity
-                //TODO: find a nice solultion for syncing the velocity into the spell components
-                //body.velocity = world.getVelocity()
+                body.velocity = world.getVelocity( id )
 
                 entityManager.updateWorldTransform( id )
             }
@@ -330,7 +329,7 @@ define(
                 var config = this.config
 
                 if( !this.world ) {
-                    var world = spell.physicsContext.createWorld( this.config.gravity, this.config.scale )
+                    var world = spell.physicsContext.createWorld( this.config.gravity, this.config.scale, this.config.velocityIterations, this.config.positionIterations )
 
                     this.world = world
                     spell.physicsWorlds.main = world
@@ -381,6 +380,16 @@ define(
              */
             destroy: function( spell ) {
                 var eventManager = spell.eventManager
+
+                this.world.clear()
+
+                this.world = undefined
+                spell.physicsWorlds.main = undefined
+
+                if( this.debug ) {
+                    this.debug = undefined
+                    spell.physicsWorlds.debugDraw = undefined
+                }
 
                 eventManager.unsubscribe( eventManager.EVENT.ENTITY_CREATED, this.entityCreatedHandler )
                 eventManager.unsubscribe( eventManager.EVENT.ENTITY_REMOVED, this.entityDestroyHandler )
