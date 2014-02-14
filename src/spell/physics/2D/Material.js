@@ -42,7 +42,7 @@ define(
 			var rollingFriction = (params && params.rollingFriction !== undefined ? params.rollingFriction : 0.005);
 			var density = (params && params.density !== undefined ? params.density : 1);
 
-			var data = m._data = new Types.createFloatArray((/*MATERIAL_DATA_SIZE*/ 5));
+			var data = m._data = Types.createFloatArray((/*MATERIAL_DATA_SIZE*/ 5));
 
 			data[(/*MAT_ELASTICITY*/ 0)] = elasticity;
 			data[(/*MAT_STATIC*/ 1)] = staticFriction;

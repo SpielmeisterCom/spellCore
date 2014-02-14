@@ -6,11 +6,13 @@ define(
     'spell/physics/2D/Context',
 	[
 		'spell/physics/2D/Material',
-		'spell/physics/2D/Circle'
+		'spell/physics/2D/Circle',
+		'spell/physics/2D/Polygon'
 	],
     function(
 	    Physics2DMaterial,
-	    Physics2DCircle
+	    Physics2DCircle,
+	    Physics2DPolygon
 	) {
 
 		'use strict'
@@ -161,41 +163,3 @@ define(
 
 	    return Physics2DContext;
 })
-
-	/*
-	 Physics2DDevice.prototype.floatArray = function (arg) {
-	 if (arguments.length === 0) {
-	 return [];
-	 }
-
-	 var i, ret;
-	 if (typeof arg === "number") {
-	 ret = new Array(arg);
-	 } else {
-	 ret = [];
-	 for (i = 0; i < arg.length; i += 1) {
-	 ret[i] = arg[i];
-	 }
-	 }
-	 return ret;
-	 };
-
-	 Physics2DDevice.prototype.uint16Array = Physics2DDevice.prototype.floatArray;
-
-	 var testArray, textDescriptor;
-	 if (typeof Float32Array !== "undefined") {
-	 testArray = new Float32Array(4);
-	 textDescriptor = Object.prototype.toString.call(testArray);
-	 if (textDescriptor === '[object Float32Array]') {
-	 Physics2DDevice.prototype.floatArray = Float32Array;
-	 }
-	 }
-
-	 if (typeof Uint16Array !== "undefined") {
-	 testArray = new Uint16Array(4);
-	 textDescriptor = Object.prototype.toString.call(testArray);
-	 if (textDescriptor === '[object Uint16Array]') {
-	 Physics2DDevice.prototype.uint16Array = Uint16Array;
-	 }
-	 }
-	 */

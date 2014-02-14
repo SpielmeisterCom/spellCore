@@ -243,7 +243,7 @@ define(
 			var originX = (params.origin ? params.origin[0] : 0);
 			var originY = (params.origin ? params.origin[1] : 0);
 
-			var data = c._data = new Types.createFloatArray((/*CIRCLE_DATA_SIZE*/ 11));
+			var data = c._data = Types.createFloatArray((/*CIRCLE_DATA_SIZE*/ 11));
 			data[(/*CIRCLE_RADIUS*/ 6)] = radius;
 			data[(/*CIRCLE_LOCAL*/ 7)] = originX;
 			data[(/*CIRCLE_LOCAL*/ 7) + 1] = originY;
