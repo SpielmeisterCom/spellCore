@@ -6,9 +6,10 @@
 define(
 	'spell/physics/2D/CollisionUtils',
 	[
+		'spell/physics/2D/Config',
 		'spell/physics/2D/TOIEvent'
 	],
-	function( Physics2DTOIEvent ) {
+	function( Physics2DConfig, Physics2DTOIEvent ) {
 
 		var Physics2DCollisionUtils = function() {
 		}

@@ -32,9 +32,11 @@
 define(
 	'spell/physics/2D/RigidBody',
 	[
+		'spell/physics/2D/Config',
 		'spell/shared/util/platform/Types'
 	],
 	function(
+		Physics2DConfig,
 		Types
 		) {
 			var Physics2DRigidBody = function() {

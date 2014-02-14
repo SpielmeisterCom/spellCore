@@ -1,5 +1,5 @@
 define(
-	'spell/physics/2D/Configuration',
+	'spell/physics/2D/Config',
 	[
 	],
 	function(

@@ -170,6 +170,52 @@ define(
 					done()
 				})
 
+				it( 'should simulate physics', function( done ) {
+
+
+					var world = context.createWorld({
+						gravity : [0, 10],
+						velocityIterations : 8,
+						positionIterations : 8
+					})
+
+					for(var i=1; i<=10; i++) {
+
+						var circleShape = context.createCircleShape({
+							radius : Math.random() * 10,
+							origin : [0, 0]
+						})
+
+						var rigidBody = context.createRigidBody({
+							type : 'dynamic',
+							shapes : [circleShape],
+							mass : 10,
+							inertia : 20,
+							sleeping : false,
+							bullet : false,
+							position : [Math.random()*100, Math.random()*100],
+							rotation : 0,
+							velocity : [Math.random() * 10, Math.random() * 10],
+							angularVelocity : 0,
+							force : [0, 0],
+							torque : 0,
+							linearDrag : 0.05,
+							angularDrag : 0.05,
+							surfaceVelocity : [0, 0],
+							userData : null
+						})
+
+						world.addRigidBody( rigidBody )
+					}
+
+					world.step()
+					world.step()
+					world.step()
+
+					done()
+				})
+
+
 
 
 

@@ -1,17 +1,23 @@
 define(
 	'spell/physics/2D/World',
 	[
+		'spell/physics/2D/Config',
+		'spell/physics/2D/Arbiter',
 		'spell/physics/2D/BoxTreeBroadphase',
 		'spell/physics/2D/CollisionUtils',
 		'spell/physics/2D/Polygon',
 		'spell/physics/2D/Circle',
+		'spell/physics/2D/Island',
 		'spell/shared/util/platform/Types'
 	],
 	function(
+		Physics2DConfig,
+		Physics2DArbiter,
 		Physics2DBoxTreeBroadphase,
 		Physics2DCollisionUtils,
 		Physics2DPolygon,
 		Physics2DCircle,
+		Physics2DIsland,
 		Types
 		) {
 		var Physics2DWorld = function() {

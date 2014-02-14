@@ -1,9 +1,10 @@
 define(
 	'spell/physics/2D/BoxTreeBroadphase',
 	[
-		'spell/data/spatial/BoxTree'
+		'spell/data/spatial/BoxTree',
+		'spell/physics/2D/BoxTreeBroadphaseHandle'
 	],
-	function( BoxTree ) {
+	function( BoxTree, Physics2DBoxTreeBroadphaseHandle ) {
 
 		var Physics2DBoxTreeBroadphase = function() {
 			this.staticTree = BoxTree.create(true);
