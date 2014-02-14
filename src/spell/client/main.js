@@ -19,7 +19,7 @@ define(
 		'spell/PluginManager',
 		'spell/StatisticsManager',
 		'spell/Console',
-        'spell/shared/util/physics/createPhysicsContext',
+		'spell/PhysicsManager',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
         'spell/shared/util/translate',
@@ -45,7 +45,7 @@ define(
 		PluginManager,
 		StatisticsManager,
 		Console,
-        createPhysicsContext,
+		PhysicsManager,
 		PlatformKit,
 		initDebugEnvironment,
         translate,
@@ -138,8 +138,7 @@ define(
 			spell.configurationManager = configurationManager
 			spell.moduleLoader         = moduleLoader
 			spell.entityManager        = entityManager
-            spell.physicsContext       = createPhysicsContext()
-            spell.physicsWorlds        = {}
+			spell.physicsManager       = new PhysicsManager()
 			spell.renderingContext     = renderingContext
 			spell.sceneManager         = sceneManager
 			spell.sendMessageToEditor  = this.sendMessageToEditor
