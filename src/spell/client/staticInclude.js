@@ -13,7 +13,6 @@ define(
 		'spell/client/2d/graphics/physics/drawOrigin',
 		'spell/client/2d/graphics/drawCoordinateGrid',
 		'spell/client/2d/graphics/drawTitleSafeOutline',
-		'spell/data/spatial/QuadTree',
 		'spell/math/mat2',
 		'spell/math/mat2d',
 		'spell/math/mat3',
