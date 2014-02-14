@@ -170,6 +170,127 @@ define(
 					done()
 				})
 
+				it( 'should create a pulleyConstraint using createPulleyConstraint()', function( done ) {
+					var expectedMethods = [
+						'configure', 'wake', 'sleep',
+						'isEnabled', 'isDisabled', 'enable',
+						'disable', 'addEventListener', 'removeEventListener',
+						'getImpulseForBody', 'getAnchorA', 'setAnchorA',
+						'getAnchorB', 'setAnchorB', 'getAnchorC',
+						'setAnchorC', 'getAnchorD', 'setAnchorD',
+						'getLowerBound', 'setLowerBound', 'getUpperBound', 'setUpperBound',
+						'getRatio', 'setRatio'
+					]
+
+					var expectedProperties = [
+						'type', 'world', 'sleeping', 'userData', 'dimension', 'bodyA',
+						'bodyB', 'bodyC', 'bodyD'
+					]
+
+					var firstRigidBody = context.createRigidBody({
+						type : 'dynamic',
+						shapes : [],
+						mass : 10,
+						inertia : 20,
+						sleeping : false,
+						bullet : false,
+						position : [0, 0],
+						rotation : 0,
+						velocity : [0, 0],
+						angularVelocity : 0,
+						force : [0, 0],
+						torque : 0,
+						linearDrag : 0.05,
+						angularDrag : 0.05,
+						surfaceVelocity : [0, 0],
+						userData : null
+					})
+
+					var secondRigidBody = context.createRigidBody({
+						type : 'dynamic',
+						shapes : [],
+						mass : 10,
+						inertia : 20,
+						sleeping : false,
+						bullet : false,
+						position : [0, 0],
+						rotation : 0,
+						velocity : [0, 0],
+						angularVelocity : 0,
+						force : [0, 0],
+						torque : 0,
+						linearDrag : 0.05,
+						angularDrag : 0.05,
+						surfaceVelocity : [0, 0],
+						userData : null
+					})
+
+					var thirdRigidBody = context.createRigidBody({
+						type : 'dynamic',
+						shapes : [],
+						mass : 10,
+						inertia : 20,
+						sleeping : false,
+						bullet : false,
+						position : [0, 0],
+						rotation : 0,
+						velocity : [0, 0],
+						angularVelocity : 0,
+						force : [0, 0],
+						torque : 0,
+						linearDrag : 0.05,
+						angularDrag : 0.05,
+						surfaceVelocity : [0, 0],
+						userData : null
+					})
+
+					var fourthRigidBody = context.createRigidBody({
+						type : 'dynamic',
+						shapes : [],
+						mass : 10,
+						inertia : 20,
+						sleeping : false,
+						bullet : false,
+						position : [0, 0],
+						rotation : 0,
+						velocity : [0, 0],
+						angularVelocity : 0,
+						force : [0, 0],
+						torque : 0,
+						linearDrag : 0.05,
+						angularDrag : 0.05,
+						surfaceVelocity : [0, 0],
+						userData : null
+					})
+
+					var pulleyConstraint = context.createPulleyConstraint({
+						bodyA : firstRigidBody,
+						bodyB : secondRigidBody,
+						bodyC : thirdRigidBody,
+						bodyD : fourthRigidBody,
+						anchorA : [1, 0],
+						anchorB : [-1, 0],
+						anchorC : [1, 0],
+						anchorD : [-1, 0],
+						ratio : 1,
+						lowerBound : 1,
+						upperBound : 4
+						// + common Constraint constructor parameters.
+					})
+
+					expectedMethods.forEach( function( method ) {
+						expect( pulleyConstraint ).to.respondTo( method )
+					})
+
+					expectedProperties.forEach( function( property ) {
+						expect( pulleyConstraint ).to.have.property( property )
+					})
+
+
+					done()
+
+				})
+
 				it( 'should simulate physics', function( done ) {
 
 
