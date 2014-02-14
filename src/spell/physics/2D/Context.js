@@ -8,13 +8,16 @@ define(
 		'spell/physics/2D/Material',
 		'spell/physics/2D/Circle',
 		'spell/physics/2D/Polygon',
-		'spell/physics/2D/RigidBody'
+		'spell/physics/2D/RigidBody',
+		'spell/physics/2D/World'
+
 	],
     function(
 	    Physics2DMaterial,
 	    Physics2DCircle,
 	    Physics2DPolygon,
-        Physics2DRigidBody
+        Physics2DRigidBody,
+        Physics2DWorld
 	) {
 
 		'use strict'

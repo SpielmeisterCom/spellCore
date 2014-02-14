@@ -137,6 +137,39 @@ define(
 				})
 
 
+				it( 'should create a valid world using createWorld()', function( done ) {
+					var expectedMethods = [
+						'step', 'getGravity', 'setGravity',
+						'addRigidBody', 'removeRigidBody', 'addConstraint',
+						'removeConstraint', 'clear', 'shapeRectangleQuery',
+						'bodyRectangleQuery', 'shapeCircleQuery', 'bodyCircleQuery',
+						'shapePointQuery', 'bodyPointQuery', 'rayCast',
+						'convexCast'
+					]
+
+					var world = context.createWorld({
+						gravity : [0, 10],
+						velocityIterations : 8,
+						positionIterations : 8
+					})
+
+					var expectedProperties = [
+						'simulatedTime', 'timeStamp', 'rigidBodies', 'constraints', 'liveDynamics', 'liveKinematics',
+						'liveConstraints', 'broadphase', 'velocityIterations', 'positionIterations', 'dynamicArbiters',
+						'staticArbiters'
+					]
+
+					expectedMethods.forEach( function( method ) {
+						expect( world ).to.respondTo( method )
+					})
+
+					expectedProperties.forEach( function( property ) {
+						expect( world ).to.have.property( property )
+					})
+
+					done()
+				})
+
 
 
 
