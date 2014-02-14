@@ -32,7 +32,6 @@ define(
 				'loadingScene',
 				'projectId',
 				'version',
-				'quadTreeSize',
 				'defaultLanguage',
 				'qualityLevels',
 				'supportedLanguages'

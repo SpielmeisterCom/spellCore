@@ -87,9 +87,6 @@ define(
 					validValues : [ 'deployed', 'development_embedded', 'development_standalone' ],
 					configurable : true
 				},
-				quadTreeSize : {
-					configurable : true
-				},
 				projectId : {
 					configurable : true
 				},
