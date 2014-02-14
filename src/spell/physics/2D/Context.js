@@ -7,12 +7,14 @@ define(
 	[
 		'spell/physics/2D/Material',
 		'spell/physics/2D/Circle',
-		'spell/physics/2D/Polygon'
+		'spell/physics/2D/Polygon',
+		'spell/physics/2D/RigidBody'
 	],
     function(
 	    Physics2DMaterial,
 	    Physics2DCircle,
-	    Physics2DPolygon
+	    Physics2DPolygon,
+        Physics2DRigidBody
 	) {
 
 		'use strict'
