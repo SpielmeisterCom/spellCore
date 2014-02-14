@@ -8,6 +8,7 @@ define(
 		'spell/physics/2D/Polygon',
 		'spell/physics/2D/Circle',
 		'spell/physics/2D/Island',
+		'spell/physics/2D/Callback',
 		'spell/shared/util/platform/Types'
 	],
 	function(
@@ -18,6 +19,7 @@ define(
 		Physics2DPolygon,
 		Physics2DCircle,
 		Physics2DIsland,
+		Physics2DCallback,
 		Types
 		) {
 		var Physics2DWorld = function() {
