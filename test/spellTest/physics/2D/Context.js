@@ -669,6 +669,82 @@ define(
 
 
 
+				it( 'should create a DistanceConstraint using createDistanceConstraint()', function( done ) {
+					var expectedMethods = [
+						'configure', 'wake', 'sleep',
+						'isEnabled', 'isDisabled', 'enable',
+						'disable', 'addEventListener', 'removeEventListener',
+						'getImpulseForBody', 'getAnchorA', 'setAnchorA',
+						'getAnchorB', 'setAnchorB',
+						'getLowerBound', 'setLowerBound',
+						'getUpperBound', 'setUpperBound'
+					]
+
+					var expectedProperties = [
+						'type', 'world', 'sleeping', 'userData', 'dimension', 'bodyA',
+						'bodyB'
+					]
+
+					var firstRigidBody = context.createRigidBody({
+						type : 'dynamic',
+						shapes : [],
+						mass : 10,
+						inertia : 20,
+						sleeping : false,
+						bullet : false,
+						position : [0, 0],
+						rotation : 0,
+						velocity : [0, 0],
+						angularVelocity : 0,
+						force : [0, 0],
+						torque : 0,
+						linearDrag : 0.05,
+						angularDrag : 0.05,
+						surfaceVelocity : [0, 0],
+						userData : null
+					})
+
+					var secondRigidBody = context.createRigidBody({
+						type : 'dynamic',
+						shapes : [],
+						mass : 10,
+						inertia : 20,
+						sleeping : false,
+						bullet : false,
+						position : [0, 0],
+						rotation : 0,
+						velocity : [0, 0],
+						angularVelocity : 0,
+						force : [0, 0],
+						torque : 0,
+						linearDrag : 0.05,
+						angularDrag : 0.05,
+						surfaceVelocity : [0, 0],
+						userData : null
+					})
+
+					var distanceConstraint = context.createDistanceConstraint({
+						bodyA : firstRigidBody,
+						bodyB : secondRigidBody,
+						anchorA : [1, 0],
+						anchorB : [1, 0],
+						lowerBound : 1,
+						upperBound : 4
+					})
+
+					expectedMethods.forEach( function( method ) {
+						expect( distanceConstraint ).to.respondTo( method )
+					})
+
+					expectedProperties.forEach( function( property ) {
+						expect( distanceConstraint ).to.have.property( property )
+					})
+
+
+					done()
+
+				})
+
 				it( 'should simulate physics', function( done ) {
 
 
