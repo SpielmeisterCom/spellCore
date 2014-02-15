@@ -19,6 +19,7 @@ define(
 		'spell/PluginManager',
 		'spell/StatisticsManager',
 		'spell/Console',
+		'spell/VisibilityManager',
 		'spell/PhysicsManager',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
@@ -45,6 +46,7 @@ define(
 		PluginManager,
 		StatisticsManager,
 		Console,
+		VisibilityManager,
 		PhysicsManager,
 		PlatformKit,
 		initDebugEnvironment,
@@ -147,6 +149,8 @@ define(
 			spell.environment          = PlatformKit.createEnvironment( configurationManager, eventManager )
 			spell.env                  = spell.environment
 			spell.libraryManager       = libraryManager
+			spell.visibilityManager    = new VisibilityManager( eventManager, configurationManager, entityManager )
+			spell.visibilityManager.init()
 
 			spell.console.debug( 'client started' )
 
