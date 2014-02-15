@@ -7,6 +7,7 @@ define(
 		'spell/shared/util/platform/private/nativeType/createFloatArray',
 		'spell/shared/util/platform/private/nativeType/hasFloatArraySupport',
 		'spell/shared/util/platform/private/nativeType/Int8Array',
+		'spell/shared/util/platform/private/nativeType/Uint16Array',
 		'spell/shared/util/platform/private/nativeType/Int32Array',
 		'spell/shared/util/platform/private/Time'
 	],
@@ -14,6 +15,7 @@ define(
 		createFloatArray,
 		hasFloatArraySupport,
 		Int8Array,
+		Uint16Array,
 		Int32Array,
 		Time
 	) {
@@ -24,6 +26,7 @@ define(
 			createFloatArray     : createFloatArray,
 			hasFloatArraySupport : hasFloatArraySupport,
 			Int8Array            : Int8Array,
+			Uint16Array          : Uint16Array,
 			Int32Array           : Int32Array,
 			Time                 : Time
 		}
