@@ -368,6 +368,80 @@ define(
 				})
 
 
+				it( 'should create a createMotorConstraint using createMotorConstraint()', function( done ) {
+					var expectedMethods = [
+						'configure', 'wake', 'sleep',
+						'isEnabled', 'isDisabled', 'enable',
+						'disable', 'addEventListener', 'removeEventListener',
+						'getImpulseForBody', 'getAnchorA', 'setAnchorA',
+						'getAnchorB', 'setAnchorB',
+						'getRatio', 'setRatio', 'getRate', 'setRate'
+					]
+
+					var expectedProperties = [
+						'type', 'world', 'sleeping', 'userData', 'dimension', 'bodyA',
+						'bodyB'
+					]
+
+					var firstRigidBody = context.createRigidBody({
+						type : 'dynamic',
+						shapes : [],
+						mass : 10,
+						inertia : 20,
+						sleeping : false,
+						bullet : false,
+						position : [0, 0],
+						rotation : 0,
+						velocity : [0, 0],
+						angularVelocity : 0,
+						force : [0, 0],
+						torque : 0,
+						linearDrag : 0.05,
+						angularDrag : 0.05,
+						surfaceVelocity : [0, 0],
+						userData : null
+					})
+
+					var secondRigidBody = context.createRigidBody({
+						type : 'dynamic',
+						shapes : [],
+						mass : 10,
+						inertia : 20,
+						sleeping : false,
+						bullet : false,
+						position : [0, 0],
+						rotation : 0,
+						velocity : [0, 0],
+						angularVelocity : 0,
+						force : [0, 0],
+						torque : 0,
+						linearDrag : 0.05,
+						angularDrag : 0.05,
+						surfaceVelocity : [0, 0],
+						userData : null
+					})
+
+					var motorConstraint = context.createMotorConstraint({
+						bodyA : firstRigidBody,
+						bodyB : secondRigidBody,
+						ratio : 1,
+						rate : 0
+					})
+
+					expectedMethods.forEach( function( method ) {
+						expect( motorConstraint ).to.respondTo( method )
+					})
+
+					expectedProperties.forEach( function( property ) {
+						expect( motorConstraint ).to.have.property( property )
+					})
+
+
+					done()
+
+				})
+
+
 
 				it( 'should simulate physics', function( done ) {
 
