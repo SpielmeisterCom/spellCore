@@ -5,13 +5,15 @@
 define(
 	'spell/physics/2D/SweepAndPruneHandle',
 	[
+		'spell/shared/util/platform/Types'
 	],
 	function(
+		Types
 	) {
 		var Physics2DSweepAndPruneHandle = function() {
 			this._next = null;
 			this._prev = null;
-			this._aabb = new Physics2DDevice.prototype.floatArray(4);
+			this._aabb = Types.createFloatArray(4);
 
 			this.data = null;
 			this.isStatic = false;

@@ -17,15 +17,15 @@ define(
 		// }
 		// Abstract methods (have to have a body unfortunately)
 		Physics2DShape.prototype.computeArea = function () {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 			return 0;
 		};
 		Physics2DShape.prototype.computeMasslessInertia = function () {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 			return 0;
 		};
 		Physics2DShape.prototype.computeCenterOfMass = function (dst /*v2*/ ) {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 			return null;
 		};
 
@@ -33,13 +33,13 @@ define(
 		//     debug.abort("abstract method"); return 0;
 		// }
 		Physics2DShape.prototype.translate = function (translation, skip) {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 		};
 		Physics2DShape.prototype._update = function (posX, posY, cos, sin, skipAABB) {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 		};
 		Physics2DShape.prototype.clone = function () {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 			return undefined;
 		};
 

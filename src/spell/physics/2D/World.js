@@ -9,6 +9,7 @@ define(
 		'spell/physics/2D/Circle',
 		'spell/physics/2D/Island',
 		'spell/physics/2D/Callback',
+		'spell/physics/2D/TOIEvent',
 		'spell/shared/util/platform/Types'
 	],
 	function(
@@ -20,6 +21,7 @@ define(
 		Physics2DCircle,
 		Physics2DIsland,
 		Physics2DCallback,
+		Physics2DTOIEvent,
 		Types
 		) {
 		var Physics2DWorld = function() {

@@ -19,7 +19,9 @@ define(
 		'spell/physics/2D/LineConstraint',
 		'spell/physics/2D/DistanceConstraint',
 		'spell/physics/2D/CustomConstraint',
-		'spell/physics/2D/SweepAndPrune'
+		'spell/physics/2D/SweepAndPrune',
+		'spell/physics/2D/BoxTreeBroadphase',
+		'spell/physics/2D/CollisionUtils'
 	],
 	function(
 		Types,
@@ -36,7 +38,9 @@ define(
 		Physics2DLineConstraint,
 		Physics2DDistanceConstraint,
 		Physics2DCustomConstraint,
-		Physics2DSweepAndPrune
+		Physics2DSweepAndPrune,
+		Physics2DBoxTreeBroadphase,
+		Physics2DCollisionUtils
 	) {
 		'use strict'
 
@@ -251,7 +255,7 @@ define(
 			var translation = transform.translation,
 				scale       = this.scale
 
-			var physicsBody = Physics.createRigidBody({
+			var physicsBody = Physics2DRigidBody.create({
 				type            : body.type,
 				velocity        : [
 					body.velocity[ 0 ] * scale,

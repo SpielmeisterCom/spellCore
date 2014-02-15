@@ -1,40 +1,41 @@
 define(
 	'spell/physics/2D/Constraint',
 	[
+		'spell/shared/util/platform/Types'
 	],
-	function() {
+	function(Types) {
 		var Physics2DConstraint = function() {
 		}
 		// Abstract methods to be overridden by subclasses
 		Physics2DConstraint.prototype._inWorld = function () {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 		};
 		Physics2DConstraint.prototype._outWorld = function () {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 		};
 		Physics2DConstraint.prototype._pairExists = function (b1, b2) {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 			return false;
 		};
 		Physics2DConstraint.prototype._wakeConnected = function () {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 		};
 		Physics2DConstraint.prototype._sleepComputation = function (union) {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 		};
 		Physics2DConstraint.prototype._preStep = function (deltaTime) {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 			return false;
 		};
 		Physics2DConstraint.prototype._warmStart = function () {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 		};
 		Physics2DConstraint.prototype._iterateVel = function () {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 			return false;
 		};
 		Physics2DConstraint.prototype._iteratePos = function () {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 			return false;
 		};
 
@@ -193,7 +194,7 @@ define(
 		// ================================================
 		Physics2DConstraint.prototype.getAnchorA = function (dst) {
 			if (dst === undefined) {
-				dst = new Physics2DDevice.prototype.floatArray(2);
+				dst = Types.createFloatArray(2);
 			}
 			var data = this._data;
 			var INDEX = this._ANCHOR_A;
@@ -203,7 +204,7 @@ define(
 		};
 		Physics2DConstraint.prototype.getAnchorB = function (dst) {
 			if (dst === undefined) {
-				dst = new Physics2DDevice.prototype.floatArray(2);
+				dst = Types.createFloatArray(2);
 			}
 			var data = this._data;
 			var INDEX = this._ANCHOR_B;
@@ -301,7 +302,7 @@ define(
 
 		// ================================================
 		Physics2DConstraint.prototype._clearCache = function () {
-			debug.abort("abstract method");
+			//debug.abort("abstract method");
 		};
 
 		Physics2DConstraint.prototype.clearCache = function () {

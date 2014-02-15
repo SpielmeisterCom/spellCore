@@ -21,10 +21,12 @@ define(
 	'spell/physics/2D/AngleConstraint',
 	[
 		'spell/physics/2D/Constraint',
+		'spell/physics/2D/Config',
 		'spell/shared/util/platform/Types'
 	],
 	function(
 		Physics2DConstraint,
+		Physics2DConfig,
 		Types
 	) {
 		var __extends = function (d, b) {

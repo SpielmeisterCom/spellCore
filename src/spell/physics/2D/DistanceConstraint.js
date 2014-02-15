@@ -25,10 +25,12 @@
 define(
 	'spell/physics/2D/DistanceConstraint',
 	[
+		'spell/physics/2D/Config',
 		'spell/physics/2D/Constraint',
 		'spell/shared/util/platform/Types'
 	],
 	function(
+		Physics2DConfig,
 		Physics2DConstraint,
 		Types
 	) {

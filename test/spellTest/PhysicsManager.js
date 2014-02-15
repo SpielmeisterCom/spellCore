@@ -906,19 +906,68 @@ define(
 					var expectedProperties = [
 					]
 
-					var sweepAndPruneHandle = physicsManager.createSweepAndPruneBroadphase()
+					var sweepAndPruneBroadphase = physicsManager.createSweepAndPruneBroadphase()
 
 					expectedMethods.forEach( function( method ) {
-						expect( sweepAndPruneHandle ).to.respondTo( method )
+						expect( sweepAndPruneBroadphase ).to.respondTo( method )
 					})
 
 					expectedProperties.forEach( function( property ) {
-						expect( sweepAndPruneHandle ).to.have.property( property )
+						expect( sweepAndPruneBroadphase ).to.have.property( property )
 					})
 
 
 					done()
 				})
+
+				it( 'should create a BoxTreeBroadphase using createBoxTreeBroadphase()', function( done ) {
+					var expectedMethods = [
+						'insert', 'update', 'remove',
+						'clear', 'perform', 'sample'
+					]
+
+					var expectedProperties = [
+					]
+
+					var boxTreeBroadphase = physicsManager.createBoxTreeBroadphase()
+
+					expectedMethods.forEach( function( method ) {
+						expect( boxTreeBroadphase ).to.respondTo( method )
+					})
+
+					expectedProperties.forEach( function( property ) {
+						expect( boxTreeBroadphase ).to.have.property( property )
+					})
+
+
+					done()
+				})
+
+				it( 'should create CollisionUtils using createCollisionUtils()', function( done ) {
+					var expectedMethods = [
+					]
+
+					var expectedProperties = [
+					]
+
+					var collisionUtils = physicsManager.createCollisionUtils()
+
+					expectedMethods.forEach( function( method ) {
+						expect( collisionUtils ).to.respondTo( method )
+					})
+
+					expectedProperties.forEach( function( property ) {
+						expect( collisionUtils ).to.have.property( property )
+					})
+
+
+					done()
+				})
+
+
+
+
+
 
 				it( 'should simulate physics', function( done ) {
 					var world = physicsManager.createWorld({
