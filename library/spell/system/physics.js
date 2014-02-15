@@ -7,23 +7,13 @@ define(
     'spell/system/physics',
     [
         'spell/Defines',
-        'spell/shared/util/platform/PlatformKit',
-
         'spell/functions'
     ],
     function(
         Defines,
-        PlatformKit,
-
         _
         ) {
         'use strict'
-
-
-        //TODO: check if the boxtree can be removed, instead use our quadtree http://docs.turbulenz.com/jslibrary_api/broadphase_api.html#broadphase
-        //TODO: add license of torbulenz to spellCore LICENCE
-        var Physics   = PlatformKit.Physics.device,
-            debugDraw = PlatformKit.Physics.debugDrawer
 
         /**
          * Creates an instance of the system.
@@ -103,13 +93,13 @@ define(
         }
 
 
-        var createJNRPlayerBody = function( shapeDef, JNRunPlayerShape ) {
+        var createJNRPlayerBody = function( physicsManager, shapeDef, JNRunPlayerShape ) {
             var radius = JNRunPlayerShape.dimensions[ 0 ] * 0.9,
                 width  = JNRunPlayerShape.dimensions[ 0 ] * 0.7,
                 sensorHeight = 5,
                 height = JNRunPlayerShape.dimensions[ 0 ],
                 shapes = [
-                    Physics.createPolygonShape(
+	                physicsManager.createPolygonShape(
                         _.extend(
                             {},
                             shapeDef,
@@ -126,7 +116,7 @@ define(
                             }
                         )
                     ),
-                    Physics.createCircleShape(
+	                physicsManager.createCircleShape(
                         _.extend(
                             {},
                             shapeDef,
@@ -137,7 +127,7 @@ define(
                             }
                         )
                     ),
-                    Physics.createPolygonShape(
+	                physicsManager.createPolygonShape(
                         _.extend(
                             {},
                             shapeDef,
@@ -160,7 +150,7 @@ define(
             return shapes
         }
 
-        var createBody = function( entityManager, world, entityId, entity ) {
+        var createBody = function( entityManager, physicsManager, world, entityId, entity ) {
             var body               = entity[ Defines.PHYSICS_BODY_COMPONENT_ID ],
                 fixture            = entity[ Defines.PHYSICS_FIXTURE_COMPONENT_ID ],
                 boxShape           = entity[ Defines.PHYSICS_BOX_SHAPE_COMPONENT_ID ],
@@ -177,7 +167,7 @@ define(
             }
 
             var shapeDef = {
-                    material : Physics.createMaterial({
+                    material : physicsManager.createMaterial({
                         elasticity : fixture.elasticity,
                         staticFriction : fixture.staticFriction,
                         dynamicFriction : fixture.dynamicFriction,
@@ -191,20 +181,20 @@ define(
                 shapes = []
 
             if( JNRunPlayerShape ) {
-                shapes = createJNRPlayerBody( shapeDef, JNRunPlayerShape )
+                shapes = createJNRPlayerBody( physicsManager, shapeDef, JNRunPlayerShape )
 
             } else {
                 if( circleShape ) {
                     shapeDef.radius = circleShape.radius
-                    shapes.push( Physics.createCircleShape( shapeDef ) )
+                    shapes.push( physicsManager.createCircleShape( shapeDef ) )
 
                 } else {
-                    shapeDef.vertices = boxShape ? Physics.createBoxVertices(
+                    shapeDef.vertices = boxShape ? physicsManager.createBoxVertices(
                         boxShape.dimensions[ 0 ],
                         boxShape.dimensions[ 1 ]
                     ): convexPolygonShape.vertices
 
-                    shapes.push( Physics.createPolygonShape( shapeDef ) )
+                    shapes.push( physicsManager.createPolygonShape( shapeDef ) )
                 }
             }
 
@@ -215,7 +205,7 @@ define(
                 }
             )
 
-            world.createBodyDef( entityId, body, shapes, transform )
+            physicsManager.createBodyDef( entityId, body, shapes, transform )
         }
 
 
@@ -225,7 +215,7 @@ define(
             }
         }
 
-        var incrementState = function( entityManager, world, bodies, transforms ) {
+        var incrementState = function( entityManager, physicsManager, bodies, transforms ) {
 
             for( var id in bodies ) {
                 var body = bodies[ id ]
@@ -239,82 +229,22 @@ define(
 
                 if( !transform ) continue
 
-                var position = world.getPosition( id )
+                var position = physicsManager.getPosition( id )
 
                 transform.translation[ 0 ] = position[0]
                 transform.translation[ 1 ] = position[1]
 
                 //TODO: check for existing of internal flags for fixed rotation in physics engine
                 if( !body.fixedRotation ){
-                    transform.rotation = world.getRotation( id )
+                    transform.rotation = physicsManager.getRotation( id )
                 } else {
-                    world.setRotation( id, transform.rotation )
+                    physicsManager.setRotation( id, transform.rotation )
                 }
 
                 //Sync velocity
-                body.velocity = world.getVelocity( id )
+                body.velocity = physicsManager.getVelocity( id )
 
                 entityManager.updateWorldTransform( id )
-            }
-        }
-
-        var _graphicsDevice = {
-            width: 800,
-            height: 600,
-            technique: undefined,
-            setStream: function() {
-
-            },
-            setTechnique: function( technique ) {
-                this.technique = technique
-            },
-            setTechniqueParameters: function() {
-
-            },
-            setScissor: function() {
-
-            },
-            createIndexBuffer: function() {
-                return {
-                    destroy: function() {
-
-                    },
-                    setData: function() {
-
-                    }
-                }
-            },
-            setIndexBuffer: function() {
-
-            },
-            drawIndexed: function() {
-
-            },
-            createSemantics: function() {
-
-            },
-            createVertexBuffer: function() {
-                return {
-                    destroy: function() {
-
-                    },
-                    setData: function() {
-
-                    }
-                }
-            },
-            createShader: function() {
-                return {
-                    getTechnique: function() {
-                        return {}
-                    }
-                }
-            },
-            createTechniqueParameters: function() {
-
-                return {
-                    clipSpace: new Array(4)
-                }
             }
         }
 
@@ -325,14 +255,13 @@ define(
              * @param {Object} [spell] The spell object.
              */
             init: function( spell ) {
-                this.world = spell.physicsWorlds.main
+                this.world = spell.physicsManager.getWorld()
                 var config = this.config
 
                 if( !this.world ) {
-                    var world = spell.physicsContext.createWorld( this.config.gravity, this.config.scale, this.config.velocityIterations, this.config.positionIterations )
+                    var world = spell.physicsManager.createWorld( this.config.gravity, this.config.scale, this.config.velocityIterations, this.config.positionIterations )
 
                     this.world = world
-                    spell.physicsWorlds.main = world
                 }
 
                 if(
@@ -345,7 +274,7 @@ define(
                         config.showBodyDetail ||
                         config.showShapeDetail
                     ) {
-                    var debug = spell.physicsWorlds.debugDraw
+                    /*var debug = spell.physicsWorlds.debugDraw
 
                     if( !debug ) {
                         debug = debugDraw.create( { graphicsDevice: _graphicsDevice } )
@@ -362,9 +291,10 @@ define(
                     debug.showSensorShapes    = config.showSensorShapes
                     debug.showBodyDetail      = config.showBodyDetail
                     debug.showShapeDetail     = config.showShapeDetail
+                */
                 }
 
-                this.entityCreatedHandler = _.bind( createBody, null, spell.entityManager, this.world )
+                this.entityCreatedHandler = _.bind( createBody, null, spell.entityManager, spell.physicsManager, this.world )
                 this.entityDestroyHandler = _.bind( this.removedEntitiesQueue.push, this.removedEntitiesQueue )
 
                 var eventManager = spell.eventManager
@@ -382,9 +312,7 @@ define(
                 var eventManager = spell.eventManager
 
                 this.world.clear()
-
                 this.world = undefined
-                spell.physicsWorlds.main = undefined
 
                 if( this.debug ) {
                     this.debug = undefined
@@ -421,18 +349,18 @@ define(
              * @param {Object} [deltaTimeInMs] The elapsed time in ms.
              */
             process: function( spell, timeInMs, deltaTimeInMs ) {
-                var world                = this.world,
+                var physicsManager       = spell.physicsManager,
                     transforms           = this.transforms,
                     removedEntitiesQueue = this.removedEntitiesQueue
 
                 if( removedEntitiesQueue.length ) {
-                    destroyBodies( world, removedEntitiesQueue )
+                    destroyBodies( physicsManager, removedEntitiesQueue )
                     removedEntitiesQueue.length = 0
                 }
 
-                world.step( deltaTimeInMs * 0.001 )
+                physicsManager.step( deltaTimeInMs * 0.001 )
                 //TODO: iterate only dynamic & kinematic bodies
-                incrementState( spell.entityManager, world, this.bodies, transforms )
+                incrementState( spell.entityManager, physicsManager, this.bodies, transforms )
             }
         }
 
