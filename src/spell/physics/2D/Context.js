@@ -10,6 +10,7 @@ define(
 		'spell/physics/2D/Polygon',
 		'spell/physics/2D/RigidBody',
 		'spell/physics/2D/World',
+		'spell/physics/2D/AngleConstraint',
 		'spell/physics/2D/PulleyConstraint'
 	],
     function(
@@ -18,6 +19,7 @@ define(
 	    Physics2DPolygon,
         Physics2DRigidBody,
         Physics2DWorld,
+        Physics2DAngleConstraint,
         Physics2DPulleyConstraint
 	) {
 
