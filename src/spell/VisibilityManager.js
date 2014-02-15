@@ -153,11 +153,11 @@ define(
 			unregisterCameraChangeHandler.call( this )
 			unregisterVisualObjectChangeHandler.call( this )
 		}
-/*
+
 		var updateVisibility = function( spell ) {
 			var currentCameraId = this.currentCameraId,
-				camera          = this.cameras[ currentCameraId ],
-				transform       = this.transforms[ currentCameraId ]
+				camera          = this.entityManager.getComponentById( currentCameraId, Defines.CAMERA_COMPONENT_ID),
+				transform       = this.entityManager.getComponentById( currentCameraId, Defines.TRANSFORM_COMPONENT_ID )
 
 			if( !camera || !transform ) {
 				return
@@ -171,12 +171,12 @@ define(
 			spell.uiPassEntities = this.uiPassEntities
 			spell.backgroundPassEntities = this.backgroundPassEntities
 		}
-*/
+
 
 		VisibilityManager.prototype = {
 			init:               init,
-			destroy:            destroy/*,
-			updateVisibility:   updateVisibility*/
+			destroy:            destroy,
+			updateVisibility:   updateVisibility
 		}
 
 		return VisibilityManager

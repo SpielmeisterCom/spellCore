@@ -555,6 +555,8 @@ define(
 				rectangles             = this.rectangles,
 				viewFrustum
 
+			spell.visibilityManager.updateVisibility( spell )
+
 			// clear color buffer
 			context.clear()
 
