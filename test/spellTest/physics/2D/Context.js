@@ -857,9 +857,31 @@ define(
 
 				})
 
+
+				it( 'should create a SweepAndPruneBroadphase using createSweepAndPruneBroadphase()', function( done ) {
+					var expectedMethods = [
+						'insert', 'update', 'remove',
+						'clear', 'perform', 'sample'
+					]
+
+					var expectedProperties = [
+					]
+
+					var sweepAndPruneHandle = context.createSweepAndPruneBroadphase()
+
+					expectedMethods.forEach( function( method ) {
+						expect( sweepAndPruneHandle ).to.respondTo( method )
+					})
+
+					expectedProperties.forEach( function( property ) {
+						expect( sweepAndPruneHandle ).to.have.property( property )
+					})
+
+
+					done()
+				})
+
 				it( 'should simulate physics', function( done ) {
-
-
 					var world = context.createWorld({
 						gravity : [0, 10],
 						velocityIterations : 8,
@@ -901,8 +923,6 @@ define(
 
 					done()
 				})
-
-
 
 
 

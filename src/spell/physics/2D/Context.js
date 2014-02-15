@@ -16,7 +16,10 @@ define(
 		'spell/physics/2D/WeldConstraint',
 		'spell/physics/2D/PointConstraint',
 		'spell/physics/2D/LineConstraint',
-		'spell/physics/2D/DistanceConstraint'
+		'spell/physics/2D/DistanceConstraint',
+		'spell/physics/2D/CustomConstraint',
+		'spell/physics/2D/SweepAndPrune'
+
 	],
     function(
 	    Physics2DMaterial,
@@ -30,7 +33,9 @@ define(
         Physics2DWeldConstraint,
         Physics2DPointConstraint,
         Physics2DLineConstraint,
-        Physics2DDistanceConstraint
+        Physics2DDistanceConstraint,
+        Physics2DCustomConstraint,
+        Physics2DSweepAndPrune
 	) {
 
 		'use strict'
