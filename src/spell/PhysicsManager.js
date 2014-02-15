@@ -5,6 +5,7 @@
 define(
 	'spell/PhysicsManager',
 	[
+		'spell/shared/util/platform/Types',
 		'spell/physics/2D/Material',
 		'spell/physics/2D/Circle',
 		'spell/physics/2D/Polygon',
@@ -21,6 +22,7 @@ define(
 		'spell/physics/2D/SweepAndPrune'
 	],
 	function(
+		Types,
 		Physics2DMaterial,
 		Physics2DCircle,
 		Physics2DPolygon,
@@ -349,7 +351,82 @@ define(
 			return this.rawWorld
 		}
 
+		var createRectangleVertices = function (minX, minY, maxX, maxY) {
+			var tmp;
+			if (maxX < minX) {
+				tmp = minX;
+				minX = maxX;
+				maxX = tmp;
+			}
+			if (maxY < minY) {
+				tmp = minY;
+				minY = maxY;
+				maxY = tmp;
+			}
+
+			var v0 = Types.createFloatArray(2);
+			v0[0] = minX;
+			v0[1] = minY;
+			var v1 = Types.createFloatArray(2);
+			v1[0] = maxX;
+			v1[1] = minY;
+			var v2 = Types.createFloatArray(2);
+			v2[0] = maxX;
+			v2[1] = maxY;
+			var v3 = Types.createFloatArray(2);
+			v3[0] = minX;
+			v3[1] = maxY;
+
+			return [v0, v1, v2, v3];
+		};
+
+		var createBoxVertices = function (width, height) {
+			var w = (width * 0.5);
+			var h = (height * 0.5);
+
+			var v0 = Types.createFloatArray(2);
+			v0[0] = -w;
+			v0[1] = -h;
+			var v1 = Types.createFloatArray(2);
+			v1[0] = w;
+			v1[1] = -h;
+			var v2 = Types.createFloatArray(2);
+			v2[0] = w;
+			v2[1] = h;
+			var v3 = Types.createFloatArray(2);
+			v3[0] = -w;
+			v3[1] = h;
+
+			return [v0, v1, v2, v3];
+		};
+
+		var createRegularPolygonVertices = function (diameterX, diameterY, numVertices) {
+			var rX = (diameterX * 0.5);
+			var rY = (diameterY * 0.5);
+			var vertices = [];
+
+			var num = numVertices;
+			var angInc = (Math.PI * 2 / num);
+
+			var i;
+			for (i = 0; i < num; i += 1) {
+				var ang = (angInc * i);
+				var vec = vertices[vertices.length] = Types.createFloatArray(2);
+				vec[0] = (rX * Math.cos(ang));
+				vec[1] = (rY * Math.sin(ang));
+			}
+
+			return vertices;
+		};
+
+
 		PhysicsManager.prototype = {
+			createRectangleVertices : createRectangleVertices,
+
+			createBoxVertices : createBoxVertices,
+
+			createRegularPolygonVertices : createRegularPolygonVertices,
+
 			getDefaultMaterial: function() {
 				return Physics2DMaterial.defaultMaterial
 			},
@@ -414,7 +491,6 @@ define(
 				return Physics2DCustomConstraint.create( params )
 			},
 
-
 			createWorld   : createWorld,
 
 			getWorld      : getWorld,
@@ -470,71 +546,4 @@ define(
 
 
 
-Physics2DContext.prototype.createRectangleVertices = function (minX, minY, maxX, maxY) {
-	var tmp;
-	if (maxX < minX) {
-		tmp = minX;
-		minX = maxX;
-		maxX = tmp;
-	}
-	if (maxY < minY) {
-		tmp = minY;
-		minY = maxY;
-		maxY = tmp;
-	}
-
-	var v0 = new Physics2DContext.prototype.floatArray(2);
-	v0[0] = minX;
-	v0[1] = minY;
-	var v1 = new Physics2DContext.prototype.floatArray(2);
-	v1[0] = maxX;
-	v1[1] = minY;
-	var v2 = new Physics2DContext.prototype.floatArray(2);
-	v2[0] = maxX;
-	v2[1] = maxY;
-	var v3 = new Physics2DContext.prototype.floatArray(2);
-	v3[0] = minX;
-	v3[1] = maxY;
-
-	return [v0, v1, v2, v3];
-};
-
-Physics2DContext.prototype.createBoxVertices = function (width, height) {
-	var w = (width * 0.5);
-	var h = (height * 0.5);
-
-	var v0 = new Physics2DContext.prototype.floatArray(2);
-	v0[0] = -w;
-	v0[1] = -h;
-	var v1 = new Physics2DContext.prototype.floatArray(2);
-	v1[0] = w;
-	v1[1] = -h;
-	var v2 = new Physics2DContext.prototype.floatArray(2);
-	v2[0] = w;
-	v2[1] = h;
-	var v3 = new Physics2DContext.prototype.floatArray(2);
-	v3[0] = -w;
-	v3[1] = h;
-
-	return [v0, v1, v2, v3];
-};
-
-Physics2DContext.prototype.createRegularPolygonVertices = function (diameterX, diameterY, numVertices) {
-	var rX = (diameterX * 0.5);
-	var rY = (diameterY * 0.5);
-	var vertices = [];
-
-	var num = numVertices;
-	var angInc = (Math.PI * 2 / num);
-
-	var i;
-	for (i = 0; i < num; i += 1) {
-		var ang = (angInc * i);
-		var vec = vertices[vertices.length] = new Physics2DContext.prototype.floatArray(2);
-		vec[0] = (rX * Math.cos(ang));
-		vec[1] = (rY * Math.sin(ang));
-	}
-
-	return vertices;
-};
 */

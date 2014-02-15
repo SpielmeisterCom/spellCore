@@ -25,6 +25,47 @@ define(
 					done()
 				})
 
+
+				it( 'should create RectangleVertices when calling createRectangleVertices', function( done ) {
+					var vertices = physicsManager.createRectangleVertices(1,2,3,4)
+
+					expect(vertices).to.have.length( 4 )
+
+					expect(vertices[0]).to.have.length( 2 )
+					expect(vertices[1]).to.have.length( 2 )
+					expect(vertices[2]).to.have.length( 2 )
+					expect(vertices[3]).to.have.length( 2 )
+
+					done()
+				})
+
+				it( 'should create BoxVertices when calling createBoxVertices', function( done ) {
+					var vertices = physicsManager.createBoxVertices(100, 100)
+
+					expect(vertices).to.have.length( 4 )
+
+					expect(vertices[0]).to.have.length( 2 )
+					expect(vertices[1]).to.have.length( 2 )
+					expect(vertices[2]).to.have.length( 2 )
+					expect(vertices[3]).to.have.length( 2 )
+
+					done()
+				})
+
+				it( 'should create RegularPolygonVertices when calling createRegularPolygonVertices', function( done ) {
+					var vertices = physicsManager.createRegularPolygonVertices(2, 2, 4)
+
+					expect(vertices).to.have.length( 4 )
+
+					expect(vertices[0]).to.have.length( 2 )
+					expect(vertices[1]).to.have.length( 2 )
+					expect(vertices[2]).to.have.length( 2 )
+					expect(vertices[3]).to.have.length( 2 )
+
+					done()
+				})
+
+
 				it( 'getDefaultMaterial() should return a valid default material', function( done ) {
 					var expectedMethods = [
 						'getElasticity', 'getStaticFriction', 'getDynamicFriction',
