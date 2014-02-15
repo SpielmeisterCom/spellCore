@@ -13,7 +13,8 @@ define(
 		'spell/physics/2D/AngleConstraint',
 		'spell/physics/2D/PulleyConstraint',
 		'spell/physics/2D/MotorConstraint',
-		'spell/physics/2D/WeldConstraint'
+		'spell/physics/2D/WeldConstraint',
+		'spell/physics/2D/PointConstraint'
 	],
     function(
 	    Physics2DMaterial,
@@ -24,7 +25,8 @@ define(
         Physics2DAngleConstraint,
         Physics2DPulleyConstraint,
         Physics2DMotorConstraint,
-        Physics2DWeldConstraint
+        Physics2DWeldConstraint,
+        Physics2DPointConstraint
 	) {
 
 		'use strict'
