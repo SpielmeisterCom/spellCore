@@ -626,13 +626,7 @@ define(
 					)
 				}
 
-                if( spell.physicsWorlds && spell.physicsWorlds.debugDraw ) {
-                    var debug = spell.physicsWorlds.debugDraw
-                    debug.begin()
-                    debug.drawWorld( spell.physicsWorlds.main.rawWorld )
-                    debug.end()
-                }
-
+				spell.physicsManager.debugDrawHook( spell.renderingContext )
 			}
 			context.restore()
 

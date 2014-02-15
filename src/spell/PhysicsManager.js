@@ -21,7 +21,8 @@ define(
 		'spell/physics/2D/CustomConstraint',
 		'spell/physics/2D/SweepAndPrune',
 		'spell/physics/2D/BoxTreeBroadphase',
-		'spell/physics/2D/CollisionUtils'
+		'spell/physics/2D/CollisionUtils',
+		'spell/physics/2D/DebugDraw'
 	],
 	function(
 		Types,
@@ -40,76 +41,81 @@ define(
 		Physics2DCustomConstraint,
 		Physics2DSweepAndPrune,
 		Physics2DBoxTreeBroadphase,
-		Physics2DCollisionUtils
+		Physics2DCollisionUtils,
+		Physics2DDebugDraw
 	) {
 		'use strict'
 
 
 		var PhysicsManager = function() {
+
+			var _graphicsDevice = {
+				width: 800,
+				height: 600,
+				technique: undefined,
+				setStream: function() {
+
+				},
+				setTechnique: function( technique ) {
+					this.technique = technique
+				},
+				setTechniqueParameters: function() {
+
+				},
+				setScissor: function() {
+
+				},
+				createIndexBuffer: function() {
+					return {
+						destroy: function() {
+
+						},
+						setData: function() {
+
+						}
+					}
+				},
+				setIndexBuffer: function() {
+
+				},
+				drawIndexed: function() {
+
+				},
+				createSemantics: function() {
+
+				},
+				createVertexBuffer: function() {
+					return {
+						destroy: function() {
+
+						},
+						setData: function() {
+
+						}
+					}
+				},
+				createShader: function() {
+					return {
+						getTechnique: function() {
+							return {}
+						}
+					}
+				},
+				createTechniqueParameters: function() {
+
+					return {
+						clipSpace: new Array(4)
+					}
+				}
+			}
+
+			this.debugDraw = Physics2DDebugDraw.create( { graphicsDevice: _graphicsDevice } )
+			this.debug = false
 		}
 
 		var idToBody           = {}
 
 
-		var _graphicsDevice = {
-			width: 800,
-			height: 600,
-			technique: undefined,
-			setStream: function() {
-
-			},
-			setTechnique: function( technique ) {
-				this.technique = technique
-			},
-			setTechniqueParameters: function() {
-
-			},
-			setScissor: function() {
-
-			},
-			createIndexBuffer: function() {
-				return {
-					destroy: function() {
-
-					},
-					setData: function() {
-
-					}
-				}
-			},
-			setIndexBuffer: function() {
-
-			},
-			drawIndexed: function() {
-
-			},
-			createSemantics: function() {
-
-			},
-			createVertexBuffer: function() {
-				return {
-					destroy: function() {
-
-					},
-					setData: function() {
-
-					}
-				}
-			},
-			createShader: function() {
-				return {
-					getTechnique: function() {
-						return {}
-					}
-				}
-			},
-			createTechniqueParameters: function() {
-
-				return {
-					clipSpace: new Array(4)
-				}
-			}
-		}
 
 
 		var getBodyById = function( entityId ) {
@@ -493,6 +499,39 @@ define(
 
 			createCustomConstraint: function( params ) {
 				return Physics2DCustomConstraint.create( params )
+			},
+
+			setDebugDrawOptions  : function( params ) {
+				this.debugDraw.showConstraints     = params.showConstraints
+				this.debugDraw.showContacts        = params.showContacts
+				this.debugDraw.showContactImpulses = params.showContactImpulses
+				this.debugDraw.showRigidBodies     = params.showRigidBodies
+				this.debugDraw.showColliderShapes  = params.showColliderShapes
+				this.debugDraw.showSensorShapes    = params.showSensorShapes
+				this.debugDraw.showBodyDetail      = params.showBodyDetail
+				this.debugDraw.showShapeDetail     = params.showShapeDetail
+
+				this.debug = (
+					params.showConstraints ||
+					params.showContacts ||
+					params.showContactImpulses ||
+					params.showRigidBodies ||
+					params.showColliderShapes ||
+					params.showSensorShapes ||
+					params.showBodyDetail ||
+					params.showShapeDetail
+				)
+			},
+
+			debugDrawHook : function( renderingContext ) {
+				if( !this.debug == true )
+					return
+
+				this.debugDraw.renderingContext = renderingContext
+				this.debugDraw.begin()
+				this.debugDraw.drawWorld( this.rawWorld )
+				this.debugDraw.end()
+
 			},
 
 			createWorld   : createWorld,

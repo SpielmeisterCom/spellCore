@@ -264,35 +264,27 @@ define(
                     this.world = world
                 }
 
-                if(
-                    config.showConstraints ||
-                        config.showContacts ||
-                        config.showContactImpulses ||
-                        config.showRigidBodies ||
-                        config.showColliderShapes ||
-                        config.showSensorShapes ||
-                        config.showBodyDetail ||
-                        config.showShapeDetail
-                    ) {
-                    /*var debug = spell.physicsWorlds.debugDraw
-
-                    if( !debug ) {
-                        debug = debugDraw.create( { graphicsDevice: _graphicsDevice } )
-                        debug.renderingContext = spell.renderingContext
-
-                        spell.physicsWorlds.debugDraw = debug
-                    }
-
-                    debug.showConstraints     = config.showConstraints
-                    debug.showContacts        = config.showContacts
-                    debug.showContactImpulses = config.showContactImpulses
-                    debug.showRigidBodies     = config.showRigidBodies
-                    debug.showColliderShapes  = config.showColliderShapes
-                    debug.showSensorShapes    = config.showSensorShapes
-                    debug.showBodyDetail      = config.showBodyDetail
-                    debug.showShapeDetail     = config.showShapeDetail
-                */
-                }
+                spell.physicsManager.setDebugDrawOptions({
+	                showConstraints     : config.showConstraints,
+                    showContacts        : config.showContacts,
+                    showContactImpulses : config.showContactImpulses,
+                    showRigidBodies     : config.showRigidBodies,
+                    showColliderShapes  : config.showColliderShapes,
+                    showSensorShapes    : config.showSensorShapes,
+                    showBodyDetail      : config.showBodyDetail,
+                    showShapeDetail     : config.showShapeDetail
+                })
+/*
+	            spell.physicsManager.setDebugDrawOptions({
+		            showConstraints     : true,
+		            showContacts        : true,
+		            showContactImpulses : true,
+		            showRigidBodies     : true,
+		            showColliderShapes  : true,
+		            showSensorShapes    : true,
+		            showBodyDetail      : true,
+		            showShapeDetail     : true
+	            })*/
 
                 this.entityCreatedHandler = _.bind( createBody, null, spell.entityManager, spell.physicsManager, this.world )
                 this.entityDestroyHandler = _.bind( this.removedEntitiesQueue.push, this.removedEntitiesQueue )
@@ -311,13 +303,17 @@ define(
             destroy: function( spell ) {
                 var eventManager = spell.eventManager
 
-                this.world.clear()
-                this.world = undefined
-
-                if( this.debug ) {
-                    this.debug = undefined
-                    spell.physicsWorlds.debugDraw = undefined
-                }
+		        spell.physicsManager.clear()
+	            spell.physicsManager.setDebugDrawOptions({
+		            showConstraints     : false,
+		            showContacts        : false,
+		            showContactImpulses : false,
+		            showRigidBodies     : false,
+		            showColliderShapes  : false,
+		            showSensorShapes    : false,
+		            showBodyDetail      : false,
+		            showShapeDetail     : false
+	            })
 
                 eventManager.unsubscribe( eventManager.EVENT.ENTITY_CREATED, this.entityCreatedHandler )
                 eventManager.unsubscribe( eventManager.EVENT.ENTITY_REMOVED, this.entityDestroyHandler )
