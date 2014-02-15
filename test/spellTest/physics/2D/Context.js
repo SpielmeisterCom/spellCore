@@ -745,6 +745,118 @@ define(
 
 				})
 
+
+				it( 'should create a CustomConstraint using createCustomConstraint()', function( done ) {
+					var expectedMethods = [
+						'configure', 'wake', 'sleep',
+						'isEnabled', 'isDisabled', 'enable',
+						'disable', 'addEventListener', 'removeEventListener',
+						'getImpulseForBody'
+					]
+
+					var expectedProperties = [
+						'type', 'world', 'sleeping', 'userData', 'dimension', 'bodies'
+					]
+
+					var firstRigidBody = context.createRigidBody({
+						type : 'dynamic',
+						shapes : [],
+						mass : 10,
+						inertia : 20,
+						sleeping : false,
+						bullet : false,
+						position : [0, 0],
+						rotation : 0,
+						velocity : [0, 0],
+						angularVelocity : 0,
+						force : [0, 0],
+						torque : 0,
+						linearDrag : 0.05,
+						angularDrag : 0.05,
+						surfaceVelocity : [0, 0],
+						userData : null
+					})
+
+					var secondRigidBody = context.createRigidBody({
+						type : 'dynamic',
+						shapes : [],
+						mass : 10,
+						inertia : 20,
+						sleeping : false,
+						bullet : false,
+						position : [0, 0],
+						rotation : 0,
+						velocity : [0, 0],
+						angularVelocity : 0,
+						force : [0, 0],
+						torque : 0,
+						linearDrag : 0.05,
+						angularDrag : 0.05,
+						surfaceVelocity : [0, 0],
+						userData : null
+					})
+
+					var customConstraint = context.createCustomConstraint({
+						dimension : 2,
+						bodies : [firstRigidBody, secondRigidBody],
+						position : function positionErrorFn(data, index)
+						{
+							data[index]     = 'errorInFirstDimension';
+							data[index + 1] = 'errorInSecondDimension';
+						},
+						jacobian : function jacobianFn(data, index)
+						{
+							data[index]     = 'jacobian term for x-velocity of first body, in first dimension';
+							data[index + 1] = 'jacobian term for y-velocity of first body, in first dimension';
+							data[index + 2] = 'jacobian term for angular velocity of first body, in first dimension';
+							data[index + 3] = 'jacobian term for x-velocity of second body, in first dimension';
+							data[index + 4] = 'jacobian term for y-velocity of second body, in first dimension';
+							data[index + 5] = 'jacobian term for angular velocity of second body, in first dimension';
+
+							data[index + 6]  = 'jacobian term for x-velocity of first body, in second dimension';
+							data[index + 7]  = 'jacobian term for y-velocity of first body, in second dimension';
+							data[index + 8]  = 'jacobian term for angular velocity of first body, in second dimension';
+							data[index + 9]  = 'jacobian term for x-velocity of second body, in second dimension';
+							data[index + 10] = 'jacobian term for y-velocity of second body, in second dimension';
+							data[index + 11] = 'jacobian term for angular velocity of second body, in second dimension';
+						},
+						positionConstants : function positionConstantsFn()
+						{
+							// Perform any useful computations whose results may be used in definition of
+							// position and jacobian functions.
+						},
+						velocityClamp : function velocityClampFn(data, index)
+						{
+							// Clamp impulse values at
+							//   data[index]     :: impulse in first dimension
+							//   data[index + 1] :: impulse in second dimension
+						},
+						positionClamp : function positionClampFn(data, index)
+						{
+							// Clamp impulse values at
+							//   data[index]     :: impulse in first dimension
+							//   data[index + 1] :: impulse in second dimension
+						},
+						debugDraw : function debugDrawFn(debugDrawObject, stiff)
+						{
+							// Draw constraint information to debug object.
+						}
+						// + common Constraint constructor parameters.
+					})
+
+					expectedMethods.forEach( function( method ) {
+						expect( customConstraint ).to.respondTo( method )
+					})
+
+					expectedProperties.forEach( function( property ) {
+						expect( customConstraint ).to.have.property( property )
+					})
+
+
+					done()
+
+				})
+
 				it( 'should simulate physics', function( done ) {
 
 
