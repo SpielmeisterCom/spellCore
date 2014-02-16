@@ -2,60 +2,24 @@ define(
 	'spellTest/VisibilityManager',
 	[
 		'chai',
+		'spell/EventManager',
 		'spell/VisibilityManager',
-		'spell/Defines'
+		'spell/Defines',
+		'spell/functions'
 	],
 	function(
 		chai,
+		EventManager,
 		VisibilityManager,
-	    Defines
+	    Defines,
+	    _
 		) {
 		'use strict'
 
 		return function( describe, it ) {
 			var expect = chai.expect
 
-			var EVENT = {
-				SCREEN_RESIZE : 1,
-				COMPONENT_CREATED : 2,
-				COMPONENT_UPDATED : 3,
-				ENTITY_CREATED : 4
-			}
-
-			var eventCallback = {
-			}
-
-			eventCallback[ EVENT.COMPONENT_CREATED ] = {}
-			eventCallback[ EVENT.COMPONENT_UPDATED ] = {}
-			eventCallback[ EVENT.ENTITY_CREATED ] = {}
-
-			var eventManagerMock = {
-				EVENT: EVENT,
-
-				subscribe: function( event, callback ) {
-					expect( callback).to.be.a('function')
-
-					if(event instanceof Array) {
-						eventCallback[ event[0] ][ event[1] ] = callback
-					} else {
-						eventCallback[ event ] = callback
-					}
-				},
-
-				unsubscribe: function( event, callback ) {
-					expect( callback).to.be.a('function')
-
-					if(event instanceof Array) {
-						expect( callback).to.equal( eventCallback[ event[0] ][ event[1] ]  )
-						eventCallback[ event[0] ][ event[1] ] = undefined
-
-					} else {
-						expect( callback).to.equal( eventCallback[ event ]  )
-						eventCallback[ event ] = undefined
-					}
-				}
-			}
-
+			var eventManager = new EventManager()
 
 			var configurationManagerMock = {
 				getValue : function( key ) {
@@ -66,75 +30,140 @@ define(
 			}
 
 			var entityManagerMock = {
-
+				componentMaps : {},
+				getEntityDimensions : function() {
+					return [100, 100]
+				}
 			}
-
 
 			describe( 'spell/VisibilityManager', function( ) {
 
 				it( 'should correctly register and unregister for screen resize events', function( done ) {
 					var visibilityManager = new VisibilityManager(
-						eventManagerMock, configurationManagerMock, entityManagerMock
+						eventManager, configurationManagerMock, entityManagerMock
 					)
-					expect( eventCallback[ EVENT.SCREEN_RESIZE ] ).to.be.undefined
-
 					visibilityManager.init()
 
 					expect(visibilityManager.screenSize[0]).to.equal(800)
 					expect(visibilityManager.screenSize[1]).to.equal(600)
 
 					//check if screenResizing are correctly handled
-					expect( eventCallback[ EVENT.SCREEN_RESIZE ]).to.be.a( 'function' )
-					eventCallback[ EVENT.SCREEN_RESIZE ]( [100, 200])
+					eventManager.publish( eventManager.EVENT.SCREEN_RESIZE, [ [100, 200] ] )
 
 					expect(visibilityManager.screenSize[0]).to.equal(100)
 					expect(visibilityManager.screenSize[1]).to.equal(200)
 
 					visibilityManager.destroy()
-					expect( eventCallback[ EVENT.SCREEN_RESIZE ] ).to.be.undefined
+
+					eventManager.publish( eventManager.EVENT.SCREEN_RESIZE, [ [200, 300] ] )
 					expect(visibilityManager.screenSize).to.be.undefined
+
 
 					done()
 				})
 
 			it( 'should correctly register and unregister for camera changed events', function( done ) {
 				var visibilityManager = new VisibilityManager(
-					eventManagerMock, configurationManagerMock, entityManagerMock
+					eventManager, configurationManagerMock, entityManagerMock
 				)
 				visibilityManager.init()
 
-				expect( eventCallback[ EVENT.COMPONENT_CREATED ][ Defines.CAMERA_COMPONENT_ID ]).to.be.a('function')
-				expect( eventCallback[ EVENT.COMPONENT_UPDATED ][ Defines.CAMERA_COMPONENT_ID ]).to.be.a('function')
-
-				eventCallback[ EVENT.COMPONENT_CREATED ][ Defines.CAMERA_COMPONENT_ID ]({
+				eventManager.publish( [ eventManager.EVENT.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], [ {
 					'active': true
-				}, 1)
+				}, 1 ] )
 
 				expect(visibilityManager.currentCameraId).to.equal(1)
 
 				visibilityManager.destroy()
 
+				eventManager.publish( [ eventManager.EVENT.COMPONENT_CREATED, Defines.CAMERA_COMPONENT_ID ], [ {
+					'active': true
+				}, 2 ] )
+
 				expect(visibilityManager.currentCameraId).to.be.undefined
-				expect( eventCallback[ EVENT.COMPONENT_CREATED ][ Defines.CAMERA_COMPONENT_ID ] ).to.be.undefined
-				expect( eventCallback[ EVENT.COMPONENT_UPDATED ][ Defines.CAMERA_COMPONENT_ID ] ).to.be.undefined
 
 				done()
 			})
-
-			it( 'should correctly register and unregister for visual object changes', function( done ) {
+/*
+			it( 'should update the boxtree when a visualobject component is created, updated and removed', function( done ) {
 				var visibilityManager = new VisibilityManager(
-					eventManagerMock, configurationManagerMock, entityManagerMock
+					eventManager, configurationManagerMock, entityManagerMock
 				)
 				visibilityManager.init()
 
-				expect( eventCallback[ EVENT.ENTITY_CREATED ][ Defines.VISUAL_OBJECT_COMPONENT_ID ]).to.be.a('function')
+				var visualComponent = {
+
+				},
+				entityId = 1
+
+				eventManager.publish(
+					[ eventManager.EVENT.COMPONENT_CREATED, Defines.VISUAL_OBJECT_COMPONENT_ID ],
+					[ visualComponent, entityId ]
+				)
+
+
+				eventManager.publish(
+					[ eventManager.EVENT.COMPONENT_UPDATED, Defines.VISUAL_OBJECT_COMPONENT_ID ],
+					[ visualComponent, entityId ] )
+
+
+				eventManager.publish(
+					[ eventManager.EVENT.COMPONENT_REMOVED, Defines.VISUAL_OBJECT_COMPONENT_ID ],
+					entityId
+				)
 
 				visibilityManager.destroy()
-				expect( eventCallback[ EVENT.ENTITY_CREATED ][ Defines.VISUAL_OBJECT_COMPONENT_ID ]).to.be.undefined
+
 
 				done()
 			})
 
+			it( 'should update the boxtree when a transform component is created, updated and removed', function( done ) {
+				var visibilityManager = new VisibilityManager(
+					eventManager, configurationManagerMock, entityManagerMock
+				)
+				visibilityManager.init()
+
+				var transformComponent = {
+					translation: [ 0, 0 ],
+					scale: 1,
+					rotation: 0
+					},
+					entityId = 1
+
+				eventManager.publish(
+					[ eventManager.EVENT.COMPONENT_CREATED, Defines.TRANSFORM_COMPONENT_ID ],
+					[ transformComponent, entityId ]
+				)
+
+
+				eventManager.publish(
+					[ eventManager.EVENT.COMPONENT_UPDATED, Defines.TRANSFORM_COMPONENT_ID ],
+					[ transformComponent, entityId ] )
+
+
+				eventManager.publish(
+					[ eventManager.EVENT.COMPONENT_REMOVED, Defines.TRANSFORM_COMPONENT_ID ],
+					entityId
+				)
+
+				visibilityManager.destroy()
+
+				done()
+			})
+
+			it( 'should update the boxtree when a composite component is created, updated and removed', function( done ) {
+				//COMPOSITE_COMPONENT_ID
+			})
+
+
+
+			it( 'should update the boxtree when an entity is created and removed', function( done ) {
+				//COMPOSITE_COMPONENT_ID
+				//if parentId Changes
+			})
+
+*/
 
 
 		})
