@@ -273,6 +273,7 @@ define(
 					translation[ 1 ]
 				],
 				rotation        : transform.rotation,
+                fixedRotation   : body.fixedRotation,
 				mass            : body.mass > 0 ? body.mass : undefined,
 				inertia         : body.inertia > 0 ? body.inertia : undefined,
 				sleeping        : body.sleeping,

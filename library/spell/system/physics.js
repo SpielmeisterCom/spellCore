@@ -234,12 +234,7 @@ define(
                 transform.translation[ 0 ] = position[0]
                 transform.translation[ 1 ] = position[1]
 
-                //TODO: check for existing of internal flags for fixed rotation in physics engine
-                if( !body.fixedRotation ){
-                    transform.rotation = physicsManager.getRotation( id )
-                } else {
-                    physicsManager.setRotation( id, transform.rotation )
-                }
+                transform.rotation = physicsManager.getRotation( id )
 
                 //Sync velocity
                 body.velocity = physicsManager.getVelocity( id )

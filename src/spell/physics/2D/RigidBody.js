@@ -720,6 +720,9 @@ define(
 
 			// =====================================================================
 			Physics2DRigidBody.prototype._deltaRotation = function (delta) {
+
+                if( this.fixedRotation ) return
+
 				var data = this._data;
 				var rotation = (data[(/*BODY_POS*/ 2) + 2] += delta);
 				if ((delta * delta) > Physics2DConfig.DELTA_ROTATION_EPSILON) {
@@ -854,6 +857,7 @@ define(
 				b.shapes = [];
 				b.constraints = [];
 				b.world = null;
+                b.fixedRotation = params.fixedRotation
 
 				var radius = 0;
 				if (shapes) {
