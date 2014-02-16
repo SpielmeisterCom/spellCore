@@ -79,8 +79,8 @@ define(
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var entityManager      = this.entityManager,
 				keyFrameAnimations = this.keyFrameAnimations,
-				worldPassEntities  = spell.worldPassEntities,
-				uiPassEntities  = spell.uiPassEntities
+				worldPassEntities  = spell.worldPassEntities || {},
+				uiPassEntities  = spell.uiPassEntities || {}
 
 			for( var id in keyFrameAnimations ) {
 				var keyFrameAnimation = keyFrameAnimations[ id ]
