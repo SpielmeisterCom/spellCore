@@ -182,6 +182,9 @@ define(
 
 			spell.applicationModule    = undefined
 			spell.configurationManager = configurationManager
+			if( loaderConfig.libraryUrl ) {
+				spell.configurationManager.setValue( 'libraryUrl', loaderConfig.libraryUrl )
+			}
 			spell.eventManager         = eventManager
 			spell.loaderConfig         = loaderConfig
 			spell.console              = console
