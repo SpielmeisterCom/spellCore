@@ -314,8 +314,8 @@ define(
 			entityManager.updateWorldTransform( entityId )
 
 			//if this object has a phyics body, reposition the physics body
-			if( body && this.spell.physicsWorlds && this.spell.physicsWorlds.main ) {
-				this.spell.physicsWorlds.main.setPosition( entityId, newTranslation )
+			if( body ) {
+				this.spell.physicsManager.setPosition( entityId, newTranslation )
 			}
 		}
 
