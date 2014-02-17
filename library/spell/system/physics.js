@@ -228,15 +228,9 @@ define(
 
                 if( !transform ) continue
 
-                var position = physicsManager.getPosition( id )
-
-                transform.translation[ 0 ] = position[0]
-                transform.translation[ 1 ] = position[1]
-
+                physicsManager.getPosition( id, transform.translation )
                 transform.rotation = physicsManager.getRotation( id )
-
-                //Sync velocity
-                body.velocity = physicsManager.getVelocity( id )
+                physicsManager.getVelocity( id, body.velocity )
 
                 entityManager.updateWorldTransform( id )
             }

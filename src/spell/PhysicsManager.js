@@ -1,6 +1,15 @@
 /**
  * @class spell.physicsManager
  * @singleton
+ *
+ * Provides rigid body physics
+ *
+ * The PhysicsManager is powered by Turblenz 2DPhysicsDevice Copyright (c) 2009-2014 Turbulenz Limited
+ *
+ * physicsManager uses SI units of meters (m), radians (rad), seconds (s), kilograms (kg) and Newtons (N).
+ *
+ * Physics parameters are tuned for objects in size ranging down to an absolute minimum of 0.001m = 1mm. Objects smaller than this will not behave correctly due to contact slop and thresholds in continuous collision detection routines. At the same time, for stability reasons there is a permitted slop in positional contacts of 0.01m = 1cm so that whilst objects down to 1mm are acceptible, objects this small will not interact together properly. You should try to keep objects at least 1cm big.
+ * A suggestion if your game operates in pixels (px) is to use a scaling factor of roughly 60px for every 1m.
  */
 define(
 	'spell/PhysicsManager',
@@ -200,11 +209,11 @@ define(
 			])
 		}
 
-		var getVelocity = function( entityId ) {
+		var getVelocity = function( entityId, dst ) {
 			var body = getBodyById( entityId )
 			if( !body ) return
 
-			return body.getVelocity()
+			return body.getVelocity( dst )
 		}
 
 		var setFilterData = function( entityId, group, maskBits ) {
@@ -230,17 +239,14 @@ define(
 			var body = getBodyById( entityId )
 			if( !body ) return
 
-			body.setPosition([
-				position[ 0 ],
-				position[ 1 ]
-			])
+			body.setPosition( position )
 		}
 
-		var getPosition = function( entityId ) {
+		var getPosition = function( entityId, dst ) {
 			var body = getBodyById( entityId )
 			if( !body ) return
 
-			return body.getPosition()
+			return body.getPosition( dst )
 		}
 
 		var getRotation = function( entityId ) {
@@ -450,6 +456,28 @@ define(
 			 return Physics2DPolygon.create( params, null )
 			},
 
+			/**
+			 * Create a RigidBody object.
+			 * @param params
+			 * @param {String} [params.type] The type of Rigid Body to create. One of *static*, *dynamic*, *kinematic*. Defaults to *dynamic*.
+			 * @param {Array} [params.shapes] The set of Shapes to assign to the Rigid Body. Shapes may not be shared between rigid bodies. Shapes of a *static* body may not be modified once the body has been assigned to a World object.
+			 * @param {Number} [params.mass] The mass in *kg* for this rigid body. This value must be strictly positive and has no effect on *static* and *kinematic* bodies which in terms of physics computations are assumed to have infinite mass. However if such a body should be transformed into a *dynamic* body at run-time, this value will still persist. If unspecified, mass will be computed as per *body.computeMassFromShapes()*.
+			 * @param {Number} [params.inertia] The moment of inertia in kg*m²/rad². This value must be strictly positive and has no effect on *static* and *kinematic* bodies which in terms of physics computations are assumed to have infinite inertia. However if such a body should be transformed into a *dynamic* body at run-time, this value will still persist. If unspecified, inertia will be computed as per *body.computeInertiaFromShapes()*.
+			 * @param {Boolean} [params.sleeping] Define if the body is to be created in a sleeping state. When added to a World object, the body will remain asleep until woken. Defaults to *false*.
+			 * @param {Boolean} [params.bullet] Define if a *dynamic* body should collide continuously with other *dynamic* bodies. Continuous collision occur always between static/kinematic and dynamic bodies, but will occur between two dynamic bodies only if at least one of them is marked as a *bullet*. Due to implementation details of continuous collisions, you are advised not to create groups of bodies that interact together as bullets which may lead to visual stalling.
+			 * @param {Array} [params.position] The position of the body’s origin in world coordinates. The position of a *static* body cannot be changed once it has been assigned to a World object, and modifications to this value equate to a teleportation of the body. *kinematic* bodies should be moved via manipulations of the body *velocity*. Defaults to *[0, 0]*.
+			 * @param {Number} [params.rotation] The rotation of the body in clockwise radians. The rotation of a *static* body cannot be changed once it has been assigned to a World object, and modifications to this value equate to a teleportation of the body. *kinematic* bodies should be rotated via manipulations of the body *angularVelocity*. Defaults to *0*.
+			 * @param {Array} [params.velocity] The linear velocity of the body in *m/s*. This parameter is ignored for *static* bodies which are not permitted to have a velocity. Defaults to *[0, 0]*.
+			 * @param {Array} [params.angularVelocity] The angular velocity of the body in *rad/s*. This parameter is ignored for *static* bodies which are not permitted to have a velocity. Defaults to *[0, 0]*.
+			 * @param {Array} [params.force] Force applied to the body at it’s origin for every update. As this is a force, and not an acceleration this property has no effect on *static* and *kinematic* bodies, or any *dynamic* body with infinite mass. This force is persistent, and is not reset after world update. Defaults to *[0, 0]*.
+			 * @param {Array} [params.torque] Torque applied to the body at it’s origin for every update. As this is a torque, and not an acceleration this property has no effect on *static* and *kinematic* bodies, or any *dynamic* body with infinite inertia. This torque is persistent, and is not reset after world update. Defaults to *[0, 0]*.
+			 * @param {Number} [params.linearDrag] The fraction of the linear velocity of a body which will be lost per second. This value must be >= 0. This property has no effect on *static* and *kinematic* bodies, or any *dynamic* body with infinite mass. Defaults to *0.05*.
+			 * @param {Number} [params.angularDrag] The fraction of the angular velocity of a body which will be lost per second. This value must be >= 0. This property has no effect on *static* and *kinematic* bodies, or any *dynamic* body with infinite inertia. Defaults to *0.05*.
+			 * @param {Array} [params.surfaceVelocity] An additional velocity in (*m/s*) used for contact physics and rotated to match the surface direction used to manipulate the effects of friction and normal reactions. Static objects may also be given a surface velocity. For example one may create a conveyor belt that moves objects pushed against in a clockwise direction by supplying a surface velocity with positive x-component. Defaults to *[0, 0]*.
+			 * @param {Object} [params.userData] Field on which to store whatever information you may like.
+
+			 * @returns {params}
+			 */
 			createRigidBody: function( params ) {
 				return Physics2DRigidBody.create( params )
 			},

@@ -1,6 +1,10 @@
+/**
+ * Physics2D Rigid Body
+ * @class spell.physics.2D.RigidBody
+ */
 // =========================================================================
 //
-// Physics2D Rigid Body
+//
 //
 // BODY DATA CONSTANTS
 // !! Must use regexp to change these globally (in all files) !!
@@ -42,10 +46,25 @@ define(
 			var Physics2DRigidBody = function() {
 			}
 
+			/**
+			 * Returns *true*, if body is of a *dynamic* type.
+			 *
+			 *     var isDynamic = body.isDynamic();
+			 *
+			 * @returns {boolean}
+			 * @method isDynamic
+			 */
 			Physics2DRigidBody.prototype.isDynamic = function () {
 				return (this._type === (/*TYPE_DYNAMIC*/ 0));
 			};
 
+			/**
+			 * Change rigid body type to *dynamic*. This operation can be made at any time except for during a simulation step.
+			 *
+			 *     body.setAsDynamic();
+			 *
+			 * @method setAsDynamic
+			 */
 			Physics2DRigidBody.prototype.setAsDynamic = function () {
 				if (this.world && this.world._midStep) {
 					return;
@@ -60,10 +79,27 @@ define(
 				data[(/*BODY_IINERTIA*/ 1)] = (inertia === Number.POSITIVE_INFINITY ? 0 : (1 / inertia));
 			};
 
+			/**
+			 * Returns *true*, if body is of a *static* type.
+			 *
+			 *     var isStatic = body.isStatic();
+			 *
+			 * @returns {boolean}
+			 * @method isStatic
+			 */
 			Physics2DRigidBody.prototype.isStatic = function () {
 				return (this._type === (/*TYPE_STATIC*/ 2));
 			};
 
+			/**
+			 * Change rigid body type to *static*. This operation can be made at any time except for during a simulation step.
+			 *
+			 * This method will also set the *velocity* and *angularVelocity* of the rigid body to *0* as static bodies are not permitted to have velocity.
+			 *
+			 *     body.setAsStatic();
+			 *
+			 * @method setAsStatic
+			 */
 			Physics2DRigidBody.prototype.setAsStatic = function () {
 				if (this.world && this.world._midStep) {
 					return;
@@ -77,10 +113,25 @@ define(
 				data[(/*BODY_VEL*/ 7)] = data[(/*BODY_VEL*/ 7) + 1] = data[(/*BODY_VEL*/ 7) + 2] = 0;
 			};
 
+			/**
+			 * Returns *true*, if body is of a *kinematic* type.
+			 *
+			 *     var isKinematic = body.isKinematic();
+			 *
+			 * @returns {boolean}
+			 * @method isKinematic
+			 */
 			Physics2DRigidBody.prototype.isKinematic = function () {
 				return (this._type === (/*TYPE_KINEMATIC*/ 1));
 			};
 
+			/**
+			 * Change rigid body type to *kinematic*. This operation can be made at any time except for during a simulation step.
+			 *
+			 *     body.setAsKinematic();
+			 *
+			 * @method setAsKinematic
+			 */
 			Physics2DRigidBody.prototype.setAsKinematic = function () {
 				if (this.world && this.world._midStep) {
 					return;
@@ -201,6 +252,17 @@ define(
 			};
 
 			// ===============================================================================
+
+			/**
+			 * Retrieve the current position of this rigid body.
+			 *
+			 *     var position = body.getPosition();
+			 *     // or
+			 *     body.getPosition(position);
+			 *
+			 * @param {Array} [position] If specified, the position of the body will be stored in this array, otherwise a new array will be created.
+			 * @method getPosition
+			 */
 			Physics2DRigidBody.prototype.getPosition = function (dst /*v2*/ ) {
 				if (dst === undefined) {
 					dst = Types.createFloatArray(2);
@@ -212,6 +274,15 @@ define(
 				return dst;
 			};
 
+			/**
+			 * Set the position of this rigid body.
+			 * This method will be ignored for *static* type bodies which are in a World as well as if it is made during a simulation step.
+			 *
+			 *     body.setPosition(position);
+			 *
+			 * @param {Array} position
+			 * @method setPosition
+			 */
 			Physics2DRigidBody.prototype.setPosition = function (position /*v2*/ ) {
 				if (this.world && (this.world._midStep || this._type === (/*TYPE_STATIC*/ 2))) {
 					return;
@@ -228,10 +299,26 @@ define(
 				}
 			};
 
+			/**
+			 * Retrieve the current rotation of this rigid body.
+			 *
+			 *     var rotation = body.getRotation();
+			 *
+			 * @returns {Number}
+			 * @method getRotation
+			 */
 			Physics2DRigidBody.prototype.getRotation = function () {
 				return this._data[(/*BODY_POS*/ 2) + 2];
 			};
 
+			/**
+			 * Set the rotation of this rigid body. This method will be ignored for *static* type bodies which are in a World as well as if it is made during a simulation step.
+			 *
+			 *     body.setRotation(rotation);
+			 *
+			 * @returns {Number}
+			 * @method setRotation
+			 */
 			Physics2DRigidBody.prototype.setRotation = function (rotation) {
 				if (this.world && (this.world._midStep || this._type === (/*TYPE_STATIC*/ 2))) {
 					return;
@@ -248,6 +335,17 @@ define(
 			};
 
 			// ===============================================================================
+			/**
+			 * Retrieve the current velocity of this rigid body.
+			 *
+			 *     var velocity = body.getVelocity();
+			 *     // or
+			 *     body.getVelocity(velocity);
+			 *
+			 * @param [dst] If specified, the velocity of the body will be stored in this array, otherwise a new array will be created.
+			 * @returns {*}
+			 * @method getVelocity
+			 */
 			Physics2DRigidBody.prototype.getVelocity = function (dst /*v2*/ ) {
 				if (dst === undefined) {
 					dst = Types.createFloatArray(2);
@@ -259,6 +357,16 @@ define(
 				return dst;
 			};
 
+			/**
+			 * Set the velocity of this rigid body.
+			 *
+			 * This method will be ignored for *static* type bodies which are in a World.
+			 *
+			 *     body.setVelocity(velocity);
+			 *
+			 * @param velocity The velocity with which to set body.
+			 * @method setVelocity
+			 */
 			Physics2DRigidBody.prototype.setVelocity = function (velocity /*v2*/ ) {
 				// Static body cannot have velocity.
 				if (this._type === (/*TYPE_STATIC*/ 2)) {
@@ -275,10 +383,28 @@ define(
 				}
 			};
 
+			/**
+			 * Retrieve the current angular velocity of this rigid body.
+			 *
+			 *     var angularVelocity = body.getAngularVelocity();
+			 *
+			 * @returns {Number}
+			 * @method getAngularVelocity
+			 */
 			Physics2DRigidBody.prototype.getAngularVelocity = function () {
 				return this._data[(/*BODY_VEL*/ 7) + 2];
 			};
 
+			/**
+			 * Set the angular velocity of this rigid body.
+			 *
+			 * This method will be ignored for *static* type bodies which are in a World.
+			 *
+			 *     body.setAngularVelocity(angularVelocity)
+			 *
+			 * @param {Array} angularVelocity The angular velocity with which to set body.
+			 * @method setAngularVelocity
+			 */
 			Physics2DRigidBody.prototype.setAngularVelocity = function (angularVelocity) {
 				// Static body cannot have velocity.
 				if (this._type === (/*TYPE_STATIC*/ 2)) {
@@ -293,6 +419,17 @@ define(
 			};
 
 			// ===============================================================================
+			/**
+			 * Retrieve the current force of this rigid body.
+			 *
+			 *     var force = body.getForce();
+			 *     // or
+			 *     body.getForce(force);
+			 *
+			 * @param {Array} [dst] If specified, the force of the body will be stored in this array, otherwise a new array will be created.
+			 * @returns {*}
+			 * @method getForce
+			 */
 			Physics2DRigidBody.prototype.getForce = function (dst /*v2*/ ) {
 				if (dst === undefined) {
 					dst = Types.createFloatArray(2);
@@ -304,6 +441,14 @@ define(
 				return dst;
 			};
 
+			/**
+			 * Set the force of this rigid body.
+			 *
+			 * *Static* bodies may have their force changed even if they are in a World.
+			 *
+			 * @param {Array} force The force with which to set body.
+			 * @method setForce
+			 */
 			Physics2DRigidBody.prototype.setForce = function (force /*v2*/ ) {
 				var data = this._data;
 				var newX = force[0];
@@ -319,10 +464,28 @@ define(
 				}
 			};
 
+			/**
+			 * Retrieve the current torque of this rigid body.
+			 *
+			 *    var torque = body.getTorque();
+			 *
+			 * @returns {Number}
+			 * @method getTorque
+			 */
 			Physics2DRigidBody.prototype.getTorque = function () {
 				return this._data[(/*BODY_FORCE*/ 10) + 2];
 			};
 
+			/**
+			 * Set the torque of this rigid body.
+			 *
+			 * *Static* bodies may have their torque changed even if they are in a World.
+			 *
+			 *    body.setTorque(torque)
+			 *
+			 * @param {Number} torque
+			 * @method setTorque
+			 */
 			Physics2DRigidBody.prototype.setTorque = function (torque) {
 				var data = this._data;
 				if (data[(/*BODY_FORCE*/ 10) + 2] !== torque) {
