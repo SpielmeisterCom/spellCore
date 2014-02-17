@@ -21,15 +21,6 @@ define(
 					console.log.apply( this, arguments )
 				}
 			}
-
-			// putting global error handler in place
-			if( window ) {
-				window.onerror = function( message, url, line ) {
-					spellConsole.error( '"' + message + '" in ' + url + ':' + line )
-
-					return true
-				}
-			}
 		}
 	}
 )
