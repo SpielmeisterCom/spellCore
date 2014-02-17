@@ -28,9 +28,9 @@ define(
             this.removedEntitiesQueue = []
         }
 
-        var triggerContactEntityEvent = function( entityManager, eventId, arbiter, params ) {
-            var entityIdA = arbiter.bodyA.userData,
-                entityIdB = arbiter.bodyB.userData
+        var triggerContactEntityEvent = function( entityManager, eventId, shapeA, arbiter, shapeB, params ) {
+			var entityIdA = shapeA.body.userData,
+				entityIdB = shapeB.body.userData
 
             var fixtureA = entityManager.getComponentById(
                 entityIdA,
@@ -54,8 +54,6 @@ define(
 
             if( fixtureA && fixtureB && bodyA && bodyB ) {
                 entityManager.triggerEvent( entityIdA, eventId, [ entityIdB, arbiter, bodyA, bodyB, fixtureA, fixtureB ].concat( params ) )
-                entityManager.triggerEvent( entityIdB, eventId, [ entityIdA, arbiter, bodyB, bodyA, fixtureB, fixtureA ].concat( params ) )
-
             }
         }
 
@@ -63,31 +61,32 @@ define(
 
             shape.addEventListener(
                 'begin', function( arbiter, otherShape ) {
-                    triggerContactEntityEvent( entityManager, 'beginContact', arbiter, [] )
+                    triggerContactEntityEvent( entityManager, 'beginContact', this, arbiter, otherShape, [] )
 
                     if( contactTrigger && contactTrigger.eventId ) {
                         var params = !contactTrigger.parameters ? [] : _.isArray( contactTrigger.parameters ) ? contactTrigger.parameters : contactTrigger.parameters.split(',')
 
-                        triggerContactEntityEvent( entityManager, contactTrigger.eventId, arbiter, params )
+                        triggerContactEntityEvent( entityManager, contactTrigger.eventId, this, arbiter, otherShape, params )
                     }
                 }
             )
 
             shape.addEventListener(
                 'end', function( arbiter, otherShape ) {
-                    triggerContactEntityEvent( entityManager, 'endContact', arbiter, [] )
+                    triggerContactEntityEvent( entityManager, 'endContact', this, arbiter, otherShape, [] )
                 }
             )
 
             shape.addEventListener(
                 'preSolve', function( arbiter, otherShape ) {
-                    triggerContactEntityEvent( entityManager, 'preSolve', arbiter, [] )
+					//In turblenz the presolve wont have this bound to a shape. We need to validate if the shapes from the arbiter can always be used
+                    triggerContactEntityEvent( entityManager, 'preSolve', arbiter.shapeA, arbiter, arbiter.shapeB, [] )
                 }
             )
 
             shape.addEventListener(
                 'progress', function( arbiter, otherShape ) {
-                    triggerContactEntityEvent( entityManager, 'progress', arbiter, [] )
+                    triggerContactEntityEvent( entityManager, 'progress', this, arbiter, otherShape, [] )
                 }
             )
         }

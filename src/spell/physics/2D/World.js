@@ -1213,7 +1213,7 @@ define(
 				/*jshint bitwise: false*/
 				if (eventObject.type === eventType && (eventObject.mask === undefined || ((eventObject.mask & groupB) !== 0))) {
 					cb = Physics2DCallback.allocate();
-					cb.thisObject = shapeA;
+					cb.thisObject = shapeB;
 					cb.callback = eventObject.callback;
 					cb.time = this._eventTime;
 					cb.index = i;
