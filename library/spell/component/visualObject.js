@@ -35,6 +35,12 @@ define(
 			},
 			set worldOpacity( x ) {
 				this._worldOpacity = x
+			},
+			get worldLayer() {
+				return this._worldLayer
+			},
+			set worldLayer( worldLayer ) {
+				this._worldLayer = worldLayer
 			}
 		}
 
