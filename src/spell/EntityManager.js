@@ -251,18 +251,20 @@ define(
 			)
 		}
 
-		var updateVisualObjectR = function( compositeComponents, visualObjectComponents, entityId, ancestorWorldOpacity ) {
+		var updateVisualObjectR = function( compositeComponents, visualObjectComponents, entityId, ancestorWorldOpacity, ancestorWorldLayer ) {
 			var visualObjectComponent = visualObjectComponents[ entityId ],
-				worldOpacity          = ancestorWorldOpacity
+				worldOpacity          = ancestorWorldOpacity,
+				worldLayer            = ancestorWorldLayer
 
 			if( visualObjectComponent ) {
 				visualObjectComponent.worldOpacity = worldOpacity *= visualObjectComponent.opacity
+				visualObjectComponent.worldLayer   = worldLayer   += visualObjectComponent.layer
 			}
 
 			var childrenIds = compositeComponents[ entityId ].childrenIds
 
 			for( var i = 0, n = childrenIds.length; i < n; i++ ) {
-				updateVisualObjectR( compositeComponents, visualObjectComponents, childrenIds[ i ], worldOpacity )
+				updateVisualObjectR( compositeComponents, visualObjectComponents, childrenIds[ i ], worldOpacity, worldLayer )
 			}
 		}
 
@@ -275,7 +277,8 @@ define(
 				compositeComponents,
 				visualObjects,
 				entityId,
-				ancestorVisualObject ? ancestorVisualObject.worldOpacity : 1.0
+				ancestorVisualObject ? ancestorVisualObject.worldOpacity : 1.0,
+				ancestorVisualObject ? ancestorVisualObject.worldLayer : 0
 			)
 		}
 

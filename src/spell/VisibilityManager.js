@@ -29,8 +29,13 @@ define(
 			this.entityManager              = entityManager
 
 
-			this.uiPassEntities             = {}
-			this.backgroundPassEntities     = {}
+			this.uiPassEntitiesMap             = {}
+			this.uiPassEntities                = []
+			this.backgroundPassEntitiesMap     = {}
+			this.backgroundPassEntities        = []
+
+			this.worldPassEntitiesLength    = 0
+			this.worldPassEntities          = []
 
 			this.boxtree                    = undefined
 
@@ -67,6 +72,12 @@ define(
 					delete entityIdsToBoxTreeNode[ entityId ]
 				}
 
+				if( this.backgroundPassEntitiesMap[ entityId ] )
+					delete this.backgroundPassEntitiesMap[ entityId ]
+
+				if( this.uiPassEntities[ entityId ] )
+					delete this.uiPassEntities[ entityId ]
+
 			} else {
 
 				var dimensions          = entityManager.getEntityDimensions( entityId ),
@@ -82,7 +93,7 @@ define(
 				if( !entityInfo.id ) {
 					entityInfo.parent    = compositeComponent.parentId
 					entityInfo.children  = compositeComponent.childrenIds
-					entityInfo.layer     = visualObject ? visualObject.layer : 0
+					entityInfo.layer     = visualObject ? visualObject.worldLayer : 0
 					entityInfo.id        = entityId
 					entityInfo.vertices  = vertices
 
@@ -90,11 +101,11 @@ define(
 				}
 
 				if( visualObject.pass === 'ui' ) {
-					this.uiPassEntities[ entityId ] = entityInfo
+					this.uiPassEntitiesMap[ entityId ] = entityInfo
 
 				} else if ( visualObject.pass === 'background' ) {
 
-					this.backgroundPassEntities[ entityId ] = entityInfo
+					this.backgroundPassEntitiesMap[ entityId ] = entityInfo
 
 				} else if ( visualObject.pass === 'world' ) {
 
@@ -280,35 +291,8 @@ define(
 			unregisterComponentHandler.call( this )
 		}
 
-		/**
-		 * Returns all entities which intersect with the region defined by the position and dimension. The return
-		 * value is an object with the entity ids as keys and additional entity metadata as value.
-		 *
-		 * @param position {Array} the position of the region in world coordinates
-		 * @param dimensions {Array} the dimensions of the region in world coordinates
-		 * @return {Object}
-		 */
-		var getEntityIdsByRegion = function( boxtree, position, dimensions ) {
-			var tmp     = [],
-				result  = {}
-
-				boxtree.getOverlappingNodes(
-				[
-					position[0] - dimensions[0] / 2,
-					position[1] - dimensions[1] / 2,
-					position[0] + dimensions[0] / 2,
-					position[1] + dimensions[1] / 2
-				],
-				tmp
-			)
-
-			//console.log( tmp.length + ' objects visible ')
-
-			_.each(tmp, function( obj ) {
-				result[ obj.id ] = obj
-			})
-
-			return result
+		var layerCompareFunction = function( a, b ) {
+			return a.layer - b.layer
 		}
 
 		var updateVisibility = function( spell ) {
@@ -322,15 +306,31 @@ define(
 
 			var screenSize                = this.screenSize,
 				aspectRatio               = screenSize[ 0 ] / screenSize[ 1 ],
-				effectiveCameraDimensions = createEffectiveCameraDimensions( camera.width, camera.height, transform.scale, aspectRatio )
-
+				effectiveCameraDimensions = createEffectiveCameraDimensions( camera.width, camera.height, transform.scale, aspectRatio),
+				position                  = transform.translation
 
 			//TODO: only if boxtree was updated
 			this.boxtree.finalize()
 
-			spell.worldPassEntities = getEntityIdsByRegion.call( this, this.boxtree, transform.translation, effectiveCameraDimensions )
-			spell.uiPassEntities = this.uiPassEntities
-			spell.backgroundPassEntities = this.backgroundPassEntities
+			this.worldPassEntities = []
+			this.worldPassEntitiesLength = this.boxtree.getOverlappingNodes(
+				[
+					position[ 0 ] - effectiveCameraDimensions[ 0 ] / 2,
+					position[ 1 ] - effectiveCameraDimensions[ 1 ] / 2,
+					position[ 0 ] + effectiveCameraDimensions[ 0 ] / 2,
+					position[ 1 ] + effectiveCameraDimensions[ 1 ] / 2
+				],
+				this.worldPassEntities,
+				0
+			)
+
+			this.worldPassEntities.sort( layerCompareFunction )
+
+			this.uiPassEntities				= _.values( this.uiPassEntitiesMap )
+			this.uiPassEntities.sort( layerCompareFunction )
+
+			this.backgroundPassEntities	= _.values( this.backgroundPassEntitiesMap )
+			this.backgroundPassEntities.sort( layerCompareFunction )
 		}
 
 

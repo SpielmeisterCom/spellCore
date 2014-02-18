@@ -51,9 +51,7 @@ define(
 			tmpVec2_1         = vec2.create(),
 			tmpMat3           = mat3.identity( mat3.create() ),
 			clearColor        = vec4.fromValues( 0, 0, 0, 1 ),
-			markerColor       = vec4.fromValues( 0.45, 0.45, 0.45, 1.0 ),
 			debugFontAssetId  = 'font:spell.OpenSans14px',
-			drawDebugShapes   = true,
 			defaultDimensions = vec2.fromValues( 1.0, 1.0 ),
 			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
 			currentCameraId
@@ -66,77 +64,6 @@ define(
 			if( !text ) return
 
 			textAppearance.renderText = text
-		}
-
-		var layerCompareFunction = function( a, b ) {
-			return a.layer - b.layer
-		}
-
-		/**
-		 * Returns an array of root entity ids. "root" in this context means an entity which has a parent which is not in the set of entities.
-		 *
-		 * @param entities
-		 * @return {Array}
-		 */
-		var getRootEntities = function( entities ) {
-			var result = []
-
-			for( var id in entities ) {
-				if( !entities[ entities[ id ].parent ] ) {
-					result.push( id )
-				}
-			}
-
-			return result
-		}
-
-		var createVisualObjectsInDrawOrder = function( visibleEntities, entityIds ) {
-			var result = []
-
-			for( var i = 0, id, visibleEntity, n = entityIds.length; i < n; i++ ) {
-				id = entityIds[ i ]
-				visibleEntity = visibleEntities[ id ]
-
-				if( !visibleEntity ) continue
-
-				result.push( visibleEntity )
-			}
-
-			result.sort( layerCompareFunction )
-
-			return result
-		}
-
-		var createEntityIdsInDrawOrder = function( visibleEntities, entityIds, result ) {
-			var childrenIds,
-				id,
-				visibleEntity,
-				visibleEntitiesSorted = createVisualObjectsInDrawOrder( visibleEntities, entityIds )
-
-			for( var i = 0, n = visibleEntitiesSorted.length; i < n; i++ ) {
-				visibleEntity = visibleEntitiesSorted[ i ]
-				id = visibleEntity.id
-
-				result.push( id )
-
-				childrenIds = visibleEntity.children
-
-				if( childrenIds && childrenIds.length > 0 ) {
-					createEntityIdsInDrawOrder( visibleEntities, childrenIds, result )
-				}
-			}
-		}
-
-		var createVisibleEntityIdsSorted = function( entities ) {
-			var result = []
-
-			createEntityIdsInDrawOrder(
-				entities,
-				getRootEntities( entities ),
-				result
-			)
-
-			return result
 		}
 
 		var createOffset = function( deltaTimeInMs, offset, replaySpeed, numFrames, frameDuration, loop ) {
@@ -578,9 +505,7 @@ define(
 			// draw visual objects in background pass
 			setCamera( context, effectiveCameraDimensions, [ 0, 0 ] )
 
-			var visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.backgroundPassEntities )
-
-			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
+			for( var i = 0, n = spell.visibilityManager.backgroundPassEntities.length; i < n; i++ ) {
 				drawVisualObject(
 					entityManager,
 					context,
@@ -595,7 +520,7 @@ define(
 					visualObjects,
 					rectangles,
 					deltaTimeInMs,
-					visibleEntityIdsSorted[ i ],
+					spell.visibilityManager.backgroundPassEntities[ i ][ 'id' ],
 					viewFrustum
 				)
 			}
@@ -606,9 +531,7 @@ define(
 			{
 				setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
 
-				visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.worldPassEntities )
-
-				for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
+				for( var i = 0, n = spell.visibilityManager.worldPassEntitiesLength; i < n; i++ ) {
 					drawVisualObject(
 						entityManager,
 						context,
@@ -623,7 +546,7 @@ define(
 						visualObjects,
 						rectangles,
 						deltaTimeInMs,
-						visibleEntityIdsSorted[ i ],
+						spell.visibilityManager.worldPassEntities[ i ][ 'id' ],
 						viewFrustum
 					)
 				}
@@ -636,9 +559,7 @@ define(
 			// draw visual objects in ui pass
 			setCamera( context, effectiveCameraDimensions, [ 0, 0 ] )
 
-			visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.uiPassEntities )
-
-			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
+			for( var i = 0, n = spell.visibilityManager.uiPassEntities.length; i < n; i++ ) {
 				drawVisualObject(
 					entityManager,
 					context,
@@ -653,7 +574,7 @@ define(
 					visualObjects,
 					rectangles,
 					deltaTimeInMs,
-					visibleEntityIdsSorted[ i ],
+					spell.visibilityManager.uiPassEntities[ i ][ 'id' ],
 					viewFrustum
 				)
 			}
