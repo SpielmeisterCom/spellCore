@@ -292,7 +292,13 @@ define(
 		}
 
 		var layerCompareFunction = function( a, b ) {
-			return a.layer - b.layer
+			if ( a.layer == b.layer ) {
+				return 0
+
+			} else {
+				return ( a.layer < b.layer ) ? -1 : 1
+
+			}
 		}
 
 		var updateVisibility = function( spell ) {
