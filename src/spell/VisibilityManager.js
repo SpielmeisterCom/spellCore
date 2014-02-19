@@ -344,7 +344,23 @@ define(
 			init:               init,
 			destroy:            destroy,
 			updateVisibility:   updateVisibility,
-			updateEntity:       updateEntity
+			updateEntity:       updateEntity,
+			getCurrentScreenSize : function() {
+				return this.screenSize
+			},
+			transformScreenToUI : function( position ) {
+				var screenSize                  = this.screenSize,
+					currentCameraId             = this.currentCameraId,
+					camera                      = this.entityManager.getComponentById( currentCameraId, Defines.CAMERA_COMPONENT_ID),
+					transform                   = this.entityManager.getComponentById( currentCameraId, Defines.TRANSFORM_COMPONENT_ID),
+					aspectRatio                 = screenSize[ 0 ] / screenSize[ 1 ],
+					effectiveCameraDimensions   = createEffectiveCameraDimensions( camera.width, camera.height, transform.scale, aspectRatio)
+
+					return [
+					( position[ 0 ] / screenSize[ 0 ] - 0.5 ) * effectiveCameraDimensions[ 0 ],
+					( position[ 1 ] / screenSize[ 1 ] - 0.5 ) * -effectiveCameraDimensions[ 1 ]
+				]
+			}
 		}
 
 		return VisibilityManager
