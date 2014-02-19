@@ -443,6 +443,8 @@ define(
 			eventManager.subscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
 			eventManager.subscribe( [ eventManager.EVENT.COMPONENT_UPDATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
 
+            var cColor = this.config.clearColor
+            clearColor = vec4.fromValues( cColor[0], cColor[1], cColor[2], 1 )
 
 //			statisticsManager = spell.statisticsManager
 //
