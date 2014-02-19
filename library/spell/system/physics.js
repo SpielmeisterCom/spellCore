@@ -161,7 +161,7 @@ define(
                             }
                         )
                     ),
-	                physicsManager.createPolygonShape(
+                    physicsManager.createPolygonShape(
                         _.extend(
                             {},
                             shapeDef,
@@ -169,6 +169,40 @@ define(
                                 vertices: [
                                     [ -width, -height ],
                                     [ -width, -height - sensorHeight ],
+                                    [ -width + sensorWidth, -height - sensorHeight ],
+                                    [ -width + sensorWidth, -height ]
+                                ],
+                                group: 0x0300,
+                                mask: 0xFFFF,
+                                sensor: true
+                            }
+                        )
+                    ),
+                    physicsManager.createPolygonShape(
+                        _.extend(
+                            {},
+                            shapeDef,
+                            {
+                                vertices: [
+                                    [ -sensorWidth, -height ],
+                                    [ -sensorWidth, -height - sensorHeight ],
+                                    [ sensorWidth, -height - sensorHeight ],
+                                    [ sensorWidth, -height ]
+                                ],
+                                group: 0x0300,
+                                mask: 0xFFFF,
+                                sensor: true
+                            }
+                        )
+                    ),
+                    physicsManager.createPolygonShape(
+                        _.extend(
+                            {},
+                            shapeDef,
+                            {
+                                vertices: [
+                                    [ width - sensorWidth, -height ],
+                                    [ width - sensorWidth, -height - sensorHeight ],
                                     [ width, -height - sensorHeight ],
                                     [ width, -height ]
                                 ],
