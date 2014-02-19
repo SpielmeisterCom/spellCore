@@ -46,6 +46,7 @@ define(
 	) {
 		'use strict'
 
+        var COLOR_NORMALIZER = 255
 
 		var tmpVec2           = vec2.create(),
 			tmpVec2_1         = vec2.create(),
@@ -444,7 +445,7 @@ define(
 			eventManager.subscribe( [ eventManager.EVENT.COMPONENT_UPDATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
 
             var cColor = this.config.clearColor
-            clearColor = vec4.fromValues( cColor[0], cColor[1], cColor[2], 1 )
+            clearColor = vec4.fromValues( cColor[0] / COLOR_NORMALIZER, cColor[1] / COLOR_NORMALIZER, cColor[2] / COLOR_NORMALIZER, 1 )
 
 //			statisticsManager = spell.statisticsManager
 //
