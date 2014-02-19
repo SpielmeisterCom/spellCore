@@ -97,8 +97,9 @@ define(
                 width  = JNRunPlayerShape.dimensions[ 0 ] * 0.7,
                 sensorHeight = 5,
                 height = JNRunPlayerShape.dimensions[ 0 ],
+                sensorWidth = width * 0.3,
                 shapes = [
-	                physicsManager.createPolygonShape(
+                    physicsManager.createPolygonShape(
                         _.extend(
                             {},
                             shapeDef,
@@ -106,6 +107,40 @@ define(
                                 vertices: [
                                     [ -width, height ],
                                     [ -width, height + sensorHeight ],
+                                    [ -width + sensorWidth, height + sensorHeight ],
+                                    [ -width + sensorWidth, height ]
+                                ],
+                                group: 0x0500,
+                                mask: 0xFFFF,
+                                sensor: true
+                            }
+                        )
+                    ),
+                    physicsManager.createPolygonShape(
+                        _.extend(
+                            {},
+                            shapeDef,
+                            {
+                                vertices: [
+                                    [ -sensorWidth, height ],
+                                    [ -sensorWidth, height + sensorHeight ],
+                                    [ sensorWidth, height + sensorHeight ],
+                                    [ sensorWidth, height ]
+                                ],
+                                group: 0x0500,
+                                mask: 0xFFFF,
+                                sensor: true
+                            }
+                        )
+                    ),
+                    physicsManager.createPolygonShape(
+                        _.extend(
+                            {},
+                            shapeDef,
+                            {
+                                vertices: [
+                                    [ width - sensorWidth, height ],
+                                    [ width - sensorWidth, height + sensorHeight ],
                                     [ width, height + sensorHeight ],
                                     [ width, height ]
                                 ],
@@ -262,17 +297,6 @@ define(
                     showBodyDetail      : config.showBodyDetail,
                     showShapeDetail     : config.showShapeDetail
                 })
-/*
-	            spell.physicsManager.setDebugDrawOptions({
-		            showConstraints     : true,
-		            showContacts        : true,
-		            showContactImpulses : true,
-		            showRigidBodies     : true,
-		            showColliderShapes  : true,
-		            showSensorShapes    : true,
-		            showBodyDetail      : true,
-		            showShapeDetail     : true
-	            })*/
 
                 this.entityCreatedHandler = _.bind( createBody, null, spell.entityManager, spell.physicsManager, this.world )
                 this.entityDestroyHandler = _.bind( this.removedEntitiesQueue.push, this.removedEntitiesQueue )
