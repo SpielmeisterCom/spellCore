@@ -283,26 +283,31 @@ define(
             }
         }
 
-        var incrementState = function( entityManager, physicsManager, bodies, transforms ) {
+        var iterateRigidBodies = function( entityManager, rigidBodies, bodies, transforms ) {
+            var length       = rigidBodies.length,
+                rigidBody, id, body, transform
 
-            for( var id in bodies ) {
-                var body = bodies[ id ]
-
-                if( body.type === 'static' ) {
-                    continue
-                }
+            for( var i = 0; i < length; i++ ) {
+                rigidBody = rigidBodies[ i ]
+                id        = rigidBody.userData
+                body      = bodies[ id ]
 
                 // transfering state to components
-                var transform = transforms[ id ]
+                transform = transforms[ id ]
 
                 if( !transform ) continue
 
-                physicsManager.getPosition( id, transform.translation )
-                transform.rotation = physicsManager.getRotation( id )
-                physicsManager.getVelocity( id, body.velocity )
+                rigidBody.getPosition( transform.translation )
+                transform.rotation = rigidBody.getRotation()
+                rigidBody.getVelocity( body.velocity )
 
                 entityManager.updateWorldTransform( id )
             }
+        }
+
+        var incrementState = function( entityManager, world, bodies, transforms ) {
+            iterateRigidBodies( entityManager, world.liveDynamics, bodies, transforms )
+            iterateRigidBodies( entityManager, world.liveKinematics, bodies, transforms )
         }
 
         physics.prototype = {
@@ -401,8 +406,7 @@ define(
                 }
 
                 physicsManager.step( deltaTimeInMs * 0.001 )
-                //TODO: iterate only dynamic & kinematic bodies
-                incrementState( spell.entityManager, physicsManager, this.bodies, transforms )
+                incrementState( spell.entityManager, this.world, this.bodies, transforms )
             }
         }
 
