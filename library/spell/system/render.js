@@ -444,8 +444,10 @@ define(
 			eventManager.subscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
 			eventManager.subscribe( [ eventManager.EVENT.COMPONENT_UPDATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
 
-            var cColor = this.config.clearColor
-            clearColor = vec4.fromValues( cColor[0] / COLOR_NORMALIZER, cColor[1] / COLOR_NORMALIZER, cColor[2] / COLOR_NORMALIZER, 1 )
+			if( this.config && this.config.clearColor ) {
+				var cColor = this.config.clearColor
+				clearColor = vec4.fromValues( cColor[0] / COLOR_NORMALIZER, cColor[1] / COLOR_NORMALIZER, cColor[2] / COLOR_NORMALIZER, 1 )
+			}
 
 //			statisticsManager = spell.statisticsManager
 //
