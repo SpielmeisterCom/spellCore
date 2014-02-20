@@ -349,6 +349,20 @@ define(
 			return this.rawWorld
 		}
 
+        var putToSleep = function( entityId ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            return body.sleep()
+        }
+
+        var wakeUp = function( entityId ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            return body.wake()
+        }
+
 		var createWorld = function( gravity, scale, velocityIterations, positionIterations ) {
 			if( !gravity ) gravity = [ 0, 0 ]
 			if( !scale ) scale = 1
@@ -566,6 +580,10 @@ define(
 			step          : step,
 
 			clear         : clear,
+
+            putToSleep    : putToSleep,
+
+            wakeUp        : wakeUp,
 
 			applyForce    : applyForce,
 
