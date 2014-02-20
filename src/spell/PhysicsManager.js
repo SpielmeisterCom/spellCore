@@ -309,10 +309,6 @@ define(
 			this.rawWorld.removeRigidBody( body )
 		}
 
-		var getRawWorld = function() {
-			return this.rawWorld
-		}
-
 		var step = function( deltaTime) {
 			this.rawWorld.step( deltaTime )
 		}
@@ -352,6 +348,20 @@ define(
 		var getWorld = function() {
 			return this.rawWorld
 		}
+
+        var putToSleep = function( entityId ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            return body.sleep()
+        }
+
+        var wakeUp = function( entityId ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            return body.wake()
+        }
 
 		var createWorld = function( gravity, scale, velocityIterations, positionIterations ) {
 			if( !gravity ) gravity = [ 0, 0 ]
@@ -571,6 +581,10 @@ define(
 
 			clear         : clear,
 
+            putToSleep    : putToSleep,
+
+            wakeUp        : wakeUp,
+
 			applyForce    : applyForce,
 
 			setAngularVelocity: setAngularVelocity,
@@ -588,8 +602,6 @@ define(
 			createBodyDef : createBodyDef,
 
 			destroyBody   : destroyBody,
-
-			getRawWorld   : getRawWorld,
 
 			setFilterData : setFilterData,
 
