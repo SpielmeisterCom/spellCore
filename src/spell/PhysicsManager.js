@@ -309,10 +309,6 @@ define(
 			this.rawWorld.removeRigidBody( body )
 		}
 
-		var getRawWorld = function() {
-			return this.rawWorld
-		}
-
 		var step = function( deltaTime) {
 			this.rawWorld.step( deltaTime )
 		}
@@ -588,8 +584,6 @@ define(
 			createBodyDef : createBodyDef,
 
 			destroyBody   : destroyBody,
-
-			getRawWorld   : getRawWorld,
 
 			setFilterData : setFilterData,
 
