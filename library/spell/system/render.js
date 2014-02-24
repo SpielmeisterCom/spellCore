@@ -52,6 +52,7 @@ define(
 			tmpVec2_1         = vec2.create(),
 			tmpMat3           = mat3.identity( mat3.create() ),
 			clearColor        = vec4.fromValues( 0, 0, 0, 1 ),
+			unsafeAreaColor   = vec4.fromValues( 0, 0, 0, 1 ),
 			debugFontAssetId  = 'font:spell.OpenSans14px',
 			defaultDimensions = vec2.fromValues( 1.0, 1.0 ),
 			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
@@ -447,6 +448,7 @@ define(
 			if( this.config && this.config.clearColor ) {
 				var cColor = this.config.clearColor
 				clearColor = vec4.fromValues( cColor[0] / COLOR_NORMALIZER, cColor[1] / COLOR_NORMALIZER, cColor[2] / COLOR_NORMALIZER, 1 )
+				this.context.setClearColor( clearColor )
 			}
 
 //			statisticsManager = spell.statisticsManager
@@ -615,7 +617,7 @@ define(
 					mathUtil.mat3Ortho( tmpMat3, 0, screenSize[ 0 ], 0, screenSize[ 1 ] )
 					context.setViewMatrix( tmpMat3 )
 
-					context.setColor( clearColor )
+					context.setColor( unsafeAreaColor )
 
 					if( offset[ 0 ] > 0 ) {
 						context.fillRect( 0, 0, offset[ 0 ], screenSize[ 1 ] )
