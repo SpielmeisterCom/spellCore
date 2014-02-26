@@ -562,13 +562,13 @@ define(
 				)
 			},
 
-			debugDrawHook : function( renderingContext ) {
+			debugDrawHook : function( renderingContext, viewport ) {
 				if( !this.debug == true )
 					return
 
 				this.debugDraw.renderingContext = renderingContext
 				this.debugDraw.begin()
-				this.debugDraw.drawWorld( this.rawWorld )
+				this.debugDraw.drawWorld( this.rawWorld, viewport )
 				this.debugDraw.end()
 
 			},

@@ -409,11 +409,11 @@ define(
             }
         };
 
-        Physics2DDebugDraw.prototype.drawWorld = function (world) {
+        Physics2DDebugDraw.prototype.drawWorld = function (world, rectangle) {
             var i, limit;
             if (this.showRigidBodies) {
-                var bodies = world.rigidBodies;
-                limit = bodies.length;
+                var bodies = [];
+                limit = world.bodyRectangleQuery(rectangle, bodies);
                 for (i = 0; i < limit; i += 1) {
                     var body = bodies[i];
                     this.drawRigidBody(body);

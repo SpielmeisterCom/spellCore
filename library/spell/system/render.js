@@ -558,7 +558,7 @@ define(
 					)
 				}
 
-				spell.physicsManager.debugDrawHook( spell.renderingContext )
+                spell.physicsManager.debugDrawHook( spell.renderingContext, [ viewFrustum.bottomLeft[0], viewFrustum.bottomLeft[1], viewFrustum.topRight[0], viewFrustum.topRight[1] ] )
 			}
 			context.restore()
 
