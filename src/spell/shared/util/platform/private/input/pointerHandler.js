@@ -92,6 +92,8 @@ define(
 	) {
 		'use strict'
 
+		var IS_MOBILE_SAFARI = !!navigator.platform.match( /^(iPad|iPod|iPhone)$/ ),
+		IS_MOBILE_CHROME = !!navigator.userAgent.match( /Chrome\/[.0-9]* Mobile/ )
 
 		var nativeHandler = null
 		var nativeClickHandler = null
@@ -168,6 +170,11 @@ define(
 
 			// only preventDefault on touchmove, otherwise no click event is triggered in mobile Safari
 			if( eventType == 'touchmove' ) {
+				event.preventDefault()
+			}
+
+			if( !IS_MOBILE_SAFARI && !IS_MOBILE_CHROME && eventType == 'touchstart' ) {
+				//don't preventDefault on touchstart on iOS, because otherwise no click event is triggered
 				event.preventDefault()
 			}
 
