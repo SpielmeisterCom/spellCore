@@ -817,13 +817,15 @@ define(
 		 */
 		var setAttribute = function( component, attributeId, value ) {
 			// TODO: Unfortunately there is no generic copy operator in javascript.
-			if( _.isObject( value ) ||
-				_.isArray( value ) ) {
-				_.extend( component[ attributeId ], value )
+            if( _.isArray( value ) ) {
+                component[ attributeId ] = value.slice( 0 )
 
-			} else {
-				component[ attributeId ] = value
-			}
+            }else if( _.isObject( value ) ) {
+                component[ attributeId ] = _.extend( component[ attributeId ] || {}, value )
+
+            } else {
+                component[ attributeId ] = value
+            }
 		}
 
 		var updateComponentAttributeTM = function( assetManager, moduleLoader, componentsWithAssets, componentId, attributeId, component, value ) {
