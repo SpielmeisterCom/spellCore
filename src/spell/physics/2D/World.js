@@ -2020,6 +2020,9 @@ define(
 				for (j = 0; j < limit2;) {
 					var arb = arbiters[j];
 					if (arb._retired) {
+                        //Bugfix because j had not been changed so were stucked in a deadlock
+                        limit2 -= 1;
+                        arbiters.pop();
 						continue;
 					}
 
