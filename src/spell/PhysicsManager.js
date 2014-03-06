@@ -448,6 +448,10 @@ define(
 
 
 		PhysicsManager.prototype = {
+            BODY_TYPE_STATIC    : 'static',
+            BODY_TYPE_DYNAMIC   : 'dynamic',
+            BODY_TYPE_KINEMATIC : 'kinematic',
+
 			createRectangleVertices : createRectangleVertices,
 
 			createBoxVertices : createBoxVertices,
@@ -572,6 +576,21 @@ define(
 				this.debugDraw.end()
 
 			},
+
+            setBodyType : function( id, type ) {
+                var body = getBodyById( id )
+                if( !body ) return
+
+                if( type === this.BODY_TYPE_STATIC && !body.isStatic() ) {
+                    body.setAsStatic()
+
+                } else if( type === this.BODY_TYPE_DYNAMIC && !body.isDynamic() ) {
+                    body.setAsDynamic()
+
+                } else if( type === this.BODY_TYPE_KINEMATIC && !body.isKinematic() ) {
+                    body.setAsKinematic()
+                }
+            },
 
 			createWorld   : createWorld,
 
