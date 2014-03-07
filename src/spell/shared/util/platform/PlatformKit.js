@@ -31,6 +31,7 @@ define(
 		'spell/shared/util/platform/private/graphics/initViewport',
 		'spell/shared/util/platform/private/advertisement',
 		'spell/shared/util/platform/private/flurry',
+		'spell/shared/util/platform/private/ouya',
 		'spell/shared/util/platform/private/createComponentType',
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
 		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
@@ -63,6 +64,7 @@ define(
 		initViewport,
 		advertisement,
 		flurry,
+		ouya,
 		createComponentType,
 		isHtml5Ejecta,
 		isHtml5TeaLeaf,
@@ -198,12 +200,15 @@ define(
 			},
 
 			getPlugins : function() {
-				if( isHtml5Ejecta ||
-					isHtml5TeaLeaf ) {
+				if( isHtml5Ejecta ) {
+					return {}
+
+				} else if ( isHtml5TeaLeaf ) {
 
 					return {
 						admob : advertisement,
-						admobWithChartboost : advertisement
+						admobWithChartboost : advertisement,
+						ouya: ouya
 					}
 
 				} else {

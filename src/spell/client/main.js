@@ -135,6 +135,7 @@ define(
 			var inputManager = new InputManager( configurationManager, renderingContext )
 			inputManager.init()
 
+			spell.pluginManager        = new PluginManager( inputManager )
 			spell.audioContext         = audioContext
 			spell.assetManager         = assetManager
 			spell.configurationManager = configurationManager
@@ -193,7 +194,6 @@ define(
 			spell.scenes               = {}
 			spell.statisticsManager    = statisticsManager
 			spell.storage              = PlatformKit.createPersistentStorage()
-			spell.pluginManager        = new PluginManager()
             spell.libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ), isModeDeployed )
 
 			this.spell = spell
