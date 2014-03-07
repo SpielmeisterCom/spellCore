@@ -14,6 +14,10 @@ define(
 
 
 		var getViewportMetaTag = function() {
+			if(!document || !document.getElementsByTagName) {
+				return
+			}
+
 			var metaTags = document.getElementsByTagName( 'meta' )
 
 			for( var i = 0, n = metaTags.length, metaTag; i < n; i++ ) {

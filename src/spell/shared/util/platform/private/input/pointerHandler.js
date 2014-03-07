@@ -92,8 +92,13 @@ define(
 	) {
 		'use strict'
 
-		var IS_MOBILE_SAFARI = !!navigator.platform.match( /^(iPad|iPod|iPhone)$/ ),
-		IS_MOBILE_CHROME = !!navigator.userAgent.match( /Chrome\/[.0-9]* Mobile/ )
+		var IS_MOBILE_SAFARI = false,
+			IS_MOBILE_CHROME = false
+
+		if( navigator && navigator.platform && navigator.userAgent ) {
+			IS_MOBILE_SAFARI = !!navigator.platform.match( /^(iPad|iPod|iPhone)$/ )
+			IS_MOBILE_CHROME = !!navigator.userAgent.match( /Chrome\/[.0-9]* Mobile/ )
+		}
 
 		var nativeHandler = null
 		var nativeClickHandler = null
