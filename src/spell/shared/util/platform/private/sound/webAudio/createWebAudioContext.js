@@ -223,6 +223,7 @@ define(
 			var sourceNode = sourceNodes[ id ]
 
 			if( sourceNode &&
+                sourceNode.node &&
 				sourceNode.node.playbackState === sourceNode.node.PLAYING_STATE ) {
 
 				sourceNode.state = PLAYING_STATE.PAUSED
@@ -235,6 +236,7 @@ define(
 			var sourceNode = sourceNodes[ id ]
 
 			if( sourceNode &&
+                sourceNode.node &&
 				sourceNode.node.playbackState !== sourceNode.node.PLAYING_STATE ) {
 
 				sourceNode.play()
