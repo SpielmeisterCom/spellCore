@@ -7,6 +7,7 @@ define(
 		'spell/shared/util/platform/private/environment/isHtml5Tizen',
 		'spell/shared/util/platform/private/environment/isHtml5WinPhone',
 		'spell/shared/util/platform/private/environment/isHtml5WinStore',
+        'spell/shared/util/platform/private/environment/hasGameControllerSupport',
 		'spell/shared/util/platform/private/jsonCoder'
 	],
 	function(
@@ -16,6 +17,7 @@ define(
 		isHtml5Tizen,
 		isHtml5WinPhone,
 		isHtml5WinStore,
+        hasGameControllerSupport,
 		jsonCoder
 	) {
 		'use strict'
@@ -77,7 +79,10 @@ define(
 			},
 			isMobileDevice: function() {
 				return isHtml5Ejecta || isHtml5TeaLeaf
-			}
+			},
+            hasGameControllerSupport: function() {
+                return hasGameControllerSupport
+            }
 		}
 	}
 )
