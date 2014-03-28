@@ -801,7 +801,7 @@ define(
 
                 // TODO: using the worldScale would be more correct here, but as we don't want to calculate it
                 // only for this test, use the local scale
-				// vec2.multiply( dimensions, dimensions, transforms[ entityId ].scale )
+				vec2.multiply( dimensions, dimensions, transforms[ entityId ].scale )
 			}
 
 			return dimensions
