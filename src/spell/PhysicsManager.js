@@ -264,7 +264,7 @@ define(
 		}
 
 		var createBodyDef = function( entityId, body, shapes, transform ) {
-			var translation = transform.translation,
+			var translation = transform.worldTranslation,
 				scale       = this.scale
 
 			var physicsBody = Physics2DRigidBody.create({
