@@ -513,14 +513,23 @@ define(
 			},
 
 			createPointConstraint: function( params ) {
+				params.bodyA = getBodyById( params.entityA )
+				params.bodyB = getBodyById( params.entityB )
+
 				return Physics2DPointConstraint.create( params )
 			},
 
 			createWeldConstraint: function( params ) {
+				params.bodyA = getBodyById( params.entityA )
+				params.bodyB = getBodyById( params.entityB )
+
 				return Physics2DWeldConstraint.create( params )
 			},
 
 			createAngleConstraint: function( params ) {
+				params.bodyA = getBodyById( params.entityA )
+				params.bodyB = getBodyById( params.entityB )
+
 				return Physics2DAngleConstraint.create( params );
 			},
 

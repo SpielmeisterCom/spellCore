@@ -28,6 +28,8 @@ define(
             this.removedEntitiesQueue = []
         }
 
+		var constraintsToCreate = []
+
         var triggerContactEntityEvent = function( entityManager, eventId, shapeA, arbiter, shapeB, params ) {
 			var entityIdA = shapeA.body.userData,
 				entityIdB = shapeB.body.userData
@@ -218,6 +220,67 @@ define(
             return shapes
         }
 
+		var checkForConstraints = function( entityId, entity ) {
+			var weldConstraint  = entity[ 'spell.component.physics.constraint.weld' ],
+				pointConstraint = entity[ 'spell.component.physics.constraint.point' ],
+				angleConstraint = entity[ 'spell.component.physics.constraint.angle' ]
+
+			if( weldConstraint ) {
+				constraintsToCreate.push( { type: 'weld', entityId: entityId, constraint: weldConstraint } )
+
+			} else if( pointConstraint ) {
+				constraintsToCreate.push( { type: 'point', entityId: entityId, constraint: pointConstraint } )
+
+			} else if( angleConstraint ) {
+				constraintsToCreate.push( { type: 'angle', entityId: entityId, constraint: angleConstraint } )
+			}
+		}
+
+		var createConstraints = function( entityManager, physicsManager, world ) {
+			for( var i = 0; i < constraintsToCreate.length; i ++ ) {
+				var constraintConfig = constraintsToCreate[ i ],
+					entityId         = constraintConfig.entityId,
+					type             = constraintConfig.type,
+					constraint       = constraintConfig.constraint
+
+				var otherEntityId = entityManager.getEntityIdsByName( constraint.otherEntity )
+
+				if( otherEntityId && otherEntityId.length === 1 ) {
+					var config = _.extend(
+						{
+							stiff : true,
+							frequency : 10,
+							damping : 1,
+							removeOnBreak : true,
+							breakUnderForce : false,
+							breakUnderError : false,
+							ignoreInteractions : false,
+							sleeping : false,
+							disabled : false
+						},
+						constraint,
+						{ entityA: otherEntityId[0], entityB: entityId }
+					)
+
+					if( type === 'point' ) {
+						constraint = physicsManager.createPointConstraint( config )
+
+					} else if( type === 'weld' ) {
+						constraint = physicsManager.createWeldConstraint( config )
+
+					} else if( type === 'angle' ) {
+						constraint = physicsManager.createAngleConstraint( config )
+					}
+
+					world.addConstraint( constraint )
+				} else {
+					throw "OtherEntity '" + constraint.otherEntity +"' in the weld constraint isn't unique or existing!"
+				}
+			}
+
+			constraintsToCreate.length = 0
+		}
+
         var createBody = function( entityManager, physicsManager, world, entityId, entity ) {
             var body               = entity[ Defines.PHYSICS_BODY_COMPONENT_ID ],
                 fixture            = entity[ Defines.PHYSICS_FIXTURE_COMPONENT_ID ],
@@ -274,6 +337,8 @@ define(
             )
 
             physicsManager.createBodyDef( entityId, body, shapes, transform )
+
+			checkForConstraints( entityId, entity )
         }
 
 
@@ -405,7 +470,9 @@ define(
                     removedEntitiesQueue.length = 0
                 }
 
-                physicsManager.step( deltaTimeInMs * 0.001 )
+				createConstraints( spell.entityManager, physicsManager, this.world )
+
+				physicsManager.step( deltaTimeInMs * 0.001 )
                 incrementState( spell.entityManager, this.world, this.bodies, transforms )
             }
         }

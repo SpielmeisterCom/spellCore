@@ -1,0 +1,30 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Weld constraint",
+	"doc": "A Weld constraint constrains the anchor points on the two bodies to be locked together, and their relative rotation to be locked at a specific value. These sub-constraints are solved as a single complex constraint for extra stability.",
+    "icon": "resources/images/icons/component.png",
+    "attributes": [
+        {
+            "name": "otherEntity",
+            "type": "string",
+            "default": "Nobody"
+        },
+        {
+            "name": "anchorA",
+            "type": "vec2",
+            "default": [ 0, 0 ]
+        },
+        {
+            "name": "anchorB",
+            "type": "vec2",
+            "default": [ 0, 0 ]
+        },
+		{
+			"name": "phase",
+			"type": "number",
+			"default": 0
+		}
+	]
+}

@@ -1,0 +1,35 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Angle constraint",
+	"doc": "An Angle constraint constrains the weighted difference of the rotations of the two bodies to be locked to a given range of values.",
+    "icon": "resources/images/icons/component.png",
+    "attributes": [
+        {
+            "name": "otherEntity",
+            "type": "string",
+            "default": "Nobody"
+        },
+        {
+            "name": "anchorA",
+            "type": "vec2",
+            "default": [ 0, 0 ]
+        },
+        {
+            "name": "ratio",
+            "type": "number",
+            "default": 1
+        },
+		{
+			"name": "lowerBound",
+			"type": "number",
+			"default": 0
+		},
+		{
+			"name": "upperBound",
+			"type": "number",
+			"default": 0
+		}
+	]
+}
