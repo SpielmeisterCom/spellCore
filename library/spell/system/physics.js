@@ -66,9 +66,10 @@ define(
                     triggerContactEntityEvent( entityManager, 'beginContact', this, arbiter, otherShape, [] )
 
                     if( contactTrigger && contactTrigger.eventId ) {
-                        var params = !contactTrigger.parameters ? [] : _.isArray( contactTrigger.parameters ) ? contactTrigger.parameters : contactTrigger.parameters.split(',')
+                        var params           = contactTrigger.parameters,
+                            normalizedParams = !params ? [] : _.isArray( params ) ? params : _.isString( params ) ? params.split(',') : [ params ]
 
-                        triggerContactEntityEvent( entityManager, contactTrigger.eventId, this, arbiter, otherShape, params )
+                        triggerContactEntityEvent( entityManager, contactTrigger.eventId, this, arbiter, otherShape, normalizedParams )
                     }
                 }
             )
@@ -227,11 +228,13 @@ define(
 
 			if( weldConstraint ) {
 				constraintsToCreate.push( { type: 'weld', entityId: entityId, constraint: weldConstraint } )
+			}
 
-			} else if( pointConstraint ) {
+            if( pointConstraint ) {
 				constraintsToCreate.push( { type: 'point', entityId: entityId, constraint: pointConstraint } )
+			}
 
-			} else if( angleConstraint ) {
+            if( angleConstraint ) {
 				constraintsToCreate.push( { type: 'angle', entityId: entityId, constraint: angleConstraint } )
 			}
 		}
