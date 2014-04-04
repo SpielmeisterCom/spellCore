@@ -248,7 +248,16 @@ define(
 
 				var otherEntityId = entityManager.getEntityIdsByName( constraint.otherEntity )
 
-				if( otherEntityId && otherEntityId.length === 1 ) {
+                //TODO: find a solution for mutliple existenz of entity names
+				if( otherEntityId ) {
+                    if( otherEntityId.length > 1 ) {
+                        otherEntityId = entityManager.getEntityIdsByName( constraint.otherEntity, entityId )
+
+                        if( !otherEntityId || otherEntityId.length > 1 ) {
+                            throw "OtherEntity '" + constraint.otherEntity +"' in the constraint isn't unique!"
+                        }
+                    }
+
 					var config = _.extend(
 						{
 							stiff : true,
@@ -277,7 +286,7 @@ define(
 
 					world.addConstraint( constraint )
 				} else {
-					throw "OtherEntity '" + constraint.otherEntity +"' in the weld constraint isn't unique or existing!"
+					throw "OtherEntity '" + constraint.otherEntity +"' in the constraint isn't existing!"
 				}
 			}
 

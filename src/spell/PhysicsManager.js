@@ -209,6 +209,17 @@ define(
 			])
 		}
 
+        var setVelocityFromPosition = function( entityId, targetPosition, rotation, deltaTime ) {
+            var body = getBodyById( entityId )
+            if( !body ) return
+
+            body.setVelocityFromPosition(
+                targetPosition,
+                rotation,
+                deltaTime
+            )
+        }
+
 		var getVelocity = function( entityId, dst ) {
 			var body = getBodyById( entityId )
 			if( !body ) return
@@ -642,6 +653,8 @@ define(
 			setVelocityX  : setVelocityX,
 
 			setVelocityY  : setVelocityY,
+
+            setVelocityFromPosition: setVelocityFromPosition,
 
 			getVelocity   : getVelocity,
 
