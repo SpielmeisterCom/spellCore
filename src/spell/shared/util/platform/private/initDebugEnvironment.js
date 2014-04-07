@@ -5,8 +5,6 @@ define(
 
 
 		return function( spellConsole ) {
-<<<<<<< HEAD
-=======
 			// rewiring console.log
 			console.originalLog = console.log
 
@@ -23,7 +21,6 @@ define(
 					console.log.apply( this, arguments )
 				}
 			}
->>>>>>> remotes/origin/master
 		}
 	}
 )
