@@ -39,6 +39,9 @@ define(
 
 
 			play: function() {
+				if( !this.soundResource || !this.soundResource.resource)
+					return
+
 				if( !this.node ||
 					this.node.playbackState !== this.node.PLAYING_STATE ) {
 
@@ -164,6 +167,7 @@ define(
 				var sourceNode = sourceNodes[ id ]
 
 				if( sourceNode.state != PLAYING_STATE.PAUSED &&
+					sourceNode.node &&
 					sourceNode.node.playbackState === sourceNode.node.FINISHED_STATE ) {
 
 					destroy( id )
@@ -219,6 +223,7 @@ define(
 			var sourceNode = sourceNodes[ id ]
 
 			if( sourceNode &&
+                sourceNode.node &&
 				sourceNode.node.playbackState === sourceNode.node.PLAYING_STATE ) {
 
 				sourceNode.state = PLAYING_STATE.PAUSED
@@ -231,6 +236,7 @@ define(
 			var sourceNode = sourceNodes[ id ]
 
 			if( sourceNode &&
+                sourceNode.node &&
 				sourceNode.node.playbackState !== sourceNode.node.PLAYING_STATE ) {
 
 				sourceNode.play()

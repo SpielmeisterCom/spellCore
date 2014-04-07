@@ -165,14 +165,30 @@ define(
 			this.spell.entityManager.updateWorldTransform( entityId )
 			this.isDirty = false
 
+            var position = this.transforms[ entityId ].translation
+
 			this.spell.sendMessageToEditor(
 				'spelled.entity.update', {
 				id: entityId,
 				componentId: 'spell.component.2d.transform',
 				config: {
-					translation: this.transforms[ entityId ].translation
+					translation: position
 				}
 			})
+
+            var physicsBody = this.spell.entityManager.getComponentById(
+                entityId,
+                'spell.component.physics.body'
+            )
+
+            //In turbulenz static bodies can't be repositioned, that's why we cast them temporal to dynamic and back
+            if( physicsBody ) {
+                this.spell.physicsManager.setBodyType( entityId, this.spell.physicsManager.BODY_TYPE_DYNAMIC )
+
+                this.spell.physicsManager.setPosition( entityId, position )
+
+                this.spell.physicsManager.setBodyType( entityId, physicsBody.type )
+            }
 
 			if(
 				this.spell.entityManager.hasComponent(
@@ -314,8 +330,8 @@ define(
 			entityManager.updateWorldTransform( entityId )
 
 			//if this object has a phyics body, reposition the physics body
-			if( body && this.spell.physicsWorlds && this.spell.physicsWorlds.main ) {
-				this.spell.physicsWorlds.main.setPosition( entityId, newTranslation )
+			if( body ) {
+				this.spell.physicsManager.setPosition( entityId, newTranslation )
 			}
 		}
 

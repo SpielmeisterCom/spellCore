@@ -79,8 +79,8 @@ define(
 		var process = function( spell, timeInMs, deltaTimeInMs ) {
 			var entityManager      = this.entityManager,
 				keyFrameAnimations = this.keyFrameAnimations,
-				worldPassEntities  = spell.worldPassEntities,
-				uiPassEntities  = spell.uiPassEntities
+				worldPassEntities  = spell.visibilityManager.worldPassEntities || [],
+				uiPassEntities  = spell.visibilityManager.uiPassEntitiesMap || {}
 
 			for( var id in keyFrameAnimations ) {
 				var keyFrameAnimation = keyFrameAnimations[ id ]
@@ -104,7 +104,16 @@ define(
 				keyFrameAnimation.offset  = offset
 				keyFrameAnimation.playing = updatePlaying( lengthInMs, rawOffset, keyFrameAnimation.looped )
 
-				if( !worldPassEntities[ id ] && !uiPassEntities[ id ] ) {
+				var currentlyVisible = (uiPassEntities[ id ])
+				if(!currentlyVisible) {
+					for (var i= 0, n = worldPassEntities.length; i<n; i++) {
+						if (worldPassEntities[ i ][ 'id' ] == id) {
+							currentlyVisible = true
+							break;
+						}
+					}
+				}
+				if( !currentlyVisible ) {
 					// HACK: If an entity is not visible do not bother updating its components. This will inevitable lead
 					// to visual artifacts when the bound of the entity is smaller than the space covered by the key
 					// frame animation. As the time of this writing this is not the case. The real solution is to

@@ -52,9 +52,12 @@ define(
 				context = null
 			}
 
-			if( context ) return context
+			if( !context ) {
+				//use the dummy audio context as fallback
+				context = createDummyAudioContext()
+			}
 
-			throw 'Could not create a audio back-end.'
+			if( context ) return context
 		}
 
 		return {

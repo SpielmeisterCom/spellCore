@@ -14,6 +14,10 @@ define(
 
 
 		var getViewportMetaTag = function() {
+			if(!document || !document.getElementsByTagName) {
+				return
+			}
+
 			var metaTags = document.getElementsByTagName( 'meta' )
 
 			for( var i = 0, n = metaTags.length, metaTag; i < n; i++ ) {
@@ -23,13 +27,13 @@ define(
 			}
 		}
 
-		var updateViewportMetaTag = function( initialScale, maximumScale ) {
+		var updateViewportMetaTag = function( initialScale, maximumScale, width ) {
 			var viewportMetaTag = getViewportMetaTag()
 			if( !viewportMetaTag ) return
 
 			viewportMetaTag.setAttribute(
 				'content',
-				'width=device-width, user-scalable=0, initial-scale=' + initialScale + ', maximum-scale=' + maximumScale + ''
+				'width=' + width + ', user-scalable=0, initial-scale=' + initialScale + ', maximum-scale=' + maximumScale + ''
 			)
 		}
 
@@ -37,12 +41,20 @@ define(
 			{
 				userAgentKeywords : [ 'iPhone', 'iPod', 'Tizen' ],
 				initialScale : 0.5,
-				maximumScale : 0.5
+				maximumScale : 0.5,
+				getWidth: function() { return 'device-width' }
 			},
 			{
 				userAgentKeywords : [ 'iPad' ],
 				initialScale : 1.0,
-				maximumScale : 1.0
+				maximumScale : 1.0,
+				getWidth: function() { return 'device-width' }
+			},
+			{
+				userAgentKeywords : [ 'Android' ],
+				initialScale : 1.0,
+				maximumScale : 1.0,
+				getWidth: function() { return window.innerWidth }
 			}
 		]
 
@@ -86,18 +98,30 @@ define(
 							'landscapeRotatedRight' :
 							'landscapeRotatedLeft'
 
-				eventManager.publish(
-					eventManager.EVENT.DEVICE_ORIENTATION_CHANGED,
-					[ orienationMode ]
-				)
+				window.setTimeout(function() {
+					var deviceClass = getDeviceClass( navigator.userAgent )
 
-				processResize()
+					if( deviceClass ) {
+						updateViewportMetaTag( deviceClass.initialScale, deviceClass.maximumScale, deviceClass.getWidth() )
+					}
+
+					window.setTimeout( function() {
+						eventManager.publish(
+							eventManager.EVENT.DEVICE_ORIENTATION_CHANGED,
+							[ orienationMode ]
+						)
+
+						processResize()
+					}, 500)
+
+				}, 500)
+
 			}
 
 			var deviceClass = getDeviceClass( navigator.userAgent )
 
 			if( deviceClass ) {
-				updateViewportMetaTag( deviceClass.initialScale, deviceClass.maximumScale )
+				updateViewportMetaTag( deviceClass.initialScale, deviceClass.maximumScale, deviceClass.getWidth() )
 			}
 
 			window.addEventListener( 'orientationchange', processOrientationChange, true )

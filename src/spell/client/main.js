@@ -19,7 +19,8 @@ define(
 		'spell/PluginManager',
 		'spell/StatisticsManager',
 		'spell/Console',
-        'spell/shared/util/physics/createPhysicsContext',
+		'spell/VisibilityManager',
+		'spell/PhysicsManager',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
         'spell/shared/util/translate',
@@ -45,7 +46,8 @@ define(
 		PluginManager,
 		StatisticsManager,
 		Console,
-        createPhysicsContext,
+		VisibilityManager,
+		PhysicsManager,
 		PlatformKit,
 		initDebugEnvironment,
         translate,
@@ -133,13 +135,13 @@ define(
 			var inputManager = new InputManager( configurationManager, renderingContext )
 			inputManager.init()
 
+			spell.pluginManager        = new PluginManager( inputManager )
 			spell.audioContext         = audioContext
 			spell.assetManager         = assetManager
 			spell.configurationManager = configurationManager
 			spell.moduleLoader         = moduleLoader
 			spell.entityManager        = entityManager
-            spell.physicsContext       = createPhysicsContext()
-            spell.physicsWorlds        = {}
+			spell.physicsManager       = new PhysicsManager()
 			spell.renderingContext     = renderingContext
 			spell.sceneManager         = sceneManager
 			spell.sendMessageToEditor  = this.sendMessageToEditor
@@ -148,6 +150,8 @@ define(
 			spell.environment          = PlatformKit.createEnvironment( configurationManager, eventManager )
 			spell.env                  = spell.environment
 			spell.libraryManager       = libraryManager
+			spell.visibilityManager    = new VisibilityManager( eventManager, configurationManager, entityManager )
+			spell.visibilityManager.init()
 
 			spell.console.debug( 'client started' )
 
@@ -179,6 +183,9 @@ define(
 
 			spell.applicationModule    = undefined
 			spell.configurationManager = configurationManager
+			if( loaderConfig.libraryUrl ) {
+				spell.configurationManager.setValue( 'libraryUrl', loaderConfig.libraryUrl )
+			}
 			spell.eventManager         = eventManager
 			spell.loaderConfig         = loaderConfig
 			spell.console              = console
@@ -187,7 +194,6 @@ define(
 			spell.scenes               = {}
 			spell.statisticsManager    = statisticsManager
 			spell.storage              = PlatformKit.createPersistentStorage()
-			spell.pluginManager        = new PluginManager()
             spell.libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ), isModeDeployed )
 
 			this.spell = spell

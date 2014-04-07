@@ -12,6 +12,10 @@ define(
 		var Environment = function( configurationManager, eventManager ) {
 			this.configurationManager = configurationManager
 			this.eventManager         = eventManager
+
+			if( typeof window !== 'undefined' ) {
+				this.window               = window
+			}
 		}
 
 		Environment.prototype = {

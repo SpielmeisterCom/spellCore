@@ -8,8 +8,15 @@
 		{
 			"name": "layer",
 			"type": "integer",
-			"default": 1,
+			"default": 0,
 			"doc": "the layer that the entity is drawn on"
+		},
+		{
+			"name": "worldLayer",
+			"engineInternal": true,
+			"type": "integer",
+			"default": 0,
+			"doc": "the effective layer that the entity is drawn on"
 		},
 		{
 			"name": "opacity",

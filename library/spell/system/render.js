@@ -46,14 +46,14 @@ define(
 	) {
 		'use strict'
 
+        var COLOR_NORMALIZER = 255
 
 		var tmpVec2           = vec2.create(),
 			tmpVec2_1         = vec2.create(),
 			tmpMat3           = mat3.identity( mat3.create() ),
 			clearColor        = vec4.fromValues( 0, 0, 0, 1 ),
-			markerColor       = vec4.fromValues( 0.45, 0.45, 0.45, 1.0 ),
+			unsafeAreaColor   = vec4.fromValues( 0, 0, 0, 1 ),
 			debugFontAssetId  = 'font:spell.OpenSans14px',
-			drawDebugShapes   = true,
 			defaultDimensions = vec2.fromValues( 1.0, 1.0 ),
 			tmpViewFrustum    = { bottomLeft : vec2.create(), topRight : vec2.create() },
 			currentCameraId
@@ -66,77 +66,6 @@ define(
 			if( !text ) return
 
 			textAppearance.renderText = text
-		}
-
-		var layerCompareFunction = function( a, b ) {
-			return a.layer - b.layer
-		}
-
-		/**
-		 * Returns an array of root entity ids. "root" in this context means an entity which has a parent which is not in the set of entities.
-		 *
-		 * @param entities
-		 * @return {Array}
-		 */
-		var getRootEntities = function( entities ) {
-			var result = []
-
-			for( var id in entities ) {
-				if( !entities[ entities[ id ].parent ] ) {
-					result.push( id )
-				}
-			}
-
-			return result
-		}
-
-		var createVisualObjectsInDrawOrder = function( visibleEntities, entityIds ) {
-			var result = []
-
-			for( var i = 0, id, visibleEntity, n = entityIds.length; i < n; i++ ) {
-				id = entityIds[ i ]
-				visibleEntity = visibleEntities[ id ]
-
-				if( !visibleEntity ) continue
-
-				result.push( visibleEntity )
-			}
-
-			result.sort( layerCompareFunction )
-
-			return result
-		}
-
-		var createEntityIdsInDrawOrder = function( visibleEntities, entityIds, result ) {
-			var childrenIds,
-				id,
-				visibleEntity,
-				visibleEntitiesSorted = createVisualObjectsInDrawOrder( visibleEntities, entityIds )
-
-			for( var i = 0, n = visibleEntitiesSorted.length; i < n; i++ ) {
-				visibleEntity = visibleEntitiesSorted[ i ]
-				id = visibleEntity.id
-
-				result.push( id )
-
-				childrenIds = visibleEntity.children
-
-				if( childrenIds && childrenIds.length > 0 ) {
-					createEntityIdsInDrawOrder( visibleEntities, childrenIds, result )
-				}
-			}
-		}
-
-		var createVisibleEntityIdsSorted = function( entities ) {
-			var result = []
-
-			createEntityIdsInDrawOrder(
-				entities,
-				getRootEntities( entities ),
-				result
-			)
-
-			return result
 		}
 
 		var createOffset = function( deltaTimeInMs, offset, replaySpeed, numFrames, frameDuration, loop ) {
@@ -516,6 +445,11 @@ define(
 			eventManager.subscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
 			eventManager.subscribe( [ eventManager.EVENT.COMPONENT_UPDATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
 
+			if( this.config && this.config.clearColor ) {
+				var cColor = this.config.clearColor
+				clearColor = vec4.fromValues( cColor[0] / COLOR_NORMALIZER, cColor[1] / COLOR_NORMALIZER, cColor[2] / COLOR_NORMALIZER, 1 )
+				this.context.setClearColor( clearColor )
+			}
 
 //			statisticsManager = spell.statisticsManager
 //
@@ -555,6 +489,8 @@ define(
 				rectangles             = this.rectangles,
 				viewFrustum
 
+			spell.visibilityManager.updateVisibility( spell )
+
 			// clear color buffer
 			context.clear()
 
@@ -576,9 +512,7 @@ define(
 			// draw visual objects in background pass
 			setCamera( context, effectiveCameraDimensions, [ 0, 0 ] )
 
-			var visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.backgroundPassEntities )
-
-			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
+			for( var i = 0, n = spell.visibilityManager.backgroundPassEntities.length; i < n; i++ ) {
 				drawVisualObject(
 					entityManager,
 					context,
@@ -593,7 +527,7 @@ define(
 					visualObjects,
 					rectangles,
 					deltaTimeInMs,
-					visibleEntityIdsSorted[ i ],
+					spell.visibilityManager.backgroundPassEntities[ i ][ 'id' ],
 					viewFrustum
 				)
 			}
@@ -604,9 +538,7 @@ define(
 			{
 				setCamera( context, effectiveCameraDimensions, cameraTransform.translation )
 
-				visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.worldPassEntities )
-
-				for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
+				for( var i = 0, n = spell.visibilityManager.worldPassEntitiesLength; i < n; i++ ) {
 					drawVisualObject(
 						entityManager,
 						context,
@@ -621,18 +553,12 @@ define(
 						visualObjects,
 						rectangles,
 						deltaTimeInMs,
-						visibleEntityIdsSorted[ i ],
+						spell.visibilityManager.worldPassEntities[ i ][ 'id' ],
 						viewFrustum
 					)
 				}
 
-                if( spell.physicsWorlds && spell.physicsWorlds.debugDraw ) {
-                    var debug = spell.physicsWorlds.debugDraw
-                    debug.begin()
-                    debug.drawWorld( spell.physicsWorlds.main.rawWorld )
-                    debug.end()
-                }
-
+                spell.physicsManager.debugDrawHook( spell.renderingContext, [ viewFrustum.bottomLeft[0], viewFrustum.bottomLeft[1], viewFrustum.topRight[0], viewFrustum.topRight[1] ] )
 			}
 			context.restore()
 
@@ -640,9 +566,7 @@ define(
 			// draw visual objects in ui pass
 			setCamera( context, effectiveCameraDimensions, [ 0, 0 ] )
 
-			visibleEntityIdsSorted = createVisibleEntityIdsSorted( spell.uiPassEntities )
-
-			for( var i = 0, n = visibleEntityIdsSorted.length; i < n; i++ ) {
+			for( var i = 0, n = spell.visibilityManager.uiPassEntities.length; i < n; i++ ) {
 				drawVisualObject(
 					entityManager,
 					context,
@@ -657,7 +581,7 @@ define(
 					visualObjects,
 					rectangles,
 					deltaTimeInMs,
-					visibleEntityIdsSorted[ i ],
+					spell.visibilityManager.uiPassEntities[ i ][ 'id' ],
 					viewFrustum
 				)
 			}
@@ -693,7 +617,7 @@ define(
 					mathUtil.mat3Ortho( tmpMat3, 0, screenSize[ 0 ], 0, screenSize[ 1 ] )
 					context.setViewMatrix( tmpMat3 )
 
-					context.setColor( clearColor )
+					context.setColor( unsafeAreaColor )
 
 					if( offset[ 0 ] > 0 ) {
 						context.fillRect( 0, 0, offset[ 0 ], screenSize[ 1 ] )

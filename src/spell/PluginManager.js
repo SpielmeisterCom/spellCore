@@ -13,8 +13,12 @@ define(
 		'use strict'
 
 
-		var PluginManager = function() {
+		var PluginManager = function( inputManager ) {
 			this.plugins = PlatformKit.getPlugins()
+
+			if( this.plugins[ 'ouya' ] ) {
+				this.plugins[ 'ouya'].init( inputManager )
+			}
 		}
 
 		PluginManager.prototype = {

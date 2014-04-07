@@ -7,7 +7,6 @@ define(
 	[
 		'spell/shared/util/createAssetId',
 		'spell/shared/util/platform/private/Application',
-		'spell/shared/util/platform/private/Box2D',
 		'spell/shared/util/platform/private/callNextFrame',
 		'spell/shared/util/platform/private/createHost',
 		'spell/shared/util/platform/private/jsonCoder',
@@ -28,12 +27,11 @@ define(
 		'spell/shared/util/platform/private/configurationOptions',
 		'spell/shared/util/platform/private/storage/PersistentStorage',
 		'spell/shared/util/platform/private/openURL',
-        'spell/shared/util/platform/private/physics2dDevice',
-        'spell/shared/util/platform/private/physics2dDebugDraw',
 		'spell/shared/util/platform/private/platformDetails',
 		'spell/shared/util/platform/private/graphics/initViewport',
 		'spell/shared/util/platform/private/advertisement',
 		'spell/shared/util/platform/private/flurry',
+		'spell/shared/util/platform/private/ouya',
 		'spell/shared/util/platform/private/createComponentType',
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
 		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
@@ -42,7 +40,6 @@ define(
 	function(
 		createAssetId,
 		Application,
-		Box2D,
 		callNextFrame,
 		createHost,
 		jsonCoder,
@@ -63,12 +60,11 @@ define(
 		configurationOptions,
 		PersistentStorage,
 		openURL,
-        physics2dDevice,
-        physics2dDebugDraw,
 		platformDetails,
 		initViewport,
 		advertisement,
 		flurry,
+		ouya,
 		createComponentType,
 		isHtml5Ejecta,
 		isHtml5TeaLeaf,
@@ -94,19 +90,6 @@ define(
 		}
 
 		return {
-			/*
-			 *
-			 */
-			Box2D : Box2D,
-
-			/*
-             *
-             */
-            Physics : {
-				device      : new physics2dDevice(),
-				debugDrawer : physics2dDebugDraw
-			},
-
 			/*
 			 *
 			 */
@@ -217,12 +200,15 @@ define(
 			},
 
 			getPlugins : function() {
-				if( isHtml5Ejecta ||
-					isHtml5TeaLeaf ) {
+				if( isHtml5Ejecta ) {
+					return {}
+
+				} else if ( isHtml5TeaLeaf ) {
 
 					return {
 						admob : advertisement,
-						admobWithChartboost : advertisement
+						admobWithChartboost : advertisement,
+						ouya: ouya
 					}
 
 				} else {

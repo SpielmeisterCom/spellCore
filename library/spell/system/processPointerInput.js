@@ -58,6 +58,32 @@ define(
 			)
 		}
 
+        var getEntityDimensionRecursive = function( entityManager, entityId ) {
+            var entityDimensions       = entityManager.getEntityDimensions( entityId ),
+                COMPOSITE_COMPONENT_ID = Defines.COMPOSITE_COMPONENT_ID
+
+            if( entityManager.hasComponent( entityId, COMPOSITE_COMPONENT_ID ) ) {
+                var composite = entityManager.getComponentById( entityId, COMPOSITE_COMPONENT_ID )
+
+                _.each(
+                    composite.childrenIds,
+                    function( childEntityId ) {
+                        var tmpDimensions = getEntityDimensionRecursive( entityManager, childEntityId )
+
+                        if( tmpDimensions[ 0 ] > entityDimensions[ 0 ] ) {
+                            entityDimensions[ 0 ] = tmpDimensions[ 0 ]
+                        }
+
+                        if( tmpDimensions[ 1 ] > entityDimensions[ 1 ] ) {
+                            entityDimensions[ 1 ] = tmpDimensions[ 1 ]
+                        }
+                    }
+                )
+            }
+
+            return entityDimensions
+        }
+
 		var processEvent = function( entityManager, screenSize, effectiveCameraDimensions, pointedEntityMap, renderingContext, eventHandlers, transforms, visualObjects, inputEvent ) {
 			if( inputEvent.type !== 'pointerDown' &&
 				inputEvent.type !== 'pointerMove' &&
@@ -101,7 +127,7 @@ define(
                 }
 
 				// NOTE: I guess the visualObject component should contain the effective dimension information.
-				var entityDimensions = entityManager.getEntityDimensions( entityId )
+				var entityDimensions = getEntityDimensionRecursive( entityManager, entityId )
 				if( !entityDimensions ) continue
 
 				var isEntityHit = isPointWithinEntity(

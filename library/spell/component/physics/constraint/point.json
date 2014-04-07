@@ -1,0 +1,25 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Point constraint",
+	"doc": "A Point constraint, constrains the anchor points on the two bodies to be locked together.",
+    "icon": "resources/images/icons/component.png",
+    "attributes": [
+        {
+            "name": "otherEntity",
+            "type": "string",
+            "default": "Nobody"
+        },
+        {
+            "name": "anchorA",
+            "type": "vec2",
+            "default": [ 0, 0 ]
+        },
+        {
+            "name": "anchorB",
+            "type": "vec2",
+            "default": [ 0, 0 ]
+        }
+	]
+}

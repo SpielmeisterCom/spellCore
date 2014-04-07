@@ -20,8 +20,13 @@
 <script type="text/javascript">
 	mocha.setup('bdd')
 
+<<<<<<< HEAD
 	var imageLoader = require('spellTest/shared/util/platform/private/loader/ImageLoader')
 	imageLoader( describe, it );
+=======
+	var RequestManager = require('spellTest/VisibilityManager')
+	RequestManager( describe, it );
+>>>>>>> remotes/origin/master
 
 
 	var textLoader = require('spellTest/shared/util/platform/private/loader/TextLoader')

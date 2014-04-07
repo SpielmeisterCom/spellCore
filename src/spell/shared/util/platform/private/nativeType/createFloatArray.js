@@ -8,11 +8,23 @@ define(
 	) {
 		'use strict'
 
-
-		var arrayType = ( hasFloatArraySupport() ? Float32Array : Array )
-
 		return function( length ) {
-			return new arrayType( length )
+
+			var array
+
+			if( hasFloatArraySupport() ) {
+
+				array = new Float32Array( length )
+
+			} else {
+
+				array = new Array( length )
+				for( var i=0; i < length; i++ ) {
+					array[ i ] = 0
+				}
+			}
+
+			return array
 		}
 	}
 )
