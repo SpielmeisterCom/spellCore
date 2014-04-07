@@ -6,13 +6,17 @@
 define(
     'spell/system/physics',
     [
+		'spell/math/vec2',
+
         'spell/Defines',
         'spell/functions'
     ],
     function(
+		vec2,
+
         Defines,
         _
-        ) {
+    ) {
         'use strict'
 
         /**
@@ -360,6 +364,12 @@ define(
             }
         }
 
+		var isVec2Equal = function( vector1, vector2 ) {
+			return vector1[0] == vector2[0] && vector1[1] == vector2[1]
+		}
+
+		var tmpVec2 = vec2.create()
+
         var iterateRigidBodies = function( entityManager, rigidBodies, bodies, transforms ) {
             var length       = rigidBodies.length,
                 rigidBody, id, body, transform
@@ -374,7 +384,16 @@ define(
 
                 if( !transform ) continue
 
-                rigidBody.getPosition( transform.translation )
+				var translation      = transform.translation,
+					worldTranslation = transform.worldTranslation,
+					position         = rigidBody.getPosition()
+
+				if( !isVec2Equal( translation, worldTranslation ) ) {
+					vec2.subtract( tmpVec2, position, worldTranslation )
+					vec2.add( position, translation, tmpVec2 )
+				}
+
+				transform.translation = position
                 transform.rotation = rigidBody.getRotation()
                 rigidBody.getVelocity( body.velocity )
 
