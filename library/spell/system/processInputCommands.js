@@ -34,17 +34,18 @@ define(
 					pendingStopCommands[ id ] = true
 
 				} else {
-					// The stop command is skipped when no corresponding start command was registered before it.
 					if( pendingStopCommands[ id ] ) {
 						pendingStopCommands[ id ] = false
-
-					} else {
-						continue
 					}
 				}
 
 				for( var j = 0, m = playerControlledIds.length; j < m; j++ ) {
-					entityManager.triggerEvent( playerControlledIds[ j ], command.getEventName() )
+					var mapping      = playerControlledIds[ j ],
+						entityId     = mapping.entityId
+
+					if( mapping.controllerId === command.inputContextId ) {
+						entityManager.triggerEvent( entityId, command.getEventName() )
+					}
 				}
 			}
 		}
@@ -60,13 +61,12 @@ define(
 				var playerControlledIds = this.playerControlledIds = []
 
 				var processControllableComponentEvents = this.processControllableComponentEvents = function( component, entityId ) {
-					if( component.controllerId !== 'player' ||
-						_.contains( playerControlledIds, entityId ) ) {
+					if( _.contains( playerControlledIds, entityId ) ) {
 
 						return
 					}
 
-					playerControlledIds.push( entityId )
+					playerControlledIds.push( { entityId: entityId, controllerId: component.controllerId } )
 				}
 
 				var eventManager = spell.eventManager
