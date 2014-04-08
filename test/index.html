@@ -23,12 +23,8 @@
 	var imageLoader = require('spellTest/shared/util/platform/private/loader/ImageLoader')
 	imageLoader( describe, it );
 
-	var RequestManager = require('spellTest/VisibilityManager')
-	RequestManager( describe, it );
-
 	var textLoader = require('spellTest/shared/util/platform/private/loader/TextLoader')
 	textLoader( describe, it );
-
 
 	var soundLoader = require('spellTest/shared/util/platform/private/loader/SoundLoader')
 	soundLoader( describe, it );
@@ -38,7 +34,6 @@
 
     var spellClient = require('spellTest/client/main')
     spellClient( describe, it );
-
 
     mocha.checkLeaks();
 	mocha.run();

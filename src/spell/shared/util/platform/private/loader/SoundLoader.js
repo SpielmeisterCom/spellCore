@@ -12,6 +12,7 @@ define(
 		var onLoad = function( callback, buffer ) {
 			// TODO: free SoundLoader retained js objects
 
+			console.log( buffer )
 			callback(
 				null,
 				this.audioContext.createSound( buffer )
@@ -24,7 +25,7 @@ define(
 		}
 
 		SoundLoader.prototype = {
-			load : function( url, isMusic, callback ) {
+			load : function( isMusic, url, callback ) {
 
 				this.audioContext.loadBuffer(
 					url,

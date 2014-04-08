@@ -21,10 +21,13 @@ define(
 		'spell/Console',
 		'spell/VisibilityManager',
 		'spell/PhysicsManager',
+		'spell/RequestManager',
 		'spell/shared/util/platform/PlatformKit',
 		'spell/shared/util/platform/initDebugEnvironment',
-        'spell/shared/util/translate',
-
+		'spell/shared/util/translate',
+		'spell/shared/util/platform/private/loader/ImageLoader',
+		'spell/shared/util/platform/private/loader/SoundLoader',
+		'spell/shared/util/platform/private/loader/TextLoader',
 		'spell/functions'
 	],
 	function(
@@ -48,10 +51,13 @@ define(
 		Console,
 		VisibilityManager,
 		PhysicsManager,
+		RequestManager,
 		PlatformKit,
 		initDebugEnvironment,
-        translate,
-
+		translate,
+		ImageLoader,
+		SoundLoader,
+		TextLoader,
 		_,
 
 		// configuration parameters passed in from stage zero loader
@@ -103,9 +109,14 @@ define(
 
 			spell.console.debug( 'created audio context (' + audioContext.getConfiguration().type + ')' )
 
+			var requestManager       = new RequestManager(
+				PlatformKit.createImageLoader( renderingContext ),
+				PlatformKit.createSoundLoader( audioContext ),
+				PlatformKit.createTextLoader( )
+			)
+			spell.requestManager         = requestManager
 
-			libraryManager.init( audioContext, renderingContext )
-
+			libraryManager.init( requestManager )
 
 			var assetManager = new AssetManager( libraryManager )
 

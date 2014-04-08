@@ -38,7 +38,7 @@ define(
 
 			describe( 'SoundLoader', function( ) {
 				it( 'should load music (using audioContext)', function( done ) {
-					soundLoader.load( 'data/music.mp3', true, function( err, data ) {
+					soundLoader.load( true, 'data/music.mp3', function( err, data ) {
 						should.not.exist( err )
 						should.exist( data )
 
@@ -47,7 +47,7 @@ define(
 				})
 
 				it( 'should load sound effects (using audioContext)', function( done ) {
-					soundLoader.load( 'data/non-existent.png', false, function( err, data ) {
+					soundLoader.load( false, 'data/non-existent.png', function( err, data ) {
 
 					should.not.exist( err )
 					should.exist( data )

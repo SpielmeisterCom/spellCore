@@ -29,33 +29,6 @@ define(
 			return nextLoadingProcessId++
 		}
 
-		var resourceJsonDecoder = function( resource ) {
-			return PlatformKit.jsonCoder.decode( resource )
-		}
-
-		var createResourceTypeToLoaderFactory = function( renderingContext, soundContext ) {
-			var createTexture = _.bind( PlatformKit.createImageLoader, null, renderingContext ),
-				createSound   = _.bind( PlatformKit.createSoundLoader, null, soundContext ),
-				createText    = _.bind( PlatformKit.createTextLoader, null, resourceJsonDecoder )
-
-			return {
-				jpeg : createTexture,
-				png  : createTexture,
-				mp3  : createSound,
-				wav  : createSound,
-				ogg  : createSound,
-				json : createText
-			}
-		}
-
-		var getLoaderFactory = function( resourceTypeToLoaderFactory, type, libraryFilePath ) {
-			var actualType = 'auto' ?
-				_.last( libraryFilePath.split( '.' ) ) :
-				type
-
-			return resourceTypeToLoaderFactory[ actualType ]
-		}
-
 		var createLoadingProcess = function( id, libraryIdsToLibraryFilePaths, libraryUrl, invalidateCache, config, next ) {
 			return {
 				assetManager       : config.assetManager,
@@ -112,25 +85,17 @@ define(
 			}
 		}
 
-		var onLoadCallback = function( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath, loadedResource ) {
-			if( !loadedResource ) {
-				throw 'Error: Loading library file "' + libraryFilePath + '" from loading process "' + loadingProcess.id + '" returned a false value.'
+		var onLoadCallback = function( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath, err, data ) {
+			if( err ) {
+				throw err
 			}
 
-			cache[ libraryId ] = loadedResource
+			cache[ libraryId ] = data
 
 			updateProgress( eventManager, cache, loadingProcesses, loadingProcess )
 		}
 
-		var onErrorCallback = function( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath ) {
-			throw 'Error: Loading library file "' + libraryFilePath + '" failed.'
-		}
-
-		var onTimedOutCallback = function( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath ) {
-			throw 'Error: Loading library file "' + libraryFilePath + '" timed out.'
-		}
-
-		var startLoadingProcess = function( cache, eventManager, resourceTypeToLoaderFactory, loadingProcesses, loadingProcess ) {
+		var startLoadingProcess = function( cache, eventManager, loadingProcesses, requestManager, loadingProcess ) {
 			var omitCache        = loadingProcess.omitCache,
 				libraryFilePaths = loadingProcess.libraryFilePaths
 
@@ -141,36 +106,20 @@ define(
 					var cachedEntry = cache[ libraryId ]
 
 					if( cachedEntry ) {
-						onLoadCallback( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath, cachedEntry )
+						onLoadCallback( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath, null, cachedEntry )
 
 						continue
 					}
-				}
-
-				var loaderFactory = getLoaderFactory( resourceTypeToLoaderFactory, loadingProcess.type, libraryFilePath )
-
-				if( !loaderFactory ) {
-					throw 'Error: Unable to load resource of type "' + loadingProcess.type + '".'
 				}
 
 				var url = loadingProcess.libraryUrl ?
 					loadingProcess.libraryUrl + '/' + libraryFilePath :
 					libraryFilePath
 
-				var loader = loaderFactory(
-					loadingProcess.assetManager,
-					libraryId,
+				requestManager.get(
 					loadingProcess.invalidateCache ? createUrlWithCacheBreaker( url ) : url,
-					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath ),
-					_.bind( onErrorCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath ),
-					_.bind( onTimedOutCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath )
+					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath )
 				)
-
-				if( !loader ) {
-					throw 'Could not create a loader for resource "' + libraryFilePath + '".'
-				}
-
-				loader.start()
 			}
 		}
 
@@ -180,7 +129,6 @@ define(
 			this.loadingProcesses            = {}
 			this.libraryUrl                  = libraryUrl
 			this.invalidateCache             = !isModeDeployed
-			this.resourceTypeToLoaderFactory
 
 			this.cache = {
 				metaData : {},
@@ -257,10 +205,6 @@ define(
 			},
 
 			load : function( libraryIdsToLibraryFilePaths, config, next ) {
-				if( !this.resourceTypeToLoaderFactory ) {
-					throw 'Error: Library manager is not properly initialized.'
-				}
-
 				if( _.size( libraryIdsToLibraryFilePaths ) === 0 ) {
 					throw 'Error: No library file paths provided.'
 				}
@@ -281,16 +225,16 @@ define(
 				startLoadingProcess(
 					loadingProcess.isMetaDataLoad ? this.cache.metaData : this.cache.resource,
 					this.eventManager,
-					this.resourceTypeToLoaderFactory,
 					this.loadingProcesses,
+					this.requestManager,
 					loadingProcess
 				)
 
 				return id
 			},
 
-			init : function( audioContext, renderingContext ) {
-				this.resourceTypeToLoaderFactory = createResourceTypeToLoaderFactory( renderingContext, audioContext )
+			init : function( requestManager ) {
+				this.requestManager                 = requestManager
 			}
 		}
 
