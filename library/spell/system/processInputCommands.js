@@ -94,7 +94,10 @@ define(
 					if( !pendingStopCommands[ id ] ) continue
 
 					for( var i = 0, n = playerControlledIds.length; i < n; i++ ) {
-						entityManager.triggerEvent( playerControlledIds[ i ], 'stop' + id )
+                        var mapping      = playerControlledIds[ i ],
+                            entityId     = mapping.entityId
+
+                        entityManager.triggerEvent( entityId, 'stop' + id )
 					}
 				}
 
