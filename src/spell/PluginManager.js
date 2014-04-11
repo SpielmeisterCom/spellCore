@@ -19,6 +19,10 @@ define(
 			if( this.plugins[ 'ouya' ] ) {
 				this.plugins[ 'ouya'].init( inputManager )
 			}
+
+            if( this.plugins[ 'store' ] ) {
+                this.plugins[ 'store'].init()
+            }
 		}
 
 		PluginManager.prototype = {
