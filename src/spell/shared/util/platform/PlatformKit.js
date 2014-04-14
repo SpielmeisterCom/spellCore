@@ -34,6 +34,7 @@ define(
 		'spell/shared/util/platform/private/ouya',
         'spell/shared/util/platform/private/iap/web',
         'spell/shared/util/platform/private/iap/windows',
+		'spell/shared/util/platform/private/iap/android',
 		'spell/shared/util/platform/private/createComponentType',
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
 		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
@@ -70,6 +71,7 @@ define(
 		ouya,
         webIap,
         windowsIap,
+		androidIap,
 		createComponentType,
 		isHtml5Ejecta,
 		isHtml5TeaLeaf,
@@ -212,7 +214,8 @@ define(
 					return {
 						admob : advertisement,
 						admobWithChartboost : advertisement,
-						ouya: ouya
+						ouya: ouya,
+						iap: androidIap
 					}
 
 				} else if( isHtml5WinStore ) {
