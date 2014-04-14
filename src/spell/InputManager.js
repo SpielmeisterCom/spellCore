@@ -21,9 +21,10 @@ define(
 		'use strict'
 
 
-		var Command = function( id, isStart ) {
+		var Command = function( id, isStart, inputContextId ) {
 			this.id = id
 			this.isStart = isStart
+			this.inputContextId = inputContextId
 		}
 
 		Command.prototype = {
@@ -88,7 +89,8 @@ define(
 
 						return new Command(
 							command.substr( 0, 1 ).toUpperCase() + command.substr( 1, command.length ),
-							isStart
+							isStart,
+							id
 						)
 					}
 				}
