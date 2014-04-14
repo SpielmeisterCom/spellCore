@@ -1,0 +1,111 @@
+{
+	"type": "system",
+	"readonly": true,
+	"input": [
+		{
+			"name": "transforms",
+			"componentId": "spell.component.2d.transform"
+		},
+		{
+			"name": "bodies",
+			"componentId": "spell.component.physics.body"
+		},
+		{
+			"name": "fixtures",
+			"componentId": "spell.component.physics.fixture"
+		},
+		{
+			"name": "contactTriggers",
+			"componentId": "spell.component.physics.contactTrigger"
+		},
+		{
+			"name": "boxShapes",
+			"componentId": "spell.component.physics.shape.box"
+		},
+		{
+			"name": "circleShapes",
+			"componentId": "spell.component.physics.shape.circle"
+		}
+	],
+	"version": 1,
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": true,
+			"doc": "if active is false the system will be skipped during processing"
+		},
+		{
+			"name": "gravity",
+			"type": "vec2",
+			"default": [ 0, -10 ],
+			"doc": "the local gravity of the world"
+		},
+		{
+			"name": "scale",
+			"type": "number",
+			"default": 1,
+			"doc": "the scale that is applied to input before it is passed to the physics engine"
+		},
+        {
+            "name": "velocityIterations",
+            "type": "number",
+            "default": 8,
+            "doc": "The number of physics iterations to use when solving errors in velocity constraints. This value must be positive, and is largely responsible for the stability of the physics"
+        },
+        {
+            "name": "positionIterations",
+            "type": "number",
+            "default": 8,
+            "doc": "The number of physics iterations to use when solving errors in position constraints. This value must be positive and is responsible for solving errors in contact penetrations and stiff constraints"
+        },
+		{
+			"name": "showConstraints",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether constraints will be drawn in calls to drawWorld(..)"
+		},
+		{
+			"name": "showContacts",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether contact points will be drawn in calls to drawWorld(..)"
+		},
+		{
+			"name": "showContactImpulses",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether contact impulses will be drawn in calls to drawWorld(..). For impulses to be drawn, it must also be the case that showContacts is true."
+		},
+		{
+			"name": "showRigidBodies",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether rigid bodies will be drawn in calls to drawWorld(..)"
+		},
+		{
+			"name": "showColliderShapes",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether collidable shapes will be drawn in calls to drawWorld(..) and drawRigidBody(..)"
+		},
+		{
+			"name": "showSensorShapes",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether shapes with sensor true will be drawn in calls to drawWorld(..) and drawRigidBody(..)"
+		},
+		{
+			"name": "showBodyDetail",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether rigid body details (origin, and change in position since last update) will be drawn in calls to drawWorld(..), and drawRigidBody(..)"
+		},
+		{
+			"name": "showShapeDetail",
+			"type": "boolean",
+			"default": false,
+			"doc": "Flag determining whether shape details (world-space bounds) will be drawn in calls to drawWorld(..), and drawRigidBody(..)"
+		}
+	]
+}

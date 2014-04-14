@@ -1,0 +1,31 @@
+{
+	"version": 1,
+	"readonly": true,
+	"type": "system",
+	"input": [
+		{
+			"name": "transforms",
+			"componentId": "spell.component.2d.transform"
+		},
+		{
+			"name": "eventHandlers",
+			"componentId": "spell.component.eventHandlers"
+		},
+		{
+			"name": "visualObjects",
+			"componentId": "spell.component.visualObject"
+		},
+		{
+			"name": "cameras",
+			"componentId": "spell.component.2d.graphics.camera"
+		}
+	],
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": true,
+			"doc": "if active is false the system will be skipped during processing"
+		}
+	]
+}

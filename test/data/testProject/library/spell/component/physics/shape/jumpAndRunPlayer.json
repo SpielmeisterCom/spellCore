@@ -1,0 +1,15 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Physics Shape - Jump and Run Player",
+	"doc": "",
+    "icon": "resources/images/icons/component.png",
+	"attributes": [
+		{
+			"name": "dimensions",
+			"type": "vec2",
+			"default": [ 1, 1 ]
+		}
+	]
+}

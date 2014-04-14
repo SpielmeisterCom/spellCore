@@ -12,19 +12,22 @@ define(
 		return function( describe, it, before, after, beforeEach, afterEach ) {
 			var expect = chai.expect
 
-			var stageZeroConfig = {}
+			var stageZeroConfig = {
+				libraryUrl : "data/testProject/library"
+			}
 
 			var spell = require( 'spell/client/main', stageZeroConfig )
 
 			var projectConfig = {
-				startScene : "test",
+				startScene : "testProject.Scene",
+				type: "project",
 				config : {
 					web : {
 						html5: true
 					}
 				},
 				scenes: [
-					'test'
+					'testProject.Scene'
 				]
 			}
 

@@ -1,0 +1,65 @@
+{
+	"type": "system",
+	"readonly": true,
+	"input": [
+		{
+			"name": "textureMatrices",
+			"componentId": "spell.component.2d.graphics.textureMatrix"
+		},
+		{
+			"name": "transforms",
+			"componentId": "spell.component.2d.transform"
+		},
+		{
+			"name": "appearances",
+			"componentId": "spell.component.2d.graphics.appearance"
+		},
+        {
+            "name": "spriteSheetAppearances",
+            "componentId": "spell.component.2d.graphics.spriteSheetAppearance"
+        },
+		{
+			"name": "animatedAppearances",
+			"componentId": "spell.component.2d.graphics.animatedAppearance"
+		},
+		{
+			"name": "textAppearances",
+			"componentId": "spell.component.2d.graphics.textAppearance"
+		},
+		{
+			"name": "tilemaps",
+			"componentId": "spell.component.2d.graphics.tilemap"
+		},
+		{
+			"name": "quadGeometries",
+			"componentId": "spell.component.2d.graphics.geometry.quad"
+		},
+		{
+			"name": "visualObjects",
+			"componentId": "spell.component.visualObject"
+		},
+		{
+			"name": "cameras",
+			"componentId": "spell.component.2d.graphics.camera"
+		},
+        {
+            "name": "rectangles",
+            "componentId": "spell.component.2d.graphics.shape.rectangle"
+        }
+	],
+	"version": 1,
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": true,
+			"doc": "if false the system will be skipped during processing"
+		},
+		{
+			"name": "debug",
+			"type": "boolean",
+			"default": false,
+			"doc": "if true the system will draw additional debug information"
+		}
+	]
+}

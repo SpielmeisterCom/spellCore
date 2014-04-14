@@ -1,0 +1,26 @@
+{
+	"version": 1,
+	"apiVersion": "0.9.9",
+	"config": {
+		"android": {
+			"package": "com.spelljs.xxx",
+			"title": "xxx",
+			"version": "1.0",
+			"orientation": "portrait",
+			"signingKeyStore": "",
+			"signingKeyStorePass": "",
+			"signingKeyAlias": "",
+			"signingKeyPass": ""
+		},
+		"projectId": "xxx",
+		"supportedLanguages": [],
+		"web": {
+			"html5": true
+		}
+	},
+	"startScene": "xxx.Scene",
+	"type": "project",
+	"scenes": [
+		"xxx.Scene"
+	]
+}

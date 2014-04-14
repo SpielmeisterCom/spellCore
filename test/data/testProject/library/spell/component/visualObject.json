@@ -1,0 +1,37 @@
+{
+	"type": "component",
+	"readonly": true,
+	"title": "Visual Object",
+	"doc": "the visual representation of an entity",
+    "icon": "resources/images/icons/component_visualobject.png",
+	"attributes": [
+		{
+			"name": "layer",
+			"type": "integer",
+			"default": 1,
+			"doc": "the layer that the entity is drawn on"
+		},
+		{
+			"name": "opacity",
+			"type": "number",
+			"default": 1,
+			"doc": "the entities opacity"
+		},
+		{
+			"name": "worldOpacity",
+			"engineInternal": true,
+			"type": "number",
+			"default": 1,
+			"doc": "the effective opacity that the entity is drawn with"
+		},
+		{
+			"name": "pass",
+			"type": {
+				"name": "enum",
+				"values": [ "background", "ui", "world" ]
+			},
+			"default": "world"
+		}
+	],
+	"version": 1
+}

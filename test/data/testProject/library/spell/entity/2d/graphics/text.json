@@ -1,0 +1,11 @@
+{
+    "type": "entityTemplate",
+    "config": {
+        "spell.component.2d.graphics.textAppearance": {},
+        "spell.component.2d.transform": {},
+        "spell.component.visualObject": {}
+    },
+    "children": [],
+    "version": 1
+}
+

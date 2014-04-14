@@ -1,0 +1,14 @@
+{
+	"readonly": true,
+	"type": "component",
+	"title": "2D Tilemap",
+	"doc": "",
+	"attributes": [
+		{
+			"name": "assetId",
+			"type": "assetId:2dTileMap",
+			"doc": "the appearance asset used for rendering"
+		}
+	],
+	"version": 1
+}

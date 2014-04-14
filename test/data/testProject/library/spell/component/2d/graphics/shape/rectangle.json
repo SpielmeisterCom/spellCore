@@ -1,0 +1,45 @@
+{
+    "type": "component",
+    "readonly": true,
+    "title": "2D Rectangle",
+    "icon": "",
+    "attributes": [
+        {
+            "name": "width",
+            "type": "number",
+            "default": 2,
+            "doc": "the width of the rectangle"
+        },
+        {
+            "name": "height",
+            "type": "number",
+            "default": 2,
+            "doc": "the height of the rectangle"
+        },
+        {
+            "name": "lineColor",
+            "type": "vec3",
+            "default": [ 1, 0, 1 ],
+            "doc": "the line color used for outlining the rectangle"
+        },
+        {
+            "name": "lineWidth",
+            "type": "number",
+            "default": 1,
+            "doc": "the width of the rectangle"
+        },
+        {
+            "name": "fill",
+            "type": "boolean",
+            "default": false,
+            "docs": "specifies if this rectangle should be filled"
+        },
+        {
+            "name": "fillColor",
+            "type": "vec3",
+            "default": [ 1, 0, 1 ],
+            "doc": "the line color used for filling the rectangle"
+        }
+    ],
+    "version": 1
+}

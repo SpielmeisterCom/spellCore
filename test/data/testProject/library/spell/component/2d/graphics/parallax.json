@@ -1,0 +1,51 @@
+{
+	"version": 1,
+	"type": "component",
+	"title": "",
+	"doc": "",
+	"icon": "",
+	"attributes": [
+		{
+			"name": "refEntityName",
+			"default": "camera",
+			"engineInternal": false,
+			"type": "string",
+			"doc": "name of entity which translation should function as reference for the parallax effect"
+		},
+		{
+			"name": "moveSpeed",
+			"default": [
+				1,
+				1
+			],
+			"engineInternal": false,
+			"type": "vec2",
+			"doc": "the speed factor for the parallax effect which will be multiplied with the reference entity's translation"
+		},
+		{
+			"name": "textureOffset",
+			"default": [
+				0,
+				0
+			],
+			"engineInternal": false,
+			"type": "vec2",
+			"doc": "an offset which will added to the parallax texture matrix (useful to set a starting texture position)"
+		},
+		{
+			"name": "repeatX",
+			"default": false,
+			"engineInternal": false,
+			"type": "boolean",
+			"doc": "specifies if this parallax layer will repeat itselfs in the x direction"
+		},
+		{
+			"name": "repeatY",
+			"default": false,
+			"engineInternal": false,
+			"type": "boolean",
+			"doc": "specifies if this parallax layer will repeat itselfs in the y direction"
+		}
+
+	]
+}

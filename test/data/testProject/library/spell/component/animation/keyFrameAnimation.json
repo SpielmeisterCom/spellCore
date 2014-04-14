@@ -1,0 +1,45 @@
+{
+	"readonly": true,
+	"type": "component",
+	"title": "Key Frame Animation",
+	"doc": "",
+    "icon": "resources/images/icons/component_animation_keyframeanimation.png",
+	"attributes": [
+		{
+			"name": "assetId",
+			"type": "assetId:keyFrameAnimation",
+			"doc": "the used key frame animation asset"
+		},
+		{
+			"name": "looped",
+			"type": "boolean",
+			"default": true,
+			"doc": "if true the animation is looped"
+		},
+		{
+			"name": "offset",
+			"type": "number",
+			"default": 0,
+			"doc": "current offset into the key frame animation in milliseconds"
+		},
+		{
+			"name": "playing",
+			"type": "boolean",
+			"default": true,
+			"doc": "if true the key frame animation is playing; gets set to false if the end of the animation is reached and looping is disabled"
+		},
+		{
+			"name": "replaySpeed",
+			"type": "number",
+			"default": 1,
+			"doc": "the replay speed used for playing the key frame animation; i.e. a speed factor of 2 means doubled playing speed"
+		},
+		{
+			"name": "reversed",
+			"type": "boolean",
+			"default": false,
+			"doc": "if true the animation is played in reverse direction"
+		}
+	],
+	"version": 1
+}

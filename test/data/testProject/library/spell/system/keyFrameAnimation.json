@@ -1,0 +1,19 @@
+{
+	"type": "system",
+	"readonly": true,
+	"input": [
+		{
+			"name": "keyFrameAnimations",
+			"componentId": "spell.component.animation.keyFrameAnimation"
+		}
+	],
+	"version": 1,
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": true,
+			"doc": "if active is false the system will be skipped during processing"
+		}
+	]
+}
