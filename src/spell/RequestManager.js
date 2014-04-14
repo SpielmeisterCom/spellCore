@@ -70,11 +70,9 @@ define(
 					type = forceType
 
 				} else {
-					if( url.indexOf( '?' ) !== -1 ) {
-						url = url.substr( 0,  url.indexOf( '?' ) )
-					}
+					var urlWithoutParameters = url.indexOf( '?' ) !== -1 ? url.substr( 0,  url.indexOf( '?' ) ) : url
 
-					var type = _.last( url.split( '.' ) )
+					var type = _.last( urlWithoutParameters.split( '.' ) )
 
 					if( !this.resourceTypeLoadFunctions[ type ] ) {
 						type = 'txt'
