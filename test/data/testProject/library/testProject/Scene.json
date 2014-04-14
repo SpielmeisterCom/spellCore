@@ -4,12 +4,6 @@
 	"systems": {
 		"update": [
 			{
-				"id": "spell.system.processKeyInput",
-				"config": {
-					"active": true
-				}
-			},
-			{
 				"id": "spell.system.cameraMover",
 				"config": {
 					"active": true
@@ -23,12 +17,6 @@
 			}
 		],
 		"render": [
-			{
-				"id": "spell.system.visibility",
-				"config": {
-					"active": true
-				}
-			},
 			{
 				"id": "spell.system.keyFrameAnimation",
 				"config": {
@@ -56,8 +44,6 @@
 		"spell.component.2d.graphics.appearance",
 		"spell.component.2d.graphics.camera",
 		"spell.component.2d.graphics.cameraMovement",
-		"spell.component.2d.graphics.debug.box",
-		"spell.component.2d.graphics.debug.circle",
 		"spell.component.2d.graphics.geometry.quad",
 		"spell.component.2d.graphics.shape.rectangle",
 		"spell.component.2d.graphics.spriteSheetAppearance",
@@ -65,15 +51,11 @@
 		"spell.component.2d.graphics.textureMatrix",
 		"spell.component.2d.graphics.tilemap",
 		"spell.component.2d.transform",
-		"spell.component.actor",
+		"spell.component.composite",
+		"spell.component.metaData",
 		"spell.component.animation.keyFrameAnimation",
 		"spell.component.audio.soundEmitter",
-		"spell.component.entityComposite.children",
-		"spell.component.entityComposite.parent",
-		"spell.component.entityComposite.root",
-		"spell.component.entityMetaData",
 		"spell.component.eventHandlers",
-		"spell.component.inputDefinition",
 		"spell.component.visualObject",
 		"spell.defaultAppearance",
 		"spell.entity.2d.graphics.camera",
@@ -81,9 +63,7 @@
 		"spell.system.cameraMover",
 		"spell.system.clearKeyInput",
 		"spell.system.keyFrameAnimation",
-		"spell.system.processKeyInput",
-		"spell.system.render",
-		"spell.system.visibility"
+		"spell.system.render"
 	],
 	"entities": [
 		{
