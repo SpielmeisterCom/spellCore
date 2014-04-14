@@ -32,8 +32,8 @@ define(
 		'spell/shared/util/platform/private/advertisement',
 		'spell/shared/util/platform/private/flurry',
 		'spell/shared/util/platform/private/ouya',
-        'spell/shared/util/platform/private/store/web',
-        'spell/shared/util/platform/private/store/windows',
+        'spell/shared/util/platform/private/iap/web',
+        'spell/shared/util/platform/private/iap/windows',
 		'spell/shared/util/platform/private/createComponentType',
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
 		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
@@ -68,8 +68,8 @@ define(
 		advertisement,
 		flurry,
 		ouya,
-        webStore,
-        windowsStore,
+        webIap,
+        windowsIap,
 		createComponentType,
 		isHtml5Ejecta,
 		isHtml5TeaLeaf,
@@ -219,12 +219,12 @@ define(
 
 				} else if( isHtml5WinStore ) {
 					return {
-                        store: windowsStore
+                        iap: windowsIap
                     }
 
 				} else {
                     return {
-                        store: webStore
+                        iap: webIap
                     }
                 }
 			}
