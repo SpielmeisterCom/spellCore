@@ -1,0 +1,22 @@
+{
+	"type": "component",
+	"readonly": true,
+	"engineInternal": true,
+	"title": "Entity Composite",
+	"doc": "This component holds the ids of the parent and children entities of this entity.",
+	"attributes": [
+		{
+			"name": "childrenIds",
+			"doc": "ids of the children entities",
+			"default": [],
+			"type": "list"
+		},
+		{
+			"name": "parentId",
+			"doc": "entity id of the parent entity",
+			"default": "0",
+			"type": "string"
+		}
+	],
+	"version": 1
+}

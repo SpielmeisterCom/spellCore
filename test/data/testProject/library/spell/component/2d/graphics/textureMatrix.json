@@ -1,0 +1,46 @@
+{
+	"type": "component",
+	"readonly": true,
+	"title": "2D Texture Matrix",
+	"doc": "the texture matrix by which the appearance coordinates are transformed by",
+	"icon": "resources/images/icons/component_2d_transform.png",
+	"attributes": [
+		{
+			"name": "translation",
+			"type": "vec2",
+			"default": [
+				0,
+				0
+			],
+			"doc": "position relative to the parent's origin"
+		},
+		{
+			"name": "scale",
+			"type": "vec2",
+			"default": [
+				1,
+				1
+			],
+			"doc": "scale relative to the parent's origin"
+		},
+		{
+			"name": "isIdentity",
+			"engineInternal": true,
+			"type": "boolean",
+			"default": true,
+			"doc": "is true when the matrix is the identity matrix"
+		},
+		{
+			"name": "matrix",
+			"engineInternal": true,
+			"type": "mat3",
+			"default": [
+				1,  0,  0,
+				0,  1,  0,
+				0,  0,  1
+			],
+			"doc": "3x3 matrix that describes the accumulated texture coordinate transformation"
+		}
+	],
+	"version": 1
+}

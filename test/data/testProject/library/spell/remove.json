@@ -1,0 +1,11 @@
+{
+	"version": 1,
+	"type": "asset",
+	"subtype": "appearance",
+	"config": {
+		"localized": false,
+		"localization": "",
+		"extension": "png"
+	},
+	"dependencies": []
+}

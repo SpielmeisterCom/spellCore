@@ -1,0 +1,79 @@
+{
+	"version": 1,
+	"type": "scene",
+	"systems": {
+		"update": [
+			{
+				"id": "spell.system.cameraMover",
+				"config": {
+					"active": true
+				}
+			},
+			{
+				"id": "spell.system.clearKeyInput",
+				"config": {
+					"active": true
+				}
+			}
+		],
+		"render": [
+			{
+				"id": "spell.system.keyFrameAnimation",
+				"config": {
+					"active": true
+				}
+			},
+			{
+				"id": "spell.system.render",
+				"config": {
+					"active": true,
+					"debug": false
+				}
+			},
+			{
+				"id": "spell.system.audio",
+				"config": {
+					"active": true
+				}
+			}
+		]
+	},
+	"libraryIds": [
+		"spell.OpenSans14px",
+		"spell.component.2d.graphics.animatedAppearance",
+		"spell.component.2d.graphics.appearance",
+		"spell.component.2d.graphics.camera",
+		"spell.component.2d.graphics.cameraMovement",
+		"spell.component.2d.graphics.geometry.quad",
+		"spell.component.2d.graphics.shape.rectangle",
+		"spell.component.2d.graphics.spriteSheetAppearance",
+		"spell.component.2d.graphics.textAppearance",
+		"spell.component.2d.graphics.textureMatrix",
+		"spell.component.2d.graphics.tilemap",
+		"spell.component.2d.transform",
+		"spell.component.composite",
+		"spell.component.metaData",
+		"spell.component.animation.keyFrameAnimation",
+		"spell.component.audio.soundEmitter",
+		"spell.component.eventHandlers",
+		"spell.component.visualObject",
+		"spell.defaultAppearance",
+		"spell.entity.2d.graphics.camera",
+		"spell.system.audio",
+		"spell.system.cameraMover",
+		"spell.system.clearKeyInput",
+		"spell.system.keyFrameAnimation",
+		"spell.system.render"
+	],
+	"entities": [
+		{
+			"name": "camera",
+			"entityTemplateId": "spell.entity.2d.graphics.camera",
+			"config": {
+				"spell.component.2d.graphics.camera": {
+					"active": true
+				}
+			}
+		}
+	]
+}

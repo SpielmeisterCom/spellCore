@@ -1,0 +1,15 @@
+{
+    "type": "component",
+    "readonly": true,
+    "title": "2D Quad Geometry",
+    "icon": "",
+    "attributes": [
+        {
+            "name": "dimensions",
+            "type": "vec2",
+            "default": [ 1, 1 ],
+            "doc": "the dimensions of the quad"
+        }
+    ],
+    "version": 1
+}

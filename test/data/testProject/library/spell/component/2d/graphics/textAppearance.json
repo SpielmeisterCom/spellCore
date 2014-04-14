@@ -1,0 +1,50 @@
+{
+	"type": "component",
+	"readonly": true,
+	"title": "2D Text Appearance",
+    "icon": "resources/images/icons/component_2d_graphics_textappearance.gif",
+	"attributes": [
+		{
+			"name": "assetId",
+			"type": "assetId:font",
+			"default": "font:spell.OpenSans14px",
+			"doc": "the appearance asset used for rendering text"
+		},
+		{
+			"name": "translationAssetId",
+			"type": "assetId:translation",
+			"doc": "the translation asset used for translation"
+		},
+		{
+			"name": "spacing",
+			"type": "integer",
+			"default": 0,
+			"doc": "the spacing that is used to draw the characters"
+		},
+		{
+			"name": "align",
+			"type": {
+				"name": "enum",
+				"values":[
+					"center",
+					"left"
+				]
+			},
+			"default": "left",
+			"doc": "the alignment that is used"
+		},
+		{
+			"name": "text",
+			"type": "string",
+			"default": "blank",
+			"doc": "the text string that is used for looking up the translation text"
+		},
+		{
+			"name": "renderText",
+			"type": "string",
+			"engineInternal": true,
+			"doc": "the text string that is used for rendering"
+		}
+	],
+	"version": 1
+}

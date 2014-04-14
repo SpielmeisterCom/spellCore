@@ -1,0 +1,28 @@
+{
+	"version": 1,
+	"type": "entityTemplate",
+	"dependencies": [
+		"spell.component.2d.transform",
+		"spell.component.physics.body",
+		"spell.component.physics.fixture",
+		"spell.component.physics.shape.box",
+		"spell.component.visualObject"
+	],
+	"config": {
+		"spell.component.visualObject": {},
+		"spell.component.2d.transform": {},
+		"spell.component.physics.body": {
+            "type": "static"
+        },
+		"spell.component.physics.fixture": {
+			"categoryBits": 4096
+		},
+		"spell.component.physics.shape.box": {
+			"dimensions": [
+				64,
+				64
+			]
+		}
+	},
+	"children": []
+}

@@ -10,12 +10,7 @@ define(
 
 
 		return function( text ) {
-			if( console.originalLog ) {
-				console.originalLog( text )
-
-			} else {
-				console.log( text )
-			}
+			console.log( text )
 		}
 	}
 )

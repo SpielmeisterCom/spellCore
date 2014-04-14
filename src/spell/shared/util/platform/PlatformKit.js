@@ -170,18 +170,16 @@ define(
 				return new PersistentStorage()
 			},
 
-			createImageLoader : function( renderingContext, assetManager, libraryId, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-				return new ImageLoader( renderingContext, url, onLoadCallback, onErrorCallback, onTimedOutCallback )
+			createImageLoader : function( renderingContext ) {
+				return new ImageLoader( renderingContext )
 			},
 
-			createSoundLoader : function( audioContext, assetManager, libraryId, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-				var asset = assetManager.get( createAssetId( 'sound', libraryId ) )
-
-				return new SoundLoader( audioContext, asset, url, onLoadCallback, onErrorCallback, onTimedOutCallback )
+			createSoundLoader : function( audioContext ) {
+				return new SoundLoader( audioContext )
 			},
 
-			createTextLoader : function( postProcess, assetManager, libraryId, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-				return new TextLoader( postProcess, url, onLoadCallback, onErrorCallback, onTimedOutCallback )
+			createTextLoader : function( ) {
+				return new TextLoader( )
 			},
 
 			flurry : flurry,

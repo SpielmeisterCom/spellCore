@@ -1,0 +1,27 @@
+{
+    "readonly": true,
+    "type": "component",
+    "title": "2D SpriteSheet Appearance",
+    "doc": "",
+    "icon": "",
+    "attributes": [
+        {
+            "name": "assetId",
+            "type": "assetId:spriteSheet",
+            "doc": "the spritesheet asset used for rendering"
+        },
+        {
+            "name": "drawAllFrames",
+            "type": "boolean",
+            "default": true,
+            "doc": "specifies whether all frames should be drawn or only those in the frame list"
+        },
+        {
+            "name": "frames",
+            "type": "list",
+            "default": [],
+            "doc": "if drawAllFrames is false, you can specify a list of frame offsets that should be drawn"
+        }
+    ],
+    "version": 1
+}

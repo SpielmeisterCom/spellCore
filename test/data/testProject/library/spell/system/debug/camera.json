@@ -1,0 +1,60 @@
+{
+	"type": "system",
+	"readonly": true,
+	"engineInternal": true,
+	"input": [
+        {
+            "name": "transforms",
+            "componentId": "spell.component.2d.transform"
+        },
+        {
+            "name": "cameras",
+            "componentId": "spell.component.2d.graphics.camera"
+        },
+        {
+            "name": "appearances",
+            "componentId": "spell.component.2d.graphics.appearance"
+        },
+        {
+            "name": "animatedAppearances",
+            "componentId": "spell.component.2d.graphics.animatedAppearance"
+        },
+        {
+            "name": "tilemaps",
+            "componentId": "spell.component.2d.graphics.tilemap"
+        },
+        {
+            "name": "metadata",
+            "componentId": "spell.component.metaData"
+        },
+        {
+            "name": "editorConfigurations",
+            "componentId": "spell.component.editorConfiguration"
+        },
+        {
+            "name": "bodies",
+            "componentId": "spell.component.physics.body"
+        }
+	],
+	"version": 1,
+	"config": [
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": false,
+			"doc": "if false the system will be skipped during processing"
+		},
+        {
+            "name": "selectedEntityId",
+            "type": "string",
+            "default": "",
+            "doc": "the entityId of the entity which should be preselected"
+        },
+        {
+            "name": "deactivatedPlugins",
+            "type": "list",
+            "default": [],
+            "doc": "list of plugin names that should be deactivated"
+        }
+	]
+}

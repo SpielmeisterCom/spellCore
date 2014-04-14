@@ -11,6 +11,7 @@
 </head>
 <body>
 	<div id="mocha"></div>
+    <div id="spell"></div>
 
 	<script src="mocha.js"></script>
 
@@ -19,10 +20,22 @@
 <script type="text/javascript">
 	mocha.setup('bdd')
 
-	var RequestManager = require('spellTest/VisibilityManager')
+	var imageLoader = require('spellTest/shared/util/platform/private/loader/ImageLoader')
+	imageLoader( describe, it );
+
+	var textLoader = require('spellTest/shared/util/platform/private/loader/TextLoader')
+	textLoader( describe, it );
+
+	var soundLoader = require('spellTest/shared/util/platform/private/loader/SoundLoader')
+	soundLoader( describe, it );
+
+	var RequestManager = require('spellTest/RequestManager')
 	RequestManager( describe, it );
 
-	mocha.checkLeaks();
+    var spellClient = require('spellTest/client/main')
+    spellClient( describe, it );
+
+    mocha.checkLeaks();
 	mocha.run();
 
 </script>

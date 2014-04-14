@@ -1,0 +1,50 @@
+{
+	"version": 1,
+	"type": "component",
+	"readonly": true,
+	"title": "Physics Fixture",
+	"doc": "",
+    "icon": "resources/images/icons/component.png",
+    "attributes": [
+        {
+            "name": "elasticity",
+            "type": "number",
+            "default": 0
+        },
+		{
+			"name": "staticFriction",
+			"type": "number",
+			"default": 2
+		},
+        {
+            "name": "dynamicFriction",
+            "type": "number",
+            "default": 1
+        },
+        {
+            "name": "rollingFriction",
+            "type": "number",
+            "default": 0.005
+        },
+        {
+            "name": "density",
+            "type": "number",
+            "default": 1
+        },
+		{
+			"name": "categoryBits",
+			"type": "integer",
+			"default": 1
+		},
+		{
+			"name": "maskBits",
+			"type": "integer",
+			"default": 65535
+		},
+		{
+			"name": "isSensor",
+			"type": "boolean",
+			"default": false
+		}
+	]
+}

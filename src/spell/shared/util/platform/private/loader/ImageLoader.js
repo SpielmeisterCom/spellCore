@@ -8,49 +8,53 @@ define(
 	) {
 		'use strict'
 
-
+		// free internal handlers
 		var free = function( image ) {
-			image.onload = null
-			image.onreadystatechange = null
+			image.onload  = null
 			image.onerror = null
 		}
 
-		var onLoad = function( image ) {
-			if( this.loaded === true ) return
-			this.loaded = true
-
+		var onError = function( image, callback, event ) {
 			free( image )
-			this.onLoadCallback( this.renderingContext.createTexture( image ) )
+
+			callback(
+				'ImageLoader> Could not load image ' + image.src,
+				null
+			)
 		}
 
-		var onError = function( image, event ) {
+		var onLoad = function( image, callback ) {
 			free( image )
-			this.onErrorCallback( event )
+
+			callback(
+				null,
+				this.renderingContext.createTexture( image )
+			)
 		}
 
-		var onReadyStateChange = function( image ) {
-			if( image.readyState === 'complete' ) {
-				image.onload( image )
-			}
-		}
-
-
-		var ImageLoader = function( renderingContext, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+		var ImageLoader = function( renderingContext ) {
 			this.renderingContext = renderingContext
-			this.url              = url
-			this.onLoadCallback   = onLoadCallback
-			this.onErrorCallback  = onErrorCallback
-			this.loaded           = false
 		}
 
 		ImageLoader.prototype = {
-			start : function() {
+			load : function( url, callback ) {
 				var image = new Image()
 
-				image.onload             = _.bind( onLoad, this, image )
-				image.onreadystatechange = _.bind( onReadyStateChange, this, image )
-				image.onerror            = _.bind( onError, this, image )
-				image.src                = this.url
+				image.onload = _.bind(
+					onLoad,
+					this,
+					image,
+					callback
+				)
+
+				image.onerror = _.bind(
+					onError,
+					this,
+					image,
+					callback
+				)
+
+				image.src = url
 			}
 		}
 

@@ -1,0 +1,14 @@
+{
+	"type": "component",
+	"readonly": true,
+	"title": "Controllable",
+	"attributes": [
+		{
+			"name": "controllerId",
+			"type": "string",
+			"doc": "the id of the controller",
+			"default": "player"
+		}
+	],
+	"version": 1
+}

@@ -9,31 +9,26 @@ define(
 		'use strict'
 
 
-		var onLoad = function( buffer ) {
-			if( this.loaded === true ) return
-			this.loaded = true
-
+		var onLoad = function( callback, buffer ) {
 			// TODO: free SoundLoader retained js objects
-
-			this.onLoadCallback( this.audioContext.createSound( buffer ) )
+			callback(
+				null,
+				this.audioContext.createSound( buffer )
+			)
 		}
 
 
-		var SoundLoader = function( audioContext, asset, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
+		var SoundLoader = function( audioContext ) {
 			this.audioContext    = audioContext
-			this.asset           = asset
-			this.url             = url
-			this.onLoadCallback  = onLoadCallback
-			this.onErrorCallback = onErrorCallback
-			this.loaded          = false
 		}
 
 		SoundLoader.prototype = {
-			start : function() {
+			load : function( isMusic, url, callback ) {
+
 				this.audioContext.loadBuffer(
-					this.url,
-					this.asset,
-					_.bind( onLoad, this )
+					url,
+					isMusic,
+					_.bind( onLoad, this, callback )
 				)
 			}
 		}

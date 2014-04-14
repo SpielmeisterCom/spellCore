@@ -1,0 +1,27 @@
+{
+    "type": "entityTemplate",
+    "config": {
+        "spell.component.2d.graphics.appearance": {},
+        "spell.component.2d.transform": {},
+        "spell.component.visualObject": {
+            "layer": -1
+        },
+        "spell.component.2d.graphics.parallax": {},
+        "spell.component.editorConfiguration": {
+            "isMoveable": false,
+            "isSelectable": false,
+            "isRemovable": false,
+            "isCloneable": false
+        },
+        "spell.component.2d.graphics.textureMatrix": {},
+        "spell.component.2d.graphics.geometry.quad": {
+            "dimensions": [
+                1024,
+                768
+            ]
+        }
+    },
+    "children": [],
+    "version": 1
+}
+

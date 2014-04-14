@@ -1,0 +1,21 @@
+{
+	"type": "component",
+	"readonly": true,
+	"engineInternal": true,
+	"title": "Meta Data",
+	"attributes": [
+		{
+			"name": "name",
+			"type": "string",
+			"default": "",
+			"doc": "the name of the entity"
+		},
+        {
+            "name": "entityTemplateId",
+            "type": "string",
+            "default": "",
+            "doc": "the library id of the entity which this entity is based on"
+        }
+	],
+	"version": 1
+}

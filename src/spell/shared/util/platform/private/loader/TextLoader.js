@@ -1,3 +1,6 @@
+/**
+ * see https://developer.mozilla.org/en/DOM/XMLHttpRequest
+ */
 define(
 	'spell/shared/util/platform/private/loader/TextLoader',
 	[
@@ -8,56 +11,47 @@ define(
 	) {
 		'use strict'
 
-
-		var onLoad = function( request ) {
-			if( this.loaded === true ) return
-
-			this.loaded = true
-
-			var response = request.response || request.responseText
-
-			if( request.status !== 200 &&
-				request.status !== 0 ) {
-
-				onError.call( this, response )
-
+		var onReadyStateChange = function( request, url, callback ) {
+			if(
+				request.readyState !== 4 /* DONE */
+			) {
+				//return if loading is not completed yet
 				return
 			}
 
-			this.onLoadCallback( this.postProcess ? this.postProcess( response ) : response )
-		}
-
-		var onError = function( event ) {
-			this.onErrorCallback( event )
-		}
-
-		var onReadyStateChange = function( request ) {
 			/*
-			 * readyState === 4 means 'DONE'; see https://developer.mozilla.org/en/DOM/XMLHttpRequest
+			 * file protocol always yields status code 0 as status
 			 */
-			if( request.readyState !== 4 ) return
+			if( request.status !== 200 && request.status !== 0 ) {
+				callback(
+					'TextLoader> Status ' + request.status + ' received while trying to receive ' + url,
+					null
+				)
 
-			onLoad.call( this, request )
+			} else {
+				// request loading completed
+
+				// free internal handler
+				request.onreadystatechange = null
+
+				var response = request.response || request.responseText
+
+				callback(
+					null,
+					response
+				)
+			}
 		}
 
-
-		var TextLoader = function( postProcess, url, onLoadCallback, onErrorCallback, onTimedOutCallback ) {
-			this.postProcess     = postProcess
-			this.url             = url
-			this.onLoadCallback  = onLoadCallback
-			this.onErrorCallback = onErrorCallback
-			this.loaded          = false
+		var TextLoader = function() {
 		}
 
 		TextLoader.prototype = {
-			start : function() {
-				var request = new XMLHttpRequest()
+			load : function( url, callback ) {
+				var request                = new XMLHttpRequest()
+				request.onreadystatechange = _.bind( onReadyStateChange, this, request, url, callback )
 
-				request.onload             = _.bind( onLoad, this, request )
-				request.onreadystatechange = _.bind( onReadyStateChange, this, request )
-				request.onerror            = _.bind( onError, this )
-
-				request.open( 'GET', this.url, true )
+				request.open( 'GET', url, true )
 				request.send()
 			}
 		}

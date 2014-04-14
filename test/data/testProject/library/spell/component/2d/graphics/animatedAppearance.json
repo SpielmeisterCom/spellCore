@@ -1,0 +1,39 @@
+{
+	"readonly": true,
+	"type": "component",
+	"title": "2D Animated Appearance",
+	"doc": "",
+    "icon": "resources/images/icons/component_2d_graphics_animatedappearance.png",
+	"attributes": [
+		{
+			"name": "assetId",
+			"type": "assetId:animation",
+			"doc": "the appearance asset used for rendering"
+		},
+		{
+			"name": "looped",
+			"type": "boolean",
+			"default": true,
+			"doc": "if true the animation is looped"
+		},
+		{
+			"name": "offset",
+			"type": "number",
+			"default": 0,
+			"doc": "current offset into the played animation in milliseconds"
+		},
+        {
+            "name": "playing",
+            "type": "boolean",
+            "default": true,
+            "doc": "if true the animation is playing; gets set to false if the end of the animation is reached and looping is disabled"
+        },
+		{
+			"name": "replaySpeed",
+			"type": "number",
+			"default": 1,
+			"doc": "the replay speed used for playing the animation; i.e. a speed factor of 2 means doubled playing speed"
+		}
+	],
+	"version": 1
+}

@@ -40,7 +40,7 @@ define(
 			loop   = !!loop
 
 			if( soundAsset.isMusic ) {
-				html5AudioContext.loadBuffer( src, soundAsset, function() {
+				html5AudioContext.loadBuffer( src, true, function() {
 					if( isContextMuted() ) {
 						html5AudioContext.muteContext()
 					}

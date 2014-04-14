@@ -1,0 +1,14 @@
+{
+	"type": "component",
+	"readonly": true,
+	"title": "Event Handlers",
+	"attributes": [
+		{
+			"name": "assetId",
+			"type": "assetId:script",
+			"default": "",
+			"doc": "the events handled by this entity"
+		}
+	],
+	"version": 1
+}

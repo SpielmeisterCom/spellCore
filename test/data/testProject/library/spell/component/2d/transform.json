@@ -1,0 +1,75 @@
+{
+	"type": "component",
+	"readonly": true,
+	"title": "2D Transformation",
+	"doc": "transformation of the local origin of the entity relative to its parent",
+	"icon": "resources/images/icons/component_2d_transform.png",
+	"attributes": [
+		{
+			"name": "translation",
+			"type": "vec2",
+			"default": [
+				0,
+				0
+			],
+			"doc": "position relative to the parent's origin"
+		},
+		{
+			"name": "rotation",
+			"type": "number",
+			"default": 0,
+			"doc": "rotation in degrees relative to the parent's origin"
+		},
+		{
+			"name": "scale",
+			"type": "vec2",
+			"default": [
+				1,
+				1
+			],
+			"doc": "scale relative to the parent's origin"
+		},
+		{
+			"name": "skew",
+			"type": "vec2",
+			"default": [
+				0,
+				0
+			],
+			"doc": "2D skew transformation along the X- and the Y-axis"
+		},
+		{
+			"name": "localMatrix",
+			"engineInternal": true,
+			"type": "mat3",
+			"default": [
+				1,  0,  0,
+				0,  1,  0,
+				0,  0,  1
+			],
+			"doc": "3x3 matrix that transforms from local to parent entity coordinate space"
+		},
+        {
+            "name": "worldTranslation",
+            "engineInternal": true,
+            "type": "vec2",
+            "default": [
+                0,
+                0
+            ],
+            "doc": "position relative to the world's origin"
+        },
+		{
+			"name": "worldMatrix",
+			"engineInternal": true,
+			"type": "mat3",
+			"default": [
+				1,  0,  0,
+				0,  1,  0,
+				0,  0,  1
+			],
+			"doc": "3x3 matrix that transforms from local to world coordinate space"
+		}
+	],
+	"version": 1
+}

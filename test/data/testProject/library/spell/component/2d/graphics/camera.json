@@ -1,0 +1,32 @@
+{
+	"type": "component",
+	"readonly": true,
+	"title": "2D Camera",
+	"attributes": [
+		{
+			"name": "width",
+			"type": "number",
+			"default": 320,
+			"doc": "the width of the section of the scene in logical units captured by the camera"
+		},
+		{
+			"name": "height",
+			"type": "number",
+			"default": 240,
+			"doc": "the height of the section of the scene in logical units captured by the camera"
+		},
+		{
+			"name": "active",
+			"type": "boolean",
+			"default": false,
+			"doc": "controls if the camera is active"
+		},
+		{
+			"name": "clearUnsafeArea",
+			"type": "boolean",
+			"default": false,
+			"doc": "if true the unsafe area is cleared with the clear color"
+		}
+	],
+	"version": 1
+}
