@@ -70,6 +70,10 @@ define(
 					type = forceType
 
 				} else {
+					if( url.indexOf( '?' ) !== -1 ) {
+						url = url.substr( 0,  url.indexOf( '?' ) )
+					}
+
 					var type = _.last( url.split( '.' ) )
 
 					if( !this.resourceTypeLoadFunctions[ type ] ) {
