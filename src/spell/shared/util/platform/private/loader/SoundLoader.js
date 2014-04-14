@@ -11,8 +11,6 @@ define(
 
 		var onLoad = function( callback, buffer ) {
 			// TODO: free SoundLoader retained js objects
-
-			console.log( buffer )
 			callback(
 				null,
 				this.audioContext.createSound( buffer )
