@@ -59,7 +59,7 @@ define(
 		}
 
         var getEntityDimensionRecursive = function( entityManager, entityId ) {
-            var entityDimensions       = entityManager.getEntityDimensions( entityId ),
+            var entityDimensions       = entityManager.getEntityDimensions( entityId, true ),
                 COMPOSITE_COMPONENT_ID = Defines.COMPOSITE_COMPONENT_ID
 
             if( entityManager.hasComponent( entityId, COMPOSITE_COMPONENT_ID ) ) {
