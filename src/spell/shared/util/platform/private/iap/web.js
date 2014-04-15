@@ -29,13 +29,13 @@ define(
                 return hasProduct( productId )
             },
             purchaseProduct: function( productId, successCallback, errorCallback ) {
+                if( hasProduct( productId ) ) {
+                    return errorCallback( STATE.alreadyPurchased )
+                }
 
                 var purchased = confirm("Want to buy '" + productId + "' ?")
 
-                if( hasProduct( productId ) ) {
-                    errorCallback( STATE.alreadyPurchased )
-
-                } else if( purchased ) {
+                if( purchased ) {
                     purchases[ productId ] = true
                     successCallback()
 
