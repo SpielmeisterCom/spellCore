@@ -20,8 +20,8 @@ define(
 				this.plugins[ 'ouya'].init( inputManager )
 			}
 
-            if( this.plugins[ 'store' ] ) {
-                this.plugins[ 'store'].init()
+            if( this.plugins[ 'iap' ] ) {
+                this.plugins[ 'iap'].init()
             }
 		}
 

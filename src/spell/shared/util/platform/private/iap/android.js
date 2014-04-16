@@ -10,6 +10,7 @@ define(
 
 
         var simulate = undefined
+        var readPurchases = false
 
         var STATE = {
             succeeded: 0,
@@ -63,12 +64,44 @@ define(
                     console.log( "Failed to consume token " + token )
                 }
             })
+
+            NATIVE.events.registerHandler( 'billingOwned', function( evt ) {
+                console.log( "Got billingOwned event: " + JSON.stringify( evt ) )
+
+                // If attempt failed,
+                if ( evt.failure ) {
+                    if (!readPurchases) {
+                        NATIVE.plugins.sendEvent("BillingPlugin", "getPurchases", "{}");
+                    }
+
+                } else {
+                    readPurchases = true
+
+                    // Add owned items
+                    var skus = evt.skus
+                    var tokens = evt.tokens
+
+                    if (skus && skus.length > 0) {
+                        for (var ii = 0, len = skus.length; ii < len; ++ii) {
+                            //TODO: Add sync the data
+                            console.log( skus[ii] )
+                            console.log( tokens[ii] )
+                        }
+                    }
+                }
+            })
+        }
+
+        var syncOwnedItems = function() {
+            NATIVE.plugins.sendEvent( "BillingPlugin", "getPurchases", "{}" )
         }
 
 		return {
 			init: function( isDebug ) {
 				simulate = isDebug
                 NATIVE.plugins.sendEvent( "BillingPlugin", "isConnected", "{}" )
+
+                syncOwnedItems()
 			},
             isProductActive: function( productId ) {
 				return false
