@@ -90,6 +90,12 @@ define(
                     }
                 }
             })
+
+            NATIVE.events.registerHandler( 'billingConnected', function( evt ) {
+                console.log( "Got billingConnected event: " + JSON.stringify( evt ) )
+
+                if( evt.connected && !readPurchases ) syncOwnedItems()
+            })
         }
 
         var syncOwnedItems = function() {
