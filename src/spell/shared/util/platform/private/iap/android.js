@@ -9,7 +9,7 @@ define(
 		'use strict'
 
 
-        var simulate = undefined
+        var simulate = false
         var readPurchases = false
 
         var STATE = {
@@ -71,7 +71,7 @@ define(
                 // If attempt failed,
                 if ( evt.failure ) {
                     if (!readPurchases) {
-                        NATIVE.plugins.sendEvent("BillingPlugin", "getPurchases", "{}");
+                        syncOwnedItems()
                     }
 
                 } else {
