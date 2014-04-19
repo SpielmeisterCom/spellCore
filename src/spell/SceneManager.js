@@ -101,48 +101,33 @@ define(
 				} else {
 					var loadingSceneId = spell.configurationManager.getValue( 'loadingScene' )
 
-					if( showLoadingScene &&
-						loadingSceneId ) {
+                    var nextSceneId     = targetSceneId,
+                        nextSceneConfig = initialConfig
 
-						loadSceneResources(
-							spell,
-							loadingSceneId,
-							_.bind(
-								postLoadedResources,
-								this,
-								spell,
-								this.entityManager,
-								this.libraryManager,
-								this.statisticsManager,
-								this.isModeDevelopment,
-								loadingSceneId,
-								{
-									targetSceneId : targetSceneId,
-									initialConfig : initialConfig
-								}
-							),
-							onProgress
-						)
+					if( showLoadingScene && loadingSceneId ) {
+                        nextSceneId         = loadingSceneId
+                        nextSceneConfig     = {
+                            targetSceneId : targetSceneId,
+                            initialConfig : initialConfig
+                        }
+                    }
 
-					} else {
-						// load library dependencies first
-						loadSceneResources(
-							spell,
-							targetSceneId,
-							_.bind(
-								postLoadedResources,
-								this,
-								spell,
-								this.entityManager,
-								this.libraryManager,
-								this.statisticsManager,
-								this.isModeDevelopment,
-								targetSceneId,
-								initialConfig
-							),
-							onProgress
-						)
-					}
+                    loadSceneResources(
+                        spell,
+                        nextSceneId,
+                        _.bind(
+                            postLoadedResources,
+                            this,
+                            spell,
+                            this.entityManager,
+                            this.libraryManager,
+                            this.statisticsManager,
+                            this.isModeDevelopment,
+                            nextSceneId,
+                            nextSceneConfig
+                        ),
+                        onProgress
+                    )
 				}
 			}
 
