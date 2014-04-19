@@ -73,10 +73,9 @@ define(
 		var start = function( applicationModule, cacheContent ) {
 			var spell                = this.spell,
 				eventManager         = spell.eventManager,
-				configurationManager = spell.configurationManager,
-				libraryManager       = spell.libraryManager
+				configurationManager = spell.configurationManager
 
-			setApplicationModule(
+            setApplicationModule(
                 spell,
                 configurationManager,
 				PlatformKit.platformDetails.getTarget(),
@@ -86,11 +85,9 @@ define(
 
 			spell.console.setSendMessageToEditor( this.sendMessageToEditor )
 
-			if( cacheContent ) {
-				libraryManager.addToCache( cacheContent )
-			}
+            var isModeDevelopment    = configurationManager.getValue( 'mode' ) !== 'deployed'
 
-			// creating rendering context
+            // creating rendering context
 			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
 				spell.eventManager,
 				configurationManager.getValue( 'id' ),
@@ -109,18 +106,23 @@ define(
 
 			spell.console.debug( 'created audio context (' + audioContext.getConfiguration().type + ')' )
 
-			var requestManager       = new RequestManager(
-				PlatformKit.createImageLoader( renderingContext ),
-				PlatformKit.createSoundLoader( audioContext ),
-				PlatformKit.createTextLoader( )
-			)
-			spell.requestManager         = requestManager
+            var requestManager       = new RequestManager(
+                PlatformKit.createImageLoader( renderingContext ),
+                PlatformKit.createSoundLoader( audioContext ),
+                PlatformKit.createTextLoader( )
+            ),
+            libraryManager       = new LibraryManager(
+                eventManager,
+                requestManager,
+                configurationManager.getValue( 'libraryUrl' ),
+                !isModeDevelopment
+            )
 
-			libraryManager.init( requestManager )
+            if( cacheContent ) {
+                libraryManager.addToCache( cacheContent )
+            }
 
 			var assetManager = new AssetManager( libraryManager )
-
-			var isModeDevelopment = configurationManager.getValue( 'mode' ) !== 'deployed'
 
 			var moduleLoader = createModuleLoader( libraryManager, isModeDevelopment, configurationManager.getValue( 'libraryUrl' ) )
 
@@ -160,6 +162,7 @@ define(
 			spell.inputManager         = inputManager
 			spell.environment          = PlatformKit.createEnvironment( configurationManager, eventManager )
 			spell.env                  = spell.environment
+            spell.requestManager       = requestManager
 			spell.libraryManager       = libraryManager
 			spell.visibilityManager    = new VisibilityManager( eventManager, configurationManager, entityManager )
 			spell.visibilityManager.init()
@@ -205,7 +208,6 @@ define(
 			spell.scenes               = {}
 			spell.statisticsManager    = statisticsManager
 			spell.storage              = PlatformKit.createPersistentStorage()
-            spell.libraryManager       = new LibraryManager( eventManager, configurationManager.getValue( 'libraryUrl' ), isModeDeployed )
 
 			this.spell = spell
 
