@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/platform/private/store/web',
+	'spell/shared/util/platform/private/iap/web',
 	[
 	],
 	function(
@@ -29,13 +29,13 @@ define(
                 return hasProduct( productId )
             },
             purchaseProduct: function( productId, successCallback, errorCallback ) {
+                if( hasProduct( productId ) ) {
+                    return errorCallback( STATE.alreadyPurchased )
+                }
 
                 var purchased = confirm("Want to buy '" + productId + "' ?")
 
-                if( hasProduct( productId ) ) {
-                    errorCallback( STATE.alreadyPurchased )
-
-                } else if( purchased ) {
+                if( purchased ) {
                     purchases[ productId ] = true
                     successCallback()
 

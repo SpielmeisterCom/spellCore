@@ -1,0 +1,39 @@
+{
+	"version": 1,
+	"type": "component",
+	"title": "",
+	"doc": "",
+	"icon": "",
+	"dependencies": [],
+	"group": "zzz",
+	"attributes": [
+		{
+			"name": "id",
+			"default": "productId",
+			"doc": "",
+			"engineInternal": false,
+			"type": "string"
+		},
+		{
+			"name": "consumable",
+			"default": false,
+			"doc": "",
+			"engineInternal": false,
+			"type": "boolean"
+		},
+		{
+			"name": "price",
+			"default": 0.99,
+			"doc": "",
+			"engineInternal": false,
+			"type": "number"
+		},
+		{
+			"name": "name",
+			"default": "Default Product",
+			"doc": "",
+			"engineInternal": false,
+			"type": "string"
+		}
+	]
+}
