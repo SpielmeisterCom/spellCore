@@ -32,6 +32,9 @@
 	var RequestManager = require('spellTest/RequestManager')
 	RequestManager( describe, it );
 
+    var LibraryManager = require('spellTest/LibraryManager')
+    LibraryManager( describe, it );
+
     var spellClient = require('spellTest/client/main')
     spellClient( describe, it );
 
