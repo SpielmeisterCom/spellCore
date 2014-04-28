@@ -753,7 +753,7 @@ define(
 			return resultIds
 		}
 
-		var getEntityDimensions = function( componentMaps, entityId ) {
+		var getEntityDimensions = function( componentMaps, entityId, skipDefaultBox ) {
 			var staticAppearances   = componentMaps[ STATIC_APPEARANCE_COMPONENT_ID ],
 				animatedAppearances = componentMaps[ ANIMATED_APPEARANCE_COMPONENT_ID ],
 				transforms          = componentMaps[ TRANSFORM_COMPONENT_ID ],
@@ -793,7 +793,7 @@ define(
 				vec2.multiply( dimensions, dimensions, tilemaps[ entityId ].asset.spriteSheet.frameDimensions )
 
 			} else {
-				return [ 100, 100 ]
+				return skipDefaultBox ? [0,0] : [ 100, 100 ]
 			}
 
 			// apply scale factor
@@ -1034,8 +1034,8 @@ define(
 			 * @param entityId
 			 * @return vec2 2d-vector containing the dimension
 			 */
-			getEntityDimensions: function( entityId ) {
-				return getEntityDimensions( this.componentMaps, entityId )
+			getEntityDimensions: function( entityId, skipDefaultBox ) {
+				return getEntityDimensions( this.componentMaps, entityId, skipDefaultBox )
 			},
 
 
