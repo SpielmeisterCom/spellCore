@@ -798,10 +798,17 @@ define(
 
 			// apply scale factor
 			if( transforms && transforms[ entityId ] ) {
+				var scale = transforms[ entityId ].scale
 
-                // TODO: using the worldScale would be more correct here, but as we don't want to calculate it
-                // only for this test, use the local scale
-				vec2.multiply( dimensions, dimensions, transforms[ entityId ].scale )
+				//normalize scaling factor
+				scale = [
+					Math.abs( scale[0] ),
+					Math.abs( scale[1] )
+				]
+
+				// TODO: using the worldScale would be more correct here, but as we don't want to calculate it
+				// only for this test, use the local scale
+				vec2.multiply( dimensions, dimensions, scale )
 			}
 
 			return dimensions
