@@ -64,10 +64,15 @@ define(
 			)
 		}
 
+		var addComponentDependencies = function( dependencies, component ) {
+
+		}
+
 		var libraryItemHandler = {
 			'scene':            addSceneDependencies,
 			'system':           addSystemDependencies,
-			'entityTemplate':   addEntityDependencies
+			'entityTemplate':   addEntityDependencies,
+			'component':        addComponentDependencies
 		}
 
 		return function( libraryItem ) {

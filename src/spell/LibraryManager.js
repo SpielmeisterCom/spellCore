@@ -2,139 +2,25 @@ define(
 	'spell/LibraryManager',
 	[
 		'spell/client/loading/addNamespaceAndName',
-		'spell/shared/util/createIdFromLibraryFilePath',
-		'spell/shared/util/createLibraryFilePath',
-		'spell/shared/util/createLibraryFilePathFromId',
-		'spell/shared/util/createUrlWithCacheBreaker',
-		'spell/shared/util/platform/PlatformKit',
+		'spell/library/getDependencies',
+		'spell/shared/util/platform/Types',
 
+		'ff',
 		'spell/functions'
 	],
 	function(
 		addNamespaceAndName,
-		createIdFromLibraryFilePath,
-		createLibraryFilePath,
-		createLibraryFilePathFromId,
-		createUrlWithCacheBreaker,
-		PlatformKit,
-
+		getDependencies,
+		Types,
+		ff,
 		_
 	) {
 		'use strict'
 
 
-		var nextLoadingProcessId = 0
-
-		var createLoadingProcessId = function() {
-			return nextLoadingProcessId++
-		}
-
-		var createLoadingProcess = function( id, libraryIdsToLibraryFilePaths, libraryUrl, invalidateCache, config, next ) {
-			return {
-				assetManager       : config.assetManager,
-				id                 : id,
-				libraryFilePaths   : libraryIdsToLibraryFilePaths,
-				invalidateCache    : invalidateCache,
-				numCompleted       : 0,
-				name               : config.name,
-				next               : next,
-				type               : config.type ? config.type : 'auto',
-				libraryUrl         : libraryUrl,
-				omitCache          : !!config.omitCache,
-				onLoadingCompleted : config.onLoadingCompleted,
-				isMetaDataLoad     : config.isMetaDataLoad !== undefined ? config.isMetaDataLoad : true
-			}
-		}
-
-		var updateProgress = function( eventManager, cache, loadingProcesses, loadingProcess ) {
-			loadingProcess.numCompleted++
-
-			var libraryFilePaths = loadingProcess.libraryFilePaths,
-				numLibraryPaths  = _.size( libraryFilePaths ),
-				progress         = loadingProcess.numCompleted / numLibraryPaths,
-				name             = loadingProcess.name
-
-			eventManager.publish(
-				[ eventManager.EVENT.RESOURCE_PROGRESS, name ],
-				[ progress, loadingProcess.numCompleted, numLibraryPaths ]
-			)
-
-			if( loadingProcess.numCompleted === numLibraryPaths ) {
-				var loadedLibraryRecords = _.pick( cache, _.keys( libraryFilePaths ) )
-
-				if( loadingProcess.isMetaDataLoad ) {
-					addNamespaceAndName( loadedLibraryRecords )
-				}
-
-				if( loadingProcess.onLoadingCompleted ) {
-					loadingProcess.onLoadingCompleted( loadedLibraryRecords )
-				}
-
-				delete loadingProcesses[ loadingProcess.id ]
-
-				if( name ) {
-					eventManager.publish(
-						[ eventManager.EVENT.RESOURCE_LOADING_COMPLETED, name ],
-						[ loadedLibraryRecords ]
-					)
-				}
-
-				if( loadingProcess.next ) {
-					loadingProcess.next()
-				}
-			}
-		}
-
-		var onLoadCallback = function( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath, err, data ) {
-			if( err ) {
-				throw err
-			}
-
-			cache[ libraryId ] = data
-
-			updateProgress( eventManager, cache, loadingProcesses, loadingProcess )
-		}
-
-		var startLoadingProcess = function( cache, eventManager, loadingProcesses, requestManager, loadingProcess ) {
-			var omitCache        = loadingProcess.omitCache,
-				libraryFilePaths = loadingProcess.libraryFilePaths
-
-			for( var libraryId in libraryFilePaths ) {
-				var libraryFilePath = libraryFilePaths[ libraryId ]
-
-				if( !omitCache ) {
-					var cachedEntry = cache[ libraryId ]
-
-					if( cachedEntry ) {
-						onLoadCallback( eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath, null, cachedEntry )
-
-						continue
-					}
-				}
-
-				var url = loadingProcess.libraryUrl ?
-					loadingProcess.libraryUrl + '/' + libraryFilePath :
-					libraryFilePath
-
-				requestManager.get(
-					loadingProcess.invalidateCache ? createUrlWithCacheBreaker( url ) : url,
-					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath )
-				)
-			}
-		}
-
-
-		var LibraryManager = function( eventManager, requestManager, libraryUrl, isModeDeployed ) {
-			this.eventManager                = eventManager
+		var LibraryManager = function( requestManager ) {
             this.requestManager              = requestManager
-			this.loadingProcesses            = {}
-			this.libraryUrl                  = libraryUrl
-			this.invalidateCache             = !isModeDeployed
-
-			this.cache = {
-				metaData : {},
-				resource : {}
-			}
+			this.library                     = {}
 		}
 
 		LibraryManager.prototype = {
@@ -205,33 +91,103 @@ define(
 				this.cache.resource = {}
 			},
 
-			load : function( libraryIdsToLibraryFilePaths, config, next ) {
-				if( _.size( libraryIdsToLibraryFilePaths ) === 0 ) {
-					throw 'Error: No library file paths provided.'
+
+			/**
+			 * This function loads library records which are specified by their libraryId(s). Dependencies are automatically resolved and loaded
+			 * The result of the loading operation will be passed into the callback function
+			 *
+			 * @param libraryIds - One or multiple libraryIds to load
+			 * @param callback - Callback in the form of fn( err, data )
+			 * @param libraryBaseUrl - base URL of the library. Ends with an /, defaults to: library/
+			 * @param forceReload - Specifiy whether a cache breaker should be added to the requests in order to avoid the local browser cache
+			 * @param timeoutInMs - Timeout in ms after which the loading operation fails
+			 */
+			loadRecords : function( libraryIds, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
+				if( !libraryBaseUrl ) {
+					libraryBaseUrl = 'library/'
 				}
 
-				var id = createLoadingProcessId()
+				if( !timeoutInMs ) {
+					timeoutInMs = 300000
+				}
 
-				var loadingProcess = createLoadingProcess(
-					id,
-					libraryIdsToLibraryFilePaths,
-					this.libraryUrl,
-					this.invalidateCache,
-					config || {},
-					next
+				if( !_.isArray( libraryIds )) {
+					libraryIds = [ libraryIds ]
+				}
+
+				var f = ff( this )
+				f.timeout( timeoutInMs )
+
+				// load libraryIds
+				f.next(
+					function() {
+						for( var index in libraryIds ) {
+							var libraryId   = libraryIds[ index ],
+								url         = libraryBaseUrl + libraryId.replace( /\./g, '/' ) + '.json'
+
+							// add a browser cache breaker if we're force reloading
+							if( forceReload ) {
+								url += '?t=' + Types.Time.getCurrentInMs()
+							}
+
+							var cb = f.slot()
+
+							this.requestManager.get( url, function( err, data ) {
+								//wrap the libraryId into the result object
+								if( data ) {
+									cb( err, {
+										libraryId:  libraryId,
+										data:       data
+									} )
+
+								} else {
+
+									cb( err, null )
+								}
+							} )
+						}
+					}
 				)
 
-				this.loadingProcesses[ id ] = loadingProcess
+				// process results and trigger loading for all dependencies
+				f.next(
+					function( ) {
+						var result = {}
 
-				startLoadingProcess(
-					loadingProcess.isMetaDataLoad ? this.cache.metaData : this.cache.resource,
-					this.eventManager,
-					this.loadingProcesses,
-					this.requestManager,
-					loadingProcess
+						for( var i=0; i<arguments.length; i++) {
+
+							var argumentsIterator   = arguments[ i ],
+								libraryId           = argumentsIterator.libraryId,
+								dependencies        = getDependencies( argumentsIterator.data )
+
+							result[ libraryId ] = argumentsIterator.data
+
+							if( dependencies.length > 0 ) {
+								this.loadRecords(
+									dependencies,
+									f.slot(),
+									forceReload
+								)
+							}
+						}
+
+						f.pass( result )
+					}
 				)
 
-				return id
+				// merge results
+				f.next(
+					function() {
+						var result = {}
+						for( var i=0; i<arguments.length; i++) {
+							var result = _.extend( result, arguments[ i ] )
+						}
+
+						f.succeed( result )
+					}
+				)
+
+				f.onComplete( callback )
 			}
 		}
 
