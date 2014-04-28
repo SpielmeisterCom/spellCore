@@ -124,8 +124,9 @@ define(
 		}
 
 
-		var LibraryManager = function( eventManager, libraryUrl, isModeDeployed ) {
+		var LibraryManager = function( eventManager, requestManager, libraryUrl, isModeDeployed ) {
 			this.eventManager                = eventManager
+            this.requestManager              = requestManager
 			this.loadingProcesses            = {}
 			this.libraryUrl                  = libraryUrl
 			this.invalidateCache             = !isModeDeployed
@@ -231,10 +232,6 @@ define(
 				)
 
 				return id
-			},
-
-			init : function( requestManager ) {
-				this.requestManager                 = requestManager
 			}
 		}
 
