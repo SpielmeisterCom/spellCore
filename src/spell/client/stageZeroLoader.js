@@ -149,8 +149,8 @@ if( !window.console ) {
 		return false
 	}
 
-	var isHtml5WinPhone = function() {
-		return window.external && typeof(window.external.notify ) !== 'undefined'
+	var isHtml5Windows = function() {
+		return typeof( Windows ) !== 'undefined'
 	}
 
 	var isWebAudioSupported = function() {
@@ -252,7 +252,8 @@ if( !window.console ) {
 
 		if( config.target === 'html5' ) {
 			if( !config.renderingBackEnd &&
-				isWebGlCapable() ) {
+				isWebGlCapable() &&
+                !isHtml5Windows() ) {
 
 				config.renderingBackEnd = 'webgl'
 			}
@@ -262,9 +263,7 @@ if( !window.console ) {
 					'web' :
 					isHtml5AudioSupported() ?
 						'html5' :
-						isHtml5WinPhone() ?
-							'winPhone' :
-							'dummy'
+						'dummy'
 			}
 		}
 
@@ -370,8 +369,8 @@ if( !window.console ) {
 		var args = [ 'html5/spell.js' ]
 
 		if( isModeDeployed ) {
-			args.push( 'html5/data.js' )
-		}
+            args.push( 'html5/data.js' )
+        }
 
 		args.push( startHtml5Executable )
 
