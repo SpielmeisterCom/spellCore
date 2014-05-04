@@ -1,5 +1,5 @@
 define(
-	'spell/shared/util/platform/private/iap/windows',
+	'spell/shared/util/platform/private/iap/target/windows',
 	[
 	],
 	function(

@@ -13,7 +13,7 @@ define(
 		'use strict'
 
 
-		var PluginManager = function( inputManager ) {
+		var PluginManager = function( inputManager, storage ) {
 			this.plugins = PlatformKit.getPlugins()
 
 			if( this.plugins[ 'ouya' ] ) {
@@ -21,7 +21,7 @@ define(
 			}
 
             if( this.plugins[ 'iap' ] ) {
-                this.plugins[ 'iap'].init()
+                this.plugins[ 'iap'].init( storage )
             }
 		}
 

@@ -32,9 +32,7 @@ define(
 		'spell/shared/util/platform/private/advertisement',
 		'spell/shared/util/platform/private/flurry',
 		'spell/shared/util/platform/private/ouya',
-        'spell/shared/util/platform/private/iap/web',
-        'spell/shared/util/platform/private/iap/windows',
-		'spell/shared/util/platform/private/iap/android',
+        'spell/shared/util/platform/private/iap/Manager',
 		'spell/shared/util/platform/private/createComponentType',
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
 		'spell/shared/util/platform/private/environment/isHtml5TeaLeaf',
@@ -69,9 +67,7 @@ define(
 		advertisement,
 		flurry,
 		ouya,
-        webIap,
-        windowsIap,
-		androidIap,
+        IapManager,
 		createComponentType,
 		isHtml5Ejecta,
 		isHtml5TeaLeaf,
@@ -206,6 +202,8 @@ define(
 			},
 
 			getPlugins : function() {
+                var iapManager = new IapManager()
+
 				if( isHtml5Ejecta ) {
 					return {}
 
@@ -215,17 +213,12 @@ define(
 						admob : advertisement,
 						admobWithChartboost : advertisement,
 						ouya: ouya,
-						iap: androidIap
+						iap: iapManager
 					}
-
-				} else if( isHtml5WinStore ) {
-					return {
-                        iap: windowsIap
-                    }
 
 				} else {
                     return {
-                        iap: webIap
+                        iap: iapManager
                     }
                 }
 			}

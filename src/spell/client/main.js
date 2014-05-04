@@ -122,7 +122,7 @@ define(
 			var inputManager = new InputManager( configurationManager, renderingContext )
 			inputManager.init()
 
-			spell.pluginManager        = new PluginManager( inputManager )
+			spell.pluginManager        = new PluginManager( inputManager, spell.storage )
 			spell.assetManager         = assetManager
 			spell.configurationManager = configurationManager
 			spell.moduleLoader         = moduleLoader
