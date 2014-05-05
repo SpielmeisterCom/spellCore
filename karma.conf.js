@@ -9,16 +9,31 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: [ 'requirejs', 'mocha', 'chai', 'sinon' ],
+    frameworks: [ 'requirejs', 'mocha', 'sinon-chai' ],
 
 
     // list of files / patterns to load in the browser
     files: [
-      {pattern: 'node_modules/**/*.js', included: false},
-      {pattern: 'src/**/*.js', included: false},
-      {pattern: 'test/**/*.js', included: false},
-      'test-karma/main.js'
+		{pattern: 'test/data/*.*', watched: false, included: false, served: true},
+
+		//Some neede node modules
+		{pattern: 'node_modules/underscore/underscore.js', watched: false, included: false},
+
+		{pattern: 'src/**/*.js',  included: false},
+		{pattern: 'test/**/*.js', included: false},
+		'test-karma/main.js'
     ],
+
+//	exclude: [
+//	  'src/spell/client/main.js'
+//	],
+
+	// web server port
+	port: 9876,
+
+	proxies: {
+		'/data/': 'http://localhost:9876/base/test/data/'
+	},
 
 
     // list of files to exclude
@@ -44,17 +59,8 @@ module.exports = function(config) {
     reporters: ['progress'],
 
 
-    // web server port
-    port: 9876,
-
-
     // enable / disable colors in the output (reporters and logs)
     colors: true,
-
-
-    // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO,
 
 
     // enable / disable watching file and executing tests whenever any file changes

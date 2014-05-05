@@ -1,17 +1,11 @@
 define(
-	'spellTest/data/spatial/BoxTree',
 	[
-		'chai',
 		'spell/data/spatial/BoxTree'
 	],
 	function(
-		chai,
 		BoxTree
 	) {
 		'use strict'
-
-		return function( describe, it ) {
-			var expect = chai.expect
 
 			var boxtree = BoxTree.create( true )
 
@@ -36,6 +30,4 @@ define(
 					done()
 				})
 			})
-
-	}
 })

@@ -1,17 +1,12 @@
 define(
-	'spellTest/LibraryManager',
 	[
-		'chai',
 		'spell/LibraryManager'
 	],
 	function(
-		chai,
 		LibraryManager
 	) {
 		'use strict'
 
-		return function( describe, it ) {
-			var expect = chai.expect
 
 			var requestManagerMock = {
                 get : function( url, callback, forceType ) {
@@ -50,6 +45,4 @@ define(
                     } )
                 })
 		})
-
-	}
 })
