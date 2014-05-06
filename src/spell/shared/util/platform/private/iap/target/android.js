@@ -27,8 +27,6 @@ define(
                         onFailure( failure, sku )
                     }
                 } else {
-                    //TODO: Only consume if it is a consumable!
-                    return
                     NATIVE.plugins.sendEvent( "BillingPlugin", "consume", JSON.stringify({
                         token: token
                     }))
@@ -99,11 +97,8 @@ define(
 				simulate = isDebug
                 NATIVE.plugins.sendEvent( "BillingPlugin", "isConnected", "{}" )
 
-                syncOwnedItems()
+//                syncOwnedItems()
 			},
-            isProductActive: function( productId ) {
-				return false
-            },
             purchaseProduct: function( productId, successCallback, errorCallback ) {
                 onFailure = errorCallback
                 onPurchase = successCallback

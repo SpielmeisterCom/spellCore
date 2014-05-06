@@ -8,6 +8,7 @@ define(
         'spell/shared/util/platform/private/iap/target/web',
         'spell/shared/util/platform/private/iap/target/windows',
 
+        'spell/Defines',
         'spell/functions'
 	],
 	function(
@@ -18,18 +19,14 @@ define(
         webIap,
         windowsIap,
 
+        Defines,
         _
 	) {
 		'use strict'
 
-        var STATE = {
-            succeeded: 0,
-            alreadyPurchased: 1,
-            notFulfilled: 2,
-            notPurchased: 3
-        }
 
-        var STORAGE_KEY = 'iap'
+        var STORAGE_KEY = 'iap',
+            STATE       = Defines.IAP.STATE
 
         var createStoreKey = function( productId ) {
             return STORAGE_KEY + '.' + productId
@@ -74,15 +71,18 @@ define(
                 this.storage = storage
             },
             purchase: function( productId, successCallback, errorCallback ) {
-                this.iap.purchaseProduct(
-                    productId,
-                    _.bind( onPurchaseSuccess, this, productId, successCallback ),
-                    _.bind( onError, this, errorCallback )
-                )
+                //Consume direktly all purchases. no sync will be made. if your offline you cant buy things. if you remove your app, your items will be removed
+                if( !this.hasProduct( productId ) ) {
+                    this.iap.purchaseProduct(
+                        productId,
+                        _.bind( onPurchaseSuccess, this, productId, successCallback ),
+                        _.bind( onError, this, errorCallback )
+                    )
+                } else {
+                    errorCallback( STATE.alreadyPurchased )
+                }
             },
             consume: function( productId, successCallback, errorCallback ) {
-                //TODO: Consume direktly all purchases. no sync will be made. if your offline you cant buy things. if you remove your app, your items will be removed
-
                 if( !successCallback ) throw new Error( 'Missing consumeSuccess callback' )
                 if( !errorCallback ) throw new Error( 'Missing consumeError callback' )
 

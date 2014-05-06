@@ -1,11 +1,15 @@
 define(
     [
         'spell/shared/util/platform/PlatformKit',
-        'spell/PluginManager'
+        'spell/PluginManager',
+
+        'spell/Defines'
     ],
     function(
         PlatformKit,
-        PluginManager
+        PluginManager,
+
+        Defines
     )
     {
         'use strict'
@@ -19,7 +23,8 @@ define(
 
 
                 describe( 'IAP', function(){
-                    var iap = pluginManager.getById( 'iap' )
+                    var iap   = pluginManager.getById( 'iap'),
+                        STATE = Defines.IAP.STATE
 
 
                     it( 'should be defined', function() {
@@ -30,27 +35,26 @@ define(
 
                     describe( 'Check IAP store', function() {
                         it( testKey + ' should not exist in the storage', function() {
-                            storage.clear( testKey )
+                            var secretStoreKey = 'iap.' + testKey
 
-                            var value = storage.get( testKey )
+                            storage.clear( secretStoreKey )
+
+                            var value = storage.get( secretStoreKey )
 
                             expect( value ).to.be.undefined
                         })
                     })
 
                     describe( 'Purchase a test product', function() {
-                        it( 'should fail with errorCode 2', function( done ) {
+                        it( 'should fail with errorCode STATE.notFulfilled', function( done ) {
                             iap.purchase(
                                 testKey,
                                 function() {
                                     throw new Error( 'should not success' )
                                 },
                                 function( errorCode ){
-                                    if( errorCode === 2 ) {
-                                        done()
-                                    } else {
-                                        throw new Error( 'wrong errorCode' )
-                                    }
+                                    expect( errorCode ).to.equal( STATE.notFulfilled )
+                                    done()
                                 }
                             )
                         } )
@@ -75,18 +79,15 @@ define(
                             expect( product ).to.be.true
                         } )
 
-                        it( 'purchase again should fail with errorCode 1', function( done ) {
+                        it( 'purchase again should fail with errorCode STATE.alreadyPurchased', function( done ) {
                             iap.purchase(
                                 testKey,
                                 function() {
                                     throw new Error( 'should fail' )
                                 },
                                 function( errorCode ) {
-                                    if( errorCode === 1 ) {
-                                        done()
-                                    } else {
-                                        throw new Error( 'iap.purchase threw an error with code: ' + errorCode )
-                                    }
+                                    expect( errorCode).to.equal( STATE.alreadyPurchased )
+                                    done()
                                 }
                             )
                         } )
@@ -114,6 +115,18 @@ define(
                                     throw new Error( 'Should not success' )
                                 },
                                 done
+                            )
+                        } )
+                    } )
+
+                    describe( 'Another purchase of ' + testKey, function() {
+                        it( 'should be possible', function( done ) {
+                            iap.purchase(
+                                testKey,
+                                done,
+                                function( errorCode ) {
+                                    throw new Error( 'iap.purchase threw an error with code: ' + errorCode )
+                                }
                             )
                         } )
                     } )
