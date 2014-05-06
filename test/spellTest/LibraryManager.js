@@ -1,11 +1,8 @@
 define(
-	'spellTest/LibraryManager',
 	[
-		'chai',
 		'spell/LibraryManager'
 	],
 	function(
-		chai,
 		LibraryManager
 	) {
 		'use strict'
@@ -164,11 +161,8 @@ define(
 		}
 
 
-		return function( describe, it ) {
-			var expect = chai.expect
-
-			var requestManagerMock = {
-                get : function( url, callback, forceType ) {
+		var requestManagerMock = {
+			get : function( url, callback, forceType ) {
 	                var result = null
 
 	                if( testLibrary[ url ] ) {
@@ -177,8 +171,8 @@ define(
 	                } else {
 		                callback( 'Could not load ' + url, null )
 	                }
-                }
-            }
+			}
+		}
 
 			var libraryManager = new LibraryManager(
                 requestManagerMock
@@ -212,6 +206,4 @@ define(
 				})
 
 		})
-
-	}
 })

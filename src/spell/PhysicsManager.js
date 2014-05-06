@@ -524,22 +524,22 @@ define(
 			},
 
 			createPointConstraint: function( params ) {
-				params.bodyA = getBodyById( params.entityA )
-				params.bodyB = getBodyById( params.entityB )
+				params.bodyA = params.entityA ? getBodyById( params.entityA ) : params.bodyA
+				params.bodyB = params.entityB ? getBodyById( params.entityB ) : params.bodyB
 
 				return Physics2DPointConstraint.create( params )
 			},
 
 			createWeldConstraint: function( params ) {
-				params.bodyA = getBodyById( params.entityA )
-				params.bodyB = getBodyById( params.entityB )
+				params.bodyA = params.entityA ? getBodyById( params.entityA ) : params.bodyA
+				params.bodyB = params.entityB ? getBodyById( params.entityB ) : params.bodyB
 
 				return Physics2DWeldConstraint.create( params )
 			},
 
 			createAngleConstraint: function( params ) {
-				params.bodyA = getBodyById( params.entityA )
-				params.bodyB = getBodyById( params.entityB )
+				params.bodyA = params.entityA ? getBodyById( params.entityA ) : params.bodyA
+				params.bodyB = params.entityB ? getBodyById( params.entityB ) : params.bodyB
 
 				return Physics2DAngleConstraint.create( params );
 			},

@@ -1,17 +1,11 @@
 define(
-	'spellTest/RequestManager',
 	[
-		'chai',
 		'spell/RequestManager'
 	],
 	function(
-		chai,
 		RequestManager
 	) {
 		'use strict'
-
-		return function( describe, it ) {
-			var expect = chai.expect
 
 			var imageLoaderMock = {
 				load: function( url, callback ) {
@@ -142,6 +136,4 @@ define(
 
 
 		})
-
-	}
 })

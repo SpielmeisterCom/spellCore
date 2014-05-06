@@ -1,28 +1,16 @@
 define(
-	'spell/shared/util/platform/private/iap/android',
-    [
-        'spell/shared/util/platform/private/environment/isHtml5TeaLeaf'
-    ],
-	function(
-        isHtml5TeaLeaf
-    ) {
+	'spell/shared/util/platform/private/iap/target/android',
+	function() {
 		'use strict'
 
 
         var simulate = false
         var readPurchases = false
 
-        var STATE = {
-            succeeded: 0,
-            alreadyPurchased: 1,
-            notFulfilled: 2,
-            notPurchased: 3
-        }
-
         var onFailure
         var onPurchase
 
-        if( isHtml5TeaLeaf ) {
+        var registerEvents = function() {
             NATIVE.events.registerHandler('billingPurchase', function( evt ) {
                 console.log( "Got billingPurchase event: " + JSON.stringify( evt ) )
 
@@ -104,14 +92,13 @@ define(
 
 		return {
 			init: function( isDebug ) {
+                registerEvents()
+
 				simulate = isDebug
                 NATIVE.plugins.sendEvent( "BillingPlugin", "isConnected", "{}" )
 
-                syncOwnedItems()
+//                syncOwnedItems()
 			},
-            isProductActive: function( productId ) {
-				return false
-            },
             purchaseProduct: function( productId, successCallback, errorCallback ) {
                 onFailure = errorCallback
                 onPurchase = successCallback

@@ -20,23 +20,23 @@
 <script type="text/javascript">
 	mocha.setup('bdd')
 
-	var tests = [
-		'spellTest/data/spatial/BoxTree',
-		'spellTest/VisibilityManager',
-		'spellTest/PhysicsManager',
-		'spellTest/shared/util/platform/private/loader/ImageLoader',
-		'spellTest/shared/util/platform/private/loader/TextLoader',
-		'spellTest/shared/util/platform/private/loader/SoundLoader',
-		'spellTest/RequestManager',
-		'spellTest/LibraryManager',
-		'spellTest/client/main'
-	]
+	var imageLoader = require('spellTest/shared/util/platform/private/loader/ImageLoader')
+	imageLoader( describe, it );
 
-	for( var i=0; i<tests.length; i++) {
-		var test = tests[ i ]
-		var testInstance = require( test )
-		testInstance( describe, it )
-	}
+	var textLoader = require('spellTest/shared/util/platform/private/loader/TextLoader')
+	textLoader( describe, it );
+
+	var soundLoader = require('spellTest/shared/util/platform/private/loader/SoundLoader')
+	soundLoader( describe, it );
+
+	var RequestManager = require('spellTest/RequestManager')
+	RequestManager( describe, it );
+
+    var LibraryManager = require('spellTest/LibraryManager')
+    LibraryManager( describe, it );
+
+    var spellClient = require('spellTest/client/main')
+    spellClient( describe, it );
 
     mocha.checkLeaks();
 	mocha.run();

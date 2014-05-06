@@ -1,17 +1,11 @@
 define(
-	'spellTest/PhysicsManager',
 	[
-		'chai',
 		'spell/PhysicsManager'
 	],
 	function(
-		chai,
 		PhysicsManager
 		) {
 		'use strict'
-
-		return function( describe, it ) {
-			var expect = chai.expect
 
 			var physicsManager = new PhysicsManager()
 
@@ -1015,6 +1009,4 @@ define(
 
 
 			})
-
-		}
 })

@@ -1,23 +1,17 @@
 define(
-	'spellTest/VisibilityManager',
 	[
-		'chai',
 		'spell/EventManager',
 		'spell/VisibilityManager',
 		'spell/Defines',
 		'spell/functions'
 	],
 	function(
-		chai,
 		EventManager,
 		VisibilityManager,
 	    Defines,
 	    _
 		) {
 		'use strict'
-
-		return function( describe, it ) {
-			var expect = chai.expect
 
 			var eventManager = new EventManager()
 
@@ -167,5 +161,4 @@ define(
 
 
 		})
-		}
 	})

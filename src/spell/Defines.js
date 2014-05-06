@@ -31,7 +31,16 @@ define(
 			SOUND_EMITTER_COMPONENT_ID                : 'spell.component.audio.soundEmitter',
 			VISUAL_OBJECT_COMPONENT_ID                : 'spell.component.visualObject',
 			CONTROLLABLE_COMPONENT_ID                 : 'spell.component.controllable',
-            IAP_PRODUCT_COMPONENT_ID                  : 'spell.component.iap.product'
+            IAP_PRODUCT_COMPONENT_ID                  : 'spell.component.iap.product',
+
+            IAP: {
+                STATE: {
+                    succeeded: 0,
+                    alreadyPurchased: 1,
+                    notFulfilled: 2,
+                    notPurchased: 3
+                }
+            }
 		}
 	}
 )
