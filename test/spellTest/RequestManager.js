@@ -58,7 +58,7 @@ define(
 
 			var requestManager = new RequestManager( imageLoaderMock, soundLoaderMock, textLoaderMock )
 
-			describe( 'RequestManager', function( ) {
+			describe( 'spell/RequestManager', function( ) {
 				[ 'jpeg', 'jpg', 'png' ].forEach(function( type ) {
 					it( 'should load ' + type + ' as image', function( done ) {
 						requestManager.get( 'data/defaultAppearance.' + type, function( err, data ) {

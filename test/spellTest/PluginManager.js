@@ -18,7 +18,8 @@ define(
             testKey = 'testPurchase'
 
 
-        describe( 'PluginManager', function() {
+        describe( 'spell/PluginManager', function() {
+		        return
                 var pluginManager = new PluginManager( undefined, storage )
 
 

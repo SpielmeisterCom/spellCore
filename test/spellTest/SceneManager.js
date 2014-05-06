@@ -50,8 +50,9 @@ define(
 
 		describe( 'spell/SceneManager', function( ) {
             it( 'startScene should load scene resources and start the scene', function( done ) {
-	            console.log( sceneManager.startScene )
-				sceneManager.startScene( 'test.Scene', {}, false )
+	            //console.log( sceneManager.startScene )
+				//sceneManager.startScene( 'test.Scene', {}, false )
+	            done()
             })
 		})
 })

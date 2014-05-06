@@ -178,7 +178,7 @@ define(
                 requestManagerMock
             )
 
-			describe( 'LibraryManager', function( ) {
+			describe( 'spell/LibraryManager', function( ) {
                 it( 'loadRecords should load a scene and it\'s dependencies', function( done ) {
                     libraryManager.loadRecords( 'test.Scene', function( err, data ) {
 	                    expect( err ).to.not.exist
