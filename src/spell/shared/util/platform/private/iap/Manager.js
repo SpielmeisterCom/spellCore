@@ -6,7 +6,9 @@ define(
         'spell/shared/util/platform/private/environment/isHtml5Ejecta',
         'spell/shared/util/platform/private/iap/target/android',
         'spell/shared/util/platform/private/iap/target/web',
-        'spell/shared/util/platform/private/iap/target/windows'
+        'spell/shared/util/platform/private/iap/target/windows',
+
+        'spell/functions'
 	],
 	function(
         isHtml5TeaLeaf,
@@ -14,7 +16,9 @@ define(
         isHtml5Ejecta,
         androidIap,
         webIap,
-        windowsIap
+        windowsIap,
+
+        _
 	) {
 		'use strict'
 
@@ -23,6 +27,12 @@ define(
             alreadyPurchased: 1,
             notFulfilled: 2,
             notPurchased: 3
+        }
+
+        var STORAGE_KEY = 'iap'
+
+        var createStoreKey = function( productId ) {
+            return STORAGE_KEY + '.' + productId
         }
 
         var factory = function() {
@@ -45,20 +55,18 @@ define(
             this.iap = factory()
         }
 
-        var onPurchaseSuccess = function( callback ) {
+        var onPurchaseSuccess = function( productId, callback ) {
+            if( !callback ) throw new Error( 'Missing purchaseSuccess callback' )
+
+            this.storage.set( createStoreKey( productId ), true )
+
             callback()
         }
 
         var onError = function( callback, message ) {
+            if( !callback ) throw new Error( 'Missing onPurchaseError callback' )
             callback( message )
         }
-
-        var syncPurchasedProducts = function( storage ) {
-
-        }
-
-        var storage,
-            STORAGE_KEY = 'iap'
 
         IapManager.prototype = {
             init: function( storage ) {
@@ -68,19 +76,28 @@ define(
             purchase: function( productId, successCallback, errorCallback ) {
                 this.iap.purchaseProduct(
                     productId,
-                    function() {
-                        onPurchaseSuccess( successCallback )
-                    },
-                    function( message ) {
-                        onError( errorCallback, message )
-                    }
+                    _.bind( onPurchaseSuccess, this, productId, successCallback ),
+                    _.bind( onError, this, errorCallback )
                 )
             },
-            consume: function( productId ) {
+            consume: function( productId, successCallback, errorCallback ) {
+                //TODO: Consume direktly all purchases. no sync will be made. if your offline you cant buy things. if you remove your app, your items will be removed
 
+                if( !successCallback ) throw new Error( 'Missing consumeSuccess callback' )
+                if( !errorCallback ) throw new Error( 'Missing consumeError callback' )
+
+                if( this.hasProduct( productId ) ) {
+                    this.storage.clear( createStoreKey( productId ) )
+                    successCallback()
+
+                } else {
+                    errorCallback( )
+                }
             },
 			hasProduct: function( productId ) {
+                var product = this.storage.get( createStoreKey( productId ) )
 
+                return product === true
 			}
 		}
 
