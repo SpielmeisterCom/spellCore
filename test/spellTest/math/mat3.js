@@ -13,7 +13,7 @@ define(
 
 			var FLOAT_EPSILON = 0.000001
 
-			describe("spell.math.mat3", function() {
+			describe("spell/math/mat3", function() {
 				it("should create an empty matrix correctly", function() {
 						var matrix = mat3.create()
 						if(

@@ -10,7 +10,7 @@ define(
 
 		var textLoader = new TextLoader()
 
-		describe( 'TextLoader', function( ) {
+		describe( 'spell/shared/util/platform/private/loader/TextLoader', function( ) {
 			it( 'should load text files', function( done ) {
 				textLoader.load( 'data/test.txt', function( err, data ) {
 

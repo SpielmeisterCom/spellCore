@@ -28,7 +28,7 @@ define(
 
 		var soundLoader = new SoundLoader( audioContextMock )
 
-		describe( 'SoundLoader', function( ) {
+		describe( 'spell/shared/util/platform/private/loader/SoundLoader', function( ) {
 			it( 'should load music (using audioContext)', function( done ) {
 				soundLoader.load( true, 'data/music.mp3', function( err, data ) {
 					should.not.exist( err )

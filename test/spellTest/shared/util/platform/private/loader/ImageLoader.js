@@ -19,7 +19,7 @@ define(
 		}
 		var imageLoader = new ImageLoader( renderingContextMock )
 
-		describe( 'ImageLoader', function( ) {
+		describe( 'spell/shared/util/platform/private/loader/ImageLoader', function( ) {
 			it( 'should load images and create textures from it', function( done ) {
 				imageLoader.load( 'data/defaultAppearance.png', function( err, data ) {
 					should.not.exist( err )

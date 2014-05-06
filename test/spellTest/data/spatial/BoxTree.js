@@ -9,7 +9,7 @@ define(
 
 			var boxtree = BoxTree.create( true )
 
-			describe( 'BoxTree', function( ) {
+			describe( 'spell/data/spatial/BoxTree', function( ) {
 				it( 'should correctly return an added object', function( done ) {
 
 					var result = []
