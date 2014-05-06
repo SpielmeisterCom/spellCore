@@ -7,7 +7,6 @@ define(
 	) {
 		'use strict'
 
-
 		var testLibrary = {
 			'library/test/component4.json': {
 				"type": "component",
@@ -80,7 +79,8 @@ define(
 			'library/test/entityTemplate.json': {
 				"type": "entityTemplate",
 				"config": {
-						"test.component3": {}
+						"test.component3": {},
+						"test.component4": {}
 				},
 				"children": [],
 				"version": 1
@@ -151,6 +151,15 @@ define(
 						"name": "camera",
 						"entityTemplateId": "test.entityTemplate",
 						"config": {
+							"test.component3": {
+								"active": true
+							}
+						}
+					},
+					{
+						"name": "camera",
+						"entityTemplateId": "test.entityTemplate",
+						"config": {
 							"test.component4": {
 								"active": true
 							}
@@ -178,9 +187,13 @@ define(
                 requestManagerMock
             )
 
+			before( function() {
+				libraryManager.free()
+			})
+
 			describe( 'spell/LibraryManager', function( ) {
-                it( 'loadRecords should load a scene and it\'s dependencies', function( done ) {
-                    libraryManager.loadRecords( 'test.Scene', function( err, data ) {
+                it( 'loadLibraryRecords should load a scene and it\'s dependencies', function( done ) {
+                    libraryManager.loadLibraryRecords( 'test.Scene', function( err, data ) {
 	                    expect( err ).to.not.exist
 						expect( data ).to.exists
 
@@ -197,13 +210,12 @@ define(
                     } )
                 })
 
-				it( 'loadRecords should fail on a unresolvable libraryId', function( done ) {
-					libraryManager.loadRecords( ['test.not.existent', 'test.not.existent2'], function( err, data ) {
+				it( 'loadLibraryRecords should fail on a unresolvable libraryId', function( done ) {
+					libraryManager.loadLibraryRecords( ['test.not.existent', 'test.not.existent2'], function( err, data ) {
 						expect( err ).to.exist
 
 						done()
 					} )
 				})
-
 		})
 })

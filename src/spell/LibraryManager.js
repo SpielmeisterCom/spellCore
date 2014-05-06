@@ -23,12 +23,137 @@ define(
 			this.library                     = {}
 		}
 
-		LibraryManager.prototype = {
-			get : function( libraryId ) {
-				var cache = this.cache
 
-				return cache.metaData[ libraryId ] || cache.resource[ libraryId ]
-			},
+		/**
+		 * This function loads library records which are specified by their libraryId(s). Dependencies are automatically resolved and loaded
+		 * The result of the loading operation will be added to the local library cache
+		 *
+		 * This function shouldn't be called directly. Use loadLibraryRecords instead.
+		 *
+		 * The local library cache will be passed into the callback function as data object as soon as the loading is finished
+		 *
+		 * @param libraryIds - One or multiple libraryIds to load
+		 * @param callback - Callback in the form of fn( err, data )
+		 * @param libraryBaseUrl - base URL of the library. Ends with an /, defaults to: library/
+		 * @param forceReload - Specifiy whether a cache breaker should be added to the requests in order to avoid the local browser cache
+		 * @param timeoutInMs - Timeout in ms after which the loading operation fails
+		 * @private
+		 */
+		var loadLibraryRecordsRecursive = function( library, requestManager, libraryIds, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
+			if( !libraryBaseUrl ) {
+				libraryBaseUrl = 'library/'
+			}
+
+			if( !timeoutInMs ) {
+				timeoutInMs = 300000
+			}
+
+			if( !_.isArray( libraryIds )) {
+				libraryIds = [ libraryIds ]
+			}
+
+			var f = ff( this )
+			f.timeout( timeoutInMs )
+
+			// load libraryIds
+			f.next(
+				function() {
+					for( var index in libraryIds ) {
+						var libraryId   = libraryIds[ index ],
+							url         = libraryBaseUrl + libraryId.replace( /\./g, '/' ) + '.json'
+
+						// add a browser cache breaker if we're force reloading
+						if( forceReload ) {
+							url += '?t=' + Types.Time.getCurrentInMs()
+						}
+
+						if( !forceReload && library[ libraryId ] ) {
+							//library record already exists, so use the cached version
+							f.pass( {
+								libraryId:  libraryId,
+								data:       library[ libraryId ]
+							} )
+
+						} else {
+
+							var cb = f.slot()
+
+							requestManager.get( url, function( err, data ) {
+								//wrap the libraryId into the result object
+								if( data ) {
+									cb( err, {
+										libraryId:  libraryId,
+										data:       data
+									} )
+
+								} else {
+
+									cb( err, null )
+								}
+							} )
+						}
+
+					}
+				}
+			)
+
+			// process results and trigger loading for all dependencies
+			f.next(
+				function( ) {
+					for( var i=0; i<arguments.length; i++) {
+
+						var argumentsIterator   = arguments[ i ],
+							libraryId           = argumentsIterator.libraryId,
+							dependencies        = getDependencies( argumentsIterator.data )
+
+						library[ libraryId ] = argumentsIterator.data
+
+						if( dependencies.length > 0 ) {
+							loadLibraryRecordsRecursive(
+								library,
+								requestManager,
+								dependencies,
+								f.slot(),
+								forceReload
+							)
+						}
+					}
+
+					f.pass( library )
+				}
+			)
+
+			// merge results
+			f.next(
+				function() {
+					var result = {}
+					for( var i=0; i<arguments.length; i++) {
+						library = _.extend( library, arguments[ i ] )
+
+					}
+
+					f.succeed( library )
+				}
+			)
+
+			f.onComplete( callback )
+		}
+
+
+		/**
+		 * Extract all referenced library assetIds from the provided library
+		 *
+		 * Respects the entity => entityTemplate => component default inheritance
+		 *
+		 * @param library
+		 * @returns {Array}
+		 */
+		var extractReferencedAssetLibraryIds = function( library ) {
+			return _.keys( library )
+		}
+
+		LibraryManager.prototype = {
+	/*
 
 			getMetaData : function( libraryId ) {
 				return this.cache.metaData[ libraryId ]
@@ -70,39 +195,40 @@ define(
 				addNamespaceAndName( this.cache.metaData )
 			},
 
-			isAvailable : function( libraryIds ) {
-				var cache = this.cache
-
-				for( var i = 0, entry, libraryId, n = libraryIds.length; i < n; i++ ) {
-					libraryId = libraryIds[ i ]
-					entry = cache.metaData[ libraryId ]
-
-					if( !entry ||
-						( entry.file && !cache.resource[ libraryId ] ) ) {
-
-						return false
-					}
-				}
-
-				return true
-			},
 
 			free : function() {
 				this.cache.resource = {}
 			},
+*/
 
+
+			get : function( libraryId, forceType ) {
+				var libraryEntry = this.library[ libraryId ]
+
+
+				if( !libraryEntry || !libraryEntry.type ||
+					( forceType && libraryEntry.type != forceType )) {
+					return
+				}
+
+				return libraryEntry
+			},
+
+			addToLibrary : function( ) {
+
+			},
 
 			/**
-			 * This function loads library records which are specified by their libraryId(s). Dependencies are automatically resolved and loaded
-			 * The result of the loading operation will be passed into the callback function
+			 * Tries to load library records and fills the library cache with it
+			 * Dependencies are automatically resolved and loaded
 			 *
-			 * @param libraryIds - One or multiple libraryIds to load
-			 * @param callback - Callback in the form of fn( err, data )
-			 * @param libraryBaseUrl - base URL of the library. Ends with an /, defaults to: library/
-			 * @param forceReload - Specifiy whether a cache breaker should be added to the requests in order to avoid the local browser cache
-			 * @param timeoutInMs - Timeout in ms after which the loading operation fails
+			 * @param libraryIds
+			 * @param callback
+			 * @param libraryBaseUrl
+			 * @param forceReload
+			 * @param timeoutInMs
 			 */
-			loadRecords : function( libraryIds, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
+			loadLibraryRecords: function( libraryIds, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
 				if( !libraryBaseUrl ) {
 					libraryBaseUrl = 'library/'
 				}
@@ -111,83 +237,56 @@ define(
 					timeoutInMs = 300000
 				}
 
-				if( !_.isArray( libraryIds )) {
-					libraryIds = [ libraryIds ]
-				}
-
 				var f = ff( this )
 				f.timeout( timeoutInMs )
 
-				// load libraryIds
+				//Load all meta data records that have a simple dependency calculation
 				f.next(
 					function() {
-						for( var index in libraryIds ) {
-							var libraryId   = libraryIds[ index ],
-								url         = libraryBaseUrl + libraryId.replace( /\./g, '/' ) + '.json'
-
-							// add a browser cache breaker if we're force reloading
-							if( forceReload ) {
-								url += '?t=' + Types.Time.getCurrentInMs()
-							}
-
-							var cb = f.slot()
-
-							this.requestManager.get( url, function( err, data ) {
-								//wrap the libraryId into the result object
-								if( data ) {
-									cb( err, {
-										libraryId:  libraryId,
-										data:       data
-									} )
-
-								} else {
-
-									cb( err, null )
-								}
-							} )
-						}
+						loadLibraryRecordsRecursive(
+							this.library,
+							this.requestManager,
+							libraryIds,
+							f.slot(),
+							libraryBaseUrl,
+							forceReload,
+							timeoutInMs
+						)
 					}
 				)
 
-				// process results and trigger loading for all dependencies
+				//now calculate the referenced asset metadata records and load them
 				f.next(
-					function( ) {
-						var result = {}
+					function( library ) {
+						var assetLibraryIds = extractReferencedAssetLibraryIds( library )
 
-						for( var i=0; i<arguments.length; i++) {
+						loadLibraryRecordsRecursive(
+							this.library,
+							this.requestManager,
+							assetLibraryIds,
+							f.slot(),
+							libraryBaseUrl,
+							forceReload,
+							timeoutInMs
+						)
 
-							var argumentsIterator   = arguments[ i ],
-								libraryId           = argumentsIterator.libraryId,
-								dependencies        = getDependencies( argumentsIterator.data )
-
-							result[ libraryId ] = argumentsIterator.data
-
-							if( dependencies.length > 0 ) {
-								this.loadRecords(
-									dependencies,
-									f.slot(),
-									forceReload
-								)
-							}
-						}
-
-						f.pass( result )
 					}
 				)
 
-				// merge results
 				f.next(
 					function() {
-						var result = {}
-						for( var i=0; i<arguments.length; i++) {
-							var result = _.extend( result, arguments[ i ] )
-						}
-
-						f.succeed( result )
+						f.succeed( this.library )
 					}
 				)
 
 				f.onComplete( callback )
+			},
+
+			/**
+			 * Resets the library cache
+			 */
+			free : function() {
+				this.library = {}
 			}
 		}
 
