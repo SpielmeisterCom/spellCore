@@ -74,6 +74,22 @@ define(
                             expect( product ).to.exist
                             expect( product ).to.be.true
                         } )
+
+                        it( 'purchase again should fail with errorCode 1', function( done ) {
+                            iap.purchase(
+                                testKey,
+                                function() {
+                                    throw new Error( 'should fail' )
+                                },
+                                function( errorCode ) {
+                                    if( errorCode === 1 ) {
+                                        done()
+                                    } else {
+                                        throw new Error( 'iap.purchase threw an error with code: ' + errorCode )
+                                    }
+                                }
+                            )
+                        } )
                     } )
 
                     describe( 'Consume ' + testKey, function(){
