@@ -7,14 +7,18 @@
 define(
 	'spell/SceneManager',
 	[
+		'ff',
 		'spell/client/loading/loadSceneResources',
 		'spell/shared/util/scene/Scene',
+		'spell/library/constructEntity',
 
 		'spell/functions'
 	],
 	function(
+		ff,
 		loadSceneResources,
 		Scene,
+		constructEntity,
 
 		_
 	) {
@@ -148,6 +152,47 @@ define(
 		}
 
 		SceneManager.prototype = {
+			loadSceneData : function( sceneId, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
+				var f = ff( this )
+				f.timeout( timeoutInMs )
+
+				f.next(
+					function() {
+						this.libraryManager.loadLibraryRecords(
+							sceneId,
+							f.slot(),
+							libraryBaseUrl,
+							forceReload,
+							timeoutInMs
+						)
+					}
+				)
+
+				f.next(
+					function( libraryRecords ) {
+						//construct sceneData from libraryRecords
+						var sceneData = libraryRecords[ sceneId ]
+
+						if( !sceneData ) {
+							throw 'Error: Could not load scene with id ' + sceneId
+						}
+
+						sceneData.entities = _.map(
+							sceneData.entities,
+							_.bind(
+								constructEntity,
+								this,
+								libraryRecords
+							)
+						)
+
+						f.succeed( sceneData )
+					}
+				)
+
+				f.onComplete( callback )
+			},
+
 			/**
 			 * Changes the currently executed scene to the scene specified by targetSceneId.
 			 *

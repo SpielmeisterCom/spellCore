@@ -17,7 +17,7 @@ define(
 		}
 
 		var libraryManager = {
-				load: function() { }
+			loadLibraryRecords: function() {}
 		}
 
 		var spell               = {
@@ -49,10 +49,95 @@ define(
 		)
 
 		describe( 'spell/SceneManager', function( ) {
-            it( 'startScene should load scene resources and start the scene', function( done ) {
-	            //console.log( sceneManager.startScene )
-				//sceneManager.startScene( 'test.Scene', {}, false )
-	            done()
-            })
+			var sandbox
+
+			beforeEach(function() {
+				sandbox = sinon.sandbox.create()
+			})
+
+			afterEach(function() {
+				sandbox.restore()
+			})
+
+
+			it( 'loadSceneData should construct a sceneData object from a sceneId', function( done ) {
+
+				 sandbox.stub( libraryManager, 'loadLibraryRecords' )
+					 .withArgs( 'test.Scene' )
+					 .callsArgWith( 1, null, {
+						'test.Scene': {
+							'entities': [
+								{
+									name: "testEntity",
+									entityTemplateId: "test.entityTemplate"
+								}
+							]
+						},
+						'test.entityTemplate': {
+							config: {
+								'testComponent': {
+									'testAttribute': 'xyz'
+								}
+							}
+						}
+					}
+				 )
+
+				sceneManager.loadSceneData(
+					'test.Scene',
+					function( err, data ) {
+						expect( err ).to.not.exist
+						expect( data ).to.exists
+
+						expect( data ).to.have.property( 'entities' )
+						expect( data[ 'entities' ] ).to.have.length( 1 )
+
+						expect( data ).to.have.deep.property('entities[0].name', 'testEntity')
+						expect( data ).to.have.deep.property('entities[0].config.testComponent.testAttribute', 'xyz')
+
+
+						done()
+					}
+				)
+
+			})
+
+			it( 'loadSceneData fails if loadLibraryRecords fails', function( done ) {
+
+				sandbox .stub( libraryManager, 'loadLibraryRecords' )
+						.callsArgWith( 1, 'Error', null )
+
+				sceneManager.loadSceneData(
+					'test.Scene',
+					function( err, data ) {
+						expect( err ).to.exist
+						expect( data ).to.not.exists
+
+						done()
+					}
+				)
+			})
+
+
+			it( 'loadSceneData fails if the scene is not included in the result', function( done ) {
+				sandbox.stub( libraryManager, 'loadLibraryRecords' )
+					.callsArgWith( 1, null, {
+						'test.AnotherScene': {
+							'entites': []
+						}
+					}
+				)
+
+				sceneManager.loadSceneData(
+					'test.Scene',
+					function( err, data ) {
+						expect( err ).to.exist
+						expect( data ).to.not.exists
+
+						done()
+					}
+				)
+
+			})
 		})
 })
