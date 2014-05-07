@@ -137,9 +137,10 @@ define(
 
 				var entityTemplate = library[ entityTemplateId ]
 
-				applyEntityConfig(
-					entityConfig.config,
-					deepClone( entityTemplate.config )
+                //clone entityTemplate config and apply instance specific config
+				entityConfig.config = applyEntityConfig(
+                    deepClone( entityTemplate.config ),
+                    entityConfig.config
 				)
 
 				entityConfig.children = applyOverloadedChildrenConfig( entityTemplate.children, entityConfig.children )
