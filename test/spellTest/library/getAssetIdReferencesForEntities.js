@@ -31,11 +31,11 @@ define(
 						'name': 'test',
 						config: {
 							'test.OtherComponent': {
-								'assetId': 'apperance:test'
+								'assetId': 'apperance:XX'
 							},
 
 							'test.Component': {
-								'assetId': 'apperance:test'
+								'assetId': 'apperance:testAssetId'
 							}
 						},
 
@@ -43,7 +43,7 @@ define(
 							'name': 'child',
 							'config': {
 								'test.Component': {
-									'assetId': 'apperance:test2'
+									'assetId': 'apperance:testAssetId2'
 								}
 							}
 						}]
@@ -51,8 +51,8 @@ define(
 				)
 
 				expect( referencedAssetIds ).to.have.length( 2 )
-				expect( referencedAssetIds[ 0 ] ).to.be.equal( 'apperance:test' )
-				expect( referencedAssetIds[ 1 ] ).to.be.equal( 'apperance:test2' )
+				expect( referencedAssetIds[ 0 ] ).to.be.equal( 'testAssetId' )
+				expect( referencedAssetIds[ 1 ] ).to.be.equal( 'testAssetId2' )
 
 
 				done()

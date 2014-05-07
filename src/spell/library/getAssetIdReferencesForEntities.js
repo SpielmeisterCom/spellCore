@@ -36,7 +36,12 @@ define(
 
 						if( componentAttributesWithAssetIds[ componentName ] &&
 							componentAttributesWithAssetIds[ componentName ][ attributeName ]) {
-							result.push( attributeValue )
+
+							result.push(
+								attributeValue.indexOf(':') > 0 ?
+									attributeValue.substr( attributeValue.indexOf(':') + 1 ) :
+									attributeValue
+							)
 						}
 
 					})
