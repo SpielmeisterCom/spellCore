@@ -229,57 +229,15 @@ define(
 			 * @param timeoutInMs
 			 */
 			loadLibraryRecords: function( libraryIds, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
-				if( !libraryBaseUrl ) {
-					libraryBaseUrl = 'library/'
-				}
-
-				if( !timeoutInMs ) {
-					timeoutInMs = 300000
-				}
-
-				var f = ff( this )
-				f.timeout( timeoutInMs )
-
-				//Load all meta data records that have a simple dependency calculation
-				f.next(
-					function() {
-						loadLibraryRecordsRecursive(
-							this.library,
-							this.requestManager,
-							libraryIds,
-							f.slot(),
-							libraryBaseUrl,
-							forceReload,
-							timeoutInMs
-						)
-					}
+				loadLibraryRecordsRecursive(
+					{},
+					this.requestManager,
+					libraryIds,
+					callback,
+					libraryBaseUrl,
+					forceReload,
+					timeoutInMs
 				)
-
-				//now calculate the referenced asset metadata records and load them
-				f.next(
-					function( library ) {
-						var assetLibraryIds = extractReferencedAssetLibraryIds( library )
-
-						loadLibraryRecordsRecursive(
-							this.library,
-							this.requestManager,
-							assetLibraryIds,
-							f.slot(),
-							libraryBaseUrl,
-							forceReload,
-							timeoutInMs
-						)
-
-					}
-				)
-
-				f.next(
-					function() {
-						f.succeed( this.library )
-					}
-				)
-
-				f.onComplete( callback )
 			},
 
 			/**
