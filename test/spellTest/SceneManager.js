@@ -60,16 +60,37 @@ define(
 			})
 
 
-			it( 'loadSceneData should construct a sceneData object from a sceneId', function( done ) {
+			it( 'loadSceneData should construct a sceneData object from a sceneId and resolve it\'s referenced assetIds', function( done ) {
 
 				 sandbox.stub( libraryManager, 'loadLibraryRecords' )
 					 .withArgs( 'test.Scene' )
 					 .callsArgWith( 1, null, {
+						 'another.component': {
+							 "type": "component",
+							 "readonly": true,
+							 "engineInternal": true,
+							 "title": "Test",
+							 "doc": "test",
+							 "attributes": [
+								 {
+									 "name": "assetId",
+									 "type": "assetId:spriteSheet",
+									 "default": "appearance:spell.defaultAppearance",
+									 "doc": "the spritesheet asset used for rendering"
+								 }
+							 ],
+							 "version": 1
+						 },
 						'test.Scene': {
 							'entities': [
 								{
 									name: "testEntity",
-									entityTemplateId: "test.entityTemplate"
+									entityTemplateId: "test.entityTemplate",
+									config: {
+										'another.component': {
+											assetId: 'appearance:reference.to.an.asset'
+										}
+									}
 								}
 							]
 						},
@@ -82,6 +103,10 @@ define(
 						}
 					}
 				 )
+				.withArgs( ['reference.to.an.asset'] )
+				.callsArgWith( 1, null, {
+					'type': 'asset'
+				 })
 
 				sceneManager.loadSceneData(
 					'test.Scene',

@@ -11,6 +11,7 @@ define(
 		'spell/client/loading/loadSceneResources',
 		'spell/shared/util/scene/Scene',
 		'spell/library/constructEntity',
+		'spell/library/getAssetIdReferencesForEntities',
 
 		'spell/functions'
 	],
@@ -19,7 +20,7 @@ define(
 		loadSceneResources,
 		Scene,
 		constructEntity,
-
+		getAssetIdReferencesForEntities,
 		_
 	) {
 		'use strict'
@@ -153,6 +154,15 @@ define(
 
 		SceneManager.prototype = {
 			loadSceneData : function( sceneId, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
+				if( !libraryBaseUrl ) {
+					libraryBaseUrl = 'library/'
+				}
+
+				if( !timeoutInMs ) {
+					timeoutInMs = 300000
+				}
+
+
 				var f = ff( this )
 				f.timeout( timeoutInMs )
 
@@ -177,6 +187,7 @@ define(
 							throw 'Error: Could not load scene with id ' + sceneId
 						}
 
+						//construct sceneData from scene library record
 						sceneData.entities = _.map(
 							sceneData.entities,
 							_.bind(
@@ -186,6 +197,30 @@ define(
 							)
 						)
 
+						f.pass( sceneData )
+
+						//now resolve all asset references from the current sceneData and request their metaData
+						var referencedAssetIds = getAssetIdReferencesForEntities( libraryRecords, sceneData.entities )
+
+						var cb = f.slot()
+
+						if( referencedAssetIds.length > 0 ) {
+							this.libraryManager.loadLibraryRecords(
+								referencedAssetIds,
+								cb,
+								libraryBaseUrl,
+								forceReload,
+								timeoutInMs
+							)
+						} else {
+							cb( null, {} )
+						}
+
+					}
+				)
+
+				f.next(
+					function( sceneData, referencedAssetIdLibraryRecords ) {
 						f.succeed( sceneData )
 					}
 				)
