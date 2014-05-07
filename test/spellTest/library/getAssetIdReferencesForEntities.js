@@ -21,6 +21,8 @@ define(
 				}
 			}
 
+	describe('spell/library/getAssetIdReferencesForEntities', function() {
+
 			it( 'should correctly resolve referenced assetIds', function( done ) {
 
 				var referencedAssetIds = getAssetIdReferencesForEntities(
@@ -56,4 +58,5 @@ define(
 				done()
 			} )
 
-})
+		})
+	})
