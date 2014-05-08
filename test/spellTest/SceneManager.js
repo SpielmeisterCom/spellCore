@@ -59,6 +59,44 @@ define(
 				sandbox.restore()
 			})
 
+			it( 'loadSceneData should construct a sceneData object from a sceneId for scenes that don\'t reference assets', function( done ) {
+				sandbox.stub( libraryManager, 'loadLibraryRecords' )
+					.withArgs( 'test.Scene' )
+					.callsArgWith( 1, null, {
+						'test.Scene': {
+							'entities': [
+								{
+									name: "testEntity",
+									config: {
+										'another.component': {
+											assetId: 'appearance:reference.to.an.asset'
+										}
+									}
+								}
+							]
+						}
+					})
+
+
+				sceneManager.loadSceneData(
+					'test.Scene',
+					function( err, sceneData, loadedLibraryRecords, loadedAssetRecords ) {
+						expect( err ).to.not.exist
+						expect( sceneData ).to.exists
+
+						expect( sceneData ).to.have.property( 'entities' )
+						expect( sceneData[ 'entities' ] ).to.have.length( 1 )
+
+						expect( sceneData ).to.have.deep.property('entities[0].name', 'testEntity')
+
+						expect( loadedLibraryRecords ).to.exists
+
+						expect( loadedAssetRecords ).to.be.empty
+
+						done()
+					}
+				)
+			})
 
 			it( 'loadSceneData should construct a sceneData object from a sceneId and resolve it\'s referenced assetIds', function( done ) {
 
