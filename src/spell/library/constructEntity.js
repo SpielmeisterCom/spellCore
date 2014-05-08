@@ -146,12 +146,55 @@ define(
 				entityConfig.children = applyOverloadedChildrenConfig( entityTemplate.children, entityConfig.children )
 			}
 
+            var children = entityConfig.children
+
+            for( var i = 0, childEntityConfig, n = children.length; i < n; i++ ) {
+                childEntityConfig = children[ i ]
+                childEntityConfig.parentId = entityConfig.id
+
+                children[ i ] = normalizeEntityConfig( library, childEntityConfig )
+            }
+
 			return entityConfig
 		}
+
+        var fillMissingComponentDefaults = function( library, entity ) {
+
+            _.each(
+                entity.config,
+                function( componentConfig, componentId ) {
+                    var componentDefinition = library[ componentId ],
+                        componentConfig     = entity.config[ componentId ]
+
+                    if( !componentDefinition ) {
+                        throw 'Error: Unknown component "' + componentId + '". Could not create entity.'
+                    }
+
+                    _.each(
+                        componentDefinition.attributes,
+                        function( attribute ) {
+                            var attributeName = attribute.name
+
+                            if( !_.has( componentConfig, attributeName ) ) {
+                                componentConfig[ attributeName ] = deepClone( attribute.default )
+                            }
+                        }
+                    )
+                }
+            )
+
+            _.each(
+                entity.children,
+                function( child ){
+                    fillMissingComponentDefaults( library, child )
+                }
+            )
+        }
 
 		return function( library, entityOrEntityTemplateId ) {
 			var entity = normalizeEntityConfig( library, entityOrEntityTemplateId )
 
+            fillMissingComponentDefaults( library, entity )
 
 			return entity
 		}
