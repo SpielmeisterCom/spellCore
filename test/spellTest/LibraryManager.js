@@ -27,6 +27,12 @@ define(
 				"doc": "test",
 				"attributes": [
 					{
+						"name": "assetId",
+						"type": "assetId:spriteSheet",
+						"default": "appearance:spell.defaultAppearance",
+						"doc": "the spritesheet asset used for rendering"
+					},
+					{
 						"name": "test",
 						"doc": "ids of the children entities",
 						"default": [],
@@ -169,7 +175,15 @@ define(
 					},
 					{
 						"name": "camera",
-						"entityTemplateId": "test.entityTemplate",
+						"config": {
+							"test.component4": {
+								"active": true,
+								"assetId": "assetId:asset.that.is.overridden.by.anonmyous.entity.config"
+							}
+						}
+					},
+					{
+						"name": "anonymousEntity3",
 						"config": {
 							"test.component4": {
 								"active": true
