@@ -357,7 +357,7 @@ define(
 
                     it( 'should be added to the entity', function() {
                         var entity = constructEntity( testLibrary, entityConfig )
-console.log( entity.config )
+
                         entity.config.should.deep.equal(
                             {
                                 'test.component1' : {
@@ -367,6 +367,7 @@ console.log( entity.config )
                                     text: 'Default Text'
                                 },
                                 'test.component4': {
+                                    testAttribute: "entityTemplateBased",
                                     active: true
                                 }
                             }
