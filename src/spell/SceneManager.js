@@ -153,6 +153,14 @@ define(
 		}
 
 		SceneManager.prototype = {
+			/**
+			 * Load all needed metaData and assetReferences for a scene
+			 * @param sceneId - Library id of the scene which should be loaded
+			 * @param callback - callback function in the form function( err, sceneData, loadedLibraryRecords, loadedAssetRecords )
+			 * @param libraryBaseUrl - base url of the library which should be used
+			 * @param forceReload - forceReload the library items
+			 * @param timeoutInMs
+			 */
 			loadSceneData : function( sceneId, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
 				if( !libraryBaseUrl ) {
 					libraryBaseUrl = 'library/'
@@ -179,9 +187,10 @@ define(
 				)
 
 				f.next(
-					function( libraryRecords ) {
+					function( sceneLibraryRecords ) {
+
 						//construct sceneData from libraryRecords
-						var sceneData = libraryRecords[ sceneId ]
+						var sceneData = sceneLibraryRecords[ sceneId ]
 
 						if( !sceneData ) {
 							throw 'Error: Could not load scene with id ' + sceneId
@@ -193,14 +202,16 @@ define(
 							_.bind(
 								constructEntity,
 								this,
-								libraryRecords
+								sceneLibraryRecords
 							)
 						)
 
 						f.pass( sceneData )
 
+						f.pass( sceneLibraryRecords )
+
 						//now resolve all asset references from the current sceneData and request their metaData
-						var referencedAssetIds = getAssetIdReferencesForEntities( libraryRecords, sceneData.entities )
+						var referencedAssetIds = getAssetIdReferencesForEntities( sceneLibraryRecords, sceneData.entities )
 
 						var cb = f.slot()
 
@@ -220,12 +231,44 @@ define(
 				)
 
 				f.next(
-					function( sceneData, referencedAssetIdLibraryRecords ) {
-						f.succeed( sceneData )
+					function( sceneData, sceneLibraryRecords, assetLibraryRecords ) {
+						f.succeed( sceneData, sceneLibraryRecords, assetLibraryRecords )
 					}
 				)
 
 				f.onComplete( callback )
+			},
+
+			loadScene : function( sceneId, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
+				if( !libraryBaseUrl ) {
+					libraryBaseUrl = 'library/'
+				}
+
+				if( !timeoutInMs ) {
+					timeoutInMs = 300000
+				}
+
+
+				var f = ff( this )
+				f.timeout( timeoutInMs )
+
+				f.next(
+					function() {
+						this.loadSceneMetaData(
+						sceneId,
+						f.slot(),
+						libraryBaseUrl,
+						forceReload,
+						timeoutInMs
+					)
+				})
+
+				//now load all referenced assetts
+				f.next(
+					function( sceneData, loadedLibraryRecords, loadedAssetRecords ) {
+
+					}
+				)
 			},
 
 			/**
