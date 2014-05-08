@@ -148,12 +148,14 @@ define(
 
             var children = entityConfig.children
 
-            for( var i = 0, childEntityConfig, n = children.length; i < n; i++ ) {
-                childEntityConfig = children[ i ]
-                childEntityConfig.parentId = entityConfig.id
+			if( children ) {
+				for( var i = 0, childEntityConfig, n = children.length; i < n; i++ ) {
+					childEntityConfig = children[ i ]
+					childEntityConfig.parentId = entityConfig.id
 
-                children[ i ] = normalizeEntityConfig( library, childEntityConfig )
-            }
+					children[ i ] = normalizeEntityConfig( library, childEntityConfig )
+				}
+			}
 
 			return entityConfig
 		}
