@@ -23,22 +23,6 @@ define(
 			this.library                     = {}
 		}
 
-
-		/**
-		 * This function loads library records which are specified by their libraryId(s). Dependencies are automatically resolved and loaded
-		 * The result of the loading operation will be added to the local library cache
-		 *
-		 * This function shouldn't be called directly. Use loadLibraryRecords instead.
-		 *
-		 * The local library cache will be passed into the callback function as data object as soon as the loading is finished
-		 *
-		 * @param libraryIds - One or multiple libraryIds to load
-		 * @param callback - Callback in the form of fn( err, data )
-		 * @param libraryBaseUrl - base URL of the library. Ends with an /, defaults to: library/
-		 * @param forceReload - Specifiy whether a cache breaker should be added to the requests in order to avoid the local browser cache
-		 * @param timeoutInMs - Timeout in ms after which the loading operation fails
-		 * @private
-		 */
 		var loadLibraryRecordsRecursive = function( library, requestManager, libraryIds, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
 			if( !libraryBaseUrl ) {
 				libraryBaseUrl = 'library/'
@@ -139,19 +123,6 @@ define(
 			f.onComplete( callback )
 		}
 
-
-		/**
-		 * Extract all referenced library assetIds from the provided library
-		 *
-		 * Respects the entity => entityTemplate => component default inheritance
-		 *
-		 * @param library
-		 * @returns {Array}
-		 */
-		var extractReferencedAssetLibraryIds = function( library ) {
-			return _.keys( library )
-		}
-
 		LibraryManager.prototype = {
 	/*
 
@@ -219,14 +190,18 @@ define(
 			},
 
 			/**
-			 * Tries to load library records and fills the library cache with it
-			 * Dependencies are automatically resolved and loaded
+			 * This function loads library records which are specified by their libraryId(s). Dependencies are automatically resolved and loaded
+			 * The result of the loading operation will be added to the local library cache
 			 *
-			 * @param libraryIds
-			 * @param callback
-			 * @param libraryBaseUrl
-			 * @param forceReload
-			 * @param timeoutInMs
+			 * This function shouldn't be called directly. Use loadLibraryRecords instead.
+			 *
+			 * The local library cache will be passed into the callback function as data object as soon as the loading is finished
+			 *
+			 * @param libraryIds - One or multiple libraryIds to load
+			 * @param callback - Callback in the form of fn( err, data )
+			 * @param libraryBaseUrl - base URL of the library. Ends with an /, defaults to: library/
+			 * @param forceReload - Specifiy whether a cache breaker should be added to the requests in order to avoid the local browser cache
+			 * @param timeoutInMs - Timeout in ms after which the loading operation fails
 			 */
 			loadLibraryRecords: function( libraryIds, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
 				loadLibraryRecordsRecursive(

@@ -8,6 +8,17 @@ define(
 		'use strict'
 
 		var testLibrary = {
+            'library/spell/defaultAppearance.json': {
+                "version": 1,
+                "type": "asset",
+                "subtype": "appearance",
+                "config": {
+                   "localized": false,
+                   "localization": "",
+                   "extension": "png"
+                },
+                "dependencies": []
+            },
 			'library/test/component4.json': {
 				"type": "component",
 				"readonly": true,
@@ -231,5 +242,17 @@ define(
 						done()
 					} )
 				})
+
+                it( 'loadLibraryRecords should load library assetIds', function( done ) {
+                    libraryManager.loadLibraryRecords( ['spell.defaultAppearance'], function( err, data ) {
+                        expect( err ).to.not.exist
+                        expect( data ).to.exists
+
+                        expect( data ).to.have.property( 'spell.defaultAppearance' )
+
+                        done()
+                    } )
+                })
+
 		})
 })

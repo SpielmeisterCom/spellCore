@@ -105,21 +105,28 @@ define(
 				 )
 				.withArgs( ['reference.to.an.asset'] )
 				.callsArgWith( 1, null, {
-					'type': 'asset'
+						 'reference.to.an.asset': {
+							 'type': 'asset'
+						 }
 				 })
 
 				sceneManager.loadSceneData(
 					'test.Scene',
-					function( err, data ) {
+					function( err, sceneData, loadedLibraryRecords, loadedAssetRecords ) {
 						expect( err ).to.not.exist
-						expect( data ).to.exists
+						expect( sceneData ).to.exists
 
-						expect( data ).to.have.property( 'entities' )
-						expect( data[ 'entities' ] ).to.have.length( 1 )
+						expect( sceneData ).to.have.property( 'entities' )
+						expect( sceneData[ 'entities' ] ).to.have.length( 1 )
 
-						expect( data ).to.have.deep.property('entities[0].name', 'testEntity')
-						expect( data ).to.have.deep.property('entities[0].config.testComponent.testAttribute', 'xyz')
+						expect( sceneData ).to.have.deep.property('entities[0].name', 'testEntity')
+						expect( sceneData ).to.have.deep.property('entities[0].config.testComponent.testAttribute', 'xyz')
 
+
+						expect( loadedLibraryRecords ).to.exists
+
+						expect( loadedAssetRecords ).to.exists
+						expect( loadedAssetRecords ).to.have.property( 'reference.to.an.asset' )
 
 						done()
 					}

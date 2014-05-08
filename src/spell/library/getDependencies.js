@@ -68,11 +68,16 @@ define(
 
 		}
 
+        var addAssetDependencies = function( dependencies, asset ) {
+
+        }
+
 		var libraryItemHandler = {
 			'scene':            addSceneDependencies,
 			'system':           addSystemDependencies,
 			'entityTemplate':   addEntityDependencies,
-			'component':        addComponentDependencies
+			'component':        addComponentDependencies,
+            'asset':            addAssetDependencies
 		}
 
 		return function( libraryItem ) {
