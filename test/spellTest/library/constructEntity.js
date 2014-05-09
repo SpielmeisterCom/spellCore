@@ -288,10 +288,37 @@ define(
                 })
 
 
-                it( 'should not be possible to have the ownerTemplateId as child (recursion)', function() {
-                    //TODO: implement a test
-                } )
-
+	            it( 'should not be possible to have the ownerTemplateId as child (recursion)', function() {
+		            expect(
+			            function() {
+				            constructEntity( {
+					            'test.wrongEntityTemplate': {
+						            "type": "entityTemplate",
+						            "config": {},
+						            "children": [
+							            {
+								            "name": "test",
+								            "entityTemplateId": 'test.wrongEntityTemplate',
+								            "config": {},
+								            children: []
+							            }
+						            ]
+					            }
+				            }, {
+					            "name": "errol",
+					            "config": {},
+					            "children": [
+						            {
+							            "name": "test",
+							            "entityTemplateId": 'test.wrongEntityTemplate',
+							            "config": {},
+							            children: []
+						            }
+					            ]
+				            } )
+			            }
+		            ).to.throw( Error )
+	            })
 
                 it( 'should have the child test in anonymousEntity4 and merge test2 with the entityTemplate', function() {
                     var testEntity = {
