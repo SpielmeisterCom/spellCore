@@ -59,21 +59,12 @@ define(
 				sandbox.restore()
 			})
 
-			it( 'loadSceneData should construct a sceneData object from a sceneId for scenes that don\'t reference assets', function( done ) {
+			it( 'loadSceneData should construct an empty scene', function( done ) {
 				sandbox.stub( libraryManager, 'loadLibraryRecords' )
 					.withArgs( 'test.Scene' )
 					.callsArgWith( 1, null, {
 						'test.Scene': {
-							'entities': [
-								{
-									name: "testEntity",
-									config: {
-										'another.component': {
-											assetId: 'appearance:reference.to.an.asset'
-										}
-									}
-								}
-							]
+							'entities': []
 						}
 					})
 
@@ -85,9 +76,7 @@ define(
 						expect( sceneData ).to.exists
 
 						expect( sceneData ).to.have.property( 'entities' )
-						expect( sceneData[ 'entities' ] ).to.have.length( 1 )
-
-						expect( sceneData ).to.have.deep.property('entities[0].name', 'testEntity')
+						expect( sceneData[ 'entities' ] ).to.have.length( 0 )
 
 						expect( loadedLibraryRecords ).to.exists
 
@@ -98,8 +87,7 @@ define(
 				)
 			})
 
-			it( 'loadSceneData should construct a sceneData object from a sceneId and resolve it\'s referenced assetIds', function( done ) {
-
+			it.only( 'loadSceneData should construct a sceneData object from a sceneId and resolve it\'s referenced assetIds', function( done ) {
 				 sandbox.stub( libraryManager, 'loadLibraryRecords' )
 					 .withArgs( 'test.Scene' )
 					 .callsArgWith( 1, null, {
@@ -119,6 +107,22 @@ define(
 							 ],
 							 "version": 1
 						 },
+						 'testComponent': {
+							"type": "component",
+								"readonly": true,
+								"engineInternal": true,
+								"title": "Test",
+								"doc": "test",
+								"attributes": [
+								{
+									"name": "assetId",
+									"type": "assetId:spriteSheet",
+									"default": "appearance:spell.defaultAppearance",
+									"doc": "the spritesheet asset used for rendering"
+								}
+							],
+								"version": 1
+						},
 						'test.Scene': {
 							'entities': [
 								{
@@ -141,16 +145,20 @@ define(
 						}
 					}
 				 )
-				.withArgs( ['reference.to.an.asset'] )
+				.withArgs( ['spell.defaultAppearance', 'reference.to.an.asset'] )
 				.callsArgWith( 1, null, {
+						 'spell.defaultAppearance': {
+							 'type': 'asset'
+						 },
 						 'reference.to.an.asset': {
 							 'type': 'asset'
 						 }
-				 })
+				})
 
 				sceneManager.loadSceneData(
 					'test.Scene',
 					function( err, sceneData, loadedLibraryRecords, loadedAssetRecords ) {
+
 						expect( err ).to.not.exist
 						expect( sceneData ).to.exists
 
@@ -168,8 +176,10 @@ define(
 
 						done()
 					}
-				)
-
+				),
+				"library/",
+				false,
+				300
 			})
 
 			it( 'loadSceneData fails if loadLibraryRecords fails', function( done ) {
