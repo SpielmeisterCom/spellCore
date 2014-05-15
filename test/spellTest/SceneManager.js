@@ -87,7 +87,7 @@ define(
 				)
 			})
 
-			it.only( 'loadSceneData should construct a sceneData object from a sceneId and resolve it\'s referenced assetIds', function( done ) {
+			it( 'loadSceneData should construct a sceneData object from a sceneId and resolve it\'s referenced assetIds', function( done ) {
 				 sandbox.stub( libraryManager, 'loadLibraryRecords' )
 					 .withArgs( 'test.Scene' )
 					 .callsArgWith( 1, null, {
