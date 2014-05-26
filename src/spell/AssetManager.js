@@ -1,15 +1,4 @@
 /**
- * The AssetManager provides access to asset instances.
- *
- * Example:
- *
- *     spell.audioContext.play(
- *         spell.assetManager.get( 'sound:myGame.creakyNoise' ).resource,
- *         'creakyNoise',
- *         0.7,
- *         false
- *     )
- *
  * @class spell.assetManager
  * @singleton
  */
@@ -25,7 +14,11 @@ define(
 		}
 
 		AssetManager.prototype = {
-			/**
+			loadAssets: function( library, assetIds, callback, libraryBaseUrl, forceReload, timeoutInMs ) {
+
+			},
+
+				/**
 			 * Adds an asset.
 			 *
 			 * @param {String} id
