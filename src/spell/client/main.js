@@ -73,8 +73,6 @@ define(
 		var start = function( applicationModule, cacheContent ) {
 			var spell                = this.spell,
 				eventManager         = spell.eventManager,
-				libraryManager       = spell.libraryManager,
-				renderingContext     = spell.renderingContext,
 				configurationManager = spell.configurationManager
 
             setApplicationModule(
@@ -89,10 +87,38 @@ define(
 
             var isModeDevelopment    = configurationManager.getValue( 'mode' ) !== 'deployed'
 
-			spell.console.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
-			spell.console.debug( 'created audio context (' + spell.audioContext.getConfiguration().type + ')' )
+            // creating rendering context
+			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
+				spell.eventManager,
+				configurationManager.getValue( 'id' ),
+				configurationManager.getValue( 'currentScreenSize' )[ 0 ],
+				configurationManager.getValue( 'currentScreenSize' )[ 1 ],
+				configurationManager.getValue( 'renderingBackEnd' )
+			)
 
-			if( cacheContent ) {
+			spell.console.debug( 'created rendering context (' + renderingContext.getConfiguration().type + ')' )
+
+
+			// creating audio context
+			var audioContext = PlatformKit.AudioFactory.createAudioContext(
+				configurationManager.getValue( 'audioBackEnd' )
+			)
+
+			spell.console.debug( 'created audio context (' + audioContext.getConfiguration().type + ')' )
+
+            var requestManager       = new RequestManager(
+                PlatformKit.createImageLoader( renderingContext ),
+                PlatformKit.createSoundLoader( audioContext ),
+                PlatformKit.createTextLoader( )
+            ),
+            libraryManager       = new LibraryManager(
+                eventManager,
+                requestManager,
+                configurationManager.getValue( 'libraryUrl' ),
+                !isModeDevelopment
+            )
+
+            if( cacheContent ) {
                 libraryManager.addToCache( cacheContent )
             }
 
@@ -123,17 +149,21 @@ define(
 			inputManager.init()
 
 			spell.pluginManager        = new PluginManager( inputManager, spell.storage )
+			spell.audioContext         = audioContext
 			spell.assetManager         = assetManager
 			spell.configurationManager = configurationManager
 			spell.moduleLoader         = moduleLoader
 			spell.entityManager        = entityManager
 			spell.physicsManager       = new PhysicsManager()
+			spell.renderingContext     = renderingContext
 			spell.sceneManager         = sceneManager
 			spell.sendMessageToEditor  = this.sendMessageToEditor
 			spell.translate            = translatePartial
 			spell.inputManager         = inputManager
 			spell.environment          = PlatformKit.createEnvironment( configurationManager, eventManager )
 			spell.env                  = spell.environment
+            spell.requestManager       = requestManager
+			spell.libraryManager       = libraryManager
 			spell.visibilityManager    = new VisibilityManager( eventManager, configurationManager, entityManager )
 			spell.visibilityManager.init()
 
@@ -161,39 +191,7 @@ define(
 				configurationManager = new ConfigurationManager( eventManager ),
 				statisticsManager    = new StatisticsManager(),
 				mainLoop             = createMainLoop( eventManager, statisticsManager, isDebug ),
-				isModeDeployed       = loaderConfig.mode === 'deployed',
-				isModeDevelopment    = configurationManager.getValue( 'mode' ) !== 'deployed'
-
-			// creating rendering context
-			var renderingContext = PlatformKit.RenderingFactory.createContext2d(
-				spell.eventManager,
-				configurationManager.getValue( 'id' ),
-				configurationManager.getValue( 'currentScreenSize' )[ 0 ],
-				configurationManager.getValue( 'currentScreenSize' )[ 1 ],
-				configurationManager.getValue( 'renderingBackEnd' )
-			)
-
-			// creating audio context
-			var audioContext = PlatformKit.AudioFactory.createAudioContext(
-				configurationManager.getValue( 'audioBackEnd' )
-			)
-
-			var requestManager       = new RequestManager(
-					PlatformKit.createImageLoader( renderingContext ),
-					PlatformKit.createSoundLoader( audioContext ),
-					PlatformKit.createTextLoader( )
-				),
-				libraryManager       = new LibraryManager(
-					eventManager,
-					requestManager,
-					configurationManager.getValue( 'libraryUrl' ),
-					!isModeDevelopment
-				)
-
-			spell.audioContext         = audioContext
-			spell.renderingContext     = renderingContext
-			spell.requestManager       = requestManager
-			spell.libraryManager       = libraryManager
+				isModeDeployed       = loaderConfig.mode === 'deployed'
 
 			statisticsManager.init()
 
