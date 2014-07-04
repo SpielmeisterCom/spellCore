@@ -1,9 +1,10 @@
-To get this running do:
+# SpellCore
 
-git clone https://github.com/Spielmeister/spellCore.git
-cd spellCore
-git submodule init
-git submodule update
-make
+## Getting Started
+* `git clone https://github.com/Spielmeister/spellCore.git`
+* `cd spellCore`
+* `git submodule init`
+* `git submodule update`
+* `make`
 
-Have a look in build/
+* Have a look in build/
