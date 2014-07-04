@@ -1,7 +1,14 @@
-This software makes use of third party libraries which come with their own licenses.
-Please look through all source files to identify all licenses which are used.
+=========================================================================================
+| SpellJS - Core Library                                                                |
+=========================================================================================
+|                                                                                       |
+| This software makes use of third party libraries which come with their own licenses.  |
+| Please look through all source files to identify all licenses which are used.         |
+|                                                                                       |
+| All other files are licensed as described at the bottom of this file.                 |
+|                                                                                       |
+=========================================================================================
 
-All other files are licensed as followed:
 
 Copyright (c) 2011-2014, Spielmeister GmbH
 Julian Haupt, Ioannis Kostomanolakis, Martin Dederer
