@@ -14,7 +14,7 @@ body {
 	margin: 0px;
 	padding: 0px;
     background-color: #000;
-
+    min-height: 5000px;
 
 	/* remove the orange box on input focus (android 4.0.4) */
 	/*-webkit-user-modify: read-write-plaintext-only;*/
