@@ -174,14 +174,14 @@ define(
 				spell.mainLoop.run()
 			}
 
-			if( applicationModule.environment &&
+			/*if( applicationModule.environment &&
 				applicationModule.environment.forceSplashScreen ) {
 
 				showSplashScreen( spell, run )
 
-			} else {
+			} else {*/
 				run()
-			}
+			//}
 		}
 
 		var init = function( loaderConfig ) {
