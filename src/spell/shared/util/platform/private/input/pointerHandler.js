@@ -174,11 +174,11 @@ define(
 				offset     = getOffset( container )
 
 			// only preventDefault on touchmove, otherwise no click event is triggered in mobile Safari
-			if( eventType == 'touchmove' ) {
+			if( eventType == 'touchmove' || eventType == 'touchend' ) {
 				event.preventDefault()
 			}
 
-			if( !IS_MOBILE_SAFARI && !IS_MOBILE_CHROME && eventType == 'touchstart' ) {
+			if( !IS_MOBILE_SAFARI /*&& !IS_MOBILE_CHROME */&& eventType == 'touchstart' ) {
 				//don't preventDefault on touchstart on iOS, because otherwise no click event is triggered
 				event.preventDefault()
 			}
@@ -278,11 +278,11 @@ define(
 			}
 
 			for( var i in registeredEvents ) {
-				el.addEventListener( registeredEvents[ i ], nativeHandler, true )
+				el.addEventListener( registeredEvents[ i ], nativeHandler, false )
 			}
 
 			nativeClickHandler = _.bind( nativeClickHandlerImpl, this, callback, eventMappings, container, configurationManager )
-			el.addEventListener( 'click', nativeClickHandler, true )
+			el.addEventListener( 'click', nativeClickHandler, false )
 		}
 
 		var removeListener = function( el ) {

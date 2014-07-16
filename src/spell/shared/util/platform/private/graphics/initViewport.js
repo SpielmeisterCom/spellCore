@@ -27,34 +27,29 @@ define(
 			}
 		}
 
-		var updateViewportMetaTag = function( initialScale, maximumScale, width ) {
+		var updateViewportMetaTag = function( metaViewPortSetting ) {
 			var viewportMetaTag = getViewportMetaTag()
 			if( !viewportMetaTag ) return
 
 			viewportMetaTag.setAttribute(
 				'content',
-				'width=' + width + ', user-scalable=0, initial-scale=' + initialScale + ', maximum-scale=' + maximumScale + ''
+                metaViewPortSetting
 			)
 		}
 
 		var deviceClasses = [
 			{
 				userAgentKeywords : [ 'iPhone', 'iPod', 'Tizen' ],
-				initialScale : 0.5,
-				maximumScale : 0.5,
-				getWidth: function() { return 'device-width' }
+                metaViewPortSetting: 'width=device-width, user-scalable=0, minimum-scale=1.0, initial-scale=0.5, maximum-scale=0.5, minimal-ui'
 			},
 			{
 				userAgentKeywords : [ 'iPad' ],
-				initialScale : 1.0,
-				maximumScale : 1.0,
-				getWidth: function() { return 'device-width' }
+                metaViewPortSetting: 'width=device-width, user-scalable=0, minimum-scale=1.0, initial-scale=1.0, maximum-scale=1.0, minimal-ui'
 			},
 			{
 				userAgentKeywords : [ 'Android' ],
-				initialScale : 1.0,
-				maximumScale : 1.0,
-				getWidth: function() { return window.innerWidth }
+                //do no use user-scalable=0 on android, because it triggers the "tap freeze" bug
+                metaViewPortSetting: 'width=device-width, initial-scale=1, maximum-scale=1.01'
 			}
 		]
 
@@ -79,49 +74,60 @@ define(
 		 * @param id the id of the spell container div
 		 */
 		return function( eventManager, id ) {
-			var processResize = function() {
-				if( window.scrollTo ) {
-					window.scrollTo( 0, 0 )
-				}
+            var IS_ANDROID = /Android/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent),
+                ORIENTATION_CHANGE_PENDING = 0
 
-				eventManager.publish(
-					eventManager.EVENT.AVAILABLE_SCREEN_SIZE_CHANGED,
-					[ getAvailableScreenSize( id ) ]
-				)
+
+			var processResize = function() {
+                if(ORIENTATION_CHANGE_PENDING) {
+                    return
+                }
+
+                if( window.scrollTo ) {
+                    window.scrollTo(0, IS_ANDROID ? 1 : 0)
+                }
+
+                window.setTimeout(function() {
+                    eventManager.publish(
+                        eventManager.EVENT.AVAILABLE_SCREEN_SIZE_CHANGED,
+                        [ getAvailableScreenSize( id ) ]
+                    )
+                }, 250)
 			}
 
 			var processOrientationChange = function() {
-				var orientation    = window.orientation,
-					orienationMode = orientation === 0 ?
-						'portrait' :
-						orientation === -90 ?
-							'landscapeRotatedRight' :
-							'landscapeRotatedLeft'
+                window.setTimeout( function() {
+                    var orientation    = window.orientation,
+                        orienationMode = orientation === 0 ?
+                            'portrait' :
+                                orientation === -90 ?
+                            'landscapeRotatedRight' :
+                            'landscapeRotatedLeft'
 
-				window.setTimeout(function() {
-					var deviceClass = getDeviceClass( navigator.userAgent )
+                    ORIENTATION_CHANGE_PENDING = 1
 
-					if( deviceClass ) {
-						updateViewportMetaTag( deviceClass.initialScale, deviceClass.maximumScale, deviceClass.getWidth() )
-					}
+                    var deviceClass = getDeviceClass( navigator.userAgent )
+                    if( deviceClass ) {
+                        updateViewportMetaTag( deviceClass.metaViewPortSetting )
+                    }
 
-					window.setTimeout( function() {
-						eventManager.publish(
-							eventManager.EVENT.DEVICE_ORIENTATION_CHANGED,
-							[ orienationMode ]
-						)
+                    window.setTimeout( function() {
+                        eventManager.publish(
+                            eventManager.EVENT.DEVICE_ORIENTATION_CHANGED,
+                            [ orienationMode ]
+                        )
 
-						processResize()
-					}, 500)
+                        ORIENTATION_CHANGE_PENDING = 0
+                        processResize()
+                    }, 500)
 
-				}, 500)
-
+                }, 500)
 			}
 
 			var deviceClass = getDeviceClass( navigator.userAgent )
 
 			if( deviceClass ) {
-				updateViewportMetaTag( deviceClass.initialScale, deviceClass.maximumScale, deviceClass.getWidth() )
+				updateViewportMetaTag( deviceClass.metaViewPortSetting )
 			}
 
 			window.addEventListener( 'orientationchange', processOrientationChange, true )
