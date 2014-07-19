@@ -93,7 +93,8 @@ define(
 		'use strict'
 
 		var IS_MOBILE_SAFARI = false,
-			IS_MOBILE_CHROME = false
+			IS_MOBILE_CHROME = false,
+            SWIPE_THRESHOLD  = 20
 
 		if( navigator && navigator.platform && navigator.userAgent ) {
 			IS_MOBILE_SAFARI = !!navigator.platform.match( /^(iPad|iPod|iPhone)$/ )
@@ -125,7 +126,59 @@ define(
 			mouseup         : 'pointerUp'
 		}
 
+        var pointerStateMatrix = {
+        }
+
+        var gestureDetector = function( callback, eventType, pointerId, button, positionX, positionY ) {
+            if( button != 0 ) {
+                return
+            }
+
+            if( eventType == 'pointerDown' ) {
+                pointerStateMatrix[ pointerId ] = {
+                    startX: positionX,
+                    startY: positionY,
+                    handled: false
+                }
+
+            } else if( eventType == 'pointerMove' && pointerStateMatrix[ pointerId ] ) {
+
+                var pointerData = pointerStateMatrix[ pointerId ],
+                    dx          = pointerData.startX - positionX,
+                    dy          = pointerData.startY - positionY,
+                    direction   = null
+
+                if( pointerData.handled == true ) {
+                    return
+                }
+
+                if( Math.abs(dx) >= SWIPE_THRESHOLD ) {
+                    direction = dx > 0 ? 'Left' : 'Right'
+
+                } else if( Math.abs(dy) >= SWIPE_THRESHOLD ) {
+                    direction = dy > 0 ? 'Up' : 'Down'
+                }
+
+                if( direction ) {
+                    pointerData.handled = true
+
+                    callback( {
+                        type            : 'swipe' + direction,
+                        position        : [ positionX, positionY ],
+                        startPosition  : [ pointerData.startX, pointerData.startY ]
+                    } )
+                }
+
+            } else if( eventType == 'pointerUp' || eventType == 'pointerCancel' ) {
+                if( pointerStateMatrix[ pointerId ] ) {
+                    delete pointerStateMatrix[ pointerId ]
+                }
+            }
+        }
+
 		var emitSpellPointerEvent = function( callback, eventType, pointerId, button, positionX, positionY ) {
+            gestureDetector( callback, eventType, pointerId, button, positionX, positionY )
+
 			callback( {
 				type      : eventType,
 				pointerId : pointerId,
@@ -283,6 +336,8 @@ define(
 
 			nativeClickHandler = _.bind( nativeClickHandlerImpl, this, callback, eventMappings, container, configurationManager )
 			el.addEventListener( 'click', nativeClickHandler, false )
+
+            pointerStateMatrix = {}
 		}
 
 		var removeListener = function( el ) {
@@ -295,7 +350,8 @@ define(
 			}
 
 			el.removeEventListener( 'click', nativeClickHandler )
-			nativeClickHandler = null
+            nativeClickHandler = null
+            pointerStateMatrix = {}
 		}
 
 		return {
