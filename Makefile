@@ -11,7 +11,7 @@ SPELL_ENGINE_DEBUG_LIB      = build/lib/spell.debug.js
 SPELL_ENGINE_RELEASE_LIB    = build/lib/spell.release.js
 SPELL_CORE_OUT_DIR          = build
 SPELL_CORE_OUT_LIB_DIR      = $(SPELL_CORE_OUT_DIR)/lib
-NODE                        = NODE_PATH=modules/node_modules node
+NODE                        = NODE_PATH=modules/node_modules nodejs
 
 
 .PHONY: all clean engine-debug engine-release additional-dependencies
