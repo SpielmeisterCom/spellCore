@@ -138,6 +138,11 @@ define(
                 spell.translate            = translatePartial
             }
 
+            var urlRewriterFn = configurationManager.getValue( 'urlRewriterFn' )
+            if( urlRewriterFn ) {
+                spell.libraryManager.urlRewriter = urlRewriterFn
+            }
+
 			spell.inputManager         = inputManager
 			spell.environment          = PlatformKit.createEnvironment( configurationManager, eventManager )
 			spell.env                  = spell.environment

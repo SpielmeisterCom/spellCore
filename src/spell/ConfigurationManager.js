@@ -102,6 +102,9 @@ define(
                 translateFn : {
                     configurable : true
                 },
+                urlRewriterFn : {
+                    configurable : true
+                },
 				loadingScene : {
 					configurable : true
 				},

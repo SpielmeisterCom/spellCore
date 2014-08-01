@@ -95,7 +95,7 @@ define(
 			updateProgress( eventManager, cache, loadingProcesses, loadingProcess )
 		}
 
-		var startLoadingProcess = function( cache, eventManager, loadingProcesses, requestManager, loadingProcess ) {
+		var startLoadingProcess = function( cache, eventManager, loadingProcesses, requestManager, loadingProcess, urlRewriter ) {
 			var omitCache        = loadingProcess.omitCache,
 				libraryFilePaths = loadingProcess.libraryFilePaths
 
@@ -116,6 +116,8 @@ define(
 					loadingProcess.libraryUrl + '/' + libraryFilePath :
 					libraryFilePath
 
+                url = urlRewriter( url )
+
 				requestManager.get(
 					loadingProcess.invalidateCache ? createUrlWithCacheBreaker( url ) : url,
 					_.bind( onLoadCallback, null, eventManager, cache, loadingProcesses, loadingProcess, libraryId, libraryFilePath )
@@ -130,6 +132,7 @@ define(
 			this.loadingProcesses            = {}
 			this.libraryUrl                  = libraryUrl
 			this.invalidateCache             = !isModeDeployed
+            this.urlRewriter                 = function( url ) { return url }
 
 			this.cache = {
 				metaData : {},
@@ -228,7 +231,8 @@ define(
 					this.eventManager,
 					this.loadingProcesses,
 					this.requestManager,
-					loadingProcess
+					loadingProcess,
+                    this.urlRewriter
 				)
 
 				return id
