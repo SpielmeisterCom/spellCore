@@ -115,7 +115,7 @@ define(
 			var translatePartial = _.bind(
 				translate,
 				null,
-				libraryManager,
+				assetManager,
 				configurationManager.getValue( 'currentLanguage' )
 			)
 
@@ -130,7 +130,14 @@ define(
 			spell.physicsManager       = new PhysicsManager()
 			spell.sceneManager         = sceneManager
 			spell.sendMessageToEditor  = this.sendMessageToEditor
-			spell.translate            = translatePartial
+
+            var translationFn              = configurationManager.getValue( 'translateFn' )
+            if( translationFn ) {
+                spell.translate            = translationFn
+            } else {
+                spell.translate            = translatePartial
+            }
+
 			spell.inputManager         = inputManager
 			spell.environment          = PlatformKit.createEnvironment( configurationManager, eventManager )
 			spell.env                  = spell.environment

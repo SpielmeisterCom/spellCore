@@ -99,6 +99,9 @@ define(
 				currentLanguage : {
 					configurable : true
 				},
+                translateFn : {
+                    configurable : true
+                },
 				loadingScene : {
 					configurable : true
 				},

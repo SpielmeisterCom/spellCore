@@ -103,7 +103,8 @@ if( !window.console ) {
 
 	var normalizeConfig = function( config ) {
 		for( var key in config ) {
-			config[ key ] = config[ key ].toString()
+            var obj = config[ key ]
+			config[ key ] = typeof( obj ) != 'function' ? obj.toString() : obj
 		}
 	}
 

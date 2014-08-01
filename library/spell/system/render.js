@@ -12,7 +12,6 @@ define(
 		'spell/client/util/createEffectiveCameraDimensions',
 		'spell/client/util/createIncludedRectangle',
 		'spell/Defines',
-		'spell/shared/util/translate',
 		'spell/shared/util/platform/PlatformKit',
 
 		'spell/math/util',
@@ -34,7 +33,6 @@ define(
 		createEffectiveCameraDimensions,
 		createIncludedRectangle,
 		Defines,
-		translate,
 		PlatformKit,
 
 		mathUtil,
@@ -61,8 +59,12 @@ define(
 //		var statisticsManager,
 //			performance = window.performance
 
-		var translateTextAppearance = function( assetManager, currentLanguage, textAppearance ) {
-			var text = translate( assetManager, currentLanguage, textAppearance.translationAssetId, textAppearance.text )
+		var translateTextAppearance = function( spell, textAppearance ) {
+            if( !textAppearance.translationAssetId ) {
+                return
+            }
+
+			var text = spell.translate( textAppearance.translationAssetId, textAppearance.text )
 			if( !text ) return
 
 			textAppearance.renderText = text
@@ -438,8 +440,7 @@ define(
 			this.translateTextAppearanceHandler = _.bind(
 				translateTextAppearance,
 				null,
-				spell.assetManager,
-				spell.configurationManager.getValue( 'currentLanguage' )
+				spell
 			)
 
 			eventManager.subscribe( [ eventManager.EVENT.COMPONENT_CREATED, Defines.TEXT_APPEARANCE_COMPONENT_ID ], this.translateTextAppearanceHandler )
