@@ -7,6 +7,10 @@ define(
 		return function( assetManager, currentLanguage, translationAssetId, text ) {
 			if( !translationAssetId ) return
 
+            if(translationAssetId.split(':').length <= 1) {
+                translationAssetId = 'translation:' + translationAssetId
+            }
+
 			var translation = assetManager.get( translationAssetId )
 			if( !translation ) return
 
