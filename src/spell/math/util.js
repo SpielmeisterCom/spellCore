@@ -200,6 +200,17 @@ define(
 			return 2 * Math.abs( 2 * ( ta - Math.floor( ta + 0.5 ) ) ) - 1
 		}
 
+        /**
+         * Returns a random number between min and max
+         * @param {Number} min
+         * @param {Number} max
+         * @returns {Number}
+         */
+        util.getRandomNumberBetween = function( min, max ) {
+            var random = Math.floor(Math.random() * (max - min + 1)) + min
+            return random
+        }
+
 		return util
 	}
 )
