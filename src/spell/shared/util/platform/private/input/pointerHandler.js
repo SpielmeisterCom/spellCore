@@ -82,19 +82,22 @@ define(
 	[
 		'spell/shared/util/platform/private/input/support',
 		'spell/shared/util/platform/private/environment/isHtml5Ejecta',
-
+        'spell/shared/util/platform/Types',
 		'spell/functions'
 	],
 	function(
 		supportedInputApi,
 		isHtml5Ejecta,
+        Types,
 		_
 	) {
 		'use strict'
 
 		var IS_MOBILE_SAFARI = false,
 			IS_MOBILE_CHROME = false,
-            SWIPE_THRESHOLD  = 20
+            SWIPE_POSITION_THRESHOLD        = 20,  /* delta pixel which need to be covered so that a swipe is detected */
+            DOUBLETAP_TIME_THRESHOLD        = 300, /* timeframe in which a second tap should be interpreted as double tap */
+            DOUBLETAP_POSITION_THRESHOLD    = 20   /* area in which a second click should be interpreted as double tap */
 
 		if( navigator && navigator.platform && navigator.userAgent ) {
 			IS_MOBILE_SAFARI = !!navigator.platform.match( /^(iPad|iPod|iPhone)$/ )
@@ -126,7 +129,14 @@ define(
 			mouseup         : 'pointerUp'
 		}
 
+        var lastPointerDown = {
+            x:      0,
+            y:      0,
+            time:   0
+        }
+
         var pointerStateMatrix = {
+
         }
 
         var gestureDetector = function( callback, eventType, pointerId, button, positionX, positionY ) {
@@ -134,7 +144,23 @@ define(
                 return
             }
 
+            var currentTime = Types.Time.getCurrentInMs()
+
             if( eventType == 'pointerDown' ) {
+                if( (currentTime - lastPointerDown.time) <= DOUBLETAP_TIME_THRESHOLD &&
+                    Math.abs( positionX - lastPointerDown.x ) <= DOUBLETAP_POSITION_THRESHOLD &&
+                    Math.abs( positionY - lastPointerDown.y ) <= DOUBLETAP_POSITION_THRESHOLD
+                  ) {
+                    callback( {
+                        type            : 'doubleClick',
+                        position        : [ positionX, positionY ]
+                    } )
+                }
+
+                lastPointerDown.x       = positionX
+                lastPointerDown.y       = positionY
+                lastPointerDown.time    = currentTime
+
                 pointerStateMatrix[ pointerId ] = {
                     startX: positionX,
                     startY: positionY,
@@ -152,10 +178,10 @@ define(
                     return
                 }
 
-                if( Math.abs(dx) >= SWIPE_THRESHOLD ) {
+                if( Math.abs(dx) >= SWIPE_POSITION_THRESHOLD ) {
                     direction = dx > 0 ? 'Left' : 'Right'
 
-                } else if( Math.abs(dy) >= SWIPE_THRESHOLD ) {
+                } else if( Math.abs(dy) >= SWIPE_POSITION_THRESHOLD ) {
                     direction = dy > 0 ? 'Up' : 'Down'
                 }
 
