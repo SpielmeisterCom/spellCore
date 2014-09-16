@@ -299,11 +299,8 @@ define(
                                 quadGeometry.dimensions :
                                 frameDestinationDimensions
 
-                            tmpVec2[ 1 ] = -1 * ( frameDestinationDimensions[ 1 ] * 0.5 )
                             tmpVec2[ 0 ] = frameTrimOffset[ 0 ] - ( quadDimensions[ 0 ] * 0.5 )
                             tmpVec2[ 1 ] = frameTrimOffset[ 1 ] - ( quadDimensions[ 1 ] * 0.5 )
-
-                            //tmpVec2[ 1 ] += frameTrimOffset[ 1 ]
 
                             context.drawSubTexture(
 								texture,
@@ -325,6 +322,11 @@ define(
 							}
 
 						} else if( type === 'spriteSheet' ) {
+
+                            if (asset.version != 1) {
+                                throw 'Only supported for version 1 styleshets'
+                            }
+
 							var frameDimensions   = asset.frameDimensions,
 								frameOffsets      = asset.frameOffsets,
 								frames            = appearance.drawAllFrames ? _.keys( asset.frameOffsets ) : appearance.frames,
