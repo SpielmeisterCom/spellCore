@@ -1051,9 +1051,12 @@ define(
 					metaDataComponents = componentMaps[ METADATA_COMPONENT_ID ],
 					resultIds          = []
 
-				var ids = scopeEntityId ?
-					getEntityCompositeIds( componentMaps[ COMPOSITE_COMPONENT_ID ], scopeEntityId, [] ) :
-					_.keys( metaDataComponents )
+				var ids
+				if(scopeEntityId && componentMaps[ COMPOSITE_COMPONENT_ID ][ scopeEntityId ]) {
+					ids = getEntityCompositeIds( componentMaps[ COMPOSITE_COMPONENT_ID ], scopeEntityId, [] );
+				} else {
+					ids = _.keys( metaDataComponents );
+				}
 
 				for( var i = 0, n = ids.length; i < n; i++ ) {
 					var nameComponentId = ids[ i ]
