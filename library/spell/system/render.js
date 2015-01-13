@@ -270,11 +270,15 @@ define(
 
 						} else if( type === 'animation' ) {
 							// animated appearance
+							var assetFrameDimensions = asset.frameDimensions,
+								assetNumFrames       = asset.numFrames,
+								wasPlaying           = appearance.playing
 
-                            var assetNumFrames       = asset.numFrames,
-                                wasPlaying           = appearance.playing
+							var quadDimensions = quadGeometry ?
+								quadGeometry.dimensions :
+								assetFrameDimensions
 
-                            if( wasPlaying ) {
+							if( wasPlaying ) {
 								if( appearance.offset == 0 ) {
 									entityManager.triggerEvent( id, 'animationStart', [ 'animation', appearance ] )
 								}
@@ -289,28 +293,22 @@ define(
 								)
 							}
 
-                            var frameIndex                  = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
-                                frameOffset                 = asset.frameOffsets[ frameIndex ],
-                                frameTrimOffset             = asset.frameTrimOffset[ frameIndex ],
-                                frameSourceDimensions       = asset.frameSourceDimensions[ frameIndex ],
-                                frameDestinationDimensions  = asset.frameDestinationDimensions[ frameIndex ]
+							var frameId     = Math.round( appearance.offset * ( assetNumFrames - 1 ) ),
+								frameOffset = asset.frameOffsets[ frameId ]
 
-                            var quadDimensions = quadGeometry ?
-                                quadGeometry.dimensions :
-                                frameDestinationDimensions
+//							var start = performance.now()
 
-                            tmpVec2[ 0 ] = frameTrimOffset[ 0 ] - ( quadDimensions[ 0 ] * 0.5 )
-                            tmpVec2[ 1 ] = frameTrimOffset[ 1 ] - ( quadDimensions[ 1 ] * 0.5 )
-
-                            context.drawSubTexture(
+							context.drawSubTexture(
 								texture,
 								frameOffset,
-                                frameSourceDimensions,
-								tmpVec2, /* destinationPosition */
-                                frameSourceDimensions
+								assetFrameDimensions,
+								vec2.scale( tmpVec2, quadDimensions, -0.5 ),
+								quadDimensions
 							)
 
-                            var reachedEnd = appearance.offset >= 1,
+//							var elapsed = performance.now() - start
+
+							var reachedEnd = appearance.offset >= 1,
 								isPlaying  = wasPlaying && ( appearance.looped || !reachedEnd )
 
 							if( isPlaying != wasPlaying ) {
@@ -348,7 +346,7 @@ define(
 									context.scale( frameDimensions )
 
 									for( var x = 0, length = frames.length; x < length && x < totalFramesInQuad; x++ ) {
-										frameIndex     = frames[ x ]
+										var frameIndex     = frames[ x ]
 										frameOffset = frameOffsets[ frameIndex ]
 
 										tmpVec2[ 0 ] = -( quadDimensions[ 0 ] / frameDimensions[ 0 ] ) * 0.5 + x % numFramesInQuad[ 0 ]

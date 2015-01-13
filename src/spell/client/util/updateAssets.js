@@ -17,66 +17,17 @@ define(
 		'use strict'
 
 
-		var createFrameOffset = function( spriteSheetAsset, frameId ) {
-            if(spriteSheetAsset.version == 1) {
-                var frameWidth      = spriteSheetAsset.config.frameWidth,
-                    frameHeight     = spriteSheetAsset.config.frameHeight,
-                    innerPadding    = spriteSheetAsset.config.innerPadding || 0,
-                    numX            = Math.floor( spriteSheetAsset.config.textureWidth / ( frameWidth + innerPadding * 2 ) ),
-                    numY            = Math.floor( spriteSheetAsset.config.textureHeight / ( frameHeight + innerPadding * 2 ) )
+		var createFrameOffset = function( frameWidth, frameHeight, numX, numY, frameId, innerPadding ) {
+			if( !innerPadding ) innerPadding = 0
 
-                if( !innerPadding ) innerPadding = 0
+			frameWidth  += innerPadding * 2
+			frameHeight += innerPadding * 2
 
-                frameWidth  += innerPadding * 2
-                frameHeight += innerPadding * 2
-
-                return [
-                        ( frameId % numX ) * frameWidth + innerPadding,
-                        Math.floor( frameId / numX ) * frameHeight + innerPadding
-                ]
-
-            } else if (spriteSheetAsset.version == 2) {
-
-                var frame = spriteSheetAsset.frames[ frameId ]
-                if(frame) {
-                    return [
-                        frame.frame.x, frame.frame.y
-                    ]
-                } else {
-                    throw 'Could not find frame ' + frameId
-                }
-            }
+			return [
+				( frameId % numX ) * frameWidth + innerPadding,
+				Math.floor( frameId / numX ) * frameHeight + innerPadding
+			]
 		}
-
-        var createSourceFrameDimension = function( spriteSheetAsset, frameId ) {
-            if(spriteSheetAsset.version == 1) {
-                return [
-                    spriteSheetAsset.config.frameWidth,
-                    spriteSheetAsset.config.frameHeight
-                ]
-
-            } else if (spriteSheetAsset.version == 2) {
-                var frame = spriteSheetAsset.frames[ frameId ]
-                if(frame) {
-                    return [
-                        frame.frame.w, frame.frame.h
-                    ]
-                } else {
-                    throw 'Could not find frame ' + frameId
-                }
-            }
-        }
-
-        var createDestinationFrameDimension = function( spriteSheetAsset, frameId ) {
-            var frame = spriteSheetAsset.frames[ frameId ]
-            if(frame) {
-                return [
-                    frame.sourceSize.w, frame.sourceSize.h
-                ]
-            } else {
-                throw 'Could not find frame ' + frameId
-            }
-        }
 
 		var createTilemapAsset = function( assetManager, asset ) {
 			var spriteSheetAssetId = asset.assetId,
@@ -104,47 +55,22 @@ define(
 				return
 			}
 
-            var frameWidth      = spriteSheetAsset.config.frameWidth,
-                frameHeight     = spriteSheetAsset.config.frameHeight,
-                numFrames       = _.size( asset.config.frameIds )
+			var frameWidth      = spriteSheetAsset.config.frameWidth,
+				frameHeight     = spriteSheetAsset.config.frameHeight,
+				innerPadding    = spriteSheetAsset.config.innerPadding || 0,
+				numX            = Math.floor( spriteSheetAsset.config.textureWidth / ( frameWidth + innerPadding * 2 ) ),
+				numY            = Math.floor( spriteSheetAsset.config.textureHeight / ( frameHeight + innerPadding * 2 ) ),
+				numFrames       = _.size( asset.config.frameIds ),
+				createFrameOffsetPartial = _.bind( createFrameOffset, null, frameWidth, frameHeight )
 
-            if(asset.version == 1 && spriteSheetAsset.version == 1) {
-                return {
-                    type                        : asset.subtype,
-                    resourceId                  : spriteSheetAsset.resourceId,
-                    frameDuration               : asset.config.duration / numFrames,
-                    frameOffsets                : _.map( asset.config.frameIds, function( frameId ) { return createFrameOffset( spriteSheetAsset, frameId ) } ),
-                    frameSourceDimensions       : _.map( asset.config.frameIds, function( frameId ) { return createSourceFrameDimension( spriteSheetAsset, frameId ) } ),
-                    frameDestinationDimensions  : _.map( asset.config.frameIds, function( frameId ) { return createSourceFrameDimension( spriteSheetAsset, frameId ) } ),
-                    frameTrimOffset             : _.map( asset.config.frameIds, function( frameId ) {
-                        return [
-                           0,
-                           0
-                        ]
-                    } ),
-                    numFrames                   : numFrames
-                }
-
-            } else if( asset.version == 2 && spriteSheetAsset.version == 2) {
-                return {
-                    type                        : asset.subtype,
-                    resourceId                  : spriteSheetAsset.resourceId,
-                    frameDuration               : asset.config.duration / numFrames,
-                    frameOffsets                : _.map( asset.config.frameIds, function( frameId ) { return createFrameOffset( spriteSheetAsset, frameId ) } ),
-                    frameSourceDimensions       : _.map( asset.config.frameIds, function( frameId ) { return createSourceFrameDimension( spriteSheetAsset, frameId ) } ),
-                    frameDestinationDimensions  : _.map( asset.config.frameIds, function( frameId ) { return createDestinationFrameDimension( spriteSheetAsset, frameId ) } ),
-                    frameTrimOffset             : _.map( asset.config.frameIds, function( frameId ) {
-                        var frame = spriteSheetAsset.frames[ frameId ]
-                        return [
-                            frame.spriteSourceSize.x,
-                            frame.sourceSize.h - frame.spriteSourceSize.h - frame.spriteSourceSize.y
-                        ]
-                    } ),
-                    numFrames                   : numFrames
-                }
-            } else {
-                throw "unknown animation asset version or animation asset / spritesheet asset version mismatch"
-            }
+			return {
+				type            : asset.subtype,
+				resourceId      : spriteSheetAsset.resourceId,
+				frameDimensions : [ frameWidth, frameHeight ],
+				frameDuration   : asset.config.duration / numFrames,
+				frameOffsets    : _.map( asset.config.frameIds, function( frameId ) { return createFrameOffsetPartial( numX, numY, frameId, innerPadding ) } ),
+				numFrames       : numFrames
+			}
 		}
 
 		var createInputMapAsset = function( asset ) {
@@ -187,41 +113,28 @@ define(
 		}
 
 		var createSpriteSheetAsset = function( asset ) {
-            if(asset.version == 1) {
-                var frameWidth      = asset.config.frameWidth || 1,
-                    frameHeight     = asset.config.frameHeight || 1,
-                    innerPadding    = asset.config.innerPadding || 0,
-                    numX            = Math.floor( asset.config.textureWidth / ( frameWidth + innerPadding * 2 ) ),
-                    numY            = Math.floor( asset.config.textureHeight / ( frameHeight + innerPadding * 2 ) ),
-                    numFrames       = numX * numY
+			var frameWidth      = asset.config.frameWidth || 1,
+				frameHeight     = asset.config.frameHeight || 1,
+				innerPadding    = asset.config.innerPadding || 0,
+				numX            = Math.floor( asset.config.textureWidth / ( frameWidth + innerPadding * 2 ) ),
+				numY            = Math.floor( asset.config.textureHeight / ( frameHeight + innerPadding * 2 ) ),
+				numFrames       = numX * numY
 
-                // create a lookup table to lookup the subtextures
-                var frameOffsets = []
+			// create a lookup table to lookup the subtextures
+			var frameOffsets = []
 
-                for( var i = 0; i < numFrames; i++ ) {
-                    frameOffsets.push( createFrameOffset( asset, i ) )
-                }
+			for( var i = 0; i < numFrames; i++ ) {
+				frameOffsets.push( createFrameOffset( frameWidth, frameHeight, numX, numY, i, innerPadding ) )
+			}
 
-                return {
-                    version         : asset.version,
-                    frameDimensions : [ frameWidth, frameHeight ],
-                    frameOffsets    : frameOffsets,
-                    frameMaxX       : numX,
-                    frameMaxY       : numY,
-                    config          : asset.config,
-                    type            : asset.subtype
-                }
-            } else if (asset.version == 2) {
-                return {
-                    version         : asset.version,
-                    config          : asset.config,
-                    frames          : asset.config.frames,
-                    type            : asset.subtype
-                }
-            } else {
-                throw "Unknown version for spritesheet version"
-            }
-
+			return {
+				frameDimensions : [ frameWidth, frameHeight ],
+				frameOffsets    : frameOffsets,
+				frameMaxX       : numX,
+				frameMaxY       : numY,
+				config          : asset.config,
+				type            : asset.subtype
+			}
 		}
 
 		var addResourceId = function( asset, assetDefinition ) {
